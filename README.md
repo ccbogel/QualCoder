@@ -8,12 +8,17 @@ This project has been tested under Ubuntu/Linux Mint.
 ## INSTALLATION
 You will need to have a python3.x version installed.
 You will also need to have pyqt5 installed.
+
 Once python is installed install pyqt5 via these commands:
+
 sudo pip3 install pyqt5  # on Linux
+
 pip install pyqt5  # on Windows
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
+
 On Linux - run the install.sh script
+
 This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
 ## Dependencies
