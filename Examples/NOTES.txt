@@ -1,0 +1,2 @@
+These files can be used to test file imort, survey import, attribute import.
+The jpg and the ID1 and ID2 files are sample text and image files that can be coded.

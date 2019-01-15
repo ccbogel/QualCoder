@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+
+'''
+Copyright (c) 2019 Colin Curtain
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Author: Colin Curtain (ccbogel)
+https://github.com/ccbogel/QualCoder
+https://pypi.org/project/QualCoder
+'''
+
+from PyQt5 import QtWidgets
+from GUI.ui_dialog_memo import Ui_Dialog_memo
+import os
+import logging
+
+path = os.path.abspath(os.path.dirname(__file__))
+logger = logging.getLogger(__name__)
+
+
+class DialogMemo(QtWidgets.QDialog):
+
+    """
+    Dialog to view and edit memo text.
+    """
+
+    title = ""
+    table_id = ""
+    table = ""
+    memo = ""
+
+    def __init__(self, settings, title="", memo=""):
+        ''' Table  and table_id are needed for selecting the text from the relevant table.
+        '''
+
+        super(DialogMemo, self).__init__(parent=None)  # overrride accept method
+        #logger.debug("table: " + table + "   table_id:" + str(table_id) + "  type: " + str(type(table_id)))
+
+        self.settings = settings
+        self.memo = memo
+        self.ui = Ui_Dialog_memo()
+        self.ui.setupUi(self)
+        self.setWindowTitle(title)
+        self.ui.textEdit.setFontPointSize(self.settings['fontsize'])
+        self.ui.textEdit.setPlainText(self.memo)
+        self.ui.textEdit.setFocus()
+
+    def accept(self):
+        ''' Accepted button overridden method '''
+
+        self.memo = self.ui.textEdit.toPlainText()
+        super(DialogMemo, self).accept()
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    ui = DialogMemo("settings", "title", "memo")
+    ui.show()
+    sys.exit(app.exec_())
+
