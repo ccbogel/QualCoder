@@ -11,9 +11,9 @@ You will also need to have pyqt5 installed.
 
 Once python is installed install pyqt5 via these commands:
 
-sudo pip3 install pyqt5  # on Linux
+Linux: sudo pip3 install pyqt5
 
-pip install pyqt5  # on Windows
+Windows: pip install pyqt5 
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
