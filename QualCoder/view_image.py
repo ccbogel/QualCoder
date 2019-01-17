@@ -60,6 +60,8 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
+    #TODO one error - image codings currently show ALL coders regardless of checkbox
+
     def __init__(self, settings):
         ''' Show list of image fiels.
         On select, Show a scaleable and scrollable image.
@@ -98,6 +100,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.pushButton_memo.pressed.connect(self.image_memo)
         self.ui.pushButton_select.pressed.connect(self.select_image)
+        self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -127,7 +130,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def get_coded_areas(self):
         ''' Get the coded area details for the rectangles.
-        Called initally and by unmark '''
+        Called by init and by unmark '''
 
         self.code_areas = []
         sql = "select imid,id,x1, y1, width, height, memo, date, owner, cid from code_image"
@@ -252,14 +255,16 @@ class DialogCodeImage(QtWidgets.QDialog):
     def load_image(self):
         ''' Add image to scene if it exists '''
 
-        try:
-            source = self.settings['path'] + "/images/" + self.file_['name']
-        except Exception as e:
-            QtWidgets.QMessageBox.warning(None, "Image error", "Image file not found. %s\n" + str(e), self.file_['name'])
+        #try:
+        source = self.settings['path'] + "/images/" + self.file_['name']
+        #except Exception as e:
+        #    QtWidgets.QMessageBox.warning(None, "Image error", "Image file not found. %s\n" + str(e), self.file_['name'])
+        #    logger.warning(str(e) + ".  " + source)
         image = QtGui.QImage(source)
         if image.isNull():
             QtWidgets.QMessageBox.warming(None, "Image Error", "Cannot open %s." % source)
             self.close()
+            logger.warning("Cannot open image: " + source)
             return
         items = list(self.scene.items())
         for i in range(items.__len__()):
@@ -276,7 +281,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def change_scale(self):
         ''' Resize image.
-        Also called by unmark, as all items need tobe redrawn '''
+        Also called by unmark, as all items need to be redrawn '''
 
         if self.pixmap is None:
             return
@@ -286,11 +291,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
-        '''items = list(self.scene.items())
-        for i in range(items.__len__()):
-            self.scene.removeItem(items[i])'''
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
+
+    def show_or_hide_coders(self):
+        ''' When checked call on draw_coded_areas to either show all coders codings,
+        otherwise only show current coder.
+        Change scale is called becuase all items need to be removed and then added to the
+        scene. pixmap being the firs item added then the codings.
+        '''
+
+        self.change_scale()
 
     def draw_coded_areas(self):
         ''' draw coded areas with scaling.
@@ -308,7 +319,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 tooltip = ""
                 for c in self.codes:
                     if c['cid'] == item['cid']:
-                        tooltip = c['name']
+                        tooltip = c['name'] + " (" + item['owner'] + ")"
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
                 width = item['width'] * self.scale
@@ -316,7 +327,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(QtCore.Qt.red, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
-                self.scene.addItem(rect_item)
+                if self.ui.checkBox_show_coders.isChecked():
+                    self.scene.addItem(rect_item)
+                else:
+                    if item['owner'] == self.settings['codername']:
+                        self.scene.addItem(rect_item)
 
     def fill_code_label(self):
         ''' Fill code label with curently selected item's code name '''
