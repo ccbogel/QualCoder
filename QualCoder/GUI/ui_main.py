@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.9
+# Created: Thu Jan 17 09:20:01 2019
+#      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +22,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 36))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -95,6 +96,8 @@ class Ui_MainWindow(object):
         self.actionExport_codebook.setObjectName("actionExport_codebook")
         self.actionCode_image = QtWidgets.QAction(MainWindow)
         self.actionCode_image.setObjectName("actionCode_image")
+        self.actionCode_frequencies = QtWidgets.QAction(MainWindow)
+        self.actionCode_frequencies.setObjectName("actionCode_frequencies")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
@@ -112,6 +115,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionExport_codebook)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
+        self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionText_mining)
         self.menuReports.addAction(self.actionSQL_statements)
         self.menuHelp.addAction(self.actionContents)
@@ -162,6 +166,7 @@ class Ui_MainWindow(object):
         self.actionView_Graph.setText(_translate("MainWindow", "View Graph"))
         self.actionExport_codebook.setText(_translate("MainWindow", "Export codebook"))
         self.actionCode_image.setText(_translate("MainWindow", "Code image"))
+        self.actionCode_frequencies.setText(_translate("MainWindow", "Code frequencies"))
 
 
 if __name__ == "__main__":
