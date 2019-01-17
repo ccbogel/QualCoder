@@ -29,17 +29,273 @@ https://pypi.org/project/QualCoder
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-#from code_colors import CodeColors
-#from color_selector import colors
 from select_file import DialogSelectFile
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 import os
 from copy import copy
 import logging
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+
+class DialogReportCodeFrequencies(QtWidgets.QDialog):
+    ''' Show code and category frequnecies, overall and for each coder.
+    This is for text coding and image coding. '''
+
+    settings = None
+    parent_textEdit = None
+    coders = []
+    categories = []
+    codes = []
+    coded_images_and_text = []
+
+    def __init__(self, settings, parent_textEdit):
+        self.settings = settings
+        self.parent_textEdit = parent_textEdit
+        self.get_data()
+        self.calculate_code_frequencies()
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_Dialog_reportCodeFrequencies()
+        self.ui.setupUi(self)
+        self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
+        self.setFont(newfont)
+        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
+        self.ui.treeWidget.setFont(treefont)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.fill_tree()
+
+    def get_data(self):
+        ''' Called from init. gets coders, code_names and categories.
+        Calls calculate_code_frequency - for each code.
+        Adds a list item that is ready to be used by the treeWidget to display multiple
+        columns with the coder frequencies.
+        '''
+
+        cur = self.settings['conn'].cursor()
+        self.coders = []
+        cur.execute("select distinct owner from code_text union select distinct owner from code_image")
+        result = cur.fetchall()
+        self.coders = []
+        for row in result:
+            self.coders.append(row[0])
+        #self.coders.append("TOTAL")
+        self.categories = []
+        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
+        result = cur.fetchall()
+        for row in result:
+            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
+            'date': row[3], 'memo': row[4], 'supercatid': row[5],
+            'display_list': [row[0], 'catid:' + str(row[1])]})
+        self.codes = []
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        result = cur.fetchall()
+        for row in result:
+            self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
+            'cid': row[4], 'catid': row[5], 'color': row[6],
+            'display_list': [row[0], 'cid:' + str(row[4])]})
+        self.coded_images_and_text = []
+        cur.execute("select cid, owner from code_text")
+        result = cur.fetchall()
+        for row in result:
+            self.coded_images_and_text.append(row)
+        cur.execute("select cid, owner from code_image")
+        result = cur.fetchall()
+        for row in result:
+            self.coded_images_and_text.append(row)
+
+    def calculate_code_frequencies(self):
+        ''' Calculate the frequency of each code for all coders and the total.
+        Add a list item to each code that can be used to display in treeWidget.
+        code_image, code_text
+        '''
+
+        for c in self.codes:
+            total = 0
+            for cn in self.coders:
+                count = 0
+                for cit in self.coded_images_and_text:
+                    if cit[1] == cn and cit[0] == c['cid']:
+                        count += 1
+                        total += 1
+                c['display_list'].append(count)
+            #del c['display_list'][-1]  # remove the incorrect Total column
+            c['display_list'].append(total)
+
+        # add the number of codes directly under each category to the category
+        for cat in self.categories:
+            # magic 3 = cat name, cat id and total columns
+            cat_list = [0] * (len(self.coders) + 3)
+            for c in self.codes:
+                if c['catid'] == cat['catid']:
+                    for i in range(2, len(c['display_list'])):
+                        cat_list[i] += c['display_list'][i]
+            cat_list = cat_list[2:]
+            for count in cat_list:
+                cat['display_list'].append(count)
+
+        # find leaf categories, add to above categories, and gradually remove leaves
+        # until only top categories are left
+        sub_cats = copy(self.categories)
+        counter = 0
+        while len(sub_cats) > 0 or counter < 10000:
+            leaf_list = []
+            branch_list = []
+            for c in sub_cats:
+                for c2 in sub_cats:
+                    if c['catid'] == c2['supercatid']:
+                        branch_list.append(c)
+            for cat in sub_cats:
+                if cat not in branch_list:
+                    leaf_list.append(cat)
+            # add totals for each coder and overall total to higher category
+            for leaf_cat in leaf_list:
+                for cat in self.categories:
+                    if cat['catid'] == leaf_cat['supercatid']:
+                        for i in range(2, len(cat['display_list'])):
+                            cat['display_list'][i] += leaf_cat['display_list'][i]
+                sub_cats.remove(leaf_cat)
+            counter += 1
+
+    def depthgauge(self, item):
+        ''' get depth for treewidget item '''
+
+        depth = 0
+        while item.parent() is not None:
+            item = item.parent()
+            depth += 1
+        return depth
+
+    def export_text_file(self):
+        ''' Export coding frequencies to text file '''
+
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        if filename[0] == "":
+            return
+        filename = filename[0] + ".txt"
+        f = open(filename, 'w')
+        text = "CODING FREQUENCIES\r\n"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        item_total_position = 1 + len(self.coders)
+        while item:
+            self.depthgauge(item)
+            cat = False
+            if item.text(1).split(':')[0] == "catid":
+                cat = True
+            prefix = ""
+            for i in range(0, self.depthgauge(item)):
+                prefix += "--"
+            if cat:
+                text += "\r\n" + prefix + "Category: " + item.text(0)  # + ", " + item.text(1)
+                text += ", Frequency: " + item.text(item_total_position)
+            else:
+                text += "\r\n" + prefix + "Code: " + item.text(0)  # + ", " + item.text(1)
+                text += ", Frequency: " + item.text(item_total_position)
+            it += 1
+            item = it.value()
+        f.write(text)
+        f.close()
+        logger.info("Report exported to " + filename)
+        QtWidgets.QMessageBox.information(None, "Text file Export", filename + " exported")
+        self.parent_textEdit.append("Text file exported to: " + filename)
+
+    def fill_tree(self):
+        ''' Fill tree widget, top level items are main categories and unlinked codes '''
+
+        cats = copy(self.categories)
+        codes = copy(self.codes)
+        self.ui.treeWidget.clear()
+        header = ["Code Tree", "Id"]
+        for coder in self.coders:
+            header.append(coder)
+        header.append("Total")
+        self.ui.treeWidget.setColumnCount(len(header))
+        self.ui.treeWidget.setHeaderLabels(header)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setStretchLastSection(False)
+        # add top level categories
+        remove_list = []
+        for c in cats:
+            if c['supercatid'] is None:
+                display_list = []
+                for i in c['display_list']:
+                    display_list.append(str(i))
+                top_item = QtWidgets.QTreeWidgetItem(display_list)
+                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                self.ui.treeWidget.addTopLevelItem(top_item)
+                remove_list.append(c)
+        for item in remove_list:
+            #try:
+            cats.remove(item)
+            #except Exception as e:
+            #    logger.debug(str(e) + " item:" + str(item))
+
+        ''' Add child categories. Look at each unmatched category, iterate through tree to
+        add as child then remove matched categories from the list. '''
+        count = 0
+        while len(cats) > 0 or count < 10000:
+            remove_list = []
+            #logger.debug("cats:" + str(cats))
+            for c in cats:
+                it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+                item = it.value()
+                while item:  # while there is an item in the list
+                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
+                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                        display_list = []
+                        for i in c['display_list']:
+                            display_list.append(str(i))
+                        child = QtWidgets.QTreeWidgetItem(display_list)
+                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        item.addChild(child)
+                        #logger.debug("Adding: " + c['name'])
+                        remove_list.append(c)
+                    it += 1
+                    item = it.value()
+            for item in remove_list:
+                cats.remove(item)
+            count += 1
+
+        # add unlinked codes as top level items
+        remove_items = []
+        for c in codes:
+            if c['catid'] is None:
+                #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
+                display_list = []
+                for i in c['display_list']:
+                    display_list.append(str(i))
+                top_item = QtWidgets.QTreeWidgetItem(display_list)
+                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                self.ui.treeWidget.addTopLevelItem(top_item)
+                remove_items.append(c)
+        for item in remove_items:
+            codes.remove(item)
+
+        # add codes as children
+        for c in codes:
+            it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+            item = it.value()
+            while item:
+                #logger.debug("for c in codes, item:" + item.text(0) +"|" + item.text(1) + ", c[cid]:" + str(c['cid']) +", c[catid]:" + str(c['catid']))
+                if item.text(1) == 'catid:' + str(c['catid']):
+                    display_list = []
+                    for i in c['display_list']:
+                        display_list.append(str(i))
+                    child = QtWidgets.QTreeWidgetItem(display_list)
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    item.addChild(child)
+                    c['catid'] = -1  # make unmatchable
+                it += 1
+                item = it.value()
+        self.ui.treeWidget.expandAll()
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
@@ -257,16 +513,20 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         Pno = (total['characters'] - total['coded0']) / total['characters'] * (total['characters'] - total['coded1']) / total['characters']
 
         BELOW IS BETTER - ONLY LOOKS AT PROPORTIONS OF CODED CHARACTERS
-        NEED TO CONFIRM THIS IS CORRECT
+        NEED TO CONFIRM THIS IS HE CORRECT APPROACH
         '''
-        unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
-        Po = total['dual_coded'] / unique_codings
-        Pyes = total['coded0'] / unique_codings * total['coded1'] / unique_codings
-        Pno = (unique_codings - total['coded0']) / unique_codings * (unique_codings - total['coded1']) / unique_codings
-        Pe = Pyes * Pno
-        kappa = round((Po - Pe) / (1 - Pe), 4)
-        total['kappa'] = kappa
-        #logger.debug("total:" + str(total))
+        total['kappa'] = "zerodiv"
+        try:
+            unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
+            Po = total['dual_coded'] / unique_codings
+            Pyes = total['coded0'] / unique_codings * total['coded1'] / unique_codings
+            Pno = (unique_codings - total['coded0']) / unique_codings * (unique_codings - total['coded1']) / unique_codings
+            Pe = Pyes * Pno
+            kappa = round((Po - Pe) / (1 - Pe), 4)
+            total['kappa'] = kappa
+        except ZeroDivisionError:
+            msg = "ZeroDivisionError. unique_codings:" + str(unique_codings)
+            logger.debug(msg)
         return total
 
     def fill_tree(self):
@@ -276,7 +536,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
-        self.ui.treeWidget.setHeaderLabels(["Name", "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.setHeaderLabels(["Code Tree", "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories

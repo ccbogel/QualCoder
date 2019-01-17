@@ -44,7 +44,7 @@ from manage_files import DialogManageFiles
 from journals import DialogJournals
 from cases import DialogCases
 from import_survey import DialogImportSurvey
-from reports import DialogReportCodes, DialogReportCoderComparisons
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
 from view_graph import ViewGraph
 from view_image import DialogCodeImage
@@ -110,6 +110,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
+        self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -157,6 +158,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
+        self.ui.actionCode_frequencies.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
 
@@ -179,6 +181,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
+        self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
@@ -211,6 +214,13 @@ class MainWindow(QtWidgets.QMainWindow):
         ''' compare two or more coders using ? cohens Kappa? '''
 
         comparison_ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
+        comparison_ui.exec_()
+        self.clean_dialog_refs()
+
+    def report_code_frequencies(self):
+        ''' show code frequencies overall and by coder '''
+
+        comparison_ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
         comparison_ui.exec_()
         self.clean_dialog_refs()
 
