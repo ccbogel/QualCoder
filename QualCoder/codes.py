@@ -559,16 +559,16 @@ class DialogCodeText(QtWidgets.QDialog):
             ui = DialogMemo(self.settings, "Memo for Code " + self.codes[found]['name'], self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
-            cur = self.settings['conn'].cursor()
-            cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
-            self.settings['conn'].commit()
+            if memo != self.codes[found]['memo']:
+                self.codes[found]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
+                self.settings['conn'].commit()
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
                 self.parent_textEdit.append("Memo for code: " + self.codes[found]['name'])
-            # update codes list and database
-            self.codes[found]['memo'] = str(memo)
 
         if selected.text(1)[0:3] == 'cat':
             # find the category in the list
@@ -581,16 +581,17 @@ class DialogCodeText(QtWidgets.QDialog):
             ui = DialogMemo(self.settings, "Memo for Category " + self.categories[found]['name'], self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
-            cur = self.settings['conn'].cursor()
-            cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
-            self.settings['conn'].commit()
+            if memo != self.categories[found]['memo']:
+                self.categories[found]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
+                self.settings['conn'].commit()
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
                 self.parent_textEdit.append("Memo for category: " + \
                     self.categories[found]['name'])
-            self.categories[found]['memo'] = memo
 
     def rename_category_or_code(self, selected):
         ''' Rename a code or category.

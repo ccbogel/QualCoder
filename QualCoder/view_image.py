@@ -60,8 +60,6 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
-    #TODO one error - image codings currently show ALL coders regardless of checkbox
-
     def __init__(self, settings):
         ''' Show list of image fiels.
         On select, Show a scaleable and scrollable image.
@@ -730,7 +728,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if found == -1:
                 return
             ui = DialogMemo(self.settings, "Memo for Code " + self.codes[found]['name'],
-            "code_name", "cid=" + str(self.codes[found]['cid']))
+            self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
@@ -738,7 +736,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             else:
                 selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
             # update codes list and database
-            self.codes[found]['memo'] = str(memo)
+            if memo != self.codes[found]['memo']:
+                self.codes[found]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
+                self.settings['conn'].commit()
 
         if selected.text(1)[0:3] == 'cat':
             # find the category in the list
@@ -749,14 +751,19 @@ class DialogCodeImage(QtWidgets.QDialog):
             if found == -1:
                 return
             ui = DialogMemo(self.settings, "Memo for Category " + self.categories[found]['name'],
-            "code_cat", "catid=" + str(self.categories[found]['catid']))
+            self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
-            self.categories[found]['memo'] = memo
+            # update codes list and database
+            if memo != self.categories[found]['memo']:
+                self.categories[found]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
+                self.settings['conn'].commit()
 
     def rename_category_or_code(self, selected):
         ''' Rename a code or category. Checks that the proposed code or category name is
@@ -853,6 +860,8 @@ class DialogViewImage(QtWidgets.QDialog):
     label = None
 
     def __init__(self, settings, image_data, parent=None):
+        ''' Image_data contains: {name, imagepath, owner, id, date, memo, fulltext}
+        '''
         self.settings = settings
         self.image_data = image_data
         QtWidgets.QDialog.__init__(self)

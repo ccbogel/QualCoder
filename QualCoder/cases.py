@@ -32,6 +32,7 @@ import datetime
 import re
 from GUI.ui_dialog_cases import Ui_Dialog_cases
 from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from view_image import DialogViewImage
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from memo import DialogMemo
@@ -50,8 +51,6 @@ class DialogCases(QtWidgets.QDialog):
     Assign entire text files or portions of files to cases.
     Assign attributes to cases. '''
 
-    #TODO add attribute button and method
-
     NAME_COLUMN = 0  # also primary key
     MEMO_COLUMN = 1
     ID_COLUMN = 2
@@ -65,7 +64,6 @@ class DialogCases(QtWidgets.QDialog):
     selected_file = None
     caseTextViewed = []
     attributes = []
-    log = ""
 
     def __init__(self, settings, parent_textEdit):
 
@@ -87,11 +85,14 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_autoassign.clicked.connect(self.automark)
         self.ui.pushButton_view.clicked.connect(self.view)
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
-        self.ui.textEdit.setText("")
-        self.ui.textEdit.setAutoFillBackground(True)
-        self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.textEdit.customContextMenuRequested.connect(self.textEditMenu)
+        self.ui.textBrowser.setText("")
+        self.ui.textBrowser.setAutoFillBackground(True)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textBrowser.customContextMenuRequested.connect(self.textBrowser_menu)
+        self.ui.textBrowser.setOpenLinks(False)
+        self.ui.textBrowser.anchorClicked.connect(self.image_link_clicked)
         self.fill_tableWidget()
+        self.ui.splitter.setSizes([1, 1, 0])
 
     def load_cases_and_attributes(self):
         '''Load case and attribute details from database. Display in tableWidget.
@@ -167,16 +168,16 @@ class DialogCases(QtWidgets.QDialog):
         self.fill_tableWidget()
         self.parent_textEdit.append("Attribute added to cases: " + name + ", type: " + valuetype)
 
-    def textEditMenu(self, position):
-        ''' Context menu for textEdit. Mark, unmark, annotate, copy. '''
+    def textBrowser_menu(self, position):
+        ''' Context menu for textBrowser. Mark, unmark, annotate, copy. '''
 
         menu = QtWidgets.QMenu()
-        if self.ui.textEdit.toPlainText() == "":
+        if self.ui.textBrowser.toPlainText() == "":
             return
         ActionItemMark = menu.addAction("Mark")
         ActionItemUnmark = menu.addAction("Unmark")
         ActionItemCopy = menu.addAction("Copy")
-        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
         if action == ActionItemMark:
             self.mark()
         if action == ActionItemUnmark:
@@ -187,7 +188,7 @@ class DialogCases(QtWidgets.QDialog):
     def copy_selected_text_to_clipboard(self):
         '''  '''
 
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selectedText = self.ui.textBrowser.textCursor().selectedText()
         cb = QtWidgets.QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
         cb.setText(selectedText, mode=cb.Clipboard)
@@ -195,7 +196,7 @@ class DialogCases(QtWidgets.QDialog):
     def import_cases_and_attributes(self):
         ''' Import from a csv file with the cases and any attributes.
         The csv file must have a header row which details the attribute names.
-        The csv filur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")e must be comma delimited. The first column must have the case ids.
+        The csv file must be comma delimited. The first column must have the case ids.
         The attribute types are calculated from the data.
         '''
 
@@ -208,7 +209,7 @@ class DialogCases(QtWidgets.QDialog):
         if filename[-4:].lower() != ".csv":
             msg = filename + "\nis not a .csv file.\nFile not imported"
             QtWidgets.QMessageBox.warning(None, "Warning", msg)
-            self.log += "\n" + msg
+            self.parent_textEdit.append(msg)
             return
         values = []
         with open(filename, 'r', newline='') as f:
@@ -385,7 +386,7 @@ class DialogCases(QtWidgets.QDialog):
 
         if x == -1:
             self.selected_case = None
-            self.ui.textEdit.clear()
+            self.ui.textBrowser.clear()
             self.case_text = []
             return
         self.selected_case = self.cases[x]
@@ -393,7 +394,7 @@ class DialogCases(QtWidgets.QDialog):
         if self.caseTextViewed != [] and self.caseTextViewed[0]['caseid'] != self.selected_case['caseid']:
             self.caseTextViewed = []
             self.case_text = []
-            self.ui.textEdit.clear()
+            self.ui.textBrowser.clear()
         self.unlight()
         #logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])
         # get case_text for this file
@@ -512,25 +513,39 @@ class DialogCases(QtWidgets.QDialog):
             return
         # selected_file is dictionary with id and name
         self.selected_file = ui.get_selected()
-        chars = str(len(self.selected_file['fulltext']))
-        self.ui.label_filename.setText("File: " + self.selected_file['name'] + " [chars: " + chars + "]")
-        self.ui.textEdit.setText(self.selected_file['fulltext'])
-        self.caseTextViewed = []
-        self.unlight()
-        self.highlight()
+        if self.selected_file['fulltext'] is not None:
+            chars = str(len(self.selected_file['fulltext']))
+            self.ui.label_filename.setText("File: " + self.selected_file['name'] + " [chars: " + chars + "]")
+            self.ui.textBrowser.setText(self.selected_file['fulltext'])
+            self.caseTextViewed = []
+            self.unlight()
+            self.highlight()
+        else:
+            self.ui.textBrowser.setText("")
+            ui = DialogViewImage(self.settings, self.selected_file)
+            ui.exec_()
+            memo = ui.ui.textEdit.toPlainText()
+            if self.selected_file['memo'] != memo:
+                self.selected_file['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute('update source set memo=? where id=?',
+                    (self.selected_file['memo'], self.selected_file['id']))
+                self.settings['conn'].commit()
 
     def unlight(self):
         ''' Remove all text highlighting from current file '''
 
         if self.selected_file is None:
             return
-        cursor = self.ui.textEdit.textCursor()
+        if self.selected_file['fulltext'] is None:
+            return
+        cursor = self.ui.textBrowser.textCursor()
         try:
             cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(len(self.selected_file['fulltext']) - 1, QtGui.QTextCursor.KeepAnchor)
             cursor.setCharFormat(QtGui.QTextCharFormat())
-        except:
-            logger.debug(("unlight, text length" +str(len(self.textEdit.toPlainText()))))
+        except Exception as e:
+            logger.debug((str(e) + "\n unlight, text length" +str(len(self.textBrowser.toPlainText()))))
 
     def highlight(self):
         ''' Apply text highlighting to current file.
@@ -539,8 +554,10 @@ class DialogCases(QtWidgets.QDialog):
 
         if self.selected_file is None:
             return
+        if self.selected_file['fulltext'] is None:
+            return
         format_ = QtGui.QTextCharFormat()
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.textBrowser.textCursor()
         for item in self.case_text:
             try:
                 cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
@@ -549,12 +566,13 @@ class DialogCases(QtWidgets.QDialog):
                 format_.setUnderlineColor(QtCore.Qt.red)
                 cursor.setCharFormat(format_)
             except:
-                msg = "highlight, text length " + str(len(self.ui.textEdit.toPlainText()))
+                msg = "highlight, text length " + str(len(self.ui.textBrowser.toPlainText()))
                 msg += "\npos0:" + str(item['pos0']) + ", pos1:" + str(item['pos1'])
                 logger.debug(msg)
 
     def view(self):
-        ''' View all of the text associated with this case '''
+        ''' View all of the text associated with this case.
+        Add links to open image files. '''
 
         row = self.ui.tableWidget.currentRow()
         if row == -1:
@@ -563,7 +581,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         self.selected_file = None
         self.ui.label_filename.setText("Viewing text of case: " + str(self.cases[row]['name']))
-        self.ui.textEdit.clear()
+        self.ui.textBrowser.clear()
         self.caseTextViewed = []
         cur = self.settings['conn'].cursor()
         cur.execute("select caseid, fid, pos0, pos1, owner, date, memo from case_text where caseid = ? order by fid, pos0",
@@ -572,22 +590,43 @@ class DialogCases(QtWidgets.QDialog):
         for row in result:
             caseText = ""
             sourcename = ""
+            imagepath = ""
             for src in self.source:
                 if src['id'] == row[1] and src['fulltext'] is not None:
                     caseText = src['fulltext'][int(row[2]):int(row[3])]
                     sourcename = src['name']
                 if src['id'] == row[1] and src['fulltext'] is None:
-                    caseText = ""
                     sourcename = src['name']
+                    imagepath = src['imagepath']
             self.caseTextViewed.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-            'text': caseText, 'sourcename': sourcename})
+            'text': caseText, 'sourcename': sourcename, 'imagepath': imagepath})
 
         for c in self.caseTextViewed:
-            self.ui.textEdit.append("<b>" + "File: " + c['sourcename'] + " Text: " +
-            str(int(c['pos0'])) + ":" + str(int(c['pos1'])) + "</b>")
-            self.ui.textEdit.append(c['text'])
-        #TODO image viewing - add to splitter with tabs widget and graphics views
+            if c['imagepath'] == '':
+                self.ui.textBrowser.append("<b>" + "File: " + c['sourcename'] + " Text: " +
+                str(int(c['pos0'])) + ":" + str(int(c['pos1'])) + "</b>")
+                self.ui.textBrowser.append(c['text'])
+            else:
+                self.ui.textBrowser.append('<b><a href="' + c['imagepath'] + '"> Image: ' + c['sourcename'] + '</a></b>')
+
+    def image_link_clicked(self, url):
+        ''' View image in dialog. '''
+
+        x = -1
+        for i in range(0, len(self.source)):
+            if url.toString() == self.source[i]['imagepath']:
+                x = i
+        if x == -1:
+            return
+        ui = DialogViewImage(self.settings, self.source[x])
+        ui.exec_()
+        memo = ui.ui.textEdit.toPlainText()
+        if self.source[x]['memo'] != memo:
+            self.source[x]['memo'] = memo
+            cur = self.settings['conn'].cursor()
+            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
+            self.settings['conn'].commit()
 
     def mark(self):
         ''' Mark selected text in file with currently selected case '''
@@ -597,9 +636,9 @@ class DialogCases(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
-        #selectedText = self.textEdit.textCursor().selectedText()
-        pos0 = self.ui.textEdit.textCursor().selectionStart()
-        pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        #selectedText = self.textBrowser.textCursor().selectedText()
+        pos0 = self.ui.textBrowser.textCursor().selectionStart()
+        pos1 = self.ui.textBrowser.textCursor().selectionEnd()
         # add new item to case_text list and database and update GUI
         item = {'caseid': int(self.cases[row]['caseid']), 'fid': int(self.selected_file['id']),
         'pos0': pos0, 'pos1': pos1, 'owner': self.settings['codername'],
@@ -627,7 +666,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         if len(self.case_text) == 0:
             return
-        location = self.ui.textEdit.textCursor().selectionStart()
+        location = self.ui.textBrowser.textCursor().selectionStart()
         unmarked = None
         for item in self.case_text:
             if location >= item['pos0'] and location <= item['pos1']:
