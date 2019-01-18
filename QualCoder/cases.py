@@ -456,8 +456,6 @@ class DialogCases(QtWidgets.QDialog):
         if self.settings['showIDs']:
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
 
-    #TODO add image file to case
-
     def add_file_to_case(self):
         ''' When select file button is pressed a dialog of filenames is presented to the user.
         The entire text of the selected file is then added to the selected case.
@@ -609,6 +607,30 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.textBrowser.append(c['text'])
             else:
                 self.ui.textBrowser.append('<b><a href="' + c['imagepath'] + '"> Image: ' + c['sourcename'] + '</a></b>')
+                path = self.settings['path'] + '/images/' + c['imagepath']
+                url = QtCore.QUrl(path)
+                document = self.ui.textBrowser.document()
+                image = QtGui.QImageReader(path).read()
+                document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+                cursor = self.ui.textBrowser.textCursor()
+                image_format = QtGui.QTextImageFormat()
+                scaler = 1.0
+                scaler_w =1.0
+                scaler_h = 1.0
+                if image.width() > 400:
+                    scaler_w = 400 / image.width()
+                if image.height() > 400:
+                    scaler_h = 400 / image.height()
+                if scaler_w < scaler_h:
+                    scaler = scaler_w
+                else:
+                    scaler = scaler_h
+
+                image_format.setWidth(image.width() * scaler)
+                image_format.setHeight(image.height() * scaler)
+                image_format.setName(url.toString())
+                cursor.insertImage(image_format)
+                #self.ui.textBrowser.append('<img src="' + path + '" style="width:100px;height:100px;"/>')
 
     def image_link_clicked(self, url):
         ''' View image in dialog. '''
