@@ -38,13 +38,10 @@ Optional
 
 * Text loaded with PyPdf is not formatted at all. This includes no paragraph separations.
 ## Future plans
-* Manage cases: When viewing a case, also show the images linked to the case.
-* Manage files: view file - make modal so multiple files can be viewed
-
 * Reports:
-    * add functionality to add reports on images
-    * add functionality to incoporate attributes in reports
-    * word count/complexity
+    * Add functionality to add reports on images
+    * Add functionality to incoporate attributes in reports
+    * Word count / word complexity statistics report
     * Matrix coding: categories by case
 
 ## License
