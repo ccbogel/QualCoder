@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_cases.ui'
 #
-# Created: Thu Jan 10 22:32:05 2019
+# Created: Fri Jan 18 21:16:07 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,6 +20,12 @@ class Ui_Dialog_cases(object):
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
         self.gridLayout_2.setObjectName("gridLayout_2")
+        self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setMinimumSize(QtCore.QSize(0, 20))
+        self.label.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.label.setWordWrap(True)
+        self.label.setObjectName("label")
+        self.gridLayout_2.addWidget(self.label, 2, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(self.groupBox_2)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName("splitter")
@@ -27,15 +33,9 @@ class Ui_Dialog_cases(object):
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
-        self.textEdit = QtWidgets.QTextEdit(self.splitter)
-        self.textEdit.setObjectName("textEdit")
+        self.textBrowser = QtWidgets.QTextBrowser(self.splitter)
+        self.textBrowser.setObjectName("textBrowser")
         self.gridLayout_2.addWidget(self.splitter, 0, 0, 1, 1)
-        self.label = QtWidgets.QLabel(self.groupBox_2)
-        self.label.setMinimumSize(QtCore.QSize(0, 20))
-        self.label.setMaximumSize(QtCore.QSize(16777215, 60))
-        self.label.setWordWrap(True)
-        self.label.setObjectName("label")
-        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBox_2, 2, 1, 1, 1)
         self.groupBox = QtWidgets.QGroupBox(Dialog_cases)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
