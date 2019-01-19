@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://pypi.org/project/QualCoder
 '''
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 from select_file import DialogSelectFile
@@ -610,24 +610,23 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
 class DialogReportCodes(QtWidgets.QDialog):
     ''' Get reports on text coding using a range of variables:
-        Files, Cases, Coders, text limiters '''
+        Files, Cases, Coders, text limiters, Attribute limiters.
+        Export reports as plain text, ODT, or html.
+         '''
 
     settings = None
     parent_textEdit = None
     code_names = []
     coders = [""]
     categories = []
-    txt = ""
-    plain_text_results = ""
-    html_results = ""
+    html_images_and_links = []
     # variables for search restrictions
-    fileIDs = ""
-    caseIDs = ""
+    file_ids = ""
+    case_ids = ""
 
     def __init__(self, settings, parent_textEdit):
         self.settings = settings
         self.parent_textEdit = parent_textEdit
-        self.txt = ""
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
@@ -642,8 +641,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_search.clicked.connect(self.search)
         self.ui.pushButton_fileselect.clicked.connect(self.select_files)
         self.ui.pushButton_caseselect.clicked.connect(self.select_cases)
+        self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
         self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
+        self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
 
     def get_data(self):
         ''' Called from init, delete category '''
@@ -760,39 +761,76 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_text_file(self):
-        ''' Export file to a plain text file, filename will have .txt ending '''
+        ''' Export file to a plain text file with .txt ending.
+        QTextWriter supports plaintext, ODF and HTML'''
 
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
         if filename[0] == "":
             return
-        filename = filename[0] + ".txt"
-        f = open(filename, 'w')
-        f.write(self.plain_text_results)
-        f.close()
-        self.parent_textEdit.append("Text report exported to: " + filename)
-        QtWidgets.QMessageBox.information(None, "Text file Exported: ", filename)
+        filename = filename[0]
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filename + ".txt")
+        tw.setFormat('plaintext')
+        tw.write(self.ui.textEdit.document())
+        tw.setFileName(filename + ".odt")
+        tw.setFormat('ODF')
+        tw.write(self.ui.textEdit.document())
+        self.parent_textEdit.append("Rport exported to: " + filename)
+        QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
+
+    def export_odt_file(self):
+        ''' Export file to open document format with .odt ending.
+        QTextWriter supports plaintext, ODF and HTML'''
+
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        if filename[0] == "":
+            return
+        filename = filename[0]
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filename + ".odt")
+        tw.setFormat('ODF')
+        tw.write(self.ui.textEdit.document())
+        self.parent_textEdit.append("Report exported to: " + filename)
+        QtWidgets.QMessageBox.information(None, "Rortexported: ", filename)
 
     def export_html_file(self):
-        ''' Export file to html file. '''
+        ''' Export file to a html file. Create folder of images and change refs to the
+        folder. '''
 
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",  os.getenv('HOME'))
         if filename[0] == "":
             return
         filename = filename[0] + ".html"
-        filedata = "<html>\n<head>\n<title>" + self.settings['projectName'] + "</title>\n</head>\n<body>\n"
-        modData = ""
-        for c in self.html_results:
-            if ord(c) < 128:
-                modData += c
-            else:
-                modData += "&#" + str(ord(c)) + ";"
-        filedata += modData
-        filedata += "</body>\n</html>"
-        f = open(filename, 'w')
-        f.write(filedata)
-        f.close()
-        self.parent_textEdit.append("HTML Report results exported to: " + filename)
-        QtWidgets.QMessageBox.information(None, "Html file Export", filename + " exported")
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filename)
+        tw.setFormat('HTML')
+        tw.write(self.ui.textEdit.document())
+
+        # Create folder of images and change html links
+        foldername = filename[:-5]
+        try:
+            os.mkdir(foldername)
+        except Exception as e:
+            logger.warning("Html folder creation error " + str(e))
+            QtWidgets.QMessageBox.information(None, "Folder creation", foldername + " error")
+            return
+        html = ""
+        try:
+            with open(filename, 'r') as f:
+                html = f.read()
+        except Exception as e:
+            logger.warning('html file reading error:' + str(e))
+        for item in self.html_images_and_links:
+            imagename = item['imagename'].split('/')[-1]
+            newlink = filename[:-5] + "/" + imagename
+            html = html.replace(item['imagename'], newlink)
+            item['image'].save(newlink)
+        with open(filename, 'w') as f:
+            f.write(html)
+        msg = "Report exported to: " + filename
+        msg += "\nImage folder: " + foldername
+        self.parent_textEdit.append(msg)
+        QtWidgets.QMessageBox.information(None, "HTML file saved", msg)
 
     def recursive_set_selected(self, item):
         ''' Set all children of this item to be selected if the item is selected.
@@ -814,7 +852,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         coder = self.ui.comboBox_coders.currentText()
         self.html_results = ""
-        self.plain_text_results = ""
+        self.html_images_and_links = []
         search_text = self.ui.lineEdit.text()
 
         # set all items under selected categories to be selected
@@ -823,7 +861,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(items) == 0:
             QtWidgets.QMessageBox.warning(None, "No codes", "No codes have been selected.")
             return
-        if self.fileIDs == "" and self.caseIDs == "":
+        if self.file_ids == "" and self.case_ids == "":
             QtWidgets.QMessageBox.warning(None, "No files or cases", "No files or cases have been selected.")
             return
 
@@ -834,20 +872,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                 code_ids += "," + i.text(1)[4:]
         code_ids = code_ids[1:]
 
-        #logger.debug("File ids\n",self.fileIDs, type(self.fileIDs))
-        #logger.debug("Case ids\n",self.caseIDs, type(self.caseIDs))
+        #logger.debug("File ids\n",self.file_ids, type(self.file_ids))
+        #logger.debug("Case ids\n",self.case_ids, type(self.case_ids))
 
-        search_results = []
-        search_string = ""  # what is this used for?
+        text_results = []
+        image_results = []
         cur = self.settings['conn'].cursor()
         # get coded text via selected files
         parameters = []
-        if self.fileIDs != "":
+        if self.file_ids != "":
+            # text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
             sql += "code_text.owner from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + str(code_ids) + ") "
-            sql += "and source.id in (" + str(self.fileIDs) + ") "
+            sql += "and source.id in (" + str(self.file_ids) + ") "
             if coder != "":
                 sql += " and code_text.owner=? "
                 parameters.append(coder)
@@ -862,17 +901,38 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                search_results.append(row)
+                text_results.append(row)
+
+            # images
+            parameters = []
+            sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+            sql += "code_image.owner, source.imagepath from code_image join code_name "
+            sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+            sql += "where code_name.cid in (" + str(code_ids) + ") "
+            sql += "and source.id in (" + str(self.file_ids) + ") "
+            if coder != "":
+                sql += " and code_image.owner=? "
+                parameters.append(coder)
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                image_results.append(row)
 
         # get coded text via selected cases
-        if self.caseIDs != "":
+        if self.case_ids != "":
+            # text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from "
             sql += "code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
             sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + str(self.caseIDs) + ") "
+            sql += "and case_text.caseid in (" + str(self.case_ids) + ") "
             sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
 
             # need to group by or can get multiple results
@@ -891,12 +951,36 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                search_results.append(row)
+                text_results.append(row)
 
-        # add to text edit with some formatting
+            # images
+            parameters = []
+            sql = "select code_name.name, color, cases.name, "
+            sql += "x1, y1, width, height, code_image.owner,source.imagepath from "
+            sql += "code_image join code_name on code_name.cid = code_image.cid "
+            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += "code_image.id = case_text.fid "
+            sql += " join source on case_text.fid = source.id "
+            sql += "where code_name.cid in (" + code_ids + ") "
+            sql += "and case_text.caseid in (" + str(self.case_ids) + ") "
+
+            if coder != "":
+                sql += " and code_image.owner=? "
+                parameters.append(coder)
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                image_results.append(row)
+
+        # Fill text edit
         self.ui.textEdit.clear()
         fileOrCase = "File"
-        if self.caseIDs != "":
+        if self.case_ids != "":
             fileOrCase = "Case"
         CODENAME = 0
         COLOR = 1
@@ -904,70 +988,111 @@ class DialogReportCodes(QtWidgets.QDialog):
         #POS0 = 3
         #POS1 = 4
         SELTEXT = 5
-        OWNER = 6
-        self.plain_text_results += "Search queries:\n" + search_string + "\n\n"
-        search_string = search_string.replace("&","&amp;")
-        search_string = search_string.replace("<","&lt;")
-        search_string = search_string.replace(">","&gt;")
-        search_string = search_string.replace("\"","&quot;")
-        self.html_results += "<h1>Search queries</h1>\n"
-        self.html_results += "<p>" + search_string + "</p>"
-        self.html_results += "<h2>Results</h2>"
+        TEXT_OWNER = 6
+        X1 = 3
+        Y1 = 4
+        WIDTH = 5
+        HEIGHT = 6
+        IMG_OWNER = 7
+        IMAGEPATH = 8
 
-        for row in search_results:
+        #TODO add search terms to textEdit
+
+        for row in text_results:
             color = row[COLOR]
             title = "<br /><em><span style=\"background-color:" + color + "\">" + row[CODENAME] + "</span>, "
             title += " "+ fileOrCase + ": " + row[FILE_OR_CASE_NAME] + "</em>"
-            title += ", <em>" + row[OWNER] + "</em>"
+            title += ", <em>" + row[TEXT_OWNER] + "</em>"
             title += "<br />"
-
             self.ui.textEdit.insertHtml(title)
             self.ui.textEdit.insertPlainText(row[SELTEXT] + "\n")
 
-            self.html_results += "<p>" + title + "<br />"
-            tmp_html = row[SELTEXT].replace("&", "&amp;")
-            tmp_html = tmp_html.replace("<", "&lt;")
-            tmp_html = tmp_html.replace(">", "&gt;")
-            #self.html_results += row[SELTEXT] + "</p>\n"
-            self.html_results += tmp_html + "</p>\n"
-            self.plain_text_results += row[CODENAME] +", " + fileOrCase + ": " + row[FILE_OR_CASE_NAME] +"\n"
-            self.plain_text_results += row[SELTEXT] + "\n\n"
+        img_counter = 0
+        for row in image_results:
+            color = row[COLOR]
+            title = "<br /><em><span style=\"background-color:" + color + "\">" + row[CODENAME] + "</span>, "
+            title += " "+ fileOrCase + ": " + row[FILE_OR_CASE_NAME] + "</em>"
+            title += ", <em>" + row[IMG_OWNER] + "</em>"
+            title += "<br />"
+            self.ui.textEdit.insertHtml(title)
+            path = self.settings['path'] + '/images/' + row[IMAGEPATH]
+            document = self.ui.textEdit.document()
+            image = QtGui.QImageReader(path).read()
+            image = image.copy(row[X1], row[Y1], row[WIDTH], row[HEIGHT])
+            # scale to max 400 wide or high. perhaps add option to change maximum limit?
+            scaler = 1.0
+            scaler_w =1.0
+            scaler_h = 1.0
+            if image.width() > 400:
+                scaler_w = 400 / image.width()
+            if image.height() > 400:
+                scaler_h = 400 / image.height()
+            if scaler_w < scaler_h:
+                scaler = scaler_w
+            else:
+                scaler = scaler_h
+            # need unique image names or the same image from the same path is reproduced
+            imagename = self.settings['path'] + '/images/' + str(img_counter) + '-' + row[IMAGEPATH]
+            item = {'imagename': imagename, 'image': image}
+            self.html_images_and_links.append(item)
+            img_counter += 1
+            url = QtCore.QUrl(imagename)
+            document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+            cursor = self.ui.textEdit.textCursor()
+            image_format = QtGui.QTextImageFormat()
+            image_format.setWidth(image.width() * scaler)
+            image_format.setHeight(image.height() * scaler)
+            image_format.setName(url.toString())
+            cursor.insertImage(image_format)
+            self.ui.textEdit.insertHtml("<br />")
+
+    def select_attributes(self):
+        ''' Select attributes based on current file selection OR on case selection.
+        This is under construction. '''
+
+        if self.file_ids == "" and self.case_ids == "":
+            return
+        #TODO add dialog to select case or file attributes
+        print("TODO - select_attributes")
+        if self.file_ids != "":
+            pass
+        if self.case_ids != "":
+            pass
 
     def select_files(self):
         ''' When select file button is pressed a dialog of filenames is presented to the user.
         The selected files are then used when searching for codings
         If files are selected, then selected cases are cleared.
-        The default is all file IDs.
+        The default is all file ids.
         To revert to default after files are selected,
         the user must press select files button then cancel the dialog.
-        Excludes image files!
         '''
 
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         filenames = []
-        self.fileIDs = ""
-        self.caseIDs = ""  # clears any case selections
+        self.file_ids = ""
+        self.case_ids = ""  # clears any case selections
         cur = self.settings['conn'].cursor()
-        cur.execute("select id, name from source where imagepath is Null")
+        cur.execute("select id, name from source")
         result = cur.fetchall()
         for row in result:
             filenames.append({'id': row[0], 'name': row[1]})
-            self.fileIDs += "," + str(row[0])
-        if len(self.fileIDs) > 0:
-            self.fileIDs = self.fileIDs[1:]
+            self.file_ids += "," + str(row[0])
+        if len(self.file_ids) > 0:
+            self.file_ids = self.file_ids[1:]
 
         ui = DialogSelectFile(filenames, "Select file(s) to view", "many")
         ok = ui.exec_()
         tooltip = "Files selected:"
         if ok:
-            tmp_IDs = ""
+            tmp_ids = ""
             selectedFiles = ui.get_selected()  # list of dictionaries
             for row in selectedFiles:
-                tmp_IDs += "," + str(row['id'])
+                tmp_ids += "," + str(row['id'])
                 tooltip += "\n" + row['name']
-            if len(tmp_IDs) > 0:
-                self.fileIDs = tmp_IDs[1:]
+            if len(tmp_ids) > 0:
+                self.file_ids = tmp_ids[1:]
                 self.ui.pushButton_fileselect.setToolTip(tooltip)
                 self.ui.label_selections.setText(tooltip.replace('\n', '; '))
             else:
@@ -983,8 +1108,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         casenames = []
-        self.fileIDs = ""
-        self.caseIDs = ""
+        self.file_ids = ""
+        self.case_ids = ""
         cur = self.settings['conn'].cursor()
         cur.execute("select caseid, name from cases")
         result = cur.fetchall()
@@ -995,13 +1120,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         ok = ui.exec_()
         tooltip = "Cases selected:"
         if ok:
-            tmp_IDs = ""
+            tmp_ids = ""
             selectedCases = ui.get_selected()  # list of dictionaries
             for row in selectedCases:
-                tmp_IDs += "," + str(row['caseid'])
+                tmp_ids += "," + str(row['caseid'])
                 tooltip += "\n" + row['name']
-            if len(tmp_IDs) > 0:
-                self.caseIDs = tmp_IDs[1:]
+            if len(tmp_ids) > 0:
+                self.case_ids = tmp_ids[1:]
                 self.ui.pushButton_caseselect.setToolTip(tooltip)
                 self.ui.label_selections.setText(tooltip.replace('\n', '; '))
 
