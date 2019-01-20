@@ -165,9 +165,14 @@ class DialogManageAttributes(QtWidgets.QDialog):
         y = self.ui.tableWidget.currentColumn()
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.settings, "Memo for Attribute " + self.attribute_type[x]['name'],
-            "attribute_type", "name='" + self.attribute_type[x]['name'] + "'")
+            self.attribute_type[x]['memo'])
             ui.exec_()
             memo = ui.memo
+            if memo != self.attribute_type[x]['memo']:
+                self.attribute_type[x]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute("update attribute_type set memo=? where name=?", (memo, self.attribute_type[x]['name']))
+                self.settings['conn'].commit()
             if memo == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
