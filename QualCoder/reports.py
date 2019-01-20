@@ -23,13 +23,13 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://pypi.org/project/QualCoder
 '''
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 from select_file import DialogSelectFile
+from report_attributes import DialogSelectAttributeParameters
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
@@ -623,6 +623,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     # variables for search restrictions
     file_ids = ""
     case_ids = ""
+    attribute_selection = ""
 
     def __init__(self, settings, parent_textEdit):
         self.settings = settings
@@ -861,8 +862,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(items) == 0:
             QtWidgets.QMessageBox.warning(None, "No codes", "No codes have been selected.")
             return
-        if self.file_ids == "" and self.case_ids == "":
-            QtWidgets.QMessageBox.warning(None, "No files or cases", "No files or cases have been selected.")
+        if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
+            QtWidgets.QMessageBox.warning(None, "No files, cases, attributes", "No files, cases or attributes have been selected.")
             return
 
         # get selected codes from the items
@@ -935,9 +936,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += "and case_text.caseid in (" + str(self.case_ids) + ") "
             sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
 
-            # need to group by or can get multiple results
-            #sql += " group by cases.name, freecode.name, " + coder + ".pos0, " + coder + ".pos1"
-
             if coder != "":
                 sql += " and code_text.owner=? "
                 parameters.append(coder)
@@ -976,6 +974,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             result = cur.fetchall()
             for row in result:
                 image_results.append(row)
+
+        # get coded text and images from attribute selection
+        if self.attribute_selection != []:
+            QtWidgets.QMessageBox.warning(None, "Attribute search", "Not implemented yet")
+            return
 
         # Fill text edit
         self.ui.textEdit.clear()
@@ -1047,17 +1050,24 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.insertHtml("<br />")
 
     def select_attributes(self):
-        ''' Select attributes based on current file selection OR on case selection.
-        This is under construction. '''
+        ''' Select attributes from case or file attributes for search method.
+        '''
 
-        if self.file_ids == "" and self.case_ids == "":
+        self.file_ids = ""
+        self.case_ids = ""
+        ui = DialogSelectAttributeParameters(self.settings)
+        ok = ui.exec_()
+        if not ok:
+            self.attribute_selection = []
             return
-        #TODO add dialog to select case or file attributes
-        print("TODO - select_attributes")
-        if self.file_ids != "":
-            pass
-        if self.case_ids != "":
-            pass
+        self.attribute_selection = ui.parameters
+        label = "Attributes: "
+        print(self.attribute_selection)
+        for i in self.attribute_selection:
+            label += i[0] + " " + i[3] + " " + str(i[4]) + ", "
+        self.ui.label_selections.setText(label)
+        #TODO add sql to select case or file attributes
+        #TODO in search() method
 
     def select_files(self):
         ''' When select file button is pressed a dialog of filenames is presented to the user.
@@ -1072,7 +1082,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_caseselect.setToolTip("")
         filenames = []
         self.file_ids = ""
-        self.case_ids = ""  # clears any case selections
+        self.case_ids = ""
+        self.attribute_selection = []
         cur = self.settings['conn'].cursor()
         cur.execute("select id, name from source")
         result = cur.fetchall()
@@ -1110,6 +1121,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         casenames = []
         self.file_ids = ""
         self.case_ids = ""
+        self.attribute_selection = []
         cur = self.settings['conn'].cursor()
         cur.execute("select caseid, name from cases")
         result = cur.fetchall()
