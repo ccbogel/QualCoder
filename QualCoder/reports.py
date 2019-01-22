@@ -765,6 +765,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         ''' Export file to a plain text file with .txt ending.
         QTextWriter supports plaintext, ODF and HTML'''
 
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
         if filename[0] == "":
             return
@@ -783,6 +785,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         ''' Export file to open document format with .odt ending.
         QTextWriter supports plaintext, ODF and HTML'''
 
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
         if filename[0] == "":
             return
@@ -798,6 +802,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         ''' Export file to a html file. Create folder of images and change refs to the
         folder. '''
 
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",  os.getenv('HOME'))
         if filename[0] == "":
             return
@@ -886,8 +892,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
             sql += "code_text.owner from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
-            sql += "where code_name.cid in (" + str(code_ids) + ") "
-            sql += "and source.id in (" + str(self.file_ids) + ") "
+            sql += "where code_name.cid in (" + code_ids + ") "
+            sql += "and source.id in (" + self.file_ids + ") "
             if coder != "":
                 sql += " and code_text.owner=? "
                 parameters.append(coder)
@@ -909,8 +915,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
             sql += "code_image.owner, source.imagepath from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-            sql += "where code_name.cid in (" + str(code_ids) + ") "
-            sql += "and source.id in (" + str(self.file_ids) + ") "
+            sql += "where code_name.cid in (" + code_ids + ") "
+            sql += "and source.id in (" + self.file_ids + ") "
             if coder != "":
                 sql += " and code_image.owner=? "
                 parameters.append(coder)
@@ -933,7 +939,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
             sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + str(self.case_ids) + ") "
+            sql += "and case_text.caseid in (" + self.case_ids + ") "
             sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
 
             if coder != "":
@@ -960,7 +966,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += "code_image.id = case_text.fid "
             sql += " join source on case_text.fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + str(self.case_ids) + ") "
+            sql += "and case_text.caseid in (" + self.case_ids + ") "
 
             if coder != "":
                 sql += " and code_image.owner=? "
@@ -977,8 +983,133 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # get coded text and images from attribute selection
         if self.attribute_selection != []:
-            QtWidgets.QMessageBox.warning(None, "Attribute search", "Not implemented yet")
-            return
+            logger.debug("attributes:" + str(self.attribute_selection))
+            # convert each row into sql and add to case or file lists
+            file_sql = []
+            case_sql = []
+            for a in self.attribute_selection:
+                #print(a)
+                sql = " select id from attribute where attribute.name = '" + a[0] + "' and attribute.value "
+                sql += a[3] + " "
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += "("
+                sql += ','.join(a[4])
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += ")"
+                if a[2] == 'numeric':
+                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                if a[1] == "file":
+                    sql += " and attribute.attr_type='file' "
+                    file_sql.append(sql)
+                else:
+                    sql += " and attribute.attr_type='case' "
+                    case_sql.append(sql)
+
+            # find file_ids matching criteria, nested sqls for each parameter
+            sql = ""
+            if len(file_sql) > 0:
+                sql = file_sql[0]
+                del file_sql[0]
+            while len(file_sql) > 0:
+                    sql += " and id in ( " + file_sql[0] + ") "
+                    del file_sql[0]
+            logger.debug(sql)
+            cur.execute(sql)
+            result = cur.fetchall()
+            file_ids = ""
+            for i in result:
+                file_ids += "," + str(i[0])
+            if len(file_ids) > 0:
+                file_ids = file_ids[1:]
+            logger.debug("file_ids: " + file_ids)
+
+            # find case_ids matching criteria, nested sqls for each parameter
+            # can get multiple case ids
+            sql = ""
+            if len(case_sql) > 0:
+                sql = case_sql[0]
+                del case_sql[0]
+            while len(case_sql) > 0:
+                    sql += " and id in ( " + case_sql[0] + ") "
+                    del case_sql[0]
+            logger.debug(sql)
+            cur.execute(sql)
+            result = cur.fetchall()
+            case_ids = ""
+            for i in result:
+                case_ids += "," + str(i[0])
+            if len(case_ids) > 0:
+                case_ids = case_ids[1:]
+            logger.debug("case_ids: " + case_ids)
+
+            # text from attribute selection
+            sql = ""
+            # first sql is for cases with/without file parameters
+            if case_ids != "":
+                sql = "select code_name.name, color, cases.name, "
+                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from "
+                sql += "code_text join code_name on code_name.cid = code_text.cid "
+                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+                sql += "code_text.fid = case_text.fid "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and case_text.caseid in (" + case_ids + ") "
+                sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1) "
+                if file_ids != "":
+                    sql += "and code_text.fid in (" + file_ids + ") "
+            else:
+                # second sql is for file parameters only
+                sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
+                sql += "code_text.owner from code_text join code_name "
+                sql += "on code_name.cid = code_text.cid join source on fid = source.id "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and source.id in (" + file_ids + ") "
+            if coder != "":
+                sql += " and code_text.owner=? "
+                parameters.append(coder)
+            if search_text != "":
+                sql += " and seltext like ? "
+                parameters.append("%" + str(search_text) + "%")
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                text_results.append(row)
+
+            # images from attribute selection
+            sql = ""
+            # first sql is for cases with/without file parameters
+            if case_ids != "":
+                sql = "select code_name.name, color, cases.name, "
+                sql += "x1, y1, width, height, code_image.owner,source.imagepath from "
+                sql += "code_image join code_name on code_name.cid = code_image.cid "
+                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+                sql += "code_image.id = case_text.fid "
+                sql += " join source on case_text.fid = source.id "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and case_text.caseid in (" + case_ids + ") "
+                if file_ids != "":
+                    sql += "and case_text.fid in (" + file_ids + ") "
+            else:
+                # second sql is for file parameters only
+                sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+                sql += "code_image.owner, source.imagepath from code_image join code_name "
+                sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and source.id in (" + file_ids + ") "
+            if coder != "":
+                sql += " and code_image.owner=? "
+                parameters.append(coder)
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                image_results.append(row)
 
         # Fill text edit
         self.ui.textEdit.clear()
@@ -1051,6 +1182,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def select_attributes(self):
         ''' Select attributes from case or file attributes for search method.
+        Text values will be quoted.
         '''
 
         self.file_ids = ""
@@ -1062,12 +1194,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         self.attribute_selection = ui.parameters
         label = "Attributes: "
-        print(self.attribute_selection)
-        for i in self.attribute_selection:
-            label += i[0] + " " + i[3] + " " + str(i[4]) + ", "
+        logger.debug("Attributes selected:" + str(self.attribute_selection))
+        for att in self.attribute_selection:
+            label += att[0] + " " + att[3] + " "
+            label += ','.join(att[4])
+            label += "; "
         self.ui.label_selections.setText(label)
-        #TODO add sql to select case or file attributes
-        #TODO in search() method
 
     def select_files(self):
         ''' When select file button is pressed a dialog of filenames is presented to the user.

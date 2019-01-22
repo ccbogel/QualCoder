@@ -92,8 +92,21 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             if operator == 'between' and len(values) < 2:
                 operator = ''
                 values = []
-            #TODO check numeric type
-
+            # check numeric type
+            type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
+            not_numeric = False
+            if type_ == "numeric":
+                for v in values:
+                    try:
+                        float(v)
+                    except ValueError:
+                        not_numeric = True
+            if not_numeric:
+                values = []
+            # add single quotes to character values
+            if type_ == "character":
+                for i in range (0, len(values)):
+                    values[i] = "'" + values[i] + "'"
             if values != []:
                 self.parameters.append([self.ui.tableWidget.item(x, self.NAME_COLUMN).text(),
                 self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
@@ -118,7 +131,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         values = values.split(';')
         tmp = [i for i in values if i != '']
         values = tmp
-        operator = self.ui.tableWidget.cellWidget(x, y - 1).currentText()
+        operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
         if operator == '':
             self.ui.tableWidget.item(x, y).setText('')
             QtWidgets.QMessageBox.warning(None, 'Warning',"No operator was selected", QtWidgets.QMessageBox.Ok)
@@ -129,9 +142,15 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
             QtWidgets.QMessageBox.warning(None, 'Warning',"Need 2 values for between", QtWidgets.QMessageBox.Ok)
-
-        #TODO check numeric type
-
+        # check numeric type
+        type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
+        if type_ == "numeric":
+            for v in values:
+                try:
+                    float(v)
+                except ValueError:
+                    QtWidgets.QMessageBox.warning(None, 'Warning', v + " is not a number", QtWidgets.QMessageBox.Ok)
+                    self.ui.tableWidget.item(x, y).setText("")
 
     def fill_tableWidget(self):
         ''' Fill the table widget with attribute name and type. '''
