@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_report_attribute_parameters.ui'
 #
-# Created: Mon Jan 21 10:13:51 2019
+# Created: Tue Jan 22 12:10:03 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -60,7 +60,8 @@ class Ui_Dialog_report_attribute_parameters(object):
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("Dialog_report_attribute_parameters", "Value list"))
         self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters to restrict reports for the attributes below. \n"
-"The value list can be a single value  or a list where each list item is separated by a semi-colon \';\'."))
+"The value list can be a single value  or a list where each list item is separated by a semi-colon \';\'.\n"
+"Wildcards for \'like\' are % and _"))
 
 
 if __name__ == "__main__":
