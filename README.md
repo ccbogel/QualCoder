@@ -38,9 +38,8 @@ Optional
 
 * Text loaded with PyPdf is not formatted at all. This includes no paragraph separations.
 ## Future plans
+* File imports : perhaps move from pydf to pdfminer.3k
 * Reports:
-    * Add functionality to add reports on images
-    * Add functionality to incoporate attributes in reports
     * Word count / word complexity statistics report
     * Matrix coding: categories by case
 
