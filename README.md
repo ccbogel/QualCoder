@@ -29,19 +29,15 @@ Required
 
 * PyQt5
 
-Optional
-
-* PyPdf to allow importing of pdf text
-
 ## Issues
 * Testing has only been performed on Ubuntu and Linux Mint.
 
-* Text loaded with PyPdf is not formatted at all. This includes no paragraph separations.
 ## Future plans
-* File imports : perhaps move from pydf to pdfminer.3k
 * Reports:
     * Word count / word complexity statistics report
     * Matrix coding: categories by case
+    * possibly import audio and video files
+    * possibly look at text mining
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
