@@ -23,7 +23,6 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://pypi.org/project/QualCoder
 
 pip install PyPDF2
 '''
@@ -249,7 +248,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         sql = "select * from case_text where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
         c_linked = cur.fetchall()
-        sql = "select * from annotation where id=?"
+        sql = "select * from annotation where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
         a_linked = cur.fetchall()
         sql = "select * from code_text where fid=?"
@@ -268,10 +267,12 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         ui = DialogViewImage(self.settings, self.source[x])
         ui.exec_()
-        self.source[x]['memo'] = ui.ui.textEdit.toPlainText()
-        cur = self.settings['conn'].cursor()
-        cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
-        self.settings['conn'].commit()
+        memo = ui.ui.textEdit.toPlainText()
+        if self.source[x]['memo'] != memo:
+            self.source[x]['memo'] = memo
+            cur = self.settings['conn'].cursor()
+            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
+            self.settings['conn'].commit()
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
         else:
@@ -376,7 +377,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             #text = convert(importFile)  # uses docx_to_html
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
-            text = " ".join(list_)
+            text = "\n".join(list_)
         # import PDF
         if import_file[-4:].lower() == ".pdf":
             try:
