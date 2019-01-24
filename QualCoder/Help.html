@@ -7,7 +7,7 @@
 	<meta name="author" content="colin-2 "/>
 	<meta name="created" content="00:00:00"/>
 	<meta name="changedby" content="cc "/>
-	<meta name="changed" content="2019-01-15T00:30:13.953792560"/>
+	<meta name="changed" content="2019-01-25T00:18:04.334806760"/>
 	<style type="text/css">
 		@page { margin: 2cm }
 		p { margin-bottom: 0cm; color: #000000 }
@@ -31,10 +31,10 @@
 data analysis. All project files are stored in a project.qda folder. 
 </p>
 <p style="margin-bottom: 0.5cm">Text files can be imported from plain
-text, <i>docx,</i> <i>odt</i> and PDF format. Image files from <i>jpg</i>,
-<i>png</i> and <i>gif</i> can be imported. Text files can also be
-entered manually. Survey spreadsheets in <i>csv</i> format can be
-imported.</p>
+text, <i>docx,</i> <i>odt</i> and <i>pdf</i> format. Image files from
+<i>jpg</i>, <i>png</i> and <i>gif</i> can be imported. Text files can
+also be entered manually. Survey spreadsheets in <i>csv</i> format
+can be imported.</p>
 <p style="margin-bottom: 0.5cm">Text can be assigned codes. Codes can
 be ordered into categories. Categories can be stored within a
 hierarchical tree structure, so several similar categories can be
@@ -76,10 +76,10 @@ also.</p>
 Manage files dialog shows any files that have been loaded. New files
 can be loaded using the </span></span></span><span style="font-variant: normal"><i><span style="font-weight: normal">Import</span></i></span><span style="font-variant: normal">
 </span><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">button.
-Files can be imported from plain text, .docx, .odt and pdf. Pdf
-import may lose most formatting and spacing. Additionally, some pdf
-files do not import very well. Image files can be imported from </span></span></span>jpg,
-jpeg, png and gif. These are stored in the images folder.</p>
+Files can be imported from plain text, .docx, .odt and pdf. </span></span></span><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">S</span></span></span><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">ome
+pdf files </span></span></span><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">may</span></span></span><span style="font-variant: normal"><span style="font-style: normal"><span style="font-weight: normal">
+not import very well. Image files can be imported from </span></span></span>jpg,
+jpeg, png and gif. These are stored in the qda/images folder.</p>
 <p style="margin-bottom: 0.5cm">Memos can be added to each file. The
 memo square says <i>Yes</i><span style="font-variant: normal">
 </span><span style="font-variant: normal"><span style="font-style: normal">indicating
@@ -109,7 +109,8 @@ case.</p>
 the text in all the files that is associated with the selected case.
 It also identifies (but currently does not display) the image files.</p>
 <p style="margin-bottom: 0.5cm">You can assign all the text of a file
-to a case by selecting a case then clicking <i>Add file to case</i>.</p>
+to a case by selecting a case then clicking <i>Add file to case</i>.
+Image files can be added to a case.</p>
 <p style="margin-bottom: 0.5cm">The <i>Open file</i> button show the
 text of a file. Any currently selected case text will be underlined
 in red.</p>
@@ -211,8 +212,6 @@ add a memo by right clicking and choosing <i>Memo</i>.
 </p>
 <p style="margin-bottom: 0.5cm">You can remove a coded area by right
 clicking inside the coded area and selecting <i>Unmark</i>.</p>
-<p style="margin-bottom: 0.5cm">Currently, there are no reporting
-options for image coding.</p>
 <h3 class="western">Code tree</h3>
 <p style="margin-bottom: 0.5cm">Right click to add codes. Memos can
 be added and are used for the basis of a codebook. Codes can also be
@@ -260,11 +259,12 @@ case selections using the <i>Case selection</i> button. Note that
 when case selections are used, file selections are ignored. Also when
 file selections are used, case selections are ignored. 
 </p>
-<p style="margin-bottom: 0.5cm">Reports can be exported to text or
-html files.</p>
-<p style="margin-bottom: 0.5cm"><font color="#ff3333">Currently,
-reports on image coding are not possible. Also currently reports
-involving attributes are not possible.</font></p>
+<p style="margin-bottom: 0.5cm">Codings can also be narrowed down
+using case and file attributes. For example, selecting participant
+interview files and selecting only those participants who were over
+50 years old.</p>
+<p style="margin-bottom: 0.5cm">Reports can be exported to text, open
+document format (ODT) or html files.</p>
 <h2 class="western">SQL statements</h2>
 <p style="margin-bottom: 0.5cm">This dialog contains three panes. The
 top pane is where SQL statements are entered and the bottom pane
@@ -297,16 +297,18 @@ software development details.</p>
 <h2 class="western">Testing in general</h2>
 <p style="margin-bottom: 0.5cm">This software has currently only been
 tested on Linux Mint using an Australian English character set.</p>
+<h2 class="western">Future plans</h2>
+<p style="margin-bottom: 0.5cm">Do a coding and word summary.</p>
+<p style="margin-bottom: 0.5cm">Investigate text mining options.</p>
+<p style="margin-bottom: 0.5cm">Potentially incorporate audio/video
+formats.</p>
 <h2 class="western">Additional software</h2>
 <p style="margin-bottom: 0.5cm">Once python3 is installed you also
-require PyQt5. Pypdf can be optionally install for attempting to read
-in the text of pdf files. From the command line run the following to
-install pyqt5 and pypdf:</p>
+require PyQt5. From the command line run the following to install
+pyqt5:</p>
 <p style="margin-bottom: 0.5cm">Windows:</p>
 <p style="margin-bottom: 0.5cm">pip install pyqt</p>
-<p style="margin-bottom: 0.5cm">pip install pypdf</p>
 <p style="margin-bottom: 0.5cm">Linux:</p>
 <p style="margin-bottom: 0.5cm">sudo pip3 install pyqt</p>
-<p style="margin-bottom: 0.5cm">sudo pip3 install pypdf</p>
 </body>
 </html>
