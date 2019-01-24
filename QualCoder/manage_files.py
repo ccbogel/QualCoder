@@ -39,22 +39,17 @@ import datetime
 import os
 from shutil import copyfile
 import logging
-
-path = os.path.abspath(os.path.dirname(__file__))
-logger = logging.getLogger(__name__)
-
 # for file extraction
 from docx import opendocx, getdocumenttext
 import zipfile
 from html_parser import *
+from pdfminer.pdfparser import PDFParser, PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine
 
-try:
-    import PyPDF2  # use this module only if it is installed
-except:
-    logger.debug("For importing PDF text, PyPDF2 not installled. From command line, try either: \
-    pip install PyPDF2 or if this still fails \
-    pip3 install PyPDF2\n On Linux add sudo to the start of the command \
-    e.g. sudo pip3 install PyPDF2")
+path = os.path.abspath(os.path.dirname(__file__))
+logger = logging.getLogger(__name__)
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -379,22 +374,26 @@ class DialogManageFiles(QtWidgets.QDialog):
             list_ = getdocumenttext(document)
             text = "\n".join(list_)
         # import PDF
-        if import_file[-4:].lower() == ".pdf":
-            try:
-                content = ""
-                pdf_obj = open(import_file,'rb')  # read binary mode
-                pdfReader = PyPDF2.PdfFileReader(pdf_obj)
-                pages = pdfReader.numPages
-                for p in range(0, pages):
-                    page_obj = pdfReader.getPage(p)
-                    page_obj.extractText()
-                    content += page_obj.extractText() + "\n"
-                text = content
-            except Exception as e:
-                QtWidgets.QMessageBox.warning(None, "Problem importing PDF",
-                str(e) + "\nPyPDF2 module may not be installed.")
-                logger.warning("Importing PDF: PyPDF2 not installled. In Terminal try: sudo pip3 install PyPDF2")
-                return
+        # code from https://stackoverflow.com/questions/44024697/how-to-read-pdf-file-using-pdfminer3k
+        fp = open(import_file,'rb')  # read binary mode
+        parser = PDFParser(fp)
+        doc = PDFDocument()
+        parser.set_document(doc)
+        doc.set_parser(parser)
+        doc.initialize('')
+        rsrcmgr = PDFResourceManager()
+        laparams = LAParams()
+        laparams.char_margin = 1.0
+        laparams.word_margin = 1.0
+        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        text = ''
+        for page in doc.get_pages():
+            interpreter.process_page(page)
+            layout = device.get_result()
+            for lt_obj in layout:
+                if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
+                    text += lt_obj.get_text()
         # import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             importErrors = 0
