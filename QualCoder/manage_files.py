@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
+https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
@@ -372,26 +373,25 @@ class DialogManageFiles(QtWidgets.QDialog):
             list_ = getdocumenttext(document)
             text = "\n".join(list_)
         # import PDF
-        # code from https://stackoverflow.com/questions/44024697/how-to-read-pdf-file-using-pdfminer3k
-        fp = open(import_file,'rb')  # read binary mode
-        parser = PDFParser(fp)
-        doc = PDFDocument()
-        parser.set_document(doc)
-        doc.set_parser(parser)
-        doc.initialize('')
-        rsrcmgr = PDFResourceManager()
-        laparams = LAParams()
-        laparams.char_margin = 1.0
-        laparams.word_margin = 1.0
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
-        text = ''
-        for page in doc.get_pages():
-            interpreter.process_page(page)
-            layout = device.get_result()
-            for lt_obj in layout:
-                if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                    text += lt_obj.get_text()
+        if import_file[-4:].lower() == '.pdf':
+            fp = open(import_file,'rb')  # read binary mode
+            parser = PDFParser(fp)
+            doc = PDFDocument()
+            parser.set_document(doc)
+            doc.set_parser(parser)
+            doc.initialize('')
+            rsrcmgr = PDFResourceManager()
+            laparams = LAParams()
+            laparams.char_margin = 1.0
+            laparams.word_margin = 1.0
+            device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+            interpreter = PDFPageInterpreter(rsrcmgr, device)
+            for page in doc.get_pages():
+                interpreter.process_page(page)
+                layout = device.get_result()
+                for lt_obj in layout:
+                    if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
+                        text += lt_obj.get_text()
         # import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             importErrors = 0
