@@ -22,9 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
-https://github.com/ccbogel/QualCoder
-
-pip install PyPDF2
+https://qualcoder.wordpress.com/
 '''
 
 from PyQt5 import QtCore, QtGui, QtWidgets
