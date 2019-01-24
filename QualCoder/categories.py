@@ -23,7 +23,6 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://pypi.org/project/QualCoder
 '''
 
 from PyQt5 import QtGui, QtWidgets
