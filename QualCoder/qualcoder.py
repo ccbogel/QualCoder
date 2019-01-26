@@ -434,9 +434,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogMemo(self.settings, "Memo for project " + self.settings['projectName'],
             memo)
         ui.exec_()
-        cur.execute('update project set memo=?', (ui.memo,))
-        self.settings['conn'].commit()
-        self.ui.textEdit.append("Project memo entered")
+        if memo != ui.memo:
+            cur.execute('update project set memo=?', (ui.memo,))
+            self.settings['conn'].commit()
+            self.ui.textEdit.append("Project memo entered.")
 
     def open_project(self, path=""):
         ''' Open an existing project. '''
@@ -467,7 +468,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['path'] = path
         self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
-        self.setWindowTitle("QualCoda " + self.settings['projectName'])
+        self.setWindowTitle("QualCoder " + self.settings['projectName'])
         cur = self.settings['conn'].cursor()
         cur.execute("select databaseversion, date, memo, about from project")
         result = cur.fetchone()
