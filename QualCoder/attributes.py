@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://pypi.org/project/QualCoder
 '''
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -34,10 +35,21 @@ from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogManageAttributes(QtWidgets.QDialog):
@@ -54,6 +66,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
     attributes = []
 
     def __init__(self, settings, parent_textEdit):
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.attribute_type = []
@@ -234,7 +247,6 @@ class DialogManageAttributes(QtWidgets.QDialog):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogManageAttributes()
     ui.show()

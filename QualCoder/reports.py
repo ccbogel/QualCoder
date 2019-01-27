@@ -35,11 +35,22 @@ from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 import os
+import sys
 from copy import copy
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
@@ -54,6 +65,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     coded_images_and_text = []
 
     def __init__(self, settings, parent_textEdit):
+
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.get_data()
@@ -312,6 +325,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     comparisons = ""
 
     def __init__(self, settings, parent_textEdit):
+
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.comparisons = ""
@@ -627,6 +642,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     attribute_selection = ""
 
     def __init__(self, settings, parent_textEdit):
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.get_data()
@@ -647,6 +663,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
         self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
+        self.ui.splitter.setSizes([10, 10, 0])
 
     def get_data(self):
         ''' Called from init, delete category '''
@@ -1181,6 +1198,37 @@ class DialogReportCodes(QtWidgets.QDialog):
             cursor.insertImage(image_format)
             self.ui.textEdit.insertHtml("<br />")
 
+        if self.case_ids != "":
+            self.fill_matrix(text_results, image_results, self.case_ids)
+
+    def fill_matrix(self, text, images, case_ids):
+        ''' Fill a tableWidget with rows of cases and columns of categories. '''
+
+        #TODO
+        #TODO need to collate codes into top-level categories
+        self.ui.splitter.setSizes([0, 0, 10])
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+        print("CASE IDS", case_ids)
+        #self.ui.tableWidget.setColumnCount(len(self.headerLabels))
+        #self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
+        #self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        '''for row, data in enumerate(self.source):
+            self.ui.tableWidget.insertRow(row)
+            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, QtWidgets.QTableWidgetItem(data['name']))
+            dateitem = QtWidgets.QTableWidgetItem(data['date'])
+            dateitem.setFlags(dateitem.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, dateitem)'''
+
+
+        print()
+        for item in text:
+            print(item)
+        print()
+        for item in images:
+            print(item)
+
     def select_attributes(self):
         ''' Select attributes from case or file attributes for search method.
         Text values will be quoted.
@@ -1274,4 +1322,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.case_ids = tmp_ids[1:]
                 self.ui.pushButton_caseselect.setToolTip(tooltip)
                 self.ui.label_selections.setText(tooltip.replace('\n', '; '))
+
+
+
 

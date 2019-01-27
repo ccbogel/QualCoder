@@ -50,6 +50,7 @@ from view_graph import ViewGraph
 from view_image import DialogCodeImage
 from dialog_sql import DialogSQL
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -58,6 +59,15 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(me
      datefmt='%Y/%m/%d %I:%M', filename=logfile,
      level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -76,6 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         ''' Set up user interface from ui_main.py file '''
 
+        sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -201,6 +212,14 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogSQL(self.settings, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
+
+    def report_matrix(self):
+        ''' crosstab of codes with cases or attributes '''
+
+        ui = DialogReportMatrix(self.settings, self.ui.textEdit)
+        ui.exec_()
+        self.clean_dialog_refs()
+
 
     """def text_mining(self):
         ''' text analysis of files / cases / codings.
@@ -531,8 +550,5 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        logger.error(str(e), exc_info=True)
-        exit(0)
+    main()
+

@@ -39,10 +39,21 @@ from select_file import DialogSelectFile
 from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 import csv
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogCases(QtWidgets.QDialog):
@@ -66,6 +77,7 @@ class DialogCases(QtWidgets.QDialog):
 
     def __init__(self, settings, parent_textEdit):
 
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         QtWidgets.QDialog.__init__(self)
@@ -624,7 +636,6 @@ class DialogCases(QtWidgets.QDialog):
                     scaler = scaler_w
                 else:
                     scaler = scaler_h
-
                 image_format.setWidth(image.width() * scaler)
                 image_format.setHeight(image.height() * scaler)
                 image_format.setName(url.toString())

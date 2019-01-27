@@ -39,10 +39,21 @@ from confirm_delete import DialogConfirmDelete
 from select_file import DialogSelectFile
 from copy import deepcopy
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogCodeImage(QtWidgets.QDialog):
@@ -61,12 +72,13 @@ class DialogCodeImage(QtWidgets.QDialog):
     code_areas = []
 
     def __init__(self, settings):
-        ''' Show list of image fiels.
+        ''' Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
         The slider values range from 9 to 99 with intervals of 3
         '''
 
+        sys.excepthook = exception_handler
         self.settings = settings
         self.codes = []
         self.categories = []
@@ -862,6 +874,8 @@ class DialogViewImage(QtWidgets.QDialog):
     def __init__(self, settings, image_data, parent=None):
         ''' Image_data contains: {name, imagepath, owner, id, date, memo, fulltext}
         '''
+
+        sys.excepthook = exception_handler
         self.settings = settings
         self.image_data = image_data
         QtWidgets.QDialog.__init__(self)

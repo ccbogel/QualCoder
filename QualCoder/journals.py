@@ -31,10 +31,21 @@ from GUI.ui_dialog_journals import Ui_Dialog_journals
 from confirm_delete import DialogConfirmDelete
 import datetime
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogJournals(QtWidgets.QDialog):
@@ -50,7 +61,9 @@ class DialogJournals(QtWidgets.QDialog):
     textDialog = None
 
     def __init__(self, settings, parent_textEdit, parent=None):
+
         super(DialogJournals, self).__init__(parent)  # overrride accept method
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.journals = []
@@ -232,7 +245,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.label_jname.setText("Journal: " + self.journals[row]['name'])
         except IndexError:
             # occurs when journal deleted
-            self.ui.label_jname("No journal selected")
+            self.ui.label_jname.setText("No journal selected")
 
     def cell_modified(self):
         ''' If the journal name has been changed in the table widget update the database

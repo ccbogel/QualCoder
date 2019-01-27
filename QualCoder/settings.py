@@ -29,11 +29,22 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtGui, QtWidgets
 from GUI.ui_dialog_settings import Ui_Dialog_settings
 import os
+import sys
 import logging
+import traceback
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogSettings(QtWidgets.QDialog):
@@ -43,6 +54,8 @@ class DialogSettings(QtWidgets.QDialog):
     settings = {}
 
     def __init__(self, settings, parent=None):
+
+        sys.excepthook = exception_handler
         self.settings = settings
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
@@ -117,7 +130,6 @@ class DialogSettings(QtWidgets.QDialog):
             f.write(txt)
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogSettings()
     ui.show()

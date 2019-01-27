@@ -28,11 +28,22 @@ https://qualcoder.wordpress.com/
 
 from PyQt5 import QtWidgets
 import os
+import sys
 from GUI.ui_dialog_information import Ui_Dialog_information
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogInformation(QtWidgets.QDialog):
@@ -48,6 +59,7 @@ class DialogInformation(QtWidgets.QDialog):
         ''' Display information text in dialog.
         If no filename is given, open a blank dialog to be populated later '''
 
+        sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)

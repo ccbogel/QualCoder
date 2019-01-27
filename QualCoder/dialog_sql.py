@@ -32,12 +32,23 @@ from PyQt5.QtCore import Qt
 from highlighter import Highlighter
 import sqlite3
 import os
+import sys
 from datetime import datetime
 from GUI.ui_dialog_SQL import Ui_Dialog_sql
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogSQL(QtWidgets.QDialog):
@@ -58,6 +69,7 @@ class DialogSQL(QtWidgets.QDialog):
 
     def __init__(self, settings, parent_textEdit):
 
+        sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.settings = settings
         self.parent_textEdit = parent_textEdit

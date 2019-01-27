@@ -10,14 +10,28 @@ from html.parser import HTMLParser  #, HTMLParseError  # Python 3.5 does not hav
 from html.entities import name2codepoint
 import re
 import os
+import sys
 import logging
+import traceback
+from PyQt5 import QtWidgets
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+
 
 class _HTMLToText(HTMLParser):
     def __init__(self):
+
+        sys.excepthook = exception_handler
         HTMLParser.__init__(self)
         self._buf = []
         self.hide_output = False

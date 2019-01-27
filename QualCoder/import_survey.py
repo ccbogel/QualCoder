@@ -35,10 +35,21 @@ import re
 import datetime
 from shutil import copyfile
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogImportSurvey(QtWidgets.QDialog):
@@ -63,6 +74,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         ''' Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise get a double-up of accept signals '''
 
+        sys.excepthook = exception_handler
         self.settings = settings
         self.delimiter = ","
         self.fields = []

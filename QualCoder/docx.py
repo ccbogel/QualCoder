@@ -46,9 +46,19 @@ import shutil
 import re
 import time
 import os
+import sys
 from os.path import join
 
 log = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 # Record template directory's location which is just 'template' for a docx
 # developer or 'site-packages/docx-template' if you have installed docx
@@ -807,6 +817,8 @@ append, or a list of etree elements
 
 def getdocumenttext(document):
     '''Return the raw text of a document, as a list of paragraphs.'''
+
+    sys.excepthook = exception_handler
     paratextlist = []
     # Compile a list of all paragraph (p) elements
     paralist = []

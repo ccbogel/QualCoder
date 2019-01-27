@@ -30,10 +30,21 @@ from PyQt5.QtWidgets import QDialog, QMessageBox
 from GUI.ui_queryDetails import Ui_Dialog_QueryDetails
 import re
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogQueryDetails(QDialog):
@@ -47,6 +58,7 @@ class DialogQueryDetails(QDialog):
          Otherwise get a double-up of accept signals. '''
 
         super(DialogQueryDetails, self).__init__(parent)
+        sys.excepthook = exception_handler
         self.settings = settings
         self.queryname = queryname
         self.sql = sql

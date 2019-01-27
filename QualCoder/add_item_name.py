@@ -28,10 +28,21 @@ https://github.com/ccbogel/QualCoder
 from PyQt5 import QtWidgets
 from GUI.ui_dialog_add_item import Ui_Dialog_add_item
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogAddItemName(QtWidgets.QDialog):
@@ -52,6 +63,7 @@ class DialogAddItemName(QtWidgets.QDialog):
     def __init__(self, items, title, parent=None):
         super(DialogAddItemName, self).__init__(parent)  # overrride accept method
 
+        sys.excepthook = exception_handler
         for i in items:
             self.existingItems.append(i['name'])
 
@@ -76,15 +88,14 @@ class DialogAddItemName(QtWidgets.QDialog):
         self.close()
 
     def get_new_name(self):
-        ''' Get the new name '''
+        ''' Get the new sys.excepthook = exception_handlername '''
 
         return self.newItem
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
-    ui = DialogAddItemName([{"name":"aaa"}, {"name":"bbb"}])
+    ui = DialogAddItemName([{"name":"aaa"}, {"name":"bbb"}], "title")
     ui.show()
     sys.exit(app.exec_())
 

@@ -29,10 +29,21 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtCore, QtWidgets
 from GUI.ui_dialog_select_file import Ui_Dialog_selectfile
 import os
+import sys
 import logging
+import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogSelectFile(QtWidgets.QDialog):
@@ -54,6 +65,7 @@ class DialogSelectFile(QtWidgets.QDialog):
         ''' present list of name to user for selection.
         data is a list of dictionaries containing the key 'name' '''
 
+        sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_selectfile()
         self.ui.setupUi(self)
@@ -85,6 +97,7 @@ class DialogSelectFile(QtWidgets.QDialog):
 class list_model(QtCore.QAbstractListModel):
     def __init__(self, dict_list, parent=None):
         super(list_model, self).__init__(parent)
+        sys.excepthook = exception_handler
         self.list = dict_list
 
     def rowCount(self, parent=QtCore.QModelIndex()):
@@ -101,7 +114,6 @@ class list_model(QtCore.QAbstractListModel):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogSelectFile([{"name":"fff"}, {"name":"jjj"}], "title", "single")
     ui.show()

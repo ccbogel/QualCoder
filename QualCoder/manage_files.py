@@ -36,8 +36,10 @@ from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new fil
 from view_image import DialogViewImage
 import datetime
 import os
+import sys
 from shutil import copyfile
 import logging
+import traceback
 # for file extraction
 from docx import opendocx, getdocumenttext
 import zipfile
@@ -49,6 +51,15 @@ from pdfminer.layout import LAParams, LTTextBox, LTTextLine
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def exception_handler(exception_type, value, tb_obj):
+    """ Global exception handler useful in GUIs.
+    tb_obj: exception.__traceback__ """
+    tb = '\n'.join(traceback.format_tb(tb_obj))
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error("Uncaught exception:\n" + text)
+    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -68,6 +79,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def __init__(self, settings, parent_textEdit):
 
+        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.load_file_data()
