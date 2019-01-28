@@ -472,11 +472,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         ''' Add memo to this coded area '''
 
         ui = DialogMemo(self.settings, "Memo for coded area of " + self.file_['name'],
-            "code_image", "imid=" + str(item['imid']))
+            item['memo'])
         ui.exec_()
-        cur = self.settings['conn'].cursor()
-        cur.execute('update code_image set memo=? where id=?', (ui.memo, self.file_['id']))
-        self.settings['conn'].commit()
+        memo = ui.memo
+        if memo != item['memo']:
+            item['memo'] = memo
+            cur = self.settings['conn'].cursor()
+            cur.execute('update code_image set memo=? where id=?', (ui.memo, item['id']))
+            self.settings['conn'].commit()
 
     def unmark(self, item):
         ''' Remove coded area '''
