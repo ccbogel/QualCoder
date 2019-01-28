@@ -482,7 +482,7 @@ class DialogCases(QtWidgets.QDialog):
         if not ok:
             return
         casefile = ui.get_selected()
-        logger.debug(casefile)
+        #logger.debug(casefile)
         text_len = 0
         if casefile['fulltext'] is not None:
             text_len = len(casefile['fulltext'])
