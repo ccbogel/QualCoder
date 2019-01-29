@@ -207,68 +207,67 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
 
     def report_sql(self):
-        ''' Run SQL statements on database '''
+        ''' Run SQL statements on database. non-modal. '''
 
         ui = DialogSQL(self.settings, self.ui.textEdit)
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
-
-    def report_matrix(self):
-        ''' crosstab of codes with cases or attributes '''
-
-        ui = DialogReportMatrix(self.settings, self.ui.textEdit)
-        ui.exec_()
-        self.clean_dialog_refs()
-
 
     """def text_mining(self):
         ''' text analysis of files / cases / codings.
         NOT CURRENTLY IMPLEMENTED, FOR FUTURE EXPANSION.
         '''
 
-        mining_ui = DialogTextMining(self.settings, self.ui.textEdit)
-        mining_ui.exec_()"""
+        ui = DialogTextMining(self.settings, self.ui.textEdit)
+        ui.show()"""
 
     def report_coding_comparison(self):
-        ''' compare two or more coders using ? cohens Kappa? '''
+        ''' compare two or more coders using Cohens Kappa. non-modal. '''
 
-        comparison_ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
-        comparison_ui.exec_()
+        ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def report_code_frequencies(self):
-        ''' show code frequencies overall and by coder '''
+        ''' show code frequencies overall and by coder. non-modal. '''
 
-        comparison_ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
-        comparison_ui.exec_()
+        ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def report_coding(self):
-        ''' report on coding and categories '''
+        ''' report on coding and categories. non-modal. '''
 
-        coding_reports_ui = DialogReportCodes(self.settings, self.ui.textEdit)
-        coding_reports_ui.exec_()
+        ui = DialogReportCodes(self.settings, self.ui.textEdit)
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def view_graph(self):
-        ''' Show acyclic graph of codes and categories '''
+        ''' Show acyclic graph of codes and categories. non-modal. '''
 
         ui = ViewGraph(self.settings)
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def help(self):
-        ''' Help dialog '''
+        ''' Help dialog.  non-modal. '''
 
         ui = DialogInformation("Help contents", "Help.html")
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def about(self):
-        ''' About dialog '''
+        ''' About dialog.  non-modal. '''
 
         ui = DialogInformation("About", "About.html")
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def manage_attributes(self):
@@ -279,15 +278,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def import_survey(self):
-        ''' Import survey flat sheet (csv or ?)
+        ''' Import survey flat sheet: csv file.
         Create cases and assign attributes to cases.
         Identify qualitative questions and assign these data to the source table for coding and
         review '''
 
-        ui = DialogImportSurvey(self.settings)
+        ui = DialogImportSurvey(self.settings, self.ui.textEdit)
         ui.exec_()
-        if ui.get_log() != "":
-            self.ui.textEdit.append(ui.get_log())
 
     def manage_cases(self):
         ''' Create, edit, delete, rename cases, add cases to files or parts of
@@ -307,8 +304,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def journals(self):
-        ''' Create and edit journals.
-        Multiple journals can be displayed non-modally.
+        ''' Create and edit journals. non-modal.
         '''
 
         ui = DialogJournals(self.settings, self.ui.textEdit)
@@ -319,7 +315,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def text_coding(self):
         ''' Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. Multiple coding windows can be displayed, non-modal.
+        text in imported text files. Multiple coding windows can be displayed non-modal.
         '''
 
         ui = DialogCodeText(self.settings, self.ui.textEdit)
@@ -330,7 +326,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def image_coding(self):
         ''' Create edit and delete codes. Apply and remove codes to the image (or regions)
-        Multiple coding windows can be displayed (non-modal).
+        Multiple coding windows can be displayed non-modal.
         '''
 
         ui = DialogCodeImage(self.settings)
@@ -480,7 +476,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug(str(e))
         if self.settings['conn'] is None:
             QtWidgets.QMessageBox.warning(None, "Cannot open file",
-                self.settings['path'] + " is not a .qda file " + msg)
+                self.settings['path'] + " is not a .qda file ")
             self.settings['path'] = ""
             return
         # get and display some project details
