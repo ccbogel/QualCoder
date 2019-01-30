@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_codings.ui'
 #
-# Created: Sun Jan 20 08:57:45 2019
+# Created: Sun Jan 27 21:50:08 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -75,6 +75,10 @@ class Ui_Dialog_reportCodings(object):
         self.treeWidget.headerItem().setText(0, "Code Tree")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
+        self.tableWidget = QtWidgets.QTableWidget(self.splitter)
+        self.tableWidget.setObjectName("tableWidget")
+        self.tableWidget.setColumnCount(0)
+        self.tableWidget.setRowCount(0)
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
 
