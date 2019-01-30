@@ -908,7 +908,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.file_ids != "":
             # text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner from code_text join code_name "
+            sql += "code_text.owner, fid from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
@@ -952,7 +952,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.case_ids != "":
             # text
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from "
+            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
             sql += "code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
@@ -1065,7 +1065,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from "
+                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
                 sql += "code_text join code_name on code_name.cid = code_text.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_text.fid = case_text.fid "
@@ -1077,7 +1077,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # second sql is for file parameters only
                 sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-                sql += "code_text.owner from code_text join code_name "
+                sql += "code_text.owner, fid from code_text join code_name "
                 sql += "on code_name.cid = code_text.cid join source on fid = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
@@ -1150,14 +1150,19 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         #TODO add search terms to textEdit
 
+        # convert text_results to dictionary for ease of use
+        tmp = []
+        for i in text_results:
+            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'pos0': i[3],
+                'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': fileOrCase})
+        text_results = tmp
+
         for row in text_results:
-            color = row[COLOR]
-            title = "<br /><em><span style=\"background-color:" + color + "\">" + row[CODENAME] + "</span>, "
-            title += " "+ fileOrCase + ": " + row[FILE_OR_CASE_NAME] + "</em>"
-            title += ", <em>" + row[TEXT_OWNER] + "</em>"
-            title += "<br />"
-            self.ui.textEdit.insertHtml(title)
-            self.ui.textEdit.insertPlainText(row[SELTEXT] + "\n")
+            #title = "<br /><em><span style=\"background-color:" + row['color'] + "\">" + row['codename'] + "</span>, "
+            #title += " "+ fileOrCase + ": " + row['file_or_casename'] + "</em>"
+            #title += ", <em>" + row['coder'] + "</em><br />"
+            self.ui.textEdit.insertHtml(self.html_heading(row))
+            self.ui.textEdit.insertPlainText(row['text'] + "\n")
 
         img_counter = 0
         for row in image_results:
@@ -1201,30 +1206,39 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.case_ids != "":
             self.fill_matrix(text_results, image_results, self.case_ids)
 
-    def fill_matrix(self, text, images, case_ids):
+    def html_heading(self, item):
+        ''' takes a dictionary item and creates a heading for the coded text portion
+        '''
+
+        html = "<br /><em><span style=\"background-color:" + item['color'] + "\">" + item['codename'] + "</span>, "
+        html += " "+ item['file_or_case'] + ": " + item['file_or_casename'] + "</em>"
+        html += ", <em>" + item['coder'] + "</em><br />"
+        return html
+
+    def fill_matrix(self, text_results, coded_images, case_ids):
         ''' Fill a tableWidget with rows of cases and columns of categories.
         First identify top-lvel categories and codes. Then map all other codes to the
         top-level cataegories. Fill tableWidget with columns of top-level items and rows
         of cases. '''
 
-        self.ui.splitter.setSizes([30, 100, 150])
+        self.ui.splitter.setSizes([10, 100, 150])
 
         # get top level categories and codes
         items = self.ui.treeWidget.selectedItems()
         top_level = []
-        h_header_labels = []
+        horizontal_labels = []
         sub_codes = []
         for item in items:
             root = self.ui.treeWidget.indexOfTopLevelItem(item)
             #print(item.text(0), item.text(1), "root", root)
             if root > -1:
-                top_level.append({'name': item.text(0), 'id': item.text(1)})
-                h_header_labels.append(item.text(0))
+                top_level.append({'name': item.text(0), 'cat_or_cid': item.text(1)})
+                horizontal_labels.append(item.text(0))
             #find sub-code and traverse upwards to map to top-level category
             if root == -1 and item.text(1)[0:3] == 'cid':
                 #print("sub", item.text(0), item.text(1))
                 not_top = True
-                sub_code = {'name': item.text(0), 'cid': item.text(1)}
+                sub_code = {'codename': item.text(0), 'cid': item.text(1)}
                 while not_top:
                     item = item.parent()
                     if self.ui.treeWidget.indexOfTopLevelItem(item) > -1:
@@ -1232,13 +1246,17 @@ class DialogReportCodes(QtWidgets.QDialog):
                         sub_code['top'] = item.text(0)
                         sub_codes.append(sub_code)
 
-        print("sub-codes mapped to top-level")
-        for s in sub_codes:
-            print(s)
-
-        #TODO hard part - organise the textEdit data for each case and top-level item
-
-
+        # add the top-level name - which will match the tableWidget column name
+        for t in text_results:
+            # this assumes the code is already a top-level name (i.e. column in tableWidget)
+            t['top'] = t['codename']
+            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            for s in sub_codes:
+                if t['codename'] == s['codename']:
+                    t['top'] = s['top']
+        for t in text_results:
+            print(t)
+        #TODO print(images)
 
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
@@ -1247,22 +1265,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
         cases = cur.fetchall()
         print(cases)
-        v_header_labels = []
+        vertical_labels = []
         for c in cases:
-            v_header_labels.append(c[1])
-        self.ui.tableWidget.setColumnCount(len(h_header_labels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(h_header_labels)
+            vertical_labels.append(c[1])
+        self.ui.tableWidget.setColumnCount(len(horizontal_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
         self.ui.tableWidget.setRowCount(len(cases))
-        self.ui.tableWidget.setVerticalHeaderLabels(v_header_labels)
+        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
 
         for row, case in enumerate(cases):
-            for col, colname in enumerate(h_header_labels):
-                item = QtWidgets.QTextEdit(colname)
-                self.ui.tableWidget.setCellWidget(row, col, item)
+            for col, colname in enumerate(horizontal_labels):
+                txt_edit = QtWidgets.QTextEdit("")
+                for t in text_results:
+                    #add top-level code text
+                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertPlainText(t['text'] + "\n")
+                #TODO add image_results
 
-
-
-
+                self.ui.tableWidget.setCellWidget(row, col, txt_edit)
+        self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
 
     def select_attributes(self):
         ''' Select attributes from case or file attributes for search method.
