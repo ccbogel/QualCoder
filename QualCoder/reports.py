@@ -1202,32 +1202,67 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.fill_matrix(text_results, image_results, self.case_ids)
 
     def fill_matrix(self, text, images, case_ids):
-        ''' Fill a tableWidget with rows of cases and columns of categories. '''
+        ''' Fill a tableWidget with rows of cases and columns of categories.
+        First identify top-lvel categories and codes. Then map all other codes to the
+        top-level cataegories. Fill tableWidget with columns of top-level items and rows
+        of cases. '''
 
-        #TODO
-        #TODO need to collate codes into top-level categories
-        self.ui.splitter.setSizes([0, 0, 10])
+        self.ui.splitter.setSizes([30, 100, 150])
+
+        # get top level categories and codes
+        items = self.ui.treeWidget.selectedItems()
+        top_level = []
+        h_header_labels = []
+        sub_codes = []
+        for item in items:
+            root = self.ui.treeWidget.indexOfTopLevelItem(item)
+            #print(item.text(0), item.text(1), "root", root)
+            if root > -1:
+                top_level.append({'name': item.text(0), 'id': item.text(1)})
+                h_header_labels.append(item.text(0))
+            #find sub-code and traverse upwards to map to top-level category
+            if root == -1 and item.text(1)[0:3] == 'cid':
+                #print("sub", item.text(0), item.text(1))
+                not_top = True
+                sub_code = {'name': item.text(0), 'cid': item.text(1)}
+                while not_top:
+                    item = item.parent()
+                    if self.ui.treeWidget.indexOfTopLevelItem(item) > -1:
+                        not_top = False
+                        sub_code['top'] = item.text(0)
+                        sub_codes.append(sub_code)
+
+        print("sub-codes mapped to top-level")
+        for s in sub_codes:
+            print(s)
+
+        #TODO hard part - organise the textEdit data for each case and top-level item
+
+
+
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        print("CASE IDS", case_ids)
-        #self.ui.tableWidget.setColumnCount(len(self.headerLabels))
-        #self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
-        #self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        '''for row, data in enumerate(self.source):
-            self.ui.tableWidget.insertRow(row)
-            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, QtWidgets.QTableWidgetItem(data['name']))
-            dateitem = QtWidgets.QTableWidgetItem(data['date'])
-            dateitem.setFlags(dateitem.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, dateitem)'''
+        cur = self.settings['conn'].cursor()
+        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
+        cases = cur.fetchall()
+        print(cases)
+        v_header_labels = []
+        for c in cases:
+            v_header_labels.append(c[1])
+        self.ui.tableWidget.setColumnCount(len(h_header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(h_header_labels)
+        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setVerticalHeaderLabels(v_header_labels)
+
+        for row, case in enumerate(cases):
+            for col, colname in enumerate(h_header_labels):
+                item = QtWidgets.QTextEdit(colname)
+                self.ui.tableWidget.setCellWidget(row, col, item)
 
 
-        print()
-        for item in text:
-            print(item)
-        print()
-        for item in images:
-            print(item)
+
+
 
     def select_attributes(self):
         ''' Select attributes from case or file attributes for search method.
