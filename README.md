@@ -34,8 +34,7 @@ Required
 
 ## Future plans
 * Reports:
-    * Word count / word complexity statistics report
-    * Matrix coding: categories by case
+    * Word count report
     * possibly import audio and video files
     * possibly look at text mining
 
