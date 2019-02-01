@@ -880,6 +880,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.html_images_and_links = []
         search_text = self.ui.lineEdit.text()
 
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+
         # set all items under selected categories to be selected
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
@@ -931,7 +935,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.imagepath from code_image join code_name "
+            sql += "code_image.owner, source.imagepath, source.id from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
@@ -978,7 +982,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # images
             parameters = []
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, code_image.owner,source.imagepath from "
+            sql += "x1, y1, width, height, code_image.owner,source.imagepath, source.id from "
             sql += "code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1100,7 +1104,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "x1, y1, width, height, code_image.owner,source.imagepath from "
+                sql += "x1, y1, width, height, code_image.owner,source.imagepath, source.id from "
                 sql += "code_image join code_name on code_name.cid = code_image.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_image.id = case_text.fid "
@@ -1112,7 +1116,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # second sql is for file parameters only
                 sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-                sql += "code_image.owner, source.imagepath from code_image join code_name "
+                sql += "code_image.owner, source.imagepath, source.id from code_image join code_name "
                 sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
@@ -1129,99 +1133,87 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 image_results.append(row)
 
-        # Fill text edit
-        self.ui.textEdit.clear()
-        fileOrCase = "File"
+        fileOrCase = ""  #TODO what if attributes ?
+        if self.file_ids != "":
+            fileOrCase = "File"
         if self.case_ids != "":
             fileOrCase = "Case"
-        CODENAME = 0
-        COLOR = 1
-        FILE_OR_CASE_NAME = 2
-        #POS0 = 3
-        #POS1 = 4
-        SELTEXT = 5
-        TEXT_OWNER = 6
-        X1 = 3
-        Y1 = 4
-        WIDTH = 5
-        HEIGHT = 6
-        IMG_OWNER = 7
-        IMAGEPATH = 8
 
         #TODO add search terms to textEdit
 
-        # convert text_results to dictionary for ease of use
+        # convert results to dictionaries for ease of use
         tmp = []
         for i in text_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'pos0': i[3],
                 'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': fileOrCase})
         text_results = tmp
+        tmp = []
+        for i in image_results:
+            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
+                'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'imagepath': i[8],
+                'fid': i[9], 'file_or_case': fileOrCase})
+        image_results = tmp
 
+        # Fill text edit
+        self.ui.textEdit.clear()
         for row in text_results:
-            #title = "<br /><em><span style=\"background-color:" + row['color'] + "\">" + row['codename'] + "</span>, "
-            #title += " "+ fileOrCase + ": " + row['file_or_casename'] + "</em>"
-            #title += ", <em>" + row['coder'] + "</em><br />"
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-
-        img_counter = 0
-        for row in image_results:
-            color = row[COLOR]
-            title = "<br /><em><span style=\"background-color:" + color + "\">" + row[CODENAME] + "</span>, "
-            title += " "+ fileOrCase + ": " + row[FILE_OR_CASE_NAME] + "</em>"
-            title += ", <em>" + row[IMG_OWNER] + "</em>"
-            title += "<br />"
-            self.ui.textEdit.insertHtml(title)
-            path = self.settings['path'] + '/images/' + row[IMAGEPATH]
-            document = self.ui.textEdit.document()
-            image = QtGui.QImageReader(path).read()
-            image = image.copy(row[X1], row[Y1], row[WIDTH], row[HEIGHT])
-            # scale to max 400 wide or high. perhaps add option to change maximum limit?
-            scaler = 1.0
-            scaler_w =1.0
-            scaler_h = 1.0
-            if image.width() > 400:
-                scaler_w = 400 / image.width()
-            if image.height() > 400:
-                scaler_h = 400 / image.height()
-            if scaler_w < scaler_h:
-                scaler = scaler_w
-            else:
-                scaler = scaler_h
-            # need unique image names or the same image from the same path is reproduced
-            imagename = self.settings['path'] + '/images/' + str(img_counter) + '-' + row[IMAGEPATH]
-            item = {'imagename': imagename, 'image': image}
-            self.html_images_and_links.append(item)
-            img_counter += 1
-            url = QtCore.QUrl(imagename)
-            document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
-            cursor = self.ui.textEdit.textCursor()
-            image_format = QtGui.QTextImageFormat()
-            image_format.setWidth(image.width() * scaler)
-            image_format.setHeight(image.height() * scaler)
-            image_format.setName(url.toString())
-            cursor.insertImage(image_format)
-            self.ui.textEdit.insertHtml("<br />")
-
+        for i, row in enumerate(image_results):
+            self.ui.textEdit.insertHtml(self.html_heading(row))
+            self.put_image_into_textedit(row, i, self.ui.textEdit)
+        # add case matrixc
         if self.case_ids != "":
             self.fill_matrix(text_results, image_results, self.case_ids)
 
-    def html_heading(self, item):
+    def put_image_into_textedit(self, img, counter, text_edit):
+        ''' Scale image, add resource to document, insert image.
+        '''
+
+        path = self.settings['path'] + '/images/' + img['imagepath']
+        document = text_edit.document()
+        image = QtGui.QImageReader(path).read()
+        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        # scale to max 300 wide or high. perhaps add option to change maximum limit?
+        scaler = 1.0
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 300:
+            scaler_w = 300 / image.width()
+        if image.height() > 300:
+            scaler_h = 300 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        # need unique image names or the same image from the same path is reproduced
+        imagename = self.settings['path'] + '/images/' + str(counter) + '-' + img['imagepath']
+        url = QtCore.QUrl(imagename)
+        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        cursor = text_edit.textCursor()
+        image_format = QtGui.QTextImageFormat()
+        image_format.setWidth(image.width() * scaler)
+        image_format.setHeight(image.height() * scaler)
+        image_format.setName(url.toString())
+        cursor.insertImage(image_format)
+        text_edit.insertHtml("<br />")
+
+    @staticmethod
+    def html_heading(item):
         ''' takes a dictionary item and creates a heading for the coded text portion
         '''
 
         html = "<br /><em><span style=\"background-color:" + item['color'] + "\">" + item['codename'] + "</span>, "
-        html += " "+ item['file_or_case'] + ": " + item['file_or_casename'] + "</em>"
-        html += ", <em>" + item['coder'] + "</em><br />"
+        html += " "+ item['file_or_case'] + ": " + item['file_or_casename'] + ", " + item['coder'] + "</em><br />"
         return html
 
-    def fill_matrix(self, text_results, coded_images, case_ids):
+    def fill_matrix(self, text_results, image_results, case_ids):
         ''' Fill a tableWidget with rows of cases and columns of categories.
         First identify top-lvel categories and codes. Then map all other codes to the
         top-level cataegories. Fill tableWidget with columns of top-level items and rows
         of cases. '''
 
-        self.ui.splitter.setSizes([10, 100, 150])
+        self.ui.splitter.setSizes([0, 300, 300])
 
         # get top level categories and codes
         items = self.ui.treeWidget.selectedItems()
@@ -1254,17 +1246,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             for s in sub_codes:
                 if t['codename'] == s['codename']:
                     t['top'] = s['top']
-        for t in text_results:
-            print(t)
-        #TODO print(images)
+        for i in image_results:
+            # this assumes the code is already a top-level name (i.e. column in tableWidget)
+            i['top'] = i['codename']
+            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+        #for t in text_results:
+        #    print(t
 
-        rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
-            self.ui.tableWidget.removeRow(0)
         cur = self.settings['conn'].cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
         cases = cur.fetchall()
-        print(cases)
         vertical_labels = []
         for c in cases:
             vertical_labels.append(c[1])
@@ -1272,17 +1266,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
         self.ui.tableWidget.setRowCount(len(cases))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
-
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
                 for t in text_results:
-                    #add top-level code text
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(t))
                         txt_edit.insertPlainText(t['text'] + "\n")
-                #TODO add image_results
-
+                for counter, i in enumerate(image_results):
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(i))
+                        self.put_image_into_textedit(i, counter, txt_edit)
                 self.ui.tableWidget.setCellWidget(row, col, txt_edit)
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
@@ -1292,6 +1286,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Text values will be quoted.
         '''
 
+        self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
         self.case_ids = ""
         ui = DialogSelectAttributeParameters(self.settings)
@@ -1317,6 +1312,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         the user must press select files button then cancel the dialog.
         '''
 
+        self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         filenames = []
@@ -1355,6 +1351,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         If neither are selected the default is all files are selected.
         '''
 
+        self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         casenames = []
