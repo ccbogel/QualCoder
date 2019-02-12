@@ -9,10 +9,16 @@ Instructions and other information are avaible here: https://qualcoder.wordpress
 ## INSTALLATION
 You will need to have a python3.x version installed.
 You will also need to have pyqt5 installed.
+You will also need to have lxml installed to get text from docx files.
 
-Once python is installed install pyqt5 via these commands:
+Once python is installed install pyqt5 and lxml via these commands:
 
-Linux: sudo pip3 install pyqt5
+Linux:
+sudo pip3 install pyqt5
+sudo pip3 install lxml
+OR
+sudo apt-get install python3-pyqt5
+sudo apt-get install python3-lxml
 
 Windows: pip install pyqt5 
 
