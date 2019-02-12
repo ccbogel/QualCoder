@@ -14,13 +14,18 @@ You will also need to have lxml installed to get text from docx files.
 Once python is installed install pyqt5 and lxml via these commands:
 
 Linux:
+
 sudo pip3 install pyqt5
 sudo pip3 install lxml
+
 OR
+
 sudo apt-get install python3-pyqt5
 sudo apt-get install python3-lxml
 
-Windows: pip install pyqt5 
+Windows: 
+pip install pyqt5 
+pip install lxml
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
