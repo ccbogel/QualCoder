@@ -29,27 +29,28 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+Slightly modified by Colin Curtain
 """
 
 import logging
-try:
-    from lxml import etree
-except:
-    from xml import etree
-# note lxml is not installed on all OS, may then try xml module instead
+# note lxml is not installed on all OS's needs to be installed
+from lxml import etree
+import re
+import shutil
+import time
+import os
+from os.path import join
 try:
     from PIL import Image
 except ImportError:
     import Image
-import zipfile
-import shutil
-import re
-import time
-import os
 import sys
-from os.path import join
+import traceback
+import zipfile
 
 log = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -101,11 +102,12 @@ nsprefixes = {
 
 def opendocx(file):
     '''Open a docx file, return a document XML tree'''
+
+    sys.excepthook = exception_handler
     mydoc = zipfile.ZipFile(file)
     xmlcontent = mydoc.read('word/document.xml')
     document = etree.fromstring(xmlcontent)
     return document
-
 
 def newdocument():
     document = makeelement('document')
