@@ -8,18 +8,13 @@ Instructions and other information are avaible here: https://qualcoder.wordpress
 
 ## INSTALLATION
 You will need to have a python3.x version installed.
-You will also need to have pyqt5 installed.
-You will also need to have lxml installed to get text from docx files.
-
-Once python is installed install pyqt5 and lxml via these commands:
+You will also need to have pyqt5 and lxml to get text from docx files.
 
 Linux:
 
-sudo pip3 install pyqt5
+Once python is installed run the install.sh script
 
-sudo pip3 install lxml
-
-OR
+The install.sh will run the following commands to install the pyqt5 and lxml modules:
 
 sudo apt-get install python3-pyqt5
 
@@ -33,7 +28,6 @@ pip install lxml
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
-On Linux - run the install.sh script
 
 This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
@@ -43,6 +37,8 @@ Required
 * Python 3.x version
 
 * PyQt5
+
+* lxml
 
 ## Issues
 * Testing has only been performed on Ubuntu and Linux Mint.
