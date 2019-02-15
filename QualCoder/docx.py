@@ -41,10 +41,7 @@ import shutil
 import time
 import os
 from os.path import join
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+from PIL import Image
 import sys
 import traceback
 import zipfile
