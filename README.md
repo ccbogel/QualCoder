@@ -20,11 +20,14 @@ sudo apt-get install python3-pyqt5
 
 sudo apt-get install python3-lxml
 
+sudo apt-get install python3-pil
+
 Windows: 
 
-pip install pyqt5 
+python -m pip install pyqt5 
 
-pip install lxml
+python -m pip install lxml
+python -m pip install Pillow
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
@@ -40,8 +43,10 @@ Required
 
 * lxml
 
+* Pillow
+
 ## Issues
-* Testing has only been performed on Ubuntu and Linux Mint.
+* Testing has only been performed on Ubuntu and Linux Mint. Some usage condcuted with Lubuntu. Some testing performed on Windows 10.
 
 ## Future plans
 * Reports:
