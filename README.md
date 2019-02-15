@@ -27,6 +27,7 @@ Windows:
 python -m pip install pyqt5 
 
 python -m pip install lxml
+
 python -m pip install Pillow
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
