@@ -791,10 +791,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         filename = filename[0]
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename + ".txt")
-        tw.setFormat('plaintext')
-        tw.write(self.ui.textEdit.document())
-        tw.setFileName(filename + ".odt")
-        tw.setFormat('ODF')
+        tw.setFormat(b'plaintext')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append("Rport exported to: " + filename)
         QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
@@ -811,7 +808,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         filename = filename[0]
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename + ".odt")
-        tw.setFormat('ODF')
+        tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append("Report exported to: " + filename)
         QtWidgets.QMessageBox.information(None, "Rortexported: ", filename)
@@ -828,7 +825,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         filename = filename[0] + ".html"
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)
-        tw.setFormat('HTML')
+        tw.setFormat(b'HTML')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
 
         # Create folder of images and change html links
