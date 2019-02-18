@@ -52,7 +52,6 @@ Required
 ## Future plans
 * Reports:
     * Word count report
-    * possibly import audio and video files
     * possibly look at text mining
 
 ## License
