@@ -27,7 +27,7 @@ https://qualcoder.wordpress.com/
 '''
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QTextCodec
 from PyQt5.QtGui import QBrush
 from select_file import DialogSelectFile
 from report_attributes import DialogSelectAttributeParameters
@@ -797,8 +797,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
 
     def export_odt_file(self):
-        ''' Export file to open document format with .odt ending.
-        QTextWriter supports plaintext, ODF and HTML'''
+        """ Export file to open document format with .odt ending.
+        QTextWriter supports plaintext, ODF and HTML ."""
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -811,11 +811,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append("Report exported to: " + filename)
-        QtWidgets.QMessageBox.information(None, "Rortexported: ", filename)
+        QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
 
     def export_html_file(self):
-        ''' Export file to a html file. Create folder of images and change refs to the
-        folder. '''
+        """ Export file to a html file. Create folder of images and change refs to the
+        folder. """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -826,10 +826,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
+        tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
 
         # Create folder of images and change html links
         foldername = filename[:-5]
+        foldername_without_path = foldername.split('/')[-1]
         try:
             os.mkdir(foldername)
         except Exception as e:
@@ -842,11 +844,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 html = f.read()
         except Exception as e:
             logger.warning('html file reading error:' + str(e))
+        print(html)
         for item in self.html_images_and_links:
             imagename = item['imagename'].split('/')[-1]
-            newlink = filename[:-5] + "/" + imagename
-            html = html.replace(item['imagename'], newlink)
-            item['image'].save(newlink)
+            folder_link = filename[:-5] + "/" + imagename
+            html_link = foldername_without_path + "/" + imagename
+            html = html.replace(item['imagename'], html_link)
+            item['image'].save(folder_link)
         with open(filename, 'w') as f:
             f.write(html)
         msg = "Report exported to: " + filename
@@ -1194,6 +1198,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         image_format.setName(url.toString())
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
+        self.html_images_and_links.append({'imagename': imagename, 'image': image})
 
     @staticmethod
     def html_heading(item):
