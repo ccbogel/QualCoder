@@ -26,22 +26,25 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
+from copy import copy
+import logging
+import os
+import sys
+import traceback
+
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt,QTextCodec
 from PyQt5.QtGui import QBrush
-from select_file import DialogSelectFile
-from report_attributes import DialogSelectAttributeParameters
+
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-import os
-import sys
-from copy import copy
-import logging
-import traceback
+from report_attributes import DialogSelectAttributeParameters
+from select_file import DialogSelectFile
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -54,8 +57,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
-    ''' Show code and category frequnecies, overall and for each coder.
-    This is for text coding and image coding. '''
+    """ Show code and category frequnecies, overall and for each coder.
+    This is for text coding and image coding. """
 
     settings = None
     parent_textEdit = None
@@ -83,11 +86,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.fill_tree()
 
     def get_data(self):
-        ''' Called from init. gets coders, code_names and categories.
+        """ Called from init. gets coders, code_names and categories.
         Calls calculate_code_frequency - for each code.
         Adds a list item that is ready to be used by the treeWidget to display multiple
         columns with the coder frequencies.
-        '''
+        """
 
         cur = self.settings['conn'].cursor()
         self.coders = []
@@ -96,7 +99,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.coders = []
         for row in result:
             self.coders.append(row[0])
-        #self.coders.append("TOTAL")
         self.categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
         result = cur.fetchall()
@@ -122,10 +124,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.coded_images_and_text.append(row)
 
     def calculate_code_frequencies(self):
-        ''' Calculate the frequency of each code for all coders and the total.
+        """ Calculate the frequency of each code for all coders and the total.
         Add a list item to each code that can be used to display in treeWidget.
-        code_image, code_text
-        '''
+        For codings in code_image, code_text
+        """
 
         for c in self.codes:
             total = 0
@@ -136,7 +138,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         count += 1
                         total += 1
                 c['display_list'].append(count)
-            #del c['display_list'][-1]  # remove the incorrect Total column
             c['display_list'].append(total)
 
         # add the number of codes directly under each category to the category
@@ -186,10 +187,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding frequencies to text file. """
 
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.path.expanduser('~'))
-        if filename[0] == "":
+        filename = "CODING FREQUENCIES.txt"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            "Select directory to save file", self.settings['directory'], options)
+        if directory == "":
             return
-        filename = filename[0] + ".txt"
+        filename = directory + "/" + filename
+
         f = open(filename, 'w')
         text = "CODING FREQUENCIES\r\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
@@ -218,7 +223,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.parent_textEdit.append("Text file exported to: " + filename)
 
     def fill_tree(self):
-        ''' Fill tree widget, top level items are main categories and unlinked codes '''
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         cats = copy(self.categories)
         codes = copy(self.codes)
@@ -313,7 +318,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
-    ''' Compare coded text sequences between coders using Cohen's Kappa '''
+    """ Compare coded text sequences between coders using Cohen's Kappa. """
 
     settings = None
     parent_textEdit = None
@@ -348,8 +353,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.fill_tree()
 
     def get_data(self):
-        ''' Called from init. gets coders, code_names, categories, file_summaries.
-        Images are not loaded. '''
+        """ Called from init. gets coders, code_names, categories, file_summaries.
+        Images are not loaded. """
 
         self.categories = []
         cur = self.settings['conn'].cursor()
@@ -379,7 +384,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.file_summaries = cur.fetchall()
 
     def coder_selected(self):
-        ''' Select coders for comparison - only two coders can be selected FOR NOW '''
+        """ Select coders for comparison - only two coders can be selected. """
 
         coder = self.ui.comboBox_coders.currentText()
         if coder == "":
@@ -394,7 +399,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.ui.pushButton_run.setEnabled(True)
 
     def clear_selection(self):
-        ''' Clear the coder selection and tree widget statistics'''
+        """ Clear the coder selection and tree widget statistics. """
 
         self.selected_coders = []
         self.ui.pushButton_run.setEnabled(False)
@@ -427,8 +432,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.parent_textEdit.append("Text file exported to: " + filename)
 
     def calculate_statistics(self):
-        ''' Iterate through tree widget, for all cids
-        For each code_name calculate the two-coder comparison statistics '''
+        """ Iterate through tree widget, for all cids
+        For each code_name calculate the two-coder comparison statistics. """
 
         self.comparisons += "====CODER COMPARISON====\nSelected coders: "
         self.comparisons += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
@@ -455,14 +460,12 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             item = it.value()
 
     def calculate_agreement_for_code_name(self, cid):
-        ''' Calculate the two-coder statistics for this cid
+        """ Calculate the two-coder statistics for this cid
         Percentage agreement.
         Get the start and end positions in all files (source table) for this cid
         Look at each file separately to ge the commonly coded text.
         Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
-        where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders
-        '''
-        """
+        where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
 
@@ -547,7 +550,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         return total
 
     def fill_tree(self):
-        ''' Fill tree widget, top level items are main categories and unlinked codes '''
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         cats = copy(self.categories)
         codes = copy(self.code_names)
@@ -626,10 +629,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
 
 class DialogReportCodes(QtWidgets.QDialog):
-    ''' Get reports on text coding using a range of variables:
+    """ Get reports on text coding using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, or html.
-         '''
+    """
 
     settings = None
     parent_textEdit = None
@@ -835,7 +838,6 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Create folder of images and change html links
         foldername = filename[:-5]
-        #TODO Windows 10 issue check
         foldername_without_path = foldername.split('/')[-1]
         try:
             os.mkdir(foldername)
@@ -849,15 +851,20 @@ class DialogReportCodes(QtWidgets.QDialog):
                 html = f.read()
         except Exception as e:
             logger.warning('html file reading error:' + str(e))
-        #print(html)
         for item in self.html_images_and_links:
             imagename = item['imagename'].split('/')[-1]
             folder_link = filename[:-5] + "/" + imagename
             item['image'].save(folder_link)
             html_link = foldername_without_path + "/" + imagename
+            ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
+            this needs to be upper case for the replace method to work:  c:  =>  C:
+            '''
+            unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
             html = html.replace(item['imagename'], html_link)
-            print("Windows 10 not replacing issue ", item['imagename'], html_link)
-            logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
+            if unreplaced_html == html:
+                html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
+            #print("Windows 10 not replacing issue ", item['imagename'], html_link)
+            #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
         with open(filename, 'w') as f:
             f.write(html)
         msg = "Report exported to: " + filename
