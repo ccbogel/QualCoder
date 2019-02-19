@@ -26,21 +26,24 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from PyQt5.QtWidgets import QDialog
-from PyQt5 import QtCore, QtWidgets, QtGui
-from GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
-from memo import DialogMemo
-from information import DialogInformation
-import math
-from copy import deepcopy
 from collections import Counter
+from copy import deepcopy
+import logging
+import math
 import os
 import sys
-import logging
 import traceback
+
+from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtWidgets import QDialog
+
+from GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
+from information import DialogInformation
+from memo import DialogMemo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -53,17 +56,16 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class ViewGraph(QDialog):
-    '''Dialog to view code and categories graph.
-    '''
+    """ Dialog to view code and categories in an acyclic graph. Provides options for
+    colors and amount of nodes to display (based on category selection).
+    """
 
     settings = None
     categories = []
     code_names = []
 
     def __init__(self, settings):
-        ''' Set up the dialog
-        and set up the
-        '''
+        """ Set up the dialog. """
 
         sys.excepthook = exception_handler
         QDialog.__init__(self)
@@ -88,7 +90,7 @@ class ViewGraph(QDialog):
         menu.exec_(event.globalPos())
 
     def get_data(self):
-        ''' Called from init and gets all the codes and categories '''
+        """ Called from init and gets all the codes and categories. """
 
         self.categories = []
         cur = self.settings['conn'].cursor()
@@ -106,8 +108,8 @@ class ViewGraph(QDialog):
             'cid': row[4], 'catid': row[5], 'color': row[6]})
 
     def do_graph(self):
-        ''' Create a circular acyclic graph
-        default font size is 8  '''
+        """ Create a circular acyclic graph
+        default font size is 8.  """
 
         self.scene.clear()
         cats = deepcopy(self.categories)
@@ -224,7 +226,7 @@ class ViewGraph(QDialog):
                         self.scene.addItem(item)
 
     def get_node_with_children(self, node, model):
-        ''' Return a short list of this top node and all its children '''
+        """ Return a short list of this top node and all its children. """
         if node is None:
             return model
         new_model = [node]
@@ -245,13 +247,11 @@ class ViewGraph(QDialog):
         return new_model
 
     def reject(self):
-        '''  '''
 
         self.dialog_list = []
         super(ViewGraph, self).reject()
 
     def accept(self):
-        '''  '''
 
         self.dialog_list = []
         super(ViewGraph, self).accept()
@@ -259,7 +259,7 @@ class ViewGraph(QDialog):
 
 # http://stackoverflow.com/questions/17891613/pyqt-mouse-events-for-qgraphicsview
 class GraphicsScene(QtWidgets.QGraphicsScene):
-    ''' set the scene for the graphics objects and re-draw events '''
+    """ set the scene for the graphics objects and re-draw events. """
 
     # matches the initial designer file graphics view
     sceneWidth = 982
@@ -270,32 +270,31 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
 
     def setWidth(self, width):
-        ''' resize scene width '''
+        """ Resize scene width. """
 
         self.sceneWidth = width
         self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
 
     def setHeight(self, height):
-        ''' resize scene height '''
+        """ Resize scene height. """
 
         self.sceneHeight = height
         self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
 
     def getWidth(self):
-        ''' return scene width '''
+        """ Return scene width. """
 
         return self.sceneWidth
 
     def getHeight(self):
-        ''' return scene height '''
+        """ Return scene height. """
 
         return self.sceneHeight
 
     def mouseMoveEvent(self, mouseEvent):
-        ''' On mouse move, an item might be repositioned so need to redraw all the link_items.
-        This slows things down, but is more dynamic. '''
+        """ On mouse move, an item might be repositioned so need to redraw all the link_items.
+        This slows things down, but is more dynamic. """
 
-        ''''''
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
 
         for item in self.items():
@@ -329,11 +328,11 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
 
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
-    ''' The item show the name and color of the code or category
-    Categories are typically shown white, and category font sizes can be enlarged using a checkbox
-    and code colours can be ignores using a check box.
-    A custom context menu allows selection of a code/category memo an displaying the information.
-     '''
+    """ The item show the name and color of the code or category
+    Categories are typically shown white, and category font sizes can be enlarged using a
+    checkbox and code colours can be ignores using a check box. A custom context menu
+    allows selection of a code/category memo an displaying the information.
+    """
 
     data = None
     border_rect = None
@@ -354,15 +353,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setPlainText(self.data['name'])
         self.setPos(self.data['x'], self.data['y'])
         self.document().contentsChanged.connect(self.text_changed)
-
         #self.border_rect = QtWidgets.QGraphicsRectItem(0, 0, rect.width(), rect.height())
         #self.border_rect.setParentItem(self)
 
     def paint(self, painter, option, widget):
-        ''' see pain override method here:
+        """ see paint override method here:
             https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
             see:
-            https://doc.qt.io/qt-5/qpainter.html '''
+            https://doc.qt.io/qt-5/qpainter.html """
 
         color = QtGui.QColor(self.data['color'])
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.SolidPattern))
@@ -380,7 +378,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             painter.drawText(5, fm.height() * (row + 1), lines[row])
 
     def text_changed(self):
-        ''' Text changed in a node. Redraw the border rectangle item to match. '''
+        """ Text changed in a node. Redraw the border rectangle item to match. """
 
         #rect = self.boundingRect()
         #self.border_rect.setRect(0, 0, rect.width(), rect.height())
@@ -388,11 +386,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         #logger.debug("self.data[name]:" + self.data['name'])
 
     def contextMenuEvent(self, event):
-        '''
+        """
         # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
-        I was not able to mapToGlobal position so, the menu maps to scene position plus the
-        Dialog screen position
-        '''
+        I was not able to mapToGlobal position so, the menu maps to scene position plus
+        the Dialog screen position.
+        """
+
         menu = QtWidgets.QMenu()
         menu.addAction('Memo')
         if self.data['cid'] is not None:
@@ -409,7 +408,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.case_text(self.data)
 
     def add_edit_memo(self, data):
-        ''' delete this method later '''
+        """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
             ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
@@ -427,8 +426,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.settings['conn'].commit()
 
     def case_text(self, data):
-        ''' Display all coded text for this code.
-        Coded text comes from ALL files and ALL coders '''
+        """ Display all coded text for this code.
+        Coded text comes from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded text : " + self.data['name'], "")
         cur = self.settings['conn'].cursor()
@@ -439,7 +438,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         POS1 = 4
         SELTEXT = 5
         OWNER = 6
-        sql = "select code_name.name, color, cases.name, "
+        sql = "select distinct code_name.name, color, cases.name, "
         sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from code_text "
         sql += " join code_name on code_name.cid = code_text.cid "
         sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
@@ -464,8 +463,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         ui.exec_()
 
     def coded_text(self, data):
-        ''' Display all coded text for this code.
-        Coded text comes from ALL files and ALL coders '''
+        """ Display all coded text for this code.
+        Coded text comes from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded text : " + self.data['name'], "")
         cur = self.settings['conn'].cursor()
@@ -507,7 +506,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
 
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
-    ''' Takes the coordinate from the two TextGraphicsItems  '''
+    """ Takes the coordinate from the two TextGraphicsItems. """
 
     from_widget = None
     from_pos = None
@@ -523,12 +522,13 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.calculatePointsAndDraw()
 
     def redraw(self):
-        ''' called from mouse move and release events '''
+        """ Called from mouse move and release events. """
 
         self.calculatePointsAndDraw()
 
     def calculatePointsAndDraw(self):
-        ''' calculate the to x and y and from x and y points. Draw line '''
+        """ Calculate the to x and y and from x and y points. Draw line between the
+        widgets. Join the line to appropriate side of widget. """
 
         to_x = self.to_widget.pos().x()
         to_y = self.to_widget.pos().y()
