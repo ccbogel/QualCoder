@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_manage_files.ui'
 #
-# Created: Tue Dec 19 08:38:55 2017
+# Created: Tue Feb 19 21:48:27 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -52,6 +52,7 @@ class Ui_Dialog_manage_files(object):
         Dialog_manage_files.setWindowTitle(_translate("Dialog_manage_files", "Files"))
         self.pushButton_view.setText(_translate("Dialog_manage_files", "View"))
         self.pushButton_create.setText(_translate("Dialog_manage_files", "Create"))
+        self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Make sure the file name does not contain unusual characters such as \': ; &quot; \' otherwise it will raise an error when trying to save this file. Rename the file if needed.</p></body></html>"))
         self.pushButton_export.setText(_translate("Dialog_manage_files", "Export"))
         self.pushButton_delete.setText(_translate("Dialog_manage_files", "Delete"))
         self.pushButton_import.setText(_translate("Dialog_manage_files", "Import"))
