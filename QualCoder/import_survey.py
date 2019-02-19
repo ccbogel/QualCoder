@@ -288,7 +288,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             case_text_list = []
             if self.fields_type[field] == "qualitative":
                 self.fields[field]
-                # create one text file combining each row, prefix [case identfier] to each row.
+                # create one text file combining each row, prefix [case identifier] to each row.
                 pos0 = 0
                 pos1 = 0
                 fulltext = ""
@@ -300,8 +300,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
                         pos1 = len(fulltext) - 2
                         case_text = [self.settings['codername'], now_date, "", pos0, pos1, name_and_caseids[row][1]]
                         case_text_list.append(case_text)
-                # add the current time to the file name to prevent sqlite Integrity Error
-                cur.execute(source_sql, (self.fields[field] +"_" + str(now_date), fulltext, "", self.settings['codername'], now_date))
+                # add the current time to the file name to ensure uniqueness and to
+                # prevent sqlite Integrity Error. Do not use now_date which contains colons
+                now = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
+                cur.execute(source_sql, (self.fields[field] +"_" + now, fulltext, "", self.settings['codername'], now_date))
                 self.settings['conn'].commit()
                 cur.execute("select last_insert_rowid()")
                 fid = cur.fetchone()[0]
