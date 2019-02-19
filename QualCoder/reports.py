@@ -175,7 +175,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             counter += 1
 
     def depthgauge(self, item):
-        ''' get depth for treewidget item '''
+        """ Get depth for treewidget item. """
 
         depth = 0
         while item.parent() is not None:
@@ -184,9 +184,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         return depth
 
     def export_text_file(self):
-        ''' Export coding frequencies to text file '''
+        """ Export coding frequencies to text file. """
 
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.path.expanduser('~'))
         if filename[0] == "":
             return
         filename = filename[0] + ".txt"
@@ -412,9 +412,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             item = it.value()
 
     def export_text_file(self):
-        ''' Export coding comparison statistics to text file '''
+        """ Export coding comparison statistics to text file. """
 
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file",
+            os.path.expanduser('~'))
         if filename[0] == "":
             return
         filename = filename[0] + ".txt"
@@ -780,17 +781,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_text_file(self):
-        ''' Export file to a plain text file with .txt ending.
-        QTextWriter supports plaintext, ODF and HTML'''
+        """ Export file to a plain text file with .txt ending.
+        QTextWriter supports plaintext, ODF and HTML. """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file",
+            os.path.expanduser('~'))
         if filename[0] == "":
             return
-        filename = filename[0]
+        filename = filename[0] + ".txt"
         tw = QtGui.QTextDocumentWriter()
-        tw.setFileName(filename + ".txt")
+        tw.setFileName(filename)
         tw.setFormat(b'plaintext')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append("Rport exported to: " + filename)
@@ -802,12 +804,13 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", os.getenv('HOME'))
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save Open Document Text file",
+            os.path.expanduser('~'))
         if filename[0] == "":
             return
-        filename = filename[0]
+        filename = filename[0] + ".odt"
         tw = QtGui.QTextDocumentWriter()
-        tw.setFileName(filename + ".odt")
+        tw.setFileName(filename)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append("Report exported to: " + filename)
@@ -819,7 +822,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",  os.getenv('HOME'))
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",
+            os.path.expanduser('~'))
         if filename[0] == "":
             return
         filename = filename[0] + ".html"
@@ -831,6 +835,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Create folder of images and change html links
         foldername = filename[:-5]
+        #TODO Windows 10 issue check
         foldername_without_path = foldername.split('/')[-1]
         try:
             os.mkdir(foldername)
@@ -844,13 +849,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 html = f.read()
         except Exception as e:
             logger.warning('html file reading error:' + str(e))
-        print(html)
+        #print(html)
         for item in self.html_images_and_links:
             imagename = item['imagename'].split('/')[-1]
             folder_link = filename[:-5] + "/" + imagename
+            item['image'].save(folder_link)
             html_link = foldername_without_path + "/" + imagename
             html = html.replace(item['imagename'], html_link)
-            item['image'].save(folder_link)
+            print("Windows 10 not replacing issue ", item['imagename'], html_link)
+            logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
         with open(filename, 'w') as f:
             f.write(html)
         msg = "Report exported to: " + filename
@@ -859,8 +866,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QMessageBox.information(None, "HTML file saved", msg)
 
     def recursive_set_selected(self, item):
-        ''' Set all children of this item to be selected if the item is selected.
-        Recurse through any child categories. '''
+        """ Set all children of this item to be selected if the item is selected.
+        Recurse through any child categories. """
         #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
         child_count = item.childCount()
         for i in range(child_count):
@@ -869,12 +876,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.recursive_set_selected(item.child(i))
 
     def search(self):
-        ''' Search for selected codings.
+        """ Search for selected codings.
         There are two main search pathways.
         The default is based on file selection and can be restricted using the file selection dialog.
         The second pathway is based on case selection and can be resctricted using the case selection dialog.
         If cases are selected this overrides (ignores) and file selections that the user has entered.
-        '''
+        """
 
         coder = self.ui.comboBox_coders.currentText()
         self.html_results = ""
