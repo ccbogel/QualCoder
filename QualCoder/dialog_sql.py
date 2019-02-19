@@ -41,6 +41,7 @@ import traceback
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -114,8 +115,8 @@ class DialogSQL(QtWidgets.QDialog):
         col_names = []
         if cur.description is not None:
             col_names = list(map(lambda x: x[0], cur.description))  # gets column names
-
-        tmp_name = os.getenv('HOME') + "/Desktop/TEMP.csv"
+        # os.getenv('HOME') does not work on Windows
+        tmp_name = os.path.expanduser('~') + "/Desktop/TEMP.csv"
         file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", tmp_name)
         if file_tuple[0] == "":
             return
