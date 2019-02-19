@@ -31,12 +31,14 @@ from GUI.ui_dialog_journals import Ui_Dialog_journals
 from confirm_delete import DialogConfirmDelete
 import datetime
 import os
+import re
 import sys
 import logging
 import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -159,6 +161,12 @@ class DialogJournals(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, 'Warning', "Journal name in use",
                 QtWidgets.QMessageBox.Ok)
             return
+        # Check for unusual characters in filename that would affect exporting
+        valid = re.match('^[\ \w-]+$', name) is not None
+        if not valid:
+            QtWidgets.QMessageBox.warning(None, 'Warning - invalid characters',
+                "In the jornal name use only: a-z, A-z 0-9 - space", QtWidgets.QMessageBox.Ok)
+            return
 
         # update database
         journal = {'name':name, 'jentry': '', 'owner':self.settings['codername'],
@@ -203,7 +211,7 @@ class DialogJournals(QtWidgets.QDialog):
         filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            "Select directory to save file", os.getenv('HOME'), options)
+            "Select directory to save file", os.path.expanduser('~'), options)
         if directory:
             filename = directory + "/" + filename
             data = self.journals[x]['jentry']
@@ -258,10 +266,20 @@ class DialogJournals(QtWidgets.QDialog):
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
+                QtWidgets.QMessageBox.warning(None, 'Warning', "No name was entered",
+                    QtWidgets.QMessageBox.Ok)
                 update = False
             for c in self.journals:
                 if c['name'] == new_name:
+                    QtWidgets.QMessageBox.warning(None, 'Warning', "Journal name in use",
+                        QtWidgets.QMessageBox.Ok)
                     update = False
+            # Check for unusual characters in filename that would affect exporting
+            valid = re.match('^[\ \w-]+$', name) is not None
+            if not valid:
+                QtWidgets.QMessageBox.warning(None, 'Warning - invalid characters',
+                    "In the jornal name use only: a-z, A-z 0-9 - space", QtWidgets.QMessageBox.Ok)
+                update = False
             if update:
                 # update source list and database
                 cur = self.settings['conn'].cursor()
