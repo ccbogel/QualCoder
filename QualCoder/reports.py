@@ -862,7 +862,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
             html = html.replace(item['imagename'], html_link)
             if unreplaced_html == html:
-                html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
+                html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
             #print("Windows 10 not replacing issue ", item['imagename'], html_link)
             #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
         with open(filename, 'w') as f:
