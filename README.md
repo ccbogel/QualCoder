@@ -47,7 +47,7 @@ Required
 * Pillow
 
 ## Issues
-* Testing has only been performed on Ubuntu and Linux Mint. Some usage condcuted with Lubuntu. Some testing performed on Windows 10.
+* Testing has only been performed on Ubuntu and Linux Mint and Window 10. Some usage conducted with Lubuntu.
 
 ## Future plans
 * Reports:
