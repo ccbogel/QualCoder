@@ -283,7 +283,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.settings['conn'].commit()
 
         # insert qualitative data into source table
-        source_sql = "insert into source(name,fulltext,memo,owner,date, imagepath) values(?,?,?,?,?, Null)"
+        source_sql = "insert into source(name,fulltext,memo,owner,date, mediapath) values(?,?,?,?,?, Null)"
         for field in range(1, len(self.fields)):  # column 0 is for identifiers
             case_text_list = []
             if self.fields_type[field] == "qualitative":

@@ -60,6 +60,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(me
      level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -74,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
     ''' Main GUI window.
     Project data is stored in a directory with .qda suffix
     core data is stored in data.qda sqlite file.
-    Journal and coding dialogs can beshown non=modally - multiple dialogs open.
+    Journal and coding dialogs can be shown non-modally - multiple dialogs open.
     There is a risk of a clash if two coding windows are open with the same file text or
     two journals open with the same journal entry. '''
 
@@ -364,7 +365,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def new_project(self):
         ''' Create a new project folder with data.qda (sqlite) and folders for documents,
-        images and audio '''
+        images, audio and video. '''
 
         #logger.debug("settings[directory]:" + self.settings['directory'])
         self.settings['path'] = QtWidgets.QFileDialog.getSaveFileName(self,
@@ -378,6 +379,7 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.settings['path'])
             os.mkdir(self.settings['path'] + "/images")
             os.mkdir(self.settings['path'] + "/audio")
+            os.mkdir(self.settings['path'] + "/video")
             os.mkdir(self.settings['path'] + "/documents")
         except Exception as e:
             logger.critical("Project creation error " + str(e))
@@ -389,8 +391,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
         cur = self.settings['conn'].cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
-        cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, imagepath text, memo text, owner text, date text, unique(name));")
+        cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
+        cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text);")
         cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text);")
         cur.execute("CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
         cur.execute("CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
@@ -448,7 +451,7 @@ class MainWindow(QtWidgets.QMainWindow):
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.settings, "Memo for project " + self.settings['projectName'],
             memo)
-        ui.exec_()
+        ui.show()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
             self.settings['conn'].commit()

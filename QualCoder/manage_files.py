@@ -106,11 +106,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source = []
         cur = self.settings['conn'].cursor()
-        cur.execute("select name, id, fulltext, imagepath, memo, owner, date from source order by name")
+        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by name")
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-            'imagepath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         # attributes
         self.headerLabels = ["Name", "Memo", "Date", "Id"]
         sql = "select name from attribute_type where caseOrFile='file'"
@@ -232,11 +232,16 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def view(self):
         ''' View and edit text file contents.
-        Alternatively view an image '''
+        Alternatively view an image or TODO other media. '''
 
         x = self.ui.tableWidget.currentRow()
-        if self.source[x]['imagepath'] is not None:
-            self.view_image(x)
+        if self.source[x]['mediapath'] is not None:
+            if self.source[x]['mediapath'][:8] == "/images/":
+                self.view_image(x)
+            if self.source[x]['mediapath'][:7] == "/video/":
+                pass  #TODO
+            if self.source[x]['mediapath'][:7] == "/audio/":
+                pass  #TODO
             return
 
         Dialog = QtWidgets.QDialog()
@@ -305,10 +310,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         # update database
         entry = {'name': name, 'id': -1, 'fulltext': filetext, 'memo': "",
         'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'imagepath': None}
+        'mediapath': None}
         cur = self.settings['conn'].cursor()
-        cur.execute("insert into source(name,fulltext,imagepath,memo,owner,date) values(?,?,?,?,?,?)",
-            (entry['name'], entry['fulltext'], entry['imagepath'], entry['memo'], entry['owner'], entry['date']))
+        cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+            (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
         self.settings['conn'].commit()
         self.parent_textEdit.append("File created: " + entry['name'])
         self.source.append(entry)
@@ -319,7 +324,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt and docx
         Note importing from html, odt and docx all formatting is lost.
-        Also 'imports' images as jpg, jpeg, png, gif which are stored in an images directory '''
+        Imports images as jpg, jpeg, png, gif which are stored in an images directory.
+        Imports audio as mp3, wav which are stored in an audio directory
+        Imports video as mp4, mov, wmv which are stored in a video directory
+         '''
 
         imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open file', self.default_import_directory)
         if not ok or imports == []:
@@ -337,27 +345,31 @@ class DialogManageFiles(QtWidgets.QDialog):
             if f.split('.')[-1].lower() in ('jpg', 'jpeg', 'png', 'gif'):
                 destination += "/images/" + filename
                 copyfile(f, destination)
-                self.load_image_reference(f)
-            #TODO audio
-            '''if f.split('.')[-1].lower() in ('wav', 'mp3'):
+                self.load_media_reference("/images/" + filename)
+            if f.split('.')[-1].lower() in ('wav', 'mp3'):
                 destination += "/audio/" + filename
-                copyfile(f, destination)'''
+                copyfile(f, destination)
+                self.load_media_reference("/audio/" + filename)
+            if f.split('.')[-1].lower() in ('mov', 'mp4', 'wmv'):
+                destination += "/video/" + filename
+                copyfile(f, destination)
+                self.load_media_reference("/video/" + filename)
         self.fill_table()
 
-    def load_image_reference(self, import_file):
-        ''' Load image reference data. '''
+    def load_media_reference(self, mediapath):
+        ''' Load media reference information. '''
 
         # check for duplicated filename and update model, widget and database
-        name_split = import_file.split("/")
+        name_split = mediapath.split("/")
         filename = name_split[-1]
         if any(d['name'] == filename for d in self.source):
             QtWidgets.QMessageBox.warning(None, 'Duplicate file', "Duplicate filename.\nFile not imported")
             return
-        entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'imagepath': filename,
+        entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
         'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.settings['conn'].cursor()
-        cur.execute("insert into source(name,memo,owner,date, imagepath, fulltext) values(?,?,?,?,?,?)",
-            (entry['name'], entry['memo'], entry['owner'], entry['date'], entry['imagepath'], entry['fulltext']))
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+            (entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'], entry['fulltext']))
         self.settings['conn'].commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
@@ -444,12 +456,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         if any(d['name'] == filename for d in self.source):
             QtWidgets.QMessageBox.warning(None, 'Duplicate file', "Duplicate filename.\nFile not imported")
             return
-        entry = {'name': filename, 'id': -1, 'fulltext': text, 'imagepath': None, 'memo': "",
+        entry = {'name': filename, 'id': -1, 'fulltext': text, 'mediapath': None, 'memo': "",
         'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.settings['conn'].cursor()
         #logger.debug("type fulltext: " + str(type(entry['fulltext'])))
-        cur.execute("insert into source(name,fulltext,imagepath,memo,owner,date) values(?,?,?,?,?,?)",
-            (entry['name'],  entry['fulltext'], entry['imagepath'], entry['memo'], entry['owner'], entry['date']))
+        cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+            (entry['name'],  entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
         self.settings['conn'].commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
@@ -543,7 +555,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         ''' Export fulltext to a plain text file, filename will have .txt ending '''
 
         x = self.ui.tableWidget.currentRow()
-        if self.source[x]['imagepath'] is not None:
+        if self.source[x]['mediapath'] is not None:
             return
         filename = self.source[x]['name']
         if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx"):
@@ -576,7 +588,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         cur = self.settings['conn'].cursor()
         # delete text source
-        if self.source[x]['imagepath'] is None:
+        if self.source[x]['mediapath'] is None:
             cur.execute("delete from source where id = ?", [fileId])
             cur.execute("delete from code_text where fid = ?", [fileId])
             cur.execute("delete from annotation where fid = ?", [fileId])
@@ -585,8 +597,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql, [fileId])
             self.settings['conn'].commit()
         # delete image source
-        if self.source[x]['imagepath'] is not None:
-            filepath = self.settings['path'] + "/images/" + self.source[x]['name']
+        if self.source[x]['mediapath'] is not None:
+            filepath = self.settings['path'] + self.source[x]['mediapath']
             try:
                 os.remove(filepath)
             except Exception as e:
@@ -646,7 +658,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = Ui_dialog_manage_files()
     ui.show()

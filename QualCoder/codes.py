@@ -92,7 +92,7 @@ class DialogCodeText(QtWidgets.QDialog):
         self.search_index = 0
         self.get_codes_categories()
         cur = self.settings['conn'].cursor()
-        cur.execute("select id, name from source where imagepath is Null")
+        cur.execute("select id, name from source where mediapath is Null")
         result = cur.fetchall()
         for row in result:
             self.filenames.append({'id': row[0], 'name': row[1]})
@@ -967,7 +967,7 @@ class DialogCodeText(QtWidgets.QDialog):
         for f in files:
             filenames += f['name'] + " "
             cur = self.settings['conn'].cursor()
-            cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and imagepath is Null",
+            cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
                 [f['id']])
             currentfile = cur.fetchone()
             text = currentfile[2]

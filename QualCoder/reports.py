@@ -380,7 +380,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
 
-        cur.execute("select id, length(fulltext) from source where imagepath is Null")
+        cur.execute("select id, length(fulltext) from source where mediapath is Null")
         self.file_summaries = cur.fetchall()
 
     def coder_selected(self):
@@ -481,7 +481,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             result0 = cur.fetchall()
             cur.execute(sql, [f[0], cid, self.selected_coders[1]])
             result1 = cur.fetchall()
-            #logger.debug("result0: " + str(result0))
+            #logger.debug("result0: " + str(result0))            print(row) #TODO tmp
+
             #logger.debug("result1: " + str(result1))
             # determine the same characters coded by both coders, by adding 1 to each coded character
             char_list = [0] * f[1]
@@ -950,7 +951,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.imagepath, source.id from code_image join code_name "
+            sql += "code_image.owner, source.mediapath, source.id from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
@@ -997,7 +998,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # images
             parameters = []
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, code_image.owner,source.imagepath, source.id from "
+            sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id from "
             sql += "code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1119,7 +1120,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "x1, y1, width, height, code_image.owner,source.imagepath, source.id from "
+                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id from "
                 sql += "code_image join code_name on code_name.cid = code_image.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_image.id = case_text.fid "
@@ -1131,7 +1132,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # second sql is for file parameters only
                 sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-                sql += "code_image.owner, source.imagepath, source.id from code_image join code_name "
+                sql += "code_image.owner, source.mediapath, source.id from code_image join code_name "
                 sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
@@ -1165,7 +1166,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         tmp = []
         for i in image_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
-                'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'imagepath': i[8],
+                'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
                 'fid': i[9], 'file_or_case': fileOrCase})
         image_results = tmp
 
@@ -1185,7 +1186,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         ''' Scale image, add resource to document, insert image.
         '''
 
-        path = self.settings['path'] + '/images/' + img['imagepath']
+        path = self.settings['path'] + img['mediapath']
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
@@ -1202,7 +1203,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # need unique image names or the same image from the same path is reproduced
-        imagename = self.settings['path'] + '/images/' + str(counter) + '-' + img['imagepath']
+        imagename = self.settings['path'] + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
         cursor = text_edit.textCursor()

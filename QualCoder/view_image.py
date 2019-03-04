@@ -156,11 +156,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.files = []
         cur = self.settings['conn'].cursor()
-        cur.execute("select name, id, memo, owner, date from source where imagepath is not Null order by name")
+        cur.execute("select name, id, memo, owner, date, mediapath from source where substr(mediapath,1,7) = '/images' order by name")
         result = cur.fetchall()
         for row in result:
-            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2], 'owner': row[3], 'date': row[4]})
-
+            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2], 'owner': row[3], 'date': row[4], 'mediapath': row[5]})
     def fill_tree(self):
         ''' Fill tree widget, tope level items are main categories and unlinked codes '''
 
@@ -266,7 +265,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         ''' Add image to scene if it exists '''
 
         #try:
-        source = self.settings['path'] + "/images/" + self.file_['name']
+        source = self.settings['path'] + self.file_['mediapath']
         #except Exception as e:
         #    QtWidgets.QMessageBox.warning(None, "Image error", "Image file not found. %s\n" + str(e), self.file_['name'])
         #    logger.warning(str(e) + ".  " + source)
@@ -875,7 +874,7 @@ class DialogViewImage(QtWidgets.QDialog):
     label = None
 
     def __init__(self, settings, image_data, parent=None):
-        ''' Image_data contains: {name, imagepath, owner, id, date, memo, fulltext}
+        ''' Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
         '''
 
         sys.excepthook = exception_handler
@@ -886,14 +885,14 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui.setupUi(self)
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
-        self.setWindowTitle("Image: " + self.image_data['name'])
+        self.setWindowTitle(self.image_data['mediapath'])
         try:
-            source = self.settings['path'] + "/images/" + self.image_data['name']
+            source = self.settings['path'] + self.image_data['mediapath']
         except Exception as e:
             QtWidgets.QMessageBox.warning(None, "Image error", "Image file not found. %s\n" + str(e), source)
         image = QtGui.QImage(source)
         if image.isNull():
-            QtWidgets.QMessageBox.warming(None, "Immage Error", "Cannot open %s." % source)
+            QtWidgets.QMessageBox.warming(None, "Image Error", "Cannot open %s." % source)
             self.close()
             return
         self.pixmap = QtGui.QPixmap.fromImage(image)
