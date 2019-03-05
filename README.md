@@ -9,6 +9,7 @@ Instructions and other information are avaible here: https://qualcoder.wordpress
 ## INSTALLATION
 You will need to have a python3.x version installed.
 You will also need to have pyqt5 and lxml to get text from docx files.
+You will also need to have a vlc player installed - for audio and video.
 
 Linux:
 
@@ -22,6 +23,8 @@ sudo apt-get install python3-lxml
 
 sudo apt-get install python3-pil
 
+sudo apt install vlc qtwayland5
+
 Windows: 
 
 python -m pip install pyqt5 
@@ -29,6 +32,8 @@ python -m pip install pyqt5
 python -m pip install lxml
 
 python -m pip install Pillow
+
+Also install a vlc player: https://www.videolan.org/vlc/download-windows.html or from the Windows Store.
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
@@ -46,8 +51,12 @@ Required
 
 * Pillow
 
+* vlc
+
 ## Issues
 * Testing has only been performed on Ubuntu and Linux Mint and Window 10. Some usage conducted with Lubuntu.
+
+* Currently working on an audio / video feature. At this stage only importation and viewing is enabled.
 
 ## Future plans
 * Reports:
