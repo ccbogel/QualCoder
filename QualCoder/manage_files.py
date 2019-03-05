@@ -34,6 +34,7 @@ from add_item_name import DialogAddItemName
 from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from view_image import DialogViewImage
+from view_av import DialogViewAV
 import datetime
 import os
 import sys
@@ -239,9 +240,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             if self.source[x]['mediapath'][:8] == "/images/":
                 self.view_image(x)
             if self.source[x]['mediapath'][:7] == "/video/":
-                pass  #TODO
+                self.view_av(x)
             if self.source[x]['mediapath'][:7] == "/audio/":
-                pass  #TODO
+                self.view_av(x)
             return
 
         Dialog = QtWidgets.QDialog()
@@ -272,6 +273,22 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source[x]['fulltext'] = text
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
         self.settings['conn'].commit()
+
+    def view_av(self, x):
+        ''' View a cideo file and edit the memo. '''
+
+        ui = DialogViewAV(self.settings, self.source[x])
+        ui.exec_()
+        memo = ui.ui.textEdit.toPlainText()
+        if self.source[x]['memo'] != memo:
+            self.source[x]['memo'] = memo
+            cur = self.settings['conn'].cursor()
+            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
+            self.settings['conn'].commit()
+        if self.source[x]['memo'] == "":
+            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
+        else:
+            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
 
     def view_image(self, x):
         ''' View an image file and edit the image memo. '''
