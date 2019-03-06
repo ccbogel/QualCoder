@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created: Thu Jan 17 09:20:01 2019
+# Created: Wed Mar  6 23:34:04 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -98,6 +98,10 @@ class Ui_MainWindow(object):
         self.actionCode_image.setObjectName("actionCode_image")
         self.actionCode_frequencies = QtWidgets.QAction(MainWindow)
         self.actionCode_frequencies.setObjectName("actionCode_frequencies")
+        self.actionCoding_Matrix = QtWidgets.QAction(MainWindow)
+        self.actionCoding_Matrix.setObjectName("actionCoding_Matrix")
+        self.actionCode_audio_video = QtWidgets.QAction(MainWindow)
+        self.actionCode_audio_video.setObjectName("actionCode_audio_video")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
@@ -111,6 +115,7 @@ class Ui_MainWindow(object):
         self.menuFiles_and_Cases.addAction(self.actionManage_attributes)
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
+        self.menuCoding.addAction(self.actionCode_audio_video)
         self.menuCoding.addAction(self.actionView_Graph)
         self.menuCoding.addAction(self.actionExport_codebook)
         self.menuReports.addAction(self.actionCoding_reports)
@@ -167,6 +172,8 @@ class Ui_MainWindow(object):
         self.actionExport_codebook.setText(_translate("MainWindow", "Export codebook"))
         self.actionCode_image.setText(_translate("MainWindow", "Code image"))
         self.actionCode_frequencies.setText(_translate("MainWindow", "Code frequencies"))
+        self.actionCoding_Matrix.setText(_translate("MainWindow", "Coding Matrix"))
+        self.actionCode_audio_video.setText(_translate("MainWindow", "Code audio/video"))
 
 
 if __name__ == "__main__":
