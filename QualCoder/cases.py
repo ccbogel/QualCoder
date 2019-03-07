@@ -25,26 +25,30 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 '''
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-import datetime
-import re
-from GUI.ui_dialog_cases import Ui_Dialog_cases
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from view_image import DialogViewImage
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from memo import DialogMemo
-from select_file import DialogSelectFile
-from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 import csv
+import datetime
+import logging
 import os
 import sys
-import logging
+import re
 import traceback
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
+
+from add_item_name import DialogAddItemName
+from confirm_delete import DialogConfirmDelete
+from GUI.ui_dialog_cases import Ui_Dialog_cases
+from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+from memo import DialogMemo
+from select_file import DialogSelectFile
+from view_av import DialogViewAV
+from view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -101,7 +105,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.textBrowser_menu)
         self.ui.textBrowser.setOpenLinks(False)
-        self.ui.textBrowser.anchorClicked.connect(self.image_link_clicked)
+        self.ui.textBrowser.anchorClicked.connect(self.link_clicked)
         self.fill_tableWidget()
         self.ui.splitter.setSizes([1, 1, 0])
 
@@ -114,11 +118,11 @@ class DialogCases(QtWidgets.QDialog):
         self.case_text = []
 
         cur = self.settings['conn'].cursor()
-        cur.execute("select name, id, fulltext, imagepath, memo, owner, date from source")
+        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source")
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-            'imagepath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         cur.execute("select name, memo, owner, date, caseid from cases")
         result = cur.fetchall()
         for row in result:
@@ -599,26 +603,26 @@ class DialogCases(QtWidgets.QDialog):
         for row in result:
             caseText = ""
             sourcename = ""
-            imagepath = ""
+            mediapath = ""
             for src in self.source:
                 if src['id'] == row[1] and src['fulltext'] is not None:
                     caseText = src['fulltext'][int(row[2]):int(row[3])]
                     sourcename = src['name']
                 if src['id'] == row[1] and src['fulltext'] is None:
                     sourcename = src['name']
-                    imagepath = src['imagepath']
+                    mediapath = src['mediapath']
             self.caseTextViewed.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-            'text': caseText, 'sourcename': sourcename, 'imagepath': imagepath})
+            'text': caseText, 'sourcename': sourcename, 'mediapath': mediapath})
 
         for c in self.caseTextViewed:
-            if c['imagepath'] == '':
+            if c['mediapath'] == '':
                 self.ui.textBrowser.append("<b>" + "File: " + c['sourcename'] + " Text: " +
                 str(int(c['pos0'])) + ":" + str(int(c['pos1'])) + "</b>")
                 self.ui.textBrowser.append(c['text'])
-            else:
-                self.ui.textBrowser.append('<b><a href="' + c['imagepath'] + '"> Image: ' + c['sourcename'] + '</a></b>')
-                path = self.settings['path'] + '/images/' + c['imagepath']
+            elif c['mediapath'][:8] == "/images/":
+                self.ui.textBrowser.append('<b><a href="' + c['mediapath'] + '"> Image: ' + c['sourcename'] + '</a></b>')
+                path = self.settings['path'] + c['mediapath']
                 url = QtCore.QUrl(path)
                 document = self.ui.textBrowser.document()
                 image = QtGui.QImageReader(path).read()
@@ -640,18 +644,28 @@ class DialogCases(QtWidgets.QDialog):
                 image_format.setHeight(image.height() * scaler)
                 image_format.setName(url.toString())
                 cursor.insertImage(image_format)
-                #self.ui.textBrowser.append('<img src="' + path + '" style="width:100px;height:100px;"/>')
+                self.ui.textBrowser.append("<br />")
+            else:
+                self.ui.textBrowser.append('<b><a href="' + c['mediapath'] + '"> A/V media: ' + c['sourcename'] + '</a></b><br />')
+                path = self.settings['path'] + c['mediapath']
+                url = QtCore.QUrl(path)
 
-    def image_link_clicked(self, url):
-        ''' View image in dialog. '''
+    def link_clicked(self, url):
+        ''' View image or audio/video media in dialog. '''
 
         x = -1
         for i in range(0, len(self.source)):
-            if url.toString() == self.source[i]['imagepath']:
+            if url.toString() == self.source[i]['mediapath']:
                 x = i
         if x == -1:
             return
-        ui = DialogViewImage(self.settings, self.source[x])
+        ui = None
+        if self.source[x]['mediapath'][:6] == "/video":
+            ui = DialogViewAV(self.settings, self.source[x])
+        if self.source[x]['mediapath'][:6] == "/audio":
+            ui = DialogViewAV(self.settings, self.source[x])
+        if self.source[x]['mediapath'][:7] == "/images":
+            ui = DialogViewImage(self.settings, self.source[x])
         ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
@@ -811,7 +825,6 @@ class DialogGetStartAndEndMarks(QtWidgets.QDialog):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogGetStartAndEndMarks("case one", ["file 1","file 2"])
     ui.show()

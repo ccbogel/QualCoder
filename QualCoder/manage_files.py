@@ -26,32 +26,34 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from memo import DialogMemo
-from confirm_delete import DialogConfirmDelete
-from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from add_item_name import DialogAddItemName
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
-from view_image import DialogViewImage
-from view_av import DialogViewAV
+import logging
 import datetime
 import os
 import sys
 from shutil import copyfile
-import logging
 import traceback
-# for file extraction
-from docx import opendocx, getdocumenttext
 import zipfile
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+from add_item_name import DialogAddItemName
+from confirm_delete import DialogConfirmDelete
+from docx import opendocx, getdocumenttext
+from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
+from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from html_parser import *
+from memo import DialogMemo
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+from view_image import DialogViewImage
+from view_av import DialogViewAV
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -233,7 +235,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def view(self):
         ''' View and edit text file contents.
-        Alternatively view an image or TODO other media. '''
+        Alternatively view an image or other media. '''
 
         x = self.ui.tableWidget.currentRow()
         if self.source[x]['mediapath'] is not None:
