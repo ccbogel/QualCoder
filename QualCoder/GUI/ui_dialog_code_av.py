@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Wed Mar  6 23:29:29 2019
+# Created: Thu Mar  7 22:12:40 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -62,16 +62,10 @@ class Ui_Dialog_code_av(object):
         self.label_coder.setGeometry(QtCore.QRect(4, 72, 201, 17))
         self.label_coder.setObjectName("label_coder")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
-        self.gridLayout_2 = QtWidgets.QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.treeWidget = QtWidgets.QTreeWidget(Dialog_code_av)
-        self.treeWidget.setObjectName("treeWidget")
-        self.treeWidget.headerItem().setText(0, "1")
-        self.gridLayout_2.addWidget(self.treeWidget, 1, 0, 1, 1)
-        self.textEdit = QtWidgets.QTextEdit(Dialog_code_av)
-        self.textEdit.setObjectName("textEdit")
-        self.gridLayout_2.addWidget(self.textEdit, 1, 1, 1, 1)
-        self.tableWidget = QtWidgets.QTableWidget(Dialog_code_av)
+        self.splitter_2 = QtWidgets.QSplitter(Dialog_code_av)
+        self.splitter_2.setOrientation(QtCore.Qt.Vertical)
+        self.splitter_2.setObjectName("splitter_2")
+        self.tableWidget = QtWidgets.QTableWidget(self.splitter_2)
         self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 60))
         font = QtGui.QFont()
         font.setPointSize(6)
@@ -81,8 +75,15 @@ class Ui_Dialog_code_av(object):
         self.tableWidget.setRowCount(0)
         self.tableWidget.verticalHeader().setDefaultSectionSize(20)
         self.tableWidget.verticalHeader().setMinimumSectionSize(20)
-        self.gridLayout_2.addWidget(self.tableWidget, 0, 0, 1, 2)
-        self.gridLayout.addLayout(self.gridLayout_2, 1, 0, 1, 1)
+        self.splitter = QtWidgets.QSplitter(self.splitter_2)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.treeWidget = QtWidgets.QTreeWidget(self.splitter)
+        self.treeWidget.setObjectName("treeWidget")
+        self.treeWidget.headerItem().setText(0, "Codes")
+        self.textEdit = QtWidgets.QTextEdit(self.splitter)
+        self.textEdit.setObjectName("textEdit")
+        self.gridLayout.addWidget(self.splitter_2, 1, 0, 1, 1)
 
         self.retranslateUi(Dialog_code_av)
         QtCore.QMetaObject.connectSlotsByName(Dialog_code_av)
