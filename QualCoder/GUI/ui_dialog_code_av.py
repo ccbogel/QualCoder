@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Thu Mar  7 22:55:26 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -19,7 +18,13 @@ class Ui_Dialog_code_av(object):
         self.splitter_2.setOrientation(QtCore.Qt.Vertical)
         self.splitter_2.setObjectName("splitter_2")
         self.tableWidget = QtWidgets.QTableWidget(self.splitter_2)
-        self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 60))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
+        self.tableWidget.setSizePolicy(sizePolicy)
+        self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.tableWidget.setBaseSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setPointSize(6)
         self.tableWidget.setFont(font)
@@ -35,6 +40,7 @@ class Ui_Dialog_code_av(object):
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Codes")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
+        self.textEdit.setTabChangesFocus(True)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout.addWidget(self.splitter_2, 1, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_code_av)
