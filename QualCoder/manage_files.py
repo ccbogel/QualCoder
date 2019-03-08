@@ -357,7 +357,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Note importing from html, odt and docx all formatting is lost.
         Imports images as jpg, jpeg, png, gif which are stored in an images directory.
         Imports audio as mp3, wav which are stored in an audio directory
-        Imports video as mp4, mov, wmv which are stored in a video directory
+        Imports video as mp4, mov, ogg, wmv which are stored in a video directory
          '''
 
         imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open file', self.default_import_directory)
@@ -381,7 +381,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 destination += "/audio/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/audio/" + filename)
-            if f.split('.')[-1].lower() in ('mov', 'mp4', 'wmv'):
+            if f.split('.')[-1].lower() in ('mov', 'mp4', 'ogg', 'wmv'):
                 destination += "/video/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/video/" + filename)
