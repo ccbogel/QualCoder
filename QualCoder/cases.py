@@ -646,7 +646,7 @@ class DialogCases(QtWidgets.QDialog):
                 cursor.insertImage(image_format)
                 self.ui.textBrowser.append("<br />")
             else:
-                self.ui.textBrowser.append('<b><a href="' + c['mediapath'] + '"> A/V media: ' + c['sourcename'] + '</a></b><br />')
+                self.ui.textBrowser.append('<br /><b><a href="' + c['mediapath'] + '"> A/V media: ' + c['sourcename'] + '</a></b><br />')
                 path = self.settings['path'] + c['mediapath']
                 url = QtCore.QUrl(path)
 

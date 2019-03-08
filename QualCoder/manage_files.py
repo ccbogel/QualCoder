@@ -105,6 +105,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         ''' Documents images and audio contain the filetype suffix.
         No suffix imples the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
+        Files with the '.transcribed' suffix mean they are associated with audio and
+        video files.
          '''
 
         self.source = []
@@ -201,11 +203,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
 
     def cell_modified(self):
-        ''' If the filename has been changed in the table widget update the database '''
+        ''' This was originally allowed: If the filename has been changed in the table
+        widget update the database.
+        Now, do not allow filename changes. This is to preserve the relationship between
+        an audio/video file and its related transcribed file.
+        Attribute values can be changed. '''
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        if y == self.NAME_COLUMN:
+        '''if y == self.NAME_COLUMN:
             newText = str(self.ui.tableWidget.item(x, y).text()).strip()
 
             # check that no other source file has this text and this is is not empty
@@ -215,6 +221,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             for c in self.source:
                 if c['name'] == newText:
                     update = False
+            # Do not allow renaming/ This to preserve names of a/v files and their
+            # dependent transcribed files: filename.type.transcribed
             if update:
                 # update source list and database
                 self.source[x]['name'] = newText
@@ -222,8 +230,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("update source set name=? where id=?", (newText, self.source[x]['id']))
                 self.settings['conn'].commit()
             else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])
-        if y > self.ID_COLUMN:  # update attribute value
+                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])'''
+        # update attribute value
+        if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.headerLabels[y]
             cur = self.settings['conn'].cursor()
@@ -277,7 +286,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.settings['conn'].commit()
 
     def view_av(self, x):
-        ''' View a cideo file and edit the memo. '''
+        ''' View an audio or video file. Edit the memo. Edit the transcribed file.
+        '''
 
         ui = DialogViewAV(self.settings, self.source[x])
         ui.exec_()
@@ -291,6 +301,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
         else:
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+        # easy way to update transcribed files
+        self.load_file_data()
 
     def view_image(self, x):
         ''' View an image file and edit the image memo. '''
@@ -376,7 +388,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def load_media_reference(self, mediapath):
-        ''' Load media reference information. '''
+        ''' Load media reference information for audio video images. '''
 
         # check for duplicated filename and update model, widget and database
         name_split = mediapath.split("/")
@@ -394,11 +406,25 @@ class DialogManageFiles(QtWidgets.QDialog):
         id_ = cur.fetchone()[0]
         entry['id'] = id_
         self.parent_textEdit.append(entry['name'] + " imported.")
+        self.source.append(entry)
+
+        # Create an empty transcription file for audio and video
+        if mediapath[:6] in("/audio", "/video"):
+            entry = {'name': filename + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+            'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            cur = self.settings['conn'].cursor()
+            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                (entry['name'],  entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
+            self.settings['conn'].commit()
+            cur.execute("select last_insert_rowid()")
+            id_ = cur.fetchone()[0]
+            entry['id'] = id_
+            self.parent_textEdit.append(entry['name'] + " imported.")
+            self.source.append(entry)
 
         # clear and refill table widget
         for r in self.source:
             self.ui.tableWidget.removeRow(0)
-        self.source.append(entry)
         self.fill_table()
 
     def load_file_text(self, import_file):
@@ -646,10 +672,12 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
-            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, QtWidgets.QTableWidgetItem(data['name']))
-            dateitem = QtWidgets.QTableWidgetItem(data['date'])
-            dateitem.setFlags(dateitem.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, dateitem)
+            name_item = QtWidgets.QTableWidgetItem(data['name'])
+            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
+            date_item = QtWidgets.QTableWidgetItem(data['date'])
+            date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, date_item)
             memoitem = data['memo']
             if memoitem != None and memoitem != "":
                 self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
