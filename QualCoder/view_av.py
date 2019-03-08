@@ -96,6 +96,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_stop.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
+        self.ui.textEdit.setReadOnly(True)
 
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
@@ -141,7 +142,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.video_set_key_input(False)
 
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
+        #self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
@@ -274,8 +275,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.media_data = ui.get_selected()
             self.ui.pushButton_play.setEnabled(True)
             self.ui.pushButton_stop.setEnabled(True)
-            self.ui.pushButton_coding.setEnabled(True)
-            self.ui.horizontalSlider.setEnabled(False)
+            self.ui.horizontalSlider.setEnabled(True)
             self.load_media()
 
     def load_media(self):
@@ -308,17 +308,21 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mediaplayer.set_hwnd(int(self.ui.frame.winId()))
         elif platform.system() == "Darwin": # for MacOS
             self.mediaplayer.set_nsobject(int(self.ui.frame.winId()))
-
         msecs = self.media.get_duration()
         secs = int(msecs / 1000)
         mins = int(secs / 60)
         remainder_secs = secs - mins * 60
         self.media_duration_text = "Duration: " + str(mins) + "." + str(remainder_secs)
         self.ui.label_time_2.setText(self.media_duration_text)
-        #TODO self.ui.textEdit.setText(transcription file)
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
+        # Get the transcribe text and fill textedit
+        cur = self.settings['conn'].cursor()
+        cur.execute("select id, fulltext from source where name = ?", [self.media_data['name'] + ".transcribed"])
+        self.transcription = cur.fetchone()
+        if self.transcription is not None:
+            self.ui.textEdit.setText(self.transcription[1])
         #self.play_pause()
 
     #TODO make and draw coded segments in table
@@ -407,6 +411,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.label_code.setText("NO CODE SELECTED")
             return
         self.ui.label_code.setText("Code: " + current.text(0))
+        # initial GUI when no code selected, keep the pushbutton disabled
+        self.ui.pushButton_coding.setEnabled(True)
 
     def media_memo(self):
         """ Create a memo for the file. """
@@ -822,7 +828,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.setWindowTitle(self.media_data['mediapath'])
 
         # Get the transcribe text and fill textedit
-        print(media_data['name'] + ".transcribed")
         cur = self.settings['conn'].cursor()
         cur.execute("select id, fulltext from source where name = ?", [media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
