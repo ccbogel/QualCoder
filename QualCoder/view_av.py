@@ -72,9 +72,11 @@ class DialogCodeAV(QtWidgets.QDialog):
     codes = []
     categories = []
     ddialog = None
+    media_data = None
     instance = None
     media_player = None
     media = None
+    segment = {}
 
     def __init__(self, settings):
         ''' Show list of audio and video files.
@@ -86,6 +88,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.codes = []
         self.categories = []
         self.media_data = None
+        self.segment['start'] = None
+        self.segment['end'] = None
         self.get_codes_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -115,10 +119,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        #self.ui.treeWidget.itemClicked.connect(self.fill_code_label)  #OLD approach
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
+        # Otherwise, the vlc player hogs all the mouse events
         self.ddialog = QtWidgets.QDialog()
         self.ddialog.resize(640, 480)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
@@ -134,9 +139,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(50, -200)))
         self.ddialog.show()
 
-        # Create a basic vlc instance
+        # Create a vlc instance and an empty vlc media player
         self.instance = vlc.Instance()
-        # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
@@ -146,6 +150,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
+        self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
+
+        msg = "Coding audio/video is under testing. No actual coding can be performed.\
+        AT THIS STAGE, you can only use this dialog to experience the workflow."
+        QtWidgets.QMessageBox.warning(None, 'UNDER TESTING', msg)
 
     def get_codes_categories(self):
         """ Called from init, delete category/code. """
@@ -276,6 +285,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_play.setEnabled(True)
             self.ui.pushButton_stop.setEnabled(True)
             self.ui.horizontalSlider.setEnabled(True)
+            self.ui.pushButton_coding.setEnabled(True)
             self.load_media()
 
     def load_media(self):
@@ -403,16 +413,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.close()
         self.stop()
 
-    def fill_code_label(self):
+    """def fill_code_label(self):
         ''' Fill code label with curently selected item's code name '''
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.setText("NO CODE SELECTED")
             return
-        self.ui.label_code.setText("Code: " + current.text(0))
-        # initial GUI when no code selected, keep the pushbutton disabled
-        self.ui.pushButton_coding.setEnabled(True)
+        self.ui.label_code.setText("Code: " + current.text(0))"""
+
 
     def media_memo(self):
         """ Create a memo for the file. """
@@ -425,6 +434,38 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.settings['conn'].commit()
         self.file_['memo'] = ui.memo
 
+    def create_or_clear_segment(self):
+        """ Make the start end end points of the segment of time.
+        Use minutes and seconds format for the time.
+        Can also clear the segment by pressing the button when it says Clear segement.
+        clear segment text is changed to Start segment once a segment is assigned to a code.
+        ??MAYBE use milliseconds?? """
+
+        if self.ui.pushButton_coding.text() == "Clear segment":
+            self.segment['start'] = None
+            self.segment['end'] = None
+            self.ui.pushButton_coding.setText("Start segment")
+            self.ui.label_segment.setText("Segment:")
+            return
+        time = self.ui.label_time.text()
+        time = time[6:]
+        if self.segment['start'] is None:
+            self.segment['start'] = time
+            self.ui.pushButton_coding.setText("End segment")
+            self.ui.label_segment.setText("Segment: " + str(self.segment['start']) + " - ")
+            return
+        if self.segment['start'] is not None and self.segment['end'] is None:
+            self.segment['end'] = time
+            self.ui.pushButton_coding.setText("Clear segment")
+
+            # check and reverse start and end times if start is greater than the end
+            if float(self.segment['start']) > float(self.segment['end']):
+                tmp = self.segment['start']
+                self.segment['start'] = self.segment['end']
+                self.segment['end'] = tmp
+            text = "Segment: " + str(self.segment['start']) + " - " + self.segment['end']
+            self.ui.label_segment.setText(text)
+
     def tree_menu(self, position):
         """ Context menu for treewidget items.
         Add, rename, memo, move or delete code or category. Change code color. """
@@ -433,6 +474,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         #print(selected.parent())
         #index = self.ui.treeWidget.currentIndex()
+        ActionItemAssignSegment = None
+        if self.segment['end'] is not None:
+            ActionItemAssignSegment = menu.addAction("Assign segment to code")
         ActionItemAddCode = menu.addAction("Add a new code")
         ActionItemAddCategory = menu.addAction("Add a new category")
         ActionItemRename = menu.addAction("Rename")
@@ -454,6 +498,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.add_edit_code_memo(selected)
         if selected is not None and action == ActionItemDelete:
             self.delete_category_or_code(selected)
+        # UnboundLocalError
+        if action == ActionItemAssignSegment:
+            self.assign_segment_to_code(selected)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -471,6 +518,19 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.get_codes_categories()
                 self.fill_tree()
         return False
+
+    def assign_segment_to_code(self, selected):
+        """ Assign time segment to selected code. """
+
+        print(self.segment)
+        print(selected.text(0), selected.text(1))
+
+        #TODO fill database
+
+        self.segment['start'] = None
+        self.segment['end'] = None
+        self.ui.label_segment.setText("Segment:")
+        self.ui.pushButton_coding.setText("Start segment")
 
     def item_moved_update_data(self, item, parent):
         """ Callanded from drop event in treeWidget view port.
