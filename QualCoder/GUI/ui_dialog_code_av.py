@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Sat Mar  9 10:40:23 2019
+# Created: Sat Mar  9 22:38:59 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -85,7 +85,7 @@ class Ui_Dialog_code_av(object):
         self.pushButton_coding.setGeometry(QtCore.QRect(153, 37, 171, 27))
         self.pushButton_coding.setObjectName("pushButton_coding")
         self.label_segment = QtWidgets.QLabel(self.groupBox_2)
-        self.label_segment.setGeometry(QtCore.QRect(190, 72, 501, 17))
+        self.label_segment.setGeometry(QtCore.QRect(190, 72, 311, 17))
         self.label_segment.setObjectName("label_segment")
         self.label_coder = QtWidgets.QLabel(self.groupBox_2)
         self.label_coder.setGeometry(QtCore.QRect(720, 72, 201, 17))
@@ -93,6 +93,9 @@ class Ui_Dialog_code_av(object):
         self.pushButton_select = QtWidgets.QPushButton(self.groupBox_2)
         self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 171, 27))
         self.pushButton_select.setObjectName("pushButton_select")
+        self.pushButton_memo = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_memo.setGeometry(QtCore.QRect(520, 66, 181, 27))
+        self.pushButton_memo.setObjectName("pushButton_memo")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog_code_av)
@@ -103,18 +106,20 @@ class Ui_Dialog_code_av(object):
     def retranslateUi(self, Dialog_code_av):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_av.setWindowTitle(_translate("Dialog_code_av", "Code Audio Video"))
+        self.textEdit.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Transcript</p></body></html>"))
         self.pushButton_play.setText(_translate("Dialog_code_av", "Play"))
         self.pushButton_stop.setText(_translate("Dialog_code_av", "Stop"))
         self.label_volume.setText(_translate("Dialog_code_av", "Volume"))
         self.label_time.setText(_translate("Dialog_code_av", "Time:"))
         self.label_time_2.setText(_translate("Dialog_code_av", "Duration: "))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
-        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Play audio/video from start or another position. Press the Start segment button to begin coding the audio/video segment. Press the Stop segment button to end the coded segment.</p></body></html>"))
+        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.</p></body></html>"))
         self.pushButton_coding.setText(_translate("Dialog_code_av", "Start segment"))
         self.label_segment.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.</p></body></html>"))
         self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
         self.label_coder.setText(_translate("Dialog_code_av", "Coder:"))
         self.pushButton_select.setText(_translate("Dialog_code_av", "Select media"))
+        self.pushButton_memo.setText(_translate("Dialog_code_av", "Segment memo"))
 
 
 if __name__ == "__main__":
