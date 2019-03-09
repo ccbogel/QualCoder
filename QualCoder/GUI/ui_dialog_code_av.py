@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Fri Mar  8 23:00:16 2019
+# Created: Sat Mar  9 10:40:23 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,10 +50,10 @@ class Ui_Dialog_code_av(object):
         self.groupBox_2.setTitle("")
         self.groupBox_2.setObjectName("groupBox_2")
         self.pushButton_play = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_play.setGeometry(QtCore.QRect(10, 37, 85, 27))
+        self.pushButton_play.setGeometry(QtCore.QRect(10, 37, 71, 27))
         self.pushButton_play.setObjectName("pushButton_play")
         self.pushButton_stop = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_stop.setGeometry(QtCore.QRect(100, 37, 85, 27))
+        self.pushButton_stop.setGeometry(QtCore.QRect(82, 37, 71, 27))
         self.pushButton_stop.setObjectName("pushButton_stop")
         self.horizontalSlider_vol = QtWidgets.QSlider(self.groupBox_2)
         self.horizontalSlider_vol.setGeometry(QtCore.QRect(795, 44, 160, 18))
@@ -66,7 +66,7 @@ class Ui_Dialog_code_av(object):
         self.label_volume.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_volume.setObjectName("label_volume")
         self.label_time = QtWidgets.QLabel(self.groupBox_2)
-        self.label_time.setGeometry(QtCore.QRect(360, 37, 151, 21))
+        self.label_time.setGeometry(QtCore.QRect(350, 40, 151, 21))
         self.label_time.setObjectName("label_time")
         self.label_time_2 = QtWidgets.QLabel(self.groupBox_2)
         self.label_time_2.setGeometry(QtCore.QRect(520, 40, 161, 21))
@@ -82,13 +82,13 @@ class Ui_Dialog_code_av(object):
         self.horizontalSlider.setTickInterval(10)
         self.horizontalSlider.setObjectName("horizontalSlider")
         self.pushButton_coding = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_coding.setGeometry(QtCore.QRect(190, 37, 161, 27))
+        self.pushButton_coding.setGeometry(QtCore.QRect(153, 37, 171, 27))
         self.pushButton_coding.setObjectName("pushButton_coding")
-        self.label_code = QtWidgets.QLabel(self.groupBox_2)
-        self.label_code.setGeometry(QtCore.QRect(190, 70, 501, 17))
-        self.label_code.setObjectName("label_code")
+        self.label_segment = QtWidgets.QLabel(self.groupBox_2)
+        self.label_segment.setGeometry(QtCore.QRect(190, 72, 501, 17))
+        self.label_segment.setObjectName("label_segment")
         self.label_coder = QtWidgets.QLabel(self.groupBox_2)
-        self.label_coder.setGeometry(QtCore.QRect(730, 70, 201, 17))
+        self.label_coder.setGeometry(QtCore.QRect(720, 72, 201, 17))
         self.label_coder.setObjectName("label_coder")
         self.pushButton_select = QtWidgets.QPushButton(self.groupBox_2)
         self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 171, 27))
@@ -109,9 +109,10 @@ class Ui_Dialog_code_av(object):
         self.label_time.setText(_translate("Dialog_code_av", "Time:"))
         self.label_time_2.setText(_translate("Dialog_code_av", "Duration: "))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
-        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Select a code. Play video from start or another position. Press the Start coding button to begin coding the audio/video segement. Press the Stop coding button to end the coded segment.</p></body></html>"))
-        self.pushButton_coding.setText(_translate("Dialog_code_av", "Start coding"))
-        self.label_code.setText(_translate("Dialog_code_av", "Code:"))
+        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Play audio/video from start or another position. Press the Start segment button to begin coding the audio/video segment. Press the Stop segment button to end the coded segment.</p></body></html>"))
+        self.pushButton_coding.setText(_translate("Dialog_code_av", "Start segment"))
+        self.label_segment.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.</p></body></html>"))
+        self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
         self.label_coder.setText(_translate("Dialog_code_av", "Coder:"))
         self.pushButton_select.setText(_translate("Dialog_code_av", "Select media"))
 
