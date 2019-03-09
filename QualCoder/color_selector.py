@@ -25,16 +25,17 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 '''
 
-from PyQt5 import QtGui, QtWidgets
-#from code_colors import CodeColors
-from GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
+import logging
 import os
 import sys
-import logging
 import traceback
+
+from PyQt5 import QtGui, QtWidgets
+from GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -55,8 +56,8 @@ colors = ["#F8E0E0","#F6CECE","#F5A9A9","#F78181","#FA5858","#F8E6E0","#F6D8CE",
 
 
 class DialogColorSelect(QtWidgets.QDialog):
-    ''' Dialog to select colour for code.
-    There are 10 columns and 6 rows of colours. '''
+    """ Dialog to select colour for code.
+    There are 10 columns and 6 rows of colours. """
 
     selected_color = None
 
@@ -71,7 +72,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.selected_color = prev_color
 
     def color_selected(self):
-        ''' Get colour selection from table widget '''
+        """ Get colour selection from table widget. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -88,13 +89,12 @@ class DialogColorSelect(QtWidgets.QDialog):
         return self.selected_color
 
     def accept(self):
-        ''' Overrriden accept button '''
+        """ Overrriden accept button. """
 
         super(DialogColorSelect, self).accept()
 
     def setupUi(self):
-        ''' seven rows of 10 columns of colours.
-        '''
+        """ seven rows of 10 columns of colours. """
 
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         for row in range(0, 7):
@@ -105,18 +105,10 @@ class DialogColorSelect(QtWidgets.QDialog):
                 codeColor = colors[row * 10 + col]
                 item.setBackground(QtGui.QBrush(QtGui.QColor(codeColor)))
                 self.ui.tableWidget.setItem(row, col, item)
-                '''if codeColor == self.prevColor:
-                    palette = self.ui.label_colour.palette()
-                    c = QtGui.QColor(codeColor)
-                    palette.setColor(QtGui.QPalette.Window, c)
-                    self.ui.label_colour.setPalette(palette)
-                    self.ui.label_colour.setAutoFillBackground(True)  # important
-                    '''
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogColorSelect("#101010")
     ui.show()

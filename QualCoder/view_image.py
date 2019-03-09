@@ -30,6 +30,7 @@ from copy import deepcopy
 import datetime
 import logging
 import os
+from random import randint
 import sys
 import traceback
 
@@ -40,6 +41,7 @@ from PyQt5.QtGui import QBrush
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from color_selector import DialogColorSelect
+from color_selector import colors
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from memo import DialogMemo
@@ -97,7 +99,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
-        self.ui.splitter.setSizes([30, 70])
+        self.ui.splitter.setSizes([100, 300])
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
@@ -633,8 +635,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         newCodeText = ui.get_new_name()
         if newCodeText is None:
             return
+        code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': newCodeText, 'memo': "", 'owner': self.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': '#F8E0E0'}
+        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
         cur = self.settings['conn'].cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
@@ -651,7 +654,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setCurrentItem(top_item)
 
     def add_category(self):
-        """ When button pressed, add a new category.
+        """ Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
         Add the new category as a top level item. """
 

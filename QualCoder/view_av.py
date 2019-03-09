@@ -28,10 +28,11 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+import logging
 import os
 import platform
+from random import randint
 import sys
-import logging
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -40,6 +41,7 @@ from PyQt5.QtGui import QBrush
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
+from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
@@ -100,8 +102,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_stop.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
+        self.ui.pushButton_memo.setEnabled(False)
         self.ui.textEdit.setReadOnly(True)
-
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
         treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
@@ -109,9 +111,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_coder.setText("Coder: " + settings['codername'])
         self.setWindowTitle("Media coding")
         self.ui.pushButton_select.pressed.connect(self.select_media)
-        #TODO implement memo and show coders later
-        #self.ui.pushButton_memo.setEnabled(False)
-        #self.ui.pushButton_memo.pressed.connect(self.image_memo)
+        self.ui.pushButton_memo.pressed.connect(self.segment_memo)
+        #TODO show other coders, maybe?
         #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -119,7 +120,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        #self.ui.treeWidget.itemClicked.connect(self.fill_code_label)  #OLD approach
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
@@ -129,7 +129,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        if platform.system() == "Darwin": # for MacOS
+        if platform.system() == "Darwin":  # for MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
@@ -139,7 +139,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(50, -200)))
         self.ddialog.show()
 
-        # Create a vlc instance and an empty vlc media player
+        # Create a vlc instance with an empty vlc media player
         self.instance = vlc.Instance()
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
@@ -152,9 +152,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
 
-        msg = "Coding audio/video is under testing. No actual coding can be performed.\
-        AT THIS STAGE, you can only use this dialog to experience the workflow."
-        QtWidgets.QMessageBox.warning(None, 'UNDER TESTING', msg)
+        msg = "Reports on segments and deleting segments can only be achieved through the sql dialog.\n\
+        A graphic showing coded segments is not implemented at this stage."
+        QtWidgets.QMessageBox.warning(None, 'UNDER DEVELOPMENT', msg)
 
     def get_codes_categories(self):
         """ Called from init, delete category/code. """
@@ -400,7 +400,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
-
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
@@ -413,56 +412,54 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.close()
         self.stop()
 
-    """def fill_code_label(self):
-        ''' Fill code label with curently selected item's code name '''
+    def segment_memo(self):
+        """ Create a memo for the segment. """
 
-        current = self.ui.treeWidget.currentItem()
-        if current.text(1)[0:3] == 'cat':
-            self.ui.label_code.setText("NO CODE SELECTED")
-            return
-        self.ui.label_code.setText("Code: " + current.text(0))"""
-
-
-    def media_memo(self):
-        """ Create a memo for the file. """
-
-        ui = DialogMemo(self.settings, "Memo for " + self.file_['name'],
-            self.file_['memo'])  # "id=" + str(self.file_['id']))
+        ui = DialogMemo(self.settings, "Memo for segment", "")
         ui.exec_()
-        cur = self.settings['conn'].cursor()
-        cur.execute('update source set memo=? where id=?', (ui.memo, self.file_['id']))
-        self.settings['conn'].commit()
-        self.file_['memo'] = ui.memo
+        self.segment['memo'] = ui.memo
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
-        Use minutes and seconds format for the time.
+        Use minutes and seconds, and milliseconds formats for the time.
         Can also clear the segment by pressing the button when it says Clear segement.
         clear segment text is changed to Start segment once a segment is assigned to a code.
-        ??MAYBE use milliseconds?? """
+        """
 
         if self.ui.pushButton_coding.text() == "Clear segment":
             self.segment['start'] = None
             self.segment['end'] = None
+            self.segment['start_msecs'] = None
+            self.segment['end_msecs'] = None
+            self.segment['memo'] = ""
             self.ui.pushButton_coding.setText("Start segment")
             self.ui.label_segment.setText("Segment:")
             return
         time = self.ui.label_time.text()
         time = time[6:]
+        time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
+            self.segment['start_msecs'] = time_msecs
+            self.segment['memo'] = ""
             self.ui.pushButton_coding.setText("End segment")
             self.ui.label_segment.setText("Segment: " + str(self.segment['start']) + " - ")
             return
         if self.segment['start'] is not None and self.segment['end'] is None:
             self.segment['end'] = time
+            self.segment['end_msecs'] = time_msecs
             self.ui.pushButton_coding.setText("Clear segment")
+            self.ui.pushButton_memo.setEnabled(True)
 
             # check and reverse start and end times if start is greater than the end
             if float(self.segment['start']) > float(self.segment['end']):
                 tmp = self.segment['start']
+                tmp_msecs = self.segment['start_msecs']
                 self.segment['start'] = self.segment['end']
+                self.segment['start_msecs'] = self.segment['end_msecs']
                 self.segment['end'] = tmp
+                self.segment['end_msecs'] = tmp_msecs
+                self.ui.pushButton_memo.setEnabled(True)
             text = "Segment: " + str(self.segment['start']) + " - " + self.segment['end']
             self.ui.label_segment.setText(text)
 
@@ -520,17 +517,30 @@ class DialogCodeAV(QtWidgets.QDialog):
         return False
 
     def assign_segment_to_code(self, selected):
-        """ Assign time segment to selected code. """
+        """ Assign time segment to selected code. Insert an entry into the database.
+        Then clear the segment for re-use."""
 
-        print(self.segment)
-        print(selected.text(0), selected.text(1))
-
-        #TODO fill database
+        #print(self.segment)
+        #print(selected.text(1))
+        #print(self.media_data)
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
+        cid = int(selected.text(1).split(':')[1])
+        values = [self.media_data['id'], self.segment['start_msecs'],
+            self.segment['end_msecs'], cid, self.segment['memo'],
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            self.settings['codername']]
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, values)
+        self.settings['conn'].commit()
 
         self.segment['start'] = None
+        self.segment['start_msecs'] = None
         self.segment['end'] = None
+        self.segment['end_msecs'] = None
+        self.segment['memo'] = ""
         self.ui.label_segment.setText("Segment:")
         self.ui.pushButton_coding.setText("Start segment")
+        self.ui.pushButton_memo.setEnabled(False)
 
     def item_moved_update_data(self, item, parent):
         """ Callanded from drop event in treeWidget view port.
@@ -618,8 +628,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         newCodeText = ui.get_new_name()
         if newCodeText is None:
             return
+        code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': newCodeText, 'memo': "", 'owner': self.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': '#F8E0E0'}
+        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
         cur = self.settings['conn'].cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
