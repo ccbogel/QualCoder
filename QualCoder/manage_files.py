@@ -66,7 +66,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogManageFiles(QtWidgets.QDialog):
-    ''' View, import, export, rename and delete text files.  '''
+    """ View, import, export, rename and delete text files. """
 
     source = []
     settings = None
@@ -102,12 +102,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def load_file_data(self):
-        ''' Documents images and audio contain the filetype suffix.
+        """ Documents images and audio contain the filetype suffix.
         No suffix imples the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
-         '''
+        """
 
         self.source = []
         cur = self.settings['conn'].cursor()
@@ -135,10 +135,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         print
 
     def add_attribute(self):
-        ''' When add button pressed, opens the addItem dialog to get new attribute text.
+        """ When add button pressed, opens the addItem dialog to get new attribute text.
         Then get the attribute type through a dialog.
         AddItem dialog checks for duplicate attribute name.
-        New attribute is added to the model and database '''
+        New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddItemName(check_names, "New attribute name")
@@ -172,9 +172,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_textEdit.append("Attribute added to files: " + name + ", type: " + valuetype)
 
     def cell_selected(self):
-        ''' When the table widget memo cell is selected display the memo.
+        """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
-        If a new memo also show in table widget by displaying YES in the memo column '''
+        If a new memo also show in table widget by displaying YES in the memo column. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -203,15 +203,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
 
     def cell_modified(self):
-        ''' This was originally allowed: If the filename has been changed in the table
-        widget update the database.
-        Now, do not allow filename changes. This is to preserve the relationship between
-        an audio/video file and its related transcribed file.
-        Attribute values can be changed. '''
+        """ If the filename has been changed in the table widget update the database.
+        Need to preserve the relationship between an audio/video file and its related
+        transcribed file. Attribute values can be changed. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        '''if y == self.NAME_COLUMN:
+        if y == self.NAME_COLUMN:
             newText = str(self.ui.tableWidget.item(x, y).text()).strip()
 
             # check that no other source file has this text and this is is not empty
@@ -221,16 +219,25 @@ class DialogManageFiles(QtWidgets.QDialog):
             for c in self.source:
                 if c['name'] == newText:
                     update = False
-            # Do not allow renaming/ This to preserve names of a/v files and their
+            # Need to preserve names of a/v files and their
             # dependent transcribed files: filename.type.transcribed
             if update:
+                print(self.source[x])  # tmp
+                if self.source[x]['mediapath'] is not None:
+                    msg = "If there is an associated '.transcribed' file please rename "
+                    msg += "it to match the media file plus '.transcribed'"
+                    QtWidgets.QMessageBox.warning(None, "Media name", msg)
+                if ".transcribed" in self.source[x]['name']:
+                    msg = "If there is an associated media file please rename "
+                    msg += "it to match the media file before the '.transcribed' suffix"
+                    QtWidgets.QMessageBox.warning(None, "Media name", msg)
                 # update source list and database
                 self.source[x]['name'] = newText
                 cur = self.settings['conn'].cursor()
                 cur.execute("update source set name=? where id=?", (newText, self.source[x]['id']))
                 self.settings['conn'].commit()
             else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])'''
+                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
@@ -243,18 +250,20 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.resizeColumnsToContents()
 
     def view(self):
-        ''' View and edit text file contents.
-        Alternatively view an image or other media. '''
+        """ View and edit text file contents.
+        Alternatively view an image or other media. """
 
         x = self.ui.tableWidget.currentRow()
         if self.source[x]['mediapath'] is not None:
             if self.source[x]['mediapath'][:8] == "/images/":
                 self.view_image(x)
+                return
             if self.source[x]['mediapath'][:7] == "/video/":
                 self.view_av(x)
+                return
             if self.source[x]['mediapath'][:7] == "/audio/":
                 self.view_av(x)
-            return
+                return
 
         Dialog = QtWidgets.QDialog()
         ui = Ui_Dialog_memo()
@@ -286,8 +295,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.settings['conn'].commit()
 
     def view_av(self, x):
-        ''' View an audio or video file. Edit the memo. Edit the transcribed file.
-        '''
+        """ View an audio or video file. Edit the memo. Edit the transcribed file.
+        """
 
         ui = DialogViewAV(self.settings, self.source[x])
         ui.exec_()
@@ -295,7 +304,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
             cur = self.settings['conn'].cursor()
-            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
+            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
+                self.source[x]['id']))
             self.settings['conn'].commit()
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
@@ -305,7 +315,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
 
     def view_image(self, x):
-        ''' View an image file and edit the image memo. '''
+        """ View an image file and edit the image memo. """
 
         ui = DialogViewImage(self.settings, self.source[x])
         ui.exec_()
@@ -313,7 +323,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
             cur = self.settings['conn'].cursor()
-            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
+            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
+                self.source[x]['id']))
             self.settings['conn'].commit()
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
@@ -351,16 +362,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def import_files(self):
-        ''' Import files and store into relevant directories (documents, images, ?audio?).
+        """ Import files and store into relevant directories (documents, images, ?audio?).
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt and docx
         Note importing from html, odt and docx all formatting is lost.
         Imports images as jpg, jpeg, png, gif which are stored in an images directory.
         Imports audio as mp3, wav which are stored in an audio directory
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory
-         '''
+        """
 
-        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open file', self.default_import_directory)
+        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open file',
+            self.default_import_directory)
         if not ok or imports == []:
             return
         nameSplit = imports[0].split("/")
@@ -388,7 +400,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def load_media_reference(self, mediapath):
-        ''' Load media reference information for audio video images. '''
+        """ Load media reference information for audio video images. """
 
         # check for duplicated filename and update model, widget and database
         name_split = mediapath.split("/")
@@ -428,7 +440,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def load_file_text(self, import_file):
-        ''' Import individual file types of .odt, .docx .txt, PDF, .html, .htm'''
+        """ Import individual file types of odt, docx txt, pdf, html, htm
+        """
 
         text = ""
 
@@ -515,8 +528,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source.append(entry)
 
     def convert_odt_to_text(self, import_file):
-        ''' convert odt to very rough equivalent with headings, list items and tables for
-        html display in qTextEdits '''
+        """ Convert odt to very rough equivalent with headings, list items and tables for
+        html display in qTextEdits. """
 
         odt_file = zipfile.ZipFile(import_file)
         data = str(odt_file.read('content.xml'))  # bytes class to string
@@ -555,10 +568,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 tagged = False
         return text
 
-    def convert_odt_to_html(self, import_file):
-        ''' convert odt to very rough equivalent with headings, list items and tables for
+    '''def convert_odt_to_html(self, import_file):
+        """ Convert odt to very rough equivalent with headings, list items and tables for
         html display in qTextEdits.
-        Not currently used '''
+        NOT CURRENTLY USED. """
 
         odt_file = zipfile.ZipFile(import_file)
         data = str(odt_file.read('content.xml'))  # bytes class to string
@@ -594,10 +607,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 text += data[i]
             if data[i] == ">":
                 tagged = False
-        return text
+        return text'''
 
     def export(self):
-        ''' Export fulltext to a plain text file, filename will have .txt ending '''
+        """ Export fulltext to a plain text file, filename will have .txt ending. """
 
         x = self.ui.tableWidget.currentRow()
         if self.source[x]['mediapath'] is not None:
@@ -621,8 +634,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_textEdit.append(filename + " exported to " + directory)
 
     def delete(self):
-        ''' Delete file from database and update model and widget.
-        Also, delete files from /images directory '''
+        """ Delete file from database and update model and widget.
+        Also, delete files from sub-directories. """
 
         x = self.ui.tableWidget.currentRow()
         fileId = self.source[x]['id']
@@ -660,7 +673,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def fill_table(self):
-        ''' Fill the table widget with file data. '''
+        """ Fill the table widget with file data. """
 
         self.ui.tableWidget.setColumnCount(len(self.headerLabels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
@@ -673,7 +686,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
             name_item = QtWidgets.QTableWidgetItem(data['name'])
-            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            #name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
@@ -694,7 +707,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     #print(type(fid), type(a[2]), type(a[0]), type(header))
                     if fid == a[2] and a[0] == header:
                         #print("found", a)
-                        #TODO id in image and file matches - get overlap
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()

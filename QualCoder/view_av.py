@@ -152,8 +152,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
 
-        msg = "Reports on segments and deleting segments can only be achieved through the sql dialog.\n\
-        A graphic showing coded segments is not implemented at this stage."
+        msg = "Currently, reports on segments and deleting segments can only be achieved through the sql dialog."
         QtWidgets.QMessageBox.warning(None, 'UNDER DEVELOPMENT', msg)
 
     def get_codes_categories(self):
@@ -1044,13 +1043,14 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.stop()
 
     def closeEvent(self, event):
-        ''' Stop the vlc player on close. '''
+        """ Stop the vlc player on close. """
 
         self.stop()
-        cur = self.settings['conn'].cursor()
-        text = self.ui.textEdit_transcription.toPlainText()
-        cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
-        self.settings['conn'].commit()
+        if self.transcription is not None:
+            cur = self.settings['conn'].cursor()
+            text = self.ui.textEdit_transcription.toPlainText()
+            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
+            self.settings['conn'].commit()
 
 
 
