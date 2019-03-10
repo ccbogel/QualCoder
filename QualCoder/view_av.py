@@ -152,7 +152,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
 
-        msg = "Currently, reports on segments and deleting segments can only be achieved through the sql dialog."
+        msg = "Currently, deleting segments can only be achieved through the sql dialog."
         QtWidgets.QMessageBox.warning(None, 'UNDER DEVELOPMENT', msg)
 
     def get_codes_categories(self):
@@ -394,7 +394,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         remainder_secs = str(secs - mins * 60)
         if len(remainder_secs) == 1:
             remainder_secs = "0" + remainder_secs
-        self.ui.label_time.setText("Time: " + str(mins) + "." + str(remainder_secs))
+        self.ui.label_time.setText("Time: " + str(mins) + "." + remainder_secs)
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
