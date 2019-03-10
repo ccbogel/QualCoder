@@ -634,6 +634,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, or html.
     """
+    #TODO - export case matrix
 
     settings = None
     parent_textEdit = None
@@ -668,7 +669,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
         self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
-        self.ui.splitter.setSizes([10, 10, 0])
+        self.ui.splitter.setSizes([100, 200, 0])
 
     def get_data(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
@@ -826,6 +827,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
         need for a separate folder that the html file links to."""
 
+        #TODO - possibly add video segments to html output - might be difficult to do
+
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",
@@ -915,7 +918,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 "No files, cases or attributes have been selected.")
             return
 
-        # get selected codes from the items
+        # get selected codes from selected items
         code_ids = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
@@ -956,13 +959,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             # coded images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.mediapath, source.id from code_image join code_name "
+            sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
+            sql += " from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
             if coder != "":
                 sql += " and code_image.owner=? "
                 parameters.append(coder)
+            if search_text != "":
+                sql += " and code_image.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -973,7 +980,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 image_results.append(row)
 
-            # coded audio and video
+            # coded audio and video, also looks for search_text in coded segment meno
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
             sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
@@ -983,6 +990,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if coder != "":
                 sql += " and code_av.owner=? "
                 parameters.append(coder)
+            if search_text != "":
+                sql += " and code_av.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1022,7 +1032,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # coded images
             parameters = []
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id from "
+            sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
+            sql += "code_image.memo from "
             sql += "code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1032,6 +1043,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if coder != "":
                 sql += " and code_image.owner=? "
                 parameters.append(coder)
+            if search_text != "":
+                sql += " and code_image.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1056,6 +1070,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if coder != "":
                 sql += " and code_av.owner=? "
                 parameters.append(coder)
+            if search_text != "":
+                sql += " and code_av.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1067,7 +1084,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 av_results.append(row)
 
         # get coded text and images from attribute selection
-        #TODO audio and video
         if self.attribute_selection != []:
             logger.debug("attributes:" + str(self.attribute_selection))
             # convert each row into sql and add to case or file lists
@@ -1075,8 +1091,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             case_sql = []
             for a in self.attribute_selection:
                 #print(a)
-                sql = " select id from attribute where attribute.name = '" + a[0] + "' and attribute.value "
-                sql += a[3] + " "
+                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
+                sql += " and attribute.value " + a[3] + " "
                 if a[3] in ('in', 'not in', 'between'):
                     sql += "("
                 sql += ','.join(a[4])
@@ -1180,12 +1196,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # second sql is for file parameters only
                 sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-                sql += "code_image.owner, source.mediapath, source.id from code_image join code_name "
+                sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
+                sql += " from code_image join code_name "
                 sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
             if coder != "":
                 sql += " and code_image.owner=? "
+            if search_text != "":
+                sql += " and code_image.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
                 parameters.append(coder)
             if parameters == []:
                 cur.execute(sql)
@@ -1197,13 +1217,50 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 image_results.append(row)
 
-        fileOrCase = ""  #TODO what if attributes ?
+            # audio and video from attribute selection
+            sql = ""
+            # first sql is for cases with/without file parameters
+            if case_ids != "":
+                sql = "select code_name.name, color, cases.name, "
+                sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,"
+                sql += "source.mediapath, source.id from "
+                sql += "code_av join code_name on code_name.cid = code_av.cid "
+                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+                sql += "code_av.id = case_text.fid "
+                sql += " join source on case_text.fid = source.id "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and case_text.caseid in (" + case_ids + ") "
+                if file_ids != "":
+                    sql += "and case_text.fid in (" + file_ids + ") "
+            else:
+                # second sql is for file parameters only
+                sql = "select code_name.name, color, source.name, code_av.pos0, "
+                sql += "code_av.pos1, code_av.memo,"
+                sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
+                sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+                sql += "where code_name.cid in (" + code_ids + ") "
+                sql += "and source.id in (" + file_ids + ") "
+            if coder != "":
+                sql += " and code_av.owner=? "
+                parameters.append(coder)
+            if search_text != "":
+                sql += " and code_av.memo like ? "
+                parameters.append("%" + str(search_text) + "%")
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                av_results.append(row)
+
+        fileOrCase = ""  # default for attributes selection
         if self.file_ids != "":
             fileOrCase = "File"
         if self.case_ids != "":
             fileOrCase = "Case"
-
-        #TODO add search terms to textEdit
 
         # convert results to dictionaries for ease of use
         tmp = []
@@ -1215,13 +1272,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i in image_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
                 'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
-                'fid': i[9], 'file_or_case': fileOrCase})
+                'fid': i[9], 'memo': i[10], 'file_or_case': fileOrCase})
         image_results = tmp
         tmp = []
         for i in av_results:
-            # prepare additional text for coded segment
+            # prepare additional text describing coded segment
             #print(i)
-            text = i[7] + ": "
+            text = i[7][1:] + ": "
             secs = int(i[3] / 1000)
             mins = int(secs / 60)
             remainder_secs = str(secs - mins * 60)
@@ -1234,10 +1291,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             if len(remainder_secs) == 1:
                 remainder_secs = "0" + remainder_secs
             text += " - " + str(mins) + "." + remainder_secs + "]"
-            '''if i[7][:6] == "/audio":
-                text = "Audio segment: " + text
-            if i[7][:6] == "/video":
-                text = "Video segment: " + text'''
             if len(i[5]) > 0:
                 text += "\nMemo: " + i[5]
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
@@ -1245,8 +1298,17 @@ class DialogReportCodes(QtWidgets.QDialog):
                 'fid': i[8], 'file_or_case': fileOrCase, 'text': text})
         av_results = tmp
 
-        # Fill text edit
+        # Add search terms to textEdit
         self.ui.textEdit.clear()
+        parameters = self.ui.label_selections.text()
+        self.ui.textEdit.insertPlainText("Search parameters:\n" + parameters)
+        if coder == "":
+            self.ui.textEdit.insertPlainText("\nCoding by: All coders")
+        else:
+            self.ui.textEdit.insertPlainText("\nCodings by: " + coder)
+        if search_text != "":
+            self.ui.textEdit.insertPlainText("\nSearch text: " + search_text)
+        self.ui.textEdit.insertPlainText("\n==========\n")
         for row in text_results:
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
@@ -1256,6 +1318,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i, row in enumerate(av_results):
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
+        # Need to resize splitter as it automatically adjust to 50%/50%
+        self.ui.splitter.setSizes([100, 300])
 
         # Fill case matrix
         if self.case_ids != "":
@@ -1293,6 +1357,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
         self.html_images_and_links.append({'imagename': imagename, 'image': image})
+        text_edit.insertPlainText(img['memo'] + "\n")
+        #TODO add code_image memo to displayed results
+
 
     @staticmethod
     def html_heading(item):
@@ -1441,11 +1508,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             selectedFiles = ui.get_selected()  # list of dictionaries
             for row in selectedFiles:
                 tmp_ids += "," + str(row['id'])
-                tooltip += "\n" + row['name']
+                tooltip += " " + row['name']
             if len(tmp_ids) > 0:
                 self.file_ids = tmp_ids[1:]
                 self.ui.pushButton_fileselect.setToolTip(tooltip)
-                self.ui.label_selections.setText(tooltip.replace('\n', '; '))
+                self.ui.label_selections.setText(tooltip)
             else:
                 self.ui.label_selections.setText("Files selected: All")
 
@@ -1468,7 +1535,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             casenames.append({'caseid': row[0], 'name': row[1]})
-
         ui = DialogSelectFile(casenames, "Select case(s) to view", "many")
         ok = ui.exec_()
         tooltip = "Cases selected:"
@@ -1477,11 +1543,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             selectedCases = ui.get_selected()  # list of dictionaries
             for row in selectedCases:
                 tmp_ids += "," + str(row['caseid'])
-                tooltip += "\n" + row['name']
+                tooltip += " " + row['name']
             if len(tmp_ids) > 0:
                 self.case_ids = tmp_ids[1:]
                 self.ui.pushButton_caseselect.setToolTip(tooltip)
-                self.ui.label_selections.setText(tooltip.replace('\n', '; '))
+                self.ui.label_selections.setText(tooltip)
 
 
 
