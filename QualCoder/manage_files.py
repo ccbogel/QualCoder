@@ -210,31 +210,33 @@ class DialogManageFiles(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == self.NAME_COLUMN:
-            newText = str(self.ui.tableWidget.item(x, y).text()).strip()
+            new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
 
             # check that no other source file has this text and this is is not empty
             update = True
-            if newText == "":
+            if new_text == "":
                 update = False
             for c in self.source:
-                if c['name'] == newText:
+                if c['name'] == new_text:
                     update = False
+            # .transcribed suffix is not to be used on a media file
+            if new_text[-12:] == ".transcribed" and self.source[x]['mediapath'] is not None:
+                update = False
             # Need to preserve names of a/v files and their
             # dependent transcribed files: filename.type.transcribed
             if update:
-                print(self.source[x])  # tmp
-                if self.source[x]['mediapath'] is not None:
+                if self.source[x]['mediapath'] is not None and self.source[x]['mediapath'][:2] in ('/a', '/v'):
                     msg = "If there is an associated '.transcribed' file please rename "
                     msg += "it to match the media file plus '.transcribed'"
                     QtWidgets.QMessageBox.warning(None, "Media name", msg)
-                if ".transcribed" in self.source[x]['name']:
+                if self.source[x]['name'][-12:] == ".transcribed":
                     msg = "If there is an associated media file please rename "
                     msg += "it to match the media file before the '.transcribed' suffix"
                     QtWidgets.QMessageBox.warning(None, "Media name", msg)
                 # update source list and database
-                self.source[x]['name'] = newText
+                self.source[x]['name'] = new_text
                 cur = self.settings['conn'].cursor()
-                cur.execute("update source set name=? where id=?", (newText, self.source[x]['id']))
+                cur.execute("update source set name=? where id=?", (new_text, self.source[x]['id']))
                 self.settings['conn'].commit()
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])
