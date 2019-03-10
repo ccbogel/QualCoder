@@ -534,7 +534,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         Pno = (total['characters'] - total['coded0']) / total['characters'] * (total['characters'] - total['coded1']) / total['characters']
 
         BELOW IS BETTER - ONLY LOOKS AT PROPORTIONS OF CODED CHARACTERS
-        NEED TO CONFIRM THIS IS HE CORRECT APPROACH
+        NEED TO CONFIRM THIS IS THE CORRECT APPROACH
         '''
         total['kappa'] = "zerodiv"
         try:
@@ -671,7 +671,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.setSizes([10, 10, 0])
 
     def get_data(self):
-        ''' Called from init, delete category '''
+        """ Called from init, delete category. Load codes, categories, and coders. """
 
         self.categories = []
         cur = self.settings['conn'].cursor()
@@ -695,7 +695,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.coders.append(row[0])
 
     def fill_tree(self):
-        ''' Fill tree widget, top level items are main categories and unlinked codes '''
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         cats = copy(self.categories)
         codes = copy(self.code_names)
@@ -822,7 +822,9 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_html_file(self):
         """ Export file to a html file. Create folder of images and change refs to the
-        folder. """
+        folder.
+        POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
+        need for a separate folder that the html file links to."""
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -886,9 +888,11 @@ class DialogReportCodes(QtWidgets.QDialog):
     def search(self):
         """ Search for selected codings.
         There are two main search pathways.
-        The default is based on file selection and can be restricted using the file selection dialog.
-        The second pathway is based on case selection and can be resctricted using the case selection dialog.
-        If cases are selected this overrides (ignores) and file selections that the user has entered.
+        The default is based on file selection and can be restricted using the file
+        selection dialog.
+        The second pathway is based on case selection and can be restricted using the
+        case selection dialog. If cases are selected this overrides file selections that
+        the user has entered.
         """
 
         coder = self.ui.comboBox_coders.currentText()
@@ -907,7 +911,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, "No codes", "No codes have been selected.")
             return
         if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
-            QtWidgets.QMessageBox.warning(None, "No files, cases, attributes", "No files, cases or attributes have been selected.")
+            QtWidgets.QMessageBox.warning(None, "No files, cases, attributes",
+                "No files, cases or attributes have been selected.")
             return
 
         # get selected codes from the items
@@ -916,17 +921,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             if i.text(1)[0:3] == 'cid':
                 code_ids += "," + i.text(1)[4:]
         code_ids = code_ids[1:]
-
         #logger.debug("File ids\n",self.file_ids, type(self.file_ids))
         #logger.debug("Case ids\n",self.case_ids, type(self.case_ids))
-
         text_results = []
         image_results = []
+        av_results = []
         cur = self.settings['conn'].cursor()
-        # get coded text via selected files
+
+        # get coded text/images/av via selected files
         parameters = []
         if self.file_ids != "":
-            # text
+            # coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
             sql += "code_text.owner, fid from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
@@ -948,7 +953,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 text_results.append(row)
 
-            # images
+            # coded images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
             sql += "code_image.owner, source.mediapath, source.id from code_image join code_name "
@@ -968,9 +973,29 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 image_results.append(row)
 
-        # get coded text via selected cases
+            # coded audio and video
+            parameters = []
+            sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
+            sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
+            sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+            sql += "where code_name.cid in (" + code_ids + ") "
+            sql += "and source.id in (" + self.file_ids + ") "
+            if coder != "":
+                sql += " and code_av.owner=? "
+                parameters.append(coder)
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                av_results.append(row)
+
+        # get coded text/images/av via selected cases
         if self.case_ids != "":
-            # text
+            # coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
             sql += "code_text join code_name on code_name.cid = code_text.cid "
@@ -979,7 +1004,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
             sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
-
             if coder != "":
                 sql += " and code_text.owner=? "
                 parameters.append(coder)
@@ -995,7 +1019,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 text_results.append(row)
 
-            # images
+            # coded images
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id from "
@@ -1005,7 +1029,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += " join source on case_text.fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
-
             if coder != "":
                 sql += " and code_image.owner=? "
                 parameters.append(coder)
@@ -1019,7 +1042,32 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 image_results.append(row)
 
+            # coded audio and video
+            parameters = []
+            sql = "select code_name.name, color, cases.name, "
+            sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,source.mediapath, "
+            sql += "source.id from "
+            sql += "code_av join code_name on code_name.cid = code_av.cid "
+            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += "code_av.id = case_text.fid "
+            sql += " join source on case_text.fid = source.id "
+            sql += "where code_name.cid in (" + code_ids + ") "
+            sql += "and case_text.caseid in (" + self.case_ids + ") "
+            if coder != "":
+                sql += " and code_av.owner=? "
+                parameters.append(coder)
+            if parameters == []:
+                cur.execute(sql)
+            else:
+                #logger.info("SQL:" + sql)
+                #logger.info("Parameters:" + str(parameters))
+                cur.execute(sql, parameters)
+            result = cur.fetchall()
+            for row in result:
+                av_results.append(row)
+
         # get coded text and images from attribute selection
+        #TODO audio and video
         if self.attribute_selection != []:
             logger.debug("attributes:" + str(self.attribute_selection))
             # convert each row into sql and add to case or file lists
@@ -1169,6 +1217,33 @@ class DialogReportCodes(QtWidgets.QDialog):
                 'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
                 'fid': i[9], 'file_or_case': fileOrCase})
         image_results = tmp
+        tmp = []
+        for i in av_results:
+            # prepare additional text for coded segment
+            #print(i)
+            text = i[7] + ": "
+            secs = int(i[3] / 1000)
+            mins = int(secs / 60)
+            remainder_secs = str(secs - mins * 60)
+            if len(remainder_secs) == 1:
+                remainder_secs = "0" + remainder_secs
+            text += " [" + str(mins) + "." + remainder_secs
+            secs = int(i[4] / 1000)
+            mins = int(secs / 60)
+            remainder_secs = str(secs - mins * 60)
+            if len(remainder_secs) == 1:
+                remainder_secs = "0" + remainder_secs
+            text += " - " + str(mins) + "." + remainder_secs + "]"
+            '''if i[7][:6] == "/audio":
+                text = "Audio segment: " + text
+            if i[7][:6] == "/video":
+                text = "Video segment: " + text'''
+            if len(i[5]) > 0:
+                text += "\nMemo: " + i[5]
+            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
+            'pos0': i[3], 'pos1': i[4], 'memo': i[5], 'coder': i[6], 'mediapath': i[7],
+                'fid': i[8], 'file_or_case': fileOrCase, 'text': text})
+        av_results = tmp
 
         # Fill text edit
         self.ui.textEdit.clear()
@@ -1178,13 +1253,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i, row in enumerate(image_results):
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.put_image_into_textedit(row, i, self.ui.textEdit)
-        # add case matrixc
+        for i, row in enumerate(av_results):
+            self.ui.textEdit.insertHtml(self.html_heading(row))
+            self.ui.textEdit.insertPlainText(row['text'] + "\n")
+
+        # Fill case matrix
         if self.case_ids != "":
-            self.fill_matrix(text_results, image_results, self.case_ids)
+            self.fill_matrix(text_results, image_results, av_results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
-        ''' Scale image, add resource to document, insert image.
-        '''
+        """ Scale image, add resource to document, insert image.
+        """
 
         path = self.settings['path'] + img['mediapath']
         document = text_edit.document()
@@ -1217,18 +1296,18 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     @staticmethod
     def html_heading(item):
-        ''' takes a dictionary item and creates a heading for the coded text portion
-        '''
+        """ Takes a dictionary item and creates a heading for the coded text portion.
+        """
 
         html = "<br /><em><span style=\"background-color:" + item['color'] + "\">" + item['codename'] + "</span>, "
         html += " "+ item['file_or_case'] + ": " + item['file_or_casename'] + ", " + item['coder'] + "</em><br />"
         return html
 
-    def fill_matrix(self, text_results, image_results, case_ids):
-        ''' Fill a tableWidget with rows of cases and columns of categories.
+    def fill_matrix(self, text_results, image_results, av_results, case_ids):
+        """ Fill a tableWidget with rows of cases and columns of categories.
         First identify top-lvel categories and codes. Then map all other codes to the
         top-level cataegories. Fill tableWidget with columns of top-level items and rows
-        of cases. '''
+        of cases. """
 
         self.ui.splitter.setSizes([0, 300, 300])
 
@@ -1256,13 +1335,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                         sub_codes.append(sub_code)
 
         # add the top-level name - which will match the tableWidget column name
-        for t in text_results:
+        for i in text_results:
             # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            t['top'] = t['codename']
+            i['top'] = i['codename']
             # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
             for s in sub_codes:
-                if t['codename'] == s['codename']:
-                    t['top'] = s['top']
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
         for i in image_results:
             # this assumes the code is already a top-level name (i.e. column in tableWidget)
             i['top'] = i['codename']
@@ -1270,8 +1349,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
-        #for t in text_results:
-        #    print(t
+        for i in av_results:
+            # this assumes the code is already a top-level name (i.e. column in tableWidget)
+            i['top'] = i['codename']
+            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
 
         cur = self.settings['conn'].cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
@@ -1290,6 +1374,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(t))
                         txt_edit.insertPlainText(t['text'] + "\n")
+                for a in av_results:
+                    if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(image_results):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(i))
@@ -1299,9 +1387,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.resizeRowsToContents()
 
     def select_attributes(self):
-        ''' Select attributes from case or file attributes for search method.
+        """ Select attributes from case or file attributes for search method.
         Text values will be quoted.
-        '''
+        """
 
         self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
@@ -1321,13 +1409,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.label_selections.setText(label)
 
     def select_files(self):
-        ''' When select file button is pressed a dialog of filenames is presented to the user.
+        """ When select file button is pressed a dialog of filenames is presented to the user.
         The selected files are then used when searching for codings
         If files are selected, then selected cases are cleared.
         The default is all file ids.
         To revert to default after files are selected,
         the user must press select files button then cancel the dialog.
-        '''
+        """
 
         self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
@@ -1362,11 +1450,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_selections.setText("Files selected: All")
 
     def select_cases(self):
-        ''' When select case button is pressed a dialog of case names is presented to the user.
+        """ When select case button is pressed a dialog of case names is presented to the user.
         The selected cases are then used when searching for codings.
         If cases are selected, then selected files are cleared.
         If neither are selected the default is all files are selected.
-        '''
+        """
 
         self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
