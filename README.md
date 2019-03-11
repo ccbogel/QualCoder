@@ -54,9 +54,9 @@ Required
 * vlc
 
 ## Issues
-* Testing has only been performed on Ubuntu and Linux Mint and Window 10. Some usage conducted with Lubuntu.
+* Testing has only been performed on Ubuntu and Linux Mint and for a large part on Windows 10. Some usage conducted with Lubuntu.
 
-* Currently working on an audio / video feature. At this stage only importation and viewing is enabled.
+* Currently working on an audio / video feature. At this stage only importation, viewing and reporting is enabled.  Need to develop a graphic timeline to view coded a/v segments in the gui, and to delete coded a/v segments.
 
 ## Future plans
 * Reports:
