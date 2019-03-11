@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Sat Mar  9 22:38:59 2019
+# Created: Mon Mar 11 17:38:22 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,22 +18,18 @@ class Ui_Dialog_code_av(object):
         self.splitter_2 = QtWidgets.QSplitter(Dialog_code_av)
         self.splitter_2.setOrientation(QtCore.Qt.Vertical)
         self.splitter_2.setObjectName("splitter_2")
-        self.tableWidget = QtWidgets.QTableWidget(self.splitter_2)
+        self.graphicsView = QtWidgets.QGraphicsView(self.splitter_2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
-        self.tableWidget.setSizePolicy(sizePolicy)
-        self.tableWidget.setMaximumSize(QtCore.QSize(16777215, 120))
-        self.tableWidget.setBaseSize(QtCore.QSize(0, 0))
+        sizePolicy.setHeightForWidth(self.graphicsView.sizePolicy().hasHeightForWidth())
+        self.graphicsView.setSizePolicy(sizePolicy)
+        self.graphicsView.setMaximumSize(QtCore.QSize(16777215, 120))
+        self.graphicsView.setBaseSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setPointSize(6)
-        self.tableWidget.setFont(font)
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(0)
-        self.tableWidget.setRowCount(0)
-        self.tableWidget.verticalHeader().setDefaultSectionSize(20)
-        self.tableWidget.verticalHeader().setMinimumSectionSize(20)
+        self.graphicsView.setFont(font)
+        self.graphicsView.setObjectName("graphicsView")
         self.splitter = QtWidgets.QSplitter(self.splitter_2)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName("splitter")
