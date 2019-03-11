@@ -24,33 +24,35 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
+https://qualcoder.wordpress.com/fetrhfvdss
 '''
 
-
-import sys
-import os
 import datetime
+import logging
+import os
+import sys
 import sqlite3
+import traceback
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 from settings import DialogSettings
 from attributes import DialogManageAttributes
-from PyQt5 import QtCore, QtGui, QtWidgets
-from GUI.ui_main import Ui_MainWindow
-from codes import DialogCodeText
-from memo import DialogMemo
-from categories import Codebook
-from information import DialogInformation
-from manage_files import DialogManageFiles
-from journals import DialogJournals
 from cases import DialogCases
+from codebook import Codebook
+from code_text import DialogCodeText
+from dialog_sql import DialogSQL
+from GUI.ui_main import Ui_MainWindow
 from import_survey import DialogImportSurvey
+from information import DialogInformation
+from journals import DialogJournals
+from manage_files import DialogManageFiles
+from memo import DialogMemo
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
+from view_av import DialogCodeAV
 from view_graph import ViewGraph
 from view_image import DialogCodeImage
-from dialog_sql import DialogSQL
-import logging
-import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -72,12 +74,12 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    ''' Main GUI window.
+    """ Main GUI window.
     Project data is stored in a directory with .qda suffix
     core data is stored in data.qda sqlite file.
     Journal and coding dialogs can be shown non-modally - multiple dialogs open.
     There is a risk of a clash if two coding windows are open with the same file text or
-    two journals open with the same journal entry. '''
+    two journals open with the same journal entry. """
 
     settings = {"conn": None, "directory": home, "projectName": "", "showIDs": False, 'path': home,
     "codername": "default", "font": "Noto Sans", "fontsize": 10, 'treefontsize': 10}
@@ -85,7 +87,7 @@ class MainWindow(QtWidgets.QMainWindow):
     dialogList = []  # keeps active and track of non-modal windows
 
     def __init__(self):
-        ''' Set up user interface from ui_main.py file '''
+        """ Set up user interface from ui_main.py file. """
 
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
@@ -96,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def init_ui(self):
-        ''' set up menu triggers '''
+        """ Set up menu triggers """
 
         # project menu
         self.ui.actionCreate_New_Project.triggered.connect(self.new_project)
@@ -116,6 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCode_image.triggered.connect(self.image_coding)
+        self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
         self.ui.actionView_Graph.triggered.connect(self.view_graph)
 
@@ -152,7 +155,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_report()
 
     def hide_menu_options(self):
-        ''' No project opened, hide options '''
+        """ No project opened, hide options """
 
         self.ui.actionClose_Project.setEnabled(False)
         self.ui.actionProject_Memo.setEnabled(False)
@@ -165,6 +168,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # codes menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
+        self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
         # reports menu
@@ -175,7 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(False)
 
     def show_menu_options(self):
-        ''' Project opened, hide options '''
+        """ Project opened, hide options """
 
         self.ui.actionClose_Project.setEnabled(True)
         self.ui.actionProject_Memo.setEnabled(True)
@@ -188,6 +192,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # codes menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
+        self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
         # reports menu
@@ -208,7 +213,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
 
     def report_sql(self):
-        ''' Run SQL statements on database. non-modal. '''
+        """ Run SQL statements on database. non-modal. """
 
         ui = DialogSQL(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -224,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()"""
 
     def report_coding_comparison(self):
-        ''' compare two or more coders using Cohens Kappa. non-modal. '''
+        """ Compare two or more coders using Cohens Kappa. non-modal. """
 
         ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -232,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def report_code_frequencies(self):
-        ''' show code frequencies overall and by coder. non-modal. '''
+        """ Show code frequencies overall and by coder. non-modal. """
 
         ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -240,7 +245,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def report_coding(self):
-        ''' report on coding and categories. non-modal. '''
+        """ Report on coding and categories. non-modal. """
 
         ui = DialogReportCodes(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -248,7 +253,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def view_graph(self):
-        ''' Show acyclic graph of codes and categories. non-modal. '''
+        """ Show acyclic graph of codes and categories. non-modal. """
 
         ui = ViewGraph(self.settings)
         self.dialogList.append(ui)
@@ -256,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def help(self):
-        ''' Help dialog.  non-modal. '''
+        """ Help dialog. non-modal. """
 
         ui = DialogInformation("Help contents", "Help.html")
         self.dialogList.append(ui)
@@ -264,7 +269,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def about(self):
-        ''' About dialog.  non-modal. '''
+        """ About dialog.  non-modal. """
 
         ui = DialogInformation("About", "About.html")
         self.dialogList.append(ui)
@@ -272,41 +277,41 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def manage_attributes(self):
-        ''' Create, edit, delete, rename attributes '''
+        """ Create, edit, delete, rename attributes """
 
         ui = DialogManageAttributes(self.settings, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
 
     def import_survey(self):
-        ''' Import survey flat sheet: csv file.
+        """ Import survey flat sheet: csv file.
         Create cases and assign attributes to cases.
-        Identify qualitative questions and assign these data to the source table for coding and
-        review '''
+        Identify qualitative questions and assign these data to the source table for
+        coding and review. """
 
         ui = DialogImportSurvey(self.settings, self.ui.textEdit)
         ui.exec_()
 
     def manage_cases(self):
-        ''' Create, edit, delete, rename cases, add cases to files or parts of
-        files, add memos to cases '''
+        """ Create, edit, delete, rename cases, add cases to files or parts of
+        files, add memos to cases. """
 
         ui = DialogCases(self.settings, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
 
     def manage_files(self):
-        ''' Create text files or import files from odt, docx, html and
+        """ Create text files or import files from odt, docx, html and
         plain text. Rename, delete and add memos to files.
-        '''
+        """
 
         ui = DialogManageFiles(self.settings, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
 
     def journals(self):
-        ''' Create and edit journals. non-modal.
-        '''
+        """ Create and edit journals. non-modal.
+        """
 
         ui = DialogJournals(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -315,9 +320,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def text_coding(self):
-        ''' Create edit and delete codes. Apply and remove codes and annotations to the
+        """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. Multiple coding windows can be displayed non-modal.
-        '''
+        """
 
         ui = DialogCodeText(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -326,9 +331,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def image_coding(self):
-        ''' Create edit and delete codes. Apply and remove codes to the image (or regions)
+        """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         Multiple coding windows can be displayed non-modal.
-        '''
+        """
 
         ui = DialogCodeImage(self.settings)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -336,16 +341,27 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()
         self.clean_dialog_refs()
 
+    def av_coding(self):
+        """ Create edit and delete codes. Apply and remove codes to segements of the
+        audio or video file. Multiple coding windows can be displayed non-modal.
+        """
+
+        ui = DialogCodeAV(self.settings)
+        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.dialogList.append(ui)
+        ui.show()
+        self.clean_dialog_refs()
+
     def codebook(self):
-        ''' Export a code book of categories and codes.
-        '''
+        """ Export a code book of categories and codes.
+        """
 
         Codebook(self.settings, self.ui.textEdit)
 
     def closeEvent(self, event):
-        ''' Override the QWindow close event.
+        """ Override the QWindow close event.
         Close all dialogs and database connection.
-        '''
+        """
 
         quit_msg = "Are you sure you want to quit?"
         reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
@@ -364,8 +380,8 @@ class MainWindow(QtWidgets.QMainWindow):
         True
 
     def new_project(self):
-        ''' Create a new project folder with data.qda (sqlite) and folders for documents,
-        images, audio and video. '''
+        """ Create a new project folder with data.qda (sqlite) and folders for documents,
+        images, audio and video. """
 
         #logger.debug("settings[directory]:" + self.settings['directory'])
         self.settings['path'] = QtWidgets.QFileDialog.getSaveFileName(self,
@@ -435,7 +451,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.open_project(self.settings['path'])
 
     def change_settings(self):
-        ''' Change default settings - the coder name, font, font size '''
+        """ Change default settings - the coder name, font, font size. """
 
         ui = DialogSettings(self.settings)
         ui.exec_()
@@ -444,7 +460,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setFont(newfont)
 
     def project_memo(self):
-        ''' Give the entire project a memo '''
+        """ Give the entire project a memo. """
 
         cur = self.settings['conn'].cursor()
         cur.execute("select memo from project")
@@ -458,7 +474,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append("Project memo entered.")
 
     def open_project(self, path=""):
-        ''' Open an existing project. '''
+        """ Open an existing project. """
 
         if self.settings['projectName'] != "":
             self.close_project()
@@ -504,7 +520,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show_menu_options()
 
     def close_project(self):
-        ''' Close an open project '''
+        """ Close an open project. """
 
         self.ui.textEdit.append("Closing project: " + self.settings['projectName'] + "\n========\n")
         try:
@@ -522,10 +538,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def clean_dialog_refs(self):
-        ''' Test the list of dialog refs to see if they have been cleared
+        """ Test the list of dialog refs to see if they have been cleared
         and create a new list of current dialogs.
         Also need to keep these dialog references to keep non-modal dialogs open.
-        Non-modal example - having a journal open and a coding dialog '''
+        Non-modal example - having a journal open and a coding dialog. """
 
         tempList = []
         for d in self.dialogList:
