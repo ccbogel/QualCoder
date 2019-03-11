@@ -64,8 +64,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogCodeAV(QtWidgets.QDialog):
-    ''' View and code audio and video segments.
-    Create codes and categories.  '''
+    """ View and code audio and video segments.
+    Create codes and categories.  """
 
     settings = None
     filename = None
@@ -73,6 +73,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     file_ = None
     codes = []
     categories = []
+    segments = []
     ddialog = None
     media_data = None
     instance = None
@@ -81,14 +82,18 @@ class DialogCodeAV(QtWidgets.QDialog):
     segment = {}
 
     def __init__(self, settings):
-        ''' Show list of audio and video files.
+        """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
-        '''
+        """
+
+        #TODO maybe show other coders ?
+        #TODO add a graphical view of coded segments
 
         sys.excepthook = exception_handler
         self.settings = settings
         self.codes = []
         self.categories = []
+        self.segments = []
         self.media_data = None
         self.segment['start'] = None
         self.segment['end'] = None
@@ -151,6 +156,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
+
+        # set the scene for coding stripes
+        self.scene = GraphicsScene()
+        self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
 
         msg = "Currently, deleting segments can only be achieved through the sql dialog."
         QtWidgets.QMessageBox.warning(None, 'UNDER DEVELOPMENT', msg)
@@ -279,13 +289,44 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         ui = DialogSelectFile(media_files, "Select file to view", "single")
         ok = ui.exec_()
-        if ok:
-            self.media_data = ui.get_selected()
-            self.ui.pushButton_play.setEnabled(True)
-            self.ui.pushButton_stop.setEnabled(True)
-            self.ui.horizontalSlider.setEnabled(True)
-            self.ui.pushButton_coding.setEnabled(True)
-            self.load_media()
+        if not ok:
+            return
+        self.media_data = ui.get_selected()
+        self.ui.pushButton_play.setEnabled(True)
+        self.ui.pushButton_stop.setEnabled(True)
+        self.ui.horizontalSlider.setEnabled(True)
+        self.ui.pushButton_coding.setEnabled(True)
+        self.load_media()
+        self.load_segments()
+
+    def load_segments(self):
+        """ Get coded segments for this file, for this coder, or all coders.
+        Currently only for this coder. Called from select_media. """
+
+        self.segments = []
+        sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
+        sql += " code_av.owner, code_name.name, code_name.color from code_av"
+        sql += " join code_name on code_name.cid=code_av.cid"
+        sql += " where id=? "
+        #if not self.ui.checkBox_show_coders.isChecked():
+        sql += " and code_av.owner=? "
+        values = [self.media_data['id']]
+        values.append(self.settings['codername'])
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, values)
+        code_results = cur.fetchall()
+        for row in code_results:
+            self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
+            'pos1': row[3], 'cid':row[4], 'memo': row[5], 'date': row[6],
+            'owner': row[7], 'codename': row[8], 'color': row[9]})
+
+        for s in self.segments:
+            print(s)
+        #TODO draw coded segments in scene
+        scaler = 990 / self.media.get_duration()
+        self.scene.clear()
+        for s in self.segments:
+            self.scene.addItem(SegmentGraphicsItem(s, scaler))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -333,8 +374,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.transcription is not None:
             self.ui.textEdit.setText(self.transcription[1])
         #self.play_pause()
-
-    #TODO make and draw coded segments in table
 
     def set_position(self):
         """ Set the movie position according to the position slider.
@@ -412,7 +451,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.stop()
 
     def segment_memo(self):
-        """ Create a memo for the segment. """
+        """ Create a memo for the segment.
+        Opened via pushButton. PushButton only avaialable when a segment start and end
+        positions are defined.  """
 
         ui = DialogMemo(self.settings, "Memo for segment", "")
         ui.exec_()
@@ -519,9 +560,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Assign time segment to selected code. Insert an entry into the database.
         Then clear the segment for re-use."""
 
-        #print(self.segment)
-        #print(selected.text(1))
-        #print(self.media_data)
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
         cid = int(selected.text(1).split(':')[1])
         values = [self.media_data['id'], self.segment['start_msecs'],
@@ -531,6 +569,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur = self.settings['conn'].cursor()
         cur.execute(sql, values)
         self.settings['conn'].commit()
+        self.load_segments()
 
         self.segment['start'] = None
         self.segment['start_msecs'] = None
@@ -542,7 +581,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_memo.setEnabled(False)
 
     def item_moved_update_data(self, item, parent):
-        """ Callanded from drop event in treeWidget view port.
+        """ Called from drop event in treeWidget view port.
         identify code or category to move.
         Also merge codes if one code is dropped on another code. """
 
@@ -859,6 +898,112 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.settings['conn'].commit()
+
+
+class GraphicsScene(QtWidgets.QGraphicsScene):
+    """ set the scene for the graphics objects and re-draw events. """
+
+    # matches the designer file graphics view
+    sceneWidth = 990
+    sceneHeight = 110
+
+    def __init__ (self, parent=None):
+        super(GraphicsScene, self).__init__ (parent)
+        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+
+    def setWidth(self, width):
+        """ Resize scene width. """
+
+        self.sceneWidth = width
+        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+
+    def setHeight(self, height):
+        """ Resize scene height. """
+
+        self.sceneHeight = height
+        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+
+    def getWidth(self):
+        """ Return scene width. """
+
+        return self.sceneWidth
+
+    def getHeight(self):
+        """ Return scene height. """
+
+        return self.sceneHeight
+
+    """def mouseMoveEvent(self, mouseEvent):
+        super(GraphicsScene, self).mousePressEvent(mouseEvent)
+
+        for item in self.items():
+            if isinstance(item, TextGraphicsItem):
+                item.data['x'] = item.pos().x()
+                item.data['y'] = item.pos().y()
+                #logger.debug("item pos:" + str(item.pos()))
+        for item in self.items():
+            if isinstance(item, LinkGraphicsItem):
+                item.redraw()
+        self.update()"""
+
+    """def mousePressEvent(self, mouseEvent):
+        super(GraphicsScene, self).mousePressEvent(mouseEvent)
+        #position = QtCore.QPointF(event.scenePos())
+        #logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
+        for item in self.items(): # item is QGraphicsProxyWidget
+            if isinstance(item, LinkItem):
+                item.redraw()
+        self.update(self.sceneRect())"""
+
+    """def mouseReleaseEvent(self, mouseEvent):
+        ''' On mouse release, an item might be repositioned so need to redraw all the
+        link_items '''
+
+        super(GraphicsScene, self).mouseReleaseEvent(mouseEvent)
+        for item in self.items():
+            if isinstance(item, LinkGraphicsItem):
+                item.redraw()
+        self.update(self.sceneRect())"""
+
+
+class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
+    """ Draws coded segment line. Uses the media duration to scale the line length.
+    y values will change depending on how many different codes are shown.
+    TODO y values will need to be supplied. """
+
+    segment = None
+    scaler = None
+
+    def __init__(self, segment, scaler):
+        super(SegmentGraphicsItem, self).__init__(None)
+
+        self.segment = segment
+        self.scaler = scaler
+        self.setFlag(self.ItemIsSelectable, True)
+        tooltip = self.segment['codename']
+        #TODO add start and end times
+        if self.segment['memo'] != "":
+            tooltip += "\nMemo: " + self.segment['memo']
+        self.setToolTip(tooltip)
+        self.calculatePointsAndDraw()
+
+    def redraw(self):
+        """ Called from mouse move and release events. """
+
+        self.calculatePointsAndDraw()
+
+    def calculatePointsAndDraw(self):
+        """ Calculate the x values for the line. """
+
+        from_x = self.segment['pos0'] * self.scaler
+        to_x = self.segment['pos1'] * self.scaler
+        print("from_x", from_x, self.segment['pos0'], self.scaler)
+        #TODO y values
+        y = 10
+        line_width = 8
+        color = QtGui.QColor(self.segment['color'])
+        self.setPen(QtGui.QPen(color, line_width, QtCore.Qt.SolidLine))
+        self.setLine(from_x, y, to_x, y)
 
 
 class DialogViewAV(QtWidgets.QDialog):
