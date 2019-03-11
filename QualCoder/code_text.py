@@ -139,6 +139,7 @@ class DialogCodeText(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        self.ui.splitter.setSizes([150, 400])
         self.fill_tree()
 
     def fill_code_label(self):
