@@ -162,10 +162,13 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.files = []
         cur = self.settings['conn'].cursor()
-        cur.execute("select name, id, memo, owner, date, mediapath from source where substr(mediapath,1,7) = '/images' order by name")
+        sql = "select name, id, memo, owner, date, mediapath from source where "
+        sql += "substr(mediapath,1,7) = '/images' order by name"
+        cur.execute(sql)
         result = cur.fetchall()
         for row in result:
-            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2], 'owner': row[3], 'date': row[4], 'mediapath': row[5]})
+            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2],
+            'owner': row[3], 'date': row[4], 'mediapath': row[5]})
 
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
@@ -484,7 +487,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if memo != item['memo']:
             item['memo'] = memo
             cur = self.settings['conn'].cursor()
-            cur.execute('update code_image set memo=? where id=?', (ui.memo, item['id']))
+            cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
             self.settings['conn'].commit()
 
     def unmark(self, item):
