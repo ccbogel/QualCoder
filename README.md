@@ -3,7 +3,7 @@ QualCoder is a qualitative data analysis application written in python3 and pyqt
 
 QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx and optionally ,and not ideally, pdf files. Codes can be assigned to text and to images and grouped into categories in hierarchical fashion similar to Nvivo. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu/Linux Mint.
+This project has been tested under Ubuntu/Linux Mint. Also partly tested on Lubuntu and Windows 10. It has not been tested on Apple MacOSX so far.
 Instructions and other information are avaible here: https://qualcoder.wordpress.com/
 
 ## INSTALLATION
@@ -54,9 +54,8 @@ Required
 * vlc
 
 ## Issues
-* Testing has only been performed on Ubuntu and Linux Mint and for a large part on Windows 10. Some usage conducted with Lubuntu.
+* Testing has only been performed on Ubuntu and Linux Mint and for a large part on Windows 10. Some usage conducted with Lubuntu. No testing has been performed on Apple MacOSX.
 
-* Currently working on an audio / video feature. At this stage only importation, viewing and reporting is enabled.  Need to develop a graphic timeline to view coded a/v segments in the gui, and to delete coded a/v segments.
 
 ## Future plans
 * Reports:
