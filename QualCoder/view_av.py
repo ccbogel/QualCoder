@@ -62,6 +62,17 @@ def exception_handler(exception_type, value, tb_obj):
     logger.error("Uncaught exception:\n" + text)
     QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
 
+def msecs_to_mins_and_secs(msecs):
+    """ Convert milliseconds to minutes and seconds.
+    msecs is an integer. Minutes and seconds output is a string."""
+
+    secs = int(msecs / 1000)
+    mins = int(secs / 60)
+    remainder_secs = str(secs - mins * 60)
+    if len(remainder_secs) == 1:
+        remainder_secs = "0" + remainder_secs
+    return str(mins) + "." + remainder_secs
+
 
 class DialogCodeAV(QtWidgets.QDialog):
     """ View and code audio and video segments.
@@ -87,7 +98,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         #TODO maybe show other coders ?
-        #TODO add a graphical view of coded segments
 
         sys.excepthook = exception_handler
         self.settings = settings
@@ -107,7 +117,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_stop.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
-        self.ui.pushButton_memo.setEnabled(False)
         self.ui.textEdit.setReadOnly(True)
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
@@ -116,7 +125,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_coder.setText("Coder: " + settings['codername'])
         self.setWindowTitle("Media coding")
         self.ui.pushButton_select.pressed.connect(self.select_media)
-        self.ui.pushButton_memo.pressed.connect(self.segment_memo)
         #TODO show other coders, maybe?
         #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
@@ -158,12 +166,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
 
         # set the scene for coding stripes
-        self.scene = GraphicsScene()
+        # matches the designer file graphics view
+        self.scene_width = 990
+        self.scene_height = 110
+        self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-
-        msg = "Currently, deleting segments can only be achieved through the sql dialog."
-        QtWidgets.QMessageBox.warning(None, 'UNDER DEVELOPMENT', msg)
 
     def get_codes_categories(self):
         """ Called from init, delete category/code. """
@@ -318,15 +326,25 @@ class DialogCodeAV(QtWidgets.QDialog):
         for row in code_results:
             self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
             'pos1': row[3], 'cid':row[4], 'memo': row[5], 'date': row[6],
-            'owner': row[7], 'codename': row[8], 'color': row[9]})
-
-        for s in self.segments:
-            print(s)
-        #TODO draw coded segments in scene
-        scaler = 990 / self.media.get_duration()
+            'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
+        # Fix overlapping segments by incrementing y values so segment is shown on a differnt line
+        for i in range(0, len(self.segments) - 1):
+            for j in range(i + 1, len(self.segments)):
+                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and  \
+                self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
+                self.segments[i]['y'] == self.segments[j]['y']) or \
+                (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and  \
+                self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
+                self.segments[i]['y'] == self.segments[j]['y']):
+                    #print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
+                    #print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
+                    # to overcome the overlap, add to the y value of the i segment
+                    self.segments[j]['y'] += 10
+        # Draw coded segments in scene
+        scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
         for s in self.segments:
-            self.scene.addItem(SegmentGraphicsItem(s, scaler))
+            self.scene.addItem(SegmentGraphicsItem(self.settings, s, scaler))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -359,10 +377,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         elif platform.system() == "Darwin": # for MacOS
             self.mediaplayer.set_nsobject(int(self.ui.frame.winId()))
         msecs = self.media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = secs - mins * 60
-        self.media_duration_text = "Duration: " + str(mins) + "." + str(remainder_secs)
+        self.media_duration_text = "Duration: " + msecs_to_mins_and_secs(msecs)
         self.ui.label_time_2.setText(self.media_duration_text)
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
@@ -428,12 +443,13 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # update label_time
         msecs = self.mediaplayer.get_time()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        self.ui.label_time.setText("Time: " + str(mins) + "." + remainder_secs)
+        self.ui.label_time.setText("Time: " + msecs_to_mins_and_secs(msecs))
+
+        # Check if segments need to be reloaded
+        # This only update of the media is playing, not ideal, but works
+        for i in self.scene.items():
+            if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
+                self.load_segments()
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -449,15 +465,6 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.ddialog.close()
         self.stop()
-
-    def segment_memo(self):
-        """ Create a memo for the segment.
-        Opened via pushButton. PushButton only avaialable when a segment start and end
-        positions are defined.  """
-
-        ui = DialogMemo(self.settings, "Memo for segment", "")
-        ui.exec_()
-        self.segment['memo'] = ui.memo
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
@@ -489,7 +496,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['end'] = time
             self.segment['end_msecs'] = time_msecs
             self.ui.pushButton_coding.setText("Clear segment")
-            self.ui.pushButton_memo.setEnabled(True)
 
             # check and reverse start and end times if start is greater than the end
             if float(self.segment['start']) > float(self.segment['end']):
@@ -499,7 +505,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.segment['start_msecs'] = self.segment['end_msecs']
                 self.segment['end'] = tmp
                 self.segment['end_msecs'] = tmp_msecs
-                self.ui.pushButton_memo.setEnabled(True)
             text = "Segment: " + str(self.segment['start']) + " - " + self.segment['end']
             self.ui.label_segment.setText(text)
 
@@ -578,7 +583,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['memo'] = ""
         self.ui.label_segment.setText("Segment:")
         self.ui.pushButton_coding.setText("Start segment")
-        self.ui.pushButton_memo.setEnabled(False)
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -903,48 +907,44 @@ class DialogCodeAV(QtWidgets.QDialog):
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
-    # matches the designer file graphics view
-    sceneWidth = 990
-    sceneHeight = 110
+    #segments = None
 
-    def __init__ (self, parent=None):
+    def __init__ (self, width, height, parent=None):
         super(GraphicsScene, self).__init__ (parent)
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+        self.scene_width = width
+        self.scene_height = height
+        #self.segments = segments
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
     def setWidth(self, width):
         """ Resize scene width. """
 
         self.sceneWidth = width
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
     def setHeight(self, height):
         """ Resize scene height. """
 
         self.sceneHeight = height
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
     def getWidth(self):
         """ Return scene width. """
 
-        return self.sceneWidth
+        return self.scene_width
 
     def getHeight(self):
         """ Return scene height. """
 
-        return self.sceneHeight
+        return self.scene_height
 
-    """def mouseMoveEvent(self, mouseEvent):
+    '''def mouseMoveEvent(self, mouseEvent):
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
 
-        for item in self.items():
-            if isinstance(item, TextGraphicsItem):
-                item.data['x'] = item.pos().x()
-                item.data['y'] = item.pos().y()
-                #logger.debug("item pos:" + str(item.pos()))
-        for item in self.items():
-            if isinstance(item, LinkGraphicsItem):
-                item.redraw()
-        self.update()"""
+        for i in self.scene.items():
+            if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
+                self.load_segments()
+        self.update()'''
 
     """def mousePressEvent(self, mouseEvent):
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
@@ -971,21 +971,88 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     y values will change depending on how many different codes are shown.
     TODO y values will need to be supplied. """
 
+    settings = None
     segment = None
     scaler = None
+    reload_segment = False
 
-    def __init__(self, segment, scaler):
+    def __init__(self, settings, segment, scaler):
         super(SegmentGraphicsItem, self).__init__(None)
 
+        self.settings = settings
         self.segment = segment
         self.scaler = scaler
+        self.reload_segment = False
         self.setFlag(self.ItemIsSelectable, True)
-        tooltip = self.segment['codename']
-        #TODO add start and end times
+        tooltip = self.segment['codename'] + " "
+        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
+        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+        tooltip += seg_time
         if self.segment['memo'] != "":
             tooltip += "\nMemo: " + self.segment['memo']
         self.setToolTip(tooltip)
         self.calculatePointsAndDraw()
+
+    def contextMenuEvent(self, event):
+        """
+        # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
+        I was not able to mapToGlobal position so, the menu maps to scene position plus
+        the Dialog screen position.
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.addAction('Memo for segment')
+        menu.addAction('Delete segment')
+        action = menu.exec_(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action.text() == 'Memo for segment':
+            self.edit_memo()
+        if action.text() == 'Delete segment':
+            self.delete()
+
+    def delete(self):
+        """ Mark segment for deletion. Does not actually delete segment item, but hides
+        it from the scene. Reload_segment is set to True, so on playing media, the update
+        event will reload all segments. """
+
+        self.setToolTip("")
+        self.setLine(-100, -100, -100, -100)
+        self.segment['memo'] = ""
+        self.segment['pos0'] = -100
+        self.segment['pos1'] = -100
+        self.segment['y'] = -100
+        self.reload_segment = True
+        sql = "delete from code_av where avid=?"
+        values = [self.segment['avid']]
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, values)
+        self.settings['conn'].commit()
+
+    def edit_memo(self):
+        """ View, edit or delete memo for this segment.
+        Reload_segment is set to True, so on playing media, the update event will reload
+        all segments. """
+
+        ui = DialogMemo(self.settings, "Memo for segment", self.segment["memo"])
+        ui.exec_()
+        if self.segment['memo'] == ui.memo:
+            return
+        self.reload_segment = True
+        self.segment['memo'] = ui.memo
+        sql = "update code_av set memo=?, date=? where avid=?"
+        values = [self.segment['memo'],
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, values)
+        self.settings['conn'].commit()
+        tooltip = self.segment['codename'] + " "
+        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
+        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+        tooltip += seg_time
+        if self.segment['memo'] != "":
+            tooltip += "\nMemo: " + self.segment['memo']
+        self.setToolTip(tooltip)
 
     def redraw(self):
         """ Called from mouse move and release events. """
@@ -997,13 +1064,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         from_x = self.segment['pos0'] * self.scaler
         to_x = self.segment['pos1'] * self.scaler
-        print("from_x", from_x, self.segment['pos0'], self.scaler)
-        #TODO y values
-        y = 10
         line_width = 8
         color = QtGui.QColor(self.segment['color'])
         self.setPen(QtGui.QPen(color, line_width, QtCore.Qt.SolidLine))
-        self.setLine(from_x, y, to_x, y)
+        self.setLine(from_x, self.segment['y'], to_x, self.segment['y'])
 
 
 class DialogViewAV(QtWidgets.QDialog):
@@ -1104,13 +1168,8 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.set_hwnd(int(self.ui.frame.winId()))
         elif platform.system() == "Darwin": # for MacOS
             self.mediaplayer.set_nsobject(int(self.ui.frame.winId()))
-
         msecs = self.media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = secs - mins * 60
-        self.media_duration_text = "Duration: " + str(mins) + "." + str(remainder_secs)
-        self.ui.label_time_2.setText(self.media_duration_text)
+        self.ui.label_time_2.setText("Duration: " + msecs_to_mins_and_secs(msecs))
         self.ui.textEdit.setText(self.media_data['memo'])
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
@@ -1160,27 +1219,19 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.audio_set_volume(volume)
 
     def update_ui(self):
-        """ Updates the user interface. """
+        """ Updates the user interface, slider and time. """
 
         # Set the slider's position to its corresponding media position
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         media_pos = int(self.mediaplayer.get_position() * 1000)
         self.ui.horizontalSlider.setValue(media_pos)
-
-        # update label_time
         msecs = self.mediaplayer.get_time()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        self.ui.label_time.setText("Time: " + str(mins) + "." + str(remainder_secs))
+        self.ui.label_time.setText("Time: " + msecs_to_mins_and_secs(msecs))
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
-
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
