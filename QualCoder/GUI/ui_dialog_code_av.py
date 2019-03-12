@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Mon Mar 11 17:38:22 2019
+# Created: Tue Mar 12 21:50:39 2019
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_code_av(object):
     def setupUi(self, Dialog_code_av):
         Dialog_code_av.setObjectName("Dialog_code_av")
-        Dialog_code_av.resize(1021, 596)
+        Dialog_code_av.resize(1025, 596)
         self.gridLayout = QtWidgets.QGridLayout(Dialog_code_av)
         self.gridLayout.setObjectName("gridLayout")
         self.splitter_2 = QtWidgets.QSplitter(Dialog_code_av)
@@ -68,7 +68,7 @@ class Ui_Dialog_code_av(object):
         self.label_time_2.setGeometry(QtCore.QRect(520, 40, 161, 21))
         self.label_time_2.setObjectName("label_time_2")
         self.horizontalSlider = QtWidgets.QSlider(self.groupBox_2)
-        self.horizontalSlider.setGeometry(QtCore.QRect(10, 7, 1003, 23))
+        self.horizontalSlider.setGeometry(QtCore.QRect(10, 7, 991, 23))
         self.horizontalSlider.setMinimum(0)
         self.horizontalSlider.setMaximum(1000)
         self.horizontalSlider.setSingleStep(1)
@@ -89,9 +89,6 @@ class Ui_Dialog_code_av(object):
         self.pushButton_select = QtWidgets.QPushButton(self.groupBox_2)
         self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 171, 27))
         self.pushButton_select.setObjectName("pushButton_select")
-        self.pushButton_memo = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_memo.setGeometry(QtCore.QRect(520, 66, 181, 27))
-        self.pushButton_memo.setObjectName("pushButton_memo")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog_code_av)
@@ -115,7 +112,6 @@ class Ui_Dialog_code_av(object):
         self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
         self.label_coder.setText(_translate("Dialog_code_av", "Coder:"))
         self.pushButton_select.setText(_translate("Dialog_code_av", "Select media"))
-        self.pushButton_memo.setText(_translate("Dialog_code_av", "Segment memo"))
 
 
 if __name__ == "__main__":
