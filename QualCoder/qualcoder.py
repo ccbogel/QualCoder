@@ -213,7 +213,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
 
     def report_sql(self):
-        """ Run SQL statements on database. non-modal. """
+        """ Run SQL statements on database. """
 
         ui = DialogSQL(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -229,23 +229,29 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()"""
 
     def report_coding_comparison(self):
-        """ Compare two or more coders using Cohens Kappa. non-modal. """
+        """ Compare two or more coders using Cohens Kappa. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCoderComparison":
+                return
         ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
 
     def report_code_frequencies(self):
-        """ Show code frequencies overall and by coder. non-modal. """
+        """ Show code frequencies overall and by coder. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCodeFrequencies":
+                return
         ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
 
     def report_coding(self):
-        """ Report on coding and categories. non-modal. """
+        """ Report on coding and categories. """
 
         ui = DialogReportCodes(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -253,7 +259,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def view_graph(self):
-        """ Show acyclic graph of codes and categories. non-modal. """
+        """ Show acyclic graph of codes and categories. """
 
         ui = ViewGraph(self.settings)
         self.dialogList.append(ui)
@@ -261,7 +267,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def help(self):
-        """ Help dialog. non-modal. """
+        """ Help dialog. """
 
         ui = DialogInformation("Help contents", "Help.html")
         self.dialogList.append(ui)
@@ -269,15 +275,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def about(self):
-        """ About dialog.  non-modal. """
+        """ About dialog. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
+                return
         ui = DialogInformation("About", "About.html")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
 
     def manage_attributes(self):
-        """ Create, edit, delete, rename attributes """
+        """ Create, edit, delete, rename attributes. """
 
         ui = DialogManageAttributes(self.settings, self.ui.textEdit)
         ui.exec_()
@@ -287,7 +296,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Import survey flat sheet: csv file.
         Create cases and assign attributes to cases.
         Identify qualitative questions and assign these data to the source table for
-        coding and review. """
+        coding and review. Modal dialog. """
 
         ui = DialogImportSurvey(self.settings, self.ui.textEdit)
         ui.exec_()
@@ -296,8 +305,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCases":
+                return
         ui = DialogCases(self.settings, self.ui.textEdit)
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def manage_files(self):
@@ -305,14 +318,20 @@ class MainWindow(QtWidgets.QMainWindow):
         plain text. Rename, delete and add memos to files.
         """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogManageFiles":
+                return
         ui = DialogManageFiles(self.settings, self.ui.textEdit)
-        ui.exec_()
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def journals(self):
-        """ Create and edit journals. non-modal.
-        """
+        """ Create and edit journals. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogJournals":
+                return
         ui = DialogJournals(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -321,8 +340,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def text_coding(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. Multiple coding windows can be displayed non-modal.
-        """
+        text in imported text files. """
 
         ui = DialogCodeText(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -332,7 +350,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
-        Multiple coding windows can be displayed non-modal.
         """
 
         ui = DialogCodeImage(self.settings)
@@ -343,8 +360,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def av_coding(self):
         """ Create edit and delete codes. Apply and remove codes to segements of the
-        audio or video file. Multiple coding windows can be displayed non-modal.
-        """
+        audio or video file. """
 
         ui = DialogCodeAV(self.settings)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -451,7 +467,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.open_project(self.settings['path'])
 
     def change_settings(self):
-        """ Change default settings - the coder name, font, font size. """
+        """ Change default settings - the coder name, font, font size. Non-modal. """
 
         ui = DialogSettings(self.settings)
         ui.exec_()
@@ -462,11 +478,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def project_memo(self):
         """ Give the entire project a memo. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogMemo":
+                return
         cur = self.settings['conn'].cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.settings, "Memo for project " + self.settings['projectName'],
             memo)
+        self.dialogList.append(ui)
         ui.show()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
