@@ -890,12 +890,13 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def search(self):
         """ Search for selected codings.
-        There are two main search pathways.
+        There are three main search pathways.
         The default is based on file selection and can be restricted using the file
         selection dialog.
         The second pathway is based on case selection and can be restricted using the
         case selection dialog. If cases are selected this overrides file selections that
         the user has entered.
+        The third pathway is based on attribute selection, which may include files or cases.
         """
 
         coder = self.ui.comboBox_coders.currentText()
@@ -917,6 +918,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, "No files, cases, attributes",
                 "No files, cases or attributes have been selected.")
             return
+
+                # Add search terms to textEdit
+        self.ui.textEdit.clear()
+        parameters = self.ui.label_selections.text()
+        self.ui.textEdit.insertPlainText("Search parameters:\n" + parameters)
+        if coder == "":
+            self.ui.textEdit.insertPlainText("\nCoding by: All coders")
+        else:
+            self.ui.textEdit.insertPlainText("\nCodings by: " + coder)
+        if search_text != "":
+            self.ui.textEdit.insertPlainText("\nSearch text: " + search_text)
+        codes_string = "\nCodes: "
+        for i in items:
+            codes_string += i.text(0) + ". "
+        self.ui.textEdit.insertPlainText(codes_string)
+        self.ui.textEdit.insertPlainText("\n==========\n")
 
         # get selected codes from selected items
         code_ids = ""
@@ -1298,17 +1315,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 'fid': i[8], 'file_or_case': fileOrCase, 'text': text})
         av_results = tmp
 
-        # Add search terms to textEdit
-        self.ui.textEdit.clear()
-        parameters = self.ui.label_selections.text()
-        self.ui.textEdit.insertPlainText("Search parameters:\n" + parameters)
-        if coder == "":
-            self.ui.textEdit.insertPlainText("\nCoding by: All coders")
-        else:
-            self.ui.textEdit.insertPlainText("\nCodings by: " + coder)
-        if search_text != "":
-            self.ui.textEdit.insertPlainText("\nSearch text: " + search_text)
-        self.ui.textEdit.insertPlainText("\n==========\n")
         for row in text_results:
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
@@ -1357,9 +1363,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
         self.html_images_and_links.append({'imagename': imagename, 'image': image})
-        text_edit.insertPlainText(img['memo'] + "\n")
-        #TODO add code_image memo to displayed results
-
+        if img['memo'] != "":
+            text_edit.insertPlainText("Memo: " + img['memo'] + "\n")
 
     @staticmethod
     def html_heading(item):
