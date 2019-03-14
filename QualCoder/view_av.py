@@ -343,7 +343,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
         for s in segments:
-            self.scene.addItem(SegmentGraphicsItem(self.settings, s, scaler, self.mediaplayer,self.timer, self.is_paused))
+            self.scene.addItem(SegmentGraphicsItem(self.settings, s, scaler, self.mediaplayer,self.timer, self.is_paused, self.ui.pushButton_play))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -980,8 +980,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     mediaplayer = None
     timer = None
     is_paused = None
+    play_button = None
 
-    def __init__(self, settings, segment, scaler, mediaplayer, timer, is_paused):
+    def __init__(self, settings, segment, scaler, mediaplayer, timer, is_paused, play_button):
         super(SegmentGraphicsItem, self).__init__(None)
 
         self.settings = settings
@@ -990,6 +991,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.mediaplayer = mediaplayer
         self.timer = timer
         self.is_paused = is_paused
+        self.play_button = play_button
         self.reload_segment = False
         self.setFlag(self.ItemIsSelectable, True)
         tooltip = self.segment['codename'] + " "
@@ -1031,12 +1033,19 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
+        self.play_button.setText("Pause")
         self.timer.start()
 
     def delete(self):
         """ Mark segment for deletion. Does not actually delete segment item, but hides
         it from the scene. Reload_segment is set to True, so on playing media, the update
         event will reload all segments. """
+
+        print(self.segment)
+        ui = DialogConfirmDelete("Segment: " + self.segment['codename'] + "\nMemo: " + self.segment['memo'])
+        ok = ui.exec_()
+        if not ok:
+            return
 
         self.setToolTip("")
         self.setLine(-100, -100, -100, -100)
