@@ -84,26 +84,24 @@ class DialogCodeAV(QtWidgets.QDialog):
     file_ = None
     codes = []
     categories = []
-    segments = []
     ddialog = None
     media_data = None
     instance = None
     media_player = None
     media = None
+    is_paused = False
     segment = {}
 
     def __init__(self, settings):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
         """
-
         #TODO maybe show other coders ?
 
         sys.excepthook = exception_handler
         self.settings = settings
         self.codes = []
         self.categories = []
-        self.segments = []
         self.media_data = None
         self.segment['start'] = None
         self.segment['end'] = None
@@ -149,7 +147,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(50, -200)))
+        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
         self.ddialog.show()
 
         # Create a vlc instance with an empty vlc media player
@@ -311,11 +309,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Get coded segments for this file, for this coder, or all coders.
         Currently only for this coder. Called from select_media. """
 
-        self.segments = []
+        segments = []
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
         sql += " code_av.owner, code_name.name, code_name.color from code_av"
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
+        #TODO possibly add checkbox and load segments for ALL coders
         #if not self.ui.checkBox_show_coders.isChecked():
         sql += " and code_av.owner=? "
         values = [self.media_data['id']]
@@ -324,27 +323,27 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql, values)
         code_results = cur.fetchall()
         for row in code_results:
-            self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
+            segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
             'pos1': row[3], 'cid':row[4], 'memo': row[5], 'date': row[6],
             'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
         # Fix overlapping segments by incrementing y values so segment is shown on a differnt line
-        for i in range(0, len(self.segments) - 1):
-            for j in range(i + 1, len(self.segments)):
-                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and  \
-                self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
-                self.segments[i]['y'] == self.segments[j]['y']) or \
-                (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and  \
-                self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
-                self.segments[i]['y'] == self.segments[j]['y']):
+        for i in range(0, len(segments) - 1):
+            for j in range(i + 1, len(segments)):
+                if (segments[j]['pos0'] >= segments[i]['pos0'] and  \
+                segments[j]['pos0'] <= segments[i]['pos1'] and \
+                segments[i]['y'] == segments[j]['y']) or \
+                (segments[j]['pos0'] <= segments[i]['pos0'] and  \
+                segments[j]['pos1'] >= segments[i]['pos0'] and \
+                segments[i]['y'] == segments[j]['y']):
                     #print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
                     #print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
                     # to overcome the overlap, add to the y value of the i segment
-                    self.segments[j]['y'] += 10
+                    segments[j]['y'] += 10
         # Draw coded segments in scene
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
-        for s in self.segments:
-            self.scene.addItem(SegmentGraphicsItem(self.settings, s, scaler))
+        for s in segments:
+            self.scene.addItem(SegmentGraphicsItem(self.settings, s, scaler, self.mediaplayer,self.timer, self.is_paused))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -373,9 +372,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             #self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
             self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
         elif platform.system() == "Windows": # for Windows
-            self.mediaplayer.set_hwnd(int(self.ui.frame.winId()))
+            self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
         elif platform.system() == "Darwin": # for MacOS
-            self.mediaplayer.set_nsobject(int(self.ui.frame.winId()))
+            self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
         self.media_duration_text = "Duration: " + msecs_to_mins_and_secs(msecs)
         self.ui.label_time_2.setText(self.media_duration_text)
@@ -395,9 +394,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
         integer variables, so you need a factor; the higher the factor, the
         more precise are the results (1000 should suffice).
+
+        Some non fatal errors occur:
+        [00007fd8d4fb8410] main decoder error: Timestamp conversion failed for 42518626: no reference clock
+        [00007fd8d4fb8410] main decoder error: Could not convert timestamp 0 for faad
         """
 
-        # Set the media position to where the slider was dragged
         self.timer.stop()
         pos = self.ui.horizontalSlider.value()
         self.mediaplayer.set_position(pos / 1000.0)
@@ -659,6 +661,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.settings['conn'].commit()
+        self.load_segments()
 
     def add_code(self):
         """ Use add_item dialog to get new code text.
@@ -747,6 +750,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected = None
         self.get_codes_categories()
         self.fill_tree()
+        self.load_segments()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -849,6 +853,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.settings['conn'].commit()
             self.codes[found]['name'] = new_text
             selected.setData(0, QtCore.Qt.DisplayRole, new_text)
+            self.load_segments()
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -894,7 +899,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         new_color = ui.get_color()
         if new_color is None:
             return
-        #print(new_color)
         selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
         #update codes list and database
         self.codes[found]['color'] = new_color
@@ -902,43 +906,41 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.settings['conn'].commit()
+        self.load_segments()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
-    #segments = None
-
     def __init__ (self, width, height, parent=None):
         super(GraphicsScene, self).__init__ (parent)
         self.scene_width = width
         self.scene_height = height
-        #self.segments = segments
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def setWidth(self, width):
-        """ Resize scene width. """
+    '''def set_width(self, width):
+        """ Resize scene width. Not currently used. """
 
         self.sceneWidth = width
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def setHeight(self, height):
-        """ Resize scene height. """
+    def set_height(self, height):
+        """ Resize scene height. Not currently used. """
 
         self.sceneHeight = height
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def getWidth(self):
-        """ Return scene width. """
+    def get_width(self):
+        """ Return scene width. Not currently used. """
 
         return self.scene_width
 
-    def getHeight(self):
-        """ Return scene height. """
+    def get_height(self):
+        """ Return scene height. Not currently used. """
 
         return self.scene_height
 
-    '''def mouseMoveEvent(self, mouseEvent):
+    def mouseMoveEvent(self, mouseEvent):
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
 
         for i in self.scene.items():
@@ -967,21 +969,27 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
 
 class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
-    """ Draws coded segment line. Uses the media duration to scale the line length.
-    y values will change depending on how many different codes are shown.
-    TODO y values will need to be supplied. """
+    """ Draws coded segment line. The media duration determines the scaler for the line length and position.
+    y values are pre-calculated and stored in the segment data.
+    """
 
     settings = None
     segment = None
     scaler = None
     reload_segment = False
+    mediaplayer = None
+    timer = None
+    is_paused = None
 
-    def __init__(self, settings, segment, scaler):
+    def __init__(self, settings, segment, scaler, mediaplayer, timer, is_paused):
         super(SegmentGraphicsItem, self).__init__(None)
 
         self.settings = settings
         self.segment = segment
         self.scaler = scaler
+        self.mediaplayer = mediaplayer
+        self.timer = timer
+        self.is_paused = is_paused
         self.reload_segment = False
         self.setFlag(self.ItemIsSelectable, True)
         tooltip = self.segment['codename'] + " "
@@ -991,7 +999,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if self.segment['memo'] != "":
             tooltip += "\nMemo: " + self.segment['memo']
         self.setToolTip(tooltip)
-        self.calculatePointsAndDraw()
+        self.draw_segment()
 
     def contextMenuEvent(self, event):
         """
@@ -1003,6 +1011,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu = QtWidgets.QMenu()
         menu.addAction('Memo for segment')
         menu.addAction('Delete segment')
+        menu.addAction('Play segment')
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1010,6 +1019,19 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.edit_memo()
         if action.text() == 'Delete segment':
             self.delete()
+        if action.text() == 'Play segment':
+            self.play_segment()
+
+    def play_segment(self):
+        """  """
+
+        #self.timer.stop()
+        #pos = self.ui.horizontalSlider.value()
+        pos = self.segment['pos0'] / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.play()
+        self.mediaplayer.set_position(pos)
+        self.is_paused = False
+        self.timer.start()
 
     def delete(self):
         """ Mark segment for deletion. Does not actually delete segment item, but hides
@@ -1055,11 +1077,11 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.setToolTip(tooltip)
 
     def redraw(self):
-        """ Called from mouse move and release events. """
+        """ Called from mouse move and release events. Not currently used. """
 
-        self.calculatePointsAndDraw()
+        self.draw_segment()
 
-    def calculatePointsAndDraw(self):
+    def draw_segment(self):
         """ Calculate the x values for the line. """
 
         from_x = self.segment['pos0'] * self.scaler
@@ -1127,7 +1149,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(50, -200)))
+        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 10)))
         self.ddialog.show()
 
         # Create a basic vlc instance
@@ -1165,9 +1187,9 @@ class DialogViewAV(QtWidgets.QDialog):
             #self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
             self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
         elif platform.system() == "Windows": # for Windows
-            self.mediaplayer.set_hwnd(int(self.ui.frame.winId()))
+            self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
         elif platform.system() == "Darwin": # for MacOS
-            self.mediaplayer.set_nsobject(int(self.ui.frame.winId()))
+            self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
         self.ui.label_time_2.setText("Duration: " + msecs_to_mins_and_secs(msecs))
         self.ui.textEdit.setText(self.media_data['memo'])
