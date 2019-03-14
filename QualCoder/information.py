@@ -68,7 +68,7 @@ class DialogInformation(QtWidgets.QDialog):
             scriptdir = os.path.dirname(os.path.abspath(__file__))
             htmlFile = os.path.join(scriptdir, filename)
             try:
-                with open(htmlFile, 'r') as f:
+                with open(htmlFile, 'r', encoding='utf8') as f:
                     self.text = f.read()
                 self.ui.textEdit.setHtml(self.text)
             except Exception as e:
