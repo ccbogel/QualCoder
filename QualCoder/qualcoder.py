@@ -300,6 +300,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogImportSurvey(self.settings, self.ui.textEdit)
         ui.exec_()
+        self.clean_dialog_refs()
 
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
@@ -567,8 +568,9 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             try:
                 #logger.debug(str(d) + ", isVisible:" + str(d.isVisible()) + " Title:" + d.windowTitle())
-                d.windowTitle()
-                tempList.append(d)
+                #d.windowTitle()
+                if d.isVisible():
+                    tempList.append(d)
             # RuntimeError: wrapped C/C++ object of type DialogSQL has been deleted
             except RuntimeError as e:
                 logger.error(str(e))
