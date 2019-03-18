@@ -476,13 +476,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         if self.ui.pushButton_coding.text() == "Clear segment":
-            self.segment['start'] = None
-            self.segment['end'] = None
-            self.segment['start_msecs'] = None
-            self.segment['end_msecs'] = None
-            self.segment['memo'] = ""
-            self.ui.pushButton_coding.setText("Start segment")
-            self.ui.label_segment.setText("Segment:")
+            self.clear_segment()
             return
         time = self.ui.label_time.text()
         time = time[6:]
@@ -516,10 +510,10 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         menu = QtWidgets.QMenu()
         selected = self.ui.treeWidget.currentItem()
-        #print(selected.parent())
-        #index = self.ui.treeWidget.currentIndex()
+        #logger.debug("selected paremt: " + str(selected.parent()))
+        #logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
         ActionItemAssignSegment = None
-        if self.segment['end'] is not None:
+        if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
         ActionItemAddCode = menu.addAction("Add a new code")
         ActionItemAddCategory = menu.addAction("Add a new category")
@@ -542,7 +536,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.add_edit_code_memo(selected)
         if selected is not None and action == ActionItemDelete:
             self.delete_category_or_code(selected)
-        # UnboundLocalError
         if action == ActionItemAssignSegment:
             self.assign_segment_to_code(selected)
 
@@ -577,6 +570,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql, values)
         self.settings['conn'].commit()
         self.load_segments()
+        self.clear_segment()
+
+    def clear_segment(self):
+        """ Called by assign_segment_to code. """
 
         self.segment['start'] = None
         self.segment['start_msecs'] = None
@@ -585,6 +582,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['memo'] = ""
         self.ui.label_segment.setText("Segment:")
         self.ui.pushButton_coding.setText("Start segment")
+        self.ui.pushButton_coding.setText("Start segment")
+        self.ui.label_segment.setText("Segment:")
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
