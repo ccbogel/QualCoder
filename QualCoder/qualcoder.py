@@ -269,7 +269,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Help dialog. """
 
-        ui = DialogInformation("Help contents", "Help.html")
+        ui = DialogInformation("Help contents", "GUI/Help.html")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -280,7 +280,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
                 return
-        ui = DialogInformation("About", "About.html")
+        ui = DialogInformation("About", "GUI/About.html")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
