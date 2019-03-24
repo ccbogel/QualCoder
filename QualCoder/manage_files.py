@@ -79,12 +79,14 @@ class DialogManageFiles(QtWidgets.QDialog):
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for additem dialog
     parent_textEdit = None
+    dialogList = []
 
     def __init__(self, settings, parent_textEdit):
 
         sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
+        self.dialogList = []
         self.load_file_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
@@ -132,7 +134,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attributes = []
         for row in result:
             self.attributes.append(row)
-        print
 
     def add_attribute(self):
         """ When add button pressed, opens the addItem dialog to get new attribute text.
@@ -301,7 +302,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
 
         ui = DialogViewAV(self.settings, self.source[x])
-        ui.exec_()
+        #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+        self.dialogList.append(ui)
+        ui.show()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
@@ -395,7 +398,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 destination += "/audio/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/audio/" + filename)
-            if f.split('.')[-1].lower() in ('mov', 'mp4', 'ogg', 'wmv'):
+            if f.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
                 destination += "/video/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/video/" + filename)
