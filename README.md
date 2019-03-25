@@ -13,6 +13,10 @@ You will also need to have a vlc player installed - for audio and video.
 
 Linux:
 
+I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package.
+
+Manual Install:
+
 Once python is installed run the install.sh script
 
 The install.sh will run the following commands to install the pyqt5 and lxml modules:
