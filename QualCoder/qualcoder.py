@@ -378,6 +378,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         """ Override the QWindow close event.
         Close all dialogs and database connection.
+        If selected via menu option exit: event == False
+        If selected via window x close: event == QtGui.QCloseEvent
         """
 
         quit_msg = "Are you sure you want to quit?"
@@ -392,9 +394,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     pass
             QtWidgets.qApp.quit()
+            return
+        if event is False:
+            return
         else:
-            return False
-        True
+            event.ignore()
 
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
@@ -581,6 +585,9 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
+    # uncomment below when used in deb package
+    #with open(path + "/QualCoder/GUI/default.stylesheet", "r") as fh:
+    # comment below when used in deb package
     with open(path + "/GUI/default.stylesheet", "r") as fh:
         app.setStyleSheet(fh.read())
     ex = MainWindow()
