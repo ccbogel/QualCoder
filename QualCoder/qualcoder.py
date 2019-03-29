@@ -57,6 +57,12 @@ from view_image import DialogCodeImage
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 logfile = home + '/QualCoder.log'
+# Delete log file on first opening so that file sizes are more managable
+try:
+    os.remove(logfile)
+except OSError:
+    pass
+
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
      datefmt='%Y/%m/%d %I:%M', filename=logfile,
      level=logging.DEBUG)
