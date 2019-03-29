@@ -29,8 +29,10 @@ https://qualcoder.wordpress.com/
 import logging
 import datetime
 import os
+import platform
 import sys
 from shutil import copyfile
+import subprocess
 import traceback
 import zipfile
 
@@ -39,6 +41,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
+import ebooklib
+from ebooklib import epub
 from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
@@ -380,28 +384,51 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.default_import_directory)
         if not ok or imports == []:
             return
+        known_file_type = False
         nameSplit = imports[0].split("/")
         temp_filename = nameSplit[-1]
         self.default_import_directory = imports[0][0:-len(temp_filename)]
         for f in imports:
             filename = f.split("/")[-1]
             destination = self.settings['path']
-            if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'pdf', 'htm', 'html'):
+            if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub'):
                 destination += "/documents/" + filename
                 copyfile(f, destination)
                 self.load_file_text(f)
+                known_file_type = True
+            if f.split('.')[-1].lower() in ('pdf'):
+                destination += "/documents/" + filename
+                # remove encryption from pdf if possible, for Linux
+                if platform.system() == "Linux":
+                    process = subprocess.Popen(["qpdf", "--decrypt", f, destination],
+                        stdout=subprocess.PIPE)
+                    process.wait()
+                    self.load_file_text(destination)
+                else:
+                    #TODO decrypt not implemented for windows, OSX
+                    QtWidgets.QMessageBox.warning(None, 'If import error occurs',
+                    "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf:\n" + f)
+                    copyfile(f, destination)
+                    self.load_file_text(destination)
+                known_file_type = True
             if f.split('.')[-1].lower() in ('jpg', 'jpeg', 'png', 'gif'):
                 destination += "/images/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/images/" + filename)
+                known_file_type = True
             if f.split('.')[-1].lower() in ('wav', 'mp3'):
                 destination += "/audio/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/audio/" + filename)
+                known_file_type = True
             if f.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
                 destination += "/video/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/video/" + filename)
+                known_file_type = True
+            if not known_file_type:
+                QtWidgets.QMessageBox.warning(None, 'Unknown file type',
+                    "Unknown file type for import:\n" + f)
         self.fill_table()
 
     def load_media_reference(self, mediapath):
@@ -459,13 +486,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
             text = "\n".join(list_)
+        # Import from epub
+        if import_file[-5:].lower() == ".epub":
+            book = epub.read_epub(import_file)
+            for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+                #print(d.get_content())
+                bytes_ = d.get_body_content()
+                string = bytes_.decode('utf-8')
+                text += html_to_text(string) + "\n"
         # import PDF
         if import_file[-4:].lower() == '.pdf':
-            fp = open(import_file,'rb')  # read binary mode
+            fp = open(import_file, 'rb')  # read binary mode
             parser = PDFParser(fp)
             doc = PDFDocument()
             parser.set_document(doc)
             doc.set_parser(parser)
+            # potential error with encrypted PDF
             doc.initialize('')
             rsrcmgr = PDFResourceManager()
             laparams = LAParams()
@@ -513,6 +549,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             if import_errors > 0:
                 QtWidgets.QMessageBox.warning(None, 'Warning', str(import_errors) + " lines not imported")
                 logger.warning(import_file + ": " + str(import_errors) + " lines not imported")
+        # import of text file did not work
+        if text == "":
+            QtWidgets.QMessageBox.warning(None, 'Warning', "Cannot import " + str(import_file) + "\n" + str(e))
+            return
         # Final checks: check for duplicated filename and update model, widget and database
         nameSplit = import_file.split("/")
         filename = nameSplit[-1]
