@@ -638,10 +638,11 @@ class DialogCodeText(QtWidgets.QDialog):
             cur = self.settings['conn'].cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.settings['conn'].commit()
+            old_name = self.codes[found]['name']
             self.codes[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append("Code renamed from: " + \
-                self.codes[found]['name'] + " to: " + new_name)
+                old_name + " to: " + new_name)
             # update filter for tooltip
             self.eventFilterTT.setCodes(self.code_text, self.codes)
             return
@@ -669,10 +670,11 @@ class DialogCodeText(QtWidgets.QDialog):
             cur.execute("update code_cat set name=? where catid=?",
             (new_name, self.categories[found]['catid']))
             self.settings['conn'].commit()
+            old_name = self.categories[found]['name']
             self.categories[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append("Category renamed from: "\
-                 + self.codes[found]['name'] + " to: " + new_name)
+                 + old_name + " to: " + new_name)
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code. """

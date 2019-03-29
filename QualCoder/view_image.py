@@ -66,6 +66,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
     settings = None
+    parent_textEdit = None
     filename = None
     pixmap = None
     scene = None
@@ -77,7 +78,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
-    def __init__(self, settings):
+    def __init__(self, settings, parent_textEdit):
         """ Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
@@ -86,6 +87,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         sys.excepthook = exception_handler
         self.settings = settings
+        self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
         self.files = []
@@ -627,6 +629,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.settings['conn'].commit()
+        self.parent_textEdit.append(msg)
 
     def add_code(self):
         """ Use add_item dialog to get new code text.
@@ -655,6 +658,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
         self.ui.treeWidget.setCurrentItem(top_item)
+        self.parent_textEdit.append("New code: " + item['name'])
 
     def add_category(self):
         """ Add a new category.
@@ -682,6 +686,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
         top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
         self.ui.treeWidget.addTopLevelItem(top_item)
+        self.parent_textEdit.append("New category: " + item['name'])
 
     def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
@@ -709,6 +714,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         ok = ui.exec_()
         if not ok:
             return
+        self.parent_textEdit.append("Code deleted: " + code_['name'])
         cur = self.settings['conn'].cursor()
         cur.execute("delete from code_name where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
@@ -732,6 +738,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         ok = ui.exec_()
         if not ok:
             return
+        self.parent_textEdit.append("Category deleted: " + category['name'])
         cur = self.settings['conn'].cursor()
         cur.execute("update code_name set catid=null where catid=?", [category['catid'], ])
         cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
@@ -794,15 +801,15 @@ class DialogCodeImage(QtWidgets.QDialog):
         not currently in use. """
 
         if selected.text(1)[0:3] == 'cid':
-            new_text, ok = QtWidgets.QInputDialog.getText(self, "Rename code", "New code name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename code", "New code name:",
             QtWidgets.QLineEdit.Normal, selected.text(0))
-            if not ok or new_text == '':
+            if not ok or new_name == '':
                 return
             # check that no other code has this text
             for c in self.codes:
-                if c['name'] == new_text:
+                if c['name'] == new_name:
                     QtWidgets.QMessageBox.warning(None, "Name in use",
-                    new_text + " is already in use, choose another name ", QtWidgets.QMessageBox.Ok)
+                    new_name + " is already in use, choose another name ", QtWidgets.QMessageBox.Ok)
                     return
             # find the code in the list
             found = -1
@@ -813,20 +820,23 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return
             # update codes list and database
             cur = self.settings['conn'].cursor()
-            cur.execute("update code_name set name=? where cid=?", (new_text, self.codes[found]['cid']))
+            cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.settings['conn'].commit()
-            self.codes[found]['name'] = new_text
-            selected.setData(0, QtCore.Qt.DisplayRole, new_text)
+            old_name = self.codes[found]['name']
+            self.codes[found]['name'] = new_name
+            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            self.parent_textEdit.append("Code renamed from: " + \
+                old_name + " to: " + new_name)
             return
 
         if selected.text(1)[0:3] == 'cat':
-            new_text, ok = QtWidgets.QInputDialog.getText(self, "Rename category", "New category name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename category", "New category name:",
             QtWidgets.QLineEdit.Normal, selected.text(0))
-            if not ok or new_text == '':
+            if not ok or new_name == '':
                 return
             # check that no other category has this text
             for c in self.categories:
-                if c['name'] == new_text:
+                if c['name'] == new_name:
                     msg = "This code name is already in use"
                     QtWidgets.QMessageBox.warning(None, "Duplicate code name", msg, QtWidgets.QMessageBox.Ok)
                     return
@@ -840,10 +850,13 @@ class DialogCodeImage(QtWidgets.QDialog):
             # update category list and database
             cur = self.settings['conn'].cursor()
             cur.execute("update code_cat set name=? where catid=?",
-            (new_text, self.categories[found]['catid']))
+            (new_name, self.categories[found]['catid']))
             self.settings['conn'].commit()
-            self.categories[found]['name'] = new_text
-            selected.setData(0, QtCore.Qt.DisplayRole, new_text)
+            old_name = self.categories[found]['name']
+            self.categories[found]['name'] = new_name
+            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            self.parent_textEdit.append("Code renamed from: " + \
+                old_name + " to: " + new_name)
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """

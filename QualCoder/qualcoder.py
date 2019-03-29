@@ -359,7 +359,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        ui = DialogCodeImage(self.settings)
+        ui = DialogCodeImage(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()
@@ -369,7 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to segements of the
         audio or video file. """
 
-        ui = DialogCodeAV(self.settings)
+        ui = DialogCodeAV(self.settings, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()

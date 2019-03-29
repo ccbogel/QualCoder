@@ -79,6 +79,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     Create codes and categories.  """
 
     settings = None
+    parent_textEdit = None
     filename = None
     files = []
     file_ = None
@@ -92,7 +93,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     is_paused = False
     segment = {}
 
-    def __init__(self, settings):
+    def __init__(self, settings, parent_textEdit):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
         """
@@ -100,11 +101,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         sys.excepthook = exception_handler
         self.settings = settings
+        self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
         self.media_data = None
         self.segment['start'] = None
         self.segment['end'] = None
+        self.segment['start_msecs'] = None
+        self.segment['end_msecs'] = None
         self.get_codes_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -309,6 +313,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Get coded segments for this file, for this coder, or all coders.
         Currently only for this coder. Called from select_media. """
 
+        if self.media_data is None:
+            return
         segments = []
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
         sql += " code_av.owner, code_name.name, code_name.color from code_av"
@@ -560,6 +566,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Assign time segment to selected code. Insert an entry into the database.
         Then clear the segment for re-use."""
 
+        if self.media_data is None:
+            return
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
         cid = int(selected.text(1).split(':')[1])
         values = [self.media_data['id'], self.segment['start_msecs'],
@@ -660,6 +668,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.settings['conn'].commit()
+        self.parent_textEdit.append(msg)
         self.load_segments()
 
     def add_code(self):
@@ -669,16 +678,17 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         ui = DialogAddItemName(self.codes, "Add new code")
         ui.exec_()
-        newCodeText = ui.get_new_name()
-        if newCodeText is None:
+        new_name = ui.get_new_name()
+        if new_name is None:
             return
         code_color = colors[randint(0, len(colors) - 1)]
-        item = {'name': newCodeText, 'memo': "", 'owner': self.settings['codername'],
+        item = {'name': new_name, 'memo': "", 'owner': self.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
         cur = self.settings['conn'].cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.settings['conn'].commit()
+        self.parent_textEdit.append("Code added: " + item['name'])
         cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
@@ -697,11 +707,11 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         ui = DialogAddItemName(self.categories, "Category")
         ui.exec_()
-        newCatText = ui.get_new_name()
-        if newCatText is None:
+        new_name = ui.get_new_name()
+        if new_name is None:
             return
         # add to database
-        item = {'name': newCatText, 'cid': None, 'memo': "",
+        item = {'name': new_name, 'cid': None, 'memo': "",
         'owner': self.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.settings['conn'].cursor()
@@ -711,6 +721,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
+        self.parent_textEdit.append("Category added: " + item['name'])
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
@@ -746,6 +757,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_name where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
         self.settings['conn'].commit()
+        self.parent_textEdit.append("Code deleted: " + code_['name'])
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -771,6 +783,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.settings['conn'].commit()
+        self.parent_textEdit.append("Category deleted: " + category['name'])
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -829,15 +842,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         not currently in use. """
 
         if selected.text(1)[0:3] == 'cid':
-            new_text, ok = QtWidgets.QInputDialog.getText(self, "Rename code", "New code name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename code", "New code name:",
             QtWidgets.QLineEdit.Normal, selected.text(0))
-            if not ok or new_text == '':
+            if not ok or new_name == '':
                 return
             # check that no other code has this text
             for c in self.codes:
-                if c['name'] == new_text:
+                if c['name'] == new_name:
                     QtWidgets.QMessageBox.warning(None, "Name in use",
-                    new_text + " is already in use, choose another name ", QtWidgets.QMessageBox.Ok)
+                    new_name + " is already in use, choose another name ", QtWidgets.QMessageBox.Ok)
                     return
             # find the code in the list
             found = -1
@@ -848,21 +861,22 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
             # update codes list and database
             cur = self.settings['conn'].cursor()
-            cur.execute("update code_name set name=? where cid=?", (new_text, self.codes[found]['cid']))
+            cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.settings['conn'].commit()
-            self.codes[found]['name'] = new_text
-            selected.setData(0, QtCore.Qt.DisplayRole, new_text)
+            self.parent_textEdit.append("Code renamed: " + self.codes[found]['name'] + " to: " + new_name)
+            self.codes[found]['name'] = new_name
+            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.load_segments()
             return
 
         if selected.text(1)[0:3] == 'cat':
-            new_text, ok = QtWidgets.QInputDialog.getText(self, "Rename category", "New category name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename category", "New category name:",
             QtWidgets.QLineEdit.Normal, selected.text(0))
-            if not ok or new_text == '':
+            if not ok or new_name == '':
                 return
             # check that no other category has this text
             for c in self.categories:
-                if c['name'] == new_text:
+                if c['name'] == new_name:
                     msg = "This code name is already in use"
                     QtWidgets.QMessageBox.warning(None, "Duplicate code name", msg, QtWidgets.QMessageBox.Ok)
                     return
@@ -876,10 +890,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             # update category list and database
             cur = self.settings['conn'].cursor()
             cur.execute("update code_cat set name=? where catid=?",
-            (new_text, self.categories[found]['catid']))
+            (new_name, self.categories[found]['catid']))
             self.settings['conn'].commit()
-            self.categories[found]['name'] = new_text
-            selected.setData(0, QtCore.Qt.DisplayRole, new_text)
+            self.parent_textEdit.append("Category renamed: " + self.categories[found]['name'] + " to: " + new_name)
+            self.categories[found]['name'] = new_name
+            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
