@@ -126,7 +126,7 @@ class DialogSettings(QtWidgets.QDialog):
         txt += str(self.settings['treefontsize']) + "\n"
         txt += self.settings['directory'] + "\n"
         txt += str(self.settings['showIDs'])
-        with open(home + '/QualCoder_settings.txt', 'w') as f:
+        with open(home + '/.qualcoder/QualCoder_settings.txt', 'w') as f:
             f.write(txt)
 
 if __name__ == "__main__":

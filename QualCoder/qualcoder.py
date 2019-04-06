@@ -56,7 +56,13 @@ from view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
-logfile = home + '/QualCoder.log'
+try:
+    os.mkdir(home + '/.qualcoder')
+except Exception as e:
+    QtWidgets.QMessageBox.critical(None, 'Cannot add .qualcoder folder to home directory',
+        "Exiting\n" + str(e))
+    exit(0)
+logfile = home + '/.qualcoder/QualCoder.log'
 # Delete log file on first opening so that file sizes are more managable
 try:
     os.remove(logfile)
@@ -139,9 +145,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionAbout.triggered.connect(self.about)
 
-        # load_settings from file stored in home
+        # load_settings from file stored in home/.qualcoder/
         try:
-            with open(home + '/QualCoder_settings.txt') as f:
+            with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
                 txt = f.read()
                 txt = txt.split("\n")
                 self.settings['codername'] = txt[0]
@@ -153,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if txt[5] == "True":
                     self.settings['showIDs'] = True
         except:
-            f = open(home + '/QualCoder_settings.txt', 'w')
+            f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
             f.write("default\nNoto Sans\n10\n10\n" + home + "\nFalse\n")
             f.close()
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
