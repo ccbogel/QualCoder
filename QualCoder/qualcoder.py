@@ -56,12 +56,12 @@ from view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
-try:
-    os.mkdir(home + '/.qualcoder')
-except Exception as e:
-    QtWidgets.QMessageBox.critical(None, 'Cannot add .qualcoder folder to home directory',
-        "Exiting\n" + str(e))
-    exit(0)
+if not os.path.exists(home + '/.qualcoder'):
+    try:
+        os.mkdir(home + '/.qualcoder')
+    except Exception as e:
+        print("Cannot add .qualcoder folder to home directory\n" + str(e))
+        raise
 logfile = home + '/.qualcoder/QualCoder.log'
 # Delete log file on first opening so that file sizes are more managable
 try:
