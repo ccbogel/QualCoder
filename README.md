@@ -39,9 +39,9 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5, lxml, pillow, six`
+`pip install pyqt5 lxml pillow six`
 
-Launch QualCoder with `python qualcoder.py`
+There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
 ## Dependencies
 Required
