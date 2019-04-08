@@ -15,20 +15,24 @@ Linux:
 
 I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package.
 
-Manual Install:
+Manual install on Linux:
 
 Once a python 3.x is installed run the install.sh script from withing the qualcoder folder.
 
 
 Windows: 
 
+Install python3 version from here: https://www.python.org/downloads/
+
+Also install a vlc player: https://www.videolan.org/vlc/download-windows.html or from the Windows Store.
+
+In th command prompt run these commands:
+
 python -m pip install pyqt5 
 
 python -m pip install lxml
 
 python -m pip install Pillow
-
-Also install a vlc player: https://www.videolan.org/vlc/download-windows.html or from the Windows Store.
 
 If you are using Windows you can create a shortcut to the QualCoder.py file to start QualCoder.
 
