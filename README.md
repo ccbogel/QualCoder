@@ -17,13 +17,13 @@ I have created a .deb package for QualCoder which can be installed into Debian/U
 
 ### Manual install on Linux:
 
-Once a python 3.x is installed run the install.sh script from withing the qualcoder folder.
+Once a python 3.x is installed run the install.sh script from within the qualcoder folder.
+
+This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
 ### Windows: 
 
-Install python3 version from here: https://www.python.org/downloads/
-
-Also install a vlc player: https://www.videolan.org/vlc/download-windows.html or from the Windows Store.
+Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store.
 
 Install dependencies in the command prompt:
 
@@ -31,7 +31,7 @@ python -m pip install pyqt5, lxml, Pillow
 
 To launch, you can create a shortcut to the QualCoder.py file to start QualCoder.
 
-This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
+Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
 ### MacOS
 
@@ -62,7 +62,12 @@ Required
 ## Future plans
 * Reports:
     * Word count report
-    * possibly look at text mining
+    * Possibly look at text mining
+    * HTML report output to include A/V segments
+* Text mining
+    * word cloud, word visualisations
+* General
+    * Translations for GUI
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
