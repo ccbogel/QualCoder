@@ -24,12 +24,13 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/fetrhfvdss
+https://qualcoder.wordpress.com/
 '''
 
 import datetime
 import logging
 import os
+import shutil
 import sys
 import sqlite3
 import traceback
@@ -93,8 +94,9 @@ class MainWindow(QtWidgets.QMainWindow):
     There is a risk of a clash if two coding windows are open with the same file text or
     two journals open with the same journal entry. """
 
-    settings = {"conn": None, "directory": home, "projectName": "", "showIDs": False, 'path': home,
-    "codername": "default", "font": "Noto Sans", "fontsize": 10, 'treefontsize': 10}
+    settings = {"conn": None, "directory": home, "projectName": "", "showIDs": False,
+    'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
+    'treefontsize': 10, "language": "en"}
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
@@ -107,6 +109,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.hide_menu_options()
         self.init_ui()
+        self.conn = None
         self.show()
 
     def init_ui(self):
@@ -158,9 +161,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.settings['showIDs'] = False
                 if txt[5] == "True":
                     self.settings['showIDs'] = True
+                # With workarounds for an empty or non-existant language line
+                try:
+                    self.settings['language'] = txt[6]
+                    if txt[6] == "":
+                        self.settings['language'] = "en"
+                except:
+                    self.settings['language'] = "en"
         except:
             f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
-            f.write("default\nNoto Sans\n10\n10\n" + home + "\nFalse\n")
+            f.write("default\nNoto Sans\n10\n10\n" + home + "\nFalse\nen")
             f.close()
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
@@ -221,6 +231,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += ". Code font size: " + self.settings['font'] + " " + str(self.settings['treefontsize'])
         msg += "\nDirectory: " + self.settings['directory']
         msg += "\nShowIDs: " + str(self.settings['showIDs'])
+        msg += "\nLanguage: " + self.settings['language']
         msg += "\n========"
         self.ui.textEdit.append(msg)
 
@@ -452,7 +463,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder 1.0'))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.settings['conn'].commit()
         try:
             # get and display some project details
@@ -511,7 +522,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append("Project memo entered.")
 
     def open_project(self, path=""):
-        """ Open an existing project. """
+        """ Open an existing project.
+        Also save a backup datetime stamped copy at the same time. """
 
         if self.settings['projectName'] != "":
             self.close_project()
@@ -547,13 +559,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
-        #self.settings_report()
-        self.ui.textEdit.append("Project Opened:" + self.settings['projectName'] + "\n========"
+        # Save a datetime stamped backup
+        nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
+        shutil.copytree(self.settings['path'], backup)
+        self.ui.textEdit.append("Project Opened:" + self.settings['projectName']
+            + "\n========"
             + "\nPath: " + self.settings['path']
             + "\nDirectory: " + self.settings['directory']
             + "\nDBVersion:" + self.project['databaseversion'] + ". "
             + "Date: " + str(self.project['date']) + "\n"
-            + "About: " + self.project['about'] + "\n========\n")
+            + "About: " + self.project['about'] + "\n"
+            + "Language: " + self.settings['language'] + "\n"
+            + "Project backup created: " + backup
+            + "\n========\n")
         self.show_menu_options()
 
     def close_project(self):
@@ -597,11 +616,30 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
-    # uncomment below when used in deb package
+    # uncomment below when used in deb package RemRmm44's suggestion
     #with open(path + "/QualCoder/GUI/default.stylesheet", "r") as fh:
-    # comment below when used in deb package
+    # comment below when used in deb package, RemRam44's suggestion
     with open(path + "/GUI/default.stylesheet", "r") as fh:
         app.setStyleSheet(fh.read())
+    # Try and load language settings from file stored in home/.qualcoder/
+    # translator applies to ui designed GUI widgets only
+    lang = "en"
+    try:
+        with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
+            txt = f.read()
+            txt = txt.split("\n")
+            lang = txt[6]
+            if lang == "":
+                lang = "en"
+    except:
+        pass
+    if lang != "en":
+        translator = QtCore.QTranslator()
+        if lang == "fr":
+            translator.load(path + "/GUI/app_fr.qm")
+        if lang == "de":
+            translator.load(path + "/GUI/app_de.qm")
+        app.installTranslator(translator)
     ex = MainWindow()
     sys.exit(app.exec_())
 
