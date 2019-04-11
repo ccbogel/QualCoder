@@ -504,18 +504,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setFont(newfont)
 
     def project_memo(self):
-        """ Give the entire project a memo. """
+        """ Give the entire project a memo. Modal dialog. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogMemo":
-                return
         cur = self.settings['conn'].cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.settings, "Memo for project " + self.settings['projectName'],
             memo)
         self.dialogList.append(ui)
-        ui.show()
+        ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
             self.settings['conn'].commit()
