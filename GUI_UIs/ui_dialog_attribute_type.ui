@@ -34,12 +34,12 @@
     <rect>
      <x>30</x>
      <y>60</y>
-     <width>116</width>
+     <width>161</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
-    <string>Character</string>
+    <string>Character - ABC</string>
    </property>
    <property name="checked">
     <bool>true</bool>
@@ -53,12 +53,12 @@
     <rect>
      <x>30</x>
      <y>90</y>
-     <width>116</width>
+     <width>171</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
-    <string>Numeric</string>
+    <string>Numeric - 123</string>
    </property>
    <attribute name="buttonGroup">
     <string notr="true">buttonGroup</string>
