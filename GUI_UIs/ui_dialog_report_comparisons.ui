@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Reports</string>
+   <string>Coder Comparisons</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -39,7 +39,7 @@
        <rect>
         <x>660</x>
         <y>20</y>
-        <width>161</width>
+        <width>211</width>
         <height>41</height>
        </rect>
       </property>
@@ -52,7 +52,7 @@
        <rect>
         <x>370</x>
         <y>20</y>
-        <width>181</width>
+        <width>231</width>
         <height>41</height>
        </rect>
       </property>

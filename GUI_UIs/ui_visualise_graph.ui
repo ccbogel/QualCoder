@@ -36,9 +36,9 @@
      <widget class="QPushButton" name="pushButton_view">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>0</y>
-        <width>141</width>
+        <width>161</width>
         <height>27</height>
        </rect>
       </property>
@@ -64,7 +64,7 @@
        <rect>
         <x>370</x>
         <y>0</y>
-        <width>251</width>
+        <width>281</width>
         <height>22</height>
        </rect>
       </property>
@@ -75,7 +75,7 @@
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>660</x>
         <y>0</y>
         <width>421</width>
         <height>30</height>

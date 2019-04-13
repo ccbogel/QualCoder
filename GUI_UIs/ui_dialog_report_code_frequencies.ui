@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Reports</string>
+   <string>Code frequencies</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -39,7 +39,7 @@
        <rect>
         <x>660</x>
         <y>10</y>
-        <width>161</width>
+        <width>241</width>
         <height>31</height>
        </rect>
       </property>

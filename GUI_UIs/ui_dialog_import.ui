@@ -91,28 +91,37 @@
        <rect>
         <x>10</x>
         <y>36</y>
-        <width>131</width>
+        <width>141</width>
         <height>21</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter 'ta' for 'tab'&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
       <property name="text">
        <string>Delimiter:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QLabel" name="label_quotefmt">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>310</x>
         <y>30</y>
-        <width>141</width>
+        <width>211</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>Quote format:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_quote">
@@ -120,18 +129,21 @@
        <rect>
         <x>530</x>
         <y>30</y>
-        <width>121</width>
+        <width>151</width>
         <height>31</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE       123, abc,123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;, 123 &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL            &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;, &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <item>
        <property name="text">
-        <string>MINIMAL</string>
+        <string>NONE</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>NONE</string>
+        <string>MINIMAL</string>
        </property>
       </item>
       <item>
