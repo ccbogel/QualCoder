@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_import.ui'
 #
-# Created: Mon Jan 14 09:17:42 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -51,13 +50,16 @@ class Ui_Dialog_Import(object):
         self.lineEdit_delimiter.setGeometry(QtCore.QRect(170, 30, 71, 31))
         self.lineEdit_delimiter.setObjectName("lineEdit_delimiter")
         self.label_delimiter = QtWidgets.QLabel(self.groupBox)
-        self.label_delimiter.setGeometry(QtCore.QRect(10, 36, 131, 21))
+        self.label_delimiter.setGeometry(QtCore.QRect(10, 36, 141, 21))
+        self.label_delimiter.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label_delimiter.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_delimiter.setObjectName("label_delimiter")
         self.label_quotefmt = QtWidgets.QLabel(self.groupBox)
-        self.label_quotefmt.setGeometry(QtCore.QRect(360, 30, 141, 31))
+        self.label_quotefmt.setGeometry(QtCore.QRect(310, 30, 211, 31))
+        self.label_quotefmt.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_quotefmt.setObjectName("label_quotefmt")
         self.comboBox_quote = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_quote.setGeometry(QtCore.QRect(530, 30, 121, 31))
+        self.comboBox_quote.setGeometry(QtCore.QRect(530, 30, 151, 31))
         self.comboBox_quote.setObjectName("comboBox_quote")
         self.comboBox_quote.addItem("")
         self.comboBox_quote.addItem("")
@@ -86,8 +88,9 @@ class Ui_Dialog_Import(object):
         self.label_delimiter.setToolTip(_translate("Dialog_Import", "<html><head/><body><p>Delimiter must be a single character.</p><p>Enter \'ta\' for \'tab\'</p></body></html>"))
         self.label_delimiter.setText(_translate("Dialog_Import", "Delimiter:"))
         self.label_quotefmt.setText(_translate("Dialog_Import", "Quote format:"))
-        self.comboBox_quote.setItemText(0, _translate("Dialog_Import", "MINIMAL"))
-        self.comboBox_quote.setItemText(1, _translate("Dialog_Import", "NONE"))
+        self.comboBox_quote.setToolTip(_translate("Dialog_Import", "<html><head/><body><p>NONE       123, abc,123, abc</p><p>MINIMAL 123, &quot;abc&quot;, 123 &quot;abc&quot;</p><p>ALL            &quot;123&quot;, &quot;abc&quot;, &quot;123&quot;, &quot;abc&quot;</p></body></html>"))
+        self.comboBox_quote.setItemText(0, _translate("Dialog_Import", "NONE"))
+        self.comboBox_quote.setItemText(1, _translate("Dialog_Import", "MINIMAL"))
         self.comboBox_quote.setItemText(2, _translate("Dialog_Import", "ALL"))
         self.label_information.setText(_translate("Dialog_Import", "Changes made on the top row will override any user changes to field names and field types below."))
 

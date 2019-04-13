@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_code_av.ui'
 #
-# Created: Tue Mar 12 21:50:39 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -46,10 +45,10 @@ class Ui_Dialog_code_av(object):
         self.groupBox_2.setTitle("")
         self.groupBox_2.setObjectName("groupBox_2")
         self.pushButton_play = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_play.setGeometry(QtCore.QRect(10, 37, 71, 27))
+        self.pushButton_play.setGeometry(QtCore.QRect(10, 37, 81, 27))
         self.pushButton_play.setObjectName("pushButton_play")
         self.pushButton_stop = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_stop.setGeometry(QtCore.QRect(82, 37, 71, 27))
+        self.pushButton_stop.setGeometry(QtCore.QRect(90, 37, 81, 27))
         self.pushButton_stop.setObjectName("pushButton_stop")
         self.horizontalSlider_vol = QtWidgets.QSlider(self.groupBox_2)
         self.horizontalSlider_vol.setGeometry(QtCore.QRect(795, 44, 160, 18))
@@ -62,7 +61,7 @@ class Ui_Dialog_code_av(object):
         self.label_volume.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_volume.setObjectName("label_volume")
         self.label_time = QtWidgets.QLabel(self.groupBox_2)
-        self.label_time.setGeometry(QtCore.QRect(350, 40, 151, 21))
+        self.label_time.setGeometry(QtCore.QRect(360, 40, 151, 21))
         self.label_time.setObjectName("label_time")
         self.label_time_2 = QtWidgets.QLabel(self.groupBox_2)
         self.label_time_2.setGeometry(QtCore.QRect(520, 40, 161, 21))
@@ -78,16 +77,16 @@ class Ui_Dialog_code_av(object):
         self.horizontalSlider.setTickInterval(10)
         self.horizontalSlider.setObjectName("horizontalSlider")
         self.pushButton_coding = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_coding.setGeometry(QtCore.QRect(153, 37, 171, 27))
+        self.pushButton_coding.setGeometry(QtCore.QRect(170, 37, 181, 27))
         self.pushButton_coding.setObjectName("pushButton_coding")
         self.label_segment = QtWidgets.QLabel(self.groupBox_2)
-        self.label_segment.setGeometry(QtCore.QRect(190, 72, 311, 17))
+        self.label_segment.setGeometry(QtCore.QRect(250, 72, 311, 17))
         self.label_segment.setObjectName("label_segment")
         self.label_coder = QtWidgets.QLabel(self.groupBox_2)
-        self.label_coder.setGeometry(QtCore.QRect(720, 72, 201, 17))
+        self.label_coder.setGeometry(QtCore.QRect(720, 72, 241, 17))
         self.label_coder.setObjectName("label_coder")
         self.pushButton_select = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 171, 27))
+        self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 211, 27))
         self.pushButton_select.setObjectName("pushButton_select")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
 

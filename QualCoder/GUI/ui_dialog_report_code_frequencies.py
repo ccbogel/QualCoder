@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_code_frequencies.ui'
 #
-# Created: Thu Jan 17 09:29:14 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -22,7 +21,7 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_exporttext = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exporttext.setGeometry(QtCore.QRect(660, 10, 161, 31))
+        self.pushButton_exporttext.setGeometry(QtCore.QRect(660, 10, 241, 31))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
         self.label_selections = QtWidgets.QLabel(self.groupBox)
         self.label_selections.setGeometry(QtCore.QRect(10, 0, 481, 40))
@@ -47,7 +46,7 @@ class Ui_Dialog_reportCodeFrequencies(object):
 
     def retranslateUi(self, Dialog_reportCodeFrequencies):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_reportCodeFrequencies.setWindowTitle(_translate("Dialog_reportCodeFrequencies", "Reports"))
+        Dialog_reportCodeFrequencies.setWindowTitle(_translate("Dialog_reportCodeFrequencies", "Code frequencies"))
         self.pushButton_exporttext.setText(_translate("Dialog_reportCodeFrequencies", "Export text file"))
         self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Code and category frequencies: overall and by coder"))
 

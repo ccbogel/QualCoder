@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_journals.ui'
 #
-# Created: Sun Dec 30 06:16:52 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,16 +20,16 @@ class Ui_Dialog_journals(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_create = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_create.setGeometry(QtCore.QRect(10, 10, 81, 27))
+        self.pushButton_create.setGeometry(QtCore.QRect(10, 10, 111, 27))
         self.pushButton_create.setObjectName("pushButton_create")
         self.pushButton_export = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_export.setGeometry(QtCore.QRect(110, 10, 81, 27))
+        self.pushButton_export.setGeometry(QtCore.QRect(130, 10, 111, 27))
         self.pushButton_export.setObjectName("pushButton_export")
         self.pushButton_delete = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(210, 10, 81, 27))
+        self.pushButton_delete.setGeometry(QtCore.QRect(250, 10, 111, 27))
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.label_jname = QtWidgets.QLabel(self.groupBox)
-        self.label_jname.setGeometry(QtCore.QRect(545, 20, 461, 21))
+        self.label_jname.setGeometry(QtCore.QRect(485, 18, 571, 21))
         self.label_jname.setObjectName("label_jname")
         self.gridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(Dialog_journals)

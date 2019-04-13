@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_codes.ui'
 #
-# Created: Thu Jan 18 07:34:44 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,10 +20,10 @@ class Ui_Dialog_codes(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_view_file = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_view_file.setGeometry(QtCore.QRect(10, 0, 141, 32))
+        self.pushButton_view_file.setGeometry(QtCore.QRect(10, 0, 151, 32))
         self.pushButton_view_file.setObjectName("pushButton_view_file")
         self.pushButton_auto_code = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_auto_code.setGeometry(QtCore.QRect(180, 0, 151, 32))
+        self.pushButton_auto_code.setGeometry(QtCore.QRect(170, 0, 181, 32))
         self.pushButton_auto_code.setObjectName("pushButton_auto_code")
         self.label_coder = QtWidgets.QLabel(self.groupBox)
         self.label_coder.setGeometry(QtCore.QRect(360, 6, 301, 28))
@@ -33,13 +32,13 @@ class Ui_Dialog_codes(object):
         self.label_file.setGeometry(QtCore.QRect(660, 7, 551, 28))
         self.label_file.setObjectName("label_file")
         self.label_coded = QtWidgets.QLabel(self.groupBox)
-        self.label_coded.setGeometry(QtCore.QRect(490, 70, 561, 28))
+        self.label_coded.setGeometry(QtCore.QRect(520, 70, 561, 28))
         self.label_coded.setObjectName("label_coded")
         self.label_code = QtWidgets.QLabel(self.groupBox)
-        self.label_code.setGeometry(QtCore.QRect(0, 70, 481, 28))
+        self.label_code.setGeometry(QtCore.QRect(0, 70, 501, 28))
         self.label_code.setObjectName("label_code")
         self.checkBox_show_coders = QtWidgets.QCheckBox(self.groupBox)
-        self.checkBox_show_coders.setGeometry(QtCore.QRect(20, 40, 221, 22))
+        self.checkBox_show_coders.setGeometry(QtCore.QRect(10, 40, 251, 22))
         self.checkBox_show_coders.setObjectName("checkBox_show_coders")
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(270, 40, 201, 26))

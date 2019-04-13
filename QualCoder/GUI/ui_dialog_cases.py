@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_cases.ui'
 #
-# Created: Fri Jan 18 21:16:07 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -37,6 +36,12 @@ class Ui_Dialog_cases(object):
         self.textBrowser.setObjectName("textBrowser")
         self.gridLayout_2.addWidget(self.splitter, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBox_2, 2, 1, 1, 1)
+        self.label_filename = QtWidgets.QLabel(Dialog_cases)
+        self.label_filename.setMinimumSize(QtCore.QSize(0, 32))
+        self.label_filename.setMaximumSize(QtCore.QSize(16777215, 32))
+        self.label_filename.setWordWrap(True)
+        self.label_filename.setObjectName("label_filename")
+        self.gridLayout.addWidget(self.label_filename, 1, 1, 1, 1)
         self.groupBox = QtWidgets.QGroupBox(Dialog_cases)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -48,36 +53,30 @@ class Ui_Dialog_cases(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_addfiles = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_addfiles.setGeometry(QtCore.QRect(140, 0, 181, 32))
+        self.pushButton_addfiles.setGeometry(QtCore.QRect(160, 0, 191, 32))
         self.pushButton_addfiles.setObjectName("pushButton_addfiles")
         self.pushButton_autoassign = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_autoassign.setGeometry(QtCore.QRect(480, 0, 201, 32))
+        self.pushButton_autoassign.setGeometry(QtCore.QRect(550, 0, 221, 32))
         self.pushButton_autoassign.setObjectName("pushButton_autoassign")
         self.pushButton_openfile = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_openfile.setGeometry(QtCore.QRect(140, 40, 541, 32))
+        self.pushButton_openfile.setGeometry(QtCore.QRect(160, 40, 541, 32))
         self.pushButton_openfile.setObjectName("pushButton_openfile")
         self.pushButton_view = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_view.setGeometry(QtCore.QRect(10, 40, 121, 32))
+        self.pushButton_view.setGeometry(QtCore.QRect(10, 40, 141, 32))
         self.pushButton_view.setObjectName("pushButton_view")
         self.pushButton_add = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_add.setGeometry(QtCore.QRect(10, 0, 121, 32))
+        self.pushButton_add.setGeometry(QtCore.QRect(10, 0, 141, 32))
         self.pushButton_add.setObjectName("pushButton_add")
         self.pushButton_delete = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(930, 40, 141, 32))
+        self.pushButton_delete.setGeometry(QtCore.QRect(990, 40, 171, 32))
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.pushButton_import_cases = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_import_cases.setGeometry(QtCore.QRect(330, 0, 141, 32))
+        self.pushButton_import_cases.setGeometry(QtCore.QRect(360, 0, 181, 32))
         self.pushButton_import_cases.setObjectName("pushButton_import_cases")
         self.pushButton_add_attribute = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_add_attribute.setGeometry(QtCore.QRect(690, 0, 191, 31))
+        self.pushButton_add_attribute.setGeometry(QtCore.QRect(780, 0, 191, 31))
         self.pushButton_add_attribute.setObjectName("pushButton_add_attribute")
         self.gridLayout.addWidget(self.groupBox, 0, 1, 1, 1)
-        self.label_filename = QtWidgets.QLabel(Dialog_cases)
-        self.label_filename.setMinimumSize(QtCore.QSize(0, 32))
-        self.label_filename.setMaximumSize(QtCore.QSize(16777215, 32))
-        self.label_filename.setWordWrap(True)
-        self.label_filename.setObjectName("label_filename")
-        self.gridLayout.addWidget(self.label_filename, 1, 1, 1, 1)
 
         self.retranslateUi(Dialog_cases)
         QtCore.QMetaObject.connectSlotsByName(Dialog_cases)
@@ -86,6 +85,7 @@ class Ui_Dialog_cases(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_cases.setWindowTitle(_translate("Dialog_cases", "Cases"))
         self.label.setText(_translate("Dialog_cases", "If a case is selected and a file is open, right click on selected text in the file to mark as belonging to a case. Selected text can also be removed from a case. Text assigned to the selected case is underlined in red."))
+        self.label_filename.setText(_translate("Dialog_cases", "."))
         self.pushButton_addfiles.setText(_translate("Dialog_cases", "Add File to case"))
         self.pushButton_autoassign.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Portions of file text can be assigned to a case through user determined start and end marks.</p></body></html>"))
         self.pushButton_autoassign.setText(_translate("Dialog_cases", "Auto assign file text"))
@@ -97,7 +97,6 @@ class Ui_Dialog_cases(object):
         self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import from a <span style=\" font-weight:600;\">comma delimited</span> csv file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
         self.pushButton_import_cases.setText(_translate("Dialog_cases", "Import cases"))
         self.pushButton_add_attribute.setText(_translate("Dialog_cases", "Add attribute"))
-        self.label_filename.setText(_translate("Dialog_cases", "."))
 
 
 if __name__ == "__main__":

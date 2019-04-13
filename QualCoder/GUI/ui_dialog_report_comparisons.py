@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_comparisons.ui'
 #
-# Created: Thu Jan  4 09:32:15 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -22,10 +21,10 @@ class Ui_Dialog_reportComparisons(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_exporttext = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exporttext.setGeometry(QtCore.QRect(660, 20, 161, 41))
+        self.pushButton_exporttext.setGeometry(QtCore.QRect(660, 20, 211, 41))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
         self.pushButton_run = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_run.setGeometry(QtCore.QRect(370, 20, 181, 41))
+        self.pushButton_run.setGeometry(QtCore.QRect(370, 20, 231, 41))
         self.pushButton_run.setObjectName("pushButton_run")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(10, 30, 71, 22))
@@ -61,7 +60,7 @@ class Ui_Dialog_reportComparisons(object):
 
     def retranslateUi(self, Dialog_reportComparisons):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_reportComparisons.setWindowTitle(_translate("Dialog_reportComparisons", "Reports"))
+        Dialog_reportComparisons.setWindowTitle(_translate("Dialog_reportComparisons", "Coder Comparisons"))
         self.pushButton_exporttext.setText(_translate("Dialog_reportComparisons", "Export text file"))
         self.pushButton_run.setText(_translate("Dialog_reportComparisons", "Run Comparisons"))
         self.label_2.setText(_translate("Dialog_reportComparisons", "Coders:"))
