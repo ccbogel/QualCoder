@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_attribute_type.ui'
 #
-# Created: Mon Dec  4 23:39:14 2017
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -19,14 +18,14 @@ class Ui_Dialog_attribute_type(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.radioButton_char = QtWidgets.QRadioButton(Dialog_attribute_type)
-        self.radioButton_char.setGeometry(QtCore.QRect(30, 60, 116, 22))
+        self.radioButton_char.setGeometry(QtCore.QRect(30, 60, 161, 22))
         self.radioButton_char.setChecked(True)
         self.radioButton_char.setObjectName("radioButton_char")
         self.buttonGroup = QtWidgets.QButtonGroup(Dialog_attribute_type)
         self.buttonGroup.setObjectName("buttonGroup")
         self.buttonGroup.addButton(self.radioButton_char)
         self.radioButton_numeric = QtWidgets.QRadioButton(Dialog_attribute_type)
-        self.radioButton_numeric.setGeometry(QtCore.QRect(30, 90, 116, 22))
+        self.radioButton_numeric.setGeometry(QtCore.QRect(30, 90, 171, 22))
         self.radioButton_numeric.setObjectName("radioButton_numeric")
         self.buttonGroup.addButton(self.radioButton_numeric)
         self.label = QtWidgets.QLabel(Dialog_attribute_type)
@@ -41,8 +40,8 @@ class Ui_Dialog_attribute_type(object):
     def retranslateUi(self, Dialog_attribute_type):
         _translate = QtCore.QCoreApplication.translate
         Dialog_attribute_type.setWindowTitle(_translate("Dialog_attribute_type", "Attribute Type"))
-        self.radioButton_char.setText(_translate("Dialog_attribute_type", "Character"))
-        self.radioButton_numeric.setText(_translate("Dialog_attribute_type", "Numeric"))
+        self.radioButton_char.setText(_translate("Dialog_attribute_type", "Character - ABC"))
+        self.radioButton_numeric.setText(_translate("Dialog_attribute_type", "Numeric - 123"))
         self.label.setText(_translate("Dialog_attribute_type", "Choose attribute type:"))
 
 
