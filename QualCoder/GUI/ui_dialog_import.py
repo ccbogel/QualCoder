@@ -88,7 +88,7 @@ class Ui_Dialog_Import(object):
         self.label_delimiter.setToolTip(_translate("Dialog_Import", "<html><head/><body><p>Delimiter must be a single character.</p><p>Enter \'ta\' for \'tab\'</p></body></html>"))
         self.label_delimiter.setText(_translate("Dialog_Import", "Delimiter:"))
         self.label_quotefmt.setText(_translate("Dialog_Import", "Quote format:"))
-        self.comboBox_quote.setToolTip(_translate("Dialog_Import", "<html><head/><body><p>NONE       123, abc,123, abc</p><p>MINIMAL 123, &quot;abc&quot;, 123 &quot;abc&quot;</p><p>ALL            &quot;123&quot;, &quot;abc&quot;, &quot;123&quot;, &quot;abc&quot;</p></body></html>"))
+        self.comboBox_quote.setToolTip(_translate("Dialog_Import", "<html><head/><body><p>NONE 123, abc</p><p>MINIMAL 123, &quot;abc&quot;</p><p>ALL &quot;123&quot;, &quot;abc&quot;</p><p><br/></p></body></html>"))
         self.comboBox_quote.setItemText(0, _translate("Dialog_Import", "NONE"))
         self.comboBox_quote.setItemText(1, _translate("Dialog_Import", "MINIMAL"))
         self.comboBox_quote.setItemText(2, _translate("Dialog_Import", "ALL"))
