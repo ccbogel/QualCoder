@@ -48,8 +48,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogImportSurvey(QtWidgets.QDialog):
@@ -59,7 +59,11 @@ class DialogImportSurvey(QtWidgets.QDialog):
     this then allows automatic assignment of attributes to each case
     Each column can be categorised as an attribute OR as qualitative.
     Text from each qualitative colums are treated as individual files and loaded into the
-    source table '''
+    source table.
+    Some GUI elements cannot be changed to anotherlanguage:
+    Quote format: NONE, MINIMAL, ALL
+    Field type: character, numeric qualitative
+    '''
 
     settings = None
     fields = []
@@ -72,7 +76,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
     def __init__(self, settings, parent_textEdit):
         ''' Need to comment out the connection accept signal line in ui_Dialog_Import.py.
-         Otherwise get a double-up of accept signals '''
+         Otherwise get a double-up of accept signals. '''
 
         sys.excepthook = exception_handler
         self.settings = settings
@@ -100,7 +104,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.get_csv_file()
         if self.fields == []:
             super(DialogImportSurvey, self).reject()
-            self.parent_textEdit.append("Survey not imported.")
+            self.parent_textEdit.append(_("Survey not imported."))
         self.fill_tableWidget()
 
     def get_csv_file(self):
@@ -111,16 +115,16 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.data = []
 
         filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-            'Select survey file', self.settings['directory'], "(*.csv)")
+            _('Select survey file'), self.settings['directory'], "(*.csv)")
         if not ok or filepath == "":
             super(DialogImportSurvey, self).reject()
             self.close()
             return
         if filepath[-4:].lower() != ".csv":
-            msg = self.filepath + "\nis not a .csv file.\nFile not imported"
-            QtWidgets.QMessageBox.warning(None, "Warning", msg)
+            msg = self.filepath + "\n" + _("is not a .csv file.\nFile not imported")
+            QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
             logger.warning(msg)
-            self.parent_textEdit.append("Survey not a csv file: " + self.filepath)
+            self.parent_textEdit.append(_("Survey not imported. Survey not a csv file: ") + self.filepath)
             super(DialogImportSurvey, self).reject()
             self.close()
             return
@@ -133,12 +137,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
         with open(filepath, 'r', newline='') as f:
             delimiter_ = self.ui.lineEdit_delimiter.text()
             if delimiter_ == '':
-                msg = "A column delimiter has not been set."
-                QtWidgets.QMessageBox.warning(None, "Warning", msg)
+                msg = _("A column delimiter has not been set.")
+                QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
                 return
 
             if delimiter_ in ('ta', 'tab'):
                 delimiter_ = "\t"
+            # The English text is in the GUI - do not translate with qt linguist
             quoting_ = csv.QUOTE_MINIMAL
             quote_type = self.ui.comboBox_quote.currentText()
             if quote_type == "NONE":
@@ -151,8 +156,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     self.data.append(row)
             except csv.Error as e:
                 logger.error(('file %s, line %d: %s' % (filepath, reader.line_num, e)))
-                self.parent_textEdit.append("Row error: " + str(reader.line_num) + "  " + str(e))
-        self.setWindowTitle("Importing from: " + filepath.split('/')[-1])
+                self.parent_textEdit.append(_(_("Row error: ")) + str(reader.line_num) + "  " + str(e))
+        self.setWindowTitle(_(_("Importing from: ")) + filepath.split('/')[-1])
         self.fields = self.data[0]
         self.data = self.data[1:]
 
@@ -195,17 +200,17 @@ class DialogImportSurvey(QtWidgets.QDialog):
             ids.append(row[0])
         ids_set = set(ids)
         if len(ids) > len(ids_set):
-            msg = "There are duplicated identifiers in the first column.\nFile not imported"
-            QtWidgets.QMessageBox.warning(None, "Warning", msg)
+            msg = _("There are duplicated identifiers in the first column.\nFile not imported")
+            QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
             self.parent_textEdit.append(filepath + " " + msg)
             return
 
-        msg = "Survey file: " + filepath
-        msg += ".\n Fields:" + str(len(self.fields))
-        msg += ". Rows: " + str(len(self.data))
+        msg = _("Survey file: ") + filepath + "\n"
+        msg += _("Fields: ") + str(len(self.fields)) + ". "
+        msg += _("Rows: ") + str(len(self.data))
         logger.info(msg)
         self.parent_textEdit.append(msg)
-        QtWidgets.QMessageBox.information(None, "Survey check", msg)
+        QtWidgets.QMessageBox.information(None, _("Survey check"), msg)
 
     def accept(self):
         ''' Check the table details are valid and import the data into a new table or
@@ -214,8 +219,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         # check for duplicate field names
         if len(self.fields) != len(set(self.fields)):
             msg = "There are duplicate attribute names."
-            QtWidgets.QMessageBox.warning(None, "Attribute name error", msg)
-            logger.info("Survey Attribute duplicate name error: " + msg)
+            QtWidgets.QMessageBox.warning(None, _("Attribute name error"), msg)
+            logger.info(_("Survey Not Imported. Attribute duplicate name error: ") + msg)
             self.parent_textEdit.append(msg)
             self.fields = []
             return
@@ -223,7 +228,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         super(DialogImportSurvey, self).accept()
 
     def insert_data(self):
-        ''' Insert case, attributes, attribute values and qualitative text '''
+        ''' Insert case, attributes, attribute values and qualitative text. '''
 
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.settings['conn'].cursor()
@@ -237,10 +242,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 caseid = cur.fetchone()[0]
                 name_and_caseids.append([c[0], caseid])
             except sqlite3.IntegrityError as e:
-                msg = str(e) + " - Duplicate case names, either in the file, or duplicates with existing cases in the project"
-                logger.error("Survey not loaded: " + msg)
-                QtWidgets.QMessageBox.warning(None, "Survey not loaded", msg)
-                self.parent_textEdit.append("Survey not loaded: " + msg)
+                msg = str(e) + _(" - Duplicate case names, either in the file, or duplicates with existing cases in the project")
+                logger.error(_("Survey not loaded: ") + msg)
+                QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), msg)
+                self.parent_textEdit.append(_("Survey not loaded: ") + msg)
                 return
 
         # insert non-qualitative attribute types, except if they are already present
@@ -314,8 +319,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     self.settings['conn'].commit()
                     #logger.debug("Case_text: " + str(case_text))
 
-        logger.info("Survey imported")
-        self.parent_textEdit.append("Survey imported.")
+        logger.info(_("Survey imported"))
+        self.parent_textEdit.append(_("Survey imported."))
 
     def options_changed(self):
         ''' When import options are changed do the import and ultimately fill the table.
@@ -365,13 +370,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.headerIndex = int(self.headerIndex.column())
 
         menu = QtWidgets.QMenu(self)
-        ActionChangeFieldName = menu.addAction('Change fieldname')
+        ActionChangeFieldName = menu.addAction(_('Change fieldname'))
         ActionChangeFieldName.triggered.connect(self.change_fieldname)
         if self.fields_type[self.headerIndex] == "character" and self.headerIndex != 0:
-            ActionChangeFieldName = menu.addAction('Change to Qualitative')
+            ActionChangeFieldName = menu.addAction(_('Change to Qualitative'))
             ActionChangeFieldName.triggered.connect(self.qualitative_field_type)
         if self.fields_type[self.headerIndex] in ('numeric', 'qualitative'):
-            ActionChangeFieldName = menu.addAction('Change to Character')
+            ActionChangeFieldName = menu.addAction(_('Change to Character'))
             ActionChangeFieldName.triggered.connect(self.character_field_type)
 
         menu.popup(self.ui.tableWidget.mapToGlobal(pos))
@@ -399,18 +404,18 @@ class DialogImportSurvey(QtWidgets.QDialog):
     def change_fieldname(self):
         ''' change the fieldname '''
 
-        fieldname, ok = QtWidgets.QInputDialog.getText(None, "Change field name", "New name:",
+        fieldname, ok = QtWidgets.QInputDialog.getText(None, _("Change field name"), _("New name:"),
              QtWidgets.QLineEdit.Normal, self.fields[self.headerIndex])
         if not ok:
             return
         # check valid values
         if re.match("^[a-zA-Z_\s][a-zA-Z0-9_\s]*$", fieldname) is None or fieldname == "":
-            QtWidgets.QMessageBox.information(None, "Field name invalid.",
-            "Name must contain only letters and numbers or '_' and must not start with a number")
+            QtWidgets.QMessageBox.information(None, _("Field name invalid."),
+            _("Name must contain only letters and numbers or '_' and must not start with a number"))
             return
         if fieldname in self.preexisting_fields or fieldname in self.fields:
-            QtWidgets.QMessageBox.information(None, "Field name invalid.",
-            fieldname + " is already in use")
+            QtWidgets.QMessageBox.information(None, _("Field name invalid."),
+            fieldname + _(" Already in use"))
             return
 
         self.fields[self.headerIndex] = fieldname

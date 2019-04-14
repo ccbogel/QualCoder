@@ -65,8 +65,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -109,7 +109,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def load_file_data(self):
         """ Documents images and audio contain the filetype suffix.
-        No suffix imples the 'file' was imported from a survey question.
+        No suffix implies the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
@@ -123,7 +123,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
             'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         # attributes
-        self.headerLabels = ["Name", "Memo", "Date", "Id"]
+        self.headerLabels = [_("Name"), _("Memo"), _("Date"), _("Id")]
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         result = cur.fetchall()
@@ -146,7 +146,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
-        ui = DialogAddItemName(check_names, "New attribute name")
+        ui = DialogAddItemName(check_names, _("New attribute name"))
         ui.exec_()
         name = ui.get_new_name()
         if name is None or name == "":
@@ -174,7 +174,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.settings['conn'].commit()
         self.load_file_data()
         self.fill_table()
-        self.parent_textEdit.append("Attribute added to files: " + name + ", type: " + valuetype)
+        self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + valuetype)
 
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
@@ -187,7 +187,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
-                ui = DialogMemo(self.settings, "Memo for file " + self.source[x]['name'],
+                ui = DialogMemo(self.settings, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo
@@ -195,7 +195,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.settings['conn'].commit()
             else:
-                ui = DialogMemo(self.settings, "Memo for file " + self.source[x]['name'],
+                ui = DialogMemo(self.settings, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo
@@ -231,13 +231,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             # dependent transcribed files: filename.type.transcribed
             if update:
                 if self.source[x]['mediapath'] is not None and self.source[x]['mediapath'][:2] in ('/a', '/v'):
-                    msg = "If there is an associated '.transcribed' file please rename "
-                    msg += "it to match the media file plus '.transcribed'"
+                    msg = _("If there is an associated '.transcribed' file please rename ")
+                    msg += _("it to match the media file plus '.transcribed'")
                     QtWidgets.QMessageBox.warning(None, "Media name", msg)
                 if self.source[x]['name'][-12:] == ".transcribed":
-                    msg = "If there is an associated media file please rename "
-                    msg += "it to match the media file before the '.transcribed' suffix"
-                    QtWidgets.QMessageBox.warning(None, "Media name", msg)
+                    msg = _("If there is an associated media file please rename ")
+                    msg += _("it to match the media file before the '.transcribed' suffix")
+                    QtWidgets.QMessageBox.warning(None, _("Media name"), msg)
                 # update source list and database
                 self.source[x]['name'] = new_text
                 cur = self.settings['conn'].cursor()
@@ -253,7 +253,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
             self.settings['conn'].commit()
-            logger.debug("updating: " + attribute_name + " , " + value)
+            #logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
     def view(self):
@@ -277,7 +277,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         ui.setupUi(Dialog)
         ui.textEdit.setFontPointSize(self.settings['fontsize'])
         ui.textEdit.setPlainText(self.source[x]['fulltext'])
-        Dialog.setWindowTitle("View file: " + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") ")
+        Dialog.setWindowTitle(_("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") ")
         Dialog.exec_()
         text = ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
@@ -294,8 +294,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.source[x]['id'], ])
         c_linked = cur.fetchall()
         if c_linked != [] or a_linked != [] or c_linked != []:
-            msg = "Cannot edit file text, there  are codes, cases or annotations linked to this file"
-            QtWidgets.QMessageBox.warning(None, 'Warning', msg, QtWidgets.QMessageBox.Ok)
+            msg = _("Cannot edit file text, there  are codes, cases or annotations linked to this file")
+            QtWidgets.QMessageBox.warning(None, _('Warning'), msg, QtWidgets.QMessageBox.Ok)
             return
         self.source[x]['fulltext'] = text
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
@@ -344,18 +344,20 @@ class DialogManageFiles(QtWidgets.QDialog):
         ''' Create a new text file by entering text into the dialog.
         Implements the QtDesigner memo dialog '''
 
-        name, ok = QtWidgets.QInputDialog.getText(self, 'New File', 'Enter the file name:')
+        name, ok = QtWidgets.QInputDialog.getText(self, _('New File'), _('Enter the file name:'))
         if not ok:
             return
         if name is None or name == "":
-            QtWidgets.QMessageBox.warning(None, 'Warning',"No filename was selected", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning'),
+                _("No filename was selected"), QtWidgets.QMessageBox.Ok)
             return
         # check for non-unique filename
         if any(d['name'] == name for d in self.source):
-            QtWidgets.QMessageBox.warning(None, 'Warning',"Filename in use", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning'),
+                _("Filename in use"), QtWidgets.QMessageBox.Ok)
             return
 
-        ui = DialogMemo(self.settings, "Creating a new file: " + name)
+        ui = DialogMemo(self.settings, _("Creating a new file: ") + name)
         ui.exec_()
         filetext = ui.memo
         # update database
@@ -366,7 +368,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
             (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
         self.settings['conn'].commit()
-        self.parent_textEdit.append("File created: " + entry['name'])
+        self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
 
@@ -380,7 +382,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory
         """
 
-        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open file',
+        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
             self.default_import_directory)
         if not ok or imports == []:
             return
@@ -405,9 +407,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     process.wait()
                     self.load_file_text(destination)
                 else:
-                    #TODO decrypt not implemented for windows, OSX
-                    QtWidgets.QMessageBox.warning(None, 'If import error occurs',
-                    "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf:\n" + f)
+                    #TODO qpdf decrypt not implemented for windows, OSX
+                    QtWidgets.QMessageBox.warning(None, _('If import error occurs'),
+                    _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f)
                     copyfile(f, destination)
                     self.load_file_text(destination)
                 known_file_type = True
@@ -427,8 +429,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.load_media_reference("/video/" + filename)
                 known_file_type = True
             if not known_file_type:
-                QtWidgets.QMessageBox.warning(None, 'Unknown file type',
-                    "Unknown file type for import:\n" + f)
+                QtWidgets.QMessageBox.warning(None, _('Unknown file type'),
+                    _("Unknown file type for import") + ":\n" + f)
         self.fill_table()
 
     def load_media_reference(self, mediapath):
@@ -438,7 +440,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         name_split = mediapath.split("/")
         filename = name_split[-1]
         if any(d['name'] == filename for d in self.source):
-            QtWidgets.QMessageBox.warning(None, 'Duplicate file', "Duplicate filename.\nFile not imported")
+            QtWidgets.QMessageBox.warning(None, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
         'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
@@ -449,7 +451,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
-        self.parent_textEdit.append(entry['name'] + " imported.")
+        self.parent_textEdit.append(entry['name'] + _(" imported."))
         self.source.append(entry)
 
         # Create an empty transcription file for audio and video
@@ -463,7 +465,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("select last_insert_rowid()")
             id_ = cur.fetchone()[0]
             entry['id'] = id_
-            self.parent_textEdit.append(entry['name'] + " imported.")
+            self.parent_textEdit.append(entry['name'] + _(" imported."))
             self.source.append(entry)
 
         # clear and refill table widget
@@ -472,7 +474,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def load_file_text(self, import_file):
-        """ Import individual file types of odt, docx txt, pdf, html, htm
+        """ Import from file types of odt, docx pdf, epub, txt, html, htm.
         """
 
         text = ""
@@ -526,7 +528,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         break
                     fileText += line
                 text = html_to_text(fileText)
-                QtWidgets.QMessageBox.warning(None, 'Warning', str(importErrors) + " lines not imported")
+                QtWidgets.QMessageBox.warning(None, _('Warning'), str(importErrors) + _(" lines not imported"))
         # Try importing as a plain text file.
         if text == "":
             import_errors = 0
@@ -544,20 +546,24 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if text[0:6] == "\ufeff":  # associated with notepad files
                         text = text[6:]
             except Exception as e:
-                QtWidgets.QMessageBox.warning(None, 'Warning', "Cannot import " + str(import_file) + "\n" + str(e))
+                QtWidgets.QMessageBox.warning(None, _('Warning'),
+                    _("Cannot import ") + str(import_file) + "\n" + str(e))
                 return
             if import_errors > 0:
-                QtWidgets.QMessageBox.warning(None, 'Warning', str(import_errors) + " lines not imported")
-                logger.warning(import_file + ": " + str(import_errors) + " lines not imported")
+                QtWidgets.QMessageBox.warning(None, _('Warning'),
+                    str(import_errors) + _(" lines not imported"))
+                logger.warning(import_file + ": " + str(import_errors) + _(" lines not imported"))
         # import of text file did not work
         if text == "":
-            QtWidgets.QMessageBox.warning(None, 'Warning', "Cannot import " + str(import_file) + "\n" + str(e))
+            QtWidgets.QMessageBox.warning(None, _('Warning'),
+                _("Cannot import ") + str(import_file) + "\n" + str(e))
             return
         # Final checks: check for duplicated filename and update model, widget and database
         nameSplit = import_file.split("/")
         filename = nameSplit[-1]
         if any(d['name'] == filename for d in self.source):
-            QtWidgets.QMessageBox.warning(None, 'Duplicate file', "Duplicate filename.\nFile not imported")
+            QtWidgets.QMessageBox.warning(None, _('Duplicate file'),
+                _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': text, 'mediapath': None, 'memo': "",
         'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
@@ -569,7 +575,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
-        self.parent_textEdit.append(entry['name'] + " imported.")
+        self.parent_textEdit.append(entry['name'] + _(" imported."))
         self.source.append(entry)
 
     def convert_odt_to_text(self, import_file):
@@ -667,16 +673,17 @@ class DialogManageFiles(QtWidgets.QDialog):
             filename = filename[0:len(filename) - 4]
         filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None, "Select directory to save file", os.getenv('HOME'), options)
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), os.getenv('HOME'), options)
         if directory !="":
             filename = directory + "/" + filename
-            logger.info("Exporting:  to " + filename)
+            #logger.info(_("Exporting to ") + filename)
             filedata = self.source[x]['fulltext']
             f = open(filename, 'w')
             f.write(filedata)
             f.close()
-        QtWidgets.QMessageBox.information(None, "File Export", str(filename) + " exported")
-        self.parent_textEdit.append(filename + " exported to " + directory)
+        QtWidgets.QMessageBox.information(None, _("File Exported"), str(filename))
+        self.parent_textEdit.append(filename + _(" exported to ") + directory)
 
     def delete(self):
         """ Delete file from database and update model and widget.
@@ -696,7 +703,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_text where fid = ?", [fileId])
             cur.execute("delete from annotation where fid = ?", [fileId])
             cur.execute("delete from case_text where fid = ?", [fileId])
-            sql = "delete from attribute where attr_type in (select attribute_type.name from attribute_type where id=? and attribute_type.caseOrFile='file')"
+            sql = "delete from attribute where attr_type in (select attribute_type.name from "
+            sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
             cur.execute(sql, [fileId])
             self.settings['conn'].commit()
         # delete image source
@@ -705,13 +713,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             try:
                 os.remove(filepath)
             except Exception as e:
-                logger.warning("Deleting image error: " + str(e))
+                logger.warning(_("Deleting image error: ") + str(e))
             cur.execute("delete from source where id = ?", [fileId])
             cur.execute("delete from code_image where id = ?", [fileId])
-            sql = "delete from attribute where attr_type in (select attribute_type.name from attribute_type where id=? and attribute_type.caseOrFile='file')"
+            sql = "delete from attribute where attr_type in (select attribute_type.name from "
+            sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
             cur.execute(sql, [fileId])
 
-        self.parent_textEdit.append("Deleted source: " + self.source[x]['name'])
+        self.parent_textEdit.append(_("Deleted: ") + self.source[x]['name'])
         for item in self.source:
             if item['id'] == fileId:
                 self.source.remove(item)

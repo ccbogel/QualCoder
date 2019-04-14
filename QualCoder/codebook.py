@@ -43,8 +43,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class Codebook():
@@ -155,11 +155,11 @@ class Codebook():
         filename = "codebook.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-        "Select directory to save file", self.settings['directory'], options)
+        _("Select directory to save file"), self.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
-        filedata = "Codebook for " + self.settings['projectName'] + "\r\n========"
+        filedata = _("Codebook for ") + self.settings['projectName'] + "\r\n========"
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         item = it.value()
         while item:
@@ -174,20 +174,20 @@ class Codebook():
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                filedata += "\r\n" + prefix + "Category: " + item.text(0) + ", " + item.text(1)
+                filedata += "\r\n" + prefix + _("Category: ") + item.text(0) + ", " + item.text(1)
                 for i in self.categories:
                     if i['catid'] == id_:
                         memo = i['memo']
                         owner = i['owner']
             else:
-                filedata += "\r\n" + prefix + "Code: " + item.text(0) + ", " + item.text(1)
+                filedata += "\r\n" + prefix + _("Code: ") + item.text(0) + ", " + item.text(1)
                 filedata += ", Frq: " + item.text(3)
                 for i in self.code_names:
                     if i['cid'] == id_:
                         memo = i['memo']
                         owner = i['owner']
-            filedata += ", Owner: " + owner
-            filedata += "\r\n" + prefix + "Memo: " + memo
+            filedata += _(", Owner: ") + owner
+            filedata += "\r\n" + prefix + _("Memo: ") + memo
 
             it += 1
             item = it.value()
@@ -195,8 +195,8 @@ class Codebook():
         f = open(filename, 'w')
         f.write(filedata)
         f.close()
-        QtWidgets.QMessageBox.information(None, "Codebook exported to ", filename + " exported")
-        self.parent_textEdit.append("Codebook exported to " + filename)
+        QtWidgets.QMessageBox.information(None, _("Codebook exported"), filename)
+        self.parent_textEdit.append(_("Codebook exported to ") + filename)
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """

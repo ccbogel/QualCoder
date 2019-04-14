@@ -43,8 +43,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 colors = ["#F8E0E0","#F6CECE","#F5A9A9","#F78181","#FA5858","#F8E6E0","#F6D8CE","#F5BCA9","#F79F81","#FA8258",
     "#F8ECE0","#F6E3CE","#F5D0A9","#F7BE81","#FAAC58","#F5ECCE","#F3E2A9","#F5DA81","#F7D358","#FACC2E",

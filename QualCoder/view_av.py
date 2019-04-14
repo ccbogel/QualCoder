@@ -59,8 +59,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
@@ -124,8 +124,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.setFont(newfont)
         treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
         self.ui.treeWidget.setFont(treefont)
-        self.ui.label_coder.setText("Coder: " + settings['codername'])
-        self.setWindowTitle("Media coding")
+        self.ui.label_coder.setText(_("Coder: ") + settings['codername'])
+        self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_select.pressed.connect(self.select_media)
         #TODO show other coders, maybe?
         #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
@@ -200,7 +200,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels(["Name", "Id", "Memo"])
+        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo")])
         self.ui.treeWidget.setColumnHidden(1, True)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
@@ -272,7 +272,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "":
-                        memo = "Memo"
+                        memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
@@ -297,7 +297,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             media_files.append({'name': row[0], 'id': row[1], 'memo': row[2],
                 'owner': row[3], 'date': row[4], 'mediapath': row[5]})
 
-        ui = DialogSelectFile(media_files, "Select file to view", "single")
+        ui = DialogSelectFile(media_files, _("Select file to view"), "single")
         ok = ui.exec_()
         if not ok:
             return
@@ -359,7 +359,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         try:
             self.media = self.instance.media_new(self.settings['path'] + self.media_data['mediapath'])
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, "Media not found",
+            QtWidgets.QMessageBox.warning(None, _("Media not found"),
                 str(e) +"\n" + self.settings['path'] + self.media_data['mediapath'])
             self.closeEvent()
             return
@@ -416,7 +416,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText("Play")
+            self.ui.pushButton_play.setText(_("Play"))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -425,7 +425,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
 
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText("Pause")
+            self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
 
@@ -433,7 +433,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop vlc player. """
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText("Play")
+        self.ui.pushButton_play.setText(_("Play"))
 
     def set_volume(self, volume):
         """ Set the volume. """
@@ -451,7 +451,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # update label_time
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText("Time: " + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
 
         # Check if segments need to be reloaded
         # This only update of the media is playing, not ideal, but works
@@ -477,11 +477,11 @@ class DialogCodeAV(QtWidgets.QDialog):
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
         Use minutes and seconds, and milliseconds formats for the time.
-        Can also clear the segment by pressing the button when it says Clear segement.
+        Can also clear the segment by pressing the button when it says Clear segment.
         clear segment text is changed to Start segment once a segment is assigned to a code.
         """
 
-        if self.ui.pushButton_coding.text() == "Clear segment":
+        if self.ui.pushButton_coding.text() == _("Clear segment"):
             self.clear_segment()
             return
         time = self.ui.label_time.text()
@@ -491,13 +491,13 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['start'] = time
             self.segment['start_msecs'] = time_msecs
             self.segment['memo'] = ""
-            self.ui.pushButton_coding.setText("End segment")
-            self.ui.label_segment.setText("Segment: " + str(self.segment['start']) + " - ")
+            self.ui.pushButton_coding.setText(_("End segment"))
+            self.ui.label_segment.setText(_("Segment: ") + str(self.segment['start']) + " - ")
             return
         if self.segment['start'] is not None and self.segment['end'] is None:
             self.segment['end'] = time
             self.segment['end_msecs'] = time_msecs
-            self.ui.pushButton_coding.setText("Clear segment")
+            self.ui.pushButton_coding.setText(_("Clear segment"))
 
             # check and reverse start and end times if start is greater than the end
             if float(self.segment['start']) > float(self.segment['end']):
@@ -507,11 +507,11 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.segment['start_msecs'] = self.segment['end_msecs']
                 self.segment['end'] = tmp
                 self.segment['end_msecs'] = tmp_msecs
-            text = "Segment: " + str(self.segment['start']) + " - " + self.segment['end']
+            text = _("Segment: ") + str(self.segment['start']) + " - " + self.segment['end']
             self.ui.label_segment.setText(text)
 
     def tree_menu(self, position):
-        """ Context menu for treewidget items.
+        """ Context menu for treeWidget items.
         Add, rename, memo, move or delete code or category. Change code color. """
 
         menu = QtWidgets.QMenu()
@@ -521,13 +521,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         ActionItemAssignSegment = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
-        ActionItemAddCode = menu.addAction("Add a new code")
-        ActionItemAddCategory = menu.addAction("Add a new category")
-        ActionItemRename = menu.addAction("Rename")
-        ActionItemEditMemo = menu.addAction("View or edit memo")
-        ActionItemDelete = menu.addAction("Delete")
+        ActionItemAddCode = menu.addAction(_("Add a new code"))
+        ActionItemAddCategory = menu.addAction(_("Add a new category"))
+        ActionItemRename = menu.addAction(_("Rename"))
+        ActionItemEditMemo = menu.addAction(_("View or edit memo"))
+        ActionItemDelete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionItemChangeColor = menu.addAction("Change code color")
+            ActionItemChangeColor = menu.addAction(_("Change code color"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
@@ -566,7 +566,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Assign time segment to selected code. Insert an entry into the database.
         Then clear the segment for re-use."""
 
-        if self.media_data is None:
+        if self.media_data is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
+            self.clear_segment()
             return
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
         cid = int(selected.text(1).split(':')[1])
@@ -588,10 +589,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['end_msecs'] = None
         self.segment['memo'] = ""
-        self.ui.label_segment.setText("Segment:")
-        self.ui.pushButton_coding.setText("Start segment")
-        self.ui.pushButton_coding.setText("Start segment")
-        self.ui.label_segment.setText("Segment:")
+        self.ui.label_segment.setText(_("Segment:"))
+        self.ui.pushButton_coding.setText(_("Start segment"))
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -650,8 +649,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Merge code or category with another code or category.
         Called by item_moved_update_data when a code is moved onto another code. """
 
-        msg = "Merge code: " + item['name'] + "\ninto code: " + parent.text(0)
-        reply = QtWidgets.QMessageBox.question(None, 'Merge codes',
+        msg = _("Merge code: ") + item['name'] + "\n==> " + parent.text(0)
+        reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return
@@ -663,8 +662,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.settings['conn'].commit()
         except Exception as e:
             e = str(e)
-            msg = "cannot merge codes, unmark overlapping text first.\n" + e
-            QtWidgets.QInformationDialog(None, "Cannot merge", msg)
+            msg = _("Cannot merge codes, unmark overlapping text.") + "\n" + e
+            QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.settings['conn'].commit()
@@ -676,7 +675,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Add_code_name dialog checks for duplicate code name.
         New code is added to data and database. """
 
-        ui = DialogAddItemName(self.codes, "Add new code")
+        ui = DialogAddItemName(self.codes, _("Add new code"))
         ui.exec_()
         new_name = ui.get_new_name()
         if new_name is None:
@@ -688,7 +687,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.settings['conn'].commit()
-        self.parent_textEdit.append("Code added: " + item['name'])
+        self.parent_textEdit.append(_("Code added: ") + item['name'])
         cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
@@ -705,7 +704,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Note: the addItem dialog does the checking for duplicate category names
         Add the new category as a top level item. """
 
-        ui = DialogAddItemName(self.categories, "Category")
+        ui = DialogAddItemName(self.categories, _("Category"))
         ui.exec_()
         new_name = ui.get_new_name()
         if new_name is None:
@@ -721,7 +720,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
-        self.parent_textEdit.append("Category added: " + item['name'])
+        self.parent_textEdit.append(_("Category added: ") + item['name'])
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
@@ -749,7 +748,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete("Code: " + selected.text(0))
+        ui = DialogConfirmDelete(_("Code: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -757,7 +756,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_name where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
         self.settings['conn'].commit()
-        self.parent_textEdit.append("Code deleted: " + code_['name'])
+        self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -774,7 +773,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if found == -1:
             return
         category = self.categories[found]
-        ui = DialogConfirmDelete("Category: " + selected.text(0))
+        ui = DialogConfirmDelete(_("Category: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -783,7 +782,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.settings['conn'].commit()
-        self.parent_textEdit.append("Category deleted: " + category['name'])
+        self.parent_textEdit.append(_("Category deleted: ") + category['name'])
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -799,14 +798,14 @@ class DialogCodeAV(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, "Memo for Code " + self.codes[found]['name'],
+            ui = DialogMemo(self.settings, _("Memo for Code ") + self.codes[found]['name'],
             self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
+                selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
             # update codes list and database
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
@@ -822,14 +821,14 @@ class DialogCodeAV(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, "Memo for Category " + self.categories[found]['name'],
+            ui = DialogMemo(self.settings, _("Memo for Category ") + self.categories[found]['name'],
             self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.DisplayRole, "Memo")
+                selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
             # update codes list and database
             if memo != self.categories[found]['memo']:
                 self.categories[found]['memo'] = memo
@@ -842,15 +841,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         not currently in use. """
 
         if selected.text(1)[0:3] == 'cid':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename code", "New code name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
             QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, "Name in use",
-                    new_name + " is already in use, choose another name ", QtWidgets.QMessageBox.Ok)
+                    QtWidgets.QMessageBox.warning(None, _("Name in use"),
+                    new_name + _(" Name already in use, choose another."), QtWidgets.QMessageBox.Ok)
                     return
             # find the code in the list
             found = -1
@@ -863,22 +862,22 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur = self.settings['conn'].cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.settings['conn'].commit()
-            self.parent_textEdit.append("Code renamed: " + self.codes[found]['name'] + " to: " + new_name)
+            self.parent_textEdit.append(_("Code renamed: ") + self.codes[found]['name'] + " ==> " + new_name)
             self.codes[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.load_segments()
             return
 
         if selected.text(1)[0:3] == 'cat':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, "Rename category", "New category name:",
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:"),
             QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other category has this text
             for c in self.categories:
                 if c['name'] == new_name:
-                    msg = "This code name is already in use"
-                    QtWidgets.QMessageBox.warning(None, "Duplicate code name", msg, QtWidgets.QMessageBox.Ok)
+                    msg = _("This category name is already in use")
+                    QtWidgets.QMessageBox.warning(None, _("Duplicate category name"), msg, QtWidgets.QMessageBox.Ok)
                     return
             # find the category in the list
             found = -1
@@ -892,7 +891,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_cat set name=? where catid=?",
             (new_name, self.categories[found]['catid']))
             self.settings['conn'].commit()
-            self.parent_textEdit.append("Category renamed: " + self.categories[found]['name'] + " to: " + new_name)
+            self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
             self.categories[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
 
@@ -1013,7 +1012,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
         if self.segment['memo'] != "":
-            tooltip += "\nMemo: " + self.segment['memo']
+            tooltip += "\n" + _("Memo: ") + self.segment['memo']
         self.setToolTip(tooltip)
         self.draw_segment()
 
@@ -1025,17 +1024,17 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         """
 
         menu = QtWidgets.QMenu()
-        menu.addAction('Memo for segment')
-        menu.addAction('Delete segment')
-        menu.addAction('Play segment')
+        menu.addAction(_('Memo for segment'))
+        menu.addAction(_('Delete segment'))
+        menu.addAction(_('Play segment'))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == 'Memo for segment':
+        if action.text() == _('Memo for segment'):
             self.edit_memo()
-        if action.text() == 'Delete segment':
+        if action.text() == _('Delete segment'):
             self.delete()
-        if action.text() == 'Play segment':
+        if action.text() == _('Play segment'):
             self.play_segment()
 
     def play_segment(self):
@@ -1047,7 +1046,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        self.play_button.setText("Pause")
+        self.play_button.setText(_("Pause"))
         self.timer.start()
 
     def delete(self):
@@ -1056,7 +1055,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         event will reload all segments. """
 
         print(self.segment)
-        ui = DialogConfirmDelete("Segment: " + self.segment['codename'] + "\nMemo: " + self.segment['memo'])
+        ui = DialogConfirmDelete(_("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
         ok = ui.exec_()
         if not ok:
             return
@@ -1079,7 +1078,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         Reload_segment is set to True, so on playing media, the update event will reload
         all segments. """
 
-        ui = DialogMemo(self.settings, "Memo for segment", self.segment["memo"])
+        ui = DialogMemo(self.settings, _("Memo for segment"), self.segment["memo"])
         ui.exec_()
         if self.segment['memo'] == ui.memo:
             return
@@ -1239,7 +1238,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText("Play")
+            self.ui.pushButton_play.setText(_("Play"))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -1248,7 +1247,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 return
 
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText("Pause")
+            self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
 
@@ -1256,7 +1255,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Stop player. """
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText("Play")
+        self.ui.pushButton_play.setText(_("Play"))
 
     def set_volume(self, volume):
         """ Set the volume. """
@@ -1272,7 +1271,7 @@ class DialogViewAV(QtWidgets.QDialog):
         media_pos = int(self.mediaplayer.get_position() * 1000)
         self.ui.horizontalSlider.setValue(media_pos)
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText("Time: " + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():

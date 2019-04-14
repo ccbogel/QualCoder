@@ -46,8 +46,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogJournals(QtWidgets.QDialog):
@@ -141,7 +141,7 @@ class DialogJournals(QtWidgets.QDialog):
             if result != j['jentry']:
                 cur.execute("update journal set jentry=? where jid=?",
                     (j['jentry'], j['jid']))
-                self.parent_textEdit.append("Journal modified: " + j['name'])
+                self.parent_textEdit.append(_("Journal modified: ") + j['name'])
         self.settings['conn'].commit()
 
     def create(self):
@@ -149,23 +149,24 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.current_jid = None
         self.ui.textEdit.setPlainText("")
-        name, ok = QtWidgets.QInputDialog.getText(self, 'New journal', 'Enter the journal name:')
+        name, ok = QtWidgets.QInputDialog.getText(self, _('New journal'), _('Enter the journal name:'))
         if not ok:
             return
         if name is None or name == "":
-            QtWidgets.QMessageBox.warning(None, 'Warning', "No name was entered",
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No name was entered"),
                 QtWidgets.QMessageBox.Ok)
             return
         # check for non-unique name
         if any(d['name'] == name for d in self.journals):
-            QtWidgets.QMessageBox.warning(None, 'Warning', "Journal name in use",
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Journal name in use"),
                 QtWidgets.QMessageBox.Ok)
             return
         # Check for unusual characters in filename that would affect exporting
+        #TODO will this work for other languages ?
         valid = re.match('^[\ \w-]+$', name) is not None
         if not valid:
-            QtWidgets.QMessageBox.warning(None, 'Warning - invalid characters',
-                "In the jornal name use only: a-z, A-z 0-9 - space", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
+                _("In the journal name use only: a-z, A-z 0-9 - space"), QtWidgets.QMessageBox.Ok)
             return
 
         # update database
@@ -178,7 +179,7 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         jid = cur.fetchone()
         journal['jid'] = jid[0]
-        self.parent_textEdit.append("Journal created:" + journal['name'])
+        self.parent_textEdit.append(_("Journal created: ") + journal['name'])
 
         # clear and refill table widget
         for r in self.journals:
@@ -211,15 +212,15 @@ class DialogJournals(QtWidgets.QDialog):
         filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            "Select directory to save file", os.path.expanduser('~'), options)
+            _("Select directory to save file"), os.path.expanduser('~'), options)
         if directory:
             filename = directory + "/" + filename
             data = self.journals[x]['jentry']
             f = open(filename, 'w')
             f.write(data)
             f.close()
-            msg = "Journal exported to:\n" + str(filename)
-            QtWidgets.QMessageBox.information(None, "Journal export", msg)
+            msg = _("Journal exported to: ") + str(filename)
+            QtWidgets.QMessageBox.information(None, _("Journal export"), msg)
             self.parent_textEdit.append(msg)
 
     def delete(self):
@@ -241,7 +242,7 @@ class DialogJournals(QtWidgets.QDialog):
                 if item['name'] == journalname:
                     self.journals.remove(item)
             self.ui.tableWidget.removeRow(x)
-            self.parent_textEdit.append("Journal deleted: " + journalname)
+            self.parent_textEdit.append(_("Journal deleted: ") + journalname)
 
     def table_selection_changed(self):
         ''' Update the journal text for the current selection. '''
@@ -250,10 +251,10 @@ class DialogJournals(QtWidgets.QDialog):
         try:
             self.current_jid = self.journals[row]['jid']
             self.view()
-            self.ui.label_jname.setText("Journal: " + self.journals[row]['name'])
+            self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
         except IndexError:
             # occurs when journal deleted
-            self.ui.label_jname.setText("No journal selected")
+            self.ui.label_jname.setText(_("No journal selected"))
 
     def cell_modified(self):
         ''' If the journal name has been changed in the table widget update the database
@@ -266,19 +267,20 @@ class DialogJournals(QtWidgets.QDialog):
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
-                QtWidgets.QMessageBox.warning(None, 'Warning', "No name was entered",
+                QtWidgets.QMessageBox.warning(None, _('Warning'), _("No name was entered"),
                     QtWidgets.QMessageBox.Ok)
                 update = False
             for c in self.journals:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, 'Warning', "Journal name in use",
+                    QtWidgets.QMessageBox.warning(None, _('Warning'), _("Journal name in use"),
                         QtWidgets.QMessageBox.Ok)
                     update = False
             # Check for unusual characters in filename that would affect exporting
+            #TODO what if in another language ?
             valid = re.match('^[\ \w-]+$', name) is not None
             if not valid:
-                QtWidgets.QMessageBox.warning(None, 'Warning - invalid characters',
-                    "In the jornal name use only: a-z, A-z 0-9 - space", QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
+                    _("In the jornal name use only: a-z, A-z 0-9 - space"), QtWidgets.QMessageBox.Ok)
                 update = False
             if update:
                 # update source list and database
@@ -287,7 +289,7 @@ class DialogJournals(QtWidgets.QDialog):
                     (new_name, self.journals[x]['name']))
                 self.settings['conn'].commit()
                 self.journals[x]['name'] = new_name
-                self.parent_textEdit.append("Journal name changed: " + new_name)
+                self.parent_textEdit.append(_("Journal name changed: ") + new_name)
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.journals[x]['name'])
 

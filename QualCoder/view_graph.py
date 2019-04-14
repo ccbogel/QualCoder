@@ -51,8 +51,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 def msecs_to_mins_and_secs(msecs):
@@ -159,7 +159,7 @@ class ViewGraph(QDialog):
                 top_node = c
         model = self.get_node_with_children(top_node, model)
 
-        ''' look at each category and determine the depth.
+        ''' Look at each category and determine the depth.
         Also determine the number of children for each catid. '''
         supercatid_list = []
         for c in model:
@@ -183,7 +183,6 @@ class ViewGraph(QDialog):
                 if m['angle'] is None and m['supercatid'] == cat_key:
                     m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
                     segment += 1
-
         ''' Calculate x y positions from central point outwards.
         The 'central' x value is towards the left side rather than true center, because
         the text boxes will draw to the right-hand side.
@@ -200,7 +199,6 @@ class ViewGraph(QDialog):
                 if m['x'] is None and m['supercatid'] is None:
                     m['x'] = c_x + (math.cos(m['angle']) * (r * rx_expander))
                     m['y'] = c_y + (math.sin(m['angle']) * r)
-                    #self.text_item(m)
                 if m['x'] is None and m['supercatid'] is not None:
                     for super_m in model:
                         if super_m['catid'] == m['supercatid'] and super_m['x'] is not None:
@@ -209,12 +207,11 @@ class ViewGraph(QDialog):
                             if abs(super_m['x'] - m['x']) < 20 and abs(super_m['y'] - m['y']) < 20:
                                 m['x'] += 20
                                 m['y'] += 20
-                    #self.text_item(m)
                 if m['x'] is None:
                     x_is_none = True
             i += 1
 
-        # fix out of view items
+        # Fix out of view items
         for m in model:
             if m['x'] < 2:
                 m['x'] = 2
@@ -225,10 +222,10 @@ class ViewGraph(QDialog):
             if m['y'] > c_y * 2 - 20:
                 m['y'] = c_y * 2 - 20
 
-        # add text items to the scene
+        # Add text items to the scene
         for m in model:
             self.scene.addItem(TextGraphicsItem(self.settings, m))
-        # add link which include the scene text items and associated data, add links before text_items
+        # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
@@ -238,7 +235,8 @@ class ViewGraph(QDialog):
                         self.scene.addItem(item)
 
     def get_node_with_children(self, node, model):
-        """ Return a short list of this top node and all its children. """
+        """ Return a short list of this top node and all its children.
+        Note, maximum depth of 10. """
         if node is None:
             return model
         new_model = [node]
@@ -305,7 +303,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
     def mouseMoveEvent(self, mouseEvent):
         """ On mouse move, an item might be repositioned so need to redraw all the link_items.
-        This slows things down, but is more dynamic. """
+        This slows re-drawing down, but is more dynamic. """
 
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
 

@@ -42,18 +42,18 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogInformation(QtWidgets.QDialog):
     """
-    Dialog to display details information PyQDA development, version and license.
+    Dialog to display details from html and text files for PyQDA development, version and license;
+    and for help information.
     """
 
     title = ""
     text = ""
-    #Dialog_information = None
 
     def __init__(self, title, filename="", parent=None):
         ''' Display information text in dialog.
@@ -73,10 +73,10 @@ class DialogInformation(QtWidgets.QDialog):
                 self.ui.textEdit.setHtml(self.text)
             except Exception as e:
                 print(e)
-                self.text = "Cannot open file."
+                self.text = _("Cannot open file.")
 
     def setHtml(self, html):
-        ''' This menthod is used to populate the textEdit.
+        ''' This method is used to populate the textEdit.
         Usually called from a View_graph TextGraphicsItem via a context menu '''
 
         self.text = html
@@ -89,7 +89,6 @@ class DialogInformation(QtWidgets.QDialog):
 
 
 if __name__ == "__main__":
-    import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = DialogInformation("a title", "a filename")
     ui.show()

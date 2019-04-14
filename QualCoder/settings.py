@@ -43,8 +43,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogSettings(QtWidgets.QDialog):
@@ -64,8 +64,9 @@ class DialogSettings(QtWidgets.QDialog):
         new_font = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.ui.fontComboBox.setCurrentFont(new_font)
-        # get coder names from code_text (and from other? may be images?)
-        sql = "select distinct owner from code_text"
+        # get coder names from code_text, images and av
+        # Note: does no appear to require a distinct clause
+        sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         coders = [""]
         if settings['conn'] is not None:
             cur = self.settings['conn'].cursor()
@@ -74,6 +75,11 @@ class DialogSettings(QtWidgets.QDialog):
             for row in results:
                 coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
+        languages = ["Deutsch de", "English en", "Français fr"]
+        self.ui.comboBox_language.addItems(languages)
+        for index, lang in enumerate(languages):
+            if lang[-2:] == self.settings['language']:
+                self.ui.comboBox_language.setCurrentIndex(index)
         self.ui.spinBox.setValue(self.settings['fontsize'])
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
@@ -90,14 +96,13 @@ class DialogSettings(QtWidgets.QDialog):
     def comboBox_coder_changed(self):
         ''' Set the coder name to the current selection. '''
 
-        logger.info("coder changed to: " + self.ui.comboBox_coders.currentText())
         self.ui.lineEdit_coderName.setText(self.ui.comboBox_coders.currentText())
 
     def choose_directory(self):
         ''' Choose default project directory. '''
 
         directory = QtWidgets.QFileDialog.getExistingDirectory(self,
-            'Choose project directory', self.settings['directory'])
+            _('Choose project directory'), self.settings['directory'])
         if directory == "":
             return
         self.ui.label_directory.setText(directory)
@@ -114,6 +119,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['showIDs'] = True
         else:
             self.settings['showIDs'] = False
+        self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
         self.save_settings()
         self.close()
 
@@ -125,7 +131,8 @@ class DialogSettings(QtWidgets.QDialog):
         txt += str(self.settings['fontsize']) + "\n"
         txt += str(self.settings['treefontsize']) + "\n"
         txt += self.settings['directory'] + "\n"
-        txt += str(self.settings['showIDs'])
+        txt += str(self.settings['showIDs']) + "\n"
+        txt += self.settings['language']
         with open(home + '/.qualcoder/QualCoder_settings.txt', 'w') as f:
             f.write(txt)
 

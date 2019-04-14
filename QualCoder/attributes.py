@@ -48,8 +48,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception:") + "\n" + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogManageAttributes(QtWidgets.QDialog):
@@ -94,7 +94,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         AddItem dialog checks for duplicate attribute name.
         New attribute is added to the model and database '''
 
-        ui = DialogAddItemName(self.attribute_type, "New attribute name")
+        ui = DialogAddItemName(self.attribute_type, _("New attribute name"))
         ui.exec_()
         newText = ui.get_new_name()
         if newText is None or newText == "":
@@ -135,7 +135,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.settings['codername']))
         self.settings['conn'].commit()
         self.fill_tableWidget()
-        self.parent_textEdit.append("Attribute added: " + item['name'])
+        self.parent_textEdit.append(_("Attribute added: ") + item['name'])
 
     def delete_attribute(self):
         ''' When delete button pressed, attribute is deleted from database '''
@@ -155,7 +155,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         for name in namesToDelete:
             for attr in self.attribute_type:
                 if attr['name'] == name:
-                    self.parent_textEdit.append("Attribute deleted: " + attr['name'])
+                    self.parent_textEdit.append(_("Attribute deleted: ") + attr['name'])
                     cur = self.settings['conn'].cursor()
                     cur.execute("delete from attribute where name = ?", (name,))
                     cur.execute("delete from attribute_type where name = ?", (name,))
@@ -176,7 +176,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == self.MEMO_COLUMN:
-            ui = DialogMemo(self.settings, "Memo for Attribute " + self.attribute_type[x]['name'],
+            ui = DialogMemo(self.settings, _("Memo for Attribute ") + self.attribute_type[x]['name'],
             self.attribute_type[x]['memo'])
             ui.exec_()
             memo = ui.memo
@@ -188,7 +188,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             if memo == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Yes")))
             self.attribute_type[x]['memo'] = str(memo)
 
     def cell_modified(self):
@@ -222,7 +222,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         for i in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(4)
-        self.ui.tableWidget.setHorizontalHeaderLabels(["name", "caseOrFile", "valuetype", "memo"])
+        self.ui.tableWidget.setHorizontalHeaderLabels([_("name"), _("caseOrFile"), _("valuetype"), _("memo")])
         for row, a in enumerate(self.attribute_type):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(a['name'])
@@ -234,7 +234,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             mText = ""
             mtmp = a['memo']
             if mtmp is not None and mtmp != "":
-                mText = "Yes"
+                mText = _("Yes")
             item = QtWidgets.QTableWidgetItem(mText)
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, item)

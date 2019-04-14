@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 from copy import copy
 import logging
 import os
+from shutil import copyfile
 import sys
 import traceback
 
@@ -52,12 +53,12 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
-    """ Show code and category frequnecies, overall and for each coder.
+    """ Show code and category frequencies, overall and for each coder.
     This is for text coding and image coding. """
 
     settings = None
@@ -126,7 +127,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def calculate_code_frequencies(self):
         """ Calculate the frequency of each code for all coders and the total.
         Add a list item to each code that can be used to display in treeWidget.
-        For codings in code_image, code_text
+        For codings in code_image, code_text.
         """
 
         for c in self.codes:
@@ -190,13 +191,13 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filename = "CODING FREQUENCIES.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            "Select directory to save file", self.settings['directory'], options)
+            _("Select directory to save file"), self.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
 
         f = open(filename, 'w')
-        text = "CODING FREQUENCIES\r\n"
+        text = _("CODING FREQUENCIES") + "\r\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -209,18 +210,18 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                text += "\r\n" + prefix + "Category: " + item.text(0)  # + ", " + item.text(1)
+                text += "\r\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
                 text += ", Frequency: " + item.text(item_total_position)
             else:
-                text += "\r\n" + prefix + "Code: " + item.text(0)  # + ", " + item.text(1)
-                text += ", Frequency: " + item.text(item_total_position)
+                text += "\r\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
+                text += _(", Frequency: ") + item.text(item_total_position)
             it += 1
             item = it.value()
         f.write(text)
         f.close()
         logger.info("Report exported to " + filename)
-        QtWidgets.QMessageBox.information(None, "Text file Export", filename + " exported")
-        self.parent_textEdit.append("Text file exported to: " + filename)
+        QtWidgets.QMessageBox.information(None, _("Text file Export"), filename + _(" exported"))
+        self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -228,7 +229,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = ["Code Tree", "Id"]
+        header = [_("Code Tree"), "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
@@ -373,8 +374,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             'Agree%':'','A and B':'','Not A Not B':'','Disagree%':'','A not B':'','B not A':'','K':''
             })
         self.coders = []
-
-        cur.execute("select distinct owner from code_text")
+        sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
+        cur.execute(sql)
         result = cur.fetchall()
         self.coders = [""]
         for row in result:
@@ -403,7 +404,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         self.selected_coders = []
         self.ui.pushButton_run.setEnabled(False)
-        self.ui.label_selections.setText("Coders: None selected")
+        self.ui.label_selections.setText(_("Coders: None selected"))
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:  # while there is an item in the list
@@ -419,7 +420,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file",
+        #TODO maybe use settings default directory here
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
             os.path.expanduser('~'))
         if filename[0] == "":
             return
@@ -427,15 +429,15 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         f = open(filename, 'w')
         f.write(self.comparisons)
         f.close()
-        logger.info("Comparisons report exported to " + filename)
-        QtWidgets.QMessageBox.information(None, "Text file Export", filename + " exported")
-        self.parent_textEdit.append("Text file exported to: " + filename)
+        logger.info(_("Coder comparisons report exported to ") + filename)
+        QtWidgets.QMessageBox.information(None, _("Text file Export"), filename)
+        self.parent_textEdit.append(_("Coder comparison text file exported to: ") + filename)
 
     def calculate_statistics(self):
         """ Iterate through tree widget, for all cids
         For each code_name calculate the two-coder comparison statistics. """
 
-        self.comparisons += "====CODER COMPARISON====\nSelected coders: "
+        self.comparisons = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
         self.comparisons += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
 
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
@@ -451,10 +453,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 item.setText(5, str(agreement['disagreement']) + "%")
                 item.setText(6, str(agreement['kappa']))
                 self.comparisons += "\n" + item.text(0) + " (" + item.text(1) + ")\n"
-                self.comparisons += "agreement: " + str(agreement['agreement']) + "%"
-                self.comparisons += ", dual coded: " + str(agreement['dual_percent']) + "%"
-                self.comparisons += ", uncoded: " + str(agreement['uncoded_percent']) + "%"
-                self.comparisons += ", disagreement: " + str(agreement['disagreement']) + "%"
+                self.comparisons += _("agreement: ") + str(agreement['agreement']) + "%"
+                self.comparisons += _(", dual coded: ") + str(agreement['dual_percent']) + "%"
+                self.comparisons += _(", uncoded: ") + str(agreement['uncoded_percent']) + "%"
+                self.comparisons += _(", disagreement: ") + str(agreement['disagreement']) + "%"
                 self.comparisons += ", Kappa: " + str(agreement['kappa'])
             it += 1
             item = it.value()
@@ -481,17 +483,17 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             result0 = cur.fetchall()
             cur.execute(sql, [f[0], cid, self.selected_coders[1]])
             result1 = cur.fetchall()
-            #logger.debug("result0: " + str(result0))            print(row) #TODO tmp
-
+            #logger.debug("result0: " + str(result0))
             #logger.debug("result1: " + str(result1))
             # determine the same characters coded by both coders, by adding 1 to each coded character
             char_list = [0] * f[1]
             for coded in result0:
-                for char in range(coded[0], coded[1] + 1):  # think I need to add 1 here
+                print(coded[0], coded[1])  # tmp
+                for char in range(coded[0], coded[1]):
                     char_list[char] += 1
                     total['coded0'] += 1
             for coded in result1:
-                for char in range(coded[0], coded[1] + 1):  # think I need to add 1 here
+                for char in range(coded[0], coded[1]):
                     char_list[char] += 1
                     total['coded1'] += 1
             uncoded = 0
@@ -546,7 +548,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
         except ZeroDivisionError:
-            msg = "ZeroDivisionError. unique_codings:" + str(unique_codings)
+            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
             logger.debug(msg)
         return total
 
@@ -557,7 +559,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
-        self.ui.treeWidget.setHeaderLabels(["Code Tree", "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
@@ -641,7 +643,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     code_names = []
     coders = [""]
     categories = []
-    html_images_and_links = []
+    html_links = []  # For html output with media link (images, av)
     # variables for search restrictions
     file_ids = ""
     case_ids = ""
@@ -702,7 +704,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels(["Name", "Id", "Memo"])
+        self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo")])
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
@@ -711,7 +713,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if c['supercatid'] is None:
                 memo = ""
                 if c['memo'] != "":
-                    memo = "Memo"
+                    memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -774,7 +776,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "":
-                        memo = "Memo"
+                        memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
@@ -791,7 +793,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file",
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
             os.path.expanduser('~'))
         if filename[0] == "":
             return
@@ -800,8 +802,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setFileName(filename)
         tw.setFormat(b'plaintext')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
-        self.parent_textEdit.append("Rport exported to: " + filename)
-        QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
+        self.parent_textEdit.append(_("Report exported: ") + filename)
+        QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
 
     def export_odt_file(self):
         """ Export file to open document format with .odt ending.
@@ -809,7 +811,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save Open Document Text file",
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
             os.path.expanduser('~'))
         if filename[0] == "":
             return
@@ -818,20 +820,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setFileName(filename)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
-        self.parent_textEdit.append("Report exported to: " + filename)
-        QtWidgets.QMessageBox.information(None, "Report exported: ", filename)
+        self.parent_textEdit.append(_("Report exported: ") + filename)
+        QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
 
     def export_html_file(self):
         """ Export file to a html file. Create folder of images and change refs to the
         folder.
         POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
         need for a separate folder that the html file links to."""
-
         #TODO - possibly add video segments to html output - might be difficult to do
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, "Save html file",
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
             os.path.expanduser('~'))
         if filename[0] == "":
             return
@@ -842,41 +843,71 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
 
-        # Create folder of images and change html links
+        # Create folder of images and media and change html links
         foldername = filename[:-5]
         foldername_without_path = foldername.split('/')[-1]
         try:
             os.mkdir(foldername)
+            os.mkdir(foldername + "/audio")
+            os.mkdir(foldername + "/video")
         except Exception as e:
-            logger.warning("Html folder creation error " + str(e))
-            QtWidgets.QMessageBox.information(None, "Folder creation", foldername + " error")
+            logger.warning(_("html folder creation error ") + str(e))
+            QtWidgets.QMessageBox.warning(None, _("Folder creation"), foldername + _(" error"))
             return
         html = ""
         try:
             with open(filename, 'r') as f:
                 html = f.read()
         except Exception as e:
-            logger.warning('html file reading error:' + str(e))
-        for item in self.html_images_and_links:
-            imagename = item['imagename'].split('/')[-1]
-            folder_link = filename[:-5] + "/" + imagename
-            item['image'].save(folder_link)
-            html_link = foldername_without_path + "/" + imagename
-            ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
-            this needs to be upper case for the replace method to work:  c:  =>  C:
-            '''
-            unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
-            html = html.replace(item['imagename'], html_link)
-            if unreplaced_html == html:
-                html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
-            #print("Windows 10 not replacing issue ", item['imagename'], html_link)
-            #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
+            logger.warning(_('html file reading error:') + str(e))
+            return
+
+        for item in self.html_links:
+            if item['imagename'] is not None:
+                # [-3] has a counter, e.g. 1_, 2_ for each image eto make it distinct
+                imagename = item['imagename'].split('/')[-3] + item['imagename'].split('/')[-1]
+                #print("IN: ", imagename)
+                folder_link = filename[:-5] + "/" + imagename
+                #print("FL:" ,folder_link)
+                item['image'].save(folder_link)
+                html_link = foldername_without_path + "/" + imagename
+                ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
+                this needs to be upper case for the replace method to work:  c:  =>  C:
+                '''
+                unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
+                html = html.replace(item['imagename'], html_link)
+                if unreplaced_html == html:
+                    html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
+                #print("Windows 10 not replacing issue ", item['imagename'], html_link)
+                #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
+            if item['avname'] is not None:
+                print(item)
+                try:
+                    # add audio/video to folder
+                    if not os.path.isfile(foldername + item['avname']):
+                        copyfile(self.settings['path'] + item['avname'], foldername + item['avname'])
+                    mediatype = item['avname'][1:6]
+                    extension = item['avname'][item['avname'].rfind('.') + 1:]
+                    extra = "</p><" + mediatype + " controls>"
+                    extra += '<source src="' + foldername + item['avname']
+                    extra += '#t=' + item['av0'] +',' + item['av1'] + '"'
+                    extra += ' type="' + mediatype + '/' + extension + '">'
+                    extra += '</' + mediatype + '><p>'
+                    print("EXTRA:", extra)
+                    # hopefully only one location with video/link: [mins.secs - mins.secs]
+                    location = html.find(item['avtext'])
+                    location = location + len(['avtext'])- 1
+                    tmp = html[:location] + extra + html[location:]
+                    html = tmp
+                except Exception as e:
+                    print(e)
+
         with open(filename, 'w') as f:
             f.write(html)
-        msg = "Report exported to: " + filename
-        msg += "\nImage folder: " + foldername
+        msg = _("Report exported to: ") + filename
+        msg += "\n" + _("Image folder: ") + foldername
         self.parent_textEdit.append(msg)
-        QtWidgets.QMessageBox.information(None, "HTML file saved", msg)
+        QtWidgets.QMessageBox.information(None, _("HTML file saved"), msg)
 
     def recursive_set_selected(self, item):
         """ Set all children of this item to be selected if the item is selected.
@@ -901,7 +932,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         coder = self.ui.comboBox_coders.currentText()
         self.html_results = ""
-        self.html_images_and_links = []
+        self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
 
         rows = self.ui.tableWidget.rowCount()
@@ -912,24 +943,24 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
         if len(items) == 0:
-            QtWidgets.QMessageBox.warning(None, "No codes", "No codes have been selected.")
+            QtWidgets.QMessageBox.warning(None, _("No codes"), _("No codes have been selected."))
             return
         if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
-            QtWidgets.QMessageBox.warning(None, "No files, cases, attributes",
-                "No files, cases or attributes have been selected.")
+            QtWidgets.QMessageBox.warning(None, _("Nothing selected"),
+                _("No files, cases or attributes have been selected."))
             return
 
-                # Add search terms to textEdit
+        # Add search terms to textEdit
         self.ui.textEdit.clear()
         parameters = self.ui.label_selections.text()
-        self.ui.textEdit.insertPlainText("Search parameters:\n" + parameters)
+        self.ui.textEdit.insertPlainText(_("Search parameters") + ":\n" + parameters + "\n")
         if coder == "":
-            self.ui.textEdit.insertPlainText("\nCoding by: All coders")
+            self.ui.textEdit.insertPlainText(_("Coding by: All coders"))
         else:
-            self.ui.textEdit.insertPlainText("\nCodings by: " + coder)
+            self.ui.textEdit.insertPlainText(_("Coding by: ") + coder)
         if search_text != "":
-            self.ui.textEdit.insertPlainText("\nSearch text: " + search_text)
-        codes_string = "\nCodes: "
+            self.ui.textEdit.insertPlainText(_("Search text: ") + search_text)
+        codes_string = "\n" + _("Codes: ")
         for i in items:
             codes_string += i.text(0) + ". "
         self.ui.textEdit.insertPlainText(codes_string)
@@ -1294,20 +1325,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         tmp = []
         for i in av_results:
             # prepare additional text describing coded segment
-            #print(i)
             text = i[7][1:] + ": "
-            secs = int(i[3] / 1000)
-            mins = int(secs / 60)
-            remainder_secs = str(secs - mins * 60)
+            secs0 = int(i[3] / 1000)
+            mins = int(secs0 / 60)
+            remainder_secs = str(secs0 - mins * 60)
             if len(remainder_secs) == 1:
                 remainder_secs = "0" + remainder_secs
             text += " [" + str(mins) + "." + remainder_secs
-            secs = int(i[4] / 1000)
-            mins = int(secs / 60)
-            remainder_secs = str(secs - mins * 60)
+            secs1 = int(i[4] / 1000)
+            mins = int(secs1 / 60)
+            remainder_secs = str(secs1 - mins * 60)
             if len(remainder_secs) == 1:
                 remainder_secs = "0" + remainder_secs
             text += " - " + str(mins) + "." + remainder_secs + "]"
+            self.html_links.append({'imagename': None, 'image': None,
+                'avname': i[7], 'av0': str(secs0), 'av1': str(secs1), 'avtext': text})
             if len(i[5]) > 0:
                 text += "\nMemo: " + i[5]
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
@@ -1362,9 +1394,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         image_format.setName(url.toString())
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
-        self.html_images_and_links.append({'imagename': imagename, 'image': image})
+        self.html_links.append({'imagename': imagename, 'image': image,
+            'avname': None, 'av0': None, 'av1': None, 'avtext': None})
         if img['memo'] != "":
-            text_edit.insertPlainText("Memo: " + img['memo'] + "\n")
+            text_edit.insertPlainText(_("Memo: ") + img['memo'] + "\n")
 
     @staticmethod
     def html_heading(item):
@@ -1472,7 +1505,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.attribute_selection = []
             return
         self.attribute_selection = ui.parameters
-        label = "Attributes: "
+        label = _("Attributes: ")
         logger.debug("Attributes selected:" + str(self.attribute_selection))
         for att in self.attribute_selection:
             label += att[0] + " " + att[3] + " "
@@ -1505,9 +1538,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.file_ids) > 0:
             self.file_ids = self.file_ids[1:]
 
-        ui = DialogSelectFile(filenames, "Select file(s) to view", "many")
+        ui = DialogSelectFile(filenames, _("Select files to view"), "many")
         ok = ui.exec_()
-        tooltip = "Files selected:"
+        tooltip = _("Files selected:")
         if ok:
             tmp_ids = ""
             selectedFiles = ui.get_selected()  # list of dictionaries
@@ -1519,7 +1552,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.pushButton_fileselect.setToolTip(tooltip)
                 self.ui.label_selections.setText(tooltip)
             else:
-                self.ui.label_selections.setText("Files selected: All")
+                self.ui.label_selections.setText(_("Files selected: All"))
 
     def select_cases(self):
         """ When select case button is pressed a dialog of case names is presented to the user.
@@ -1540,9 +1573,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             casenames.append({'caseid': row[0], 'name': row[1]})
-        ui = DialogSelectFile(casenames, "Select case(s) to view", "many")
+        ui = DialogSelectFile(casenames, _("Select cases to view"), "many")
         ok = ui.exec_()
-        tooltip = "Cases selected:"
+        tooltip = _("Cases selected:")
         if ok:
             tmp_ids = ""
             selectedCases = ui.get_selected()  # list of dictionaries

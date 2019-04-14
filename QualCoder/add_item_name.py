@@ -41,8 +41,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception") + ":\n" + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogAddItemName(QtWidgets.QDialog):
@@ -81,14 +81,14 @@ class DialogAddItemName(QtWidgets.QDialog):
         duplicate = False
         if thisItem in self.existingItems:
             duplicate = True
-            QtWidgets.QMessageBox.warning(None, "Duplicated", "This already exists")
+            QtWidgets.QMessageBox.warning(None, _("Duplicated"), _("This already exists"))
             return
         if duplicate is False:
             self.newItem = thisItem
         self.close()
 
     def get_new_name(self):
-        ''' Get the new sys.excepthook = exception_handlername '''
+        ''' Get the new name '''
 
         return self.newItem
 

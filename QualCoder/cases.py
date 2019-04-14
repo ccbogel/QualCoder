@@ -56,8 +56,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ")  + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogCases(QtWidgets.QDialog):
@@ -153,7 +153,7 @@ class DialogCases(QtWidgets.QDialog):
         for a in result:
             attribute_names.append({'name': a[0]})
         check_names = attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'caseid'}, {'name':'date'}]
-        ui = DialogAddItemName(check_names, "New attribute name")
+        ui = DialogAddItemName(check_names, _("New attribute name"))
         ui.exec_()
         name = ui.get_new_name()
         if name is None or name == "":
@@ -181,7 +181,7 @@ class DialogCases(QtWidgets.QDialog):
         self.settings['conn'].commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
-        self.parent_textEdit.append("Attribute added to cases: " + name + ", type: " + valuetype)
+        self.parent_textEdit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + valuetype)
 
     def textBrowser_menu(self, position):
         ''' Context menu for textBrowser. Mark, unmark, annotate, copy. '''
@@ -189,8 +189,8 @@ class DialogCases(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         if self.ui.textBrowser.toPlainText() == "":
             return
-        ActionItemMark = menu.addAction("Mark")
-        ActionItemUnmark = menu.addAction("Unmark")
+        ActionItemMark = menu.addAction(_("Mark"))
+        ActionItemUnmark = menu.addAction(_("Unmark"))
         ActionItemCopy = menu.addAction("Copy")
         action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
         if action == ActionItemMark:
@@ -216,13 +216,13 @@ class DialogCases(QtWidgets.QDialog):
         '''
 
         if self.cases != []:
-            logger.warning("Cases have already been created.")
-        filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Select attributes file',
+            logger.warning(_("Cases have already been created."))
+        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select attributes file'),
             self.settings['directory'], "(*.csv)")[0]
         if filename == "":
             return
         if filename[-4:].lower() != ".csv":
-            msg = filename + "\nis not a .csv file.\nFile not imported"
+            msg = filename + "\n" + _("is not a .csv file. File not imported")
             QtWidgets.QMessageBox.warning(None, "Warning", msg)
             self.parent_textEdit.append(msg)
             return
@@ -235,7 +235,7 @@ class DialogCases(QtWidgets.QDialog):
             except csv.Error as e:
                 logger.warning(('file %s, line %d: %s' % (filename, reader.line_num, e)))
         if len(values) <= 1:
-            logger.info("Cannot import from csv, only one row in file")
+            logger.info(_("Cannot import from csv, only one row in file"))
             return
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         header = values[0]
@@ -275,7 +275,7 @@ class DialogCases(QtWidgets.QDialog):
                     attribute_value_type[col], 'case'))
                     self.settings['conn'].commit()
                 except Exception as e:
-                    logger.error("attribute:" + att_name + ", " + str(e))
+                    logger.error(_("attribute:") + att_name + ", " + str(e))
         # insert attributes
         sql = "select name, caseid from cases"
         cur.execute(sql)
@@ -290,7 +290,7 @@ class DialogCases(QtWidgets.QDialog):
         self.settings['conn'].commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
-        msg = "Cases and attributes from " + filename + " imported."
+        msg = _("Cases and attributes imported from: ") + filename
         self.parent_textEdit.append(msg)
         logger.info(msg)
 
@@ -300,7 +300,7 @@ class DialogCases(QtWidgets.QDialog):
         New case is added to the model and database.
         Attribute placeholders are assigned to the database for this new case. """
 
-        ui = DialogAddItemName(self.cases, "Case")
+        ui = DialogAddItemName(self.cases, _("Case"))
         ui.exec_()
         newCaseText = ui.get_new_name()
         if newCaseText is None:
@@ -324,7 +324,7 @@ class DialogCases(QtWidgets.QDialog):
         self.settings['conn'].commit()
         self.cases.append(item)
         self.fill_tableWidget()
-        self.parent_textEdit.append("Case added: " + item['name'])
+        self.parent_textEdit.append(_("Case added: ") + item['name'])
 
     def delete_case(self):
         ''' When delete button pressed, case is deleted from model and database '''
@@ -367,19 +367,19 @@ class DialogCases(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == self.NAME_COLUMN:  # update case name
-            newText = str(self.ui.tableWidget.item(x, y).text()).strip()
+            new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
             # check that no other case name has this text and this is not empty
             update = True
-            if newText == "":
+            if new_text == "":
                 update = False
             for c in self.cases:
-                if c['name'] == newText:
+                if c['name'] == new_text:
                     update = False
             if update:
                 cur = self.settings['conn'].cursor()
-                cur.execute("update cases set name=? where caseid=?", (newText, self.cases[x]['caseid']))
+                cur.execute("update cases set name=? where caseid=?", (new_text, self.cases[x]['caseid']))
                 self.settings['conn'].commit()
-                self.cases[x]['name'] = newText
+                self.cases[x]['name'] = new_text
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.cases[x]['name'])
         if y > 2:  # update attribute value
@@ -391,14 +391,12 @@ class DialogCases(QtWidgets.QDialog):
             self.settings['conn'].commit()
 
     def cell_selected(self):
-        '''
-        Highlight case text if a file is selected.
+        ''' Highlight case text if a file is selected.
         Indicate memo is present, update memo text, or delete memo by clearing text.
         '''
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-
         if x == -1:
             self.selected_case = None
             self.ui.textBrowser.clear()
@@ -426,7 +424,7 @@ class DialogCases(QtWidgets.QDialog):
         self.highlight()
 
         if y == self.MEMO_COLUMN:
-            ui = DialogMemo(self.settings, "Memo for case " + self.cases[x]['name'],
+            ui = DialogMemo(self.settings, _("Memo for case ") + self.cases[x]['name'],
                 self.cases[x]['memo'])
             ui.exec_()
             self.cases[x]['memo'] = ui.memo
@@ -436,10 +434,10 @@ class DialogCases(QtWidgets.QDialog):
             if self.cases[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Yes")))
 
     def fill_tableWidget(self):
-        ''' Fill the table widget with case details '''
+        ''' Fill the table widget with case details. '''
 
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
@@ -454,7 +452,7 @@ class DialogCases(QtWidgets.QDialog):
             memotmp = c['memo']
             if memotmp is not None and memotmp != "":
                 self.ui.tableWidget.setItem(row, self.MEMO_COLUMN,
-                QtWidgets.QTableWidgetItem("Yes"))
+                QtWidgets.QTableWidgetItem(_("Yes")))
             cid = c['caseid']
             if cid is None:
                 cid = ""
@@ -478,10 +476,10 @@ class DialogCases(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         if x == -1:
-            QtWidgets.QMessageBox.warning(None, 'Warning', "No case was selected")
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No case was selected"))
             return
         ui = DialogSelectFile(self.source,
-        "Select entire file for case: " + self.cases[x]['name'], "single")
+        _("Select entire file for case: ") + self.cases[x]['name'], "single")
         ok = ui.exec_()
         if not ok:
             return
@@ -500,15 +498,15 @@ class DialogCases(QtWidgets.QDialog):
             (newlink['caseid'], newlink['fid'], newlink['pos0'], newlink['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, "Already Linked",
-            "This file has already been linked to this case")
+            QtWidgets.QMessageBox.warning(None, _("Already Linked"),
+            _("This file has already been linked to this case"))
             return
         cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
             ,(newlink['caseid'],newlink['fid'],newlink['pos0'],newlink['pos1'],
             newlink['owner'],newlink['date'], newlink['memo']))
         self.settings['conn'].commit()
-        msg = casefile['name'] + " added to case. "
-        QtWidgets.QMessageBox.information(None, "File added to case", msg)
+        msg = casefile['name'] + _(" added to case.")
+        QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
         self.parent_textEdit.append(msg)
 
     def select_file(self):
@@ -520,7 +518,7 @@ class DialogCases(QtWidgets.QDialog):
 
         self.ui.tableWidget.clearSelection()
         self.case_text = []
-        ui = DialogSelectFile(self.source, "Select file to view", "single")
+        ui = DialogSelectFile(self.source, _("Select file to view"), "single")
         ok = ui.exec_()
         if not ok:
             return
@@ -546,7 +544,7 @@ class DialogCases(QtWidgets.QDialog):
                 self.settings['conn'].commit()
 
     def unlight(self):
-        ''' Remove all text highlighting from current file '''
+        ''' Remove all text highlighting from current file. '''
 
         if self.selected_file is None:
             return
@@ -593,7 +591,7 @@ class DialogCases(QtWidgets.QDialog):
         if self.selected_case is None:
             return
         self.selected_file = None
-        self.ui.label_filename.setText("Viewing text of case: " + str(self.cases[row]['name']))
+        self.ui.label_filename.setText(_("Viewing text of case: ") + str(self.cases[row]['name']))
         self.ui.textBrowser.clear()
         self.caseTextViewed = []
         cur = self.settings['conn'].cursor()
@@ -646,7 +644,7 @@ class DialogCases(QtWidgets.QDialog):
                 cursor.insertImage(image_format)
                 self.ui.textBrowser.append("<br />")
             else:
-                self.ui.textBrowser.append('<br /><b><a href="' + c['mediapath'] + '"> A/V media: ' + c['sourcename'] + '</a></b><br />')
+                self.ui.textBrowser.append('<br /><b><a href="' + c['mediapath'] + '">' + _('A/V media: ') + c['sourcename'] + '</a></b><br />')
                 path = self.settings['path'] + c['mediapath']
                 url = QtCore.QUrl(path)
 
@@ -675,7 +673,7 @@ class DialogCases(QtWidgets.QDialog):
             self.settings['conn'].commit()
 
     def mark(self):
-        ''' Mark selected text in file with currently selected case '''
+        ''' Mark selected text in file with currently selected case. '''
 
         if self.selected_file is None:
             return
@@ -698,15 +696,15 @@ class DialogCases(QtWidgets.QDialog):
             (item['caseid'], item['fid'], item['pos0'], item['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, "Already Linked",
-                "This segment has already been linked to this case")
+            QtWidgets.QMessageBox.warning(None, _("Already Linked"),
+                _("This segment has already been linked to this case"))
             return
         cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
             ,(item['caseid'],item['fid'],item['pos0'],item['pos1'],item['owner'],item['date'],item['memo']))
         self.settings['conn'].commit()
 
     def unmark(self):
-        ''' Remove case marking from selected text in selected file '''
+        ''' Remove case marking from selected text in selected file. '''
 
         if self.selected_file is None:
             return
@@ -736,15 +734,15 @@ class DialogCases(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         if row == -1:
-            QtWidgets.QMessageBox.warning(None, 'Warning', "No case was selected")
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No case was selected"))
             return
-        ui = DialogSelectFile(self.source, "Select file(s) to assign case", "many")
+        ui = DialogSelectFile(self.source, _("Select files to assign case"), "many")
         ok = ui.exec_()
         if not ok:
             return
         files = ui.get_selected()
         if len(files) == 0:
-            QtWidgets.QMessageBox.warning(None, 'Warning', "No file was selected")
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No file was selected"))
             return
         #logger.debug(str(files))
         #logger.debug(str(type(files)))
@@ -758,7 +756,7 @@ class DialogCases(QtWidgets.QDialog):
         start_mark = ui.get_start_mark()
         end_mark = ui.get_end_mark()
         if start_mark == "" or end_mark == "":
-            QtWidgets.QMessageBox.warning(None, 'Warning', "Cannot have blank text marks")
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _('Cannot have blank text marks'))
             return
         warnings = 0
         for f in files:
@@ -767,23 +765,23 @@ class DialogCases(QtWidgets.QDialog):
                 [f['id']])
             currentfile = cur.fetchone()
             text = currentfile[2]
-            textStarts = [match.start() for match in re.finditer(re.escape(start_mark), text)]
-            textEnds = [match.start() for match in re.finditer(re.escape(end_mark), text)]
+            text_starts = [match.start() for match in re.finditer(re.escape(start_mark), text)]
+            text_ends = [match.start() for match in re.finditer(re.escape(end_mark), text)]
             #logger.debug(textStarts, textEnds)
             #add new code linkage items to database
-            for startPos in textStarts:
+            for startPos in text_starts:
                 pos1 = -1  # default if not found
                 textEndIterator = 0
                 try:
-                    while startPos >= textEnds[textEndIterator]:
+                    while startPos >= text_ends[textEndIterator]:
                         textEndIterator += 1
                 except IndexError:
                     textEndIterator = -1
                     warnings += 1
-                    logger.warning(f['name'] + ". Could not find end mark: " + end_mark)
+                    logger.warning("Could not find end mark: " + f['name'] + "  " + end_mark)
 
                 if textEndIterator >= 0:
-                    pos1 = textEnds[textEndIterator]
+                    pos1 = text_ends[textEndIterator]
                     item = {'caseid': int(self.cases[row]['caseid']), 'fid': int(f['id']),
                     'pos0': startPos, 'pos1': pos1,
                     'owner': self.settings['codername'],
@@ -795,8 +793,8 @@ class DialogCases(QtWidgets.QDialog):
                           item['owner'], item['date'], item['memo']))
                     self.settings['conn'].commit()
         if warnings > 0:
-            QtWidgets.QMessageBox.warning(None, 'Warning',
-                 str(warnings) + " end mark did not match up")
+            QtWidgets.QMessageBox.warning(None, _('Warning'),
+                  _("End mark did not match up: ") + str(warnings))
         self.ui.tableWidget.clearSelection()
 
 

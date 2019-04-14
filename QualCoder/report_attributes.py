@@ -43,13 +43,14 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogSelectAttributeParameters(QtWidgets.QDialog):
     ''' Select parameters for attributes to limit coding report results.
     Parameters are either case-based or file-based.
+    The English SQL operators: not, between, etc. cannot be exchanged for another language.
     '''
 
     NAME_COLUMN = 0
@@ -134,7 +135,8 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
 
     def cell_modified(self):
         ''' Values entered or changed in the values_list column. Allow value entry
-        only if the operator has been selected.'''
+        only if the operator has been selected. '''
+
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -147,14 +149,15 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
         if operator == '':
             self.ui.tableWidget.item(x, y).setText('')
-            QtWidgets.QMessageBox.warning(None, 'Warning',"No operator was selected", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning'),_("No operator was selected"), QtWidgets.QMessageBox.Ok)
             return
         # enforce that value list is only one item for selected operators
         if operator in ('<','<=','>','>=','==','like') and len(values) > 1:
-            QtWidgets.QMessageBox.warning(None, 'Warning',"Too many values given for this operator", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Too many values given for this operator"),
+                QtWidgets.QMessageBox.Ok)
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
-            QtWidgets.QMessageBox.warning(None, 'Warning',"Need 2 values for between", QtWidgets.QMessageBox.Ok)
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Need 2 values for between"), QtWidgets.QMessageBox.Ok)
         # check numeric type
         type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
         if type_ == "numeric":
@@ -162,7 +165,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 try:
                     float(v)
                 except ValueError:
-                    QtWidgets.QMessageBox.warning(None, 'Warning', v + " is not a number", QtWidgets.QMessageBox.Ok)
+                    QtWidgets.QMessageBox.warning(None, _('Warning'), v + _(" is not a number"), QtWidgets.QMessageBox.Ok)
                     self.ui.tableWidget.item(x, y).setText("")
 
     def fill_tableWidget(self):

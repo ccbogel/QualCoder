@@ -28,6 +28,7 @@ https://qualcoder.wordpress.com/
 '''
 
 import datetime
+import gettext
 import logging
 import os
 import shutil
@@ -82,8 +83,8 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error("Uncaught exception:\n" + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception ', text)
+    logger.error(_("Uncaught exception : ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -193,6 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
+        self.ui.actionExport_codebook.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -217,6 +219,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
+        self.ui.actionExport_codebook.setEnabled(True)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -226,12 +229,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionText_mining.setEnabled(False)
 
     def settings_report(self):
-        msg = "Settings\n========\nCoder: " + self.settings['codername'] + "\n"
-        msg += "Font: " + self.settings['font'] + " " + str(self.settings['fontsize'])
-        msg += ". Code font size: " + self.settings['font'] + " " + str(self.settings['treefontsize'])
-        msg += "\nDirectory: " + self.settings['directory']
-        msg += "\nShowIDs: " + str(self.settings['showIDs'])
-        msg += "\nLanguage: " + self.settings['language']
+        msg = _("Settings")
+        msg += "\n========\n"
+        msg += _("Coder") + ": " + self.settings['codername'] + "\n"
+        msg += _("Font") + ": " + self.settings['font'] + " " + str(self.settings['fontsize'])
+        msg += ". "
+        msg += _("Code font size") + ": " + self.settings['font'] + " " + str(self.settings['treefontsize']) + "\n"
+        msg += _("Directory") + ": " + self.settings['directory'] + "\n"
+        msg += _("Show IDs") + ": " + str(self.settings['showIDs']) + "\n"
+        msg += _("Language") + ": " + self.settings['language']
         msg += "\n========"
         self.ui.textEdit.append(msg)
 
@@ -292,7 +298,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Help dialog. """
 
-        ui = DialogInformation("Help contents", "GUI/Help.html")
+        ui = DialogInformation("Help contents", "GUI/en_Help.html")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -405,7 +411,7 @@ class MainWindow(QtWidgets.QMainWindow):
         If selected via window x close: event == QtGui.QCloseEvent
         """
 
-        quit_msg = "Are you sure you want to quit?"
+        quit_msg = _("Are you sure you want to quit?")
         reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
         QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
@@ -429,9 +435,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #logger.debug("settings[directory]:" + self.settings['directory'])
         self.settings['path'] = QtWidgets.QFileDialog.getSaveFileName(self,
-            "Enter project name", self.settings['directory'], ".qda")[0]
+            _("Enter project name"), self.settings['directory'], ".qda")[0]
         if self.settings['path'] == "":
-            QtWidgets.QMessageBox.warning(None, "Project", "No project created.")
+            QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created."))
             return
         if self.settings['path'].find(".qda") == -1:
             self.settings['path'] = self.settings['path'] + ".qda"
@@ -442,8 +448,8 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.settings['path'] + "/video")
             os.mkdir(self.settings['path'] + "/documents")
         except Exception as e:
-            logger.critical("Project creation error " + str(e))
-            QtWidgets.QMessageBox.warning(None, "Project", "No project created.Exiting. " + str(e))
+            logger.critical(_("Project creation error ") + str(e))
+            QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created. Exiting. ") + str(e))
             exit(0)
         self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
@@ -467,9 +473,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['conn'].commit()
         try:
             # get and display some project details
-            self.ui.textEdit.append("\nNew project: " + self.settings['path'] + " created.")
+            self.ui.textEdit.append("\n" + _("New project: ") + self.settings['path'] + _(" created."))
             #self.settings['projectName'] = self.path.rpartition('/')[2]
-            self.ui.textEdit.append("Opening: " + self.settings['path'])
+            self.ui.textEdit.append(_("Opening: ") + self.settings['path'])
             self.setWindowTitle("QualCoder " + self.settings['projectName'])
             cur = self.settings['conn'].cursor()
             cur.execute('select sqlite_version()')
@@ -480,15 +486,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.project['date'] = result[1]
             self.project['memo'] = result[2]
             self.project['about'] = result[3]
-            self.ui.textEdit.append("New Project Created\n========\n"
-                + "DBVersion:" + str(self.project['databaseversion']) + "\n"
-                + "Date: " + str(self.project['date']) + "\n"
-                + "About: " + str(self.project['about']) + "\n"
-                + "Coder:" + str(self.settings['codername']) + "\n"
+            self.ui.textEdit.append(_("New Project Created") + "\n========\n"
+                + _("DB Version:") + str(self.project['databaseversion']) + "\n"
+                + _("Date: ") + str(self.project['date']) + "\n"
+                + _("About: ") + str(self.project['about']) + "\n"
+                + _("Coder:") + str(self.settings['codername']) + "\n"
                 + "========")
         except Exception as e:
-            logger.warning("Problem creating Db " + self.settings['path'] + " Exception:" + str(e))
-            self.ui.textEdit.append("\nProblems creating Db\n" + self.settings['path'])
+            msg = _("Problem creating database ")
+            logger.warning(msg + self.settings['path'] + " Exception:" + str(e))
+            self.ui.textEdit.append("\n" + msg + "\n" + self.settings['path'])
             self.ui.textEdit.append(str(e))
             self.close_project()
             return
@@ -509,14 +516,14 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.settings['conn'].cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
-        ui = DialogMemo(self.settings, "Memo for project " + self.settings['projectName'],
+        ui = DialogMemo(self.settings, _("Memo for project ") + self.settings['projectName'],
             memo)
         self.dialogList.append(ui)
         ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
             self.settings['conn'].commit()
-            self.ui.textEdit.append("Project memo entered.")
+            self.ui.textEdit.append(_("Project memo entered."))
 
     def open_project(self, path=""):
         """ Open an existing project.
@@ -524,10 +531,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.settings['projectName'] != "":
             self.close_project()
-        self.setWindowTitle("QualCoder Open Project")
+        self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                'Open project directory', self.settings['directory'])
+                _('Open project directory'), self.settings['directory'])
         if path == "" or path is False:
             return
         if len(path) > 3 and path[-4:] == ".qda":
@@ -540,8 +547,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 msg += str(e)
                 logger.debug(str(e))
         if self.settings['conn'] is None:
-            QtWidgets.QMessageBox.warning(None, "Cannot open file",
-                self.settings['path'] + " is not a .qda file ")
+            QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
+                self.settings['path'] + _(" is not a .qda file "))
             self.settings['path'] = ""
             return
         # get and display some project details
@@ -560,15 +567,15 @@ class MainWindow(QtWidgets.QMainWindow):
         nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
         shutil.copytree(self.settings['path'], backup)
-        self.ui.textEdit.append("Project Opened:" + self.settings['projectName']
-            + "\n========"
-            + "\nPath: " + self.settings['path']
-            + "\nDirectory: " + self.settings['directory']
-            + "\nDBVersion:" + self.project['databaseversion'] + ". "
-            + "Date: " + str(self.project['date']) + "\n"
-            + "About: " + self.project['about'] + "\n"
-            + "Language: " + self.settings['language'] + "\n"
-            + "Project backup created: " + backup
+        self.ui.textEdit.append(_("Project Opened: ") + self.settings['projectName']
+            + "\n========\n"
+            + _("Path: ") + self.settings['path'] + "\n"
+            + _("Directory: ") + self.settings['directory'] + "\n"
+            + _("Database version: ") + self.project['databaseversion'] + ". "
+            + _("Date: ") + str(self.project['date']) + "\n"
+            + _("About: ") + self.project['about'] + "\n"
+            + _("Language: ") + self.settings['language'] + "\n"
+            + _("Project backup created: ") + backup
             + "\n========\n")
         self.show_menu_options()
 
@@ -630,13 +637,17 @@ def main():
                 lang = "en"
     except:
         pass
+    getlang = gettext.translation('en', localedir='locale', languages=['en'])
     if lang != "en":
         translator = QtCore.QTranslator()
         if lang == "fr":
-            translator.load(path + "/GUI/app_fr.qm")
+            translator.load(path + "/locale/fr/app_fr.qm")
+            getlang = gettext.translation('fr', localedir='locale', languages=['fr'])
         if lang == "de":
-            translator.load(path + "/GUI/app_de.qm")
+            translator.load(path + "/locale/de/app_de.qm")
+            getlang = gettext.translation('de', localedir='locale', languages=['de'])
         app.installTranslator(translator)
+    getlang.install()
     ex = MainWindow()
     sys.exit(app.exec_())
 
