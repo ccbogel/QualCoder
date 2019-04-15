@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=QualCoder
+Type=Application
+Comment=Qualitiatve data analysis
+Exec=python3 /usr/share/qualcoder/qualcoder.py
+Icon=/usr/share/pixmaps/qualcoder.png
+Terminal=false
+Categories=Science;
+Name[en_AU]=QualCoder
