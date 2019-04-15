@@ -13,7 +13,7 @@ You will also need to have a vlc player installed - for audio and video.
 
 ### Linux:
 
-I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package.
+I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package. (UNDER REVIEW)
 
 ### Manual install on Linux:
 
@@ -29,7 +29,7 @@ Install dependencies in the command prompt:
 
 python -m pip install pyqt5, lxml, Pillow
 
-To launch, you can create a shortcut to the QualCoder.py file to start QualCoder.
+To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
 Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
