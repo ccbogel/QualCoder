@@ -637,7 +637,6 @@ def main():
                 lang = "en"
     except:
         pass
-    print(path)
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
     if lang != "en":
         translator = QtCore.QTranslator()
