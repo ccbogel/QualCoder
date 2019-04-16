@@ -17,7 +17,7 @@ I have created a .deb package for QualCoder which can be installed into Debian/U
 
 ### Manual install on Linux:
 
-Once a python 3.x is installed, make the install.sh executable and run the install.sh script from the terminal: 
+Once a python 3.x is installed, make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
 
 ./install.sh
 
