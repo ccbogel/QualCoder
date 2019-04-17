@@ -303,25 +303,32 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
+        Added try block in case VLC bindings do not work.
         """
 
-        ui = DialogViewAV(self.settings, self.source[x])
-        #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
-        self.dialogList.append(ui)
-        ui.show()
-        memo = ui.ui.textEdit.toPlainText()
-        if self.source[x]['memo'] != memo:
-            self.source[x]['memo'] = memo
-            cur = self.settings['conn'].cursor()
-            cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
-                self.source[x]['id']))
-            self.settings['conn'].commit()
-        if self.source[x]['memo'] == "":
-            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
-        else:
-            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
-        # easy way to update transcribed files
-        self.load_file_data()
+        try:
+            ui = DialogViewAV(self.settings, self.source[x])
+            #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+            self.dialogList.append(ui)
+            ui.show()
+            memo = ui.ui.textEdit.toPlainText()
+            if self.source[x]['memo'] != memo:
+                self.source[x]['memo'] = memo
+                cur = self.settings['conn'].cursor()
+                cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
+                    self.source[x]['id']))
+                self.settings['conn'].commit()
+            if self.source[x]['memo'] == "":
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
+            else:
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+            # easy way to update transcribed files
+            self.load_file_data()
+        except Exception as e:
+            logger.debug(e)
+            print(e)
+            QtWidgets.QMessageBox.warning(None, 'view av error', str(e), QtWidgets.QMessageBox.Ok)
+            return
 
     def view_image(self, x):
         """ View an image file and edit the image memo. """

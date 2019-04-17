@@ -649,7 +649,8 @@ class DialogCases(QtWidgets.QDialog):
                 url = QtCore.QUrl(path)
 
     def link_clicked(self, url):
-        ''' View image or audio/video media in dialog. '''
+        ''' View image or audio/video media in dialog.
+        For A/V, added try block in case VLC bindings do not work.  '''
 
         x = -1
         for i in range(0, len(self.source)):
@@ -658,10 +659,16 @@ class DialogCases(QtWidgets.QDialog):
         if x == -1:
             return
         ui = None
-        if self.source[x]['mediapath'][:6] == "/video":
-            ui = DialogViewAV(self.settings, self.source[x])
-        if self.source[x]['mediapath'][:6] == "/audio":
-            ui = DialogViewAV(self.settings, self.source[x])
+        try:
+            if self.source[x]['mediapath'][:6] == "/video":
+                ui = DialogViewAV(self.settings, self.source[x])
+            if self.source[x]['mediapath'][:6] == "/audio":
+                ui = DialogViewAV(self.settings, self.source[x])
+        except Exception as e:
+            logger.debug(str(e))
+            print(e)
+            QtWidgets.QMessageBox.warning(None, 'view av error', str(e), QtWidgets.QMessageBox.Ok)
+            return
         if self.source[x]['mediapath'][:7] == "/images":
             ui = DialogViewImage(self.settings, self.source[x])
         ui.exec_()

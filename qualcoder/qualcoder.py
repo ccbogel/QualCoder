@@ -390,12 +390,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def av_coding(self):
         """ Create edit and delete codes. Apply and remove codes to segements of the
-        audio or video file. """
+        audio or video file. Added try block in case VLC bindings do not work. """
 
-        ui = DialogCodeAV(self.settings, self.ui.textEdit)
-        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.dialogList.append(ui)
-        ui.show()
+        try:
+            ui = DialogCodeAV(self.settings, self.ui.textEdit)
+            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            self.dialogList.append(ui)
+            ui.show()
+        except Exception as e:
+            logger.debug(str(e))
+            print(e)
+            QtWidgets.QMessageBox.warning(None, "A/V Coding", str(e), QtWidgets.QMessageBox.Ok)
         self.clean_dialog_refs()
 
     def codebook(self):
