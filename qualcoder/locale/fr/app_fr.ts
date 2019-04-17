@@ -74,17 +74,17 @@
     <message>
         <location filename="ui_queryDetails.py" line="41"/>
         <source>Query Details</source>
-        <translation>Requête détails</translation>
+        <translation>Détails de la requête</translation>
     </message>
     <message>
         <location filename="ui_queryDetails.py" line="42"/>
         <source>Query Name</source>
-        <translation>Requête nom</translation>
+        <translation>Nom de la requête</translation>
     </message>
     <message>
         <location filename="ui_queryDetails.py" line="43"/>
         <source>Query Description</source>
-        <translation>Requête description </translation>
+        <translation>Description de la requête</translation>
     </message>
 </context>
 <context>
@@ -92,17 +92,17 @@
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
         <source>Define start and end marks for auto assigning</source>
-        <translation type="unfinished">Définir les marques de début et de fin pour l&apos;attribution automatique</translation>
+        <translation type="unfinished">Définir les marqueurs de début et de fin pour l&apos;attribution automatique</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>Define the start and end text marks.This allows parts of files to be allocated to the selected case.</source>
-        <translation type="unfinished">Définit les marques de texte de début et de fin. Cela permet d’attribuer des parties de fichiers au cas sélectionné</translation>
+        <translation type="unfinished">Définir les marqueurs de texte de début et de fin. Cela permet d’attribuer des parties de fichiers au cas sélectionné</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
         <source>Case:</source>
-        <translation>Cas:</translation>
+        <translation>Cas :</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="67"/>
@@ -112,12 +112,12 @@
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="68"/>
         <source>Start mark</source>
-        <translation>Ddépart marque</translation>
+        <translation>Marquage de début</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="69"/>
         <source>End mark</source>
-        <translation>Fin marque</translation>
+        <translation>Marquage de fin</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="70"/>
@@ -143,7 +143,7 @@
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="42"/>
         <source>Assign attribute</source>
-        <translation>Attribuer attribuer</translation>
+        <translation>Assigner un attribut</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="43"/>
@@ -158,7 +158,7 @@
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="45"/>
         <source>Assign attribute to:</source>
-        <translation type="unfinished">Attribuer un attribut à:</translation>
+        <translation type="unfinished">Assigner un attribut à :</translation>
     </message>
 </context>
 <context>
@@ -171,7 +171,7 @@
     <message>
         <location filename="ui_dialog_attribute_type.py" line="45"/>
         <source>Choose attribute type:</source>
-        <translation>Choisissez le type d&apos;attribut:</translation>
+        <translation>Choisissez le type d&apos;attribut :</translation>
     </message>
     <message>
         <location filename="ui_dialog_attribute_type.py" line="43"/>
@@ -204,7 +204,7 @@
     <message>
         <location filename="ui_dialog_cases.py" line="89"/>
         <source>Add File to case</source>
-        <translation>Ajouter un fichier à la casse</translation>
+        <translation>Ajouter un fichier au cas</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="90"/>
@@ -214,12 +214,12 @@
     <message>
         <location filename="ui_dialog_cases.py" line="91"/>
         <source>Auto assign file text</source>
-        <translation type="unfinished">Attribuer automatiquement le texte du fichier</translation>
+        <translation type="unfinished">Attribuer automatiquement le fichier texte</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="92"/>
         <source>Open file to view and assign text to case</source>
-        <translation type="unfinished">Ouvrir fichier pour afficher et attribuer du texte à la cas</translation>
+        <translation type="unfinished">Ouvrir le fichier pour afficher et lui assigner du texte au cas</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="93"/>
@@ -272,12 +272,12 @@
     <message>
         <location filename="ui_dialog_code_av.py" line="102"/>
         <source>Play</source>
-        <translation>Passer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="103"/>
         <source>Stop</source>
-        <translation>Arrêtez</translation>
+        <translation>Stopper</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="104"/>
@@ -383,7 +383,7 @@
     <message>
         <location filename="ui_dialog_codes.py" line="86"/>
         <source>View File</source>
-        <translation>Voir la fiche</translation>
+        <translation>Voir lr fichier</translation>
     </message>
     <message>
         <location filename="ui_dialog_codes.py" line="87"/>
@@ -423,12 +423,12 @@
     <message>
         <location filename="ui_dialog_codes.py" line="94"/>
         <source>Search for text:</source>
-        <translation type="unfinished">Recherche de texte:</translation>
+        <translation type="unfinished">Rechercher dans le texte :</translation>
     </message>
     <message>
         <location filename="ui_dialog_codes.py" line="95"/>
         <source>Case sensitive search</source>
-        <translation type="unfinished">0 en 0</translation>
+        <translation type="unfinished">Recherche sensible à la casse</translation>
     </message>
     <message>
         <location filename="ui_dialog_codes.py" line="96"/>
@@ -464,7 +464,7 @@
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="34"/>
         <source>Confirm Delete</source>
-        <translation type="unfinished">Confirmation de la suppression</translation>
+        <translation type="unfinished">Confirmer la suppression</translation>
     </message>
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="35"/>
@@ -485,7 +485,7 @@
     <message>
         <location filename="ui_dialog_journals.py" line="57"/>
         <source>Journals</source>
-        <translation></translation>
+        <translation>Journaux de bord</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="58"/>
@@ -635,12 +635,12 @@
     <message>
         <location filename="ui_dialog_report_codings.py" line="101"/>
         <source>File selection</source>
-        <translation>Sélection de fichier</translation>
+        <translation>Sélection du fichier</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="102"/>
         <source>Search text:</source>
-        <translation type="unfinished">Recherche texte</translation>
+        <translation type="unfinished">Rechercher dans le texte</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="103"/>
@@ -660,12 +660,12 @@
     <message>
         <location filename="ui_dialog_report_codings.py" line="106"/>
         <source>Export ODT file</source>
-        <translation>Exporter fichier ODT</translation>
+        <translation>Exporter en fichier ODT</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="107"/>
         <source>Search selections:</source>
-        <translation>Sélections de recherche:</translation>
+        <translation>Sélections de recherche :</translation>
     </message>
 </context>
 <context>
@@ -683,7 +683,7 @@
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="65"/>
         <source>Run Comparisons</source>
-        <translation>Exécution</translation>
+        <translation>Exécuter la comparaison</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="66"/>
@@ -731,7 +731,7 @@
     <message>
         <location filename="ui_report_attribute_parameters.py" line="61"/>
         <source>Value list</source>
-        <translation type="unfinished">Liste de valeur</translation>
+        <translation type="unfinished">Liste de valeurs</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="62"/>
@@ -748,7 +748,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_dialog_select_file.py" line="31"/>
         <source>Select File</source>
-        <translation>Choisir le fichier</translation>
+        <translation>Choisir un fichier</translation>
     </message>
 </context>
 <context>
@@ -819,12 +819,12 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_dialog_SQL.py" line="67"/>
         <source>Run</source>
-        <translation>Run</translation>
+        <translation>Exécuter</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="68"/>
         <source>Export to file</source>
-        <translation type="unfinished">Exporter fichier</translation>
+        <translation type="unfinished">Exporter dans un fichier</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="69"/>
@@ -872,7 +872,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_dialog_text_mining.py" line="95"/>
         <source>Files</source>
-        <translation>Fichers</translation>
+        <translation>Fichiers</translation>
     </message>
     <message>
         <location filename="ui_dialog_text_mining.py" line="96"/>
@@ -920,12 +920,12 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="86"/>
         <source>Play</source>
-        <translation>Passer</translation>
+        <translation>Jouer</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="87"/>
         <source>Stop</source>
-        <translation>Arrêtez</translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="88"/>
@@ -950,7 +950,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="92"/>
         <source>Transcription:</source>
-        <translation type="unfinished">Transcription:</translation>
+        <translation type="unfinished">Transcription :</translation>
     </message>
 </context>
 <context>
@@ -976,7 +976,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_visualise_graph.py" line="47"/>
         <source>View graph</source>
-        <translation type="unfinished">Voir graphique</translation>
+        <translation type="unfinished">Voir le graphique</translation>
     </message>
     <message>
         <location filename="ui_visualise_graph.py" line="48"/>
@@ -986,7 +986,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_visualise_graph.py" line="49"/>
         <source>Categories larger font</source>
-        <translation type="unfinished">Catégories police plus grande</translation>
+        <translation type="unfinished">Catégories de police plus grande</translation>
     </message>
 </context>
 <context>
@@ -1029,17 +1029,17 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_main.py" line="146"/>
         <source>Open Project</source>
-        <translation>Projet ouvert</translation>
+        <translation>Ouvrir un projet</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="147"/>
         <source>Close Project</source>
-        <translation>Projet fermer</translation>
+        <translation>Fermer un projet</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="148"/>
         <source>Project Memo</source>
-        <translation>Projet note</translation>
+        <translation>Notes de projets</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="149"/>
@@ -1049,7 +1049,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_main.py" line="150"/>
         <source>Exit</source>
-        <translation>Exit</translation>
+        <translation>Sortir</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="151"/>
@@ -1069,12 +1069,12 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_main.py" line="154"/>
         <source>Manage journals</source>
-        <translation type="unfinished">Gérer journals</translation>
+        <translation type="unfinished">Gérer les journaux de bord</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="155"/>
         <source>Code text</source>
-        <translation type="unfinished">Texte de code</translation>
+        <translation type="unfinished">Code</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="156"/>
@@ -1124,7 +1124,7 @@ Les caractères génériques pour &apos;like&apos; sont% et _</translation>
     <message>
         <location filename="ui_main.py" line="165"/>
         <source>About</source>
-        <translation>Sur</translation>
+        <translation>À propos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="166"/>
