@@ -50,6 +50,7 @@ from information import DialogInformation
 from journals import DialogJournals
 from manage_files import DialogManageFiles
 from memo import DialogMemo
+from refi import Refi
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
@@ -122,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
         self.ui.actionClose_Project.triggered.connect(self.close_project)
         self.ui.actionSettings.triggered.connect(self.change_settings)
+        self.ui.actionProject_Exchange_Export.triggered.connect(self.project_exchange_export)
         self.ui.actionExit.triggered.connect(self.closeEvent)
 
         # file cases and journals menu
@@ -178,10 +180,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_report()
 
     def hide_menu_options(self):
-        """ No project opened, hide options """
+        """ No project opened, hide these menu options """
 
         self.ui.actionClose_Project.setEnabled(False)
         self.ui.actionProject_Memo.setEnabled(False)
+        self.ui.actionProject_Exchange_Export.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -203,10 +206,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(False)
 
     def show_menu_options(self):
-        """ Project opened, hide options """
+        """ Project opened, show these menu options """
 
         self.ui.actionClose_Project.setEnabled(True)
         self.ui.actionProject_Memo.setEnabled(True)
+        self.ui.actionProject_Exchange_Export.setEnabled(True)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
@@ -404,10 +408,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def codebook(self):
-        """ Export a code book of categories and codes.
+        """ Export a text file code book of categories and codes.
         """
 
         Codebook(self.settings, self.ui.textEdit)
+
+    def project_exchange_export(self):
+        """ Export the project as a qpdx zipped folder.
+         Follows the REFI Project Exchange standards.
+         CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
+        VARIABLES ARE NOT SUCCESSFULLY EXPORTED YET.
+        CURRENTLY GIFS ARE EXPORTED UNCHANGED (NEED TO BE PNG OR JPG)"""
+
+        Refi(self.settings, self.ui.textEdit)
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
