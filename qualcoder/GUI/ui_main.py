@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created: Wed Mar  6 23:34:04 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -22,7 +21,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -102,11 +101,15 @@ class Ui_MainWindow(object):
         self.actionCoding_Matrix.setObjectName("actionCoding_Matrix")
         self.actionCode_audio_video = QtWidgets.QAction(MainWindow)
         self.actionCode_audio_video.setObjectName("actionCode_audio_video")
+        self.actionProject_Exchange_Export = QtWidgets.QAction(MainWindow)
+        self.actionProject_Exchange_Export.setObjectName("actionProject_Exchange_Export")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
         self.menuProject.addAction(self.actionProject_Memo)
         self.menuProject.addAction(self.actionSettings)
+        self.menuProject.addAction(self.actionProject_Exchange_Export)
+        self.menuProject.addSeparator()
         self.menuProject.addAction(self.actionExit)
         self.menuFiles_and_Cases.addAction(self.actionManage_files)
         self.menuFiles_and_Cases.addAction(self.actionManage_cases)
@@ -174,6 +177,7 @@ class Ui_MainWindow(object):
         self.actionCode_frequencies.setText(_translate("MainWindow", "Code frequencies"))
         self.actionCoding_Matrix.setText(_translate("MainWindow", "Coding Matrix"))
         self.actionCode_audio_video.setText(_translate("MainWindow", "Code audio/video"))
+        self.actionProject_Exchange_Export.setText(_translate("MainWindow", "Project Exchange Export"))
 
 
 if __name__ == "__main__":
