@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -38,6 +38,8 @@
     <addaction name="actionClose_Project"/>
     <addaction name="actionProject_Memo"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionProject_Exchange_Export"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuFiles_and_Cases">
@@ -242,6 +244,11 @@
   <action name="actionCode_audio_video">
    <property name="text">
     <string>Code audio/video</string>
+   </property>
+  </action>
+  <action name="actionProject_Exchange_Export">
+   <property name="text">
+    <string>Project Exchange Export</string>
    </property>
   </action>
  </widget>
