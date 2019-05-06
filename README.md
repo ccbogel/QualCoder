@@ -37,6 +37,8 @@ To launch, you can create a shortcut to the qualcoder.py file to start QualCoder
 
 Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
+CURRENT WINDOWS ISSUE: working with audio/video requires a missing dll module. So I have also added a qualcoder_non_av folder which will run qualcoder for text and images. You wont be able to code or view audio or video.
+
 ### MacOS
 
 Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
