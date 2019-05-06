@@ -31,7 +31,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-python -m pip install pyqt5, lxml, Pillow
+python -m pip install pyqt5, lxml, Pillow, six
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
