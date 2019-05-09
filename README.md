@@ -37,7 +37,8 @@ To launch, you can create a shortcut to the qualcoder.py file to start QualCoder
 
 Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
-CURRENT WINDOWS ISSUE: working with audio/video requires a missing dll module. So I have also added a qualcoder_non_av folder which will run qualcoder for text and images. You wont be able to code or view audio or video.
+CURRENT WINDOWS ISSUE: working with audio/video requires a missing dll module. So I have also added a qualcoder_non_av folder which will run qualcoder for text and images. You wont be able to code or view audio or video. 
+I believe the problem is based on whether you have both 32 bit python and vlc install or 64 bit python and vlc installed. If one is 32 bit and the other is 64 bit, python and vlc will not be compatable.
 
 ### MacOS
 
