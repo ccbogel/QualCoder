@@ -9,7 +9,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION
 You will need to have a python3.x version installed.
 You will also need to have pyqt5 and lxml to get text from docx files.
-You will also need to have a vlc player installed - for audio and video.
+You will also need to have a vlc player installed - for audio and video. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3.
 
 ### Linux:
 
