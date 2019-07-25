@@ -398,6 +398,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         temp_filename = nameSplit[-1]
         self.default_import_directory = imports[0][0:-len(temp_filename)]
         for f in imports:
+            # Added process events, in case many large files are imported, which leaves the FileDialog open and covering the screen.
+            QtWidgets.QApplication.processEvents()
             filename = f.split("/")[-1]
             destination = self.settings['path']
             if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub'):
