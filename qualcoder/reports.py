@@ -632,7 +632,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
 
 class DialogReportCodes(QtWidgets.QDialog):
-    """ Get reports on text coding using a range of variables:
+    """ Get reports on coded text/images/audio/video using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, or html.
     """
@@ -671,6 +671,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
         self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
+        self.ui.pushButton_export_csv.clicked.connect(self.export_csv_file)
         self.ui.splitter.setSizes([100, 200, 0])
 
     def get_data(self):
@@ -788,7 +789,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_text_file(self):
-        """ Export file to a plain text file with .txt ending.
+        """ Export report to a plain text file with .txt ending.
         QTextWriter supports plaintext, ODF and HTML. """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -806,7 +807,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
 
     def export_odt_file(self):
-        """ Export file to open document format with .odt ending.
+        """ Export report to open document format with .odt ending.
         QTextWriter supports plaintext, ODF and HTML ."""
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -822,13 +823,25 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append(_("Report exported: ") + filename)
         QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
+        
+    def export_csv_file(self):
+        """ Export report to csv file.
+        """
+        
+        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
+            os.path.expanduser('~'))
+        if filename[0] == "":
+            return
+        filename = filename[0] + ".csv"
+        
+        QtWidgets.QMessageBox.information(None, _("Report as CSV file"), "NOT CURRENTLY ENACTED")
+        
 
     def export_html_file(self):
-        """ Export file to a html file. Create folder of images and change refs to the
+        """ Export report to a html file. Create folder of images and change refs to the
         folder.
         POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
         need for a separate folder that the html file links to."""
-        #TODO - possibly add video segments to html output - might be difficult to do
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -1325,7 +1338,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         tmp = []
         for i in av_results:
             # prepare additional text describing coded segment
-            text = i[7][1:] + ": "
+            text = ""
+            if i[7] is None:
+                msg = "Should not have a None value for a/v media name.\n"
+                msg += str(i)
+                msg += "\nFirst backup project then: delete from code_av where id=" + str(i[9])
+                QtWidgets.QMessageBox.information(None, _("No media name in AV results"), msg)
+                logger.error("None value for a/v media name in AV results\n" + str(i))
+            if i[7] is not None:
+                text = i[7][1:] + ": "
             secs0 = int(i[3] / 1000)
             mins = int(secs0 / 60)
             remainder_secs = str(secs0 - mins * 60)
@@ -1493,7 +1514,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def select_attributes(self):
         """ Select attributes from case or file attributes for search method.
-        Text values will be quoted.
+        Text values will be quoted.print("i[7]:  ", i[7])  # tmp
         """
 
         self.ui.splitter.setSizes([300, 300, 0])
