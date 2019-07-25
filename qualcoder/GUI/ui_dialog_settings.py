@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,9 +11,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_settings(object):
     def setupUi(self, Dialog_settings):
         Dialog_settings.setObjectName("Dialog_settings")
-        Dialog_settings.resize(737, 401)
+        Dialog_settings.resize(737, 483)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_settings)
-        self.buttonBox.setGeometry(QtCore.QRect(390, 350, 261, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(420, 430, 261, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
@@ -40,10 +40,10 @@ class Ui_Dialog_settings(object):
         self.checkBox.setGeometry(QtCore.QRect(410, 180, 151, 22))
         self.checkBox.setObjectName("checkBox")
         self.label_directory = QtWidgets.QLabel(Dialog_settings)
-        self.label_directory.setGeometry(QtCore.QRect(30, 310, 671, 21))
+        self.label_directory.setGeometry(QtCore.QRect(30, 390, 671, 21))
         self.label_directory.setObjectName("label_directory")
         self.pushButton_choose_directory = QtWidgets.QPushButton(Dialog_settings)
-        self.pushButton_choose_directory.setGeometry(QtCore.QRect(30, 270, 391, 31))
+        self.pushButton_choose_directory.setGeometry(QtCore.QRect(30, 350, 391, 31))
         self.pushButton_choose_directory.setObjectName("pushButton_choose_directory")
         self.label_2 = QtWidgets.QLabel(Dialog_settings)
         self.label_2.setGeometry(QtCore.QRect(15, 77, 161, 20))
@@ -69,6 +69,14 @@ class Ui_Dialog_settings(object):
         self.comboBox_language = QtWidgets.QComboBox(Dialog_settings)
         self.comboBox_language.setGeometry(QtCore.QRect(200, 110, 241, 33))
         self.comboBox_language.setObjectName("comboBox_language")
+        self.checkBox_auto_backup = QtWidgets.QCheckBox(Dialog_settings)
+        self.checkBox_auto_backup.setGeometry(QtCore.QRect(30, 270, 511, 23))
+        self.checkBox_auto_backup.setChecked(True)
+        self.checkBox_auto_backup.setObjectName("checkBox_auto_backup")
+        self.checkBox_backup_AV_files = QtWidgets.QCheckBox(Dialog_settings)
+        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(30, 300, 651, 23))
+        self.checkBox_backup_AV_files.setChecked(True)
+        self.checkBox_backup_AV_files.setObjectName("checkBox_backup_AV_files")
 
         self.retranslateUi(Dialog_settings)
         self.buttonBox.accepted.connect(Dialog_settings.accept)
@@ -80,8 +88,9 @@ class Ui_Dialog_settings(object):
         Dialog_settings.setTabOrder(self.fontComboBox, self.spinBox)
         Dialog_settings.setTabOrder(self.spinBox, self.spinBox_treefontsize)
         Dialog_settings.setTabOrder(self.spinBox_treefontsize, self.checkBox)
-        Dialog_settings.setTabOrder(self.checkBox, self.pushButton_choose_directory)
-        Dialog_settings.setTabOrder(self.pushButton_choose_directory, self.buttonBox)
+        Dialog_settings.setTabOrder(self.checkBox, self.checkBox_auto_backup)
+        Dialog_settings.setTabOrder(self.checkBox_auto_backup, self.checkBox_backup_AV_files)
+        Dialog_settings.setTabOrder(self.checkBox_backup_AV_files, self.pushButton_choose_directory)
 
     def retranslateUi(self, Dialog_settings):
         _translate = QtCore.QCoreApplication.translate
@@ -95,6 +104,8 @@ class Ui_Dialog_settings(object):
         self.label_3.setText(_translate("Dialog_settings", "Font size for categories and codes tree"))
         self.label_4.setText(_translate("Dialog_settings", "Language"))
         self.comboBox_language.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Close and open the software for the change in language to occur.</p></body></html>"))
+        self.checkBox_auto_backup.setText(_translate("Dialog_settings", "Backup project folder every time project is opened"))
+        self.checkBox_backup_AV_files.setText(_translate("Dialog_settings", "Backup video and audio files. Uncheck to speed up backups."))
 
 
 if __name__ == "__main__":

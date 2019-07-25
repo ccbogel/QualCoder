@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_codings.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,13 +21,13 @@ class Ui_Dialog_reportCodings(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_exporttext = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exporttext.setGeometry(QtCore.QRect(760, 80, 211, 27))
+        self.pushButton_exporttext.setGeometry(QtCore.QRect(760, 60, 211, 27))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
         self.pushButton_caseselect = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_caseselect.setGeometry(QtCore.QRect(390, 50, 191, 27))
         self.pushButton_caseselect.setObjectName("pushButton_caseselect")
         self.pushButton_exporthtml = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exporthtml.setGeometry(QtCore.QRect(760, 20, 211, 27))
+        self.pushButton_exporthtml.setGeometry(QtCore.QRect(760, 0, 211, 27))
         self.pushButton_exporthtml.setObjectName("pushButton_exporthtml")
         self.pushButton_fileselect = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_fileselect.setGeometry(QtCore.QRect(390, 20, 191, 27))
@@ -52,8 +52,11 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_attributeselect.setGeometry(QtCore.QRect(390, 80, 191, 27))
         self.pushButton_attributeselect.setObjectName("pushButton_attributeselect")
         self.pushButton_exportodt = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exportodt.setGeometry(QtCore.QRect(760, 50, 211, 27))
+        self.pushButton_exportodt.setGeometry(QtCore.QRect(760, 30, 211, 27))
         self.pushButton_exportodt.setObjectName("pushButton_exportodt")
+        self.pushButton_export_csv = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_export_csv.setGeometry(QtCore.QRect(760, 90, 211, 27))
+        self.pushButton_export_csv.setObjectName("pushButton_export_csv")
         self.verticalLayout.addWidget(self.groupBox)
         self.label_selections = QtWidgets.QLabel(Dialog_reportCodings)
         self.label_selections.setMinimumSize(QtCore.QSize(0, 50))
@@ -104,6 +107,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_2.setText(_translate("Dialog_reportCodings", "Coder:"))
         self.pushButton_attributeselect.setText(_translate("Dialog_reportCodings", "Attribute selection"))
         self.pushButton_exportodt.setText(_translate("Dialog_reportCodings", "Export ODT file"))
+        self.pushButton_export_csv.setText(_translate("Dialog_reportCodings", "Export csv file"))
         self.label_selections.setText(_translate("Dialog_reportCodings", "Search selections:"))
 
 
