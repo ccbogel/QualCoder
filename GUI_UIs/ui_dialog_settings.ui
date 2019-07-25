@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>737</width>
-    <height>401</height>
+    <height>483</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>350</y>
+     <x>420</x>
+     <y>430</y>
      <width>261</width>
      <height>32</height>
     </rect>
@@ -114,7 +114,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>310</y>
+     <y>390</y>
      <width>671</width>
      <height>21</height>
     </rect>
@@ -127,7 +127,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>270</y>
+     <y>350</y>
      <width>391</width>
      <height>31</height>
     </rect>
@@ -226,6 +226,38 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox_auto_backup">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>270</y>
+     <width>511</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Backup project folder every time project is opened</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_backup_AV_files">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>300</y>
+     <width>651</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Backup video and audio files. Uncheck to speed up backups.</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>lineEdit_coderName</tabstop>
@@ -235,8 +267,9 @@
   <tabstop>spinBox</tabstop>
   <tabstop>spinBox_treefontsize</tabstop>
   <tabstop>checkBox</tabstop>
+  <tabstop>checkBox_auto_backup</tabstop>
+  <tabstop>checkBox_backup_AV_files</tabstop>
   <tabstop>pushButton_choose_directory</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
