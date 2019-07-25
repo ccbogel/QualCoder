@@ -88,6 +88,14 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
+        if self.settings['backup_on_open'] is True:
+            self.ui.checkBox_auto_backup.setChecked(True)
+        else:
+            self.ui.checkBox_auto_backup.setChecked(False)
+        if self.settings['backup_av_files'] is True:
+            self.ui.checkBox_backup_AV_files.setChecked(True)
+        else:
+            self.ui.checkBox_backup_AV_files.setChecked(False)
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
@@ -120,19 +128,31 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['showIDs'] = False
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
+        if self.ui.checkBox_auto_backup.isChecked():
+            self.settings['backup_on_open'] = True
+        else:
+            self.settings['backup_on_open'] = False
+        if self.ui.checkBox_backup_AV_files.isChecked():
+            self.settings['backup_av_files'] = True
+        else:
+            self.settings['backup_av_files'] = False
         self.save_settings()
         self.close()
 
     def save_settings(self):
-        ''' Save settings to text file in user's home directory. '''
+        ''' Save settings to text file in user's home directory.
+        Each setting has a variable identifier then a colon 
+        followed by the value. '''
 
-        txt = self.settings['codername'] + "\n"
-        txt += self.settings['font'] + "\n"
-        txt += str(self.settings['fontsize']) + "\n"
-        txt += str(self.settings['treefontsize']) + "\n"
-        txt += self.settings['directory'] + "\n"
-        txt += str(self.settings['showIDs']) + "\n"
-        txt += self.settings['language']
+        txt = 'codername:' + self.settings['codername'] + "\n"
+        txt += 'font:' + self.settings['font'] + "\n"
+        txt += 'fontsize:' + str(self.settings['fontsize']) + "\n"
+        txt += 'treefontsize:' + str(self.settings['treefontsize']) + "\n"
+        txt += 'directory:' + self.settings['directory'] + "\n"
+        txt += 'showIDs:' + str(self.settings['showIDs']) + "\n"
+        txt += 'language:' + self.settings['language'] + "\n"
+        txt += 'backup_on_open:' + str(self.settings['backup_on_open']) + '\n'
+        txt += 'backup_av_files:' + str(self.settings['backup_av_files'])
         with open(home + '/.qualcoder/QualCoder_settings.txt', 'w') as f:
             f.write(txt)
 

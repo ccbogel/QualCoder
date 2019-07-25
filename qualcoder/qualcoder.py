@@ -98,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     settings = {"conn": None, "directory": home, "projectName": "", "showIDs": False,
     'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
-    'treefontsize': 10, "language": "en"}
+    'treefontsize': 10, "language": "en", "backup_on_open": True, "backup_av_files": True}
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
@@ -156,28 +156,44 @@ class MainWindow(QtWidgets.QMainWindow):
             with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
                 txt = f.read()
                 txt = txt.split("\n")
-                self.settings['codername'] = txt[0]
-                self.settings['font'] = txt[1]
-                self.settings['fontsize'] = int(txt[2])
-                self.settings['treefontsize'] = int(txt[3])
-                self.settings['directory'] = txt[4]
-                self.settings['showIDs'] = False
-                if txt[5] == "True":
-                    self.settings['showIDs'] = True
-                # With workarounds for an empty or non-existant language line
-                try:
-                    self.settings['language'] = txt[6]
-                    if txt[6] == "":
-                        self.settings['language'] = "en"
-                except:
-                    self.settings['language'] = "en"
+                self.settings['codername'] = self.split_value(txt[0])
+                self.settings['font'] = self.split_value(txt[1])
+                self.settings['fontsize'] = int(self.split_value(txt[2]))
+                self.settings['treefontsize'] = int(self.split_value(txt[3]))
+                self.settings['directory'] = self.split_value(txt[4])
+                self.settings['showIDs'] = True
+                if self.split_value(txt[5]) == "False":
+                    self.settings['showIDs'] = False
+                self.settings['language'] = self.split_value(txt[6])
+                self.settings['backup_on_open'] = True
+                if self.split_value(txt[7]) == "False":
+                    self.settings['backup_on_open'] = False
+                self.settings['backup_av_files'] = True
+                if self.split_value(txt[8]) == "False":
+                    self.settings['backup_av_files'] = False
         except:
             f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
-            f.write("default\nNoto Sans\n10\n10\n" + home + "\nFalse\nen")
+            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n" 
+            text += 'directory:' + home 
+            text += "\nshowIDs:False\nlanguage:en\nbackup_on_open:True\nbackup_av_files:True"
+            f.write(text)
             f.close()
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.settings_report()
+        
+    def split_value(self, intext):
+        """ A legacy method. Originally the settings file have a newline separated list of values.
+        Now, each line is preceeded by the varaible name and a colon then the value.
+        Takes the text line, and returns a value, either as is, 
+        or if there is a colon the text after the colon.
+        Suggest deleting this method after 6 months.
+        """
+        try:
+            v = intext.split(':', 1)[1]
+            return v
+        except:
+            return intext
 
     def hide_menu_options(self):
         """ No project opened, hide these menu options """
@@ -236,12 +252,13 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = _("Settings")
         msg += "\n========\n"
         msg += _("Coder") + ": " + self.settings['codername'] + "\n"
-        msg += _("Font") + ": " + self.settings['font'] + " " + str(self.settings['fontsize'])
-        msg += ". "
-        msg += _("Code font size") + ": " + self.settings['font'] + " " + str(self.settings['treefontsize']) + "\n"
+        msg += _("Font") + ": " + self.settings['font'] + " " + str(self.settings['fontsize']) + "\n"
+        msg += _("Tree font size") + ": " + str(self.settings['treefontsize']) + "\n"
         msg += _("Directory") + ": " + self.settings['directory'] + "\n"
         msg += _("Show IDs") + ": " + str(self.settings['showIDs']) + "\n"
-        msg += _("Language") + ": " + self.settings['language']
+        msg += _("Language") + ": " + self.settings['language'] + "\n"
+        msg += _("Backup on open") + ": " + str(self.settings['backup_on_open']) + "\n"
+        msg += _("Backup AV files") + ": " + str(self.settings['backup_av_files'])
         msg += "\n========"
         self.ui.textEdit.append(msg)
 
@@ -581,19 +598,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
+        
         # Save a datetime stamped backup
-        nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
-        shutil.copytree(self.settings['path'], backup)
+        if self.settings['backup_on_open'] is True:
+            nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
+            if self.settings['backup_av_files'] is True:
+                shutil.copytree(self.settings['path'], backup)
+            else:
+                shutil.copytree(self.settings['path'], backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
+                self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+            self.ui.textEdit.append(_("Project backup created: ") + backup) 
+            
         self.ui.textEdit.append(_("Project Opened: ") + self.settings['projectName']
             + "\n========\n"
             + _("Path: ") + self.settings['path'] + "\n"
             + _("Directory: ") + self.settings['directory'] + "\n"
             + _("Database version: ") + self.project['databaseversion'] + ". "
             + _("Date: ") + str(self.project['date']) + "\n"
-            + _("About: ") + self.project['about'] + "\n"
-            + _("Language: ") + self.settings['language'] + "\n"
-            + _("Project backup created: ") + backup
+            + _("About: ") + self.project['about'] 
             + "\n========\n")
         self.show_menu_options()
 
