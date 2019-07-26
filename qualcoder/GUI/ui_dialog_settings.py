@@ -13,7 +13,7 @@ class Ui_Dialog_settings(object):
         Dialog_settings.setObjectName("Dialog_settings")
         Dialog_settings.resize(737, 483)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_settings)
-        self.buttonBox.setGeometry(QtCore.QRect(420, 430, 261, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(430, 440, 261, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
@@ -40,10 +40,10 @@ class Ui_Dialog_settings(object):
         self.checkBox.setGeometry(QtCore.QRect(410, 180, 151, 22))
         self.checkBox.setObjectName("checkBox")
         self.label_directory = QtWidgets.QLabel(Dialog_settings)
-        self.label_directory.setGeometry(QtCore.QRect(30, 390, 671, 21))
+        self.label_directory.setGeometry(QtCore.QRect(30, 410, 671, 21))
         self.label_directory.setObjectName("label_directory")
         self.pushButton_choose_directory = QtWidgets.QPushButton(Dialog_settings)
-        self.pushButton_choose_directory.setGeometry(QtCore.QRect(30, 350, 391, 31))
+        self.pushButton_choose_directory.setGeometry(QtCore.QRect(30, 370, 391, 31))
         self.pushButton_choose_directory.setObjectName("pushButton_choose_directory")
         self.label_2 = QtWidgets.QLabel(Dialog_settings)
         self.label_2.setGeometry(QtCore.QRect(15, 77, 161, 20))
@@ -74,7 +74,7 @@ class Ui_Dialog_settings(object):
         self.checkBox_auto_backup.setChecked(True)
         self.checkBox_auto_backup.setObjectName("checkBox_auto_backup")
         self.checkBox_backup_AV_files = QtWidgets.QCheckBox(Dialog_settings)
-        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(30, 300, 651, 23))
+        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(30, 300, 651, 61))
         self.checkBox_backup_AV_files.setChecked(True)
         self.checkBox_backup_AV_files.setObjectName("checkBox_backup_AV_files")
 
@@ -105,7 +105,9 @@ class Ui_Dialog_settings(object):
         self.label_4.setText(_translate("Dialog_settings", "Language"))
         self.comboBox_language.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Close and open the software for the change in language to occur.</p></body></html>"))
         self.checkBox_auto_backup.setText(_translate("Dialog_settings", "Backup project folder every time project is opened"))
-        self.checkBox_backup_AV_files.setText(_translate("Dialog_settings", "Backup video and audio files. Uncheck to speed up backups."))
+        self.checkBox_backup_AV_files.setText(_translate("Dialog_settings", "Backup video and audio files. Uncheck to speed up backups.\n"
+"Not recommended unless you have many large files slowing the backup.\n"
+"You must store these files elsewhere."))
 
 
 if __name__ == "__main__":
