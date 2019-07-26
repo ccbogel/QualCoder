@@ -27,6 +27,7 @@ https://qualcoder.wordpress.com/
 '''
 
 from copy import copy
+import csv
 import logging
 import os
 from shutil import copyfile
@@ -794,12 +795,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
-        QTextWriter supports plaintext, ODF and HTML. """
+        QTextWriter supports plaintext, ODF and HTML. 
+        TODO? add default directory to export to
+        """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
-            os.path.expanduser('~'))
+            self.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".txt"
@@ -812,12 +815,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_odt_file(self):
         """ Export report to open document format with .odt ending.
-        QTextWriter supports plaintext, ODF and HTML ."""
+        QTextWriter supports plaintext, ODF and HTML .
+        """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
-            os.path.expanduser('~'))
+            self.settings['directory'])
+        #    os.path.expanduser('~'))
         if filename[0] == "":
             return
         filename = filename[0] + ".odt"
@@ -833,23 +838,53 @@ class DialogReportCodes(QtWidgets.QDialog):
         Export coded data as csv with codes as column headings.
         Draw data from self.text_results, self.image_results, self.av_results
         First need to determine number of columns based on the distinct number of codes in the results.
+        Then the number of rows based on the most frequently assigned code.
         """
+
+        if self.text_results == [] and self.images_results == [] and self.av_results == []:
+            return
+
+        codes_all = []
+        codes_set = []
+        codes_freq_list = []
 
         print("TEXT")
         for i in self.text_results:
-            print(i)
+            codes_all.append(i['codename'])
+            #print(i)
         print("IMAGES")
         for i in self.image_results:
+            codes_all.append(i['codename'])
             print(i)
         print("AUDIO/VIDEO")
         for i in self.av_results:
-            print(i)
+            codes_all.append(i['codename'])
+            #print(i)
+        
+        codes_set = list(set(codes_all))
+        codes_set.sort()
+        for x in codes_set:
+            codes_freq_list.append(codes_all.count(x))
+        
+        print(codes_all)
+        print(codes_set)
+        print(codes_freq_list)
+        
+        ncols = len(codes_set)
+        nrows = sorted(codes_freq_list)[-1]
+        print("ncols:", ncols, "nrows:", nrows)
+        
+        
 
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
-            os.path.expanduser('~'))
+            self.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".csv"
+        with open(filename, 'w', newline='') as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',',
+                quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerow(codes_set)  # header row
         
         QtWidgets.QMessageBox.information(None, _("Report as CSV file"), "NOT CURRENTLY ENACTED")
         
@@ -858,12 +893,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
         POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
-        need for a separate folder that the html file links to."""
+        need for a separate folder that the html file links to.
+        TODO? add default directory to export to
+        """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
-            os.path.expanduser('~'))
+            self.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".html"
