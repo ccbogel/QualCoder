@@ -634,9 +634,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 class DialogReportCodes(QtWidgets.QDialog):
     """ Get reports on coded text/images/audio/video using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
-        Export reports as plain text, ODT, or html.
+        Export reports as plain text, ODT, html or csv.
     """
     #TODO - export case matrix
+    #TODO - export coded data as csv with codes as column headings
 
     settings = None
     parent_textEdit = None
@@ -644,6 +645,9 @@ class DialogReportCodes(QtWidgets.QDialog):
     coders = [""]
     categories = []
     html_links = []  # For html output with media link (images, av)
+    text_results = []
+    image_results = []
+    av_results = []
     # variables for search restrictions
     file_ids = ""
     case_ids = ""
@@ -826,8 +830,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         
     def export_csv_file(self):
         """ Export report to csv file.
+        Export coded data as csv with codes as column headings.
+        Draw data from self.text_results, self.image_results, self.av_results
+        First need to determine number of columns based on the distinct number of codes in the results.
         """
-        
+
+        print("TEXT")
+        for i in self.text_results:
+            print(i)
+        print("IMAGES")
+        for i in self.image_results:
+            print(i)
+        print("AUDIO/VIDEO")
+        for i in self.av_results:
+            print(i)
+
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
             os.path.expanduser('~'))
         if filename[0] == "":
@@ -941,10 +958,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         case selection dialog. If cases are selected this overrides file selections that
         the user has entered.
         The third pathway is based on attribute selection, which may include files or cases.
+
+        The textEdit.document is filled with the search results.
+        Results are drawn from the textEdit.document to fill reports in .txt and .odt formats.
+        Results are drawn from the textEdit.document and html_links variable to fill reports in html format.
+        Results are drawn from self.text_results, self.image_results and self.av_results to prepare a csv file.
         """
 
         coder = self.ui.comboBox_coders.currentText()
-        self.html_results = ""
+        #self.html_results = ""
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
 
@@ -987,9 +1009,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         code_ids = code_ids[1:]
         #logger.debug("File ids\n",self.file_ids, type(self.file_ids))
         #logger.debug("Case ids\n",self.case_ids, type(self.case_ids))
-        text_results = []
-        image_results = []
-        av_results = []
+        self.text_results = []
+        self.image_results = []
+        self.av_results = []
         cur = self.settings['conn'].cursor()
 
         # get coded text/images/av via selected files
@@ -1015,7 +1037,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                text_results.append(row)
+                self.text_results.append(row)
 
             # coded images
             parameters = []
@@ -1039,7 +1061,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                image_results.append(row)
+                self.image_results.append(row)
 
             # coded audio and video, also looks for search_text in coded segment meno
             parameters = []
@@ -1062,7 +1084,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                av_results.append(row)
+                self.av_results.append(row)
 
         # get coded text/images/av via selected cases
         if self.case_ids != "":
@@ -1088,7 +1110,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                text_results.append(row)
+                self.text_results.append(row)
 
             # coded images
             parameters = []
@@ -1115,7 +1137,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                image_results.append(row)
+                self.image_results.append(row)
 
             # coded audio and video
             parameters = []
@@ -1142,7 +1164,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                av_results.append(row)
+                self.av_results.append(row)
 
         # get coded text and images from attribute selection
         if self.attribute_selection != []:
@@ -1238,15 +1260,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                text_results.append(row)
+                self.text_results.append(row)
 
             # images from attribute selection
             sql = ""
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id from "
-                sql += "code_image join code_name on code_name.cid = code_image.cid "
+                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, code_image.memo "
+                sql += "from code_image join code_name on code_name.cid = code_image.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_image.id = case_text.fid "
                 sql += " join source on case_text.fid = source.id "
@@ -1276,7 +1298,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                image_results.append(row)
+                self.image_results.append(row)
 
             # audio and video from attribute selection
             sql = ""
@@ -1315,7 +1337,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             for row in result:
-                av_results.append(row)
+                self.av_results.append(row)
 
         fileOrCase = ""  # default for attributes selection
         if self.file_ids != "":
@@ -1325,18 +1347,18 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # convert results to dictionaries for ease of use
         tmp = []
-        for i in text_results:
+        for i in self.text_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'pos0': i[3],
                 'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': fileOrCase})
-        text_results = tmp
+        self.text_results = tmp
         tmp = []
-        for i in image_results:
+        for i in self.image_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
                 'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
                 'fid': i[9], 'memo': i[10], 'file_or_case': fileOrCase})
-        image_results = tmp
+        self.image_results = tmp
         tmp = []
-        for i in av_results:
+        for i in self.av_results:
             # prepare additional text describing coded segment
             text = ""
             if i[7] is None:
@@ -1366,23 +1388,24 @@ class DialogReportCodes(QtWidgets.QDialog):
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
             'pos0': i[3], 'pos1': i[4], 'memo': i[5], 'coder': i[6], 'mediapath': i[7],
                 'fid': i[8], 'file_or_case': fileOrCase, 'text': text})
-        av_results = tmp
+        self.av_results = tmp
 
-        for row in text_results:
+        # Put results into the textEdit.document
+        for row in self.text_results:
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-        for i, row in enumerate(image_results):
+        for i, row in enumerate(self.image_results):
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.put_image_into_textedit(row, i, self.ui.textEdit)
-        for i, row in enumerate(av_results):
+        for i, row in enumerate(self.av_results):
             self.ui.textEdit.insertHtml(self.html_heading(row))
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-        # Need to resize splitter as it automatically adjust to 50%/50%
+        # Need to resize splitter as it automatically adjusts to 50%/50%
         self.ui.splitter.setSizes([100, 300])
 
         # Fill case matrix
         if self.case_ids != "":
-            self.fill_matrix(text_results, image_results, av_results, self.case_ids)
+            self.fill_matrix(self.text_results, self.image_results, self.av_results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
