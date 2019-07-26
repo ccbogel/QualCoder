@@ -84,6 +84,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
         self.ui.comboBox_coders.currentIndexChanged.connect(self.comboBox_coder_changed)
+        self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
+
         if self.settings['showIDs'] is True:
             self.ui.checkBox.setChecked(True)
         else:
@@ -92,6 +94,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
             self.ui.checkBox_auto_backup.setChecked(False)
+
         if self.settings['backup_av_files'] is True:
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
@@ -100,6 +103,14 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
+
+    def backup_state_changed(self):
+        """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
+
+        if self.ui.checkBox_auto_backup.isChecked():
+            self.ui.checkBox_backup_AV_files.setEnabled(True)
+        else:
+            self.ui.checkBox_backup_AV_files.setEnabled(False)
 
     def comboBox_coder_changed(self):
         ''' Set the coder name to the current selection. '''
