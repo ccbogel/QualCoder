@@ -839,6 +839,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Draw data from self.text_results, self.image_results, self.av_results
         First need to determine number of columns based on the distinct number of codes in the results.
         Then the number of rows based on the most frequently assigned code.
+        Each data cell contains coded text, or the memo if A/V or image and the file or case name.
         """
 
         if self.text_results == [] and self.images_results == [] and self.av_results == []:
@@ -848,15 +849,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         codes_set = []
         codes_freq_list = []
 
-        print("TEXT")
+        #print("TEXT")  # tmp
         for i in self.text_results:
             codes_all.append(i['codename'])
             #print(i)
-        print("IMAGES")
+        #print("IMAGES")  # tmp
         for i in self.image_results:
             codes_all.append(i['codename'])
-            print(i)
-        print("AUDIO/VIDEO")
+            #print(i)
+        #print("AUDIO/VIDEO")  # tmp
         for i in self.av_results:
             codes_all.append(i['codename'])
             #print(i)
@@ -866,16 +867,61 @@ class DialogReportCodes(QtWidgets.QDialog):
         for x in codes_set:
             codes_freq_list.append(codes_all.count(x))
         
-        print(codes_all)
-        print(codes_set)
-        print(codes_freq_list)
+        #print(codes_all)
+        #print(codes_set)
+        #print(codes_freq_list)
         
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
-        print("ncols:", ncols, "nrows:", nrows)
-        
-        
+        #print("ncols:", ncols, "nrows:", nrows)
 
+        # Prepare data rows for csv writer
+        csv_data = []
+        for r in range(0, nrows):
+            row = []
+            for c in range(0, ncols):
+                row.append("")
+            csv_data.append(row)
+            
+        # Look at each code and fill column with data
+        for col, code in enumerate(codes_set):
+            row = 0
+            for i in self.text_results:
+                if i['codename'] == code:
+                    d = i['text'] + "\n" + i['file_or_casename']
+                     # Add file id if results are based on attribute selection
+                    if i['file_or_case'] == "":
+                        d += " fid:" + str(i['fid'])
+                    csv_data[row][col]  = d
+                    row += 1
+            for i in self.image_results:
+                if i['codename'] == code:
+                    d = i['memo'] 
+                    if d == "":
+                        d = "NO MENO"
+                    d += "\n" + i['file_or_casename']
+                    # Add filename if results are based on attribute selection
+                    if i['file_or_case'] == "":
+                        d += " " + i['mediapath'][8:]
+                    csv_data[row][col] = d
+                    row +=1   
+            for i in self.av_results:
+                if i['codename'] == code:
+                    d = i['memo'] 
+                    if d == "":
+                        d = "NO MEMO"
+                    d += "\n"
+                    # av 'text' contains video/filename, time slot and memo, so trim some out
+                    trimmed = i['text'][6:]
+                    pos = trimmed.find(']')
+                    trimmed = trimmed[:pos + 1]
+                    # Add case name as well as file name and time slot
+                    if i['file_or_case'] != "File":
+                        trimmed = i['file_or_casename'] + " " + trimmed
+                    d += trimmed
+                    csv_data[row][col] = d
+                    row += 1
+            
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
             self.settings['directory'])
         if filename[0] == "":
@@ -885,9 +931,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
-        
-        QtWidgets.QMessageBox.information(None, _("Report as CSV file"), "NOT CURRENTLY ENACTED")
-        
+            for row in csv_data:
+                filewriter.writerow(row)        
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
