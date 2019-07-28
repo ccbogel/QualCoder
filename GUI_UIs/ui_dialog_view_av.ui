@@ -220,7 +220,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Audio track</string>
+       <string>Audio:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
