@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_view_av.ui'
 #
-# Created: Fri Mar  8 22:19:51 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -42,13 +41,13 @@ class Ui_Dialog_view_av(object):
         self.pushButton_stop.setGeometry(QtCore.QRect(110, 40, 85, 27))
         self.pushButton_stop.setObjectName("pushButton_stop")
         self.horizontalSlider_vol = QtWidgets.QSlider(self.groupBox_2)
-        self.horizontalSlider_vol.setGeometry(QtCore.QRect(655, 50, 160, 18))
+        self.horizontalSlider_vol.setGeometry(QtCore.QRect(640, 50, 160, 18))
         self.horizontalSlider_vol.setMaximum(100)
         self.horizontalSlider_vol.setProperty("value", 100)
         self.horizontalSlider_vol.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_vol.setObjectName("horizontalSlider_vol")
         self.label_volume = QtWidgets.QLabel(self.groupBox_2)
-        self.label_volume.setGeometry(QtCore.QRect(580, 46, 61, 20))
+        self.label_volume.setGeometry(QtCore.QRect(570, 46, 61, 20))
         self.label_volume.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_volume.setObjectName("label_volume")
         self.label_time = QtWidgets.QLabel(self.groupBox_2)
@@ -67,6 +66,13 @@ class Ui_Dialog_view_av(object):
         self.horizontalSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.horizontalSlider.setTickInterval(10)
         self.horizontalSlider.setObjectName("horizontalSlider")
+        self.comboBox_tracks = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_tracks.setGeometry(QtCore.QRect(940, 43, 61, 28))
+        self.comboBox_tracks.setObjectName("comboBox_tracks")
+        self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setGeometry(QtCore.QRect(840, 50, 91, 20))
+        self.label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label.setObjectName("label")
         self.gridLayout.addWidget(self.groupBox_2, 3, 0, 1, 1)
         self.label_transcription = QtWidgets.QLabel(Dialog_view_av)
         self.label_transcription.setObjectName("label_transcription")
@@ -89,6 +95,7 @@ class Ui_Dialog_view_av(object):
         self.label_time.setText(_translate("Dialog_view_av", "Time:"))
         self.label_time_2.setText(_translate("Dialog_view_av", "Duration: "))
         self.horizontalSlider.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
+        self.label.setText(_translate("Dialog_view_av", "Audio track"))
         self.label_transcription.setText(_translate("Dialog_view_av", "Transcription:"))
 
 

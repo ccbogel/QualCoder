@@ -83,11 +83,18 @@ class Ui_Dialog_code_av(object):
         self.label_segment.setGeometry(QtCore.QRect(250, 72, 311, 17))
         self.label_segment.setObjectName("label_segment")
         self.label_coder = QtWidgets.QLabel(self.groupBox_2)
-        self.label_coder.setGeometry(QtCore.QRect(720, 72, 241, 17))
+        self.label_coder.setGeometry(QtCore.QRect(730, 72, 271, 17))
         self.label_coder.setObjectName("label_coder")
         self.pushButton_select = QtWidgets.QPushButton(self.groupBox_2)
         self.pushButton_select.setGeometry(QtCore.QRect(10, 67, 211, 27))
         self.pushButton_select.setObjectName("pushButton_select")
+        self.comboBox_tracks = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_tracks.setGeometry(QtCore.QRect(660, 60, 51, 28))
+        self.comboBox_tracks.setObjectName("comboBox_tracks")
+        self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setGeometry(QtCore.QRect(570, 67, 81, 20))
+        self.label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label.setObjectName("label")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog_code_av)
@@ -111,6 +118,7 @@ class Ui_Dialog_code_av(object):
         self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
         self.label_coder.setText(_translate("Dialog_code_av", "Coder:"))
         self.pushButton_select.setText(_translate("Dialog_code_av", "Select media"))
+        self.label.setText(_translate("Dialog_code_av", "Audio track"))
 
 
 if __name__ == "__main__":
