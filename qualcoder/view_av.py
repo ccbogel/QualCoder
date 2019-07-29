@@ -90,6 +90,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     instance = None
     media_player = None
     media = None
+    metadata = None
     is_paused = False
     segment = {}
 
@@ -122,7 +123,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.setReadOnly(True)
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
+        treefont = QtGui.QFont(settings['font'],
+            settings['treefontsize'], QtGui.QFont.Normal)
         self.ui.treeWidget.setFont(treefont)
         self.ui.label_coder.setText(_("Coder: ") + settings['codername'])
         self.setWindowTitle(_("Media coding"))
@@ -138,6 +140,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
+        # a displaydialog or ddialog
         # Otherwise, the vlc player hogs all the mouse events
         self.ddialog = QtWidgets.QDialog()
         self.ddialog.resize(640, 480)
@@ -159,13 +162,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
-
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        #self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
+        self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
+        self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
 
         # set the scene for coding stripes
         # matches the designer file graphics view
@@ -363,7 +366,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 str(e) +"\n" + self.settings['path'] + self.media_data['mediapath'])
             self.closeEvent()
             return
-
+        # clear comboBox tracks options and reload when playing/pausing
+        self.ui.comboBox_tracks.clear()
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
@@ -393,7 +397,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit.setText(self.transcription[1])
-        #self.play_pause()
 
     def set_position(self):
         """ Set the movie position according to the position slider.
@@ -411,6 +414,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos / 1000.0)
         self.timer.start()
 
+    def audio_track_changed(self):
+        """ Audio track changed.
+        The video needs to be playing/paused before the combobox is filled with track options.
+        The combobox only has positive integers."""
+
+        text = self.ui.comboBox_tracks.currentText()
+        #print("text: ", text)
+        if text == "":
+            text = 1
+        success = self.mediaplayer.audio_set_track(int(text))
+        #print("changed audio ", success)
+
     def play_pause(self):
         """ Toggle play or pause status. """
 
@@ -423,11 +438,19 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self.mediaplayer.play() == -1:
                 self.open_file()
                 return
-
             self.mediaplayer.play()
             self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
+
+        # update combobox_tracks only once with audio track options
+        # media info works, but needs to have to have video playing first
+        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
+            tracks = self.mediaplayer.audio_get_track_description()
+            for t in tracks:
+                if t[0] > 0:
+                    #print(t[0], t[1])  # track number and track name
+                    self.ui.comboBox_tracks.addItem(str(t[0]))
 
     def stop(self):
         """ Stop vlc player. """
@@ -1186,6 +1209,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
+        self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
 
         try:
             self.media = self.instance.media_new(self.settings['path'] + self.media_data['mediapath'])
@@ -1233,6 +1257,18 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos / 1000.0)
         self.timer.start()
 
+    def audio_track_changed(self):
+        """ Audio track changed.
+        The video needs to be playing/paused before the combobox is filled with track options.
+        The combobox only has positive integers."""
+
+        text = self.ui.comboBox_tracks.currentText()
+        #print("text: ", text)
+        if text == "":
+            text = 1
+        success = self.mediaplayer.audio_set_track(int(text))
+        #print("changed audio ", success)
+
     def play_pause(self):
         """ Toggle play or pause status. """
 
@@ -1250,6 +1286,15 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
+
+        # update combobox_tracks only once with audio track options
+        # media info works, but needs to have to have video playing first
+        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
+            tracks = self.mediaplayer.audio_get_track_description()
+            for t in tracks:
+                if t[0] > 0:
+                    #print(t[0], t[1])  # track number and track name
+                    self.ui.comboBox_tracks.addItem(str(t[0]))
 
     def stop(self):
         """ Stop player. """
