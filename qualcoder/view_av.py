@@ -93,6 +93,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     metadata = None
     is_paused = False
     segment = {}
+    timer = QtCore.QTimer()
 
     def __init__(self, settings, parent_textEdit):
         """ Show list of audio and video files.
@@ -140,9 +141,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
-        # a displaydialog or ddialog
+        # a displaydialog named ddialog
         # Otherwise, the vlc player hogs all the mouse events
         self.ddialog = QtWidgets.QDialog()
+        # enable custom window hint
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        # disable close button, only close through closing the Ui_Dialog_code_av
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.resize(640, 480)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
@@ -420,9 +425,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         The combobox only has positive integers."""
 
         text = self.ui.comboBox_tracks.currentText()
-        #print("text: ", text)
         if text == "":
             text = 1
+        #print("text: ", text)
         success = self.mediaplayer.audio_set_track(int(text))
         #print("changed audio ", success)
 
@@ -443,20 +448,20 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.timer.start()
             self.is_paused = False
 
-        # update combobox_tracks only once with audio track options
-        # media info works, but needs to have to have video playing first
-        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
-            tracks = self.mediaplayer.audio_get_track_description()
-            for t in tracks:
-                if t[0] > 0:
-                    #print(t[0], t[1])  # track number and track name
-                    self.ui.comboBox_tracks.addItem(str(t[0]))
-
     def stop(self):
-        """ Stop vlc player. """
+        """ Stop vlc player. Set position slider to the start.
+         If multiple audio tracks are shown in the combobox, set the audio track to the first index.
+         This is because when beginning play again, the audio track reverts to the first track.
+         Programatically setting the audio track to other values does not work."""
 
         self.mediaplayer.stop()
         self.ui.pushButton_play.setText(_("Play"))
+        self.timer.stop()
+        self.ui.horizontalSlider.setProperty("value", 0)
+
+        # set combobox display of audio track to the first one, or leave it blank if it contains no items
+        if self.ui.comboBox_tracks.count() > 0:
+            self.ui.comboBox_tracks.setCurrentIndex(0)
 
     def set_volume(self, volume):
         """ Set the volume. """
@@ -464,7 +469,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.audio_set_volume(volume)
 
     def update_ui(self):
-        """ Updates the user interface. """
+        """ Updates the user interface. Update the slider position to match media.
+         Adds audio track options to combobox.
+         Updates the current displayed media time. """
+
+        # update audio track list, only works if media is playing
+        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
+            tracks = self.mediaplayer.audio_get_track_description()
+            for t in tracks:
+                if t[0] > 0:
+                    #print(t[0], t[1])  # track number and track name
+                    self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the slider's position to its corresponding media position
         # Note that the setValue function only takes values of type int,
@@ -477,7 +492,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
 
         # Check if segments need to be reloaded
-        # This only update of the media is playing, not ideal, but works
+        # This only updates if the media is playing, not ideal, but works
         for i in self.scene.items():
             if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
                 self.load_segments()
@@ -1182,6 +1197,10 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
+        # enable custom window hint
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        # disable close button, only close through closing the Ui_Dialog_view_av
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowTitle(self.media_data['mediapath'])
         self.ddialog.resize(640, 480)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
@@ -1272,6 +1291,8 @@ class DialogViewAV(QtWidgets.QDialog):
     def play_pause(self):
         """ Toggle play or pause status. """
 
+        # check that QDialog containinv vlc is visible (i.e. has not been closed)
+
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
             self.ui.pushButton_play.setText(_("Play"))
@@ -1287,20 +1308,19 @@ class DialogViewAV(QtWidgets.QDialog):
             self.timer.start()
             self.is_paused = False
 
-        # update combobox_tracks only once with audio track options
-        # media info works, but needs to have to have video playing first
-        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
-            tracks = self.mediaplayer.audio_get_track_description()
-            for t in tracks:
-                if t[0] > 0:
-                    #print(t[0], t[1])  # track number and track name
-                    self.ui.comboBox_tracks.addItem(str(t[0]))
-
     def stop(self):
-        """ Stop player. """
+        """ Stop vlc player. Set position slider to the start.
+         If multiple audio tracks are shown in the combobox, set the audio track to the first index.
+         This is because when beginning play again, the audio track reverts to the first track.
+         Programatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
         self.ui.pushButton_play.setText(_("Play"))
+        self.ui.horizontalSlider.setProperty("value", 0)
+
+        # set combobox display of audio track to the first one, or leave it blank if it contains no items
+        if self.ui.comboBox_tracks.count() > 0:
+            self.ui.comboBox_tracks.setCurrentIndex(0)
 
     def set_volume(self, volume):
         """ Set the volume. """
@@ -1308,7 +1328,17 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.audio_set_volume(volume)
 
     def update_ui(self):
-        """ Updates the user interface, slider and time. """
+        """ Updates the user interface. Update the slider position to match media.
+         Adds audio track options to combobox.
+         Updates the current displayed media time. """
+
+        # update audio track list, only works if media is playing
+        if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
+            tracks = self.mediaplayer.audio_get_track_description()
+            for t in tracks:
+                if t[0] > 0:
+                    #print(t[0], t[1])  # track number and track name
+                    self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the slider's position to its corresponding media position
         # Note that the setValue function only takes values of type int,
@@ -1330,6 +1360,7 @@ class DialogViewAV(QtWidgets.QDialog):
     def closeEvent(self, event):
         """ Stop the vlc player on close. """
 
+        self.ddialog.close()
         self.stop()
         if self.transcription is not None:
             cur = self.settings['conn'].cursor()
