@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -103,12 +103,22 @@ class Ui_MainWindow(object):
         self.actionCode_audio_video.setObjectName("actionCode_audio_video")
         self.actionProject_Exchange_Export = QtWidgets.QAction(MainWindow)
         self.actionProject_Exchange_Export.setObjectName("actionProject_Exchange_Export")
+        self.actionREFI_Codebook_export = QtWidgets.QAction(MainWindow)
+        self.actionREFI_Codebook_export.setObjectName("actionREFI_Codebook_export")
+        self.actionREFI_Codebook_import = QtWidgets.QAction(MainWindow)
+        self.actionREFI_Codebook_import.setObjectName("actionREFI_Codebook_import")
+        self.actionREFI_QDA_Project_import = QtWidgets.QAction(MainWindow)
+        self.actionREFI_QDA_Project_import.setObjectName("actionREFI_QDA_Project_import")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
         self.menuProject.addAction(self.actionProject_Memo)
         self.menuProject.addAction(self.actionSettings)
+        self.menuProject.addSeparator()
+        self.menuProject.addAction(self.actionREFI_Codebook_export)
         self.menuProject.addAction(self.actionProject_Exchange_Export)
+        self.menuProject.addAction(self.actionREFI_Codebook_import)
+        self.menuProject.addAction(self.actionREFI_QDA_Project_import)
         self.menuProject.addSeparator()
         self.menuProject.addAction(self.actionExit)
         self.menuFiles_and_Cases.addAction(self.actionManage_files)
@@ -177,7 +187,11 @@ class Ui_MainWindow(object):
         self.actionCode_frequencies.setText(_translate("MainWindow", "Code frequencies"))
         self.actionCoding_Matrix.setText(_translate("MainWindow", "Coding Matrix"))
         self.actionCode_audio_video.setText(_translate("MainWindow", "Code audio/video"))
-        self.actionProject_Exchange_Export.setText(_translate("MainWindow", "Project Exchange Export"))
+        self.actionProject_Exchange_Export.setText(_translate("MainWindow", "REFI-QDA Project export"))
+        self.actionProject_Exchange_Export.setToolTip(_translate("MainWindow", "REFI-QDA Project export"))
+        self.actionREFI_Codebook_export.setText(_translate("MainWindow", "REFI-Codebook export"))
+        self.actionREFI_Codebook_import.setText(_translate("MainWindow", "REFI-Codebook import"))
+        self.actionREFI_QDA_Project_import.setText(_translate("MainWindow", "REFI-QDA Project import"))
 
 
 if __name__ == "__main__":
