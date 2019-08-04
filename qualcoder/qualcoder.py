@@ -50,7 +50,7 @@ from information import DialogInformation
 from journals import DialogJournals
 from manage_files import DialogManageFiles
 from memo import DialogMemo
-from refi import Refi
+from refi import Refi_export
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
@@ -123,7 +123,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
         self.ui.actionClose_Project.triggered.connect(self.close_project)
         self.ui.actionSettings.triggered.connect(self.change_settings)
-        self.ui.actionProject_Exchange_Export.triggered.connect(self.project_exchange_export)
+        self.ui.actionProject_Exchange_Export.triggered.connect(self.REFI_project_export)
+        self.ui.actionREFI_Codebook_export.triggered.connect(self.REFI_codebook_export)
+        self.ui.actionREFI_Codebook_import.triggered.connect(self.REFI_codebook_import)
+        self.ui.actionREFI_QDA_Project_import.triggered.connect(self.REFI_project_import)
         self.ui.actionExit.triggered.connect(self.closeEvent)
 
         # file cases and journals menu
@@ -173,19 +176,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.settings['backup_av_files'] = False
         except:
             f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
-            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n" 
-            text += 'directory:' + home 
+            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n"
+            text += 'directory:' + home
             text += "\nshowIDs:False\nlanguage:en\nbackup_on_open:True\nbackup_av_files:True"
             f.write(text)
             f.close()
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.settings_report()
-        
+
     def split_value(self, intext):
         """ A legacy method. Originally the settings file have a newline separated list of values.
         Now, each line is preceeded by the varaible name and a colon then the value.
-        Takes the text line, and returns a value, either as is, 
+        Takes the text line, and returns a value, either as is,
         or if there is a colon the text after the colon.
         Suggest deleting this method after 6 months.
         """
@@ -198,9 +201,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def hide_menu_options(self):
         """ No project opened, hide these menu options """
 
+        # project menu
         self.ui.actionClose_Project.setEnabled(False)
         self.ui.actionProject_Memo.setEnabled(False)
         self.ui.actionProject_Exchange_Export.setEnabled(False)
+        self.ui.actionREFI_Codebook_export.setEnabled(False)
+        self.ui.actionREFI_Codebook_import.setEnabled(False)
+        self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -224,9 +231,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_menu_options(self):
         """ Project opened, show these menu options """
 
+        # project menu
         self.ui.actionClose_Project.setEnabled(True)
         self.ui.actionProject_Memo.setEnabled(True)
         self.ui.actionProject_Exchange_Export.setEnabled(True)
+        self.ui.actionREFI_Codebook_export.setEnabled(True)
+        self.ui.actionREFI_Codebook_import.setEnabled(True)
+        self.ui.actionREFI_QDA_Project_import.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
@@ -430,14 +441,33 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Codebook(self.settings, self.ui.textEdit)
 
-    def project_exchange_export(self):
+    def REFI_project_export(self):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
          CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
         VARIABLES ARE NOT SUCCESSFULLY EXPORTED YET.
         CURRENTLY GIFS ARE EXPORTED UNCHANGED (NEED TO BE PNG OR JPG)"""
 
-        Refi(self.settings, self.ui.textEdit)
+        Refi_export(self.settings, self.ui.textEdit, "project")
+
+    def REFI_codebook_export(self):
+        """ Export the codebook as .qdc
+        Follows the REFI standard.
+        CURRENTLY IN TESTING AND MAY BE INCORRECT. """
+
+        Refi_export(self.settings, self.ui.textEdit, "codebook")
+
+    def REFI_codebook_import(self):
+        """ Import a codebook .qdc into an opened project.
+        Follows the REFI standard """
+
+        QtWidgets.QMessageBox.information(None, "REFI Codebook import", "NOT IMPLEMENTED YET")
+
+    def REFI_project_import(self):
+        """ Import a qpdx QDA project.
+        Follows the REFI standard. """
+
+        QtWidgets.QMessageBox.information(None, "REFI QDA Project import", "NOT IMPLEMENTED YET")
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
@@ -598,7 +628,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
-        
+
         # Save a datetime stamped backup
         if self.settings['backup_on_open'] is True:
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -608,15 +638,15 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 shutil.copytree(self.settings['path'], backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
-            self.ui.textEdit.append(_("Project backup created: ") + backup) 
-            
+            self.ui.textEdit.append(_("Project backup created: ") + backup)
+
         self.ui.textEdit.append(_("Project Opened: ") + self.settings['projectName']
             + "\n========\n"
             + _("Path: ") + self.settings['path'] + "\n"
             + _("Directory: ") + self.settings['directory'] + "\n"
             + _("Database version: ") + self.project['databaseversion'] + ". "
             + _("Date: ") + str(self.project['date']) + "\n"
-            + _("About: ") + self.project['about'] 
+            + _("About: ") + self.project['about']
             + "\n========\n")
         self.show_menu_options()
 

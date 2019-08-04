@@ -52,7 +52,7 @@ def exception_handler(exception_type, value, tb_obj):
     #QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class Refi(QtWidgets.QDialog):
+class Refi_export(QtWidgets.QDialog):
 
     """
     Create Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
@@ -72,28 +72,32 @@ class Refi(QtWidgets.QDialog):
     parent_textEdit = None
     settings = None
     tree = None
+    export_type = ""
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, settings, parent_textEdit, export_type):
         """  """
 
         sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
+        self.export_type = export_type
+        self.xml = ""
         self.get_categories()
         self.get_codes()
         self.get_users()
         self.get_sources()
-        #self.codebook_xml()
-        #self.xml_validation("codebook")
-        self.project_xml()
-        self.xml_validation("project")
-        self.export_project()
-        print(self.notes)
-        exit(0)
+        if self.export_type == "codebook":
+            self.codebook_exchange_xml()
+            self.xml_validation("codebook")
+            self.export_codebook()
+        if self.export_type == "project":
+            self.project_xml()
+            self.xml_validation("project")
+            self.export_project()
 
     def export_project(self):
         '''
-        .qde file
+        .qde zipfile
         Internal files are identified in the path attribute of the source element by the URL naming scheme internal://
         /sources folder
         Audio and video source file size:
@@ -168,6 +172,27 @@ class Refi(QtWidgets.QDialog):
         msg += "This project exchange is not fully compliant with the exchange standard."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
+    def export_codebook(self):
+        """ Export REFI format codebook. """
+
+        filename = "Codebook-" + self.settings['projectName'][:-4] + ".qdc"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.settings['directory'], options)
+        if directory == "":
+            return
+        filename = directory + "/" + filename
+        try:
+            f = open(filename, 'w')
+            f.write(self.xml)
+            f.close()
+            msg = filename + " has been exported. "
+            msg += "Warning: This codebook has not been tested for accurate import into other software."
+            QtWidgets.QMessageBox.information(None, _("Codebook exported"), _(msg))
+        except Exception as e:
+            logger.debug(str(e))
+            QtWidgets.QMessageBox.information(None, _("Codebook NOT exported"), str(e))
+
     def user_guid(self, username):
         """ Requires a username. returns matching guid """
         for u in self.users:
@@ -186,7 +211,7 @@ class Refi(QtWidgets.QDialog):
         """ Creates the xml for the .qde file.
         base path for external sources is set to the settings directory. """
 
-        self.xml = '<?xml version="1.0" standalone="yes"?>\n'  #encoding="UTF-8"?>\n'
+        self.xml = '<?xml version="1.0" standalone="yes" encoding="UTF-8"?>\n'
         self.xml += '<Project '
         self.xml += 'xmlns="urn:QDA-XML:project:1.0" '
         guid = self.create_guid()
@@ -217,7 +242,8 @@ class Refi(QtWidgets.QDialog):
         self.xml += '</Project>'
 
     def variables_xml(self):
-        """ Variables are associated with Sources and Cases """
+        """ Variables are associated with Sources and Cases.
+        Called by project_xml """
 
         self.variables = []
 
@@ -248,6 +274,7 @@ class Refi(QtWidgets.QDialog):
         """ Create a Note xml for project, sources, cases, codes, etc
         Appends xml in notes list.
         name is used for names of journal entries.
+        Called by:
         returns a guid for a NoteRef """
 
         guid = self.create_guid()
@@ -266,8 +293,9 @@ class Refi(QtWidgets.QDialog):
     def notes_xml(self):
         """ Collate note_xml list into final xml
         <Notes><Note></Note></Notes>
-        Note xml requires a NoteRef in the source or case
-         returns xml """
+        Note xml requires a NoteRef in the source or case.
+        Called by: project_xml
+        returns xml """
 
         if self.notes == []:
             return ''
@@ -280,6 +308,7 @@ class Refi(QtWidgets.QDialog):
     def cases_xml(self):
         """ Create xml for cases.
         Putting memo into description, but should I also create a Note xml too?
+        Called by: project_xml
         returns xml """
 
         xml = ''
@@ -304,7 +333,9 @@ class Refi(QtWidgets.QDialog):
         return xml
 
     def case_source_ref_xml(self, caseid):
-        """ Find sources linked to this case, pos0 and pos1 must equal zero. """
+        """ Find sources linked to this case, pos0 and pos1 must equal zero.
+        Called by: cases_xml
+        returns xml """
 
         xml = ''
         cur = self.settings['conn'].cursor()
@@ -324,7 +355,7 @@ class Refi(QtWidgets.QDialog):
     def sources_xml(self):
         """ Create xml for sources: text, pictures, pdf, audio, video.
          Also add selections to each source.
-
+        Called by: project_xml
         returns xml """
 
         xml = "<Sources>\n"
@@ -421,6 +452,7 @@ class Refi(QtWidgets.QDialog):
         """ Get and complete text selection xml.
         xml is in form:
         <PlainTextSelection><Coding><CodeRef/></Coding></PlainTextSelection>
+        Called by: sources_xml
         returns xml
         """
 
@@ -447,6 +479,7 @@ class Refi(QtWidgets.QDialog):
 
     def picture_selection_xml(self, id_):
         """ Get and complete picture selection xml.
+        Called by: sources_xml
         returns xml """
 
         xml = ""
@@ -474,6 +507,7 @@ class Refi(QtWidgets.QDialog):
 
     def av_selection_xml(self, id_):
         """ Get and complete av selection xml.
+        Called by: sources_xml
         returns xml """
 
         xml = ""
@@ -499,6 +533,7 @@ class Refi(QtWidgets.QDialog):
 
     def transcript_xml(self, source):
         """ Find any transcript of media source.
+        Called by: sources_xml
         returns xml """
 
         xml = ""
@@ -583,10 +618,13 @@ class Refi(QtWidgets.QDialog):
             xml = '<Code guid="' + c['guid']
             xml += '" name="' + c['name']
             xml += '" isCodable="true'
-            xml += '" color="' + c['color'] + '">\n'
+            xml += '" color="' + c['color'] + '"'
             if c['memo'] != "":
+                xml += '>\n'
                 xml += '<Description>' + c['memo'] + '</Description>\n'
-            xml += '</Code>\n'
+                xml += '</Code>\n'
+            else:  # no description element, so wrap up code as <code />
+                xml += ' />\n'
             c['xml'] = xml
             self.codes.append(c)
 
@@ -687,7 +725,7 @@ class Refi(QtWidgets.QDialog):
         self.guids.append(guid)
         return guid
 
-    def codebook_exchange_xml_does_not_validate(self):
+    def codebook_exchange_xml(self):
         """ See: https://www.qdasoftware.org/wp-content/uploads/2019/03/QDAS-XML-1-0.pdf
         GUID: 128 bit integer used to identify resources, globally unique
         lxml parser: error occurs when defining UTF-8 encoding in first line
@@ -696,37 +734,12 @@ class Refi(QtWidgets.QDialog):
         Please use bytes input or XML fragments without declaration.
         This does not validate DONT USE"""
 
-        self.xml = '<?xml version="1.0" ?>\n'  #encoding="UTF-8"?>\n'
-        self.xml += '<CodeBook \n'
-        self.xml += 'xmlns="urn:QDA-XML:codebook:1.0"\n'
-        self.xml += 'xmlns:qda="urn:QDA-XML:types"\n'
-        self.xml += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
-        self.xml += 'xsi:schemaLocation="urn:QDA-XML:codebook:1.0 Codebook.xsd"\n'
-        self.xml += 'name="Example" guid="{91ffe013-d122-4acb-a25a-2ec103b9e404}"'
-        self.xml += '>\n'
-        self.xml += '<Codes>\n'
-
-        for c in self.codes:
-            #print(c)
-            self.xml += '<Code guid="' + '{00000000-0000-0000-0000-000000000000}' #str(c['cid'])
-            self.xml += '" name="' + c['name']
-            self.xml += '" isCodable="true'
-            self.xml += '" color="' + c['color'] + '">'
-            self.xml += '<Description>' + c['memo'] + '</Description>\n'
-            #self.xml += '<qda:IsChildOfCode>{5215cc69-b628-4e02-afb9-9beeaee55808}</qda:IsChildOfCode>\n'
-            #self.xml += ' creatingUser="{e1fcef53-4718-4698-aac9-a4708d4b982c}"\n'
-            self.xml += '</Code>\n'
-        for c in self.categories:
-            self.xml += '<Code guid="' + '{00000000-0000-0000-0000-000000000000}' #str(c['cid'])
-            self.xml += '" name="' + c['name']
-            self.xml += '" isCodable="false'
-            #self.xml += '" color="' + c['color']
-            self.xml += '">'
-            self.xml += '<Description>' + c['memo'] + '</Description>\n'
-            self.xml += '</Code>\n'
-        self.xml += '</Codes>\n'
-        self.xml += '<Sets>\n'
-        self.xml += '</CodeBook>\n'
+        self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
+        self.xml += '<CodeBook xmlns="urn:QDA-XML:codebook:1:0" '
+        self.xml += 'xsi:schemaLocation="urn:QDA-XML:codebook:1:0 Codebook.xsd" '
+        self.xml += 'origin="QualCoder" '
+        self.xml += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+        self.xml += self.codebook_xml()[10:]
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML compliance with XSD
@@ -744,8 +757,8 @@ class Refi(QtWidgets.QDialog):
         try:
             print("Validating:{0}".format(self.xml))
             print("xsd_file:{0}".format(file_xsd))
-            #xml_doc = etree.parse(self.xml)
-            xml_doc = etree.fromstring(self.xml)
+            #xml_doc = etree.tostring(self.xml)
+            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
             xsd_doc = etree.parse(file_xsd)
             xmlschema = etree.XMLSchema(xsd_doc)
             xmlschema.assert_(xml_doc)
