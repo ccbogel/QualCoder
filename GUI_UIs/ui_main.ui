@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -38,7 +38,11 @@
     <addaction name="actionClose_Project"/>
     <addaction name="actionProject_Memo"/>
     <addaction name="actionSettings"/>
+    <addaction name="separator"/>
+    <addaction name="actionREFI_Codebook_export"/>
     <addaction name="actionProject_Exchange_Export"/>
+    <addaction name="actionREFI_Codebook_import"/>
+    <addaction name="actionREFI_QDA_Project_import"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -248,7 +252,25 @@
   </action>
   <action name="actionProject_Exchange_Export">
    <property name="text">
-    <string>Project Exchange Export</string>
+    <string>REFI-QDA Project export</string>
+   </property>
+   <property name="toolTip">
+    <string>REFI-QDA Project export</string>
+   </property>
+  </action>
+  <action name="actionREFI_Codebook_export">
+   <property name="text">
+    <string>REFI-Codebook export</string>
+   </property>
+  </action>
+  <action name="actionREFI_Codebook_import">
+   <property name="text">
+    <string>REFI-Codebook import</string>
+   </property>
+  </action>
+  <action name="actionREFI_QDA_Project_import">
+   <property name="text">
+    <string>REFI-QDA Project import</string>
    </property>
   </action>
  </widget>
