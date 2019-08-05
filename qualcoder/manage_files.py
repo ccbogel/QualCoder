@@ -260,6 +260,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ View and edit text file contents.
         Alternatively view an image or other media. """
 
+        # need to relaod this, as transcribed files can be changed via view_av, and are otherwise not
+        # updated
+        self.load_file_data()
+
         x = self.ui.tableWidget.currentRow()
         if self.source[x]['mediapath'] is not None:
             if self.source[x]['mediapath'][:8] == "/images/":
@@ -297,6 +301,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg = _("Cannot edit file text, there  are codes, cases or annotations linked to this file")
             QtWidgets.QMessageBox.warning(None, _('Warning'), msg, QtWidgets.QMessageBox.Ok)
             return
+
         self.source[x]['fulltext'] = text
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
         self.settings['conn'].commit()
@@ -304,6 +309,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
         Added try block in case VLC bindings do not work.
+        Uses a non-modal dialog.
         """
 
         try:
@@ -311,19 +317,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
             self.dialogList.append(ui)
             ui.show()
-            memo = ui.ui.textEdit.toPlainText()
-            if self.source[x]['memo'] != memo:
-                self.source[x]['memo'] = memo
-                cur = self.settings['conn'].cursor()
-                cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
-                    self.source[x]['id']))
-                self.settings['conn'].commit()
+            # try and update file data here
+            self.load_file_data()
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
-            # easy way to update transcribed files
-            self.load_file_data()
         except Exception as e:
             logger.debug(e)
             print(e)

@@ -1188,7 +1188,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.setFont(newfont)
         self.setWindowTitle(self.media_data['mediapath'])
 
-        # Get the transcribe text and fill textedit
+        # Get the transcribed text and fill textedit
         cur = self.settings['conn'].cursor()
         cur.execute("select id, fulltext from source where name = ?", [media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
@@ -1362,11 +1362,15 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.ddialog.close()
         self.stop()
+        memo = self.ui.textEdit.toPlainText()
+        cur = self.settings['conn'].cursor()
+        cur.execute('update source set memo=? where id=?', (memo, self.media_data['id']))
+        self.settings['conn'].commit()
         if self.transcription is not None:
-            cur = self.settings['conn'].cursor()
             text = self.ui.textEdit_transcription.toPlainText()
             cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
             self.settings['conn'].commit()
+
 
 
 
