@@ -36,6 +36,7 @@ import sys
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
@@ -95,6 +96,11 @@ class DialogCodeAV(QtWidgets.QDialog):
     segment = {}
     timer = QtCore.QTimer()
 
+    # for transcribed text
+    annotations = []
+    code_text = []
+    time_positions = []  # transcribed timepositions as [text_pos, milliseconds]
+
     def __init__(self, settings, parent_textEdit):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
@@ -106,6 +112,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
+        self.annotations = []
+        self.code_text = []
+        self.time_positions = []
         self.media_data = None
         self.segment['start'] = None
         self.segment['end'] = None
@@ -121,7 +130,19 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_stop.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
+
+        # Prepare textEdit for coding transcribed text
+        self.ui.textEdit.setPlainText("")
+        self.ui.textEdit.setAutoFillBackground(True)
+        self.ui.textEdit.setToolTip("")
+        self.ui.textEdit.setMouseTracking(True)
         self.ui.textEdit.setReadOnly(True)
+        self.eventFilterTT = ToolTip_EventFilter()
+        self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        #self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text) # no longer used
+
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
         treefont = QtGui.QFont(settings['font'],
@@ -396,18 +417,113 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
-        # Get the transcribe text and fill textedit
+
+        # Get the transcribed text and fill textedit
         cur = self.settings['conn'].cursor()
-        cur.execute("select id, fulltext from source where name = ?", [self.media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext, name from source where name = ?", [self.media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
-        if self.transcription is not None:
-            self.ui.textEdit.setText(self.transcription[1])
+        if self.transcription is None:
+            return
+        self.ui.textEdit.setText(self.transcription[1])
+        self.get_timestamps_from_transcription()
+
+        # get text annotations
+        cur = self.settings['conn'].cursor()
+        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=? and fid=?",
+            [self.settings['codername'], self.transcription[0]])
+        result = cur.fetchall()
+        for row in result:
+            self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
+            'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+
+        # get code text for this file and for this coder, or all coders
+        self.code_text = []
+        coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
+        coding_sql += " where fid=? "
+        #if not self.ui.checkBox_show_coders.isChecked():
+        coding_sql += " and owner=? "
+        #    sql_values.append(self.settings['codername'])
+        #cur.execute(coding_sql, sql_values)
+        cur.execute(coding_sql, (self.transcription[0], self.settings['codername']))
+        code_results = cur.fetchall()
+        for row in code_results:
+            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
+            'pos0': row[3], 'pos1':row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+        # update filter for tooltip
+        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        # redo textEdit formatting
+        self.unlight()
+        self.highlight()
+
+    def get_timestamps_from_transcription(self):
+        """ Get a list of starting time positions from transcribed text file.
+        Expects time stamps to be contained within square brackets []
+        Expects [mm ss]  or [hh mm ss]
+        Examples:  [00:34:12] [45:33] [01.23.45] [02.34]
+        Looks for a hh mm ss separator of : or .
+        Converts hh mm ss to milliseconds with text position and stored in a list """
+
+        # get [] bracketed test sections and positions
+        tmp_list = []
+        bracketed = False
+        section_pos = -1
+        section = ""
+        for i, c in enumerate(self.transcription[1]):
+            if bracketed:
+                section += c
+            if c == "[":
+                bracketed = True
+                section_pos = i
+            if c == "]":
+                bracketed = False
+                section = section[:-1]
+                tmp_list.append([section_pos, section])
+                section = ""
+                section_pos = -1
+
+        # get the hh mm ss separator and check for numerics
+        time_list = []
+        separator = ""
+        for t in tmp_list:
+            if t[1].find(':') > 0:
+                separator = ':'
+            if t[1].find('.') > 0:
+                separator = '.'
+            all_numbers = True
+            splt = t[1].split(separator)
+            for s in splt:
+                try:
+                    int(s)
+                except:
+                    all_numbers = False
+            if all_numbers:
+                time_list.append([t[0], t[1]])
+
+        #convert hh mm ss to milliseconds
+        self.time_positions = []
+        for i in time_list:
+            t = i[1].split(separator)
+            #exit(0)
+            if len(t) == 3:
+                try:
+                    msecs = (int(t[0]) * 3600 + int(t[1]) * 60 + int(t[2])) * 1000
+                    self.time_positions.append([i[0], msecs])
+                except:
+                    pass
+            if len(t) == 2:
+                try:
+                    msecs = (int(t[0]) * 60 + int(t[1])) * 1000
+                    self.time_positions.append([i[0], msecs])
+                except:
+                    pass
+        #print(self.time_positions)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
         integer variables, so you need a factor; the higher the factor, the
         more precise are the results (1000 should suffice).
+        Called by:
 
         Some non fatal errors occur:
         [00007fd8d4fb8410] main decoder error: Timestamp conversion failed for 42518626: no reference clock
@@ -496,6 +612,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         for i in self.scene.items():
             if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
                 self.load_segments()
+
+        """ For long transcripts, update the relevant text position in the textEdit to match the
+        video's current position. """
+        if self.transcription is not None or self.ui.textEdit.toPlainText() != "":
+            text_pos = 0
+            for i in range(1, len(self.time_positions)):
+                if msecs > self.time_positions[i - 1][1] and msecs < self.time_positions[i][1]:
+                    text_pos = self.time_positions[i][0]
+                    #print(msecs,self.time_positions[i-1][1], text_pos)
+                    textCursor = self.ui.textEdit.textCursor()
+                    textCursor.setPosition(text_pos)
+                    self.ui.textEdit.setTextCursor(textCursor)
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -958,6 +1086,260 @@ class DialogCodeAV(QtWidgets.QDialog):
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.settings['conn'].commit()
         self.load_segments()
+
+    # Methods used with the textEdit transcribed text
+    def unlight(self):
+        """ Remove all text highlighting from current file. """
+
+        if self.transcription is None or self.ui.textEdit.toPlainText() == "":
+            return
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(len(self.transcription[1]) - 1, QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+
+    def highlight(self):
+        """ Apply text highlighting to current file.
+        If no colour has been assigned to a code, those coded text fragments are coloured gray.
+        Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
+        name, owner. """
+
+        fmt = QtGui.QTextCharFormat()
+        cursor = self.ui.textEdit.textCursor()
+
+        # add coding highlights
+        for item in self.code_text:
+            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+            color = "#F8E0E0"  # default light red
+            for fcode in self.codes:
+                if fcode['cid'] == item['cid']:
+                    color = fcode['color']
+            fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
+            # highlight codes with memos - these are italicised
+            if item['memo'] is not None and item['memo'] != "":
+                fmt.setFontItalic(True)
+            else:
+                fmt.setFontItalic(False)
+                fmt.setFontWeight(QtGui.QFont.Normal)
+            cursor.setCharFormat(fmt)
+
+        # add annotation marks - these are in bold
+        for note in self.annotations:
+            if note['fid'] == self.transcription[0]:
+                cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
+                formatB = QtGui.QTextCharFormat()
+                formatB.setFontWeight(QtGui.QFont.Bold)
+                cursor.mergeCharFormat(formatB)
+
+    def textEdit_menu(self, position):
+        """ Context menu for textEdit. Mark, unmark, annotate, copy. """
+
+        menu = QtWidgets.QMenu()
+        ActionItemMark = menu.addAction(_("Mark"))
+        ActionItemUnmark = menu.addAction(_("Unmark"))
+        ActionItemAnnotate = menu.addAction(_("Annotate"))
+        ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action == ActionItemCopy:
+            self.copy_selected_text_to_clipboard()
+        if action == ActionItemMark:
+            self.mark()
+        cursor = self.ui.textEdit.cursorForPosition(position)
+        if action == ActionItemUnmark:
+            self.unmark(cursor.position())
+        if action == ActionItemAnnotate:
+            self.annotate(cursor.position())
+
+    def copy_selected_text_to_clipboard(self):
+        """ Copy text to clipboard for external use.
+        For example adding text to another document. """
+
+        selectedText = self.ui.textEdit.textCursor().selectedText()
+        cb = QtWidgets.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard)
+        cb.setText(selectedText, mode=cb.Clipboard)
+
+    def mark(self):
+        """ Mark selected text in file with currently selected code.
+       Need to check for multiple same codes at same pos0 and pos1.
+       """
+
+        if self.transcription is None or self.ui.textEdit.toPlainText() == "":
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No transcription"), QtWidgets.QMessageBox.Ok)
+            return
+        item = self.ui.treeWidget.currentItem()
+        if item is None:
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"), QtWidgets.QMessageBox.Ok)
+            return
+        if item.text(1).split(':')[0] == 'catid':  # must be a code
+            return
+        cid = int(item.text(1).split(':')[1])
+        selectedText = self.ui.textEdit.textCursor().selectedText()
+        pos0 = self.ui.textEdit.textCursor().selectionStart()
+        pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        # add the coded section to code text, add to database and update GUI
+        coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
+        'pos0': pos0, 'pos1': pos1, 'owner': self.settings['codername'], 'memo': "",
+        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        self.code_text.append(coded)
+        self.highlight()
+        cur = self.settings['conn'].cursor()
+
+        # check for an existing duplicated marking first
+        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
+            (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
+        result = cur.fetchall()
+        if len(result) > 0:
+            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
+            _("This segment has already been coded with this code by ") + coded['owner'],
+            QtWidgets.QMessageBox.Ok)
+            return
+
+        #TODO should not get sqlite3.IntegrityError:
+        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        try:
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
+                coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
+                coded['memo'], coded['date']))
+            self.settings['conn'].commit()
+        except Exception as e:
+            logger.debug(str(e))
+        # update filter for tooltip
+        self.eventFilterTT.setCodes(self.code_text, self.codes)
+
+    def unmark(self, location):
+        """ Remove code marking by this coder from selected text in current file. """
+
+        if self.transcription is None or self.ui.textEdit.toPlainText() == "":
+            return
+        unmarked = None
+        for item in self.code_text:
+            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.settings['codername']:
+                unmarked = item
+        if unmarked is None:
+            return
+
+        # delete from db, remove from coding and update highlights
+        cur = self.settings['conn'].cursor()
+        cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
+            (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.settings['codername']))
+        self.settings['conn'].commit()
+        if unmarked in self.code_text:
+            self.code_text.remove(unmarked)
+
+        # update filter for tooltip and update code colours
+        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.unlight()
+        self.highlight()
+
+    def annotate(self, location):
+        """ Add view, or remove an annotation for selected text.
+        Annotation positions are displayed as bold text.
+        """
+
+        if self.transcription is None or self.ui.textEdit.toPlainText() == "":
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No media transcription selected"))
+            return
+        pos0 = self.ui.textEdit.textCursor().selectionStart()
+        pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        text_length = len(self.ui.textEdit.toPlainText())
+        if pos0 >= text_length or pos1 >= text_length:
+            return
+        item = None
+        details = ""
+        annotation = ""
+        # find existing annotation at this position for this file
+        for note in self.annotations:
+            if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.transcription[0]:
+                item = note  # use existing annotation
+                details = item['owner'] + " " + item['date']
+        # exit method if no text selected and there is not annotation at this position
+        if pos0 == pos1 and item is None:
+            return
+        # add new item to annotations, add to database and update GUI
+        if item is None:
+            item = {'fid': self.transcription[0], 'pos0': pos0, 'pos1': pos1,
+            'memo': str(annotation), 'owner': self.settings['codername'],
+            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+        ui = DialogMemo(self.settings, _("Annotation: ") + details, item['memo'])
+        ui.exec_()
+        item['memo'] = ui.memo
+        if item['memo'] != "":
+            cur = self.settings['conn'].cursor()
+            cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
+                values(?,?,?,?,?,?)" ,(item['fid'], item['pos0'], item['pos1'],
+                item['memo'], item['owner'], item['date']))
+            self.settings['conn'].commit()
+            cur.execute("select last_insert_rowid()")
+            anid = cur.fetchone()[0]
+            item['anid'] = anid
+            self.annotations.append(item)
+            self.highlight()
+            self.parent_textEdit.append(_("Annotation added at position: ") \
+                + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.transcription[2])
+        # if blank delete the annotation
+        if item['memo'] == "":
+            cur = self.settings['conn'].cursor()
+            cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
+            self.settings['conn'].commit()
+            for note in self.annotations:
+                if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
+                    self.annotations.remove(note)
+            self.parent_textEdit.append(_("Annotation removed from position ") \
+                + str(item['pos0']) + _(" for: ") + self.transcription[2])
+        self.unlight()
+        self.highlight()
+
+
+class ToolTip_EventFilter(QtCore.QObject):
+    """ Used to add a dynamic tooltip for the textEdit.
+    The tool top text is changed according to its position in the text.
+    If over a coded section the codename is displayed in the tooltip.
+    """
+
+    codes = None
+    code_text = None
+
+    def setCodes(self, code_text, codes):
+        self.code_text = code_text
+        self.codes = codes
+        for item in self.code_text:
+            for c in self.codes:
+                if item['cid'] == c['cid']:
+                    item['name'] = c['name']
+
+    def eventFilter(self, receiver, event):
+        #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+        if event.type() == QtCore.QEvent.ToolTip:
+            helpEvent = QHelpEvent(event)
+            cursor = QtGui.QTextCursor()
+            cursor = receiver.cursorForPosition(helpEvent.pos())
+            pos = cursor.position()
+            receiver.setToolTip("")
+            displayText = ""
+            # occasional None type error
+            if self.code_text is None:
+                #Call Base Class Method to Continue Normal Event Processing
+                return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
+            for item in self.code_text:
+                if item['pos0'] <= pos and item['pos1'] >= pos:
+                    if displayText == "":
+                        displayText = item['name']
+                    else:  # can have multiple codes on same selected area
+                        try:
+                            displayText += "\n" + item['name']
+                        except Exception as e:
+                            msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
+                            msg += str(item) + "\n" + self.code_text
+                            logger.error(msg)
+            if displayText != "":
+                receiver.setToolTip(displayText)
+
+        #Call Base Class Method to Continue Normal Event Processing
+        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
