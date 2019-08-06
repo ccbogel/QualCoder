@@ -117,6 +117,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source = []
         cur = self.settings['conn'].cursor()
+        # very occassionally code_text.seltext can be empty, when codes are unmarked from text
+        # so remove these rows
+        cur.execute('delete from code_text where length(seltext)=0')
+        self.settings['conn'].commit()
+
         cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by name")
         result = cur.fetchall()
         for row in result:

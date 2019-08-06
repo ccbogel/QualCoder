@@ -650,6 +650,11 @@ class MainWindow(QtWidgets.QMainWindow):
             + "\n========\n")
         self.show_menu_options()
 
+        # very occassionally code_text.seltext can be empty, when codes are unmarked from text
+        # so remove these rows
+        cur.execute('delete from code_text where length(seltext)=0')
+        self.settings['conn'].commit()
+
     def close_project(self):
         """ Close an open project. """
 
