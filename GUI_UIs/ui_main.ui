@@ -260,12 +260,12 @@
   </action>
   <action name="actionREFI_Codebook_export">
    <property name="text">
-    <string>REFI-Codebook export</string>
+    <string>REFI-QDA Codebook export</string>
    </property>
   </action>
   <action name="actionREFI_Codebook_import">
    <property name="text">
-    <string>REFI-Codebook import</string>
+    <string>REFI-QDA Codebook import</string>
    </property>
   </action>
   <action name="actionREFI_QDA_Project_import">
