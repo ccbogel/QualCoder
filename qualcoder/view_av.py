@@ -32,6 +32,7 @@ import logging
 import os
 import platform
 from random import randint
+import re
 import sys
 import traceback
 
@@ -99,7 +100,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     # for transcribed text
     annotations = []
     code_text = []
-    time_positions = []  # transcribed timepositions as [text_pos, milliseconds]
+    time_positions = []  # transcribed timepositions as list of [text_pos0, text_pos1, milliseconds]
 
     def __init__(self, settings, parent_textEdit):
         """ Show list of audio and video files.
@@ -456,66 +457,75 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.highlight()
 
     def get_timestamps_from_transcription(self):
-        """ Get a list of starting time positions from transcribed text file.
-        Expects time stamps to be contained within square brackets []
-        Expects [mm ss]  or [hh mm ss]
-        Examples:  [00:34:12] [45:33] [01.23.45] [02.34]
-        Looks for a hh mm ss separator of : or .
-        Converts hh mm ss to milliseconds with text position and stored in a list """
+        """ Get a list of starting/ending characterpositions and time in milliseconds
+        from transcribed text file.
 
-        # get [] bracketed test sections and positions
-        tmp_list = []
-        bracketed = False
-        section_pos = -1
-        section = ""
-        for i, c in enumerate(self.transcription[1]):
-            if bracketed:
-                section += c
-            if c == "[":
-                bracketed = True
-                section_pos = i
-            if c == "]":
-                bracketed = False
-                section = section[:-1]
-                tmp_list.append([section_pos, section])
-                section = ""
-                section_pos = -1
+        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
+        09:33:04,100 --> 09:33:09,600
 
-        # get the hh mm ss separator and check for numerics
-        time_list = []
-        separator = ""
-        for t in tmp_list:
-            if t[1].find(':') > 0:
-                separator = ':'
-            if t[1].find('.') > 0:
-                separator = '.'
-            all_numbers = True
-            splt = t[1].split(separator)
-            for s in splt:
-                try:
-                    int(s)
-                except:
-                    all_numbers = False
-            if all_numbers:
-                time_list.append([t[0], t[1]])
+        Converts hh mm ss to milliseconds with text positions stored in a list
+        The list contains lists of [text_pos0, text_pos1, milliseconds] """
 
-        #convert hh mm ss to milliseconds
+        mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
+        hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
+        mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
+        hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
+        srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
+
         self.time_positions = []
-        for i in time_list:
-            t = i[1].split(separator)
-            #exit(0)
-            if len(t) == 3:
-                try:
-                    msecs = (int(t[0]) * 3600 + int(t[1]) * 60 + int(t[2])) * 1000
-                    self.time_positions.append([i[0], msecs])
-                except:
-                    pass
-            if len(t) == 2:
-                try:
-                    msecs = (int(t[0]) * 60 + int(t[1])) * 1000
-                    self.time_positions.append([i[0], msecs])
-                except:
-                    pass
+        for match in re.finditer(mmss1, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss1, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(mmss2, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss2, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss_sss, self.transcription[1]):
+            # Format #00:12:34.567#
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            s2 = s[2].split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(srt, self.transcription[1]):
+            # Format 09:33:04,100 --> 09:33:09,600  skip the arrow and second time position
+            stamp = match.group()[0:12]
+            s = stamp.split(':')
+            s2 = s[2].split(',')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
         #print(self.time_positions)
 
     def set_position(self):
@@ -613,17 +623,21 @@ class DialogCodeAV(QtWidgets.QDialog):
             if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
                 self.load_segments()
 
+        '''
         """ For long transcripts, update the relevant text position in the textEdit to match the
-        video's current position. """
+        video's current position.
+        time_postion list itme: [text_pos0, text_pos1, milliseconds]
+        """
         if self.transcription is not None or self.ui.textEdit.toPlainText() != "":
             text_pos = 0
             for i in range(1, len(self.time_positions)):
-                if msecs > self.time_positions[i - 1][1] and msecs < self.time_positions[i][1]:
+                if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
-                    #print(msecs,self.time_positions[i-1][1], text_pos)
+                    #print(msecs,self.time_positions[i-1][2], text_pos)
                     textCursor = self.ui.textEdit.textCursor()
                     textCursor.setPosition(text_pos)
                     self.ui.textEdit.setTextCursor(textCursor)
+        '''
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -1179,6 +1193,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         selectedText = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        if pos0 == pos1:  # Something quirky happened
+            return
         # add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.settings['codername'], 'memo': "",
@@ -1551,6 +1567,7 @@ class DialogViewAV(QtWidgets.QDialog):
     mediaplayer = None
     media = None
     transcription = None
+    time_positions = []
 
     def __init__(self, settings, media_data, parent=None):
 
@@ -1562,6 +1579,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.settings = settings
         self.media_data = media_data
         self.is_paused = True
+        self.time_positions = []
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
@@ -1576,6 +1594,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit_transcription.setText(self.transcription[1])
+            self.get_timestamps_from_transcription()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -1644,6 +1663,78 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
         #self.play_pause()
+
+    def get_timestamps_from_transcription(self):
+        """ Get a list of starting/ending characterpositions and time in milliseconds
+        from transcribed text file.
+
+        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
+        09:33:04,100 --> 09:33:09,600
+
+        Converts hh mm ss to milliseconds with text positions stored in a list
+        The list contains lists of [text_pos0, text_pos1, milliseconds] """
+
+        mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
+        hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
+        mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
+        hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
+        srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
+
+        self.time_positions = []
+        for match in re.finditer(mmss1, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss1, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(mmss2, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss2, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss_sss, self.transcription[1]):
+            # Format #00:12:34.567#
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            s2 = s[2].split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(srt, self.transcription[1]):
+            # Format 09:33:04,100 --> 09:33:09,600  skip the arrow and second time position
+            stamp = match.group()[0:12]
+            s = stamp.split(':')
+            s2 = s[2].split(',')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        #print(self.time_positions)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
@@ -1729,6 +1820,20 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setValue(media_pos)
         msecs = self.mediaplayer.get_time()
         self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+
+        """ For long transcripts, update the relevant text position in the textEdit to match the
+        video's current position.
+        time_postion list itme: [text_pos0, text_pos1, milliseconds]
+        """
+        if self.transcription is not None or self.ui.textEdit_transcription.toPlainText() != "":
+            text_pos = 0
+            for i in range(1, len(self.time_positions)):
+                if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
+                    text_pos = self.time_positions[i][0]
+                    #print(msecs,self.time_positions[i-1][2], text_pos)
+                    textCursor = self.ui.textEdit_transcription.textCursor()
+                    textCursor.setPosition(text_pos)
+                    self.ui.textEdit_transcription.setTextCursor(textCursor)
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
