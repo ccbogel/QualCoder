@@ -142,7 +142,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
-        #self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text) # no longer used
 
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
@@ -623,21 +622,17 @@ class DialogCodeAV(QtWidgets.QDialog):
             if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
                 self.load_segments()
 
-        '''
         """ For long transcripts, update the relevant text position in the textEdit to match the
         video's current position.
         time_postion list itme: [text_pos0, text_pos1, milliseconds]
         """
-        if self.transcription is not None or self.ui.textEdit.toPlainText() != "":
-            text_pos = 0
+        if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit.toPlainText() != "":
             for i in range(1, len(self.time_positions)):
                 if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
-                    #print(msecs,self.time_positions[i-1][2], text_pos)
                     textCursor = self.ui.textEdit.textCursor()
                     textCursor.setPosition(text_pos)
                     self.ui.textEdit.setTextCursor(textCursor)
-        '''
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -1149,6 +1144,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
+
+        if self.ui.checkBox_scroll_transcript.isChecked():
+            return
 
         menu = QtWidgets.QMenu()
         ActionItemMark = menu.addAction(_("Mark"))
@@ -1838,11 +1836,9 @@ class DialogViewAV(QtWidgets.QDialog):
         time_postion list itme: [text_pos0, text_pos1, milliseconds]
         """
         if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit_transcription.toPlainText() != "":
-            text_pos = 0
             for i in range(1, len(self.time_positions)):
                 if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
-                    #print(msecs,self.time_positions[i-1][2], text_pos)
                     textCursor = self.ui.textEdit_transcription.textCursor()
                     textCursor.setPosition(text_pos)
                     self.ui.textEdit_transcription.setTextCursor(textCursor)
