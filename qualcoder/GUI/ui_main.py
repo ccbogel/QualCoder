@@ -189,8 +189,8 @@ class Ui_MainWindow(object):
         self.actionCode_audio_video.setText(_translate("MainWindow", "Code audio/video"))
         self.actionProject_Exchange_Export.setText(_translate("MainWindow", "REFI-QDA Project export"))
         self.actionProject_Exchange_Export.setToolTip(_translate("MainWindow", "REFI-QDA Project export"))
-        self.actionREFI_Codebook_export.setText(_translate("MainWindow", "REFI-Codebook export"))
-        self.actionREFI_Codebook_import.setText(_translate("MainWindow", "REFI-Codebook import"))
+        self.actionREFI_Codebook_export.setText(_translate("MainWindow", "REFI-QDA Codebook export"))
+        self.actionREFI_Codebook_import.setText(_translate("MainWindow", "REFI-QDA Codebook import"))
         self.actionREFI_QDA_Project_import.setText(_translate("MainWindow", "REFI-QDA Project import"))
 
 
