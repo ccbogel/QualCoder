@@ -1588,7 +1588,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.setFont(newfont)
         self.setWindowTitle(self.media_data['mediapath'])
 
-        # Get the transcribed text and fill textedit
+        # Get the transcription text and fill textedit
         cur = self.settings['conn'].cursor()
         cur.execute("select id, fulltext from source where name = ?", [media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
@@ -1662,7 +1662,19 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
+
+        self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
+
+    def scroll_transcribed_checkbox_changed(self):
+        """ If checked, then cannot edit the textEdit_transcribed. """
+
+        if self.ui.checkBox_scroll_transcript.isChecked():
+            self.ui.textEdit_transcription.setReadOnly(True)
+        else:
+            # redo timestamps as text may have been changed by user
+            self.get_timestamps_from_transcription()
+            self.ui.textEdit_transcription.setReadOnly(False)
 
     def get_timestamps_from_transcription(self):
         """ Get a list of starting/ending characterpositions and time in milliseconds
@@ -1825,7 +1837,7 @@ class DialogViewAV(QtWidgets.QDialog):
         video's current position.
         time_postion list itme: [text_pos0, text_pos1, milliseconds]
         """
-        if self.transcription is not None or self.ui.textEdit_transcription.toPlainText() != "":
+        if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit_transcription.toPlainText() != "":
             text_pos = 0
             for i in range(1, len(self.time_positions)):
                 if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
