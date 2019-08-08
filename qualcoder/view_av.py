@@ -1148,21 +1148,46 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.ui.checkBox_scroll_transcript.isChecked():
             return
 
+        cursor = self.ui.textEdit.cursorForPosition(position)
         menu = QtWidgets.QMenu()
         ActionItemMark = menu.addAction(_("Mark"))
         ActionItemUnmark = menu.addAction(_("Unmark"))
         ActionItemAnnotate = menu.addAction(_("Annotate"))
         ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+        Action_video_position_timestamp = -1
+        for ts in self.time_positions:
+            #print(ts, cursor.position())
+            if cursor.position() >= ts[0] and cursor.position() <= ts[1]:
+                Action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action == ActionItemCopy:
             self.copy_selected_text_to_clipboard()
         if action == ActionItemMark:
             self.mark()
-        cursor = self.ui.textEdit.cursorForPosition(position)
         if action == ActionItemUnmark:
             self.unmark(cursor.position())
         if action == ActionItemAnnotate:
             self.annotate(cursor.position())
+        try:
+            if action == Action_video_position_timestamp:
+                self.set_video_to_timestamp_position(cursor.position())
+        except:
+            pass
+
+    def set_video_to_timestamp_position(self, position):
+        """ Set the video position to this time stamp.
+        The horizontal slider will move to match the position of the video (in update_ui).
+        """
+
+        timestamp = None
+        for ts in self.time_positions:
+            if position >= ts[0] and position <= ts[1]:
+                timestamp = ts
+        if timestamp is None:
+            return
+        self.timer.stop()
+        self.mediaplayer.set_position(timestamp[2] / self.media.get_duration())
+        self.timer.start()
 
     def copy_selected_text_to_clipboard(self):
         """ Copy text to clipboard for external use.
