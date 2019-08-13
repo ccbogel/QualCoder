@@ -795,7 +795,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
-        QTextWriter supports plaintext, ODF and HTML. 
+        QTextWriter supports plaintext, ODF and HTML.
         TODO? add default directory to export to
         """
 
@@ -832,7 +832,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append(_("Report exported: ") + filename)
         QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
-        
+
     def export_csv_file(self):
         """ Export report to csv file.
         Export coded data as csv with codes as column headings.
@@ -842,7 +842,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Each data cell contains coded text, or the memo if A/V or image and the file or case name.
         """
 
-        if self.text_results == [] and self.images_results == [] and self.av_results == []:
+        if self.text_results == [] and self.image_results == [] and self.av_results == []:
             return
 
         codes_all = []
@@ -861,16 +861,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i in self.av_results:
             codes_all.append(i['codename'])
             #print(i)
-        
+
         codes_set = list(set(codes_all))
         codes_set.sort()
         for x in codes_set:
             codes_freq_list.append(codes_all.count(x))
-        
+
         #print(codes_all)
         #print(codes_set)
         #print(codes_freq_list)
-        
+
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
         #print("ncols:", ncols, "nrows:", nrows)
@@ -882,7 +882,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for c in range(0, ncols):
                 row.append("")
             csv_data.append(row)
-            
+
         # Look at each code and fill column with data
         for col, code in enumerate(codes_set):
             row = 0
@@ -896,7 +896,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     row += 1
             for i in self.image_results:
                 if i['codename'] == code:
-                    d = i['memo'] 
+                    d = i['memo']
                     if d == "":
                         d = "NO MENO"
                     d += "\n" + i['file_or_casename']
@@ -904,10 +904,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_case'] == "":
                         d += " " + i['mediapath'][8:]
                     csv_data[row][col] = d
-                    row +=1   
+                    row +=1
             for i in self.av_results:
                 if i['codename'] == code:
-                    d = i['memo'] 
+                    d = i['memo']
                     if d == "":
                         d = "NO MEMO"
                     d += "\n"
@@ -921,7 +921,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     d += trimmed
                     csv_data[row][col] = d
                     row += 1
-            
+
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
             self.settings['directory'])
         if filename[0] == "":
@@ -932,7 +932,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
             for row in csv_data:
-                filewriter.writerow(row)        
+                filewriter.writerow(row)
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
