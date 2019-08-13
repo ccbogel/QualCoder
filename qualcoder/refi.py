@@ -27,10 +27,12 @@ https://qualcoder.wordpress.com/
 '''
 
 from copy import copy
+import datetime
 import logging
 from lxml import etree
 import os
 import shutil
+import sqlite3
 import sys
 import traceback
 import uuid
@@ -50,6 +52,206 @@ def exception_handler(exception_type, value, tb_obj):
     print(text)
     logger.error(_("Uncaught exception: ") + text)
     #QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+
+
+class Refi_import():
+
+    """
+    Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
+    """
+
+    file_path = None
+    categories = []
+    codes = []
+    users = []
+    sources = []
+    guids = []
+    notes = []  # contains xml of guid and note (memo) text
+    variables = []  # contains dictionary of variable xml, guid, name
+    xml = ""
+    parent_textEdit = None
+    settings = None
+    tree = None
+    import_type = None
+    xml = None
+
+    def __init__(self, settings, parent_textEdit, import_type):
+
+        sys.excepthook = exception_handler
+        self.settings = settings
+        self.parent_textEdit = parent_textEdit
+        self.import_type = import_type
+
+        # these two ifs are redundant but keep
+        if self.settings['projectName'] == '' and self.import_type == "qdc":
+            QtWidgets.QMessageBox.information(None, _("Codebook import"), _("Need to have an opened project before import"))
+            return
+        if self.settings['projectName'] != '' and self.import_type == "qdpx":
+            QtWidgets.QMessageBox.information(None, _("Project import"), _("Need to have no project open before import"))
+            return
+
+        self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+            _('Select REFI_QDA file'), self.settings['directory'], "(*." + import_type + ")")
+        if not ok or self.file_path == "":
+            return
+
+        if import_type == "qdc":
+            self.import_codebook()
+        else:
+            self.import_project()
+
+    def import_codebook(self):
+        """ Import REFI-QDA standard codebook into opened project.
+        Codebooks do not validate using the qdasoftware.org Codebook.xsd generated on 2017-10-05 16:17z"""
+
+        #with open(self.file_path, "r") as xml_file:
+        #    self.xml = xml_file.read()
+        #result = self.xml_validation("codebook")
+        #print(result)
+        # Typical error with codebook XSD validation:
+        # PARSING ERROR: StartTag: invalid element name, line 3, column 2 (Codebook.xsd, line 3)
+
+        tree = etree.parse(self.file_path)  # get element tree object
+        root = tree.getroot()
+        # look for the Codes tag, which contains each Code element
+        children = root.getchildren()
+        for cb in children:
+            #print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
+            if cb.tag == "{urn:QDA-XML:codebook:1:0}Codes":
+                counter = 0
+                codes = cb.getchildren()
+                for c in codes:
+                    # recursive search through each Code in Codes
+                    counter += self.sub_codes(cb, None)
+                QtWidgets.QMessageBox.information(None, _("Codebook imported"),
+                    str(counter) + _(" categories and codes imported from ") + self.file_path)
+                return
+        QtWidgets.QMessageBox.warning(None, _("Codebook importation"), self.file_path + _(" NOT imported"))
+
+    def sub_codes(self, parent, cat_id):
+        """ Get subcode elements, if any.
+        Determines whether the Code is a Category item or a Code item.
+        Uses the parent entered cat_id ot give a Code a category alignment,
+        or if a category, gives the category alignment to a super_category.
+
+        Recursive, until no more child Codes found.
+        Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
+
+        Returns: counter of inserted codes and categories
+         """
+
+        counter = 0
+        elements = parent.getchildren()
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        description = ""
+        for e in elements:
+            if e.tag ==  "{urn:QDA-XML:codebook:1:0}Description":
+                description = e.text
+
+        # Determine if the parent is a code or a category
+        # Has Code element children, so must be a category, insert into code_cat table
+        is_category = False
+        for e in elements:
+            if e.tag == "{urn:QDA-XML:codebook:1:0}Code":
+                is_category = True
+        if is_category:
+            last_insert_id = None
+            name = parent.get("name")
+            if name is not None:
+                cur = self.settings['conn'].cursor()
+                # insert this category into code_cat table
+                try:
+                    cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)"
+                        , [name, description, now_date, cat_id])
+                    self.settings['conn'].commit()
+                    cur.execute("select last_insert_rowid()")
+                    last_insert_id = cur.fetchone()[0]
+                    counter += 1
+                except sqlite3.IntegrityError as e:
+                    QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
+
+            for e in elements:
+                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
+                    counter += self.sub_codes(e, last_insert_id)
+                    #print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
+            return counter
+
+        # No children and no Description child element so, insert this code into code_name table
+        if is_category is False and elements == []:
+            name = parent.get("name")
+            #print("No children or description ", name)
+            color = parent.get("color")
+            if color == None:
+                color = "#999999"
+            try:
+                cur = self.settings['conn'].cursor()
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
+                    , [name, description, now_date, cat_id, color])
+                self.settings['conn'].commit()
+                counter += 1
+            except sqlite3.IntegrityError as e:
+                QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+            return counter
+
+        # One child, a description so, insert this code into code_name table
+        if is_category is False and len(elements) == 1 and elements[0].tag == "{urn:QDA-XML:codebook:1:0}Description":
+            name = parent.get("name")
+            #print("Only a description child: ", name)
+            color = parent.get("color")
+            if color == None:
+                color = "#999999"
+            try:
+                cur = self.settings['conn'].cursor()
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
+                    , [name, description, now_date, cat_id, color])
+                self.settings['conn'].commit()
+                counter += 1
+            except sqlite3.IntegrityError as e:
+                QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+            return counter
+
+    def import_project(self):
+        """ Import REFI-QDA standard project as a new project. """
+
+        print(self.file_path)
+        #TODO unzip folder
+        '''
+        with open(self.file_path, "r") as xml_file:
+            self.xml = xml_file.read()
+        print(self.xml)
+        result = self.xml_validation("project")
+        '''
+
+    def xml_validation(self, xsd_type="codebook"):
+        """ Verify that the XML complies with XSD
+        Arguments:
+            1. file_xml: Input xml file
+            2. file_xsd: xsd file which needs to be validated against xml
+        Return:
+            No return value
+        """
+
+        file_xsd = path + "/Codebook.xsd"
+        if xsd_type != "codebook":
+            file_xsd = path + "/Project-mrt2019.xsd"
+        print(file_xsd)
+        try:
+            print("Validating:{0}".format(self.xml))
+            print("xsd_file:{0}".format(file_xsd))
+            #xml_doc = etree.tostring(self.xml)
+            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
+            xsd_doc = etree.parse(file_xsd)
+            xmlschema = etree.XMLSchema(xsd_doc)
+            xmlschema.assert_(xml_doc)
+            return True
+        except etree.XMLSyntaxError as err:
+            print("PARSING ERROR:{0}".format(err))
+            return False
+
+        except AssertionError as err:
+            print("Incorrect XML schema: {0}".format(err))
+            return False
+
 
 
 class Refi_export(QtWidgets.QDialog):
@@ -186,8 +388,8 @@ class Refi_export(QtWidgets.QDialog):
             f = open(filename, 'w')
             f.write(self.xml)
             f.close()
-            msg = filename + " has been exported. "
-            msg += "Warning: This codebook has not been tested for accurate import into other software."
+            msg = "Codebook has been exported to "
+            msg += filename
             QtWidgets.QMessageBox.information(None, _("Codebook exported"), _(msg))
         except Exception as e:
             logger.debug(str(e))
@@ -661,7 +863,7 @@ class Refi_export(QtWidgets.QDialog):
                 c['examine'] = False
                 xml += '<Code guid="' + c['guid']
                 xml += '" name="' + c['name']
-                xml += '" isCodable="false'
+                xml += '" isCodable="true'
                 xml += '">\n'
                 if c['memo'] != "":
                     xml += '<Description>' + c['memo'] + '</Description>\n'
@@ -676,7 +878,8 @@ class Refi_export(QtWidgets.QDialog):
         return xml
 
     def add_sub_categories(self, cid, cats):
-        """ Returns recursive xml of category """
+        """ Returns recursive xml of category.
+        Categories have isCodable=true in exports from other software """
 
         xml = ""
         counter = 0
@@ -687,7 +890,7 @@ class Refi_export(QtWidgets.QDialog):
                     c['examine'] = False
                     xml += '<Code guid="' + c['guid']
                     xml += '" name="' + c['name']
-                    xml += '" isCodable="false'
+                    xml += '" isCodable="true'
                     xml += '">\n'
                     if c['memo'] != "":
                         xml += '<Description>' + c['memo'] + '</Description>\n'
@@ -742,7 +945,8 @@ class Refi_export(QtWidgets.QDialog):
         self.xml += self.codebook_xml()[10:]
 
     def xml_validation(self, xsd_type="codebook"):
-        """ Verify that the XML compliance with XSD
+        """ Verify that the XML complies with XSD.
+        I believe the codebook XSD might be incorrect.
         Arguments:
             1. file_xml: Input xml file
             2. file_xsd: xsd file which needs to be validated against xml

@@ -50,7 +50,7 @@ from information import DialogInformation
 from journals import DialogJournals
 from manage_files import DialogManageFiles
 from memo import DialogMemo
-from refi import Refi_export
+from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
@@ -452,22 +452,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def REFI_codebook_export(self):
         """ Export the codebook as .qdc
-        Follows the REFI standard.
-        CURRENTLY IN TESTING AND MAY BE INCORRECT. """
+        Follows the REFI standard version 1.0. https://www.qdasoftware.org/
+        """
 
         Refi_export(self.settings, self.ui.textEdit, "codebook")
 
     def REFI_codebook_import(self):
         """ Import a codebook .qdc into an opened project.
-        Follows the REFI standard """
+        Follows the REFI-QDA standard version 1.0. https://www.qdasoftware.org/
+         """
 
-        QtWidgets.QMessageBox.information(None, "REFI Codebook import", "NOT IMPLEMENTED YET")
+        Refi_import(self.settings, self.ui.textEdit, "qdc")
 
     def REFI_project_import(self):
         """ Import a qpdx QDA project.
         Follows the REFI standard. """
 
         QtWidgets.QMessageBox.information(None, "REFI QDA Project import", "NOT IMPLEMENTED YET")
+        Refi_import(self.settings, self.ui.textEdit, "qdpx")
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
