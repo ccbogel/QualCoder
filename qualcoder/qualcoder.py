@@ -449,6 +449,8 @@ class MainWindow(QtWidgets.QMainWindow):
         CURRENTLY GIFS ARE EXPORTED UNCHANGED (NEED TO BE PNG OR JPG)"""
 
         Refi_export(self.settings, self.ui.textEdit, "project")
+        msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
+        QtWidgets.QMessageBox.warning(None, "REFI QDA Project export", msg)
 
     def REFI_codebook_export(self):
         """ Export the codebook as .qdc
@@ -465,11 +467,22 @@ class MainWindow(QtWidgets.QMainWindow):
         Refi_import(self.settings, self.ui.textEdit, "qdc")
 
     def REFI_project_import(self):
-        """ Import a qpdx QDA project.
+        """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard. """
 
-        QtWidgets.QMessageBox.information(None, "REFI QDA Project import", "NOT IMPLEMENTED YET")
+        self.close_project()
+        self.ui.textEdit.append("IMPORTING REFI-QDA PROJECT")
+        self.new_project()
+        # check for project created succesfully
+        if self.settings['projectName'] == "":
+            QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
+            return
         Refi_import(self.settings, self.ui.textEdit, "qdpx")
+        msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
+        msg += "Text code positions do not line up with some imports.\n"
+        msg += "Images, audio, video, transcripts not tested.\n"
+        msg += "Sets and Graphs not imported."
+        QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
@@ -498,8 +511,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
-        images, audio and video. """
+        images, audio and video.
+        Note the database does not keep a table specifically for users (coders), instead
+        usernames can be freely entered through the settings dialog and are collated from coded text, images and a/v.
+        """
 
+        if self.settings['directory'] == "":
+            self.settings['directory'] = os.path.expanduser('~')
         #logger.debug("settings[directory]:" + self.settings['directory'])
         self.settings['path'] = QtWidgets.QFileDialog.getSaveFileName(self,
             _("Enter project name"), self.settings['directory'], ".qda")[0]

@@ -61,14 +61,11 @@ class Refi_import():
     """
 
     file_path = None
-    categories = []
     codes = []
     users = []
+    cases = []
     sources = []
-    guids = []
-    notes = []  # contains xml of guid and note (memo) text
-    variables = []  # contains dictionary of variable xml, guid, name
-    xml = ""
+    variables = []  # contains dictionary of Variable guid, name, varaible application (cases or files/sources), last_insert_id, text or other
     parent_textEdit = None
     settings = None
     tree = None
@@ -81,15 +78,12 @@ class Refi_import():
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.import_type = import_type
-
-        # these two ifs are redundant but keep
-        if self.settings['projectName'] == '' and self.import_type == "qdc":
-            QtWidgets.QMessageBox.information(None, _("Codebook import"), _("Need to have an opened project before import"))
-            return
-        if self.settings['projectName'] != '' and self.import_type == "qdpx":
-            QtWidgets.QMessageBox.information(None, _("Project import"), _("Need to have no project open before import"))
-            return
-
+        self.tree = None
+        self.codes = []
+        self.users = []
+        self.cases = []
+        self.sources = []
+        self.variables = []
         self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
             _('Select REFI_QDA file'), self.settings['directory'], "(*." + import_type + ")")
         if not ok or self.file_path == "":
@@ -117,11 +111,11 @@ class Refi_import():
         children = root.getchildren()
         for cb in children:
             #print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
-            if cb.tag == "{urn:QDA-XML:codebook:1:0}Codes":
+            if cb.tag in ("{urn:QDA-XML:codebook:1:0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
-                codes = cb.getchildren()
-                for c in codes:
-                    # recursive search through each Code in Codes
+                code_elements = cb.getchildren()
+                for c in code_elements:
+                    # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 QtWidgets.QMessageBox.information(None, _("Codebook imported"),
                     str(counter) + _(" categories and codes imported from ") + self.file_path)
@@ -136,23 +130,26 @@ class Refi_import():
 
         Recursive, until no more child Codes found.
         Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
+        Note: urn difference between codebook.qdc and project.qdpx
 
-        Returns: counter of inserted codes and categories
-         """
+        :param parent element, cat_id
+
+        :returns counter of inserted codes and categories
+        """
 
         counter = 0
         elements = parent.getchildren()
         now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         description = ""
         for e in elements:
-            if e.tag ==  "{urn:QDA-XML:codebook:1:0}Description":
+            if e.tag in("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
                 description = e.text
 
         # Determine if the parent is a code or a category
         # Has Code element children, so must be a category, insert into code_cat table
         is_category = False
         for e in elements:
-            if e.tag == "{urn:QDA-XML:codebook:1:0}Code":
+            if e.tag in ("{urn:QDA-XML:codebook:1:0}Code", "{urn:QDA-XML:project:1.0}Code"):
                 is_category = True
         if is_category:
             last_insert_id = None
@@ -171,7 +168,7 @@ class Refi_import():
                     QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
 
             for e in elements:
-                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
+                if e.tag not in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
                     counter += self.sub_codes(e, last_insert_id)
                     #print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
             return counter
@@ -188,13 +185,16 @@ class Refi_import():
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
                     , [name, description, now_date, cat_id, color])
                 self.settings['conn'].commit()
+                cur.execute("select last_insert_rowid()")
+                last_insert_id = cur.fetchone()[0]
+                self.codes.append({'guid': parent.get('guid'),'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
                 QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
 
         # One child, a description so, insert this code into code_name table
-        if is_category is False and len(elements) == 1 and elements[0].tag == "{urn:QDA-XML:codebook:1:0}Description":
+        if is_category is False and len(elements) == 1 and elements[0].tag in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
             name = parent.get("name")
             #print("Only a description child: ", name)
             color = parent.get("color")
@@ -205,39 +205,616 @@ class Refi_import():
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
                     , [name, description, now_date, cat_id, color])
                 self.settings['conn'].commit()
+                cur.execute("select last_insert_rowid()")
+                last_insert_id = cur.fetchone()[0]
+                self.codes.append({'guid': parent.get('guid'),'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
                 QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
 
-    def import_project(self):
-        """ Import REFI-QDA standard project as a new project. """
+        #SHOULD NOT GET HERE
+        print("SHOULD NOT BE HERE")
+        '''print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
+        return counter'''
 
-        print(self.file_path)
-        #TODO unzip folder
-        '''
-        with open(self.file_path, "r") as xml_file:
+    def import_project(self):
+        """ Import REFI-QDA standard project into a new project space.
+        Unzip project folder and parse xml.
+        Key project tags:
+        {urn: QDA - XML: project:1.0}Users
+        {urn: QDA - XML: project:1.0}CodeBook
+        {urn: QDA - XML: project:1.0}Variables
+        {urn: QDA - XML: project:1.0}Cases
+        {urn: QDA - XML: project:1.0}Sources
+        {urn: QDA - XML: project:1.0}Links  not implemented
+        {urn: QDA - XML: project:1.0}Sets  not implemented
+        {urn: QDA - XML: project:1.0}Graphs  not implemented
+        {urn: QDA - XML: project:1.0}Notes
+        {urn: QDA - XML: project:1.0}Description
+        """
+
+        #print("IMPORT PROJECT" ,self.file_path)
+        # Create extract folder
+        self.folder_name = self.file_path[:-4] + "_temporary"
+        self.parent_textEdit.append(_("Reading from: ") + self.file_path)
+        self.parent_textEdit.append(_("Creating temporary directory: ") + self.folder_name)
+
+        # Unzip folder
+        project_zip = zipfile.ZipFile(self.file_path)
+        project_zip.extractall(self.folder_name)
+        project_zip.close()
+        # Parse xml
+        with open(self.folder_name + "/project.qde", "r") as xml_file:
             self.xml = xml_file.read()
-        print(self.xml)
         result = self.xml_validation("project")
+        self.parent_textEdit.append("Project XML parsing successful: " + str(result))
+
+        tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
+        root = tree.getroot()
+        # look for the Codes tag, which contains each Code element
+        children = root.getchildren()
+        for c in children:
+            #print(c.tag)
+            if c.tag == "{urn:QDA-XML:project:1.0}Users":
+                self.parent_textEdit.append(_("Parse users"))
+                self.parse_users(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}CodeBook":
+                codes = c.getchildren()[0]  # <Codes> tag is only element
+                counter = 0
+                for code in codes:
+                    # recursive search through each Code in Codes
+                    counter += self.sub_codes(code, None)
+                self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(counter)))
+            if c.tag == "{urn:QDA-XML:project:1.0}Variables":
+                self.parent_textEdit.append(_("Parse and loading variables"))
+                self.parse_variables(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}Cases":
+                self.parent_textEdit.append(_("Parsing and loading cases"))
+                self.parse_cases(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
+                self.parent_textEdit.append(_("Parsing and loading sources"))
+                self.parse_sources(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
+                self.parent_textEdit.append(_("Parsing and loading journal notes"))
+                self.parse_notes(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}Description":
+                self.parent_textEdit.append(_("Parsing and loading project memo"))
+                self.parse_project_description(c)
+            QtWidgets.QApplication.processEvents()
+        self.clean_up_case_codes_and_case_text()
+
+    def parse_variables(self, element):
+        """ Parse the Variables element.
+        Example format:
+        <Variable guid="51dc3bcd-5454-47ff-a4d6-ea699144410d" name="Cases:Age group" typeOfVariable="Text">
+        <Description />
+        </Variable>
+
+        TODO variables assigned to files
+
+        typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
+
+        :param element
+        """
+
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur = self.settings['conn'].cursor()
+
+        for e in element.getchildren():
+            #print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
+            name = e.get("name").split(':')[1]
+            caseOrFile = e.get("name").split(':')[0]
+            if caseOrFile == "Cases":
+                caseOrFile = "case"
+            else:
+                caseOrFile = "file"  # is this always true, need to test?
+            valuetype = e.get("typeOfVariable")  # may need to tweak Text
+            if valuetype in("Text", "Boolean", "Date", "DateTime"):
+                valuetype = "character"
+            if valuetype in ("Integer", "Float"):
+                valuetype = "numeric"
+            variable = {"name": name, "caseOrFile": caseOrFile, "guid": e.get("guid"), "id": None, "memo": "", "valuetype": valuetype}
+            # Get the description text
+            d_elements = e.getchildren()
+            for d in d_elements:
+                memo = ""
+                #print("Memo ", d.tag)
+                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
+                    memo = d.text
+                variable["memo"] = memo
+
+            # insert variable type into database
+            try:
+                cur.execute(
+                    "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
+                    , (name, now_date, self.settings['codername'], memo, caseOrFile, valuetype))
+                self.settings['conn'].commit()
+                #cur.execute("select last_insert_rowid()")
+                #last_insert_id = cur.fetchone()[0]
+            except sqlite3.IntegrityError as e:
+                QtWidgets.QMessageBox.warning(None, _("Variable import error"), _("Variable name already exists: ") + name)
+
+            # refer to the variables later
+            self.variables.append(variable)
+
+    def parse_cases(self, element):
+        """ Parse the Cases element.
+        Need to parse the element twice.
+        First parse: enter Cases into database to generate caseids after insert.
+        Enter empty values for Variables for each Case.
+        Second parse: read variable values and update in attributes table.
+
+        Note: some Codes in CodeBook are Cases - they use the same guid
+
+        Example xml format:
+        <Case guid="4a463c0d-9263-494a-81d6-e9d5a229f227" name="Anna">
+            <Description />
+            <VariableValue>
+                <VariableRef targetGUID="51dc3bcd-5454-47ff-a4d6-ea699144410d" />
+                <TextValue>20-29</TextValue>
+                </VariableValue>
+            <VariableValue>
+                <VariableRef targetGUID="d5ef65d5-bf84-425b-a1d6-ea69914df5ca" />
+                <TextValue>Female</TextValue>
+            </VariableValue>
+        </Case>
+
+        :param element - the Cases element:
+        """
+
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur = self.settings['conn'].cursor()
+
+        for e in element.getchildren():
+            #print(e.tag, e.get("name"), e.get("guid"))
+
+            item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.settings['codername'], "memo": "", "caseid": None}
+            # Get the description text
+            d_elements = e.getchildren()
+            for d in d_elements:
+                memo = ""
+                #print("Memo ", d.tag)
+                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
+                    memo = d.text
+                item["memo"] = memo
+
+            # Enter Case into sqlite and keep a copy in  a list
+            try:
+                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                    ,(item['name'], item['memo'], item['owner'], now_date))
+                self.settings['conn'].commit()
+                cur.execute("select last_insert_rowid()")
+                item['caseid'] = cur.fetchone()[0]
+                self.cases.append(item)
+            except Exception as e:
+                self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e))
+                logger.error("item:" + str(item) + ", " + str(e))
+
+            # Create an empty attribute entry for each Case and variable in the attributes table
+            sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+            for v in self.variables:
+                if v['caseOrFile'] == 'case':
+                    cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.settings['codername']))
+                    self.settings['conn'].commit()
+
+            # look for VariableValue tag, extract and enter into
+            for vv in d_elements:
+                guid = None
+                value = None
+                if vv.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                    for v_element in vv.getchildren():
+                        if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                            guid = v_element.get("targetGUID")
+                        if v_element.tag in ("{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
+                        "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                        "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                            value = v_element.text
+                    #print(guid, value)
+                    # Get attribute name by linking guids
+                    attr_name = ""
+                    for attr in self.variables:
+                        if attr['guid'] == guid:
+                            attr_name = attr['name']
+
+                    # Update the attribute table
+                    sql = "update attribute set value=? where name=? and attr_type='case'and id=?"
+                    cur.execute(sql, (value, attr_name, item['caseid']))
+                    self.settings['conn'].commit()
+
+    def clean_up_case_codes_and_case_text(self):
+        """ Some Code guids match the Case guids. So remove these Codes.
+        For text selectino:
+        Some Coding selections match the Case guid. So re-align to Case selections.
+        """
+
+        cur = self.settings['conn'].cursor()
+
+        # Remove Code and code_text
+        case_texts = []
+        for case in self.cases:
+            for code in self.codes:
+                if case['guid'] == code['guid']:
+                    cur.execute("delete from code_name where cid=?", (code['cid'],))
+                    cur.execute("select ? as 'caseid', fid, pos0,pos1, owner, date, memo from code_text where cid=?",
+                        (case['caseid'], code['cid']))
+                    results = cur.fetchall()
+                    for c in results:
+                        case_texts.append(c)
+                    cur.execute("delete from code_text where cid=?", (code['cid'],))
+                    self.settings['conn'].commit()
+
+        # Insert case text details into case_text
+        for c in case_texts:
+            sql = "insert into case_text (caseid,fid,pos0,pos1,owner, date, memo) values(?,?,?,?,?,?,?)"
+            cur.execute(sql, c)
+            self.settings['conn'].commit()
+
+    def parse_sources(self, element):
+        """ Parse the Sources element.
+        This contains text and media sources as well as variables describing the source and coding information.
+        Example format:
+        <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
+
+
+        :param element:
+        """
+
+        for e in element.getchildren():
+            #print(e.tag, e.get("name"))
+            if e.tag == "{urn:QDA-XML:project:1.0}TextSource":
+                self.load_text_source(e)  # TESTING
+            if e.tag == "{urn:QDA-XML:project:1.0}PictureSource":
+                self.load_picture_source(e)  # TESTING
+            if e.tag == "{urn:QDA-XML:project:1.0}AudioSource":
+                self.load_audio_source(e)  # TESTING
+            if e.tag == "{urn:QDA-XML:project:1.0}VideoSource":
+                self.load_video_source(e)  # TESTING
+            #TODOif e.tag == "{urn:QDA-XML:project:1.0}PDFSource":
+            #    self.load_pdf_source(e)
+
+    def load_picture_source(self, element):
+        """ Load this picture source.
+         Load the description and codings into sqlite.
+         """
+
+        print("Load picture source todo")
+        name = element.get("name")
+        guid = element.get("guid")
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+
+        # paths starts with internal://
+        path = element.get("path").split('internal:/')[1]
+        source_path = self.folder_name + '/Sources' + path
+
+        # Copy file into .qda images folder and rename into original name
+        #print(source_path)
+        destination = self.settings['path'] + "/images/" + name
+        media_path = "/images/" + name
+        #print(destination)
+        try:
+            shutil.copyfile(source_path, destination)
+        except Exception as e:
+            self.parent_textEdit.append(_('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        cur = self.settings['conn'].cursor()
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+            (name, '', creating_user, create_date, media_path, None))
+        self.settings['conn'].commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+
+        #TODO load codings
+
+
+    def load_audio_source(self, element):
+        """ Load audio source into .
+        Load the description and codings into sqlite.
+
+        path to file can be internal or relative.
+        e.g. path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
+        """
+        #TODO check this works
+        print("Load audio source todo")
+        name = element.get("name")
+        guid = element.get("guid")
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+
+        # path starts with internal:// or relative:///
+        path = element.get("path")
+        if path.find("internal://") == 0:
+            path = element.get("path").split('internal:/')[1]
+            source_path = self.folder_name + '/Sources' + path
+        if path.find("relative:///") == 0:
+            source_path = self.settings['path'] + "../" + path.split('relative:///')[1]
+            print("RELATIVE AUDIO PATH: " + source_path)  # tmp
+
+        # Copy file into .qda audio folder and rename into original name
+        #print(source_path)
+        destination = self.settings['path'] + "/audio/" + name
+        media_path = "/audio/" + name
+        #print(destination)
+        try:
+            shutil.copyfile(source_path, destination)
+        except Exception as e:
+            self.parent_textEdit.append(_('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        cur = self.settings['conn'].cursor()
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+            (name, '', creating_user, create_date, media_path, None))
+        self.settings['conn'].commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+
+        #TODO load transcript
+        #TODO transcript contains SynchPoints AKA timestamps
+        #TODO load codings
+
+    def load_video_source(self, element):
+        """ Load this video source into .
+        Load the description and codings into sqlite.
+        """
+        #TODO check this works
+        print("Load video source todo")
+        name = element.get("name")
+        guid = element.get("guid")
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+
+        # paths starts with internal:// or relative:///
+        path = element.get("path")
+        if path.find("internal://") == 0:
+            path = element.get("path").split('internal:/')[1]
+            source_path = self.folder_name + '/Sources' + path
+        if path.find("relative:///") == 0:
+            source_path = self.settings['path'] + "../" + path.split('relative:///')[1]
+            print("RELATIVE AUDIO PATH: " + source_path)  # tmp
+
+        # Copy file into .qda video folder and rename into original name
+        #print(source_path)
+        destination = self.settings['path'] + "/video/" + name
+        media_path = "/video/" + name
+        #print(destination)
+        try:
+            shutil.copyfile(source_path, destination)
+        except Exception as e:
+            self.parent_textEdit.append(_('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        cur = self.settings['conn'].cursor()
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+            (name, '', creating_user, create_date, media_path, None))
+        self.settings['conn'].commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+
+        #TODO load transcript
+        #TODO transcript contains SynchPoints AKA timestamps
+        #TODO load codings
+
+    def load_text_source(self, element):
+        """ Load this text source into sqlite.
+         Add the description and the text codings.
+         """
+
+        cur = self.settings['conn'].cursor()
+
+        name = element.get("name")
+        guid = element.get("guid")
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        # paths starts with internal://
+        plain_path = element.get("plainTextPath").split('internal:/')[1]
+        plain_path = self.folder_name + '/Sources' + plain_path
+
+        # find Description to complete memo
+        memo = ""
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = e.text
+        source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
+                 'owner': self.settings['codername'], 'date': create_date, 'guid': guid}
+        # Read the text and enter into sqlite source table
+        try:
+            with open(plain_path) as f:
+                fulltext = f.read()
+                #if fulltext[0:6] == "\ufeff":  # associated with notepad files
+                #    fulltext = fulltext[6:]
+                source['fulltext'] = fulltext
+                cur = self.settings['conn'].cursor()
+                # logger.debug("type fulltext: " + str(type(entry['fulltext'])))
+                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                    (name, fulltext, source['mediapath'], memo, creating_user, create_date))
+                self.settings['conn'].commit()
+                cur.execute("select last_insert_rowid()")
+                id_ = cur.fetchone()[0]
+                source['id'] = id_
+                self.sources.append(source)
+        except Exception as e:
+            self.parent_textEdit.append(_("Cannot read from TextSource: ") + plain_path + "\n" + str(e))
+
+        # Copy file into .qda documents folder and rename into original name
+        rich_path = element.get("richTextPath").split('internal:/')[1]
+        rich_path_full = self.folder_name + '/Sources' + rich_path
+        #print(rich_path_full)
+        destination = self.settings['path'] + "/documents/" + name + '.' + rich_path.split('.')[-1]
+        #print(destination)
+        try:
+            shutil.copyfile(rich_path_full, destination)
+        except Exception as e:
+            self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + rich_path_full + "\nto: " + destination + '\n' + str(e))
+
+        # ParsePlainTextSelection elements for Coding elements and load these
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
+                self._load_codings_for_text(source, e)
+
+    def _load_codings_for_text(self, source, element):
+        ''' These are PlainTextSelection elements.
+        These elements contain a Coding element and a Description element.
+        The Description element is treated as an Annotation.
+
+        Some Coding guids withh match a Case guid. This is Case text.
+
+        Example format:
+        < PlainTextSelection guid = "08cbced0-d736-44c8-8fd6-eb4d29fe46c5" name = "" startPosition = "1967"
+        endPosition = "2207" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime = "2019-06-07T03:36:36Z"
+        modifyingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime = "2019-06-07T03:36:36Z" >
+        < Description / >
+        < Coding guid = "76414714-63c4-4a25-a47e-66fef80bd52e" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        creationDateTime = "2019-06-06T06:27:01Z" >
+        < CodeRef targetGUID = "2dfba8c9-59f5-4424-99d6-ea9bce18134b" / >
+        < / Coding >
+        < / PlainTextSelection >
+
+         Inconsistent positioning of pos0 and pos1 from import of plain text from Nvivo.
+
+        :param entry - the source text dictionary
+        :param element - the PlainTextSelection element
         '''
+
+        cur = self.settings['conn'].cursor()
+        pos0 = int(element.get("startPosition"))
+        pos1 = int(element.get("endPosition"))
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        seltext = source['fulltext'][pos0:pos1]
+        for e in element:
+            # Treat description text as an annotation
+            if e.tag == "{urn:QDA-XML:project:1.0}Description" and e.text is not None:
+                cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
+                values(?,?,?,?,?,?)" ,(source['id'], pos0, pos1,
+                e.text, creating_user, create_date))
+                self.settings['conn'].commit()
+            if e.tag == "{urn:QDA-XML:project:1.0}Coding":
+                memo = ""
+                #TODO? can coded text be memoed?
+                # Get the code id from the CodeRef guid
+                cid = None
+                codeRef = e.getchildren()[0]
+                for c in self.codes:
+                    if c['guid'] == codeRef.get("targetGUID"):
+                        cid = c['cid']
+                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                    memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
+                    seltext, pos0, pos1, creating_user, memo, create_date))
+                self.settings['conn'].commit()
+
+    def parse_notes(self, element):
+        """ Parse the Notes element.
+        Notes are possibly journal entries.
+        Example format:
+        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
+        <Description>Steps towards completing the assignment</Description>
+        </Note>
+
+        :param element Notes
+        """
+
+        cur = self.settings['conn'].cursor()
+
+        for e in element.getchildren():
+            #print(e.tag, e.get("name"), e.get("plainTextPath"))
+            name = e.get("name")
+            create_date = e.get("creationDateTime")
+            create_date = create_date.replace('T', ' ')
+            create_date = create_date.replace('Z', '')
+            creating_user_guid = e.get("creatingUser")
+            creating_user = "default"
+            for u in self.users:
+                if u['guid'] == creating_user_guid:
+                    creating_user = u['name']
+            # paths starts with internal://
+            path = e.get("plainTextPath").split('internal:/')[1]
+            path = self.folder_name + '/Sources' + path
+            #print(path)
+            jentry = ""
+            try:
+                with open(path) as f:
+                    jentry = f.read()
+            except Exception as e:
+                self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
+            cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
+            (name, jentry, creating_user, create_date))
+            self.settings['conn'].commit()
+
+    def parse_project_description(self, element):
+        """ Parse the Description element
+        This might be an overall project description, at the end of the xml.
+        Example format:
+        <Description guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" >
+        </Description>
+
+        :param element Description
+        """
+
+        memo = element.text
+        if memo is None:
+            memo = ""
+        cur = self.settings['conn'].cursor()
+        cur.execute("update project set memo = ?", (memo, ))
+        self.settings['conn'].commit()
+
+    def parse_users(self, element):
+        """ Parse Users element children, fill list with guid and name.
+        There is no user table in QualCoder sqlite.
+        Store each user in dictionary with name and guid.
+        :param Users element
+        """
+
+        for e in element.getchildren():
+            #print(e.tag, e.get("name"), e.get("guid"))
+            self.users.append({"name": e.get("name"), "guid": e.get("guid")})
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD
         Arguments:
             1. file_xml: Input xml file
             2. file_xsd: xsd file which needs to be validated against xml
-        Return:
-            No return value
+
+        :param xsd_type codebook or project
+
+        :return true or false passing validation
         """
 
         file_xsd = path + "/Codebook.xsd"
         if xsd_type != "codebook":
             file_xsd = path + "/Project-mrt2019.xsd"
-        print(file_xsd)
+        #print(file_xsd)
         try:
-            print("Validating:{0}".format(self.xml))
-            print("xsd_file:{0}".format(file_xsd))
+            #print("Validating:{0}".format(self.xml))
+            #print("xsd_file:{0}".format(file_xsd))
             #xml_doc = etree.tostring(self.xml)
             xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
             xsd_doc = etree.parse(file_xsd)
@@ -251,7 +828,6 @@ class Refi_import():
         except AssertionError as err:
             print("Incorrect XML schema: {0}".format(err))
             return False
-
 
 
 class Refi_export(QtWidgets.QDialog):
@@ -797,7 +1373,9 @@ class Refi_export(QtWidgets.QDialog):
             self.sources.append(source)
 
     def get_users(self):
-        """ get all users and assign guid. """
+        """ Get all users and assign guid.
+        QualCoder sqlite does not actually keep a separate list of users.
+        Usernames are drawn from coded text, images and a/v."""
 
         self. users = []
         sql = "select distinct owner from  code_image union select owner from code_text union select owner from code_av"
