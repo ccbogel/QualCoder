@@ -425,6 +425,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.transcription is None:
             return
         self.ui.textEdit.setText(self.transcription[1])
+        self.ui.textEdit.ensureCursorVisible()
         self.get_timestamps_from_transcription()
 
         # get text annotations
@@ -1682,6 +1683,7 @@ class DialogViewAV(QtWidgets.QDialog):
         msecs = self.media.get_duration()
         self.ui.label_time_2.setText("Duration: " + msecs_to_mins_and_secs(msecs))
         self.ui.textEdit.setText(self.media_data['memo'])
+        self.ui.textEdit.ensureCursorVisible()
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
