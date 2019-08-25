@@ -295,15 +295,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         # cannot edit file text of there are linked cases, codes or annotations
         sql = "select * from case_text where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
-        c_linked = cur.fetchall()
+        ca_linked = cur.fetchall()
         sql = "select * from annotation where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
         a_linked = cur.fetchall()
         sql = "select * from code_text where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
         c_linked = cur.fetchall()
-        if c_linked != [] or a_linked != [] or c_linked != []:
-            msg = _("Cannot edit file text, there  are codes, cases or annotations linked to this file")
+        if ca_linked != [] or a_linked != [] or c_linked != []:
+            msg = _("Cannot edit file text, there are codes, cases or annotations linked to this file")
             QtWidgets.QMessageBox.warning(None, _('Warning'), msg, QtWidgets.QMessageBox.Ok)
             return
 
