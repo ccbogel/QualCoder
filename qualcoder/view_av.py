@@ -532,7 +532,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        print(self.time_positions)
+        #print(self.time_positions)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
