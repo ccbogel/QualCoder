@@ -29,9 +29,10 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtWidgets
 import os
 import sys
-from GUI.ui_dialog_information import Ui_Dialog_information
 import logging
 import traceback
+
+from .GUI.ui_dialog_information import Ui_Dialog_information
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

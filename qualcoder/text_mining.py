@@ -29,13 +29,14 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-from select_file import DialogSelectFile
-from GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
 import os
 import sys
 from copy import copy
 import logging
 import traceback
+
+from .select_file import DialogSelectFile
+from .GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

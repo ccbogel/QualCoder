@@ -41,15 +41,15 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-from add_item_name import DialogAddItemName
-from color_selector import DialogColorSelect
-from color_selector import colors
-from confirm_delete import DialogConfirmDelete
-from GUI.ui_dialog_code_av import Ui_Dialog_code_av
-from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from memo import DialogMemo
-from select_file import DialogSelectFile
-import vlc
+from .add_item_name import DialogAddItemName
+from .color_selector import DialogColorSelect
+from .color_selector import colors
+from .confirm_delete import DialogConfirmDelete
+from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
+from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
+from .memo import DialogMemo
+from .select_file import DialogSelectFile
+from . import vlc
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

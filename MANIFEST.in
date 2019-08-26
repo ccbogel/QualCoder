@@ -1,0 +1,2 @@
+recursive-include qualcoder/GUI *.stylesheet
+recursive-include qualcoder/locale *

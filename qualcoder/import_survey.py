@@ -28,7 +28,6 @@ https://qualcoder.wordpress.com/
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from GUI.ui_dialog_import import Ui_Dialog_Import
 import sqlite3
 import csv
 import re
@@ -38,6 +37,8 @@ import os
 import sys
 import logging
 import traceback
+
+from .GUI.ui_dialog_import import Ui_Dialog_Import
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

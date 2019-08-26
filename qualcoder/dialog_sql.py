@@ -29,14 +29,15 @@ https://github.com/ccbogel/QualCoder
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from highlighter import Highlighter
 import sqlite3
 import os
 import sys
 from datetime import datetime
-from GUI.ui_dialog_SQL import Ui_Dialog_sql
 import logging
 import traceback
+
+from .GUI.ui_dialog_SQL import Ui_Dialog_sql
+from .highlighter import Highlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

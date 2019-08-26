@@ -1,0 +1,16 @@
+Source: qualcoder
+Section: python
+Maintainer: YOUR NAME <EMAIL>
+Homepage: http://foo.com
+Build-Depends:
+    debhelper-compat,
+    dh-python,
+    python3-all,
+    python3-setuptools,
+
+Package: qualcoder
+Architecture: all
+Depends: 
+    python3,
+Homepage: http://foo.com
+Description: Here you can put a one line description. 

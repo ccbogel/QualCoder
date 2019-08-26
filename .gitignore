@@ -1,1 +1,10 @@
 venv/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/qualcoder.substvars
+debian/qualcoder
+dist
+.pybuild/
+*.egg-info
+*.deb
