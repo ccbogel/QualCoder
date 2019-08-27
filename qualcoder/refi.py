@@ -885,7 +885,7 @@ class Refi_export(QtWidgets.QDialog):
 
         Source types:
         Plain text, PDF
-        Images must be jpeg or png - although I will export all types
+        Images must be jpeg or png
 
         Create an unzipped folder with a /sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
@@ -893,11 +893,11 @@ class Refi_export(QtWidgets.QDialog):
 
         project_name = self.settings['projectName'][:-4]
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
-        print(prep_path)
+        print("REFI-QDA EXPORT prep_path: ", prep_path)  # tmp
         try:
             shutil.rmtree(prep_path)
-        except FileNotFoundError:
-            pass
+        except FileNotFoundError :
+            logger.error(_("Project export error ") + _(" .qualcoder preperatory path not found"))
         try:
             os.mkdir(prep_path)
             os.mkdir(prep_path + "/sources")
@@ -906,13 +906,14 @@ class Refi_export(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             exit(0)
         try:
-            with open(prep_path +'/' + project_name + '.qde', 'w') as f:
+            #with open(prep_path +'/' + project_name + '.qde', 'w') as f:  # older naming
+            with open(prep_path +'/project.qde', 'w') as f:
                 f.write(self.xml)
         except Exception as e:
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             print(e)
             exit(0)
-        for s in self.sources:
+        #for s in self.sources:
             #print(s)
             destination = '/sources/' + s['filename']
             if s['mediapath'] is not None:
@@ -945,8 +946,9 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError:
             pass
         msg = export_path + ".qpdx\n"
-        msg += "Journals, most memos and variables are not exported. "
-        msg += "GIFs (if present) are not converted to jpg on export, which does not meet the exchange standard. "
+        msg += "Journals, most memos and source variables are not exported. "
+        msg += "Other image formats are not converted to jpg on export. "
+        msg += "Large > 2GBfiles are not stored externally. "
         msg += "This project exchange is not fully compliant with the exchange standard."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
@@ -989,9 +991,11 @@ class Refi_export(QtWidgets.QDialog):
         """ Creates the xml for the .qde file.
         base path for external sources is set to the settings directory. """
 
-        self.xml = '<?xml version="1.0" standalone="yes" encoding="UTF-8"?>\n'
+        self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<Project '
-        self.xml += 'xmlns="urn:QDA-XML:project:1.0" '
+        self.xml += 'xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        self.xml += 'name="' + self.settings['projectName'] + '" '
+        self.xml += 'origin="Qualcoder-1.4" '
         guid = self.create_guid()
         self.xml += 'creatingUserGUID="' + guid + '" '  # there is no creating user in QualCoder
         cur = self.settings['conn'].cursor()
@@ -1000,15 +1004,12 @@ class Refi_export(QtWidgets.QDialog):
         dtime = result[0].replace(" ", "T")
         self.xml += 'creationDateTime="' + dtime + '" '
         #self.xml += 'basePath="' + self.settings['directory'] + '" '
-        self.xml += 'name="' + self.settings['projectName'] + '" '
-        self.xml += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-        self.xml += 'origin="Qualcoder-1.3" '
-        self.xml += 'xsi:schemaLocation="urn:QDA-XML:project:1:0 http://schema.qdasoftware.org/versions/Project/v1.0/Project.xsd"'
+        self.xml += 'xmlns="urn:QDA-XML:project:1.0"'
         self.xml += '>\n'
         # add users
         self.xml += "<Users>\n"
         for row in self.users:
-            self.xml += '<User guid="' + row['guid'] + '" name="' + row['name'] + '"/>\n'
+            self.xml += '<User guid="' + row['guid'] + '" name="' + row['name'] + '" />\n'
         self.xml += "</Users>\n"
         self.xml += self.codebook_xml()
         self.xml += self.variables_xml()
@@ -1016,18 +1017,22 @@ class Refi_export(QtWidgets.QDialog):
         self.xml += self.sources_xml()
         self.xml += self.notes_xml()
         #self.sets_xml()
+        #self.xml += self.project_description_xml()
 
         self.xml += '</Project>'
 
     def variables_xml(self):
         """ Variables are associated with Sources and Cases.
-        Called by project_xml """
+        Stores a list of the variables with guids for later use.
+        Called by project_xml
+
+        :returns xml string
+        """
 
         self.variables = []
-
         xml = ""
         cur = self.settings['conn'].cursor()
-        cur.execute("select name, date ,owner, memo, caseOrFile,valuetype from attribute_type")
+        cur.execute("select name, memo, caseOrFile,valuetype from attribute_type")
         results = cur.fetchall()
         if results == []:
             return xml
@@ -1038,54 +1043,95 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'name="' + r[0] + '" '
             xml += 'typeOfVariable="'
             # Only two variable options in QualCoder
-            if r[5] == 'numeric':
+            if r[3] == 'numeric':
                 xml += 'Float" '
             else:
                 xml += 'Text" '
             xml += '>\n'
+            # Add variable memo in description
+            if r[1] == "" or r[1] is None:
+                xml += '<Description />\n'
+            else:
+                xml += '<Description>' + r[1] + '</Description>\n'
             xml += '</Variable>\n'
-            self.variables.append({'guid': guid, 'name': r[0], 'type': r[5], 'caseOrFile': r[4]})
+            self.variables.append({'guid': guid, 'name': r[0], 'caseOrFile': r[2], 'type': r[3]})
         xml += '</Variables>\n'
         return xml
 
-    def create_note_xml(self, guid, text, user, datetime, name=""):
-        """ Create a Note xml for project, sources, cases, codes, etc
-        Appends xml in notes list.
-        name is used for names of journal entries.
-        Called by:
-        returns a guid for a NoteRef """
+    def create_project_description_xml(self):
+        """
 
+        :returns xml string of project description
+        """
+
+        #TODO
+        print("TODO PROJECT DESCRIPTION XML")
+
+    def create_note_xml(self, journal):  #guid, text, user, datetime, name=""):
+        """ Create a Note xml for journal entries
+        Appends xml in notes list.
+        Called by: notes_xml
+        Format:
+        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
+       <Description></Description>
+       </Note>
+
+        :param guid
+        :param the text of the journal entry
+        :param user is the user who created the entry
+        :param datetime is the creation datetime of the entry
+        :param name is the name of the journal entry
+
+        :returns a guid for a NoteRef
+        """
+
+        #TODO export guid_plaintext.txt file
+        print("TODO EXPORT PLAINTEXT.TXT NOTE FILES")
         guid = self.create_guid()
         xml = '<Note guid="' + guid + '" '
-        xml += 'creatingUser="' + user + '" '
-        xml += 'creationDateTime="' + datetime + '" '
-        if name != "":
-            xml += 'name="' + name + '" '
+        xml += 'creatingUser="' + journal[3] + '" '
+        #TODO datetime might need converting to REFI-QDA format - CHECK ALL SPOTS FOR THIS
+        print("TODO FIX DATETIME FORMAT")
+        xml += 'creationDateTime="' + journal[2] + '" '
+        xml += 'name="' + journal[0] + '" '
+        xml += ' plainTextPath="internal://' + guid + '.txt" '
         xml += '>\n'
-        xml += '<PlainTextContent>' + text + '</PlainTextContent>\n'
+        #xml += '<PlainTextContent>' + text + '</PlainTextContent>\n'
+        # Add blank Description tag for the journal entry, as these are not memoed
+        xml += '<Description />'
         xml += '</Note>\n'
         self.notes.append(xml)
-        noteref = '<NoteRef targetGUID="' + guid + '" />\n'
-        return noteref
+        return xml
 
     def notes_xml(self):
-        """ Collate note_xml list into final xml
+        """ Get journal entries and store them as Notes.
+        Collate note_xml list into final xml
         <Notes><Note></Note></Notes>
         Note xml requires a NoteRef in the source or case.
         Called by: project_xml
-        returns xml """
 
-        if self.notes == []:
-            return ''
+        :returns xml
+        """
+
+        self.notes = []
+        # Get journal entries
+        cur = self.settings['conn'].cursor()
+        sql = "select name, jentry, date, owner from journal where jentry is not null"
+        cur.execute(sql)
+        j_results = cur.fetchall()
         xml = '<Notes>\n'
-        for note in self.notes:
-            xml += note
+        for j in j_results:
+             #TODO add note detials to this and then export .txt files
+             #TODO self.notes.append
+            xml += self.create_note_xml(j)
         xml += '</Notes>\n'
         return xml
 
     def cases_xml(self):
         """ Create xml for cases.
-        Putting memo into description, but should I also create a Note xml too?
+        Put case memo into description tag.
+
+
         Called by: project_xml
         returns xml """
 
@@ -1101,19 +1147,56 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'name="' + r[1] + '">\n'
             if r[2] != "":
                 xml += '<Description>' + r[2] + '</Description>\n'
+            if r[2] == "":
+                xml += '<Description />\n'
+            xml += self.case_variables_xml(r[0])
             xml += self.case_source_ref_xml(r[0])
-            #TODO unsure how this works as only has a targetRef
-            #xml += self.case_selection_xml(r[0])
-            #TODO unsure how this works
-            #xml += self.case_variables_xml(r[0])
             xml += '</Case>\n'
         xml += '</Cases>\n'
+        return xml
+
+    def case_variables_xml(self, caseid):
+        """ Get the variables, name, type and value for this case and create xml.
+        Case variables are stored like this:
+        <VariableValue>
+        <VariableRef targetGUID="51dc3bcd-5454-47ff-a4d6-ea699144410d" />
+        <TextValue>20-29</TextValue>
+        </VariableValue>
+
+        :param caseid integer
+
+        :returns xml string for case variables
+        """
+
+        xml = ""
+        cur = self.settings['conn'].cursor()
+        sql = "select attribute.name, value from attribute where attr_type='case' and id=?"
+        cur.execute(sql, (caseid, ))
+        attributes = cur.fetchall()
+        for a in attributes:
+            xml += '<VariableValue>\n'
+            guid = ''
+            var_type = 'character'
+            for v in self.variables:
+                if v['name'] == a[0]:
+                    guid = v['guid']
+                    var_type == v['type']
+            xml += '<VariableRef targetGUID="' + guid + '" />\n'
+            if var_type == 'numeric':
+                xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
+            if var_type == 'character':
+                xml += '<TextValue>' + a[1] + '</TextValue>\n'
+            xml += '</VariableValue>\n'
         return xml
 
     def case_source_ref_xml(self, caseid):
         """ Find sources linked to this case, pos0 and pos1 must equal zero.
         Called by: cases_xml
-        returns xml """
+
+        :param caseid integer
+
+        :returns xml string
+        """
 
         xml = ''
         cur = self.settings['conn'].cursor()
@@ -1134,7 +1217,9 @@ class Refi_export(QtWidgets.QDialog):
         """ Create xml for sources: text, pictures, pdf, audio, video.
          Also add selections to each source.
         Called by: project_xml
-        returns xml """
+
+        :returns xml string
+        """
 
         xml = "<Sources>\n"
         for s in self.sources:
@@ -1231,7 +1316,10 @@ class Refi_export(QtWidgets.QDialog):
         xml is in form:
         <PlainTextSelection><Coding><CodeRef/></Coding></PlainTextSelection>
         Called by: sources_xml
-        returns xml
+
+        :param id_ file id integer
+
+        :returns xml string
         """
 
         xml = ""
@@ -1250,7 +1338,7 @@ class Refi_export(QtWidgets.QDialog):
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + str(r[5]).replace(' ', 'T') + '">\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '"/>\n'
+            xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
             xml += '</Coding>\n'
             xml += '</PlainTextSelection>\n'
         return xml
@@ -1258,7 +1346,11 @@ class Refi_export(QtWidgets.QDialog):
     def picture_selection_xml(self, id_):
         """ Get and complete picture selection xml.
         Called by: sources_xml
-        returns xml """
+
+        :param id_ is the source id
+
+        :returns xml string
+        """
 
         xml = ""
         sql = "select imid, cid, x1,y1, width, height, owner, date, memo from code_image "
@@ -1286,7 +1378,11 @@ class Refi_export(QtWidgets.QDialog):
     def av_selection_xml(self, id_):
         """ Get and complete av selection xml.
         Called by: sources_xml
-        returns xml """
+
+        :param id_ is the source id
+
+        :returns xml string
+        """
 
         xml = ""
         sql = "select avid, cid, pos0, pos1, owner, date, memo from code_av "
@@ -1312,7 +1408,11 @@ class Refi_export(QtWidgets.QDialog):
     def transcript_xml(self, source):
         """ Find any transcript of media source.
         Called by: sources_xml
-        returns xml """
+
+        :param source  is this media source dictionary.
+
+        :returns xml string
+        """
 
         xml = ""
         for t in self.sources:
@@ -1425,7 +1525,9 @@ class Refi_export(QtWidgets.QDialog):
         """ Top level items are main categories and unlinked codes
         Create xml for codes and categories.
         codes within categories are does like this: <code><code></code></code>
-        returns xml """
+
+        :returns xml string
+        """
 
         xml = '<CodeBook>\n'
         xml += '<Codes>\n'
@@ -1457,7 +1559,13 @@ class Refi_export(QtWidgets.QDialog):
 
     def add_sub_categories(self, cid, cats):
         """ Returns recursive xml of category.
-        Categories have isCodable=true in exports from other software """
+        Categories have isCodable=true in exports from other software.
+
+        :param cid  is this cid
+        :param cats  a list of categories
+
+        :returns xml string
+        """
 
         xml = ""
         counter = 0
@@ -1491,6 +1599,8 @@ class Refi_export(QtWidgets.QDialog):
         """ Create globally unique guid for each component. 128 bit integer, 32 chars
         Format:
         ([0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12})|(\{[0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12}\})
+
+        :returns guid string
         """
 
         v = uuid.uuid4().hex
