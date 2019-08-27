@@ -307,7 +307,7 @@ class DialogSQL(QtWidgets.QDialog):
             self.ui.textEdit_sql.setText(beginText + endText)
 
         if action == action_paste:
-            clipboard = QtGui.QApplication.clipboard()
+            clipboard = QtWidgets.QApplication.clipboard()
             text = clipboard.text()
             cursor.insertText(text)
 
