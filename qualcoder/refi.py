@@ -946,10 +946,11 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError:
             pass
         msg = export_path + ".qpdx\n"
-        msg += "Journals, most memos and source variables are not exported. "
+        msg += "Source variables are not exported. "
+        msg += "Coding for audio/video and images not exported."
         msg += "Other image formats are not converted to jpg on export. "
-        msg += "Large > 2GBfiles are not stored externally. "
-        msg += "This project exchange is not fully compliant with the exchange standard."
+        msg += "Large > 2GBfiles are not stored externally. All files not exported yet."
+        msg += "This project exchange is not compliant with the exchange standard."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
     def export_codebook(self):
@@ -999,10 +1000,9 @@ class Refi_export(QtWidgets.QDialog):
         guid = self.create_guid()
         self.xml += 'creatingUserGUID="' + guid + '" '  # there is no creating user in QualCoder
         cur = self.settings['conn'].cursor()
-        cur.execute("select date,memo from project")
+        cur.execute("select date from project")
         result = cur.fetchone()
-        dtime = result[0].replace(" ", "T")
-        self.xml += 'creationDateTime="' + dtime + '" '
+        self.xml += 'creationDateTime="' + self.convert_timestamp(result[0]) + '" '
         #self.xml += 'basePath="' + self.settings['directory'] + '" '
         self.xml += 'xmlns="urn:QDA-XML:project:1.0"'
         self.xml += '>\n'
@@ -1017,8 +1017,7 @@ class Refi_export(QtWidgets.QDialog):
         self.xml += self.sources_xml()
         self.xml += self.notes_xml()
         #self.sets_xml()
-        #self.xml += self.project_description_xml()
-
+        self.xml += self.project_description_xml()
         self.xml += '</Project>'
 
     def variables_xml(self):
@@ -1058,14 +1057,20 @@ class Refi_export(QtWidgets.QDialog):
         xml += '</Variables>\n'
         return xml
 
-    def create_project_description_xml(self):
+    def project_description_xml(self):
         """
 
         :returns xml string of project description
         """
 
-        #TODO
-        print("TODO PROJECT DESCRIPTION XML")
+        cur = self.settings['conn'].cursor()
+        cur.execute("select memo from project")
+        results = cur.fetchall()
+        if results == []:  # this should not happen
+            return '<Description />\n'
+        memo = str(results[0][0])  # could be None
+        xml = '<Description>' + memo + '</Description>\n'
+        return xml
 
     def create_note_xml(self, journal):  #guid, text, user, datetime, name=""):
         """ Create a Note xml for journal entries
@@ -1092,7 +1097,7 @@ class Refi_export(QtWidgets.QDialog):
         xml += 'creatingUser="' + journal[3] + '" '
         #TODO datetime might need converting to REFI-QDA format - CHECK ALL SPOTS FOR THIS
         print("TODO FIX DATETIME FORMAT")
-        xml += 'creationDateTime="' + journal[2] + '" '
+        xml += 'creationDateTime="' + self.convert_timestamp(journal[2]) + '" '
         xml += 'name="' + journal[0] + '" '
         xml += ' plainTextPath="internal://' + guid + '.txt" '
         xml += '>\n'
@@ -1119,6 +1124,8 @@ class Refi_export(QtWidgets.QDialog):
         sql = "select name, jentry, date, owner from journal where jentry is not null"
         cur.execute(sql)
         j_results = cur.fetchall()
+        if j_results == []:
+            return ''
         xml = '<Notes>\n'
         for j in j_results:
              #TODO add note detials to this and then export .txt files
@@ -1230,7 +1237,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'richTextPath="internal://' + s['filename'] + '" '
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '">\n'
                 if s['memo'] != '':
@@ -1254,7 +1261,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += '<PDFSource '
                 xml += 'path="internal://' + s['filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '">\n'
                 if s['memo'] != '':
@@ -1262,7 +1269,6 @@ class Refi_export(QtWidgets.QDialog):
                 xml += '<Representation guid="' + self.create_guid() + '" '
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
                 xml += 'name="' + s['name'] + '">\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += '</Representation>'
@@ -1270,7 +1276,7 @@ class Refi_export(QtWidgets.QDialog):
             if s['mediapath'] is not None and s['mediapath'][0:7] == '/images':
                 xml += '<PictureSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'path="internal://' + s['filename'] + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '" >\n'
@@ -1281,7 +1287,7 @@ class Refi_export(QtWidgets.QDialog):
             if s['mediapath'] is not None and s['mediapath'][0:6] == '/audio':
                 xml += '<AudioSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
@@ -1296,7 +1302,7 @@ class Refi_export(QtWidgets.QDialog):
             if s['mediapath'] is not None and s['mediapath'][0:6] == '/video':
                 xml += '<VideoSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'creationDateTime="' + s['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
@@ -1334,10 +1340,9 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'endPosition="' + str(r[3]) + '" '
             xml += 'name="' + str(r[1]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + str(r[5]).replace(' ', 'T') + '">\n'
+            xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + str(r[5]).replace(' ', 'T') + '">\n'
+            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
             xml += '</Coding>\n'
             xml += '</PlainTextSelection>\n'
@@ -1366,10 +1371,9 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'secondY="' + str(int(r[3] + r[5])) + '" '
             xml += 'name="' + str(r[8]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" '
-            xml += 'creationDateTime="' + str(r[7]).replace(' ', 'T') + '">\n'
+            xml += 'creationDateTime="' + self.convert_timestamp(r[7]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[6]) + '" '
-            xml += 'creationDateTime="' + str(r[7]).replace(' ', 'T') + '">\n'
+            xml += 'creatingUser="' + self.user_guid(r[6]) + '" >'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
             xml += '</PictureSelection>\n'
@@ -1395,11 +1399,10 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'begin="' + str(int(r[2])) + '" '
             xml += 'end="' + str(int(r[3])) + '" '
             xml += 'name="' + str(r[6]) + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + str(r[5]).replace(' ', 'T') + '">\n'
+            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + str(r[5]).replace(' ', 'T') + '">\n'
+            xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
             xml += '</VideoSelection>\n'
@@ -1419,7 +1422,7 @@ class Refi_export(QtWidgets.QDialog):
             if t['name'] == source['name'] + '.transcribed':
                 xml = '<Transcript plainTextPath="internal://' + t['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(t['owner']) + '" '
-                xml += 'creationDateTime="' + t['date'] + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
                 xml += 'guid="' + self.create_guid() + '" '
                 xml += 'name="' + t['name'] + '" >\n'
                 xml += '<SyncPoint guid="' + self.create_guid() + '" '
@@ -1430,6 +1433,13 @@ class Refi_export(QtWidgets.QDialog):
                 xml += '</Transcript>\n'
                 break
         return xml
+
+    def convert_timestamp(self, time_in):
+        ''' Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ '''
+
+        print("TIME IN ", time_in)
+        time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + 'Z'
+        return time_out
 
     def get_sources(self):
         """ Add text sources, picture sources, pdf sources, audio sources, video sources.
@@ -1463,7 +1473,7 @@ class Refi_export(QtWidgets.QDialog):
             if r[2] is not None:
                 plaintext_filename = self.create_guid() + ".txt"
             source = {'id': r[0], 'name': r[1], 'fulltext': r[2], 'mediapath': r[3],
-            'memo': r[4], 'owner': r[5], 'date': r[6].replace(' ', 'T'), 'guid': guid,
+            'memo': r[4], 'owner': r[5], 'date': r[6], 'guid': guid,
             'filename': filename, 'plaintext_filename': plaintext_filename,
             'external': None}
             if source['mediapath'] is not None:
