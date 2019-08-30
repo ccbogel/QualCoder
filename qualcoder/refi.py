@@ -893,7 +893,7 @@ class Refi_export(QtWidgets.QDialog):
 
         project_name = self.settings['projectName'][:-4]
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
-        print("REFI-QDA EXPORT prep_path: ", prep_path)  # tmp
+        #print("REFI-QDA EXPORT prep_path: ", prep_path)  # tmp
         try:
             shutil.rmtree(prep_path)
         except FileNotFoundError :
@@ -906,15 +906,14 @@ class Refi_export(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             exit(0)
         try:
-            #with open(prep_path +'/' + project_name + '.qde', 'w') as f:  # older naming
             with open(prep_path +'/project.qde', 'w') as f:
                 f.write(self.xml)
         except Exception as e:
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             print(e)
             exit(0)
-        #for s in self.sources:
-            #print(s)
+        for s in self.sources:
+            print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
             destination = '/sources/' + s['filename']
             if s['mediapath'] is not None:
                     try:
@@ -946,10 +945,11 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError:
             pass
         msg = export_path + ".qpdx\n"
-        msg += "Source variables are not exported. "
-        msg += "Coding for audio/video and images not exported."
-        msg += "Other image formats are not converted to jpg on export. "
-        msg += "Large > 2GBfiles are not stored externally. All files not exported yet."
+        msg += "Coding for a/v transcripts is not correct yet. \n"
+        msg += "Coding exported as a <TextSource> rather than within "
+        msg += " the <VideoSource><Transcript> tags.\n"
+        msg += "gif image format is not converted to jpg on export. "
+        msg += "Large > 2GBfiles are not stored externally."
         msg += "This project exchange is not compliant with the exchange standard."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
@@ -1059,7 +1059,6 @@ class Refi_export(QtWidgets.QDialog):
 
     def project_description_xml(self):
         """
-
         :returns xml string of project description
         """
 
@@ -1220,6 +1219,40 @@ class Refi_export(QtWidgets.QDialog):
                     xml += '"/>\n'
         return xml
 
+    def source_variables_xml(self, sourceid):
+        """ Get the variables, name, type and value for this source and create xml.
+        Source variables are stored like this:
+        <VariableValue>
+        <VariableRef targetGUID="51dc3bcd-5454-47ff-a4d6-ea699144410d" />
+        <TextValue>20-29</TextValue>
+        </VariableValue>
+
+        :param caseid integer
+
+        :returns xml string for case variables
+        """
+
+        xml = ""
+        cur = self.settings['conn'].cursor()
+        sql = "select attribute.name, value from attribute where attr_type='file' and id=?"
+        cur.execute(sql, (sourceid, ))
+        attributes = cur.fetchall()
+        for a in attributes:
+            xml += '<VariableValue>\n'
+            guid = ''
+            var_type = 'character'
+            for v in self.variables:
+                if v['name'] == a[0]:
+                    guid = v['guid']
+                    var_type == v['type']
+            xml += '<VariableRef targetGUID="' + guid + '" />\n'
+            if var_type == 'numeric':
+                xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
+            if var_type == 'character':
+                xml += '<TextValue>' + a[1] + '</TextValue>\n'
+            xml += '</VariableValue>\n'
+        return xml
+
     def sources_xml(self):
         """ Create xml for sources: text, pictures, pdf, audio, video.
          Also add selections to each source.
@@ -1243,18 +1276,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['memo'] != '':
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.text_selection_xml(s['id'])
-
-                """
-                #TODO TEST variable value
-                #TODO variableRef contains name=targetGUID and type=GUID
-                # presume variable [0]
-                xml += '<VariableValue>'
-                for v in self.variables:
-                    print("VARIABLE", v)
-                xml += '<VariableRef targetGUID="'  + self.variables[0]['guid'] + '"/>'
-                xml += '</VariableValue>\n'
-                """
-
+                xml += self.source_variables_xml(s['id'])
                 xml += '</TextSource>\n'
             # pdf document
             if s['mediapath'] is None and s['name'][-4:].lower() == '.pdf':
@@ -1272,6 +1294,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'name="' + s['name'] + '">\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += '</Representation>'
+                xml += self.source_variables_xml(s['id'])
                 xml += '</PDFSource>\n'
             if s['mediapath'] is not None and s['mediapath'][0:7] == '/images':
                 xml += '<PictureSource '
@@ -1283,6 +1306,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['memo'] != '':
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.picture_selection_xml(s['id'])
+                xml += self.source_variables_xml(s['id'])
                 xml += '</PictureSource>\n'
             if s['mediapath'] is not None and s['mediapath'][0:6] == '/audio':
                 xml += '<AudioSource '
@@ -1298,6 +1322,7 @@ class Refi_export(QtWidgets.QDialog):
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'])
+                xml += self.source_variables_xml(s['id'])
                 xml += '</AudioSource>\n'
             if s['mediapath'] is not None and s['mediapath'][0:6] == '/video':
                 xml += '<VideoSource '
@@ -1313,6 +1338,7 @@ class Refi_export(QtWidgets.QDialog):
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'])
+                xml += self.source_variables_xml(s['id'])
                 xml += '</VideoSource>\n'
         xml += "</Sources>\n"
         return xml
