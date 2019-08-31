@@ -482,11 +482,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.parent_textEdit.append(entry['name'] + _(" imported."))
             self.source.append(entry)
 
-        # clear and refill table widget
-        for r in self.source:
-            self.ui.tableWidget.removeRow(0)
-        self.fill_table()
-
     def load_file_text(self, import_file):
         """ Import from file types of odt, docx pdf, epub, txt, html, htm.
         """
