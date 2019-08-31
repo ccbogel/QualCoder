@@ -388,7 +388,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt and docx
         Note importing from html, odt and docx all formatting is lost.
-        Imports images as jpg, jpeg, png, gif which are stored in an images directory.
+        Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as mp3, wav which are stored in an audio directory
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory
         """
@@ -426,7 +426,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     copyfile(f, destination)
                     self.load_file_text(destination)
                 known_file_type = True
-            if f.split('.')[-1].lower() in ('jpg', 'jpeg', 'png', 'gif'):
+            if f.split('.')[-1].lower() in ('jpg', 'jpeg', 'png'):
                 destination += "/images/" + filename
                 copyfile(f, destination)
                 self.load_media_reference("/images/" + filename)
@@ -444,6 +444,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if not known_file_type:
                 QtWidgets.QMessageBox.warning(None, _('Unknown file type'),
                     _("Unknown file type for import") + ":\n" + f)
+        self.load_file_data()
         self.fill_table()
 
     def load_media_reference(self, mediapath):
