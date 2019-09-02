@@ -31,6 +31,7 @@ import datetime
 import logging
 from lxml import etree
 import os
+import re
 import shutil
 import sqlite3
 import sys
@@ -844,7 +845,7 @@ class Refi_export(QtWidgets.QDialog):
     users = []
     sources = []
     guids = []
-    notes = []  # contains xml of guid and note (memo) text
+    note_files = []  # contains guid.txt name and note text
     variables = []  # contains dictionary of variable xml, guid, name
     xml = ""
     parent_textEdit = None
@@ -913,7 +914,7 @@ class Refi_export(QtWidgets.QDialog):
             print(e)
             exit(0)
         for s in self.sources:
-            print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
+            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
             destination = '/sources/' + s['filename']
             if s['mediapath'] is not None:
                     try:
@@ -936,6 +937,9 @@ class Refi_export(QtWidgets.QDialog):
                 # plaintext has different guid from richtext
                 with open(prep_path + '/sources/' + s['plaintext_filename'], 'w') as f:
                     f.write(s['fulltext'])
+        for notefile in self.note_files:
+            with open(prep_path + '/sources/' + notefile[0], 'w') as f:
+                f.write(notefile[1])
 
         export_path = self.settings['path'][:-4]
         shutil.make_archive(export_path, 'zip', prep_path)
@@ -946,9 +950,8 @@ class Refi_export(QtWidgets.QDialog):
             pass
         msg = export_path + ".qpdx\n"
         msg += "Coding for a/v transcripts is not correct yet. \n"
-        msg += "Coding exported as a <TextSource> rather than within "
+        msg += "Transcript coding exported as a <TextSource> rather than within "
         msg += " the <VideoSource><Transcript> tags.\n"
-        msg += "gif image format is not converted to jpg on export. "
         msg += "Large > 2GBfiles are not stored externally."
         msg += "This project exchange is not compliant with the exchange standard."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
@@ -990,7 +993,8 @@ class Refi_export(QtWidgets.QDialog):
 
     def project_xml(self):
         """ Creates the xml for the .qde file.
-        base path for external sources is set to the settings directory. """
+        base path for external sources is set to the settings directory.
+        No PDFSources, No sets, No graphs. """
 
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<Project '
@@ -1016,7 +1020,6 @@ class Refi_export(QtWidgets.QDialog):
         self.xml += self.cases_xml()
         self.xml += self.sources_xml()
         self.xml += self.notes_xml()
-        #self.sets_xml()
         self.xml += self.project_description_xml()
         self.xml += '</Project>'
 
@@ -1074,6 +1077,7 @@ class Refi_export(QtWidgets.QDialog):
     def create_note_xml(self, journal):  #guid, text, user, datetime, name=""):
         """ Create a Note xml for journal entries
         Appends xml in notes list.
+        Appends file name and journal text in notes_files list. This is exported to sources folder.
         Called by: notes_xml
         Format:
         <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
@@ -1089,13 +1093,9 @@ class Refi_export(QtWidgets.QDialog):
         :returns a guid for a NoteRef
         """
 
-        #TODO export guid_plaintext.txt file
-        print("TODO EXPORT PLAINTEXT.TXT NOTE FILES")
         guid = self.create_guid()
         xml = '<Note guid="' + guid + '" '
-        xml += 'creatingUser="' + journal[3] + '" '
-        #TODO datetime might need converting to REFI-QDA format - CHECK ALL SPOTS FOR THIS
-        print("TODO FIX DATETIME FORMAT")
+        xml += 'creatingUser="' + self.user_guid(journal[3]) + '" '
         xml += 'creationDateTime="' + self.convert_timestamp(journal[2]) + '" '
         xml += 'name="' + journal[0] + '" '
         xml += ' plainTextPath="internal://' + guid + '.txt" '
@@ -1104,7 +1104,7 @@ class Refi_export(QtWidgets.QDialog):
         # Add blank Description tag for the journal entry, as these are not memoed
         xml += '<Description />'
         xml += '</Note>\n'
-        self.notes.append(xml)
+        self.note_files.append([guid + '.txt', journal[1]])
         return xml
 
     def notes_xml(self):
@@ -1117,7 +1117,7 @@ class Refi_export(QtWidgets.QDialog):
         :returns xml
         """
 
-        self.notes = []
+        self.note_files = []
         # Get journal entries
         cur = self.settings['conn'].cursor()
         sql = "select name, jentry, date, owner from journal where jentry is not null"
@@ -1127,8 +1127,6 @@ class Refi_export(QtWidgets.QDialog):
             return ''
         xml = '<Notes>\n'
         for j in j_results:
-             #TODO add note detials to this and then export .txt files
-             #TODO self.notes.append
             xml += self.create_note_xml(j)
         xml += '</Notes>\n'
         return xml
@@ -1436,6 +1434,8 @@ class Refi_export(QtWidgets.QDialog):
 
     def transcript_xml(self, source):
         """ Find any transcript of media source.
+        Need to add timestamp synchpoints.
+
         Called by: sources_xml
 
         :param source  is this media source dictionary.
@@ -1453,17 +1453,101 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'name="' + t['name'] + '" >\n'
                 xml += '<SyncPoint guid="' + self.create_guid() + '" '
                 xml += 'position="0" timeStamp="0" />\n'
-                # Element not expected
-                #if t['memo'] != '':
-                #    xml += self.create_note_xml(guid, t['memo'], self.user_guid(t['owner']), t['date'])
+                xml += self.get_synchpoints_from_transcription(t['fulltext'])
                 xml += '</Transcript>\n'
                 break
+        return xml
+
+    def get_synchpoints_from_transcription(self, text):
+        """ Get a list of starting/ending character positions and time in milliseconds
+        from transcribed text file.
+
+        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
+        09:33:04,100 --> 09:33:09,600
+
+        Converts hh mm ss to milliseconds with text positions for xml SyncPoint
+        Format:
+        <SyncPoint guid="c32d0ae1‐7f16‐4bbe‐93a1‐537e2dc0fb66"
+        position="94" timeStamp="45000" />
+        """
+
+        mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
+        hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
+        mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
+        hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#"  # allow for 1 to 3 msecs digits
+        srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
+        xml = ""
+
+        for match in re.finditer(mmss1, text):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
+        for match in re.finditer(hhmmss1, text):
+            stamp = match.group()[1:-1]
+            s = stamp.split(':')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
+        for match in re.finditer(mmss2, text):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 60 + int(s[1])) * 1000
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
+        for match in re.finditer(hhmmss2, text):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
+        for match in re.finditer(hhmmss_sss, text):
+            # Format #00:12:34.567#
+            stamp = match.group()[1:-1]
+            text_hms = stamp.split(':')
+            text_secs = text_hms[2].split('.')[0]
+            text_msecs = text_hms[2].split('.')[1]
+            # adjust msecs to 1000's for 1 or 2 digit strings
+            if len(text_msecs) == 1:
+                text_msecs += "00"
+            if len(text_msecs) == 2:
+                text_msecs += "0"
+            try:
+                msecs = (int(text_hms[0]) * 3600 + int(text_hms[1]) * 60 + int(text_secs)) * 1000 + int(text_msecs)
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
+        for match in re.finditer(srt, text):
+            # Format 09:33:04,100 --> 09:33:09,600  skip the arrow and second time position
+            stamp = match.group()[0:12]
+            s = stamp.split(':')
+            s2 = s[2].split(',')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
+                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
+                xml += 'timeStamp="' + str(msecs) + '" />\n'
+            except:
+                pass
         return xml
 
     def convert_timestamp(self, time_in):
         ''' Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ '''
 
-        print("TIME IN ", time_in)
         time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + 'Z'
         return time_out
 
