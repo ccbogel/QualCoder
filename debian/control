@@ -1,16 +1,37 @@
 Source: qualcoder
-Section: python
-Maintainer: YOUR NAME <EMAIL>
-Homepage: http://foo.com
-Build-Depends:
-    debhelper-compat,
+Section: science
+Priority: optional
+Maintainer: Colin Curtain, <ccbogel@hotmail.com>
+Build-Depends: 
+    debhelper (>= 7),
     dh-python,
     python3-all,
     python3-setuptools,
+Standards-Version: 3.9.2
 
 Package: qualcoder
 Architecture: all
 Depends: 
-    python3,
-Homepage: http://foo.com
-Description: Here you can put a one line description. 
+    python3, 
+    python3-pyqt5,
+    python3-pil, 
+    python3-lxml, 
+    python3-pikepdf, 
+    python3-six,
+    python3-ebooklib,
+    python3-pdfminer,
+    python3-ply,
+    python3-chardet,
+    python3-vlc,
+    python3-click,
+    vlc, 
+    qpdf,
+Homepage: https://qualcoder.wordpress.com/
+Description: Qualitative data analysis.
+ A qualitative data analysis application.
+ QualCoder projects are stored in a Sqlite database. Text files can be typed in
+ manually or loaded from txt, odt, docx and optionally ,and not ideally, pdf
+ files. Codes can be assigned to text, images and audio/video segments. Codes
+ can be grouped into categories. Various types of reports can be produced
+ including visual coding graphs, coder comparisons and coding frequencies.
+

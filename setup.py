@@ -4,8 +4,6 @@ def readme():
     with open('README') as f:
         return f.read()
 
-print('aaa',find_packages())
-
 setup(
     name='QualCoder',
     version='1.3',
@@ -38,6 +36,8 @@ setup(
         'pdfminer.six',
         'ply',
         'chardet',
+        'python-vlc',
+        'click',
     ],
     include_package_data=True,
     zip_safe=False,

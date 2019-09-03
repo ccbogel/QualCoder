@@ -36,6 +36,7 @@ import sys
 import sqlite3
 import traceback
 
+import click
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .settings import DialogSettings
@@ -712,7 +713,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dialogList = tempList
 
 
-def main():
+@click.command()
+@click.option('-p','--project-path')
+def main(project_path):
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -745,6 +748,8 @@ def main():
         app.installTranslator(translator)
     getlang.install()
     ex = MainWindow()
+    if project_path:
+        ex.open_project(project_path)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

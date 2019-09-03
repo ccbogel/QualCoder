@@ -37,6 +37,7 @@ import traceback
 import zipfile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -515,18 +516,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         if import_file[-4:].lower() == '.pdf':
             fp = open(import_file, 'rb')  # read binary mode
             parser = PDFParser(fp)
-            doc = PDFDocument()
+            doc = PDFDocument(parser=parser)
             parser.set_document(doc)
-            doc.set_parser(parser)
             # potential error with encrypted PDF
-            doc.initialize('')
             rsrcmgr = PDFResourceManager()
             laparams = LAParams()
             laparams.char_margin = 1.0
             laparams.word_margin = 1.0
             device = PDFPageAggregator(rsrcmgr, laparams=laparams)
             interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in doc.get_pages():
+            for page in PDFPage.create_pages(doc):
                 interpreter.process_page(page)
                 layout = device.get_result()
                 for lt_obj in layout:

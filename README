@@ -10,5 +10,19 @@ Instructions and other information are avaible here: https://qualcoder.wordpress
 You will need to have a python3.x version installed.
 You will also need to have pyqt5, lxml, qpdf and vlc
 
+### Install via python/pip
+
+1. It is recommend to create a virtualenvironment, probably should work with `python -m venv venv`
+2. activate the new environment: `source venv\bin\activate`
+3. Install all the requirements: `python -m pip install -r requirements.txt`
+
+### Install via apt
+All dependent packages should be availabe in ubuntu disco.
+
+### Use 
+
+A deb package is provided however you will most probably need to add unstable
+repos as described at https://www.binarytides.com/enable-testing-repo-debian/
+
 ## License
 QualCoder is distributed under the MIT LICENSE.
