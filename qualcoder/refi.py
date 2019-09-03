@@ -30,6 +30,7 @@ from copy import copy
 import datetime
 import logging
 from lxml import etree
+from operator import itemgetter
 import os
 import re
 import shutil
@@ -37,6 +38,7 @@ import sqlite3
 import sys
 import traceback
 import uuid
+import vlc
 import zipfile
 
 from PyQt5 import QtWidgets
@@ -1319,7 +1321,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['memo'] != '':
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
-                xml += self.av_selection_xml(s['id'])
+                xml += self.av_selection_xml(s['id'], 'Audio')
                 xml += self.source_variables_xml(s['id'])
                 xml += '</AudioSource>\n'
             if s['mediapath'] is not None and s['mediapath'][0:6] == '/video':
@@ -1335,7 +1337,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['memo'] != '':
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
-                xml += self.av_selection_xml(s['id'])
+                xml += self.av_selection_xml(s['id'], 'Video')
                 xml += self.source_variables_xml(s['id'])
                 xml += '</VideoSource>\n'
         xml += "</Sources>\n"
@@ -1403,9 +1405,19 @@ class Refi_export(QtWidgets.QDialog):
             xml += '</PictureSelection>\n'
         return xml
 
-    def av_selection_xml(self, id_):
-        """ Get and complete av selection xml.
-        Called by: sources_xml
+    def av_selection_xml(self, id_, mediatype):
+        """ Get codings and complete av selection xml.
+        Called by: sources_xml.
+        Video Format:
+        <VideoSelection end="17706" modifyingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB"
+        begin="14706" creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" creationDateTime="2018‐03‐
+        27T19:34:32Z" modifiedDateTime="2018‐03‐27T19:34:55Z" guid="0EF270BA‐47AD‐4107‐B78F‐7697362BCA44"
+        name="00:14.70 – 00:17.70">
+        <Coding creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB"
+        creationDateTime="2018‐03‐27T19:36:01Z" guid="04EBEC7D‐EAB4‐43FC‐8167‐ADB14F921143">
+        <CodeRef targetGUID="9F43FE32‐C2CB‐4BA8‐B766‐A0734C826E49"/>
+        </Coding>
+        </VideoSelection>
 
         :param id_ is the source id
 
@@ -1419,7 +1431,7 @@ class Refi_export(QtWidgets.QDialog):
         cur.execute(sql, [id_, ])
         results = cur.fetchall()
         for r in results:
-            xml += '<VideoSelection guid="' + self.create_guid() + '" '
+            xml += '<' + mediatype + 'Selection guid="' + self.create_guid() + '" '
             xml += 'begin="' + str(int(r[2])) + '" '
             xml += 'end="' + str(int(r[3])) + '" '
             xml += 'name="' + str(r[6]) + '" '
@@ -1429,7 +1441,7 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
-            xml += '</VideoSelection>\n'
+            xml += '</' + mediatype + 'Selection>\n'
         return xml
 
     def transcript_xml(self, source):
@@ -1451,14 +1463,101 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
                 xml += 'guid="' + self.create_guid() + '" '
                 xml += 'name="' + t['name'] + '" >\n'
-                xml += '<SyncPoint guid="' + self.create_guid() + '" '
-                xml += 'position="0" timeStamp="0" />\n'
-                xml += self.get_synchpoints_from_transcription(t['fulltext'])
+                # Get and add xml for syncpoints
+                sync_list = self.get_transcript_syncpoints(t)
+                for s in sync_list:
+                    xml += s[1]
+                xml += self.get_transcript_selections(t, sync_list)
                 xml += '</Transcript>\n'
                 break
         return xml
 
-    def get_synchpoints_from_transcription(self, text):
+    def get_transcript_selections(self, media, sync_list):
+        """ Add transcript selections with syncpoints.
+        Cannot accurately match the millisecond transcript selections used here as the
+        syncpoint msecs are calculated from transcript textual timestamps.
+        Start end character text positions are accurate.
+
+        Format:
+        <TranscriptSelection guid="ecdbd559‐e5d2‐45b4‐bb60‐54e2530de054" name="English Clip 1"
+        fromSyncPoint="d7c91d8c‐77f6‐4058‐b21e‐010a157ba027" toSyncPoint="01809d1d‐40a9‐4941‐8685‐c5eafa9de319">
+        <Description>English Clip Comment 1</Description>
+        <Coding guid="f1d221e5‐fa3a‐4b9a‐865c‐7712cd428c62">
+        <CodeRef targetGUID="d342cd5e‐52d1‐4894‐a342‐7d42ed947797" />
+        </Coding>
+        <Coding
+        guid="ee856ef0‐6296‐4fd3‐8e5a‐5e3d202a145c">
+        <CodeRef targetGUID="0bd904ef‐7dff‐47d6‐a94e‐f47e9134a596" />
+        </Coding>
+        </TranscriptSelection>
+
+        :param media dictionary containing id, name, owner, date, fulltext, memo, mediapath
+
+        :param sync_list  list of guid, xml and char positions
+
+        :return: xml for transcript selections
+        """
+
+        sql = "select pos0,pos1,cid,owner, date, memo from code_text where fid=? order by pos0"
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, [media['id'], ])
+        results = cur.fetchall()
+        for r in results:
+            print(r)
+
+        #TODO
+        return ''
+
+    def get_transcript_syncpoints(self, media):
+        """
+        Need to get all the transcription codings, start, end positions, code, coder.
+        For each of these, create a syncpoint.
+        The milliseconds syncs will be approximate only, based on the start and end media milliseconds and any
+        in-text detected timestamps.
+
+        :param media dictionary containing id, name, owner, date, fulltext, memo, mediapath
+
+        :return: list containing guid, syncpoint xml, character position
+        """
+
+        tps = self.get_transcript_timepoints(media)  # ordered list of charpos, msecs
+        sql = "select pos0,pos1,cid,owner, date, memo from code_text where fid=? order by pos0"
+        cur = self.settings['conn'].cursor()
+        cur.execute(sql, [media['id'], ])
+        results = cur.fetchall()
+        sync_list = []
+        # starting syncpoint
+        guid = self.create_guid()
+        xml = '<SyncPoint guid="' + guid + '" position="0" timeStamp="0" />\n'
+        sync_list.append([guid, xml, 0])
+
+        for r in results:
+            # text start position
+            guid = self.create_guid()
+            msecs = 0
+            for t in tps:
+                if t[0] <= r[0]:
+                    msecs = t[1]
+            xml = '<SyncPoint guid="' + guid + '" position="' + str(r[0]) + '" '
+            xml += 'timeStamp="' + str(msecs) + '" />\n'
+            sync_list.append([guid, xml, r[0]])
+            # text end position
+            msecs = 0
+            for t in tps:
+                if t[0] <= r[1]:
+                    msecs = t[1]
+            if msecs == 0:
+                msecs = tps[-1][1]  # the media end
+            guid = self.create_guid()
+            xml = '<SyncPoint guid="' + guid + '" position="' + str(r[1]) + '" '
+            xml += 'timeStamp="' + str(msecs) + '" />\n'
+            sync_list.append([guid, xml, r[1]])
+
+        #TODO might have multiples of the same char position and msecs, trim back?
+
+        return sync_list
+
+    def get_transcript_timepoints(self, media):
         """ Get a list of starting/ending character positions and time in milliseconds
         from transcribed text file.
 
@@ -1469,7 +1568,16 @@ class Refi_export(QtWidgets.QDialog):
         Format:
         <SyncPoint guid="c32d0ae1‐7f16‐4bbe‐93a1‐537e2dc0fb66"
         position="94" timeStamp="45000" />
+
+        :param text string
+
+        :return list of time points as [character position, milliseconds]
         """
+
+        text = media['fulltext']
+
+        if len(text) == 0 or text is None:
+            return []
 
         mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
         hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
@@ -1477,15 +1585,15 @@ class Refi_export(QtWidgets.QDialog):
         hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
         hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#"  # allow for 1 to 3 msecs digits
         srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
-        xml = ""
 
+        time_pos = [[0, 0]]
         for match in re.finditer(mmss1, text):
             stamp = match.group()[1:-1]
             s = stamp.split(':')
             try:
                 msecs = (int(s[0]) * 60 + int(s[1])) * 1000
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
         for match in re.finditer(hhmmss1, text):
@@ -1493,8 +1601,7 @@ class Refi_export(QtWidgets.QDialog):
             s = stamp.split(':')
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
         for match in re.finditer(mmss2, text):
@@ -1502,8 +1609,7 @@ class Refi_export(QtWidgets.QDialog):
             s = stamp.split('.')
             try:
                 msecs = (int(s[0]) * 60 + int(s[1])) * 1000
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
         for match in re.finditer(hhmmss2, text):
@@ -1511,8 +1617,7 @@ class Refi_export(QtWidgets.QDialog):
             s = stamp.split('.')
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
         for match in re.finditer(hhmmss_sss, text):
@@ -1528,8 +1633,7 @@ class Refi_export(QtWidgets.QDialog):
                 text_msecs += "0"
             try:
                 msecs = (int(text_hms[0]) * 3600 + int(text_hms[1]) * 60 + int(text_secs)) * 1000 + int(text_msecs)
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
         for match in re.finditer(srt, text):
@@ -1539,11 +1643,30 @@ class Refi_export(QtWidgets.QDialog):
             s2 = s[2].split(',')
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
-                xml += '<SyncPoint guid="' + self.create_guid() + '" position="' + str(match.span()[0]) + '" '
-                xml += 'timeStamp="' + str(msecs) + '" />\n'
+                time_pos.append([match.span()[0], msecs])
             except:
                 pass
-        return xml
+
+        media_length = 0
+        cur = self.settings['conn'].cursor()
+        media_name = media['name'][0:-12]
+        cur.execute("select mediapath from source where name=?", (media_name, ))
+        media_path_list = cur.fetchone()
+        try:
+            instance = vlc.Instance()
+            vlc_media = instance.media_new(self.settings['path'] + media_path_list[0])
+            vlc_media.parse()
+            media_length = vlc_media.get_duration() - 1
+            if media_length == -1:
+                media_length = 0
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(None, _("Media not found"),
+                str(e) + "\n" + media_name)
+        time_pos.append([len(text) - 1, media_length])
+
+        # order the list by character positions
+        time_pos = sorted(time_pos, key=itemgetter(0))
+        return time_pos
 
     def convert_timestamp(self, time_in):
         ''' Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ '''
