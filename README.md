@@ -21,7 +21,7 @@ Once a python 3.x is installed, make the install.sh executable and run the insta
 
 ./install.sh
 
-The qualcoder folder should be in te same directory as the install.sh script.
+The qualcoder folder should be in the same directory as the install.sh script.
 
 This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
