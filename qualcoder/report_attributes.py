@@ -33,7 +33,7 @@ import sys
 import logging
 import traceback
 
-from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
+from GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

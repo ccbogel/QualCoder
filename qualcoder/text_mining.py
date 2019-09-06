@@ -35,8 +35,8 @@ from copy import copy
 import logging
 import traceback
 
-from .select_file import DialogSelectFile
-from .GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
+from select_file import DialogSelectFile
+from GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

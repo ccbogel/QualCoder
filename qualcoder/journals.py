@@ -34,8 +34,8 @@ import sys
 import logging
 import traceback
 
-from .GUI.ui_dialog_journals import Ui_Dialog_journals
-from .confirm_delete import DialogConfirmDelete
+from GUI.ui_dialog_journals import Ui_Dialog_journals
+from confirm_delete import DialogConfirmDelete
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

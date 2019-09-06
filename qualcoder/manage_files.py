@@ -47,16 +47,16 @@ from pdfminer.layout import LAParams, LTTextBox, LTTextLine
 import ebooklib
 from ebooklib import epub
 
-from .add_item_name import DialogAddItemName
-from .confirm_delete import DialogConfirmDelete
-from .docx import opendocx, getdocumenttext
-from .GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from .GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
-from .html_parser import *
-from .memo import DialogMemo
-from .view_image import DialogViewImage
-from .view_av import DialogViewAV
+from add_item_name import DialogAddItemName
+from confirm_delete import DialogConfirmDelete
+from docx import opendocx, getdocumenttext
+from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
+from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
+from html_parser import *
+from memo import DialogMemo
+from view_image import DialogViewImage
+from view_av import DialogViewAV
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

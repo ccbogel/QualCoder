@@ -31,7 +31,7 @@ import sys
 import logging
 import traceback
 
-from .GUI.ui_dialog_confirm_delete import Ui_Dialog_confirmDelete
+from GUI.ui_dialog_confirm_delete import Ui_Dialog_confirmDelete
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
