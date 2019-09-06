@@ -38,7 +38,10 @@ import sqlite3
 import sys
 import traceback
 import uuid
-import vlc
+try:
+    import vlc
+except:
+    pass
 import zipfile
 
 from PyQt5 import QtWidgets

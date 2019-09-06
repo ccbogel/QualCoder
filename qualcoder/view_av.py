@@ -41,7 +41,10 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-import vlc
+try:
+    import vlc
+except:
+    pass
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
