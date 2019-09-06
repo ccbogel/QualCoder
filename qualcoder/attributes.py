@@ -26,18 +26,20 @@ https://github.com/ccbogel/QualCoder
 https://pypi.org/project/QualCoder
 '''
 
-from PyQt5 import QtCore, QtGui, QtWidgets
 import datetime
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from memo import DialogMemo
-from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 import os
 import sys
 import logging
 import traceback
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+from .add_item_name import DialogAddItemName
+from .confirm_delete import DialogConfirmDelete
+from .memo import DialogMemo
+from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
+from .GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

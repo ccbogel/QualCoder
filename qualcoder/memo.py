@@ -27,11 +27,12 @@ https://qualcoder.wordpress.com/
 '''
 
 from PyQt5 import QtWidgets
-from GUI.ui_dialog_memo import Ui_Dialog_memo
 import os
 import sys
 import logging
 import traceback
+
+from .GUI.ui_dialog_memo import Ui_Dialog_memo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

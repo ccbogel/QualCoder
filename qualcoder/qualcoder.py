@@ -36,26 +36,27 @@ import sys
 import sqlite3
 import traceback
 
+import click
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from settings import DialogSettings
-from attributes import DialogManageAttributes
-from cases import DialogCases
-from codebook import Codebook
-from code_text import DialogCodeText
-from dialog_sql import DialogSQL
-from GUI.ui_main import Ui_MainWindow
-from import_survey import DialogImportSurvey
-from information import DialogInformation
-from journals import DialogJournals
-from manage_files import DialogManageFiles
-from memo import DialogMemo
-from refi import Refi_export, Refi_import
-from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from .settings import DialogSettings
+from .attributes import DialogManageAttributes
+from .cases import DialogCases
+from .codebook import Codebook
+from .code_text import DialogCodeText
+from .dialog_sql import DialogSQL
+from .GUI.ui_main import Ui_MainWindow
+from .import_survey import DialogImportSurvey
+from .information import DialogInformation
+from .journals import DialogJournals
+from .manage_files import DialogManageFiles
+from .memo import DialogMemo
+from .refi import Refi_export, Refi_import
+from .reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
-from view_av import DialogCodeAV
-from view_graph import ViewGraph
-from view_image import DialogCodeImage
+from .view_av import DialogCodeAV
+from .view_graph import ViewGraph
+from .view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -712,7 +713,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dialogList = tempList
 
 
-def main():
+@click.command()
+@click.option('-p','--project-path')
+def main(project_path):
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -745,6 +748,8 @@ def main():
         app.installTranslator(translator)
     getlang.install()
     ex = MainWindow()
+    if project_path:
+        ex.open_project(project_path)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

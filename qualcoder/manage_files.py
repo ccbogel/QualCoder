@@ -37,23 +37,26 @@ import traceback
 import zipfile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from docx import opendocx, getdocumenttext
-import ebooklib
-from ebooklib import epub
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
-from html_parser import *
-from memo import DialogMemo
-from pdfminer.pdfparser import PDFParser, PDFDocument
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
-from view_image import DialogViewImage
-from view_av import DialogViewAV
+
+import ebooklib
+from ebooklib import epub
+
+from .add_item_name import DialogAddItemName
+from .confirm_delete import DialogConfirmDelete
+from .docx import opendocx, getdocumenttext
+from .GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
+from .GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
+from .html_parser import *
+from .memo import DialogMemo
+from .view_image import DialogViewImage
+from .view_av import DialogViewAV
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -509,18 +512,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         if import_file[-4:].lower() == '.pdf':
             fp = open(import_file, 'rb')  # read binary mode
             parser = PDFParser(fp)
-            doc = PDFDocument()
+            doc = PDFDocument(parser=parser)
             parser.set_document(doc)
-            doc.set_parser(parser)
             # potential error with encrypted PDF
-            doc.initialize('')
             rsrcmgr = PDFResourceManager()
             laparams = LAParams()
             laparams.char_margin = 1.0
             laparams.word_margin = 1.0
             device = PDFPageAggregator(rsrcmgr, laparams=laparams)
             interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in doc.get_pages():
+            for page in PDFPage.create_pages(doc):
                 interpreter.process_page(page)
                 layout = device.get_result()
                 for lt_obj in layout:
