@@ -13,7 +13,6 @@ You will also need to have a vlc player installed - for audio and video.
 
 ### Linux:
 
-There is a separate README file for Ubuntu above.
 I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package. It is not a perfect package so you might have to re-install it to get it to install correctly.
 
 ### Manual install on Linux:
