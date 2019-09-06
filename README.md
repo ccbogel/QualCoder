@@ -9,10 +9,11 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION
 You will need to have a python3.x version installed.
 You will also need to have pyqt5 and lxml to get text from docx files.
-You will also need to have a vlc player installed - for audio and video. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3.
+You will also need to have a vlc player installed - for audio and video. 
 
 ### Linux:
 
+There is a separate README file for Ubuntu above.
 I have created a .deb package for QualCoder which can be installed into Debian/Ubuntu systems. This will install the QualCoder software by double-clicking on the .deb package. It is not a perfect package so you might have to re-install it to get it to install correctly.
 
 ### Manual install on Linux:
@@ -27,7 +28,7 @@ This will install QualCoder in the /usr/share directory and create a launcher. A
 
 ### Windows: 
 
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store.
+Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3.
 
 Install dependencies in the command prompt:
 
@@ -37,8 +38,6 @@ To launch, you can create a shortcut to the qualcoder.py file to start QualCoder
 
 Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
 
-CURRENT WINDOWS ISSUE: working with audio/video requires a missing dll module. So I have also added a qualcoder_non_av folder which will run qualcoder for text and images. You wont be able to code or view audio or video. 
-I believe the problem is based on whether you have both 32 bit python and vlc install or 64 bit python and vlc installed. If one is 32 bit and the other is 64 bit, python and vlc will not be compatable.
 
 ### MacOS
 
@@ -78,7 +77,7 @@ Required
 * vlc
 
 ## Issues
-* Testing has only been performed on Ubuntu and Linux Mint and for a large part on Windows 10. Some usage conducted with Lubuntu and Apple MacOSX.
+* Testing has mostly been performed on Ubuntu, Linux Mint and Windows 10. Some usage conducted with Lubuntu and Apple MacOSX.
 
 ## Future plans
 * Reports:
