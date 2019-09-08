@@ -1,4 +1,4 @@
-graphviz
+pygraphviz
 pikepdf
 six
 ebooklib
