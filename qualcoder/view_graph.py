@@ -26,16 +26,16 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from collections import Counter
+from collections import Counter, defaultdict
 from copy import deepcopy
 import logging
+import time
 import math
 import os
 import sys
 import traceback
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QDialog
 
 from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
 from .information import DialogInformation
@@ -43,6 +43,101 @@ from .memo import DialogMemo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+def get_cats_from_supercats(node,cats):
+    cats = deepcopy(cats)
+    for x in cats:
+        if x['supercatid'] == node['catid']:
+            yield x
+            yield from get_cats_from_supercats(x,cats)
+
+def calc_supercats(cats):
+    per_supercat = defaultdict(list)
+    for cat in cats:
+        per_supercat[cat['supercatid']].append(cat)
+    return per_supercat
+
+def recurse_supercats(node,per_supercat,func):
+    for x in per_supercat.pop(node['catid'],[]):
+        func(node,x)
+        yield x
+        yield from recurse_supercats(x,per_supercat,func=func)
+
+def visit_cats_from_supercats(cats,node=None,func=None):
+    if func is None:
+        func = lambda a,b:(a,b)
+    per_supercat = calc_supercats(cats)
+    if node is not None:
+        yield from recurse_supercats(node,per_supercat,func=func)
+    else:
+        per_cats = {x['catid']:x for x in cats}
+        for supercatid,scats in per_supercat.items():
+            if supercatid in per_cats:
+                supercat = per_cats[supercatid]
+                for cat in scats:
+                    func(supercat,cat)
+                    yield cat
+            else:
+                for cat in cats:
+                    func(None,cat)
+                    yield cat
+
+
+def get_codes_from_cats(cats,codes):
+    for cat in cats:
+        for c in codes:
+            if c['catid'] == cat['catid']:
+                yield c
+
+def visit_codes_from_cats(cats,codes,func=None):
+    if func is None:
+        func = lambda a,b:(a,b)
+    for cat in cats:
+        for c in codes:
+            if c['catid'] == cat['catid'] and c != cat:
+                func(cat,c)
+                yield c
+
+
+def get_first_with_attr(cats,**attrs):
+    get_cats = lambda x:set(sorted(x[k] for k in attrs))
+    search_cats = get_cats(attrs)
+    for x in cats:
+        if get_cats(x) == search_cats:
+            return x
+
+
+def plot_with_pygraphviz(cats,codes,topnode=None,prog='neato',rankdir='LR'):
+    import pygraphviz as pgv
+
+    tocatid = lambda x:'catid:%s'%x['catid']
+    tocid = lambda x:'cid:%s'%x['cid']
+
+    graph = pgv.AGraph(overlap=False,splines=True,dpi=96,rankdir=rankdir) 
+    if topnode is not None:
+        graph.add_node(tocatid(topnode),label=topnode['name'])
+    
+    def draw_connection_cats(top,b):
+        graph.add_node(tocatid(b),label=b['name'],type='cat')
+        if top is not None:
+            graph.add_edge(tocatid(top),tocatid(b),label='')
+
+    def draw_connection_codes(top,b):
+        attrs = {}
+        if 'color' in b:
+            attrs['fillcolor'] = b['color']
+            attrs['style'] = 'filled'
+        graph.add_node(tocid(b),label=b['name'],type='code',**attrs)
+        if top is not None:
+            graph.add_edge(tocatid(top),tocid(b),label='')
+
+    mycats = list(visit_cats_from_supercats(cats,node=topnode,func=draw_connection_cats))
+    mycodes = list(visit_codes_from_cats(mycats,codes,draw_connection_codes))
+    graph.layout(prog=prog) # layout with default (neato)
+    path = os.path.abspath('simple.pdf')
+    print('saved to: %s'%path)
+    graph.draw(path) # draw png
+    return graph
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -66,334 +161,245 @@ def msecs_to_mins_and_secs(msecs):
         remainder_secs = "0" + remainder_secs
     return str(mins) + "." + remainder_secs
 
+def get_node_with_children(node, model):
+    """ Return a short list of this top node and all its children.
+    Note, maximum depth of 10. """
+    if node is None:
+        return model
+    new_model = [node]
+    i = 0  # not really needed, but keep for ensuring an exit from while loop
+    new_model_changed = True
+    while model != [] and new_model_changed and i < 10:
+        new_model_changed = False
+        append_list = []
+        for n in new_model:
+            for m in model:
+                if m['supercatid'] == n['catid']:
+                    append_list.append(m)
+        for n in append_list:
+            new_model.append(n)
+            model.remove(n)
+            new_model_changed = True
+        i += 1
+    return new_model
 
-class ViewGraph(QDialog):
+class ViewGraph(QtWidgets.QWidget):
     """ Dialog to view code and categories in an acyclic graph. Provides options for
     colors and amount of nodes to display (based on category selection).
     """
 
-    settings = None
     categories = []
     code_names = []
 
-    def __init__(self, settings):
+    def __init__(self, app,parent=None):
         """ Set up the dialog. """
-
+        super(ViewGraph,self).__init__(parent=parent)
         sys.excepthook = exception_handler
-        QDialog.__init__(self)
-        self.settings = settings
-        self.get_data()
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.app = app
         combobox_list = ['All']
-        for c in self.categories:
+        for c in self.app.categories:
             combobox_list.append(c['name'])
-        # Set up the user interface from Designer.
-        self.ui = Ui_Dialog_visualiseGraph()
-        self.ui.setupUi(self)
-        self.ui.comboBox.addItems(combobox_list)
-        # set the scene
-        self.scene = GraphicsScene()
-        self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.ui.pushButton_view.pressed.connect(self.do_graph)
 
-    def contextMenuEvent(self, event):
-        menu = QtWidgets.QMenu()
-        menu.addAction('sample')
-        menu.exec_(event.globalPos())
-
-    def get_data(self):
-        """ Called from init and gets all the codes and categories. """
-
-        self.categories = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by name")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
-        self.code_names = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
-        result = cur.fetchall()
-        for row in result:
-            self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
+        self.graphicsView = GraphViewer(self.app,parent=self)
+        self.layout().addWidget(self.graphicsView)
+        self.groupBox_2 = QtWidgets.QGroupBox(self)
+        self.groupBox_2.setMinimumSize(QtCore.QSize(0, 40))
+        self.groupBox_2.setTitle("")
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.pushButton_view = QtWidgets.QPushButton('View',self.groupBox_2)
+        self.pushButton_view.setGeometry(QtCore.QRect(0, 0, 161, 27))
+        self.pushButton_view.setObjectName("pushButton_view")
+        self.comboBox = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox.setGeometry(QtCore.QRect(660, 0, 421, 30))
+        self.comboBox.setObjectName("comboBox")
+        self.checkBox_neato = QtWidgets.QCheckBox('neato',self.groupBox_2)
+        self.checkBox_neato.setGeometry(QtCore.QRect(170, 0, 191, 22))
+        self.checkBox_neato.setObjectName("checkBox_blackandwhite")
+        self.layout().addWidget(self.groupBox_2)
+        self.pushButton_view.pressed.connect(self.do_graph)
+        self.comboBox.addItems(combobox_list)
+        self.resize(1098, 753)
+        # self.graphicsView.setGeometry(QtCore.QRect(10, 40, 601, 411))
 
     def do_graph(self):
-        """ Create a circular acyclic graph
-        default font size is 8.  """
-
-        self.scene.clear()
-        cats = deepcopy(self.categories)
-        codes = deepcopy(self.code_names)
-
-        for c in codes:
-            c['depth'] = 0
-            c['x'] = None
-            c['y'] = None
-            c['supercatid'] = c['catid']
-            c['angle'] = None
-            if self.ui.checkBox_blackandwhite.isChecked():
-                c['color'] = "#FFFFFF"
-            c['fontsize'] = 8
-        for c in cats:
-            c['depth'] = 0
-            c['x'] = None
-            c['y'] = None
-            c['cid'] = None
-            c['angle'] = None
-            c['color'] = '#FFFFFF'
-            c['fontsize'] = 8
-            if self.ui.checkBox_fontsize.isChecked():
-                c['fontsize'] = 9
-                if c['depth'] == 0:
-                    c['fontsize'] = 10
-        model = cats + codes
-
-        # Default is all categories and codes
-        top_node = self.ui.comboBox.currentText()
-        if top_node == "All":
-            top_node = None
-        for c in cats:
-            if c['name'] == top_node:
-                top_node = c
-        model = self.get_node_with_children(top_node, model)
-
-        ''' Look at each category and determine the depth.
-        Also determine the number of children for each catid. '''
-        supercatid_list = []
-        for c in model:
-            supercatid = 0
-            depth = 0
-            supercatid = c['supercatid']
-            supercatid_list.append(c['supercatid'])
-            while supercatid is not None:
-                for s in cats:
-                    if supercatid == s['catid']:
-                        depth += 1
-                        supercatid = s['supercatid']
-                c['depth'] = depth
-        catid_counts = Counter(supercatid_list)
-
-        # assign angles to each item segment
-        for cat_key in catid_counts.keys():
-            #logger.debug("cat_key:" + cat_key + "", catid_counts[cat_key]:" + str(catid_counts[cat_key]))
-            segment = 1
-            for m in model:
-                if m['angle'] is None and m['supercatid'] == cat_key:
-                    m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
-                    segment += 1
-        ''' Calculate x y positions from central point outwards.
-        The 'central' x value is towards the left side rather than true center, because
-        the text boxes will draw to the right-hand side.
-        '''
-        c_x = self.scene.getWidth() / 3
-        c_y = self.scene.getHeight() / 2
-        r = 180
-        rx_expander = c_x / c_y  # screen is landscape, so stretch x position
-        x_is_none = True
-        i = 0
-        while x_is_none and i < 1000:
-            x_is_none = False
-            for m in model:
-                if m['x'] is None and m['supercatid'] is None:
-                    m['x'] = c_x + (math.cos(m['angle']) * (r * rx_expander))
-                    m['y'] = c_y + (math.sin(m['angle']) * r)
-                if m['x'] is None and m['supercatid'] is not None:
-                    for super_m in model:
-                        if super_m['catid'] == m['supercatid'] and super_m['x'] is not None:
-                            m['x'] = super_m['x'] + (math.cos(m['angle']) * (r * rx_expander) / (m['depth'] + 2))
-                            m['y'] = super_m['y'] + (math.sin(m['angle']) * r / (m['depth'] + 2))
-                            if abs(super_m['x'] - m['x']) < 20 and abs(super_m['y'] - m['y']) < 20:
-                                m['x'] += 20
-                                m['y'] += 20
-                if m['x'] is None:
-                    x_is_none = True
-            i += 1
-
-        # Fix out of view items
-        for m in model:
-            if m['x'] < 2:
-                m['x'] = 2
-            if m['y'] < 2:
-                m['y'] = 2
-            if m['x'] > c_x * 2 - 20:
-                m['x'] = c_x * 2 - 20
-            if m['y'] > c_y * 2 - 20:
-                m['y'] = c_y * 2 - 20
-
-        # Add text items to the scene
-        for m in model:
-            self.scene.addItem(TextGraphicsItem(self.settings, m))
-        # Add link which includes the scene text items and associated data, add links before text_items
-        for m in self.scene.items():
-            if isinstance(m, TextGraphicsItem):
-                for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.data['supercatid'] is not None and m.data['supercatid'] == n.data['catid'] and n.data['depth'] < m.data['depth']:
-                        #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
-                        item = LinkGraphicsItem(m, n)
-                        self.scene.addItem(item)
-
-    def get_node_with_children(self, node, model):
-        """ Return a short list of this top node and all its children.
-        Note, maximum depth of 10. """
-        if node is None:
-            return model
-        new_model = [node]
-        i = 0  # not really needed, but keep for ensuring an exit from while loop
-        new_model_changed = True
-        while model != [] and new_model_changed and i < 10:
-            new_model_changed = False
-            append_list = []
-            for n in new_model:
-                for m in model:
-                    if m['supercatid'] == n['catid']:
-                        append_list.append(m)
-            for n in append_list:
-                new_model.append(n)
-                model.remove(n)
-                new_model_changed = True
-            i += 1
-        return new_model
-
-    def reject(self):
-
-        self.dialog_list = []
-        super(ViewGraph, self).reject()
-
-    def accept(self):
-
-        self.dialog_list = []
-        super(ViewGraph, self).accept()
+        name = self.comboBox.currentText()
+        topnode = get_first_with_attr(self.app.categories,name=name)
+        if self.checkBox_neato.isChecked():
+            prog = 'neato'
+        else:
+            prog = 'dot'
+        graph = plot_with_pygraphviz(
+            self.app.categories,self.app.codes,topnode=topnode,prog=prog)
+        self.graphicsView.drawGraph(graph)
 
 
-# http://stackoverflow.com/questions/17891613/pyqt-mouse-events-for-qgraphicsview
-class GraphicsScene(QtWidgets.QGraphicsScene):
-    """ set the scene for the graphics objects and re-draw events. """
+class GVEdgeGraphicsItem(QtWidgets.QGraphicsPathItem):
+    """ cudos to: http://www.mupuf.org/blog/2010/07/08/how_to_use_graphviz_to_draw_graphs_in_a_qt_graphics_scene/ """
+    def __init__(self):
+        super(GVEdgeGraphicsItem, self).__init__(None)
+        self.setFlag(self.ItemIsSelectable, False)
+        linkWidth = 1
+        self.setPen(QtGui.QPen(QtCore.Qt.black, linkWidth, QtCore.Qt.SolidLine))
 
-    # matches the initial designer file graphics view
-    sceneWidth = 982
-    sceneHeight = 647
-
-    def __init__ (self, parent=None):
-        super(GraphicsScene, self).__init__ (parent)
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
-
-    def setWidth(self, width):
-        """ Resize scene width. """
-
-        self.sceneWidth = width
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
-
-    def setHeight(self, height):
-        """ Resize scene height. """
-
-        self.sceneHeight = height
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
-
-    def getWidth(self):
-        """ Return scene width. """
-
-        return self.sceneWidth
-
-    def getHeight(self):
-        """ Return scene height. """
-
-        return self.sceneHeight
-
-    def mouseMoveEvent(self, mouseEvent):
-        """ On mouse move, an item might be repositioned so need to redraw all the link_items.
-        This slows re-drawing down, but is more dynamic. """
-
-        super(GraphicsScene, self).mousePressEvent(mouseEvent)
-
-        for item in self.items():
-            if isinstance(item, TextGraphicsItem):
-                item.data['x'] = item.pos().x()
-                item.data['y'] = item.pos().y()
-                #logger.debug("item pos:" + str(item.pos()))
-        for item in self.items():
-            if isinstance(item, LinkGraphicsItem):
-                item.redraw()
-        self.update()
-
-        '''def mousePressEvent(self, mouseEvent):
-        super(GraphicsScene, self).mousePressEvent(mouseEvent)
-        #position = QtCore.QPointF(event.scenePos())
-        #logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
-        for item in self.items(): # item is QGraphicsProxyWidget
-            if isinstance(item, LinkItem):
-                item.redraw()
-        self.update(self.sceneRect())'''
-
-    """def mouseReleaseEvent(self, mouseEvent):
-        ''' On mouse release, an item might be repositioned so need to redraw all the
-        link_items '''
-
-        super(GraphicsScene, self).mouseReleaseEvent(mouseEvent)
-        for item in self.items():
-            if isinstance(item, LinkGraphicsItem):
-                item.redraw()
-        self.update(self.sceneRect())"""
+    def setPath(self,edge,yoffset,scaler):
+        path = QtGui.QPainterPath()
+        start = edge[0].attr['pos'].split(',')
+        controlpoints = []
+        for cp in edge.attr['pos'].split(' '):
+            txt = cp.split(',')
+            controlpoints.append((float(txt[0]),float(txt[1])))
+        path.moveTo(controlpoints[0][0]*scaler,yoffset-controlpoints[0][1]*scaler)
+        i = 1
+        while i < len(controlpoints):
+            path.cubicTo(
+                controlpoints[i][0]*scaler,yoffset-controlpoints[i][1]*scaler,
+                controlpoints[i+1][0]*scaler,yoffset-controlpoints[i+1][1]*scaler,
+                controlpoints[i+2][0]*scaler,yoffset-controlpoints[i+2][1]*scaler,
+            )
+            i += 3
+        super(GVEdgeGraphicsItem,self).setPath(path)
 
 
-class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
-    """ The item show the name and color of the code or category
-    Categories are typically shown white, and category font sizes can be enlarged using a
-    checkbox and code colours can be ignores using a check box. A custom context menu
-    allows selection of a code/category memo an displaying the information.
-    """
+class ZoomedViewer(QtWidgets.QGraphicsView):
+    """ zooming and panning from https://stackoverflow.com/questions/35508711/how-to-enable-pan-and-zoom-in-a-qgraphicsview"""
 
-    data = None
-    border_rect = None
-    font = None
-    settings = None
+    def __init__(self, parent=None):
+        super(ZoomedViewer, self).__init__(parent)
+        self._zoom = 0
+        self._bb = None
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        # self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        # self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
+        self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
-    def __init__(self, settings, data):
-        super(TextGraphicsItem, self).__init__(None)
+    def has_bb(self):
+        return self._bb is not None
 
-        self.settings = settings
-        self.data = data
-        self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextEditable)
-        self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
-        self.setFont(self.font)
-        self.setPlainText(self.data['name'])
-        if self.data['cid'] is None:
-            self.setPlainText(self.data['name'])
-        self.setPos(self.data['x'], self.data['y'])
-        self.document().contentsChanged.connect(self.text_changed)
-        #self.border_rect = QtWidgets.QGraphicsRectItem(0, 0, rect.width(), rect.height())
-        #self.border_rect.setParentItem(self)
+    def fitInView(self, scale=True):
+        if self.has_bb():
+            rect = QtCore.QRectF(*self._bb)
+            if not rect.isNull():
+                self.setSceneRect(rect)
+                unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
+                self.scale(1 / unity.width(), 1 / unity.height())
+                viewrect = self.viewport().rect()
+                scenerect = self.transform().mapRect(rect)
+                factor = min(viewrect.width() / scenerect.width(),
+                             viewrect.height() / scenerect.height())
+                self.scale(factor, factor)
+                self._zoom = 0
 
-    def paint(self, painter, option, widget):
-        """ see paint override method here:
-            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
-            see:
-            https://doc.qt.io/qt-5/qpainter.html """
+    def wheelEvent(self, event):
+        if QtCore.Qt.ControlModifier & event.modifiers():
+            self.zoom(event)
+            event.accept()
+        else:
+            self.scroll(event)
+            event.accept()
 
-        color = QtGui.QColor(self.data['color'])
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.SolidPattern))
-        painter.drawRect(self.boundingRect())
-        #logger.debug("bounding rect:" + str(self.boundingRect()))
-        painter.setFont(self.font)
-        #fi = painter.fontInfo()
-        #logger.debug("Font:", fi.family(), " Pixelsize:",fi.pixelSize(), " Pointsize:", fi.pointSize(), " Style:", fi.style())
-        fm = painter.fontMetrics()
-        #logger.debug("Font height: ", fm.height())
-        painter.setPen(QtCore.Qt.black)
-        lines = self.data['name'].split('\n')
-        for row in range(0, len(lines)):
-            #painter.drawText(5,fm.height(),self.data['name'])
-            painter.drawText(5, fm.height() * (row + 1), lines[row])
+    def scroll(self,event):
+        if False: # Not working
+            height = self._bb[3] - self._bb[1]
+            if event.angleDelta().y() > 0:
+                val = 10
+            else:
+                val = -10
+            print(height,val)
+            self.translate(0,val)
 
-    def text_changed(self):
-        """ Text changed in a node. Redraw the border rectangle item to match. """
 
-        #rect = self.boundingRect()
-        #self.border_rect.setRect(0, 0, rect.width(), rect.height())
-        self.data['name'] = self.toPlainText()
-        #logger.debug("self.data[name]:" + self.data['name'])
+    def zoom(self,event):
+        if self.has_bb():
+            if event.angleDelta().y() > 0:
+                factor = 1.25
+                self._zoom += 1
+            else:
+                factor = 0.8
+                self._zoom -= 1
+            if self._zoom > 0:
+                self.scale(factor, factor)
+            elif self._zoom == 0:
+                self.fitInView()
+            else:
+                self._zoom = 0
+
+    def toggleDragMode(self):
+        if self.dragMode() == QtWidgets.QGraphicsView.ScrollHandDrag:
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+        elif self.has_bb():
+            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+
+    def resizeEvent(self,event):
+        if self._zoom == 0:
+            self.fitInView()
+        super(ZoomedViewer, self).resizeEvent(event)
+
+
+class GraphViewer(ZoomedViewer):
+    DEFAULTDPI = 72 
+    
+    def __init__(self,app=None,parent=None):
+        super(GraphViewer,self).__init__(parent=parent)
+        self.app = app
+        self.setScene(QtWidgets.QGraphicsScene(self))
+
+    def calc_node_pos(self,node):
+        pos = node.attr['pos'].split(',')
+        x = float(pos[0])
+        y = float(pos[1])
+        width = float(node.attr['width'])*self.dpi
+        height = float(node.attr['height'])*self.dpi
+        return (
+            x*(self.dpi/self.DEFAULTDPI)-width/2,
+            self._bb[3]-y*(self.dpi/self.DEFAULTDPI)-height/2,
+            width,
+            height,
+        )
+
+    def calcbb(self,graph):
+        for x in graph.graph_attr['bb'].split(','):
+            yield float(x)*(self.dpi/self.DEFAULTDPI)
+
+    def drawGraph(self,graph):
+        self.scene().clear()
+        self._zoom = 0
+        if graph is not None:
+            self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+            self.dpi = int(graph.graph_attr.get('dpi',96))
+            self._bb = tuple(self.calcbb(graph))
+
+            for node in graph.nodes():
+                item = NodeGraphicsItem(
+                    *self.calc_node_pos(node),node,app=self.app)
+                self.scene().addItem(item)
+            for edge in graph.edges():
+                x = self.app.get_node_from_graph(edge[0])
+                y = self.app.get_node_from_graph(edge[1])
+                item = GVEdgeGraphicsItem()
+                item.setPath(edge,self._bb[3],(self.dpi/self.DEFAULTDPI))
+                self.scene().addItem(item)
+        else:
+            self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+            self._bb = None
+        self.fitInView()
+   
+
+class NodeGraphicsItem(QtWidgets.QGraphicsEllipseItem):
+
+    def __init__(self,x,y,width,height,node,app=None):
+        super(NodeGraphicsItem,self).__init__(x,y,width,height)
+        self.node = node
+        self.settings = app.settings
+        self.data = app.get_node_from_graph(node)
+        self.app = app
+        if 'fillcolor' in dict(node.attr):
+            color = QtGui.QColor(node.attr['fillcolor'])
+            self.setBrush(QtGui.QBrush(color, style=QtCore.Qt.SolidPattern))
+        self.textitem = QtWidgets.QGraphicsTextItem(node.attr['label'],parent=self)
+        self.textitem.setPos(x+width/4,y+height/4)
 
     def contextMenuEvent(self, event):
         """
@@ -421,26 +427,26 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
-            ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
+            ui = DialogMemo("Memo for Code " + data['name'], data['memo'],**self.settings)
             ui.exec_()
             self.data['memo'] = ui.memo
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo(self.settings, "Memo for Category " + data['name'], data['memo'])
+            ui = DialogMemo("Memo for Category " + data['name'], data['memo'],**self.settings)
             ui.exec_()
             self.data['memo'] = ui.memo
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_cat set memo=? where catid=?", (self.data['memo'], self.data['catid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
 
     def case_media(self, data):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded media for cases: " + self.data['name'], "")
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1
         CASE_NAME = 2
@@ -558,7 +564,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         Coded media comes from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded text : " + self.data['name'], "")
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1
         SOURCE_NAME = 2
@@ -614,73 +620,27 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
         ui.exec_()
 
+class MainWindow(QtWidgets.QWidget):
 
-class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
-    """ Takes the coordinate from the two TextGraphicsItems. """
+    def __init__(self,app):
+        super(MainWindow, self).__init__()
+        self.app = app 
+        self.view = GraphViewer(app,parent=self)
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().addWidget(self.view)                       
+        button = QtWidgets.QPushButton('View',self)
+        self.layout().addWidget(button)
+        button.pressed.connect(self.do_graph)
 
-    from_widget = None
-    from_pos = None
-    to_widget = None
-    to_pos = None
+    def do_graph(self):
+        # name = self.comboBox.currentText()
+        topnode = get_first_with_attr(self.app.categories,catid=12)
+        # topnode = get_first_with_attr(self.app.categories,name=name)
+        graph = plot_with_pygraphviz(
+            self.app.categories,self.app.codes,topnode=topnode)
+        self.view.drawGraph(graph)
 
-    def __init__(self, from_widget, to_widget):
-        super(LinkGraphicsItem, self).__init__(None)
-
-        self.from_widget = from_widget
-        self.to_widget = to_widget
-        self.setFlag(self.ItemIsSelectable, True)
-        self.calculatePointsAndDraw()
-
-    def redraw(self):
-        """ Called from mouse move and release events. """
-
-        self.calculatePointsAndDraw()
-
-    def calculatePointsAndDraw(self):
-        """ Calculate the to x and y and from x and y points. Draw line between the
-        widgets. Join the line to appropriate side of widget. """
-
-        to_x = self.to_widget.pos().x()
-        to_y = self.to_widget.pos().y()
-        from_x = self.from_widget.pos().x()
-        from_y = self.from_widget.pos().y()
-
-        x_overlap = False
-        # fix from_x value to middle of from widget if to_widget overlaps in x position
-        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
-            from_x = from_x + self.from_widget.boundingRect().width() / 2
-            x_overlap = True
-        # fix to_x value to middle of to widget if from_widget overlaps in x position
-        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
-            to_x = to_x + self.to_widget.boundingRect().width() / 2
-            x_overlap = True
-
-        # fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
-        if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
-            from_x = from_x + self.from_widget.boundingRect().width()
-        # fix to_x value to right-hand side if from_widget on the right of the to widget
-        elif not x_overlap and from_x > to_x + self.to_widget.boundingRect().width():
-            to_x = to_x + self.to_widget.boundingRect().width()
-
-        y_overlap = False
-        # fix from_y value to middle of from widget if to_widget overlaps in y position
-        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
-            from_y = from_y + self.from_widget.boundingRect().height() / 2
-            y_overlap = True
-        # fix from_y value to middle of to widget if from_widget overlaps in y position
-        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
-            to_y = to_y + self.to_widget.boundingRect().height() / 2
-            y_overlap = True
-
-        # fix from_y value if to_widget is above the from_widget
-        if not y_overlap and to_y > from_y:
-            from_y = from_y + self.from_widget.boundingRect().height()
-        # fix to_y value if from_widget is below the to widget
-        elif not y_overlap and from_y > to_y:
-            to_y = to_y + self.to_widget.boundingRect().height()
-
-        linkWidth = 1
-        self.setPen(QtGui.QPen(QtCore.Qt.black, linkWidth, QtCore.Qt.SolidLine))
-        self.setLine(from_x, from_y, to_x, to_y)
-
+    def wheelEvent(self,event):
+        self.view.wheelEvent(event)
+        event.accept()
 

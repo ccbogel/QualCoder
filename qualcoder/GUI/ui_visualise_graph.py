@@ -17,8 +17,6 @@ class Ui_Dialog_visualiseGraph(object):
         self.splitter = QtWidgets.QSplitter(Dialog_visualiseGraph)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
-        self.graphicsView = QtWidgets.QGraphicsView(self.splitter)
-        self.graphicsView.setObjectName("graphicsView")
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_visualiseGraph)
         self.groupBox_2.setMinimumSize(QtCore.QSize(0, 40))

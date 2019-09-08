@@ -57,6 +57,7 @@ from .reports import DialogReportCodes, DialogReportCoderComparisons, DialogRepo
 from .view_av import DialogCodeAV
 from .view_graph import ViewGraph
 from .view_image import DialogCodeImage
+from . import view_graph
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -74,10 +75,10 @@ except OSError:
     pass
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
-     datefmt='%Y/%m/%d %I:%M', filename=logfile,
-     level=logging.DEBUG)
+     datefmt='%Y/%m/%d %I:%M')# filename=logfile,
+     # level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -88,6 +89,87 @@ def exception_handler(exception_type, value, tb_obj):
     logger.error(_("Uncaught exception : ") + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
+def split_value(intext):
+    """ A legacy method. Originally the settings file have a newline separated list of values.
+    Now, each line is preceeded by the varaible name and a colon then the value.
+    Takes the text line, and returns a value, either as is,
+    or if there is a colon the text after the colon.
+    Suggest deleting this method after 6 months.
+    """
+    try:
+        v = intext.split(':', 1)[1]
+        return v
+    except:
+        return intext
+
+
+class App(object):
+    def __init__(self,conn):
+        self.conn = conn
+        self.codes, self.categories = self.get_data()
+        self.model = self.calc_model(self.categories,self.codes)
+        self.settings = self.load_settings()
+
+    def calc_model(self,cats,codes):
+        model = {}
+        for cat in cats:
+            model['catid:%s'%cat['catid']] = cat
+        for code in codes:
+            model['cid:%s'%code['cid']] = code
+        return model
+
+    def get_node_from_graph(self,node):
+        return self.model[node.name]
+
+    def get_data(self):
+        """ Called from init and gets all the codes and categories. """
+        categories = []
+        cur = self.conn.cursor()
+        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by name")
+        result = cur.fetchall()
+        for row in result:
+            categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
+            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
+        code_names = []
+        cur = self.conn.cursor()
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        result = cur.fetchall()
+        for row in result:
+            code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
+            'cid': row[4], 'catid': row[5], 'color': row[6]})
+        return code_names,categories
+
+    @classmethod
+    def load_settings(cls):
+        # load_settings from file stored in home/.qualcoder/
+        settings =  {}
+        try:
+            with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
+                txt = f.read()
+                txt = txt.split("\n")
+                settings['codername'] = split_value(txt[0])
+                settings['font'] = split_value(txt[1])
+                settings['fontsize'] = int(split_value(txt[2]))
+                settings['treefontsize'] = int(split_value(txt[3]))
+                settings['directory'] = split_value(txt[4])
+                settings['showIDs'] = True
+                if split_value(txt[5]) == "False":
+                    settings['showIDs'] = False
+                settings['language'] = split_value(txt[6])
+                settings['backup_on_open'] = True
+                if split_value(txt[7]) == "False":
+                    settings['backup_on_open'] = False
+                settings['backup_av_files'] = True
+                if split_value(txt[8]) == "False":
+                    settings['backup_av_files'] = False
+        except:
+            f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
+            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n"
+            text += 'directory:' + home
+            text += "\nshowIDs:False\nlanguage:en\nbackup_on_open:True\nbackup_av_files:True"
+            f.write(text)
+            f.close()
+        return settings
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -111,6 +193,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.hide_menu_options()
+        self.settings.update(App.load_settings())
+        self.app = None
         self.init_ui()
         self.conn = None
         self.show()
@@ -155,49 +239,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionAbout.triggered.connect(self.about)
 
-        # load_settings from file stored in home/.qualcoder/
-        try:
-            with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
-                txt = f.read()
-                txt = txt.split("\n")
-                self.settings['codername'] = self.split_value(txt[0])
-                self.settings['font'] = self.split_value(txt[1])
-                self.settings['fontsize'] = int(self.split_value(txt[2]))
-                self.settings['treefontsize'] = int(self.split_value(txt[3]))
-                self.settings['directory'] = self.split_value(txt[4])
-                self.settings['showIDs'] = True
-                if self.split_value(txt[5]) == "False":
-                    self.settings['showIDs'] = False
-                self.settings['language'] = self.split_value(txt[6])
-                self.settings['backup_on_open'] = True
-                if self.split_value(txt[7]) == "False":
-                    self.settings['backup_on_open'] = False
-                self.settings['backup_av_files'] = True
-                if self.split_value(txt[8]) == "False":
-                    self.settings['backup_av_files'] = False
-        except:
-            f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
-            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n"
-            text += 'directory:' + home
-            text += "\nshowIDs:False\nlanguage:en\nbackup_on_open:True\nbackup_av_files:True"
-            f.write(text)
-            f.close()
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.settings_report()
-
-    def split_value(self, intext):
-        """ A legacy method. Originally the settings file have a newline separated list of values.
-        Now, each line is preceeded by the varaible name and a colon then the value.
-        Takes the text line, and returns a value, either as is,
-        or if there is a colon the text after the colon.
-        Suggest deleting this method after 6 months.
-        """
-        try:
-            v = intext.split(':', 1)[1]
-            return v
-        except:
-            return intext
 
     def hide_menu_options(self):
         """ No project opened, hide these menu options """
@@ -323,7 +367,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph(self):
         """ Show acyclic graph of codes and categories. """
 
-        ui = ViewGraph(self.settings)
+        ui = view_graph.ViewGraph(self.app)# ViewGraph(self.app)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -541,6 +585,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
         #try:
         self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
+        self.app = App(self.settings['conn'])
         cur = self.settings['conn'].cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
@@ -628,6 +673,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = ""
             try:
                 self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
+                self.app = App(self.settings['conn'])
             except Exception as e:
                 self.settings['conn'] = None
                 msg += str(e)
@@ -715,7 +761,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 @click.command()
 @click.option('-p','--project-path')
-def main(project_path):
+@click.option('-v','--view',is_flag=True)
+def gui(project_path,view):
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -750,8 +797,47 @@ def main(project_path):
     ex = MainWindow()
     if project_path:
         ex.open_project(project_path)
+    if view:
+        ex.view_graph()
     sys.exit(app.exec_())
 
-if __name__ == '__main__':
-    main()
+@click.group()
+def cli():
+    pass
+
+@cli.command()
+@click.argument('project-path')
+def interactive(project_path):
+    conn = sqlite3.connect(project_path + "/data.qda")
+    codes,cats = get_data(conn)
+    from . import view_graph
+    from IPython import embed
+    embed()
+
+@cli.command()
+@click.argument('project-path')
+@click.option('-c','--cat-id',type=int)
+@click.option('-p','--prog',default='neato')
+@click.option('--rankdir',default='LR')
+@click.option('--gui',is_flag=True)
+def graph(project_path,cat_id,gui,**kwargs):
+    conn = sqlite3.connect(project_path + "/data.qda")
+    from . import view_graph
+    qual_app = App(conn)
+    codes,cats = qual_app.get_data()
+    graph =  None
+    if cat_id:
+        topnode = view_graph.get_first_with_attr(cats,catid=cat_id)
+        if not topnode:
+            print('Nothing found for catid %s'%catid)
+        else:
+            graph = view_graph.plot_with_pygraphviz(cats,codes,topnode=topnode,**kwargs)
+    else:
+        graph = view_graph.plot_with_pygraphviz(cats,codes,**kwargs)
+    if gui and graph:
+        app = QtWidgets.QApplication(sys.argv)
+        win = view_graph.MainWindow(app=qual_app)
+        win.view.drawGraph(graph)
+        win.show()
+        sys.exit(app.exec_())
 

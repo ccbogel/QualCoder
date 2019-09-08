@@ -15,7 +15,8 @@ setup(
         'Operating System :: OS Independent',
     ],
     entry_points = {
-        'gui_scripts' : ['qualcoder = qualcoder.qualcoder:main']
+        'gui_scripts' : ['qualcoder = qualcoder.qualcoder:gui'],
+        'console_scripts' : ['qualcoder-cli = qualcoder.qualcoder:cli'],
     },
     # data_files = [
         # ('share/applications/', ['qualcoder.desktop'])
@@ -27,6 +28,7 @@ setup(
     author_email='ccbogel@hotmail.com',
     license='MIT',
     install_requires=[
+        'graphviz',
         'pyqt5',
         'lxml',
         'Pillow', 
