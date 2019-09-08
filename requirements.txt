@@ -1,0 +1,13 @@
+graphviz
+pikepdf
+six
+ebooklib
+pdfminer.six
+ply
+chardet
+python-vlc
+click
+six
+#pyqt5
+#lxml
+#Pillow
