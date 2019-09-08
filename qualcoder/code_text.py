@@ -61,7 +61,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class DialogCodeText(QtWidgets.QDialog):
+class DialogCodeText(QtWidgets.QWidget):
     ''' Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
     Trialled using setHtml for documents, but on marking text Html formattin was replaced, also
@@ -84,6 +84,7 @@ class DialogCodeText(QtWidgets.QDialog):
     eventFilter = None
 
     def __init__(self, settings, parent_textEdit):
+        super(DialogCodeText,self).__init__()
 
         sys.excepthook = exception_handler
         self.settings = settings
@@ -107,7 +108,6 @@ class DialogCodeText(QtWidgets.QDialog):
             self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
 
-        QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_codes()
         self.ui.setupUi(self)
         newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
