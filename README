@@ -12,9 +12,10 @@ You will also need to have pyqt5, lxml, qpdf and vlc
 
 ### Install via python/pip
 
-1. It is recommend to create a virtualenvironment, probably should work with `python -m venv venv`
+1. It is recommended to create a virtualenvironment, probably should work with `python -m venv venv` which will create a directory named `venv` which is your new virtual environment.
 2. activate the new environment: `source venv\bin\activate`
-3. Install all the requirements: `python -m pip install -r requirements.txt`
+3. Install all the requirements, before cd into the directoy holding the source code of qualcoder: `python -m pip install .`
+3b. If you want to install in development mode, which will use the code in your source code directory, use : `python -m pip install -e .`
 
 ### Install via apt
 All dependent packages should be availabe in ubuntu disco.
