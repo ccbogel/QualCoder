@@ -46,6 +46,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_codes import Ui_Dialog_codes
 from .memo import DialogMemo
 from .select_file import DialogSelectFile
+from .helpers import CodedMediaMixin
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class DialogCodeText(QtWidgets.QWidget):
+class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
     ''' Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
     Trialled using setHtml for documents, but on marking text Html formattin was replaced, also
@@ -83,11 +84,11 @@ class DialogCodeText(QtWidgets.QWidget):
     search_index = 0
     eventFilter = None
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
         super(DialogCodeText,self).__init__()
-
+        self.app = app
+        self.settings = app.settings
         sys.excepthook = exception_handler
-        self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
@@ -96,7 +97,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.get_codes_categories()
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select id, name from source where mediapath is Null")
         result = cur.fetchall()
         for row in result:
@@ -110,11 +111,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.ui = Ui_Dialog_codes()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
+        newfont = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
+        treefont = QtGui.QFont(self.settings['font'], self.settings['treefontsize'], QtGui.QFont.Normal)
         self.ui.treeWidget.setFont(treefont)
-        self.ui.label_coder.setText("Coder: " + settings['codername'])
+        self.ui.label_coder.setText("Coder: " + self.settings['codername'])
         self.ui.label_file.setText("File: Not selected")
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
@@ -246,7 +247,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Called from init, delete category/code. """
 
         self.categories = []
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
         result = cur.fetchall()
         for row in result:
@@ -254,7 +255,7 @@ class DialogCodeText(QtWidgets.QWidget):
             'date': row[3], 'memo': row[4], 'supercatid': row[5]})
 
         self.codes = []
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
         result = cur.fetchall()
         for row in result:
@@ -333,23 +334,34 @@ class DialogCodeText(QtWidgets.QWidget):
         ActionItemRename = menu.addAction(_("Rename"))
         ActionItemEditMemo = menu.addAction(_("View or edit memo"))
         ActionItemDelete = menu.addAction(_("Delete"))
+        ActionItemChangeColor = None
+        ActionShowCodedMedia = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
-
+            ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
-            self.change_code_color(selected)
-        if action == ActionItemAddCategory:
-            self.add_category()
-        if action == ActionItemAddCode:
-            self.add_code()
-        if selected is not None and action == ActionItemRename:
-            self.rename_category_or_code(selected)
-        if selected is not None and action == ActionItemEditMemo:
-            self.add_edit_memo(selected)
-        if selected is not None and action == ActionItemDelete:
-            self.delete_category_or_code(selected)
-            return
+        if action is not None :
+            if selected is not None and action == ActionItemChangeColor:
+                self.change_code_color(selected)
+            elif action == ActionItemAddCategory:
+                self.add_category()
+            elif action == ActionItemAddCode:
+                self.add_code()
+            elif selected is not None and action == ActionItemRename:
+                self.rename_category_or_code(selected)
+            elif selected is not None and action == ActionItemEditMemo:
+                self.add_edit_memo(selected)
+            elif selected is not None and action == ActionItemDelete:
+                self.delete_category_or_code(selected)
+            elif selected is not None and action == ActionShowCodedMedia :
+                found = None
+                tofind = int(selected.text(1)[4:])
+                for code in self.codes:
+                    if code['cid'] == tofind:
+                        found = code
+                        break
+                if found:
+                    self.coded_media(found)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identfiy treeWidgetItem drop events.
@@ -391,10 +403,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     # something went wrong
                     return
                 self.categories[found]['supercatid'] = supercatid
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_cat set supercatid=? where catid=?",
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
-            self.settings['conn'].commit()
+            self.app.conn.commit()
 
         # find the code in the list
         if item.text(1)[0:3] == 'cid':
@@ -414,10 +426,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 catid = int(parent.text(1).split(':')[1])
                 self.codes[found]['catid'] = catid
 
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=? where cid=?",
             [self.codes[found]['catid'], self.codes[found]['cid']])
-            self.settings['conn'].commit()
+            self.app.conn.commit()
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
@@ -428,19 +440,19 @@ class DialogCodeText(QtWidgets.QWidget):
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         old_cid = item['cid']
         new_cid = int(parent.text(1).split(':')[1])
         try:
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         except Exception as e:
             e = str(e)
             msg = _("Cannot merge codes, unmark overlapping text first. ") + e
             QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
         # update filter for tooltip
@@ -460,10 +472,10 @@ class DialogCodeText(QtWidgets.QWidget):
         item = {'name': newCodeText, 'memo': "", 'owner': self.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
         'color': code_color}
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
@@ -489,10 +501,10 @@ class DialogCodeText(QtWidgets.QWidget):
         item = {'name': newCatText, 'cid': None, 'memo': "",
         'owner': self.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
@@ -528,10 +540,10 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec_()
         if not ok:
             return
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("delete from code_name where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -554,11 +566,11 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec_()
         if not ok:
             return
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("update code_name set catid=null where catid=?", [category['catid'], ])
         cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         selected = None
         self.get_codes_categories()
         self.fill_tree()
@@ -580,9 +592,9 @@ class DialogCodeText(QtWidgets.QWidget):
             memo = ui.memo
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
@@ -602,9 +614,9 @@ class DialogCodeText(QtWidgets.QWidget):
             memo = ui.memo
             if memo != self.categories[found]['memo']:
                 self.categories[found]['memo'] = memo
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
@@ -634,9 +646,9 @@ class DialogCodeText(QtWidgets.QWidget):
             if found == -1:
                 return
             # update codes list and database
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             old_name = self.codes[found]['name']
             self.codes[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
@@ -664,10 +676,10 @@ class DialogCodeText(QtWidgets.QWidget):
             if found == -1:
                 return
             # update category list and database
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_cat set name=? where catid=?",
             (new_name, self.categories[found]['catid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             old_name = self.categories[found]['name']
             self.categories[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
@@ -693,10 +705,10 @@ class DialogCodeText(QtWidgets.QWidget):
         selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
         #update codes list, database and color markings
         self.codes[found]['color'] = new_color
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         self.highlight()
 
     def view_file(self):
@@ -709,7 +721,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if ok:
             # filename is dictionary with id and name
             self.filename = ui.get_selected()
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("select name, id, fulltext, memo, owner, date from source where id=?",
                 [self.filename['id']])
             file_result = cur.fetchone()
@@ -814,7 +826,7 @@ class DialogCodeText(QtWidgets.QWidget):
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self.code_text.append(coded)
         self.highlight()
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
 
         # check for an existing duplicated marking first
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
@@ -832,7 +844,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                 coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
                 coded['memo'], coded['date']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         except Exception as e:
             logger.debug(str(e))
         # update filter for tooltip
@@ -866,10 +878,10 @@ class DialogCodeText(QtWidgets.QWidget):
             return
 
         # delete from db, remove from coding and update highlights
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
             (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.settings['codername']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         if unmarked in self.code_text:
             self.code_text.remove(unmarked)
 
@@ -911,11 +923,11 @@ class DialogCodeText(QtWidgets.QWidget):
         ui.exec_()
         item['memo'] = ui.memo
         if item['memo'] != "":
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
                 values(?,?,?,?,?,?)" ,(item['fid'], item['pos0'], item['pos1'],
                 item['memo'], item['owner'], item['date']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
             anid = cur.fetchone()[0]
             item['anid'] = anid
@@ -925,9 +937,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.filename['name'])
         # if blank delete the annotation
         if item['memo'] == "":
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             for note in self.annotations:
                 if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
                     self.annotations.remove(note)
@@ -970,7 +982,7 @@ class DialogCodeText(QtWidgets.QWidget):
         filenames = ""
         for f in files:
             filenames += f['name'] + " "
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
                 [f['id']])
             currentfile = cur.fetchone()
@@ -982,12 +994,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 'pos0': startPos, 'pos1': startPos + len(findText),
                 'owner': self.settings['codername'], 'memo': "",
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
                     owner,memo,date) values(?,?,?,?,?,?,?,?)"
                     , (item['cid'], item['fid'], item['seltext'], item['pos0'],
                     item['pos1'], item['owner'], item['memo'], item['date']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
 
                 # if this is the currently open file update the code text list and GUI
                 if f['id'] == self.filename['id']:

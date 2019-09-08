@@ -58,7 +58,7 @@ class DialogMemo(QtWidgets.QDialog):
     table = ""
     memo = ""
 
-    def __init__(self, title="", memo="",**settings):
+    def __init__(self, settings,title="", memo=""):
         ''' Table  and table_id are needed for selecting the text from the relevant table.
         '''
 

@@ -449,7 +449,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
-        ui = DialogCodeText(self.settings, self.ui.textEdit)
+        ui = DialogCodeText(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()

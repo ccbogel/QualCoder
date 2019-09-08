@@ -40,6 +40,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
 from .information import DialogInformation
 from .memo import DialogMemo
+from .helpers import CodedMediaMixin
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -387,7 +388,7 @@ class GraphViewer(ZoomedViewer):
         self.fitInView()
    
 
-class NodeGraphicsItem(QtWidgets.QGraphicsEllipseItem):
+class NodeGraphicsItem(CodedMediaMixin,QtWidgets.QGraphicsEllipseItem):
 
     def __init__(self,x,y,width,height,node,app=None):
         super(NodeGraphicsItem,self).__init__(x,y,width,height)
@@ -410,7 +411,7 @@ class NodeGraphicsItem(QtWidgets.QGraphicsEllipseItem):
 
         menu = QtWidgets.QMenu()
         menu.addAction('Memo')
-        if self.data['cid'] is not None:
+        if self.data.get('cid') is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
         action = menu.exec_(QtGui.QCursor.pos())
@@ -427,14 +428,14 @@ class NodeGraphicsItem(QtWidgets.QGraphicsEllipseItem):
         """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
-            ui = DialogMemo("Memo for Code " + data['name'], data['memo'],**self.settings)
+            ui = DialogMemo(self.settings,"Memo for Code " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.app.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
             self.app.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo("Memo for Category " + data['name'], data['memo'],**self.settings)
+            ui = DialogMemo(self.settings,"Memo for Category " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.app.conn.cursor()
@@ -558,67 +559,6 @@ class NodeGraphicsItem(QtWidgets.QGraphicsEllipseItem):
         image_format.setName(url.toString())
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
-
-    def coded_media(self, data):
-        """ Display all coded media for this code.
-        Coded media comes from ALL files and ALL coders. """
-
-        ui = DialogInformation("Coded text : " + self.data['name'], "")
-        cur = self.app.conn.cursor()
-        CODENAME = 0
-        COLOR = 1
-        SOURCE_NAME = 2
-        POS0 = 3
-        POS1 = 4
-        SELTEXT = 5
-        OWNER = 6
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, code_text.owner from "
-        sql += "code_text "
-        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
-        sql += " where code_name.cid =" + str(self.data['cid']) + " "
-        sql += " order by source.name, pos0, code_text.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        # Text
-        for row in results:
-            title = '<span style=\"background-color:' + row[COLOR] + '\">'
-            title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
-            title += ", Coder: <em>" + row[OWNER] + "</em> "
-            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
-            ui.ui.textEdit.insertHtml(title)
-            ui.ui.textEdit.append(row[SELTEXT] + "\n\n")
-
-        # Images
-        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
-        sql += " from code_image join code_name "
-        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-        sql += "where code_name.cid =" + str(self.data['cid']) + " "
-        sql += " order by source.name, code_image.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for counter, row in enumerate(results):
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[8] + '</span>')
-            ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7]  + '<br />')
-            img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
-            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
-            ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")
-
-        # Media
-        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
-        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-        sql += "where code_name.cid = " + str(self.data['cid']) + " "
-        sql += " order by source.name, code_av.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for row in results:
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[7] + '</span>')
-            start = msecs_to_mins_and_secs(row[3])
-            end = msecs_to_mins_and_secs(row[4])
-            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] Coder: ' + row[6])
-            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
-        ui.exec_()
 
 class MainWindow(QtWidgets.QWidget):
 
