@@ -171,6 +171,30 @@ class App(object):
             f.close()
         return settings
 
+    def add_relations_table(self):
+        cur = self.conn.cursor()
+        cur.execute(("CREATE TABLE relations_type (relid integer primary key,"
+            "name text, memo text, color text, line text, unique(name));"))
+        cur.execute(("CREATE TABLE code_name_relation (id integer primary key,"
+            "relid int NOT NULL,"
+            "from_id int NOT NULL,"
+            "to_id int NOT NULL,"
+            "FOREIGN KEY (relid) REFERENCES relations_type(relid) ON DELETE CASCADE,"
+            "FOREIGN KEY (from_id) REFERENCES code_name(cid) ON DELETE CASCADE,"
+            "FOREIGN KEY (to_id) REFERENCES code_name(cid) ON DELETE CASCADE);"
+        ))
+        cur.execute(("CREATE TABLE code_text_relation (id integer primary key,"
+            "relid int NOT NULL,"
+            "from_id int NOT NULL,"
+            "to_id int NOT NULL,"
+            "FOREIGN KEY (relid) REFERENCES relations_type(relid) ON DELETE CASCADE,"
+            "FOREIGN KEY (from_id) REFERENCES code_text(cid) ON DELETE CASCADE,"
+            "FOREIGN KEY (to_id) REFERENCES code_text(cid) ON DELETE CASCADE);"
+        ))
+
+        self.conn.commit()
+
+
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
     Project data is stored in a directory with .qda suffix
@@ -554,6 +578,8 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
 
+ 
+
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
         images, audio and video.
@@ -670,6 +696,9 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         if len(path) > 3 and path[-4:] == ".qda":
             self.settings['path'] = path
+            persist_path = os.path.join(os.path.expanduser('~'),'.qualcoder','cur_project.txt')
+            with open(persist_path,'w') as f:
+                f.write(path)
             msg = ""
             try:
                 self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
@@ -763,6 +792,10 @@ class MainWindow(QtWidgets.QMainWindow):
 @click.option('-p','--project-path')
 @click.option('-v','--view',is_flag=True)
 def gui(project_path,view):
+    if project_path is None:
+        persist_path = os.path.join(os.path.expanduser('~'),'.qualcoder','cur_project.txt')
+        with open(persist_path,'r') as f:
+            project_path = f.read().strip()
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -809,8 +842,8 @@ def cli():
 @click.argument('project-path')
 def interactive(project_path):
     conn = sqlite3.connect(project_path + "/data.qda")
-    codes,cats = get_data(conn)
-    from . import view_graph
+    conn = sqlite3.connect(project_path + "/data.qda")
+    qual_app = App(conn)
     from IPython import embed
     embed()
 
