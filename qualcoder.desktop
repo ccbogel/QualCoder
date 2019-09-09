@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=QualCoder
 Type=Application
-Version=1.0
+Version=1.4
 Comment=Qualitiatve data analysis
 Exec=python3 /usr/share/qualcoder/qualcoder.py
 Icon=/usr/share/pixmaps/qualcoder.png
