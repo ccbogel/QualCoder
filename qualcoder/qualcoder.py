@@ -110,6 +110,39 @@ class App(object):
         self.model = self.calc_model(self.categories,self.codes)
         self.settings = self.load_settings()
 
+    def get_linktypes(self):
+        cur = self.conn.cursor()
+        cur.execute("select name, memo,color,linetype, owner, date, linkid from links_type")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'name': row[0], 'memo': row[1], 'color':row[2],'linetype':row[3],'owner': row[4], 'date': row[5],'linkid':row[6]})
+        return res
+
+    def get_code_names(self):
+        cur = self.conn.cursor()
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
+            'cid': row[4], 'catid': row[5], 'color': row[6]})
+        return res
+
+    def get_code_name_links(self):
+        cur = self.conn.cursor()
+        cur.execute(("select code_name_links.memo,"
+            "code_name_links.owner, code_name_links.date,"
+            "links_type.color, links_type.name, from_id, to_id from code_name_links"
+            " inner join links_type on code_name_links.linkid = links_type.linkid "
+        ))
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'memo': row[0], 'owner': row[1], 'date': row[2],
+                'color': row[3], 'name': row[4], 'from_id':row[5],'to_id': row[6]})
+        return res
+
     def calc_model(self,cats,codes):
         model = {}
         for cat in cats:
@@ -173,26 +206,59 @@ class App(object):
 
     def add_relations_table(self):
         cur = self.conn.cursor()
-        cur.execute(("CREATE TABLE relations_type (relid integer primary key,"
-            "name text, memo text, color text, line text, unique(name));"))
-        cur.execute(("CREATE TABLE code_name_relation (id integer primary key,"
-            "relid int NOT NULL,"
+        cur.execute(("CREATE TABLE links_type (linkid integer primary key,"
+            "name text,"
+            "memo text,"
+            "color text,"
+            "linetype text,"
+            "date text,"
+            "owner text,"
+            "unique(name));"))
+        cur.execute(("CREATE TABLE code_name_links (id integer primary key,"
+            "linkid int NOT NULL,"
             "from_id int NOT NULL,"
             "to_id int NOT NULL,"
-            "FOREIGN KEY (relid) REFERENCES relations_type(relid) ON DELETE CASCADE,"
+            "owner text,"
+            "date text,"
+            "memo text,"
+            "FOREIGN KEY (linkid) REFERENCES links_type(linkid) ON DELETE CASCADE,"
             "FOREIGN KEY (from_id) REFERENCES code_name(cid) ON DELETE CASCADE,"
             "FOREIGN KEY (to_id) REFERENCES code_name(cid) ON DELETE CASCADE);"
         ))
-        cur.execute(("CREATE TABLE code_text_relation (id integer primary key,"
-            "relid int NOT NULL,"
+        cur.execute(("CREATE TABLE code_text_links (id integer primary key,"
+            "linkid int NOT NULL,"
             "from_id int NOT NULL,"
             "to_id int NOT NULL,"
-            "FOREIGN KEY (relid) REFERENCES relations_type(relid) ON DELETE CASCADE,"
+            "owner text,"
+            "date text,"
+            "memo text,"
+            "FOREIGN KEY (linkid) REFERENCES links_type(linkid) ON DELETE CASCADE,"
             "FOREIGN KEY (from_id) REFERENCES code_text(cid) ON DELETE CASCADE,"
             "FOREIGN KEY (to_id) REFERENCES code_text(cid) ON DELETE CASCADE);"
         ))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
 
         self.conn.commit()
+
+    def add_code_name_link(self,linkid,from_cid,to_cid,memo=''):
+        item = {
+            'linkid': linkid,
+            'from_id':from_cid,
+            'to_id':to_cid,
+            'memo':memo,
+            'owner': self.settings['codername'],
+            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        cur = self.conn.cursor()
+        cur.execute(
+            "insert into code_name_links (linkid,from_id,to_id,owner,date,memo) values(?,?,?,?,?,?)",
+            (item['linkid'], item['from_id'],item['to_id'],item['owner'], item['date'],item['memo'])
+        )
+        self.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        item['relid'] = cur.fetchone()[0]
+        return item
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -209,9 +275,9 @@ class MainWindow(QtWidgets.QMainWindow):
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
-    def __init__(self):
+    def __init__(self,force_quit=False):
         """ Set up user interface from ui_main.py file. """
-
+        self.force_quit = force_quit
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
@@ -560,23 +626,24 @@ class MainWindow(QtWidgets.QMainWindow):
         If selected via window x close: event == QtGui.QCloseEvent
         """
 
-        quit_msg = _("Are you sure you want to quit?")
-        reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
-        QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.Yes:
-            self.dialogList = None
-            if self.settings['conn'] is not None:
-                try:
-                    self.settings['conn'].commit()
-                    self.settings['conn'].close()
-                except:
-                    pass
-            QtWidgets.qApp.quit()
-            return
-        if event is False:
-            return
-        else:
-            event.ignore()
+        if not self.force_quit:
+            quit_msg = _("Are you sure you want to quit?")
+            reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
+            QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+            if reply == QtWidgets.QMessageBox.Yes:
+                self.dialogList = None
+                if self.settings['conn'] is not None:
+                    try:
+                        self.settings['conn'].commit()
+                        self.settings['conn'].close()
+                    except:
+                        pass
+                QtWidgets.qApp.quit()
+                return
+            if event is False:
+                return
+            else:
+                event.ignore()
 
  
 
@@ -628,6 +695,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.settings['conn'].commit()
+        self.app.add_relations_table()
         try:
             # get and display some project details
             self.ui.textEdit.append("\n" + _("New project: ") + self.settings['path'] + _(" created."))
@@ -719,11 +787,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("QualCoder " + self.settings['projectName'])
         cur = self.settings['conn'].cursor()
         cur.execute("select databaseversion, date, memo, about from project")
-        result = cur.fetchone()
+        result = cur.fetchall()[-1]
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
+
+        if int(self.project['databaseversion'][1:]) < 2:
+            self.app.add_relations_table()
 
         # Save a datetime stamped backup
         if self.settings['backup_on_open'] is True:
@@ -791,11 +862,15 @@ class MainWindow(QtWidgets.QMainWindow):
 @click.command()
 @click.option('-p','--project-path')
 @click.option('-v','--view',is_flag=True)
-def gui(project_path,view):
+@click.option('--force-quit',is_flag=True)
+def gui(project_path,view,force_quit):
     if project_path is None:
         persist_path = os.path.join(os.path.expanduser('~'),'.qualcoder','cur_project.txt')
-        with open(persist_path,'r') as f:
-            project_path = f.read().strip()
+        try:
+            with open(persist_path,'r') as f:
+                project_path = f.read().strip()
+        except:
+            pass
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -827,7 +902,7 @@ def gui(project_path,view):
             getlang = gettext.translation('de', localedir=path + '/locale', languages=['de'])
         app.installTranslator(translator)
     getlang.install()
-    ex = MainWindow()
+    ex = MainWindow(force_quit=force_quit)
     if project_path:
         ex.open_project(project_path)
     if view:
@@ -858,15 +933,16 @@ def graph(project_path,cat_id,gui,**kwargs):
     from . import view_graph
     qual_app = App(conn)
     codes,cats = qual_app.get_data()
+    codelinks = qual_app.get_code_name_links()
     graph =  None
     if cat_id:
         topnode = view_graph.get_first_with_attr(cats,catid=cat_id)
         if not topnode:
             print('Nothing found for catid %s'%catid)
         else:
-            graph = view_graph.plot_with_pygraphviz(cats,codes,topnode=topnode,**kwargs)
+            graph = view_graph.plot_with_pygraphviz(cats,codes,codelinks,topnode=topnode,**kwargs)
     else:
-        graph = view_graph.plot_with_pygraphviz(cats,codes,**kwargs)
+        graph = view_graph.plot_with_pygraphviz(cats,codes,codelinks,**kwargs)
     if gui and graph:
         app = QtWidgets.QApplication(sys.argv)
         win = view_graph.MainWindow(app=qual_app)

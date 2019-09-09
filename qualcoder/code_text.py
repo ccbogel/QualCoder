@@ -39,7 +39,7 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush
 
-from .add_item_name import DialogAddItemName
+from .add_item_name import DialogAddItemName, DialogLinkTo
 from .color_selector import DialogColorSelect
 from .color_selector import colors
 from .confirm_delete import DialogConfirmDelete
@@ -47,6 +47,7 @@ from .GUI.ui_dialog_codes import Ui_Dialog_codes
 from .memo import DialogMemo
 from .select_file import DialogSelectFile
 from .helpers import CodedMediaMixin
+from .qtmodels import DictListModel, ListObjectModel
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -91,8 +92,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.codes = []
+        self.linktypes = []
         self.categories = []
         self.filenames = []
+        self.codeslistmodel = DictListModel({})
         self.annotations = []
         self.search_indices = []
         self.search_index = 0
@@ -140,8 +143,11 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        self.ui.listWidgetLinks.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidgetLinks.customContextMenuRequested.connect(self.linkstree_menu)
         self.ui.splitter.setSizes([150, 400])
         self.fill_tree()
+        self.fill_links()
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -151,6 +157,14 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.ui.label_code.setText(_("NO CODE SELECTED"))
             return
         self.ui.label_code.setText("Code: " + current.text(0))
+
+    def fill_links(self):
+        for link in self.linktypes:
+            self.add_to_linktypes_list(link['name'])
+
+    def add_to_linktypes_list(self,linkname):
+        w = QtWidgets.QListWidgetItem(linkname,parent=self.ui.listWidgetLinks)
+        self.ui.listWidgetLinks.addItem(w)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -254,13 +268,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
             'date': row[3], 'memo': row[4], 'supercatid': row[5]})
 
-        self.codes = []
-        cur = self.app.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
-        result = cur.fetchall()
-        for row in result:
-            self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
+        self.codes = self.app.get_code_names()
+        self.linktypes = self.app.get_linktypes()
+        self.codeslistmodel.reset_data({x['cid']:x for x in self.codes})
+         
 
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
@@ -336,9 +347,11 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         ActionItemDelete = menu.addAction(_("Delete"))
         ActionItemChangeColor = None
         ActionShowCodedMedia = None
+        ActionLinkTo = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
+            ActionLinkTo = menu.addAction(_("Link to"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None :
             if selected is not None and action == ActionItemChangeColor:
@@ -362,6 +375,63 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                         break
                 if found:
                     self.coded_media(found)
+            elif selected is not None and action == ActionLinkTo:
+                self.link_to(selected)
+
+    def link_to(self,item):
+        """ Use add_item dialog to get new code text. Add_code_name dialog checks for
+        duplicate code name. A random color is selected for the code.
+        New code is added to data and database. """
+
+        myname = item.text(0)
+        linksmodel = ListObjectModel(self.linktypes,key='name')
+        ui = DialogLinkTo(self.codeslistmodel.makeProxy('name'),linksmodel,myname)
+        ui.exec_()
+        if ui.linktype and ui.linkitem:
+            othername = ui.linkitem
+            linkid = ui.linktype['linkid']
+            other = my = None
+            for code in self.codes:
+                if myname == code['name']:
+                    my = code['cid']
+                    if other:
+                        break
+                if othername == code['name']:
+                    other = code['cid']
+                    if my:
+                        break
+            item = self.app.add_code_name_link(linkid,my,other)
+            self.parent_textEdit.append(("New link from: %s -> %s"%(myname,othername)))
+
+    def linkstree_menu(self, position):
+        """ Context menu for treewidget items.
+        Add, rename, memo, move or delete code or category. Change code color. """
+
+        menu = QtWidgets.QMenu()
+        selected = self.ui.treeWidget.currentItem()
+        #logger.debug("Selected parent: " + selected.parent())
+        #index = self.ui.treeWidget.currentIndex()
+        ActionItemAddLink = menu.addAction(_("Add a new link"))
+        ActionItemRename = menu.addAction(_("Rename"))
+        ActionItemEditMemo = menu.addAction(_("View or edit memo"))
+        ActionItemDelete = menu.addAction(_("Delete"))
+        ActionItemChangeColor = menu.addAction(_("Change code color"))
+        action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if action is not None :
+            if selected is not None and action == ActionItemChangeColor:
+                print('not yet')
+                # self.change_code_color(selected)
+            elif action == ActionItemAddLink:
+                self.add_link()
+            elif selected is not None and action == ActionItemRename:
+                print('not yet')
+                # self.rename_category_or_code(selected)
+            elif selected is not None and action == ActionItemEditMemo:
+                print('not yet')
+                # self.add_edit_memo(selected)
+            elif selected is not None and action == ActionItemDelete:
+                print('not yet')
+                # self.delete_category_or_code(selected)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identfiy treeWidgetItem drop events.
@@ -457,6 +527,38 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
+
+    def add_link(self):
+        """ Use add_item dialog to get new code text. Add_code_name dialog checks for
+        duplicate code name. A random color is selected for the code.
+        New code is added to data and database. """
+
+
+        ui = DialogAddItemName(self.linktypes, _("Add new link"))
+        ui.exec_()
+        newCodeText = ui.get_new_name()
+        if newCodeText is None:
+            return
+        code_color = colors[randint(0, len(colors) - 1)]
+        item = {
+            'name': newCodeText,
+            'memo': "", 
+            'owner': self.settings['codername'],
+            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'linetype':'<->',
+            'color': code_color,
+        }
+        cur = self.app.conn.cursor()
+        cur.execute(
+            "insert into links_type (name,memo,color,linetype,owner,date) values(?,?,?,?,?,?)",
+            (item['name'], item['memo'],item['color'],item['linetype'],item['owner'], item['date'])
+        )
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        item['linkid'] = linkid = cur.fetchone()[0]
+        self.linktypes.append(item)
+        self.add_to_linktypes_list(item['name'])
+        self.parent_textEdit.append(_("New link: ") + item['name'])
 
     def add_code(self):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for

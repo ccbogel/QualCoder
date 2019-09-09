@@ -35,6 +35,8 @@ import os
 import sys
 import traceback
 
+import pygraphviz as pgv
+
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
@@ -108,11 +110,11 @@ def get_first_with_attr(cats,**attrs):
             return x
 
 
-def plot_with_pygraphviz(cats,codes,topnode=None,prog='neato',rankdir='LR'):
-    import pygraphviz as pgv
-
+def plot_with_pygraphviz(cats,codes,codelinks,topnode=None,prog='neato',rankdir='LR'):
     tocatid = lambda x:'catid:%s'%x['catid']
     tocid = lambda x:'cid:%s'%x['cid']
+
+    addednodes = set()
 
     graph = pgv.AGraph(overlap=False,splines=True,dpi=96,rankdir=rankdir) 
     if topnode is not None:
@@ -128,9 +130,23 @@ def plot_with_pygraphviz(cats,codes,topnode=None,prog='neato',rankdir='LR'):
         if 'color' in b:
             attrs['fillcolor'] = b['color']
             attrs['style'] = 'filled'
-        graph.add_node(tocid(b),label=b['name'],type='code',**attrs)
+        cid = tocid(b)
+        addednodes.add(cid)
+        graph.add_node(cid,label=b['name'],type='code',**attrs)
         if top is not None:
             graph.add_edge(tocatid(top),tocid(b),label='')
+
+    codesper = {x['cid']:x for x in codes}
+    for link in codelinks:
+        a = 'cid:%s'%link['from_id']
+        b = 'cid:%s'%link['to_id']
+        if a not in addednodes:
+            fromnode = codesper[link['from_id']]
+            graph.add_node(a,label=fromnode['name'],type='code',fillcolor=fromnode['color'])
+        if b not in addednodes:
+            tonode = codesper[link['to_id']]
+            graph.add_node(b,label=tonode['name'],type='code',fillcolor=tonode['color'])
+        graph.add_edge(a,b,label=link['name'],fontcolor=link['color'],color=link['color'])
 
     mycats = list(visit_cats_from_supercats(cats,node=topnode,func=draw_connection_cats))
     mycodes = list(visit_codes_from_cats(mycats,codes,draw_connection_codes))
@@ -216,7 +232,11 @@ class ViewGraph(QtWidgets.QWidget):
         self.comboBox.setObjectName("comboBox")
         self.checkBox_neato = QtWidgets.QCheckBox('neato',self.groupBox_2)
         self.checkBox_neato.setGeometry(QtCore.QRect(170, 0, 191, 22))
-        self.checkBox_neato.setObjectName("checkBox_blackandwhite")
+        self.checkBox_neato.setObjectName("checkBox_graphviz_prog")
+        self.checkBox_named_links = QtWidgets.QCheckBox('code-name-links',self.groupBox_2)
+        self.checkBox_named_links.setGeometry(QtCore.QRect(290, 0, 191, 22))
+        self.checkBox_named_links.setChecked(True)
+        self.checkBox_named_links.setObjectName("checkBox_named_links")
         self.layout().addWidget(self.groupBox_2)
         self.pushButton_view.pressed.connect(self.do_graph)
         self.comboBox.addItems(combobox_list)
@@ -230,22 +250,42 @@ class ViewGraph(QtWidgets.QWidget):
             prog = 'neato'
         else:
             prog = 'dot'
+        if self.checkBox_named_links.isChecked():
+            namedlinks = self.app.get_code_name_links()
+        else:
+            namedlinks = []
         graph = plot_with_pygraphviz(
-            self.app.categories,self.app.codes,topnode=topnode,prog=prog)
+            self.app.categories,
+            self.app.codes,
+            namedlinks,
+            topnode=topnode,prog=prog)
         self.graphicsView.drawGraph(graph)
 
 
 class GVEdgeGraphicsItem(QtWidgets.QGraphicsPathItem):
     """ cudos to: http://www.mupuf.org/blog/2010/07/08/how_to_use_graphviz_to_draw_graphs_in_a_qt_graphics_scene/ """
-    def __init__(self):
+    def __init__(self,edge,yoffset,scaler):
         super(GVEdgeGraphicsItem, self).__init__(None)
         self.setFlag(self.ItemIsSelectable, False)
-        linkWidth = 1
-        self.setPen(QtGui.QPen(QtCore.Qt.black, linkWidth, QtCore.Qt.SolidLine))
+        if 'fontcolor' in dict(edge.attr):
+            color = QtGui.QColor(edge.attr['fontcolor'])
+            linkWidth = 4
+        else:
+            linkWidth = 1
+            color = QtGui.QColor(QtCore.Qt.black)
+        pen = QtGui.QPen(color, linkWidth, QtCore.Qt.SolidLine)
+        self.setPen(pen)
+        if 'lp' in dict(edge.attr):
+            # pos = edge.attr['lp'].split(',')
+            # mpos = pos[len(pos)//2].split(',')
+            mpos = edge.attr['lp'].split(',')
+            self.textitem = QtWidgets.QGraphicsTextItem(edge.attr['label'],parent=self)
+            self.textitem.setPos(float(mpos[0])*scaler,yoffset-float(mpos[1])*scaler)
+            self.textitem.setDefaultTextColor(color)
+            self.setPath(edge,yoffset,scaler)
 
     def setPath(self,edge,yoffset,scaler):
         path = QtGui.QPainterPath()
-        start = edge[0].attr['pos'].split(',')
         controlpoints = []
         for cp in edge.attr['pos'].split(' '):
             txt = cp.split(',')
@@ -379,8 +419,7 @@ class GraphViewer(ZoomedViewer):
             for edge in graph.edges():
                 x = self.app.get_node_from_graph(edge[0])
                 y = self.app.get_node_from_graph(edge[1])
-                item = GVEdgeGraphicsItem()
-                item.setPath(edge,self._bb[3],(self.dpi/self.DEFAULTDPI))
+                item = GVEdgeGraphicsItem(edge,self._bb[3],(self.dpi/self.DEFAULTDPI))
                 self.scene().addItem(item)
         else:
             self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
@@ -575,9 +614,10 @@ class MainWindow(QtWidgets.QWidget):
     def do_graph(self):
         # name = self.comboBox.currentText()
         topnode = get_first_with_attr(self.app.categories,catid=12)
+        code_links = self.app.get_code_name_links()
         # topnode = get_first_with_attr(self.app.categories,name=name)
         graph = plot_with_pygraphviz(
-            self.app.categories,self.app.codes,topnode=topnode)
+            self.app.categories,self.app.codes,code_links,topnode=topnode)
         self.view.drawGraph(graph)
 
     def wheelEvent(self,event):
