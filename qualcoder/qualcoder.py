@@ -118,19 +118,21 @@ class App(object):
         try:
             with open(self.persist_path,'r') as f:
                 for line in f:
-                    res.append(line)
+                    res.append(line.strip())
         except:
             logger.debug('No previous projects found')
         return res
 
     def append_recent_project(self,path):
         res = self.read_previous_project_paths()
-        res.append(path)
-        with open(self.persist_path,'w') as f:
-            for i,line in enumerate(reversed(res)):
-                f.write(line)
-                if i > 10:
-                    break
+        if path != res[0]:
+            res.append(path)
+            with open(self.persist_path,'w') as f:
+                for i,line in enumerate(reversed(res)):
+                    f.write(line)
+                    f.write(os.linesep)
+                    if i > 10:
+                        break
 
     def get_most_recent_projectpath(self):
         res = self.read_previous_project_paths()
@@ -248,19 +250,19 @@ class App(object):
 
     def merge_settings_with_default_stylesheet(self,settings):
         stylesheet = []
-        pattern = re.compile('^Q')
+        pattern = re.compile('^Q|[*]')
         with open(path + "/GUI/default.stylesheet", "r") as fh:
             cur_element = None
             for line in fh:
                 if pattern.match(line):
-                    cur_element = line
+                    cur_element = line.strip()
                     stylesheet.append(line.strip())
                 elif 'font-size' in line and cur_element == '*':
-                    stylesheet.append('   font-size:%spx;'%settings.get('fontsize'))
+                    stylesheet.append('   font-size:%.0fpx;'%settings.get('fontsize'))
                 elif 'font-size' in line and cur_element == 'QTreeWidget':
-                    stylesheet.append('   font-size:%spx;'%settings.get('treefontsize'))
+                    stylesheet.append('   font-size:%.0fpx;'%settings.get('treefontsize'))
                 else:
-                    stylesheet.append(line.strip())
+                    stylesheet.append(line.rstrip())
         return '\n'.join(stylesheet)
 
     def load_settings(self):
@@ -982,8 +984,6 @@ def gui(project_path,view,force_quit):
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
-    with open('test.txt','w') as f:
-        f.write(stylesheet)
     app.setStyleSheet(stylesheet)
     # Try and load language settings from file stored in home/.qualcoder/
     # translator applies to ui designed GUI widgets only
