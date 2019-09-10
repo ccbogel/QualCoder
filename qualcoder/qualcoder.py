@@ -244,8 +244,10 @@ class App(object):
         default =  config['DEFAULT']
         res = dict(default)
         # convert to float can be removed when all manual styles are removed
-        res['fontsize'] = default.getfloat('fontsize')
-        res['treefontsize'] = default.getfloat('treefontsize')
+        if 'fontsize' in default:
+            res['fontsize'] = default.getfloat('fontsize')
+        if 'treefontsize' in default:
+            res['treefontsize'] = default.getfloat('treefontsize')
         return res
 
     def merge_settings_with_default_stylesheet(self,settings):
@@ -269,8 +271,7 @@ class App(object):
         res = self._load_config_ini()
         if not len(res):
             try:
-                res = self._load_old_settings()
-                self.write_config_ini(res)
+                self.write_config_ini(self._load_old_settings())
                 logger.warning('Converted to config.ini, remove old config')
                 os.remove(os.path.join(self.confighome,'QualCoder_settings.txt'))
             except OSError:
@@ -278,6 +279,7 @@ class App(object):
                 logger.info('Initilaized config.ini')
             except:
                 logger.exception('Failed to convert to onfig.ini')
+            res = self._load_config_ini()
         return res
 
     @property
@@ -285,8 +287,8 @@ class App(object):
         return {
             'codername':'default',
             'font':'Noto Sans',
-            'fontsize':10,
-            'treefontsize':10,
+            'fontsize':18,
+            'treefontsize':14,
             'directory':os.path.expanduser('~'),
             'showIDs':False,
             'language':'en',
