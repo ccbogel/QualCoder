@@ -27,6 +27,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
+import re
 import datetime
 import gettext
 import logging
@@ -35,6 +36,7 @@ import shutil
 import sys
 import sqlite3
 import traceback
+import configparser
 
 import click
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -104,11 +106,47 @@ def split_value(intext):
 
 
 class App(object):
-    def __init__(self,conn):
-        self.conn = conn
+    def __init__(self):
+        self.conn = None
+        self.confighome = os.path.expanduser('~/.qualcoder')
+        self.configpath = os.path.join(self.confighome,'config.ini')
+        self.persist_path = os.path.join(self.confighome,'recent_projects.txt')
+        self.settings = self.load_settings()
+   
+    def read_previous_project_paths(self):
+        res = []
+        try:
+            with open(self.persist_path,'r') as f:
+                for line in f:
+                    res.append(line)
+        except:
+            logger.debug('No previous projects found')
+        return res
+
+    def append_recent_project(self,path):
+        res = self.read_previous_project_paths()
+        res.append(path)
+        with open(self.persist_path,'w') as f:
+            for i,line in enumerate(reversed(res)):
+                f.write(line)
+                if i > 10:
+                    break
+
+    def get_most_recent_projectpath(self):
+        res = self.read_previous_project_paths()
+        if res:
+            return res[0]
+
+    def create_connection(self,project_path):
+        self.conn = sqlite3.connect(os.path.join(project_path,'data.qda'))
+        self._load_model()
+
+    def _load_model(self):
         self.codes, self.categories = self.get_data()
         self.model = self.calc_model(self.categories,self.codes)
-        self.settings = self.load_settings()
+
+    def read_user_preferences(self,path):
+        config = configparser.ConfigParser()
 
     def get_linktypes(self):
         cur = self.conn.cursor()
@@ -143,6 +181,26 @@ class App(object):
                 'color': row[3], 'name': row[4], 'from_id':row[5],'to_id': row[6]})
         return res
 
+    def get_filenames(self):
+        cur = self.conn.cursor()
+        cur.execute("select id, name from source where mediapath is Null")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1]})
+        return res 
+
+    def get_annotations(self):
+        cur = self.conn.cursor()
+        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
+            [self.settings['codername'], ])
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
+            'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+        return res
+
     def calc_model(self,cats,codes):
         model = {}
         for cat in cats:
@@ -172,36 +230,90 @@ class App(object):
             'cid': row[4], 'catid': row[5], 'color': row[6]})
         return code_names,categories
 
-    @classmethod
-    def load_settings(cls):
+    def write_config_ini(self,settings):
+        config = configparser.ConfigParser()
+        config['DEFAULT'] = settings
+        with open(self.configpath, 'w') as configfile:
+            config.write(configfile)
+
+    def _load_config_ini(self):
+        config = configparser.ConfigParser()
+        config.read(self.configpath)
+        default =  config['DEFAULT']
+        res = dict(default)
+        # convert to float can be removed when all manual styles are removed
+        res['fontsize'] = default.getfloat('fontsize')
+        res['treefontsize'] = default.getfloat('treefontsize')
+        return res
+
+    def merge_settings_with_default_stylesheet(self,settings):
+        stylesheet = []
+        pattern = re.compile('^Q')
+        with open(path + "/GUI/default.stylesheet", "r") as fh:
+            cur_element = None
+            for line in fh:
+                if pattern.match(line):
+                    cur_element = line
+                    stylesheet.append(line.strip())
+                elif 'font-size' in line and cur_element == '*':
+                    stylesheet.append('   font-size:%spx;'%settings.get('fontsize'))
+                elif 'font-size' in line and cur_element == 'QTreeWidget':
+                    stylesheet.append('   font-size:%spx;'%settings.get('treefontsize'))
+                else:
+                    stylesheet.append(line.strip())
+        return '\n'.join(stylesheet)
+
+    def load_settings(self):
+        res = self._load_config_ini()
+        if not len(res):
+            try:
+                res = self._load_old_settings()
+                self.write_config_ini(res)
+                logger.warning('Converted to config.ini, remove old config')
+                os.remove(os.path.join(self.confighome,'QualCoder_settings.txt'))
+            except OSError:
+                self.write_config_ini(self.default_settings)
+                logger.info('Initilaized config.ini')
+            except:
+                logger.exception('Failed to convert to onfig.ini')
+        return res
+
+    @property
+    def default_settings(self):
+        return {
+            'codername':'default',
+            'font':'Noto Sans',
+            'fontsize':10,
+            'treefontsize':10,
+            'directory':os.path.expanduser('~'),
+            'showIDs':False,
+            'language':'en',
+            'backup_on_open':True,
+            'backup_av_files':True,
+        }
+
+
+    def _load_old_settings(self):
         # load_settings from file stored in home/.qualcoder/
         settings =  {}
-        try:
-            with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
-                txt = f.read()
-                txt = txt.split("\n")
-                settings['codername'] = split_value(txt[0])
-                settings['font'] = split_value(txt[1])
-                settings['fontsize'] = int(split_value(txt[2]))
-                settings['treefontsize'] = int(split_value(txt[3]))
-                settings['directory'] = split_value(txt[4])
-                settings['showIDs'] = True
-                if split_value(txt[5]) == "False":
-                    settings['showIDs'] = False
-                settings['language'] = split_value(txt[6])
-                settings['backup_on_open'] = True
-                if split_value(txt[7]) == "False":
-                    settings['backup_on_open'] = False
-                settings['backup_av_files'] = True
-                if split_value(txt[8]) == "False":
-                    settings['backup_av_files'] = False
-        except:
-            f = open(home + '/.qualcoder/QualCoder_settings.txt', 'w')
-            text = "codername:default\nfont:Noto Sans\nfontsize:10\ntreefontsize:10\n"
-            text += 'directory:' + home
-            text += "\nshowIDs:False\nlanguage:en\nbackup_on_open:True\nbackup_av_files:True"
-            f.write(text)
-            f.close()
+        with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
+            txt = f.read()
+            txt = txt.split("\n")
+            settings['codername'] = split_value(txt[0])
+            settings['font'] = split_value(txt[1])
+            settings['fontsize'] = int(split_value(txt[2]))
+            settings['treefontsize'] = int(split_value(txt[3]))
+            settings['directory'] = split_value(txt[4])
+            settings['showIDs'] = True
+            if split_value(txt[5]) == "False":
+                settings['showIDs'] = False
+            settings['language'] = split_value(txt[6])
+            settings['backup_on_open'] = True
+            if split_value(txt[7]) == "False":
+                settings['backup_on_open'] = False
+            settings['backup_av_files'] = True
+            if split_value(txt[8]) == "False":
+                settings['backup_av_files'] = False
         return settings
 
     def add_relations_table(self):
@@ -275,16 +387,16 @@ class MainWindow(QtWidgets.QMainWindow):
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
-    def __init__(self,force_quit=False):
+    def __init__(self,app,force_quit=False):
         """ Set up user interface from ui_main.py file. """
+        self.app = app
         self.force_quit = force_quit
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.hide_menu_options()
-        self.settings.update(App.load_settings())
-        self.app = None
+        self.settings.update(app.load_settings())
         self.init_ui()
         self.conn = None
         self.show()
@@ -729,7 +841,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def change_settings(self):
         """ Change default settings - the coder name, font, font size. Non-modal. """
 
-        ui = DialogSettings(self.settings)
+        ui = DialogSettings(self.app)
         ui.exec_()
         self.settings_report()
         newfont = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
@@ -764,13 +876,11 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         if len(path) > 3 and path[-4:] == ".qda":
             self.settings['path'] = path
-            persist_path = os.path.join(os.path.expanduser('~'),'.qualcoder','cur_project.txt')
-            with open(persist_path,'w') as f:
-                f.write(path)
+            self.app.append_recent_project(path)
             msg = ""
             try:
                 self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
-                self.app = App(self.settings['conn'])
+                self.app.create_connection(path)
             except Exception as e:
                 self.settings['conn'] = None
                 msg += str(e)
@@ -864,33 +974,20 @@ class MainWindow(QtWidgets.QMainWindow):
 @click.option('-v','--view',is_flag=True)
 @click.option('--force-quit',is_flag=True)
 def gui(project_path,view,force_quit):
+    qual_app = App()
+    settings = qual_app.load_settings()
     if project_path is None:
-        persist_path = os.path.join(os.path.expanduser('~'),'.qualcoder','cur_project.txt')
-        try:
-            with open(persist_path,'r') as f:
-                project_path = f.read().strip()
-        except:
-            pass
+        project_path = qual_app.get_most_recent_projectpath()
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
-    # uncomment below when used in deb package RemRmm44's suggestion
-    #with open(path + "/QualCoder/GUI/default.stylesheet", "r") as fh:
-    # comment below when used in deb package, RemRam44's suggestion
-    with open(path + "/GUI/default.stylesheet", "r") as fh:
-        app.setStyleSheet(fh.read())
+    stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
+    with open('test.txt','w') as f:
+        f.write(stylesheet)
+    app.setStyleSheet(stylesheet)
     # Try and load language settings from file stored in home/.qualcoder/
     # translator applies to ui designed GUI widgets only
-    lang = "en"
-    try:
-        with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
-            txt = f.read()
-            txt = txt.split("\n")
-            lang = txt[6]
-            if lang == "":
-                lang = "en"
-    except:
-        pass
+    lang = settings.get('language','en')
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
     if lang != "en":
         translator = QtCore.QTranslator()
@@ -902,9 +999,9 @@ def gui(project_path,view,force_quit):
             getlang = gettext.translation('de', localedir=path + '/locale', languages=['de'])
         app.installTranslator(translator)
     getlang.install()
-    ex = MainWindow(force_quit=force_quit)
+    ex = MainWindow(qual_app,force_quit=force_quit)
     if project_path:
-        ex.open_project(project_path)
+        ex.open_project(path=project_path)
     if view:
         ex.view_graph()
     sys.exit(app.exec_())
@@ -916,9 +1013,9 @@ def cli():
 @cli.command()
 @click.argument('project-path')
 def interactive(project_path):
-    conn = sqlite3.connect(project_path + "/data.qda")
-    conn = sqlite3.connect(project_path + "/data.qda")
-    qual_app = App(conn)
+    with open(path + "/GUI/default.stylesheet", "r") as fh:
+        stylesheet = fh.read()
+    qual_app = App()
     from IPython import embed
     embed()
 

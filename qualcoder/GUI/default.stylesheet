@@ -34,4 +34,7 @@ QTableWidget:focus
 	border: 3px solid #ffaa00;
 }
 
-
+QTreeWidget
+{ 
+    font-size: 14px;
+}

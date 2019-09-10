@@ -94,24 +94,12 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.codes = []
         self.linktypes = []
         self.categories = []
-        self.filenames = []
+        self.filenames = self.app.get_filenames()
         self.codeslistmodel = DictListModel({})
-        self.annotations = []
+        self.annotations = self.app.get_annotations()
         self.search_indices = []
         self.search_index = 0
         self.get_codes_categories()
-        cur = self.app.conn.cursor()
-        cur.execute("select id, name from source where mediapath is Null")
-        result = cur.fetchall()
-        for row in result:
-            self.filenames.append({'id': row[0], 'name': row[1]})
-        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
-            [self.settings['codername'], ])
-        result = cur.fetchall()
-        for row in result:
-            self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
-            'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
-
         self.ui = Ui_Dialog_codes()
         self.ui.setupUi(self)
         newfont = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
