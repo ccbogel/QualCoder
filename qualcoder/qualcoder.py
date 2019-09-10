@@ -1048,7 +1048,8 @@ def interactive(project_path):
 def graph(project_path,cat_id,gui,**kwargs):
     conn = sqlite3.connect(project_path + "/data.qda")
     from . import view_graph
-    qual_app = App(conn)
+    qual_app = App()
+    qual_app.create_connection(project_path)
     codes,cats = qual_app.get_data()
     codelinks = qual_app.get_code_name_links()
     graph =  None

@@ -38,6 +38,7 @@ import traceback
 import pygraphviz as pgv
 
 from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtCore import Qt
 
 from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
 from .information import DialogInformation
@@ -61,7 +62,9 @@ def calc_supercats(cats):
     return per_supercat
 
 def recurse_supercats(node,per_supercat,func):
+    # print(node)
     for x in per_supercat.pop(node['catid'],[]):
+        # print('##',node,x)
         func(node,x)
         yield x
         yield from recurse_supercats(x,per_supercat,func=func)
@@ -272,9 +275,9 @@ class GVEdgeGraphicsItem(QtWidgets.QGraphicsPathItem):
             color = QtGui.QColor(edge.attr['fontcolor'])
             linkWidth = 4
         else:
-            linkWidth = 1
-            color = QtGui.QColor(QtCore.Qt.black)
-        pen = QtGui.QPen(color, linkWidth, QtCore.Qt.SolidLine)
+            linkWidth = 2
+            color = Qt.black
+        pen = QtGui.QPen(color, linkWidth, Qt.SolidLine)
         self.setPen(pen)
         if 'lp' in dict(edge.attr):
             # pos = edge.attr['lp'].split(',')
@@ -283,7 +286,7 @@ class GVEdgeGraphicsItem(QtWidgets.QGraphicsPathItem):
             self.textitem = QtWidgets.QGraphicsTextItem(edge.attr['label'],parent=self)
             self.textitem.setPos(float(mpos[0])*scaler,yoffset-float(mpos[1])*scaler)
             self.textitem.setDefaultTextColor(color)
-            self.setPath(edge,yoffset,scaler)
+        self.setPath(edge,yoffset,scaler)
 
     def setPath(self,edge,yoffset,scaler):
         path = QtGui.QPainterPath()
