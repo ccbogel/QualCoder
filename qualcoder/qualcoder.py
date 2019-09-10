@@ -154,9 +154,17 @@ class App(object):
         cur = self.conn.cursor()
         cur.execute("select name, memo,color,linetype, owner, date, linkid from links_type")
         result = cur.fetchall()
-        res = []
+        res = {}
         for row in result:
-            res.append({'name': row[0], 'memo': row[1], 'color':row[2],'linetype':row[3],'owner': row[4], 'date': row[5],'linkid':row[6]})
+            res[row[6]] = {
+                'name': row[0],
+                'memo': row[1],
+                'color':row[2],
+                'linetype':row[3],
+                'owner': row[4], 
+                'date': row[5],
+                'linkid':row[6],
+            }
         return res
 
     def get_code_names(self):
@@ -375,6 +383,16 @@ class App(object):
         item['relid'] = cur.fetchone()[0]
         return item
 
+    def set_link_field(self,linkid,key,value):
+        cur = self.conn.cursor()
+        cur.execute("update links_type set %s=? where linkid=?"%key,(value, linkid))
+        self.conn.commit()
+
+    def delete_link(self,linkid):
+        cur = self.conn.cursor()
+        cur.execute("delete from code_name_links where linkid=?", [linkid])
+        cur.execute("delete from links_type where linkid=?", [linkid])
+        self.conn.commit()
 
 
 class MainWindow(QtWidgets.QMainWindow):

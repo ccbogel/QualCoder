@@ -19,9 +19,9 @@ class ListObjectModel(QtCore.QAbstractListModel):
         if role == Qt.DisplayRole:
             return self.nativedata[idx][self.key]
         elif role == Qt.ForegroundRole:
-            return QtGui.QBrush(QtGui.QColor(self.nativedata[idx].get('color',Qt.black)))
+            return QtGui.QBrush(Qt.black)
         elif role == Qt.BackgroundRole:
-            return QtGui.QBrush(Qt.white)
+            return QtGui.QBrush(QtGui.QColor(self.nativedata[idx].get('color',Qt.white)))
         elif role == Qt.CheckStateRole:
             return self._checkstate.get(key,Qt.CheckState.Unchecked)
 
@@ -72,9 +72,9 @@ class DictListModel(QtCore.QAbstractListModel):
                 else:
                     return self.nativedata[key][self.key]
             elif role == Qt.ForegroundRole:
-                return QtGui.QBrush(self.nativedata[key].get('color',Qt.black))
+                return QtGui.QBrush(Qt.black)
             elif role == Qt.BackgroundRole:
-                return QtGui.QBrush(Qt.white)
+                return QtGui.QBrush(QtGui.QColor(self.nativedata[key].get('color',Qt.white)))
             elif role == Qt.CheckStateRole:
                 return self._checkstate.get(key,Qt.CheckState.Unchecked)
 

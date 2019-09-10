@@ -241,6 +241,7 @@ class ViewGraph(QtWidgets.QWidget):
         self.pushButton_view.pressed.connect(self.do_graph)
         self.comboBox.addItems(combobox_list)
         self.resize(1098, 753)
+        self.setAttribute(Qt.WA_QuitOnClose, False )
         # self.graphicsView.setGeometry(QtCore.QRect(10, 40, 601, 411))
 
     def do_graph(self):
