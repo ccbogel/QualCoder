@@ -125,7 +125,7 @@ class App(object):
 
     def append_recent_project(self,path):
         res = self.read_previous_project_paths()
-        if path != res[0]:
+        if not res or path != res[0]:
             res.append(path)
             with open(self.persist_path,'w') as f:
                 for i,line in enumerate(reversed(res)):
