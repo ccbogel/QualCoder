@@ -954,11 +954,11 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError:
             pass
         msg = export_path + ".qpdx\n"
-        msg += "Coding for a/v transcripts is not correct yet. \n"
-        msg += "Transcript coding exported as a <TextSource> rather than within "
-        msg += " the <VideoSource><Transcript> tags.\n"
+        msg += "Coding for a/v transcripts is also exported as a <TextSource>.\n"
+        msg += "Transcript syncronisation with a/v is approximated from textual timepoints in the transcript. "
         msg += "Large > 2GBfiles are not stored externally."
-        msg += "This project exchange is not compliant with the exchange standard."
+        msg += "This project exchange is not compliant with the exchange standard.\n"
+        msg += "REFI-QDA EXPERIMENTAL FUNCTION."
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
     def export_codebook(self):
@@ -1501,20 +1501,35 @@ class Refi_export(QtWidgets.QDialog):
         :return: xml for transcript selections
         """
 
+        xml = ''
         sql = "select pos0,pos1,cid,owner, date, memo from code_text where fid=? order by pos0"
         cur = self.settings['conn'].cursor()
         cur.execute(sql, [media['id'], ])
         results = cur.fetchall()
-        for r in results:
-            print(r)
-
-        #TODO
-        return ''
+        for coded in results:
+            #print(coded)
+            xml += '<TranscriptSelection guid="' + self.create_guid() + '" '
+            xml += 'name="' + media['name'] + '" '
+            xml += 'fromSyncPoint="'
+            for sp in sync_list:
+                if sp[2] == coded[0]:
+                    xml += sp[0]
+            xml += '" toSyncPoint="'
+            for sp in sync_list:
+                if sp[2] == coded[1]:
+                    xml += sp[0]
+            xml += '">\n'
+            xml += '<Coding guid="' + self.create_guid() + '" >\n'
+            xml += '<CodeRef targetGUID="' + self.code_guid(coded[2]) + '" />\n'
+            xml += '</Coding>\n'
+            xml += '</TranscriptSelection>\n'
+        return xml
 
     def get_transcript_syncpoints(self, media):
         """
         Need to get all the transcription codings, start, end positions, code, coder.
-        For each of these, create a syncpoint.
+        For each of these and create a syncpoint.
+        Look through sll the textual timepoints to find the closest needed to create the syncpoints.
         The milliseconds syncs will be approximate only, based on the start and end media milliseconds and any
         in-text detected timestamps.
 
@@ -1524,6 +1539,9 @@ class Refi_export(QtWidgets.QDialog):
         """
 
         tps = self.get_transcript_timepoints(media)  # ordered list of charpos, msecs
+        #print("TIME POINTS", len(tps))
+        #print(tps)
+
         sql = "select pos0,pos1,cid,owner, date, memo from code_text where fid=? order by pos0"
         cur = self.settings['conn'].cursor()
         cur.execute(sql, [media['id'], ])
@@ -1557,7 +1575,8 @@ class Refi_export(QtWidgets.QDialog):
             sync_list.append([guid, xml, r[1]])
 
         #TODO might have multiples of the same char position and msecs, trim back?
-
+        #print("SYNC_LIST", len(sync_list))
+        #print(sync_list)  # tmp
         return sync_list
 
     def get_transcript_timepoints(self, media):
