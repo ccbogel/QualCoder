@@ -77,7 +77,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
     codes = []
     categories = []
     filenames = []
-    filename = {}  # contains filename and file id returned from SelectFile
+    filename = None  # contains filename and file id returned from SelectFile
     sourceText = None
     code_text = []
     annotations = []
@@ -311,7 +311,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.search_index = 0
         cur = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        self.view_file(next_result[0])
+        if self.filename is None or self.filename['id'] != next_result[0]['id']:
+            self.view_file(next_result[0])
         cur.setPosition(next_result[1])
         cur.setPosition(cur.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cur)
@@ -892,6 +893,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.ui.textEdit.clear()
 
     def view_file(self,filedata):
+        self.filename = filedata
         sql_values = []
         file_result = self.app.get_file_texts([filedata['id']])[0]
         sql_values.append(int(file_result['id']))
@@ -934,37 +936,34 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
         name, owner. """
 
-        if self.sourceText is None:
-            return
-        fmt = QtGui.QTextCharFormat()
-        cursor = self.ui.textEdit.textCursor()
+        if self.sourceText is not None:
+            fmt = QtGui.QTextCharFormat()
+            cursor = self.ui.textEdit.textCursor()
 
-        # add coding highlights
-        for item in self.code_text:
-            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
-            color = "#F8E0E0"  # default light red
-            for fcode in self.codes:
-                if fcode['cid'] == item['cid']:
-                    color = fcode['color']
-            fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
-            # highlight codes with memos - these are italicised
-            if item['memo'] is not None and item['memo'] != "":
-                fmt.setFontItalic(True)
-            else:
-                fmt.setFontItalic(False)
-                fmt.setFontWeight(QtGui.QFont.Normal)
-            cursor.setCharFormat(fmt)
+            # add coding highlights
+            codes = {x['cid']:x for x in self.codes}
+            for item in self.code_text:
+                cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+                color = codes.get(item['cid'],{}).get('color',"#F8E0E0")  # default light red
+                fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
+                # highlight codes with memos - these are italicised
+                if item['memo'] is not None and item['memo'] != "":
+                    fmt.setFontItalic(True)
+                else:
+                    fmt.setFontItalic(False)
+                    fmt.setFontWeight(QtGui.QFont.Normal)
+                cursor.setCharFormat(fmt)
 
-        # add annotation marks - these are in bold
-        for note in self.annotations:
-            if len(self.filename.keys()) > 0:  # will be zero if using autocode and no file is loaded
-                if note['fid'] == self.filename['id']:
-                    cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
-                    cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
-                    formatB = QtGui.QTextCharFormat()
-                    formatB.setFontWeight(QtGui.QFont.Bold)
-                    cursor.mergeCharFormat(formatB)
+            # add annotation marks - these are in bold
+            for note in self.annotations:
+                if len(self.filename.keys()) > 0:  # will be zero if using autocode and no file is loaded
+                    if note['fid'] == self.filename['id']:
+                        cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
+                        cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
+                        formatB = QtGui.QTextCharFormat()
+                        formatB.setFontWeight(QtGui.QFont.Bold)
+                        cursor.mergeCharFormat(formatB)
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
