@@ -416,6 +416,17 @@ class App(object):
         return res
 
 
+    def get_code_texts(self,text):
+        cur = self.conn.cursor()
+        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
+        cur.execute(
+            codingsql, 
+            [text],
+        )
+        keys = 'cid','fid','seltext','pos0','pos1','owner','date','memo'
+        for res in cur.fetchall():
+            yield dict(zip(keys,res))
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
