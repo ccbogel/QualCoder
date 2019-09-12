@@ -114,7 +114,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
-        self.ui.pushButton_view_file.clicked.connect(self.view_file)
+        self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
@@ -133,6 +133,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.fill_tree()
         self.fill_links()
         self.setAttribute(Qt.WA_QuitOnClose, False )
+        
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -260,7 +261,6 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.linktypes = self.app.get_linktypes()
         self.codeslistmodel.reset_data({x['cid']:x for x in self.codes})
          
-
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is two or more characters long.
@@ -271,14 +271,17 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.ui.pushButton_search_results.setEnabled(False)
         self.search_indices = []
         self.search_index = -1
-        text = self.ui.lineEdit_search.text()
+        search_term = self.ui.lineEdit_search.text()
         self.ui.pushButton_search_results.setText("0 / 0")
-        if len(text) < 2 or len(self.ui.textEdit.toPlainText()) == 0:
-            return
-        self.search_indices = [match.start() for match in re.finditer(re.escape(text), self.sourceText)]
-        if len(self.search_indices) > 0:
-            self.ui.pushButton_search_results.setEnabled(True)
-        self.ui.pushButton_search_results.setText("0 / " + str(len(self.search_indices)))
+        if len(search_term) >= 2:
+            self.search_indices = []
+            pattern = re.compile(re.escape(search_term),re.IGNORECASE)
+            for filedata in self.app.get_file_texts():
+                for match in pattern.finditer(filedata['fulltext']):
+                    self.search_indices.append((filedata,match.start()))
+            if len(self.search_indices) > 0:
+                self.ui.pushButton_search_results.setEnabled(True)
+            self.ui.pushButton_search_results.setText("0 / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
@@ -287,7 +290,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         if self.search_index == len(self.search_indices):
             self.search_index = 0
         cur = self.ui.textEdit.textCursor()
-        cur.setPosition(self.search_indices[self.search_index])
+        next_result = self.search_indices[self.search_index]
+        self.view_file(next_result[0])
+        cur.setPosition(next_result[1])
         cur.setPosition(cur.position() + len(self.ui.lineEdit_search.text()), QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cur)
         self.ui.pushButton_search_results.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
@@ -853,48 +858,45 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                     Qt.SolidPattern)
                 )
     
-    def view_file(self):
+    def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
         The selected file is then displayed for coding. """
 
         ui = DialogSelectFile(self.filenames, "Select file to view", "single")
         ok = ui.exec_()
-        sql_values = []
         if ok:
             # filename is dictionary with id and name
             self.filename = ui.get_selected()
-            cur = self.app.conn.cursor()
-            cur.execute("select name, id, fulltext, memo, owner, date from source where id=?",
-                [self.filename['id']])
-            file_result = cur.fetchone()
-            sql_values.append(int(file_result[1]))
-            self.sourceText = file_result[2]
-            self.ui.label_file.setText("File " + str(file_result[1]) + " : " + file_result[0])
-
-            # get code text for this file and for this coder, or all coders
-            self.code_text = []
-            codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
-            codingsql += " where fid=? "
-            if not self.ui.checkBox_show_coders.isChecked():
-                codingsql += " and owner=? "
-                sql_values.append(self.settings['codername'])
-            cur.execute(codingsql, sql_values)
-            code_results = cur.fetchall()
-            for row in code_results:
-                self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-                'pos0': row[3], 'pos1':row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
-            self.ui.textEdit.setPlainText(self.sourceText)
-            # update filter for tooltip
-            self.eventFilterTT.setCodes(self.code_text, self.codes)
-            # clear search indices and lineEdit
-            self.ui.lineEdit_search.setText("")
-            self.search_indices = []
-            self.search_index = 0
-            # redo formatting
-            self.unlight()
-            self.highlight()
+            self.view_file(self.filename)
         else:
             self.ui.textEdit.clear()
+
+    def view_file(self,filedata):
+        sql_values = []
+        file_result = self.app.get_file_texts([filedata['id']])[0]
+        sql_values.append(int(file_result['id']))
+        self.sourceText = file_result['fulltext']
+        self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
+
+        # get code text for this file and for this coder, or all coders
+        self.code_text = []
+        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
+        codingsql += " where fid=? "
+        if not self.ui.checkBox_show_coders.isChecked():
+            codingsql += " and owner=? "
+            sql_values.append(self.settings['codername'])
+        cur = self.app.conn.cursor()
+        cur.execute(codingsql, sql_values)
+        code_results = cur.fetchall()
+        for row in code_results:
+            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
+            'pos0': row[3], 'pos1':row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+        self.ui.textEdit.setPlainText(self.sourceText)
+        # update filter for tooltip
+        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        # redo formatting
+        self.unlight()
+        self.highlight()
 
     def unlight(self):
         """ Remove all text highlighting from current file. """

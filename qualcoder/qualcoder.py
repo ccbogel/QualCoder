@@ -394,6 +394,29 @@ class App(object):
         cur.execute("delete from links_type where linkid=?", [linkid])
         self.conn.commit()
 
+    def get_file_texts(self,fileids=None):
+        cur = self.conn.cursor()
+        if fileids is not None:
+            cur.execute(
+                "select name, id, fulltext, memo, owner, date from source where id in (?)",
+                fileids
+            )
+        else:
+            cur.execute("select name, id, fulltext, memo, owner, date from source order by name")
+        res = []
+        for row in cur.fetchall():
+            res.append({
+            'name':row[0],
+            'id':row[1],
+            'fulltext':row[2],
+            'memo':row[3],
+            'owner':row[4],
+            'date':row[5],
+        })
+        return res
+
+
+
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -1036,6 +1059,7 @@ def interactive(project_path):
     with open(path + "/GUI/default.stylesheet", "r") as fh:
         stylesheet = fh.read()
     qual_app = App()
+    qual_app.create_connection(project_path)
     from IPython import embed
     embed()
 
