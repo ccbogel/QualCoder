@@ -1,14 +1,13 @@
-env:
-  TRAVIS_DEBIAN_NETWORK_ENABLED=true
+dist: bionic
 
 sudo: required
 language: generic
 
-services:
-  - docker
+install: ./install_build_dependencies.sh
 
 script:
-  - wget -O- https://travis.debian.net/script.sh | sh -
+  - gbp dch --ignore-branch -a -S 
+  - dpkg-buildpackage -us -uc -b 
 
 if:
   tag IS blank
