@@ -32,7 +32,7 @@ class Ui_Dialog_codes(object):
         self.label_file.setGeometry(QtCore.QRect(660, 7, 551, 28))
         self.label_file.setObjectName("label_file")
         self.label_coded = QtWidgets.QLabel(self.groupBox)
-        self.label_coded.setGeometry(QtCore.QRect(520, 70, 561, 28))
+        self.label_coded.setGeometry(QtCore.QRect(720, 70, 561, 28))
         self.label_coded.setObjectName("label_coded")
         self.label_code = QtWidgets.QLabel(self.groupBox)
         self.label_code.setGeometry(QtCore.QRect(0, 70, 501, 28))
@@ -78,6 +78,14 @@ class Ui_Dialog_codes(object):
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
+        self.search_escaped = QtWidgets.QCheckBox('escaped',self.groupBox)
+        self.search_escaped.setGeometry(QtCore.QRect(470, 70, 92, 25))
+        self.search_escaped.setObjectName("search_escaped")
+        self.search_all_files = QtWidgets.QCheckBox('all',self.groupBox)
+        self.search_all_files.setGeometry(QtCore.QRect(560, 70, 92, 25))
+        self.search_all_files.setObjectName("search_all_files")
+        self.search_all_files.setChecked(True)
+
 
         self.retranslateUi(Dialog_codes)
         QtCore.QMetaObject.connectSlotsByName(Dialog_codes)

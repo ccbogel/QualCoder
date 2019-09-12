@@ -274,14 +274,34 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         search_term = self.ui.lineEdit_search.text()
         self.ui.pushButton_search_results.setText("0 / 0")
         if len(search_term) >= 2:
-            self.search_indices = []
-            pattern = re.compile(re.escape(search_term),re.IGNORECASE)
-            for filedata in self.app.get_file_texts():
-                for match in pattern.finditer(filedata['fulltext']):
-                    self.search_indices.append((filedata,match.start()))
-            if len(self.search_indices) > 0:
-                self.ui.pushButton_search_results.setEnabled(True)
-            self.ui.pushButton_search_results.setText("0 / " + str(len(self.search_indices)))
+            pattern = None
+            if self.ui.search_escaped.isChecked():
+                pattern = re.compile(re.escape(search_term),re.IGNORECASE)
+            else:
+                try:
+                    pattern = re.compile(search_term,re.IGNORECASE)
+                except:
+                    logger.warning('Bad escape')
+            if pattern is not None:
+                self.search_indices = []
+                if self.ui.search_all_files.isChecked():
+                    for filedata in self.app.get_file_texts():
+                        try:
+                            text = filedata['fulltext']
+                            for match in pattern.finditer(text):
+                                self.search_indices.append((filedata,match.start(),len(match.group(0))))
+                        except:
+                            logger.exception('Failed searching text %s for %s',filedata['name'],search_term)
+                else:
+                    try:
+                        if self.sourceText:
+                            for match in pattern.finditer(self.sourceText):
+                                self.search_indices.append((filedata,match.start(),len(match.group(0))))
+                    except:
+                        logger.exception('Failed searching current file for %s',search_term)
+                if len(self.search_indices) > 0:
+                    self.ui.pushButton_search_results.setEnabled(True)
+                self.ui.pushButton_search_results.setText("0 / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
@@ -293,7 +313,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         next_result = self.search_indices[self.search_index]
         self.view_file(next_result[0])
         cur.setPosition(next_result[1])
-        cur.setPosition(cur.position() + len(self.ui.lineEdit_search.text()), QtGui.QTextCursor.KeepAnchor)
+        cur.setPosition(cur.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cur)
         self.ui.pushButton_search_results.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
