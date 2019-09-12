@@ -1,3 +1,6 @@
+env:
+  TRAVIS_DEBIAN_NETWORK_ENABLED=true
+
 sudo: required
 language: generic
 
@@ -5,7 +8,7 @@ services:
   - docker
 
 script:
-  - wget -O- http://travis.debian.net/script.sh | sh -
+  - wget -O- https://travis.debian.net/script.sh | sh -
 
 if:
   tag IS blank
