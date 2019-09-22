@@ -118,6 +118,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        self.ui.search_escaped.stateChanged.connect(self.search_for_text)
+        self.ui.search_all_files.stateChanged.connect(self.search_for_text)
+        self.ui.search_case.stateChanged.connect(self.search_for_text)
         self.ui.pushButton_search_results.setEnabled(False)
         self.ui.pushButton_search_results.pressed.connect(self.move_to_next_search_text)
         self.ui.treeWidget.setDragEnabled(True)
@@ -275,11 +278,14 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.pushButton_search_results.setText("0 / 0")
         if len(search_term) >= 2:
             pattern = None
+            flags = 0
+            if not self.ui.search_case.isChecked():
+                flags |= re.IGNORECASE
             if self.ui.search_escaped.isChecked():
-                pattern = re.compile(re.escape(search_term),re.IGNORECASE)
+                pattern = re.compile(re.escape(search_term),flags)
             else:
                 try:
-                    pattern = re.compile(search_term,re.IGNORECASE)
+                    pattern = re.compile(search_term,flags)
                 except:
                     logger.warning('Bad escape')
             if pattern is not None:

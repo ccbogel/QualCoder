@@ -85,6 +85,9 @@ class Ui_Dialog_codes(object):
         self.search_all_files.setGeometry(QtCore.QRect(560, 70, 92, 25))
         self.search_all_files.setObjectName("search_all_files")
         self.search_all_files.setChecked(True)
+        self.search_case = QtWidgets.QCheckBox('case',self.groupBox)
+        self.search_case.setGeometry(QtCore.QRect(610, 70, 92, 25))
+        self.search_case.setObjectName("search_case_sensitive")
 
 
         self.retranslateUi(Dialog_codes)
@@ -103,7 +106,10 @@ class Ui_Dialog_codes(object):
         self.checkBox_show_coders.setToolTip(_translate("Dialog_codes", "Mark this to show all coded text by all other coders."))
         self.checkBox_show_coders.setText(_translate("Dialog_codes", "Show other coders"))
         self.label.setText(_translate("Dialog_codes", "Search for text:"))
-        self.lineEdit_search.setToolTip(_translate("Dialog_codes", "Case sensitive search"))
+        self.lineEdit_search.setToolTip(_translate("Dialog_codes", "Search term"))
+        self.search_case.setToolTip(_translate("Dialog_codes", "Case sensitive search"))
+        self.search_all_files.setToolTip(_translate("Dialog_codes", "Search all files"))
+        self.search_escaped.setToolTip(_translate("Dialog_codes", "Search escaped (no special regex characters)"))
         self.pushButton_search_results.setText(_translate("Dialog_codes", "0 of 0"))
 
 
