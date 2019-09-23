@@ -1,11 +1,13 @@
+dist: bionic
+
 sudo: required
 language: generic
 
-services:
-  - docker
+install: ./install_build_dependencies.sh
 
 script:
-  - wget -O- http://travis.debian.net/script.sh | sh -
+  - gbp dch --ignore-branch -a -S 
+  - dpkg-buildpackage -us -uc -b 
 
 if:
   tag IS blank

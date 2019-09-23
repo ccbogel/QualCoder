@@ -1,10 +1,9 @@
-#export DH_VERBOSE=1
-export PYBUILD_NAME=qualcoder
-
+#!/usr/bin/make -f
 %:
-    dh $@ --with python3 --buildsystem=pybuild
+	dh $@ --with python-virtualenv
 
-
-override_dh_auto_clean:
-    dh_auto_clean -O--buildsystem=pybuild
-    find . -type d -name '__pycache__' -empty -delete
+override_dh_virtualenv:
+	dh_virtualenv --setuptools \
+		--python python3 \
+		--extra-pip-arg --ignore-installed \
+		--use-system-packages

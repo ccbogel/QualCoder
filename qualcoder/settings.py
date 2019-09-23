@@ -54,10 +54,11 @@ class DialogSettings(QtWidgets.QDialog):
 
     settings = {}
 
-    def __init__(self, settings, parent=None):
+    def __init__(self, app, parent=None):
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
+        self.settings = app.settings
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
@@ -155,18 +156,8 @@ class DialogSettings(QtWidgets.QDialog):
         ''' Save settings to text file in user's home directory.
         Each setting has a variable identifier then a colon 
         followed by the value. '''
+        self.app.write_congig_ini(self.settings)
 
-        txt = 'codername:' + self.settings['codername'] + "\n"
-        txt += 'font:' + self.settings['font'] + "\n"
-        txt += 'fontsize:' + str(self.settings['fontsize']) + "\n"
-        txt += 'treefontsize:' + str(self.settings['treefontsize']) + "\n"
-        txt += 'directory:' + self.settings['directory'] + "\n"
-        txt += 'showIDs:' + str(self.settings['showIDs']) + "\n"
-        txt += 'language:' + self.settings['language'] + "\n"
-        txt += 'backup_on_open:' + str(self.settings['backup_on_open']) + '\n'
-        txt += 'backup_av_files:' + str(self.settings['backup_av_files'])
-        with open(home + '/.qualcoder/QualCoder_settings.txt', 'w') as f:
-            f.write(txt)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

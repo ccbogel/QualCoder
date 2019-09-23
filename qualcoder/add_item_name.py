@@ -25,7 +25,8 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 '''
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt, pyqtSignal
 import os
 import sys
 import logging
@@ -92,6 +93,75 @@ class DialogAddItemName(QtWidgets.QDialog):
         ''' Get the new name '''
 
         return self.newItem
+
+class DialogLinkTo(QtWidgets.QDialog):
+    """
+    Dialog to get a new code or code category from user.
+    Also used for Case and File adding attributes.
+    Requires a name for Dialog title (and label in setupUI)
+    Requires a list of dictionary 'name' items.
+    Dialog returns ok if the item is not a duplicate of a name in the list.
+    Returns one item through getnewItem method.
+    """
+
+    def __init__(self, model, linktypes, fromname, parent=None):
+        super(DialogLinkTo, self).__init__(parent)  # overrride accept method
+        self.linktype = None
+        self.linkitem = None
+        self.linktypes = linktypes 
+        self.model = model
+
+        self.setupUi()
+        completer = QtWidgets.QCompleter()#[x['name'] for x in model.nativedata])
+        completer.setCompletionMode(QtWidgets.QCompleter.InlineCompletion)
+        completer.setCompletionColumn(0)
+        completer.setCompletionRole(Qt.DisplayRole)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setModel(model)
+        self.lineEdit.setCompleter(completer)
+
+        self.combo.setModel(linktypes)
+        self.setWindowTitle('Create link to %s'%fromname)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed);
+
+    def setupUi(self):
+        self.setObjectName("CreateLinkTo")
+        self.resize(400, 142)
+        self.setFixedSize(400, 142)
+        self.buttonBox = QtWidgets.QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QtCore.QRect(170, 90, 201, 32))
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
+        self.lineEdit = QtWidgets.QLineEdit(self)
+        self.lineEdit.setGeometry(QtCore.QRect(20, 40, 351, 27))
+        self.lineEdit.setObjectName("lineEdit")
+        self.label = QtWidgets.QLabel("Link to:",self)
+        self.label.setGeometry(QtCore.QRect(20, 20, 141, 17))
+        self.label.setObjectName("label")
+        self.labelc = QtWidgets.QLabel("Linktype:",self)
+        self.labelc.setGeometry(QtCore.QRect(20, 70, 141, 17))
+        self.labelc.setObjectName("linktype_label")
+        self.combo = QtWidgets.QComboBox(self)
+        self.combo.setGeometry(QtCore.QRect(20, 90, 141, 27))
+        self.lineEdit.setObjectName("linktype")
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        # QtCore.QMetaObject.connectSlotsByName(self)
+        # self.setTabOrder(self.combo,self.lineEdit, self.buttonBox)
+        self.lineEdit.setFocus(True)
+
+    def accept(self):
+        """ On pressing accept button, check there is no duplicate.
+        If no duplicate then accept end close the dialog """
+
+        thisItem = str(self.lineEdit.text())
+        if thisItem in {v['name'] for v in self.model.nativedata.values()}:
+            self.linkitem = thisItem
+            self.linktype = self.linktypes.nativedata[self.combo.currentIndex()]
+            self.close()
+        else:
+            QtWidgets.QMessageBox.warning(None, _("Not existing"), _("This does not exists"))
 
 
 if __name__ == "__main__":

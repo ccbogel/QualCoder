@@ -58,7 +58,7 @@ class DialogMemo(QtWidgets.QDialog):
     table = ""
     memo = ""
 
-    def __init__(self, settings, title="", memo=""):
+    def __init__(self, settings,title="", memo=""):
         ''' Table  and table_id are needed for selecting the text from the relevant table.
         '''
 
@@ -71,7 +71,7 @@ class DialogMemo(QtWidgets.QDialog):
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowTitle(title)
-        self.ui.textEdit.setFontPointSize(self.settings['fontsize'])
+        self.ui.textEdit.setFontPointSize(self.settings.get('fontsize',12))
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
 
