@@ -118,9 +118,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-        self.ui.search_escaped.stateChanged.connect(self.search_for_text)
-        self.ui.search_all_files.stateChanged.connect(self.search_for_text)
-        self.ui.search_case.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.pushButton_search_results.setEnabled(False)
         self.ui.pushButton_search_results.pressed.connect(self.move_to_next_search_text)
         self.ui.treeWidget.setDragEnabled(True)
@@ -133,6 +133,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.listWidgetLinks.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidgetLinks.customContextMenuRequested.connect(self.linkstree_menu)
         self.ui.splitter.setSizes([150, 400])
+        self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
         self.fill_links()
         self.setAttribute(Qt.WA_QuitOnClose, False )
@@ -268,6 +269,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is two or more characters long.
         Resets current search_index.
+        If all files is check then searches for all matching text across all text files and
+        displays the file text and current position to user.
+        If case sensitive is checked then text seared is matched for case sensitivity.
+        If search escaped is checked ?
         """
 
         if len(self.search_indices) == 0:
@@ -279,9 +284,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         if len(search_term) >= 2:
             pattern = None
             flags = 0
-            if not self.ui.search_case.isChecked():
+            if not self.ui.checkBox_search_case.isChecked():
                 flags |= re.IGNORECASE
-            if self.ui.search_escaped.isChecked():
+            if self.ui.checkBox_search_escaped.isChecked():
                 pattern = re.compile(re.escape(search_term),flags)
             else:
                 try:
@@ -290,7 +295,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                     logger.warning('Bad escape')
             if pattern is not None:
                 self.search_indices = []
-                if self.ui.search_all_files.isChecked():
+                if self.ui.checkBox_search_all_files.isChecked():
+                    """ Search for this text across all files. Show each file in textEdit
+                    """
                     for filedata in self.app.get_file_texts():
                         try:
                             text = filedata['fulltext']
@@ -302,6 +309,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                     try:
                         if self.sourceText:
                             for match in pattern.finditer(self.sourceText):
+                                # get result as first dictionary item
+                                filedata = self.app.get_file_texts([self.filename['id'], ])[0]
                                 self.search_indices.append((filedata,match.start(),len(match.group(0))))
                     except:
                         logger.exception('Failed searching current file for %s',search_term)
@@ -317,6 +326,9 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.search_index = 0
         cur = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
+        # TypeError: string indices must be integers
+        print(self.filename)  # tmp
+        print("next_result:\n", next_result)  # tmp
         if self.filename is None or self.filename['id'] != next_result[0]['id']:
             self.view_file(next_result[0])
         cur.setPosition(next_result[1])

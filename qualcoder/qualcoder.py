@@ -59,7 +59,7 @@ from reports import DialogReportCodes, DialogReportCoderComparisons, DialogRepor
 from view_av import DialogCodeAV
 from view_graph import ViewGraph
 from view_image import DialogCodeImage
-#from . import view_graph
+import view_graph
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -395,6 +395,9 @@ class App(object):
         self.conn.commit()
 
     def get_file_texts(self,fileids=None):
+        """ Get the text of all text files as a list of dictionaries.
+        param: fielids - a list of fileids or None """
+
         cur = self.conn.cursor()
         if fileids is not None:
             cur.execute(
