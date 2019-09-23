@@ -531,6 +531,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         new_cid = int(parent.text(1).split(':')[1])
         try:
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
+            cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
+            cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -672,6 +674,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute("delete from code_name where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
+        cur.execute("delete from code_av where cid=?", [code_['cid'], ])
+        cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_name_links where from_id=?", [code['cid'], ])
         cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
         self.app.conn.commit()
