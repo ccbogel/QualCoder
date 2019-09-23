@@ -43,8 +43,8 @@ from PyQt5.QtGui import QBrush
 
 try:
     import vlc
-except:
-    pass
+except Exception as e:
+    print(e)
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
