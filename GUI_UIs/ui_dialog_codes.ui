@@ -89,23 +89,23 @@
      <widget class="QLabel" name="label_coded">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>780</x>
         <y>70</y>
-        <width>561</width>
+        <width>361</width>
         <height>28</height>
        </rect>
       </property>
       <property name="text">
-       <string>Right click below to mark and unmark selected text</string>
+       <string>Right click to mark and unmark selected text</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>70</y>
-        <width>501</width>
-        <height>28</height>
+        <y>67</y>
+        <width>441</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
@@ -196,6 +196,54 @@
        <string>0 of 0</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_search_case">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>70</y>
+        <width>88</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Case</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_search_all_files">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>70</y>
+        <width>88</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>All</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_search_escaped">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>70</y>
+        <width>101</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search escaped (no special regex characters)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Escaped</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="0">
@@ -203,30 +251,43 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QTreeWidget" name="treeWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QSplitter" name="leftsplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>200</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="baseSize">
-       <size>
-        <width>200</width>
-        <height>0</height>
-       </size>
-      </property>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
+      <widget class="QTreeWidget" name="treeWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-      </column>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+      </widget>
+      <widget class="QListWidget" name="ListWidgetLinks">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </widget>
      <widget class="QTextEdit" name="textEdit"/>
     </widget>
