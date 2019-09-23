@@ -41,25 +41,25 @@ import configparser
 import click
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .settings import DialogSettings
-from .attributes import DialogManageAttributes
-from .cases import DialogCases
-from .codebook import Codebook
-from .code_text import DialogCodeText
-from .dialog_sql import DialogSQL
-from .GUI.ui_main import Ui_MainWindow
-from .import_survey import DialogImportSurvey
-from .information import DialogInformation
-from .journals import DialogJournals
-from .manage_files import DialogManageFiles
-from .memo import DialogMemo
-from .refi import Refi_export, Refi_import
-from .reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from settings import DialogSettings
+from attributes import DialogManageAttributes
+from cases import DialogCases
+from codebook import Codebook
+from code_text import DialogCodeText
+from dialog_sql import DialogSQL
+from GUI.ui_main import Ui_MainWindow
+from import_survey import DialogImportSurvey
+from information import DialogInformation
+from journals import DialogJournals
+from manage_files import DialogManageFiles
+from memo import DialogMemo
+from refi import Refi_export, Refi_import
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
-from .view_av import DialogCodeAV
-from .view_graph import ViewGraph
-from .view_image import DialogCodeImage
-from . import view_graph
+from view_av import DialogCodeAV
+from view_graph import ViewGraph
+from view_image import DialogCodeImage
+#from . import view_graph
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -112,7 +112,7 @@ class App(object):
         self.configpath = os.path.join(self.confighome,'config.ini')
         self.persist_path = os.path.join(self.confighome,'recent_projects.txt')
         self.settings = self.load_settings()
-   
+
     def read_previous_project_paths(self):
         res = []
         try:
@@ -161,7 +161,7 @@ class App(object):
                 'memo': row[1],
                 'color':row[2],
                 'linetype':row[3],
-                'owner': row[4], 
+                'owner': row[4],
                 'date': row[5],
                 'linkid':row[6],
             }
@@ -198,7 +198,7 @@ class App(object):
         res = []
         for row in result:
             res.append({'id': row[0], 'name': row[1]})
-        return res 
+        return res
 
     def get_annotations(self):
         cur = self.conn.cursor()
@@ -398,11 +398,11 @@ class App(object):
         cur = self.conn.cursor()
         if fileids is not None:
             cur.execute(
-                "select name, id, fulltext, memo, owner, date from source where id in (?)",
+                "select name, id, fulltext, memo, owner, date from source where id in (?) and fulltext is not null",
                 fileids
             )
         else:
-            cur.execute("select name, id, fulltext, memo, owner, date from source order by name")
+            cur.execute("select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
         res = []
         for row in cur.fetchall():
             res.append({
@@ -420,7 +420,7 @@ class App(object):
         cur = self.conn.cursor()
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
         cur.execute(
-            codingsql, 
+            codingsql,
             [text],
         )
         keys = 'cid','fid','seltext','pos0','pos1','owner','date','memo'
@@ -813,7 +813,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 event.ignore()
 
- 
+
 
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
@@ -1024,7 +1024,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.error(str(e))
         self.dialogList = tempList
 
-
 @click.command()
 @click.option('-p','--project-path')
 @click.option('-v','--view',is_flag=True)
@@ -1103,3 +1102,5 @@ def graph(project_path,cat_id,gui,**kwargs):
         win.show()
         sys.exit(app.exec_())
 
+if __name__ == "__main__":
+    gui()

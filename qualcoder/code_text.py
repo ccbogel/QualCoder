@@ -39,15 +39,15 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush
 
-from .add_item_name import DialogAddItemName, DialogLinkTo
-from .color_selector import DialogColorSelect
-from .color_selector import colors
-from .confirm_delete import DialogConfirmDelete
-from .GUI.ui_dialog_codes import Ui_Dialog_codes
-from .memo import DialogMemo
-from .select_file import DialogSelectFile
-from .helpers import CodedMediaMixin
-from .qtmodels import DictListModel, ListObjectModel
+from add_item_name import DialogAddItemName, DialogLinkTo
+from color_selector import DialogColorSelect
+from color_selector import colors
+from confirm_delete import DialogConfirmDelete
+from GUI.ui_dialog_codes import Ui_Dialog_codes
+from memo import DialogMemo
+from select_file import DialogSelectFile
+from helpers import CodedMediaMixin
+from qtmodels import DictListModel, ListObjectModel
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -136,7 +136,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.fill_tree()
         self.fill_links()
         self.setAttribute(Qt.WA_QuitOnClose, False )
-        
+
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -263,7 +263,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.codes = self.app.get_code_names()
         self.linktypes = self.app.get_linktypes()
         self.codeslistmodel.reset_data({x['cid']:x for x in self.codes})
-         
+
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is two or more characters long.
@@ -558,7 +558,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         code_color = colors[randint(0, len(colors) - 1)]
         item = {
             'name': newCodeText,
-            'memo': "", 
+            'memo': "",
             'owner': self.settings['codername'],
             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'linetype':'<->',
@@ -881,10 +881,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                 link['color'] = new_color
                 self.app.set_link_field(link['linkid'],'color',new_color)
                 selected.setBackground(
-                    QBrush(QtGui.QColor(new_color), 
+                    QBrush(QtGui.QColor(new_color),
                     Qt.SolidPattern)
                 )
-    
+
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
         The selected file is then displayed for coding. """

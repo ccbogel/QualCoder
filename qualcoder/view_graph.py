@@ -35,15 +35,19 @@ import os
 import sys
 import traceback
 
-import pygraphviz as pgv
+try:
+    import pygraphviz as pgv
+except:
+    print("Cannot import pygraphviz try:\nsudo apt-get install python3-pip\nsudo pip3 install graphviz")
+    print("or: sudo apt-get install python3-pygraphviz")
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
-from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
-from .information import DialogInformation
-from .memo import DialogMemo
-from .helpers import CodedMediaMixin
+from GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
+from information import DialogInformation
+from memo import DialogMemo
+from helpers import CodedMediaMixin
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -119,10 +123,10 @@ def plot_with_pygraphviz(cats,codes,codelinks,topnode=None,prog='neato',rankdir=
 
     addednodes = set()
 
-    graph = pgv.AGraph(overlap=False,splines=True,dpi=96,rankdir=rankdir) 
+    graph = pgv.AGraph(overlap=False,splines=True,dpi=96,rankdir=rankdir)
     if topnode is not None:
         graph.add_node(tocatid(topnode),label=topnode['name'])
-    
+
     def draw_connection_cats(top,b):
         graph.add_node(tocatid(b),label=b['name'],type='cat')
         if top is not None:
@@ -384,8 +388,8 @@ class ZoomedViewer(QtWidgets.QGraphicsView):
 
 
 class GraphViewer(ZoomedViewer):
-    DEFAULTDPI = 72 
-    
+    DEFAULTDPI = 72
+
     def __init__(self,app=None,parent=None):
         super(GraphViewer,self).__init__(parent=parent)
         self.app = app
@@ -429,7 +433,7 @@ class GraphViewer(ZoomedViewer):
             self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
             self._bb = None
         self.fitInView()
-   
+
 
 class NodeGraphicsItem(CodedMediaMixin,QtWidgets.QGraphicsEllipseItem):
 
@@ -607,10 +611,10 @@ class MainWindow(QtWidgets.QWidget):
 
     def __init__(self,app):
         super(MainWindow, self).__init__()
-        self.app = app 
+        self.app = app
         self.view = GraphViewer(app,parent=self)
         self.setLayout(QtWidgets.QVBoxLayout())
-        self.layout().addWidget(self.view)                       
+        self.layout().addWidget(self.view)
         button = QtWidgets.QPushButton('View',self)
         self.layout().addWidget(button)
         button.pressed.connect(self.do_graph)

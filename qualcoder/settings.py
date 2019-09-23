@@ -63,15 +63,15 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
-        new_font = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
+        new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.ui.fontComboBox.setCurrentFont(new_font)
         # get coder names from code_text, images and av
         # Note: does no appear to require a distinct clause
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         coders = [""]
-        if settings['conn'] is not None:
-            cur = self.settings['conn'].cursor()
+        if self.app.conn is not None:
+            cur = self.app.conn.cursor()
             cur.execute(sql)
             results = cur.fetchall()
             for row in results:
@@ -88,7 +88,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_coders.currentIndexChanged.connect(self.comboBox_coder_changed)
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
 
-        if self.settings['showIDs'] is True:
+        if self.settings['showids'] is True:
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
@@ -137,9 +137,9 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
-            self.settings['showIDs'] = True
+            self.settings['showids'] = True
         else:
-            self.settings['showIDs'] = False
+            self.settings['showids'] = False
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
         if self.ui.checkBox_auto_backup.isChecked():
             self.settings['backup_on_open'] = True
@@ -154,9 +154,9 @@ class DialogSettings(QtWidgets.QDialog):
 
     def save_settings(self):
         ''' Save settings to text file in user's home directory.
-        Each setting has a variable identifier then a colon 
+        Each setting has a variable identifier then a colon
         followed by the value. '''
-        self.app.write_congig_ini(self.settings)
+        self.app.write_config_ini(self.settings)
 
 
 if __name__ == "__main__":

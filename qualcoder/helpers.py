@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-from .information import DialogInformation
+from information import DialogInformation
 
 class CodedMediaMixin:
     def coded_media(self, data):
