@@ -116,7 +116,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)
+        self.ui.checkBox_show_coders.setEnabled(False)  # to fix
+        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # to fix
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
