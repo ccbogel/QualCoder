@@ -3,6 +3,19 @@ from PyQt5.QtCore import Qt
 
 from information import DialogInformation
 
+
+def msecs_to_mins_and_secs(msecs):
+    """ Convert milliseconds to minutes and seconds.
+    msecs is an integer. Minutes and seconds output is a string."""
+
+    secs = int(msecs / 1000)
+    mins = int(secs / 60)
+    remainder_secs = str(secs - mins * 60)
+    if len(remainder_secs) == 1:
+        remainder_secs = "0" + remainder_secs
+    return str(mins) + "." + remainder_secs
+
+
 class CodedMediaMixin:
     def coded_media(self, data):
         """ Display all coded media for this code.
@@ -44,9 +57,12 @@ class CodedMediaMixin:
         results = cur.fetchall()
         for counter, row in enumerate(results):
             ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[8] + '</span>')
-            ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7]  + '<br />')
+            ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7])
             img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
-            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
+            #self.put_image_into_textedit(img, counter, ui.ui.textEdit)  # cannot do this
+            dimensions = "x: " + str(int(img['x1'])) + ", y: " + str(int(img['y1'])) + ", width: " 
+            dimensions += str(int(img['width'])) + ", height: " + str(int(img['height']))
+            ui.ui.textEdit.append(dimensions)
             ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")
 
         # Media

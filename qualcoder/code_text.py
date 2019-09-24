@@ -326,9 +326,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.search_index = 0
         cur = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        # TypeError: string indices must be integers
-        print(self.filename)  # tmp
-        print("next_result:\n", next_result)  # tmp
+        # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
         if self.filename is None or self.filename['id'] != next_result[0]['id']:
             self.view_file(next_result[0])
         cur.setPosition(next_result[1])
