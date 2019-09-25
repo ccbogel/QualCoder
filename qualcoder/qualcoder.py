@@ -77,10 +77,10 @@ except OSError:
     pass
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
-     datefmt='%Y/%m/%d %I:%M')# filename=logfile,
-     # level=logging.DEBUG)
+     datefmt='%Y/%m/%d %I:%M', filename=logfile)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -91,22 +91,10 @@ def exception_handler(exception_type, value, tb_obj):
     logger.error(_("Uncaught exception : ") + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
-def split_value(intext):
-    """ A legacy method. Originally the settings file have a newline separated list of values.
-    Now, each line is preceeded by the varaible name and a colon then the value.
-    Takes the text line, and returns a value, either as is,
-    or if there is a colon the text after the colon.
-    Suggest deleting this method after 6 months.
-    """
-    try:
-        v = intext.split(':', 1)[1]
-        return v
-    except:
-        return intext
-
 
 class App(object):
     def __init__(self):
+        sys.excepthook = exception_handler
         self.conn = None
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome,'config.ini')
@@ -123,7 +111,7 @@ class App(object):
             logger.debug('No previous projects found')
         return res
 
-    def append_recent_project(self,path):
+    def append_recent_project(self, path):
         res = self.read_previous_project_paths()
         if not res or path != res[0]:
             res.append(path)
@@ -147,7 +135,7 @@ class App(object):
         self.codes, self.categories = self.get_data()
         self.model = self.calc_model(self.categories,self.codes)
 
-    def read_user_preferences(self,path):
+    def read_user_preferences(self, path):
         config = configparser.ConfigParser()
 
     def get_linktypes(self):
@@ -211,7 +199,7 @@ class App(object):
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         return res
 
-    def calc_model(self,cats,codes):
+    def calc_model(self, cats, codes):
         model = {}
         for cat in cats:
             model['catid:%s'%cat['catid']] = cat
@@ -219,7 +207,7 @@ class App(object):
             model['cid:%s'%code['cid']] = code
         return model
 
-    def get_node_from_graph(self,node):
+    def get_node_from_graph(self, node):
         return self.model[node.name]
 
     def get_data(self):
@@ -240,7 +228,7 @@ class App(object):
             'cid': row[4], 'catid': row[5], 'color': row[6]})
         return code_names,categories
 
-    def write_config_ini(self,settings):
+    def write_config_ini(self, settings):
         config = configparser.ConfigParser()
         config['DEFAULT'] = settings
         with open(self.configpath, 'w') as configfile:
@@ -258,7 +246,7 @@ class App(object):
             res['treefontsize'] = default.getfloat('treefontsize')
         return res
 
-    def merge_settings_with_default_stylesheet(self,settings):
+    def merge_settings_with_default_stylesheet(self, settings):
         stylesheet = []
         pattern = re.compile('^Q|[*]')
         with open(path + "/GUI/default.stylesheet", "r") as fh:
@@ -278,15 +266,8 @@ class App(object):
     def load_settings(self):
         res = self._load_config_ini()
         if not len(res):
-            try:
-                self.write_config_ini(self._load_old_settings())
-                logger.warning('Converted to config.ini, remove old config')
-                os.remove(os.path.join(self.confighome,'QualCoder_settings.txt'))
-            except OSError:
-                self.write_config_ini(self.default_settings)
-                logger.info('Initilaized config.ini')
-            except:
-                logger.exception('Failed to convert to onfig.ini')
+            self.write_config_ini(self.default_settings)
+            logger.info('Initilaized config.ini')
             res = self._load_config_ini()
         return res
 
@@ -303,30 +284,6 @@ class App(object):
             'backup_on_open':True,
             'backup_av_files':True,
         }
-
-
-    def _load_old_settings(self):
-        # load_settings from file stored in home/.qualcoder/
-        settings =  {}
-        with open(home + '/.qualcoder/QualCoder_settings.txt') as f:
-            txt = f.read()
-            txt = txt.split("\n")
-            settings['codername'] = split_value(txt[0])
-            settings['font'] = split_value(txt[1])
-            settings['fontsize'] = int(split_value(txt[2]))
-            settings['treefontsize'] = int(split_value(txt[3]))
-            settings['directory'] = split_value(txt[4])
-            settings['showIDs'] = True
-            if split_value(txt[5]) == "False":
-                settings['showIDs'] = False
-            settings['language'] = split_value(txt[6])
-            settings['backup_on_open'] = True
-            if split_value(txt[7]) == "False":
-                settings['backup_on_open'] = False
-            settings['backup_av_files'] = True
-            if split_value(txt[8]) == "False":
-                settings['backup_av_files'] = False
-        return settings
 
     def add_relations_table(self):
         cur = self.conn.cursor()
@@ -364,7 +321,7 @@ class App(object):
 
         self.conn.commit()
 
-    def add_code_name_link(self,linkid,from_cid,to_cid,memo=''):
+    def add_code_name_link(self, linkid, from_cid, to_cid, memo=''):
         item = {
             'linkid': linkid,
             'from_id':from_cid,
@@ -383,18 +340,18 @@ class App(object):
         item['relid'] = cur.fetchone()[0]
         return item
 
-    def set_link_field(self,linkid,key,value):
+    def set_link_field(self, linkid, key, value):
         cur = self.conn.cursor()
-        cur.execute("update links_type set %s=? where linkid=?"%key,(value, linkid))
+        cur.execute("update links_type set %s=? where linkid=?"%key, (value, linkid))
         self.conn.commit()
 
-    def delete_link(self,linkid):
+    def delete_link(self, linkid):
         cur = self.conn.cursor()
         cur.execute("delete from code_name_links where linkid=?", [linkid])
         cur.execute("delete from links_type where linkid=?", [linkid])
         self.conn.commit()
 
-    def get_file_texts(self,fileids=None):
+    def get_file_texts(self, fileids=None):
         """ Get the text of all text files as a list of dictionaries.
         param: fielids - a list of fileids or None """
 
@@ -418,8 +375,7 @@ class App(object):
         })
         return res
 
-
-    def get_code_texts(self,text):
+    def get_code_texts(self, text):
         cur = self.conn.cursor()
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
         cur.execute(
@@ -429,7 +385,6 @@ class App(object):
         keys = 'cid','fid','seltext','pos0','pos1','owner','date','memo'
         for res in cur.fetchall():
             yield dict(zip(keys,res))
-
 
 
 class MainWindow(QtWidgets.QMainWindow):
