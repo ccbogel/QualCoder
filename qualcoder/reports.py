@@ -927,7 +927,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if filename[0] == "":
             return
         filename = filename[0] + ".csv"
-        with open(filename, 'w', newline='') as csvfile:
+        with open(filename, 'w', encoding ='utf-8', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
