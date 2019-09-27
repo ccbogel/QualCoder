@@ -58,6 +58,7 @@ from reports import DialogReportCodes, DialogReportCoderComparisons, DialogRepor
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph import ViewGraph
+from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 import view_graph
 
@@ -443,6 +444,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
         self.ui.actionView_Graph.triggered.connect(self.view_graph)
+        self.ui.actionView_Graph_2.triggered.connect(self.view_graph_original)
 
         # reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -583,7 +585,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph(self):
         """ Show acyclic graph of codes and categories. """
 
-        ui = view_graph.ViewGraph(self.app)# ViewGraph(self.app)
+        ui = view_graph.ViewGraph(self.app)
+        self.dialogList.append(ui)
+        ui.show()
+        self.clean_dialog_refs()
+
+    def view_graph_original(self):
+        """ Show acyclic graph of codes and categories. """
+
+        ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
