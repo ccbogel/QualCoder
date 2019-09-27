@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -109,6 +109,8 @@ class Ui_MainWindow(object):
         self.actionREFI_Codebook_import.setObjectName("actionREFI_Codebook_import")
         self.actionREFI_QDA_Project_import = QtWidgets.QAction(MainWindow)
         self.actionREFI_QDA_Project_import.setObjectName("actionREFI_QDA_Project_import")
+        self.actionView_Graph_2 = QtWidgets.QAction(MainWindow)
+        self.actionView_Graph_2.setObjectName("actionView_Graph_2")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
@@ -130,6 +132,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
         self.menuCoding.addAction(self.actionView_Graph)
+        self.menuCoding.addAction(self.actionView_Graph_2)
         self.menuCoding.addAction(self.actionExport_codebook)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
@@ -192,6 +195,7 @@ class Ui_MainWindow(object):
         self.actionREFI_Codebook_export.setText(_translate("MainWindow", "REFI-QDA Codebook export"))
         self.actionREFI_Codebook_import.setText(_translate("MainWindow", "REFI-QDA Codebook import"))
         self.actionREFI_QDA_Project_import.setText(_translate("MainWindow", "REFI-QDA Project import"))
+        self.actionView_Graph_2.setText(_translate("MainWindow", "View Graph 2"))
 
 
 if __name__ == "__main__":
