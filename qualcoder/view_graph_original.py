@@ -77,13 +77,13 @@ class ViewGraphOriginal(QDialog):
     categories = []
     code_names = []
 
-    def __init__(self, app):
+    def __init__(self, app, settings):
         """ Set up the dialog. """
 
         sys.excepthook = exception_handler
         QDialog.__init__(self)
         self.app = app
-        self.settings = app.settings
+        self.settings = settings
         self.code_names, self.categories = self.app.get_data()
         combobox_list = ['All']
         for c in self.categories:
@@ -208,7 +208,7 @@ class ViewGraphOriginal(QDialog):
 
         # Add text items to the scene
         for m in model:
-            self.scene.addItem(TextGraphicsItem(self.app, m))
+            self.scene.addItem(TextGraphicsItem(self.app, self.settings, m))
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
@@ -334,11 +334,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     settings = None
 
-    def __init__(self, app, data):
+    def __init__(self, app, settings, data):
         super(TextGraphicsItem, self).__init__(None)
 
         self.app = app
-        self.settings = self.app.settings
+        self.settings = settings
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
