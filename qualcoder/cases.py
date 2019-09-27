@@ -466,7 +466,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
-        if self.settings['showIDs']:
+        if self.settings['showids'] == 'True':
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
 
     def add_file_to_case(self):

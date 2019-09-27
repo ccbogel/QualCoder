@@ -775,7 +775,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
-        if self.settings['showIDs']:
+        if self.settings['showids'] == 'True':
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
         self.ui.tableWidget.verticalHeader().setVisible(False)
 

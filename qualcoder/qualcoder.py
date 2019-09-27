@@ -281,11 +281,12 @@ class App(object):
             'fontsize':18,
             'treefontsize':14,
             'directory':os.path.expanduser('~'),
-            'showIDs':False,
+            'showids':False,
             'language':'en',
             'backup_on_open':True,
             'backup_av_files':True,
         }
+    # do we need to add a path variable?
 
     def add_relations_table(self):
         cur = self.conn.cursor()
@@ -397,9 +398,9 @@ class MainWindow(QtWidgets.QMainWindow):
     There is a risk of a clash if two coding windows are open with the same file text or
     two journals open with the same journal entry. """
 
-    settings = {"conn": None, "directory": home, "projectName": "", "showIDs": False,
+    settings = {"conn": None, "directory": home, "projectName": "", "showids": 'False',
     'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
-    'treefontsize': 10, "language": "en", "backup_on_open": True, "backup_av_files": True}
+    'treefontsize': 10, "language": "en", "backup_on_open": 'True', "backup_av_files": 'True'}
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
@@ -413,8 +414,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.hide_menu_options()
         self.settings.update(app.load_settings())
+        # need to add path to settings
+        print(self.settings)  # tmp
         self.init_ui()
-        self.conn = None
+        #self.conn = None
         self.show()
 
     def init_ui(self):
@@ -526,14 +529,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def settings_report(self):
         msg = _("Settings")
         msg += "\n========\n"
-        msg += _("Coder") + ": " + self.settings['codername'] + "\n"
-        msg += _("Font") + ": " + self.settings['font'] + " " + str(self.settings['fontsize']) + "\n"
-        msg += _("Tree font size") + ": " + str(self.settings['treefontsize']) + "\n"
-        msg += _("Directory") + ": " + self.settings['directory'] + "\n"
-        msg += _("Show IDs") + ": " + str(self.settings['showIDs']) + "\n"
-        msg += _("Language") + ": " + self.settings['language'] + "\n"
-        msg += _("Backup on open") + ": " + str(self.settings['backup_on_open']) + "\n"
-        msg += _("Backup AV files") + ": " + str(self.settings['backup_av_files'])
+        msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
+        msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.settings['fontsize']) + "\n"
+        msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
+        msg += _("Directory") + ": " + self.app.settings['directory'] + "\n"
+        msg += _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
+        msg += _("Language") + ": " + self.app.settings['language'] + "\n"
+        msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
+        msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
         msg += "\n========"
         self.ui.textEdit.append(msg)
 
@@ -578,6 +581,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
+        print("qualcoder.view_graph_original\n", self.settings)  # tmp
+        print("qualcoder.view_graph_original\n", self.app.settings)  # tmp
         ui = DialogReportCodes(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
@@ -594,8 +599,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
+        print("qualcoder.view_graph_original\n", self.settings)  # tmp
+        print("qualcoder.view_graph_original\n", self.app.settings)  # tmp
         ui = ViewGraphOriginal(self.app, self.settings)
-        #print("qualcoder.view_graph_original\n", self.settings)  # tmp
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -931,10 +937,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.add_relations_table()
 
         # Save a datetime stamped backup
-        if self.settings['backup_on_open'] is True:
+        if self.settings['backup_on_open'] == 'True':
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
-            if self.settings['backup_av_files'] is True:
+            if self.settings['backup_av_files'] == 'True':
                 shutil.copytree(self.settings['path'], backup)
             else:
                 shutil.copytree(self.settings['path'], backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))

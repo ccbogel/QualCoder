@@ -246,7 +246,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 for i in c['display_list']:
                     display_list.append(str(i))
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -271,7 +271,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         for i in c['display_list']:
                             display_list.append(str(i))
                         child = QtWidgets.QTreeWidgetItem(display_list)
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        #child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         item.addChild(child)
                         #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
@@ -290,7 +290,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 for i in c['display_list']:
                     display_list.append(str(i))
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -310,7 +310,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         display_list.append(str(i))
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -568,7 +568,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -590,7 +590,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                     #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        #child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         item.addChild(child)
                         #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
@@ -606,7 +606,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             if c['catid'] is None:
                 #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -623,7 +623,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -721,7 +721,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -765,7 +765,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -785,7 +785,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable

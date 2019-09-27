@@ -245,7 +245,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -270,7 +270,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        #child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         child.setToolTip(0, c['owner'] + "\n" + c['date'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -288,7 +288,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -308,7 +308,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setToolTip(0, c['owner'] + "\n" + c['date'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)

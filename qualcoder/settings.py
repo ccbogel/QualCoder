@@ -88,16 +88,16 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_coders.currentIndexChanged.connect(self.comboBox_coder_changed)
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
 
-        if self.settings['showids'] is True:
+        if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
-        if self.settings['backup_on_open'] is True:
+        if self.settings['backup_on_open'] == 'True':
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
             self.ui.checkBox_auto_backup.setChecked(False)
 
-        if self.settings['backup_av_files'] is True:
+        if self.settings['backup_av_files'] == 'True':
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
@@ -137,18 +137,18 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
-            self.settings['showids'] = True
+            self.settings['showids'] = 'True'
         else:
-            self.settings['showids'] = False
+            self.settings['showids'] = 'False'
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
         if self.ui.checkBox_auto_backup.isChecked():
-            self.settings['backup_on_open'] = True
+            self.settings['backup_on_open'] = 'True'
         else:
-            self.settings['backup_on_open'] = False
+            self.settings['backup_on_open'] = 'False'
         if self.ui.checkBox_backup_AV_files.isChecked():
-            self.settings['backup_av_files'] = True
+            self.settings['backup_av_files'] = 'True'
         else:
-            self.settings['backup_av_files'] = False
+            self.settings['backup_av_files'] = 'False'
         self.save_settings()
         self.close()
 
