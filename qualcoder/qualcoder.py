@@ -129,7 +129,7 @@ class App(object):
         if res:
             return res[0]
 
-    def create_connection(self,project_path):
+    def create_connection(self, project_path):
         self.conn = sqlite3.connect(os.path.join(project_path,'data.qda'))
         self._load_model()
 
@@ -417,7 +417,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # need to add path to settings
         print(self.settings)  # tmp
         self.init_ui()
-        #self.conn = None
         self.show()
 
     def init_ui(self):
@@ -599,9 +598,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
-        print("qualcoder.view_graph_original\n", self.settings)  # tmp
-        print("qualcoder.view_graph_original\n", self.app.settings)  # tmp
-        ui = ViewGraphOriginal(self.app, self.settings)
+        ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -776,10 +773,10 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.Yes:
                 self.dialogList = None
-                if self.settings['conn'] is not None:
+                if self.app.conn is not None:
                     try:
-                        self.settings['conn'].commit()
-                        self.settings['conn'].close()
+                        self.app.conn.commit()
+                        self.app.conn.close()
                     except:
                         pass
                 QtWidgets.qApp.quit()
@@ -818,10 +815,11 @@ class MainWindow(QtWidgets.QMainWindow):
             exit(0)
         self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
-        #try:
+
         self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
         self.app = App(self.settings['conn'])
-        cur = self.settings['conn'].cursor()
+        #cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
@@ -921,6 +919,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.settings['path'] = ""
             return
         # get and display some project details
+        self.app.settings['path'] = path
         self.settings['path'] = path
         self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
@@ -956,11 +955,6 @@ class MainWindow(QtWidgets.QMainWindow):
             + _("About: ") + self.project['about']
             + "\n========\n")
         self.show_menu_options()
-
-        # very occassionally code_text.seltext can be empty, when codes are unmarked from text
-        # so remove these rows
-        cur.execute('delete from code_text where length(seltext)=0')
-        self.settings['conn'].commit()
 
     def close_project(self):
         """ Close an open project. """
