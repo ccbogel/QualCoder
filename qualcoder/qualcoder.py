@@ -94,6 +94,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class App(object):
+
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
@@ -402,7 +403,7 @@ class MainWindow(QtWidgets.QMainWindow):
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
-    def __init__(self,app,force_quit=False):
+    def __init__(self, app, force_quit=False):
         """ Set up user interface from ui_main.py file. """
         self.app = app
         self.force_quit = force_quit
@@ -593,7 +594,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
-        ui = ViewGraphOriginal(self.app)
+        ui = ViewGraphOriginal(self.app, self.settings)
+        #print("qualcoder.view_graph_original\n", self.settings)  # tmp
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -780,8 +782,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             else:
                 event.ignore()
-
-
 
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
