@@ -208,7 +208,7 @@ class ViewGraphOriginal(QDialog):
 
         # Add text items to the scene
         for m in model:
-            self.scene.addItem(TextGraphicsItem(self.settings, m))
+            self.scene.addItem(TextGraphicsItem(self.app, m))
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
@@ -331,12 +331,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     data = None
     border_rect = None
     font = None
+    app = None
     settings = None
 
-    def __init__(self, settings, data):
+    def __init__(self, app, data):
         super(TextGraphicsItem, self).__init__(None)
 
-        self.settings = settings
+        self.app = app
+        self.settings = self.app.settings
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
@@ -408,23 +410,23 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
             ui = DialogMemo(self.settings, "Memo for Category " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update code_cat set memo=? where catid=?", (self.data['memo'], self.data['catid']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
 
     def case_media(self, data):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded media for cases: " + self.data['name'], "")
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1
         CASE_NAME = 2
@@ -509,6 +511,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         the uniqueness to the name.
         """
 
+        print(self.settings)  # tmp
+        print(img['mediapath'])
+        path = os.path.abspath(os.path.dirname(__file__))
+        print(path)
+        # Error no path
         path = self.settings['path'] + img['mediapath']
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
@@ -542,7 +549,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         Coded media comes from ALL files and ALL coders. """
 
         ui = DialogInformation("Coded text : " + self.data['name'], "")
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1
         SOURCE_NAME = 2
