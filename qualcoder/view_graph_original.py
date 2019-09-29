@@ -73,6 +73,7 @@ class ViewGraphOriginal(QDialog):
     """
 
     app = None
+
     conn = None
     settings = None
     categories = []
@@ -210,7 +211,7 @@ class ViewGraphOriginal(QDialog):
 
         # Add text items to the scene
         for m in model:
-            self.scene.addItem(TextGraphicsItem(self.conn, self.settings, m))
+            self.scene.addItem(TextGraphicsItem(self.app, m))
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
@@ -335,11 +336,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font = None
     settings = None
 
-    def __init__(self, conn, settings, data):
+    def __init__(self, app, data):
         super(TextGraphicsItem, self).__init__(None)
 
-        self.conn = conn
-        self.settings = settings
+        self.conn = app.conn
+        self.settings = app.settings
+        self.project_path = app.project_path
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
@@ -512,8 +514,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         the uniqueness to the name.
         """
 
-        path = os.path.abspath(os.path.dirname(__file__))
-        path = self.settings['path'] + img['mediapath']
+        path = self.project_path + img['mediapath']
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
@@ -530,7 +531,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         else:
             scaler = scaler_h
         # need unique image names or the same image from the same path is reproduced
-        imagename = self.settings['path'] + '/images/' + str(counter) + '-' + img['mediapath']
+        imagename = self.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
         cursor = text_edit.textCursor()

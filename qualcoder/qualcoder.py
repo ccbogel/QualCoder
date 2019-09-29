@@ -94,19 +94,25 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class App(object):
+    """ General methods for loading settings and recent project stored in .qualcoder folder.
+    Settings does not contain project name, project path or db connection.
+    """
 
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
+        self.project_path = None
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome,'config.ini')
         self.persist_path = os.path.join(self.confighome,'recent_projects.txt')
         self.settings = self.load_settings()
 
     def read_previous_project_paths(self):
+        """ Recent project path is stored in .qualcoder/recent_projects.txt """
+
         res = []
         try:
-            with open(self.persist_path,'r') as f:
+            with open(self.persist_path, 'r') as f:
                 for line in f:
                     res.append(line.strip())
         except:
@@ -114,30 +120,41 @@ class App(object):
         return res
 
     def append_recent_project(self, path):
+        """ Add project path as first entry to .qualcoder/recent_projects.txt """
+
         res = self.read_previous_project_paths()
         if not res or path != res[0]:
             res.append(path)
-            with open(self.persist_path,'w') as f:
-                for i,line in enumerate(reversed(res)):
+            with open(self.persist_path, 'w') as f:
+                for i, line in enumerate(reversed(res)):
                     f.write(line)
                     f.write(os.linesep)
                     if i > 10:
                         break
 
     def get_most_recent_projectpath(self):
+        """ Get most recent project path from .qualcoder/recent_projects.txt """
+
         res = self.read_previous_project_paths()
         if res:
             return res[0]
 
     def create_connection(self, project_path):
-        self.conn = sqlite3.connect(os.path.join(project_path,'data.qda'))
+        """ Create connection to recent project and load codes, categories and model """
+
+        self.project_path = project_path
+        self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
         self._load_model()
 
     def _load_model(self):
+        """ Creates list of dictionaries of codes and categories.
+        Creates dictionary model containing all codes and categories """
+
         self.codes, self.categories = self.get_data()
-        self.model = self.calc_model(self.categories,self.codes)
+        self.model = self.calc_model(self.categories, self.codes)
 
     def read_user_preferences(self, path):
+        print("App.read_users_preferences IS THIS USED?")  # tmp
         config = configparser.ConfigParser()
 
     def get_linktypes(self):
@@ -178,10 +195,21 @@ class App(object):
         res = []
         for row in result:
             res.append({'memo': row[0], 'owner': row[1], 'date': row[2],
-                'color': row[3], 'name': row[4], 'from_id':row[5],'to_id': row[6]})
+                'color': row[3], 'name': row[4], 'from_id': row[5], 'to_id': row[6]})
         return res
 
     def get_filenames(self):
+        """ Get all filenames """
+        cur = self.conn.cursor()
+        cur.execute("select id, name from source")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1]})
+        return res
+
+    def get_text_filenames(self):
+        """ Get textual filenames """
         cur = self.conn.cursor()
         cur.execute("select id, name from source where mediapath is Null")
         result = cur.fetchall()
@@ -191,6 +219,8 @@ class App(object):
         return res
 
     def get_annotations(self):
+        """ Get annotations for text files """
+
         cur = self.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
             [self.settings['codername'], ])
@@ -202,6 +232,9 @@ class App(object):
         return res
 
     def calc_model(self, cats, codes):
+        """ Model dictinary containing all codes and categories
+        Keys are strings of catid:id or cid:id """
+
         model = {}
         for cat in cats:
             model['catid:%s'%cat['catid']] = cat
@@ -214,6 +247,7 @@ class App(object):
 
     def get_data(self):
         """ Called from init and gets all the codes and categories. """
+
         categories = []
         cur = self.conn.cursor()
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by name")
@@ -241,11 +275,11 @@ class App(object):
         config.read(self.configpath)
         default =  config['DEFAULT']
         res = dict(default)
-        # convert to float can be removed when all manual styles are removed
+        # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
-            res['fontsize'] = default.getfloat('fontsize')
+            res['fontsize'] = default.getint('fontsize')
         if 'treefontsize' in default:
-            res['treefontsize'] = default.getfloat('treefontsize')
+            res['treefontsize'] = default.getint('treefontsize')
         return res
 
     def merge_settings_with_default_stylesheet(self, settings):
@@ -276,17 +310,16 @@ class App(object):
     @property
     def default_settings(self):
         return {
-            'codername':'default',
-            'font':'Noto Sans',
-            'fontsize':18,
-            'treefontsize':14,
-            'directory':os.path.expanduser('~'),
-            'showids':False,
-            'language':'en',
-            'backup_on_open':True,
-            'backup_av_files':True,
+            'codername': 'default',
+            'font': 'Noto Sans',
+            'fontsize': 16,
+            'treefontsize': 14,
+            'directory': os.path.expanduser('~'),
+            'showids': False,
+            'language': 'en',
+            'backup_on_open': True,
+            'backup_av_files': True,
         }
-    # do we need to add a path variable?
 
     def add_relations_table(self):
         cur = self.conn.cursor()
@@ -327,9 +360,9 @@ class App(object):
     def add_code_name_link(self, linkid, from_cid, to_cid, memo=''):
         item = {
             'linkid': linkid,
-            'from_id':from_cid,
-            'to_id':to_cid,
-            'memo':memo,
+            'from_id': from_cid,
+            'to_id': to_cid,
+            'memo': memo,
             'owner': self.settings['codername'],
             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
@@ -356,7 +389,7 @@ class App(object):
 
     def get_file_texts(self, fileids=None):
         """ Get the text of all text files as a list of dictionaries.
-        param: fielids - a list of fileids or None """
+        param: fileids - a list of fileids or None """
 
         cur = self.conn.cursor()
         if fileids is not None:
@@ -385,7 +418,7 @@ class App(object):
             codingsql,
             [text],
         )
-        keys = 'cid','fid','seltext','pos0','pos1','owner','date','memo'
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
         for res in cur.fetchall():
             yield dict(zip(keys,res))
 
@@ -398,6 +431,7 @@ class MainWindow(QtWidgets.QMainWindow):
     There is a risk of a clash if two coding windows are open with the same file text or
     two journals open with the same journal entry. """
 
+    # Note: App.settings does not contain projectName, conn or path (to database)
     settings = {"conn": None, "directory": home, "projectName": "", "showids": 'False',
     'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
     'treefontsize': 10, "language": "en", "backup_on_open": 'True', "backup_av_files": 'True'}
@@ -414,8 +448,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.hide_menu_options()
         self.settings.update(app.load_settings())
-        # need to add path to settings
-        print(self.settings)  # tmp
+        self.ui.textEdit.setFontPointSize(self.settings['fontsize'])
         self.init_ui()
         self.show()
 
@@ -529,7 +562,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = _("Settings")
         msg += "\n========\n"
         msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
-        msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.settings['fontsize']) + "\n"
+        msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
         msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
         msg += _("Directory") + ": " + self.app.settings['directory'] + "\n"
         msg += _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
@@ -817,9 +850,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
 
         self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
-        self.app = App(self.settings['conn'])
-        #cur = self.settings['conn'].cursor()
-        cur = self.app.conn.cursor()
+        cur = self.settings['conn'].cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
@@ -835,6 +866,8 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.settings['conn'].commit()
+        self.app = App()
+        self.app.create_connection(self.settings['path'])
         self.app.add_relations_table()
         try:
             # get and display some project details
@@ -842,7 +875,7 @@ class MainWindow(QtWidgets.QMainWindow):
             #self.settings['projectName'] = self.path.rpartition('/')[2]
             self.ui.textEdit.append(_("Opening: ") + self.settings['path'])
             self.setWindowTitle("QualCoder " + self.settings['projectName'])
-            cur = self.settings['conn'].cursor()
+            #cur = self.settings['conn'].cursor()
             cur.execute('select sqlite_version()')
             self.ui.textEdit.append("SQLite version: " + str(cur.fetchone()))
             cur.execute("select databaseversion, date, memo, about from project")
@@ -867,13 +900,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.open_project(self.settings['path'])
 
     def change_settings(self):
-        """ Change default settings - the coder name, font, font size. Non-modal. """
+        """ Change default settings - the coder name, font, font size. Non-modal.
+        Backup options """
 
         ui = DialogSettings(self.app)
         ui.exec_()
         self.settings_report()
-        newfont = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
 
     def project_memo(self):
         """ Give the entire project a memo. Modal dialog. """
@@ -904,7 +939,6 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         if len(path) > 3 and path[-4:] == ".qda":
             self.settings['path'] = path
-            self.app.append_recent_project(path)
             msg = ""
             try:
                 self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
@@ -919,7 +953,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.settings['path'] = ""
             return
         # get and display some project details
-        self.app.settings['path'] = path
         self.settings['path'] = path
         self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
         self.settings['directory'] = self.settings['path'].rpartition('/')[0]
@@ -936,10 +969,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.add_relations_table()
 
         # Save a datetime stamped backup
-        if self.settings['backup_on_open'] == 'True':
+        if self.app.settings['backup_on_open'] == 'True':
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
-            if self.settings['backup_av_files'] == 'True':
+            if self.app.settings['backup_av_files'] == 'True':
                 shutil.copytree(self.settings['path'], backup)
             else:
                 shutil.copytree(self.settings['path'], backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
