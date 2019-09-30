@@ -192,7 +192,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -217,7 +217,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        #child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         child.setToolTip(0, c['owner'] + "\n" + c['date'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -235,7 +235,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -255,7 +255,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setToolTip(0, c['owner'] + "\n" + c['date'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
@@ -624,6 +624,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             QtWidgets.QInformationDialog(None, "Cannot merge", msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
+        cur.execute("delete from code_av where cid=?", [old_cid, ])
+        cur.execute("delete from code_text where cid=?", [old_cid, ])
+        cur.execute("delete from code_image where cid=?", [old_cid, ])
+        cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+        cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
         self.settings['conn'].commit()
         self.parent_textEdit.append(msg)
 
@@ -716,6 +721,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
+        cur.execute("delete from code_name_links where from_id=?", [code['cid'], ])
+        cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
         self.settings['conn'].commit()
         selected = None
         self.get_codes_categories()
