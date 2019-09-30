@@ -94,7 +94,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.codes = []
         self.linktypes = {}
         self.categories = []
-        self.filenames = self.app.get_filenames()
+        self.filenames = self.app.get_text_filenames()
         self.codeslistmodel = DictListModel({})
         self.annotations = self.app.get_annotations()
         self.search_indices = []
@@ -138,7 +138,6 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.fill_tree()
         self.fill_links()
         self.setAttribute(Qt.WA_QuitOnClose, False )
-
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -551,6 +550,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
+        cur.execute("delete from code_av where cid=?", [old_cid, ])
+        cur.execute("delete from code_image where cid=?", [old_cid, ])
+        cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+        cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
         self.app.conn.commit()
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
@@ -913,7 +916,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         else:
             self.ui.textEdit.clear()
 
-    def view_file(self,filedata):
+    def view_file(self, filedata):
         self.filename = filedata
         sql_values = []
         file_result = self.app.get_file_texts([filedata['id']])[0]
