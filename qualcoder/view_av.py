@@ -854,6 +854,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
+        cur.execute("delete from code_image where cid=?", [old_cid, ])
+        cur.execute("delete from code_av where cid=?", [old_cid, ])
+        cur.execute("delete from code_text where cid=?", [old_cid, ])
+        cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+        cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
         self.settings['conn'].commit()
         self.parent_textEdit.append(msg)
         self.load_segments()
@@ -945,6 +950,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
+        cur.execute("delete from code_name_links where from_id=?", [code['cid'], ])
+        cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
         self.settings['conn'].commit()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None
