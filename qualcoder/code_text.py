@@ -88,7 +88,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
 
     def __init__(self, app, parent_textEdit):
 
-        super(DialogCodeText,self).__init__()
+        super(DialogCodeText, self).__init__()
         self.app = app
         self.settings = app.settings
         sys.excepthook = exception_handler
@@ -139,8 +139,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
-        self.ui.listWidgetLinks.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.listWidgetLinks.customContextMenuRequested.connect(self.linkstree_menu)
+        #self.ui.listWidgetLinks.setContextMenuPolicy(Qt.CustomContextMenu)
+        #self.ui.listWidgetLinks.customContextMenuRequested.connect(self.linkstree_menu)
         self.ui.splitter.setSizes([150, 400])
         self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
@@ -270,9 +270,9 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is two or more characters long.
         Resets current search_index.
-        If all files is check then searches for all matching text across all text files and
-        displays the file text and current position to user.
-        If case sensitive is checked then text seared is matched for case sensitivity.
+        If all files is checked then searches for all matching text across all text files
+        and displays the file text and current position to user.
+        If case sensitive is checked then text searched is matched for case sensitivity.
         If search escaped is checked ?
         """
 
@@ -288,10 +288,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             if not self.ui.checkBox_search_case.isChecked():
                 flags |= re.IGNORECASE
             if self.ui.checkBox_search_escaped.isChecked():
-                pattern = re.compile(re.escape(search_term),flags)
+                pattern = re.compile(re.escape(search_term), flags)
             else:
                 try:
-                    pattern = re.compile(search_term,flags)
+                    pattern = re.compile(search_term, flags)
                 except:
                     logger.warning('Bad escape')
             if pattern is not None:
@@ -312,7 +312,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                             for match in pattern.finditer(self.sourceText):
                                 # get result as first dictionary item
                                 filedata = self.app.get_file_texts([self.filename['id'], ])[0]
-                                self.search_indices.append((filedata,match.start(),len(match.group(0))))
+                                self.search_indices.append((filedata,match.start(), len(match.group(0))))
                     except:
                         logger.exception('Failed searching current file for %s',search_term)
                 if len(self.search_indices) > 0:
@@ -378,11 +378,11 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         ActionItemDelete = menu.addAction(_("Delete"))
         ActionItemChangeColor = None
         ActionShowCodedMedia = None
-        ActionLinkTo = None
+        #ActionLinkTo = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
-            ActionLinkTo = menu.addAction(_("Link to"))
+            #ActionLinkTo = menu.addAction(_("Link to"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None :
             if selected is not None and action == ActionItemChangeColor:
@@ -397,7 +397,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 self.add_edit_memo(selected)
             elif selected is not None and action == ActionItemDelete:
                 self.delete_category_or_code(selected)
-            elif selected is not None and action == ActionShowCodedMedia :
+            elif selected is not None and action == ActionShowCodedMedia:
                 found = None
                 tofind = int(selected.text(1)[4:])
                 for code in self.codes:
@@ -406,10 +406,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                         break
                 if found:
                     self.coded_media(found)
-            elif selected is not None and action == ActionLinkTo:
+            '''elif selected is not None and action == ActionLinkTo:
                 self.link_to(selected)
 
-    def link_to(self,item):
+    def link_to(self, item):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database. """
@@ -431,8 +431,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     other = code['cid']
                     if my:
                         break
-            item = self.app.add_code_name_link(linkid,my,other)
-            self.parent_textEdit.append(("New link from: %s -> %s"%(myname,othername)))
+            item = self.app.add_code_name_link(linkid, my, other)
+            self.parent_textEdit.append(("New link from: %s -> %s"%(myname, othername)))
 
     def linkstree_menu(self, position):
         """ Context menu for treewidget items.
@@ -458,7 +458,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             elif selected is not None and action == ActionItemEditMemo:
                 self.edit_link_memo(selected)
             elif selected is not None and action == ActionItemDelete:
-                self.delete_link(selected)
+                self.delete_link(selected)'''
 
     def eventFilter(self, object, event):
         """ Using this event filter to identfiy treeWidgetItem drop events.
@@ -559,7 +559,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
-    def add_link(self):
+    '''def add_link(self):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database. """
@@ -589,7 +589,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         item['linkid'] = linkid = cur.fetchone()[0]
         self.linktypes[linkid] = item
         self.add_to_linktypes_list(item)
-        self.parent_textEdit.append(_("New link: ") + item['name'])
+        self.parent_textEdit.append(_("New link: ") + item['name'])'''
 
     def add_code(self):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
@@ -657,7 +657,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if selected.text(1)[0:3] == 'cid':
             self.delete_code(selected)
 
-    def delete_link(self, selected):
+    '''def delete_link(self, selected):
         """ Determine if selected item is a code or category before deletion. """
         link = self.linktypes[selected.linkid]
         ui = DialogConfirmDelete(_("Link: ") + selected.text())
@@ -666,7 +666,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             selected = None
             self.linktypes = self.app.get_linktypes()
             self.fill_links()
-            self.parent_textEdit.append(_("Link deleted: ") + link['name'] + "\n")
+            self.parent_textEdit.append(_("Link deleted: ") + link['name'] + "\n")'''
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
@@ -771,7 +771,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
 
-    def edit_link_memo(self, selected):
+    '''def edit_link_memo(self, selected):
         """ View and edit a memo for a category or code. """
         link = self.linktypes[selected.linkid]
         ui = DialogMemo(self.settings, _("Memo for Code: ") + link['name'], link['memo'])
@@ -780,7 +780,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if memo != link['memo']:
             link['memo'] = memo
             self.app.set_link_field(link['linkid'],'memo',memo)
-            self.parent_textEdit.append(_("Memo for link: ") + link['name'])
+            self.parent_textEdit.append(_("Memo for link: ") + link['name'])'''
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
@@ -844,7 +844,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Category renamed from: ") + old_name + _(" to: ") + new_name)
 
-    def rename_link(self, selected):
+    '''def rename_link(self, selected):
         """ Rename a code or category.
         Check that the code or category name is not currently in use. """
         link = self.linktypes[selected.linkid]
@@ -860,7 +860,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 old_name = link['name']
                 link['name'] = new_name
                 selected.setData(QtCore.Qt.DisplayRole, new_name)
-                self.parent_textEdit.append(_("Link renamed from: ") + old_name + _(" to: ") + new_name)
+                self.parent_textEdit.append(_("Link renamed from: ") + old_name + _(" to: ") + new_name)'''
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code. """
@@ -888,7 +888,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.app.conn.commit()
         self.highlight()
 
-    def change_link_color(self, selected):
+    '''def change_link_color(self, selected):
         """ Change the colour of the currently selected code. """
         link = self.linktypes[selected.linkid]
         ui = DialogColorSelect(link['color'])
@@ -900,7 +900,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 selected.setBackground(
                     QBrush(QtGui.QColor(new_color),
                     Qt.SolidPattern)
-                )
+                )'''
 
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
@@ -915,7 +915,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         else:
             self.ui.textEdit.clear()
 
-    def view_file(self,filedata):
+    def view_file(self, filedata):
+        """ Get and display file text for this file.
+        Get and display coding highlights. """
+
         self.filename = filedata
         sql_values = []
         file_result = self.app.get_file_texts([filedata['id']])[0]
@@ -935,7 +938,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         code_results = cur.fetchall()
         for row in code_results:
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-            'pos0': row[3], 'pos1':row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
         self.ui.textEdit.setPlainText(self.sourceText)
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
