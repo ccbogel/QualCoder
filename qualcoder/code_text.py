@@ -44,10 +44,11 @@ from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_codes import Ui_Dialog_codes
-from memo import DialogMemo
-from select_file import DialogSelectFile
 from helpers import CodedMediaMixin
+from memo import DialogMemo
 from qtmodels import DictListModel, ListObjectModel
+from select_file import DialogSelectFile
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
+class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     ''' Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
     Trialled using setHtml for documents, but on marking text Html formattin was replaced, also
@@ -86,6 +87,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
     eventFilter = None
 
     def __init__(self, app, parent_textEdit):
+
         super(DialogCodeText,self).__init__()
         self.app = app
         self.settings = app.settings
@@ -94,7 +96,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.codes = []
         self.linktypes = {}
         self.categories = []
-        self.filenames = self.app.get_text_filenames()
+        self.filenames = self.app.get_filenames()
         self.codeslistmodel = DictListModel({})
         self.annotations = self.app.get_annotations()
         self.search_indices = []
@@ -102,6 +104,12 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.get_codes_categories()
         self.ui = Ui_Dialog_codes()
         self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText("Coder: " + self.settings['codername'])
         self.ui.label_file.setText("File: Not selected")
         self.ui.textEdit.setPlainText("")
@@ -116,8 +124,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        self.ui.checkBox_show_coders.setEnabled(False)  # to fix
-        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # to fix
+        self.ui.checkBox_show_coders.setEnabled(False)  # to allow viewing other codes, todo
+        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # todo
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -137,7 +145,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
         self.fill_links()
-        self.setAttribute(Qt.WA_QuitOnClose, False )
+        self.setAttribute(Qt.WA_QuitOnClose, False)
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -154,7 +162,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             self.add_to_linktypes_list(link)
 
     def add_to_linktypes_list(self,link):
-        w = QtWidgets.QListWidgetItem(link['name'],parent=self.ui.listWidgetLinks)
+        w = QtWidgets.QListWidgetItem(link['name'], parent=self.ui.listWidgetLinks)
         w.linkid = link['linkid']
         w.setBackground(QBrush(QtGui.QColor(link['color']), Qt.SolidPattern))
         self.ui.listWidgetLinks.addItem(w)
@@ -253,17 +261,10 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
     def get_codes_categories(self):
         """ Called from init, delete category/code. """
 
-        self.categories = []
+        self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
-
-        self.codes = self.app.get_code_names()
         self.linktypes = self.app.get_linktypes()
-        self.codeslistmodel.reset_data({x['cid']:x for x in self.codes})
+        self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
@@ -471,7 +472,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
-                self.get_codes_categories()
+                self.get_codes_and_categories()
                 self.fill_tree()
         return False
 
@@ -543,6 +544,8 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
+            cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+            cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -550,10 +553,6 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
             QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
-        cur.execute("delete from code_av where cid=?", [old_cid, ])
-        cur.execute("delete from code_image where cid=?", [old_cid, ])
-        cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-        cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
         self.app.conn.commit()
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
@@ -615,7 +614,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         item['cid'] = cid
         self.codes.append(item)
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
+        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
         color = item['color']
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
@@ -645,7 +644,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
         self.ui.treeWidget.addTopLevelItem(top_item)
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
@@ -694,7 +693,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_categories()
+        self.get_codes_and_categories()
         self.fill_tree()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
         # update filter for tooltip
@@ -721,7 +720,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_categories()
+        self.get_codes_and_categories()
         self.fill_tree()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
@@ -916,7 +915,7 @@ class DialogCodeText(CodedMediaMixin,QtWidgets.QWidget):
         else:
             self.ui.textEdit.clear()
 
-    def view_file(self, filedata):
+    def view_file(self,filedata):
         self.filename = filedata
         sql_values = []
         file_result = self.app.get_file_texts([filedata['id']])[0]
