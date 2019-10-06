@@ -76,7 +76,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     """ View, import, export, rename and delete text files. """
 
     source = []
-    settings = None
+    app = None
     textDialog = None
     headerLabels = ["Name", "Memo", "Date", "Id"]
     NAME_COLUMN = 0
@@ -88,18 +88,19 @@ class DialogManageFiles(QtWidgets.QDialog):
     parent_textEdit = None
     dialogList = []
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.dialogList = []
         self.load_file_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.pushButton_create.clicked.connect(self.create)
         self.ui.pushButton_view.clicked.connect(self.view)
@@ -119,12 +120,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
 
         self.source = []
-        cur = self.settings['conn'].cursor()
-        # very occassionally code_text.seltext can be empty, when codes are unmarked from text
-        # so remove these rows
-        cur.execute('delete from code_text where length(seltext)=0')
-        self.settings['conn'].commit()
-
+        cur = self.app.conn.cursor()
         cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by name")
         result = cur.fetchall()
         for row in result:
@@ -169,17 +165,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(name, now_date, self.settings['codername'], "", 'file', valuetype))
-        self.settings['conn'].commit()
+            ,(name, now_date, self.app.settings['codername'], "", 'file', valuetype))
+        self.app.conn.commit()
         sql = "select id from source"
         cur.execute(sql)
         ids = cur.fetchall()
         for id_ in ids:
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            cur.execute(sql, (name, "", id_[0], 'file', now_date, self.settings['codername']))
-        self.settings['conn'].commit()
+            cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
+        self.app.conn.commit()
         self.load_file_data()
         self.fill_table()
         self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + valuetype)
@@ -195,21 +191,21 @@ class DialogManageFiles(QtWidgets.QDialog):
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
-                ui = DialogMemo(self.settings, _("Memo for file ") + self.source[x]['name'],
+                ui = DialogMemo(self.app.settings, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             else:
-                ui = DialogMemo(self.settings, _("Memo for file ") + self.source[x]['name'],
+                ui = DialogMemo(self.app.settings, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
@@ -248,19 +244,19 @@ class DialogManageFiles(QtWidgets.QDialog):
                     QtWidgets.QMessageBox.warning(None, _("Media name"), msg)
                 # update source list and database
                 self.source[x]['name'] = new_text
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update source set name=? where id=?", (new_text, self.source[x]['id']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.headerLabels[y]
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             #logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
@@ -287,14 +283,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         Dialog = QtWidgets.QDialog()
         ui = Ui_Dialog_memo()
         ui.setupUi(Dialog)
-        ui.textEdit.setFontPointSize(self.settings['fontsize'])
+        ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
         ui.textEdit.setPlainText(self.source[x]['fulltext'])
         Dialog.setWindowTitle(_("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") ")
         Dialog.exec_()
         text = ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
             return
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         # cannot edit file text of there are linked cases, codes or annotations
         sql = "select * from case_text where fid=?"
         cur.execute(sql, [self.source[x]['id'], ])
@@ -312,7 +308,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source[x]['fulltext'] = text
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
 
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
@@ -321,7 +317,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
 
         try:
-            ui = DialogViewAV(self.settings, self.source[x])
+            ui = DialogViewAV(self.app, self.source[x])
             #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
             self.dialogList.append(ui)
             ui.show()
@@ -340,15 +336,15 @@ class DialogManageFiles(QtWidgets.QDialog):
     def view_image(self, x):
         """ View an image file and edit the image memo. """
 
-        ui = DialogViewImage(self.settings, self.source[x])
+        ui = DialogViewImage(self.app, self.source[x])
         ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
                 self.source[x]['id']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
         else:
@@ -371,17 +367,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("Filename in use"), QtWidgets.QMessageBox.Ok)
             return
 
-        ui = DialogMemo(self.settings, _("Creating a new file: ") + name)
+        ui = DialogMemo(self.app.settings, _("Creating a new file: ") + name)
         ui.exec_()
         filetext = ui.memo
         # update database
         entry = {'name': name, 'id': -1, 'fulltext': filetext, 'memo': "",
-        'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'mediapath': None}
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
             (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
@@ -408,7 +404,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Added process events, in case many large files are imported, which leaves the FileDialog open and covering the screen.
             QtWidgets.QApplication.processEvents()
             filename = f.split("/")[-1]
-            destination = self.settings['path']
+            destination = self.app.project_path
             if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub'):
                 destination += "/documents/" + filename
                 copyfile(f, destination)
@@ -460,11 +456,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
-        'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        cur = self.settings['conn'].cursor()
+        'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        cur = self.app,conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
             (entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'], entry['fulltext']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
@@ -474,11 +470,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Create an empty transcription file for audio and video
         if mediapath[:6] in("/audio", "/video"):
             entry = {'name': filename + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
-            'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-            cur = self.settings['conn'].cursor()
+            'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            cur = self.app.conn.cursor()
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                 (entry['name'],  entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
             id_ = cur.fetchone()[0]
             entry['id'] = id_
@@ -576,12 +572,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': text, 'mediapath': None, 'memo': "",
-        'owner': self.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        cur = self.settings['conn'].cursor()
+        'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        cur = self.app.conn.cursor()
         #logger.debug("type fulltext: " + str(type(entry['fulltext'])))
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
             (entry['name'],  entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
@@ -706,7 +702,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         if not ok:
             return
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         # delete text source
         if self.source[x]['mediapath'] is None:
             cur.execute("delete from source where id = ?", [fileId])
@@ -716,10 +712,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql = "delete from attribute where attr_type in (select attribute_type.name from "
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
             cur.execute(sql, [fileId])
-            self.settings['conn'].commit()
+            self.app.conn.commit()
         # delete image source
         if self.source[x]['mediapath'] is not None:
-            filepath = self.settings['path'] + self.source[x]['mediapath']
+            filepath = self.app.project_path + self.source[x]['mediapath']
             try:
                 os.remove(filepath)
             except Exception as e:
@@ -729,6 +725,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql = "delete from attribute where attr_type in (select attribute_type.name from "
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
             cur.execute(sql, [fileId])
+            self.app.conn.commit()
 
         self.parent_textEdit.append(_("Deleted: ") + self.source[x]['name'])
         for item in self.source:
@@ -775,7 +772,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
-        if self.settings['showids'] == 'True':
+        if self.app.settings['showids'] == 'True':
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
         self.ui.tableWidget.verticalHeader().setVisible(False)
 
