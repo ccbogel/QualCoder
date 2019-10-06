@@ -59,19 +59,19 @@ class DialogJournals(QtWidgets.QDialog):
     OWNER_COLUMN = 2
     journals = []
     current_jid = None
-    settings = None
+    app = None
     parent_textEdit = None
     textDialog = None
 
-    def __init__(self, settings, parent_textEdit, parent=None):
+    def __init__(self, app, parent_textEdit, parent=None):
 
         super(DialogJournals, self).__init__(parent)  # overrride accept method
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.journals = []
         self.current_jid = None
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name, date, jentry, owner, jid from journal")
         result = cur.fetchall()
         for row in result:
@@ -79,8 +79,9 @@ class DialogJournals(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         #self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
@@ -134,7 +135,7 @@ class DialogJournals(QtWidgets.QDialog):
     def closeEvent(self, event):
         ''' Save journal text changes to database. '''
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         for j in self.journals:
             cur.execute("select jentry from journal where jid=?", (j['jid'], ))
             result = cur.fetchone()
@@ -143,7 +144,7 @@ class DialogJournals(QtWidgets.QDialog):
                 cur.execute("update journal set jentry=? where jid=?",
                     (j['jentry'], j['jid']))
                 self.parent_textEdit.append(_("Journal modified: ") + j['name'])
-        self.settings['conn'].commit()
+        self.app.conn.commit()
 
     def create(self):
         ''' Create a new journal by entering text into the dialog '''
@@ -163,7 +164,6 @@ class DialogJournals(QtWidgets.QDialog):
                 QtWidgets.QMessageBox.Ok)
             return
         # Check for unusual characters in filename that would affect exporting
-        #TODO will this work for other languages ?
         valid = re.match('^[\ \w-]+$', name) is not None
         if not valid:
             QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
@@ -171,12 +171,12 @@ class DialogJournals(QtWidgets.QDialog):
             return
 
         # update database
-        journal = {'name':name, 'jentry': '', 'owner':self.settings['codername'],
+        journal = {'name':name, 'jentry': '', 'owner':self.app.settings['codername'],
             'date':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'jid':None}
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
             (journal['name'], journal['jentry'], journal['owner'], journal['date']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         jid = cur.fetchone()
         journal['jid'] = jid[0]
@@ -236,9 +236,9 @@ class DialogJournals(QtWidgets.QDialog):
         ok = ui.exec_()
 
         if ok:
-            cur = self.settings['conn'].cursor()
+            cur = self.app.conn.cursor()
             cur.execute("delete from journal where name = ?", [journalname])
-            self.settings['conn'].commit()
+            cur = self.app.conn.commit()
             for item in self.journals:
                 if item['name'] == journalname:
                     self.journals.remove(item)
@@ -277,18 +277,17 @@ class DialogJournals(QtWidgets.QDialog):
                         QtWidgets.QMessageBox.Ok)
                     update = False
             # Check for unusual characters in filename that would affect exporting
-            #TODO what if in another language ?
-            valid = re.match('^[\ \w-]+$', name) is not None
+            valid = re.match('^[\ \w-]+$', new_name) is not None
             if not valid:
                 QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
                     _("In the jornal name use only: a-z, A-z 0-9 - space"), QtWidgets.QMessageBox.Ok)
                 update = False
             if update:
                 # update source list and database
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update journal set name=? where name=?",
                     (new_name, self.journals[x]['name']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
                 self.journals[x]['name'] = new_name
                 self.parent_textEdit.append(_("Journal name changed: ") + new_name)
             else:  # put the original text in the cell
