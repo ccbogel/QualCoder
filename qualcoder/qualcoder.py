@@ -199,7 +199,7 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames """
+        """ Get all filenames. """
         cur = self.conn.cursor()
         cur.execute("select id, name from source")
         result = cur.fetchall()
@@ -209,7 +209,7 @@ class App(object):
         return res
 
     def get_text_filenames(self):
-        """ Get textual filenames """
+        """ Get filenames of textfiles only. """
         cur = self.conn.cursor()
         cur.execute("select id, name from source where mediapath is Null")
         result = cur.fetchall()
@@ -219,7 +219,7 @@ class App(object):
         return res
 
     def get_annotations(self):
-        """ Get annotations for text files """
+        """ Get annotations for text files. """
 
         cur = self.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
@@ -692,7 +692,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogManageFiles":
                 return
-        ui = DialogManageFiles(self.settings, self.ui.textEdit)
+        ui = DialogManageFiles(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -703,7 +703,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogJournals":
                 return
-        ui = DialogJournals(self.settings, self.ui.textEdit)
+        ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()
@@ -723,7 +723,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        ui = DialogCodeImage(self.settings, self.ui.textEdit)
+        ui = DialogCodeImage(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()
@@ -734,7 +734,7 @@ class MainWindow(QtWidgets.QMainWindow):
         audio or video file. Added try block in case VLC bindings do not work. """
 
         try:
-            ui = DialogCodeAV(self.settings, self.ui.textEdit)
+            ui = DialogCodeAV(self.app, self.ui.textEdit)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.dialogList.append(ui)
             ui.show()
