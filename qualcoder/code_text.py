@@ -96,7 +96,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.codes = []
         self.linktypes = {}
         self.categories = []
-        self.filenames = self.app.get_filenames()
+        self.filenames = self.app.get_text_filenames()
         self.codeslistmodel = DictListModel({})
         self.annotations = self.app.get_annotations()
         self.search_indices = []
