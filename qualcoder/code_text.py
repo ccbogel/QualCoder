@@ -39,7 +39,7 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush
 
-from add_item_name import DialogAddItemName, DialogLinkTo
+from add_item_name import DialogAddItemName  # , DialogLinkTo
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
@@ -94,7 +94,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.codes = []
-        self.linktypes = {}
+        #self.linktypes = {}
         self.categories = []
         self.filenames = self.app.get_text_filenames()
         self.codeslistmodel = DictListModel({})
@@ -144,7 +144,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.ui.splitter.setSizes([150, 400])
         self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
-        self.fill_links()
+        #self.fill_links()
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
     def fill_code_label(self):
@@ -156,7 +156,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             return
         self.ui.label_code.setText("Code: " + current.text(0))
 
-    def fill_links(self):
+    '''def fill_links(self):
         self.ui.listWidgetLinks.clear()
         for link in self.linktypes.values():
             self.add_to_linktypes_list(link)
@@ -165,7 +165,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         w = QtWidgets.QListWidgetItem(link['name'], parent=self.ui.listWidgetLinks)
         w.linkid = link['linkid']
         w.setBackground(QBrush(QtGui.QColor(link['color']), Qt.SolidPattern))
-        self.ui.listWidgetLinks.addItem(w)
+        self.ui.listWidgetLinks.addItem(w)'''
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -263,7 +263,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
-        self.linktypes = self.app.get_linktypes()
+        #self.linktypes = self.app.get_linktypes()
         self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def search_for_text(self):
@@ -544,8 +544,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
-            cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-            cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -689,8 +689,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_name_links where from_id=?", [code['cid'], ])
-        cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
+        #cur.execute("delete from code_name_links where from_id=?", [code['cid'], ])
+        #cur.execute("delete from code_name_links where to_id=?", [code['cid'], ])
         self.app.conn.commit()
         selected = None
         self.get_codes_and_categories()

@@ -218,7 +218,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
-        self.linktypes = self.app.get_linktypes()
+        #self.linktypes = self.app.get_linktypes()
         self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def fill_tree(self):
@@ -842,8 +842,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
-            cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-            cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -942,8 +942,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_name_links where from_id=?", [code_['cid'], ])
-        cur.execute("delete from code_name_links where to_id=?", [code_['cid'], ])
+        #cur.execute("delete from code_name_links where from_id=?", [code_['cid'], ])
+        #cur.execute("delete from code_name_links where to_id=?", [code_['cid'], ])
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None

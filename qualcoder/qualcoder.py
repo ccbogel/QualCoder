@@ -103,8 +103,8 @@ class App(object):
         self.conn = None
         self.project_path = None
         self.confighome = os.path.expanduser('~/.qualcoder')
-        self.configpath = os.path.join(self.confighome,'config.ini')
-        self.persist_path = os.path.join(self.confighome,'recent_projects.txt')
+        self.configpath = os.path.join(self.confighome, 'config.ini')
+        self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
         self.settings = self.load_settings()
 
     def read_previous_project_paths(self):
@@ -153,27 +153,6 @@ class App(object):
         self.codes, self.categories = self.get_data()
         self.model = self.calc_model(self.categories, self.codes)
 
-    def read_user_preferences(self, path):
-        print("App.read_users_preferences IS THIS USED?")  # tmp
-        config = configparser.ConfigParser()
-
-    def get_linktypes(self):
-        cur = self.conn.cursor()
-        cur.execute("select name, memo,color,linetype, owner, date, linkid from links_type")
-        result = cur.fetchall()
-        res = {}
-        for row in result:
-            res[row[6]] = {
-                'name': row[0],
-                'memo': row[1],
-                'color':row[2],
-                'linetype':row[3],
-                'owner': row[4],
-                'date': row[5],
-                'linkid':row[6],
-            }
-        return res
-
     def get_code_names(self):
         cur = self.conn.cursor()
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
@@ -182,20 +161,6 @@ class App(object):
         for row in result:
             res.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
             'cid': row[4], 'catid': row[5], 'color': row[6]})
-        return res
-
-    def get_code_name_links(self):
-        cur = self.conn.cursor()
-        cur.execute(("select code_name_links.memo,"
-            "code_name_links.owner, code_name_links.date,"
-            "links_type.color, links_type.name, from_id, to_id from code_name_links"
-            " inner join links_type on code_name_links.linkid = links_type.linkid "
-        ))
-        result = cur.fetchall()
-        res = []
-        for row in result:
-            res.append({'memo': row[0], 'owner': row[1], 'date': row[2],
-                'color': row[3], 'name': row[4], 'from_id': row[5], 'to_id': row[6]})
         return res
 
     def get_filenames(self):
@@ -262,7 +227,7 @@ class App(object):
         for row in result:
             code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
             'cid': row[4], 'catid': row[5], 'color': row[6]})
-        return code_names,categories
+        return code_names, categories
 
     def write_config_ini(self, settings):
         config = configparser.ConfigParser()
@@ -320,6 +285,75 @@ class App(object):
             'backup_on_open': True,
             'backup_av_files': True,
         }
+
+    def get_file_texts(self, fileids=None):
+        """ Get the text of all text files as a list of dictionaries.
+        param: fileids - a list of fileids or None """
+
+        cur = self.conn.cursor()
+        if fileids is not None:
+            cur.execute(
+                "select name, id, fulltext, memo, owner, date from source where id in (?) and fulltext is not null",
+                fileids
+            )
+        else:
+            cur.execute("select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
+        res = []
+        for row in cur.fetchall():
+            res.append({
+            'name': row[0],
+            'id': row[1],
+            'fulltext': row[2],
+            'memo': row[3],
+            'owner': row[4],
+            'date': row[5],
+        })
+        return res
+
+    def get_code_texts(self, text):
+        cur = self.conn.cursor()
+        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
+        cur.execute(
+            codingsql,
+            [text],
+        )
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
+        for res in cur.fetchall():
+            yield dict(zip(keys, res))
+
+    '''def read_user_preferences(self, path):
+        config = configparser.ConfigParser()
+
+    def get_linktypes(self):
+        cur = self.conn.cursor()
+        cur.execute("select name, memo,color,linetype, owner, date, linkid from links_type")
+        result = cur.fetchall()
+        res = {}
+        for row in result:
+            res[row[6]] = {
+                'name': row[0],
+                'memo': row[1],
+                'color':row[2],
+                'linetype':row[3],
+                'owner': row[4],
+                'date': row[5],
+                'linkid':row[6],
+            }
+        return res
+
+    def get_code_name_links(self):
+        cur = self.conn.cursor()
+        cur.execute(("select code_name_links.memo,"
+            "code_name_links.owner, code_name_links.date,"
+            "links_type.color, links_type.name, from_id, to_id from code_name_links"
+            " inner join links_type on code_name_links.linkid = links_type.linkid "
+        ))
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'memo': row[0], 'owner': row[1], 'date': row[2],
+                'color': row[3], 'name': row[4], 'from_id': row[5], 'to_id': row[6]})
+        return res
 
     def add_relations_table(self):
         cur = self.conn.cursor()
@@ -385,42 +419,7 @@ class App(object):
         cur = self.conn.cursor()
         cur.execute("delete from code_name_links where linkid=?", [linkid])
         cur.execute("delete from links_type where linkid=?", [linkid])
-        self.conn.commit()
-
-    def get_file_texts(self, fileids=None):
-        """ Get the text of all text files as a list of dictionaries.
-        param: fileids - a list of fileids or None """
-
-        cur = self.conn.cursor()
-        if fileids is not None:
-            cur.execute(
-                "select name, id, fulltext, memo, owner, date from source where id in (?) and fulltext is not null",
-                fileids
-            )
-        else:
-            cur.execute("select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
-        res = []
-        for row in cur.fetchall():
-            res.append({
-            'name':row[0],
-            'id':row[1],
-            'fulltext':row[2],
-            'memo':row[3],
-            'owner':row[4],
-            'date':row[5],
-        })
-        return res
-
-    def get_code_texts(self, text):
-        cur = self.conn.cursor()
-        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
-        cur.execute(
-            codingsql,
-            [text],
-        )
-        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
-        for res in cur.fetchall():
-            yield dict(zip(keys,res))
+        self.conn.commit()'''
 
 
 class MainWindow(QtWidgets.QMainWindow):

@@ -138,7 +138,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
-        self.linktypes = self.app.get_linktypes()
+        #self.linktypes = self.app.get_linktypes()
         self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
         #print(self.codeslistmodel)  # tmp
 
@@ -340,7 +340,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(QtCore.Qt.red, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
-                if self.ui.checkBox_show_coders.isChecked():
+                if self.ui.checkBox_show_coders.isChecked() and item['owner'] != self.app.settings['codername']:
+                    rect_item.setPen(QtGui.QPen(QtCore.Qt.magenta, 2, QtCore.Qt.DashLine))
                     self.scene.addItem(rect_item)
                 else:
                     if item['owner'] == self.app.settings['codername']:
@@ -619,8 +620,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
-            cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-            cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
+            #cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -720,8 +721,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        cur.execute("delete from code_name_links where from_id=?", [code_['cid'], ])
-        cur.execute("delete from code_name_links where to_id=?", [code_['cid'], ])
+        #cur.execute("delete from code_name_links where from_id=?", [code_['cid'], ])
+        #cur.execute("delete from code_name_links where to_id=?", [code_['cid'], ])
         self.app.conn.commit()
         selected = None
         self.get_codes_categories()
