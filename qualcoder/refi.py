@@ -289,6 +289,7 @@ class Refi_import():
                 self.parse_project_description(c)
             QtWidgets.QApplication.processEvents()
         self.clean_up_case_codes_and_case_text()
+        self.parent_textEdit.append(self.file_path + _(" loaded."))
 
     def parse_variables(self, element):
         """ Parse the Variables element.
@@ -333,7 +334,7 @@ class Refi_import():
             try:
                 cur.execute(
                     "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-                    , (name, now_date, self.settings['codername'], memo, caseOrFile, valuetype))
+                    , (name, now_date, self.app.settings['codername'], memo, caseOrFile, valuetype))
                 self.app.conn.commit()
                 #cur.execute("select last_insert_rowid()")
                 #last_insert_id = cur.fetchone()[0]
@@ -1009,7 +1010,7 @@ class Refi_export(QtWidgets.QDialog):
         cur.execute("select date from project")
         result = cur.fetchone()
         self.xml += 'creationDateTime="' + self.convert_timestamp(result[0]) + '" '
-        #self.xml += 'basePath="' + self.settings['directory'] + '" '
+        #self.xml += 'basePath="' + self.app.settings['directory'] + '" '
         self.xml += 'xmlns="urn:QDA-XML:project:1.0"'
         self.xml += '>\n'
         # add users
@@ -1313,7 +1314,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'path="absolute:///'+ self.settings['directory'] + '/' + s['filename'] + '" '
+                    xml += 'path="absolute:///'+ self.app.settings['directory'] + '/' + s['filename'] + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '" >\n'
                 if s['memo'] != '':
@@ -1329,7 +1330,7 @@ class Refi_export(QtWidgets.QDialog):
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml +='path="absolute:///' + self.settings['directory'] + '/'+ s['filename'] + '" '
+                    xml +='path="absolute:///' + self.app.settings['directory'] + '/'+ s['filename'] + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '" >\n'
                 if s['memo'] != '':
@@ -1671,7 +1672,7 @@ class Refi_export(QtWidgets.QDialog):
         media_path_list = cur.fetchone()
         try:
             instance = vlc.Instance()
-            vlc_media = instance.media_new(self.settings['path'] + media_path_list[0])
+            vlc_media = instance.media_new(self.app.project_path + media_path_list[0])
             vlc_media.parse()
             media_length = vlc_media.get_duration() - 1
             if media_length == -1:
@@ -1729,7 +1730,7 @@ class Refi_export(QtWidgets.QDialog):
             if source['mediapath'] is not None:
                 fileinfo = os.stat(self.app.project_path + source['mediapath'])
                 if fileinfo.st_size >= 2147483647:
-                    source['external'] = self.settings['directory']
+                    source['external'] = self.app.settings['directory']
             self.sources.append(source)
 
     def get_users(self):
