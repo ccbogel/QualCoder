@@ -95,16 +95,18 @@ def exception_handler(exception_type, value, tb_obj):
 
 class App(object):
     """ General methods for loading settings and recent project stored in .qualcoder folder.
-    Settings does not contain project name, project path or db connection.
+    Savable settings does not contain project name, project path or db connection.
     """
 
     conn = None
-    project_path = None
+    project_path = ""
+    project_name = ""
 
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
-        self.project_path = None
+        self.project_path = ""
+        self.project_name = ""
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
@@ -146,15 +148,16 @@ class App(object):
         """ Create connection to recent project and load codes, categories and model """
 
         self.project_path = project_path
+        self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
-        self._load_model()
+        #self._load_model()
 
-    def _load_model(self):
+    '''def _load_model(self):
         """ Creates list of dictionaries of codes and categories.
         Creates dictionary model containing all codes and categories """
 
         self.codes, self.categories = self.get_data()
-        self.model = self.calc_model(self.categories, self.codes)
+        self.model = self.calc_model(self.categories, self.codes)'''
 
     def get_code_names(self):
         cur = self.conn.cursor()
@@ -433,10 +436,10 @@ class MainWindow(QtWidgets.QMainWindow):
     There is a risk of a clash if two coding windows are open with the same file text or
     two journals open with the same journal entry. """
 
-    # Note: App.settings does not contain projectName, conn or path (to database)
+    """# Note: App.settings does not contain projectName, conn or path (to database)
     settings = {"conn": None, "directory": home, "projectName": "", "showids": 'False',
     'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
-    'treefontsize': 10, "language": "en", "backup_on_open": 'True', "backup_av_files": 'True'}
+    'treefontsize': 10, "language": "en", "backup_on_open": 'True', "backup_av_files": 'True'}"""
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
@@ -449,8 +452,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.hide_menu_options()
-        self.settings.update(app.load_settings())
-        self.ui.textEdit.setFontPointSize(self.settings['fontsize'])
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.init_ui()
         self.show()
 
@@ -670,7 +674,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Identify qualitative questions and assign these data to the source table for
         coding and review. Modal dialog. """
 
-        ui = DialogImportSurvey(self.settings, self.ui.textEdit)
+        ui = DialogImportSurvey(self.app, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
 
@@ -681,7 +685,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCases":
                 return
-        ui = DialogCases(self.settings, self.ui.textEdit)
+        ui = DialogCases(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -750,7 +754,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Export a text file code book of categories and codes.
         """
 
-        Codebook(self.settings, self.ui.textEdit)
+        Codebook(self.app, self.ui.textEdit)
 
     def REFI_project_export(self):
         """ Export the project as a qpdx zipped folder.
@@ -759,7 +763,7 @@ class MainWindow(QtWidgets.QMainWindow):
         VARIABLES ARE NOT SUCCESSFULLY EXPORTED YET.
         CURRENTLY GIFS ARE EXPORTED UNCHANGED (NEED TO BE PNG OR JPG)"""
 
-        Refi_export(self.settings, self.ui.textEdit, "project")
+        Refi_export(self.app, self.ui.textEdit, "project")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project export", msg)
 
@@ -767,15 +771,15 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Export the codebook as .qdc
         Follows the REFI standard version 1.0. https://www.qdasoftware.org/
         """
-
-        Refi_export(self.settings, self.ui.textEdit, "codebook")
+        #
+        Refi_export(self.app, self.ui.textEdit, "codebook")
 
     def REFI_codebook_import(self):
         """ Import a codebook .qdc into an opened project.
         Follows the REFI-QDA standard version 1.0. https://www.qdasoftware.org/
          """
 
-        Refi_import(self.settings, self.ui.textEdit, "qdc")
+        Refi_import(self.app, self.ui.textEdit, "qdc")
 
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
@@ -785,10 +789,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append("IMPORTING REFI-QDA PROJECT")
         self.new_project()
         # check for project created succesfully
-        if self.settings['projectName'] == "":
+        if self.app.project_name == "":
             QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
             return
-        Refi_import(self.settings, self.ui.textEdit, "qdpx")
+
+        Refi_import(self.app, self.ui.textEdit, "qdpx")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
         msg += "Text code positions do not line up with some imports.\n"
         msg += "Images, audio, video, transcripts not tested.\n"
@@ -828,31 +833,31 @@ class MainWindow(QtWidgets.QMainWindow):
         usernames can be freely entered through the settings dialog and are collated from coded text, images and a/v.
         """
 
-        if self.settings['directory'] == "":
-            self.settings['directory'] = os.path.expanduser('~')
-        #logger.debug("settings[directory]:" + self.settings['directory'])
-        self.settings['path'] = QtWidgets.QFileDialog.getSaveFileName(self,
-            _("Enter project name"), self.settings['directory'], ".qda")[0]
-        if self.settings['path'] == "":
+        self.app = App()
+        if self.app.settings['directory'] == "":
+            self.app.settings['directory'] = os.path.expanduser('~')
+        self.app.project_path = QtWidgets.QFileDialog.getSaveFileName(self,
+            _("Enter project name"), self.app.settings['directory'], ".qda")[0]
+        if self.app.project_path == "":
             QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created."))
             return
-        if self.settings['path'].find(".qda") == -1:
-            self.settings['path'] = self.settings['path'] + ".qda"
+        if self.app.project_path.find(".qda") == -1:
+            self.app.project_path = self.app.project_path + ".qda"
         try:
-            os.mkdir(self.settings['path'])
-            os.mkdir(self.settings['path'] + "/images")
-            os.mkdir(self.settings['path'] + "/audio")
-            os.mkdir(self.settings['path'] + "/video")
-            os.mkdir(self.settings['path'] + "/documents")
+            os.mkdir(self.app.project_path)
+            os.mkdir(self.app.project_path + "/images")
+            os.mkdir(self.app.project_path + "/audio")
+            os.mkdir(self.app.project_path + "/video")
+            os.mkdir(self.app.project_path + "/documents")
         except Exception as e:
             logger.critical(_("Project creation error ") + str(e))
             QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created. Exiting. ") + str(e))
             exit(0)
-        self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
-        self.settings['directory'] = self.settings['path'].rpartition('/')[0]
-
-        self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
-        cur = self.settings['conn'].cursor()
+        self.app.project_name = self.app.project_path.rpartition('/')[2]
+        self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
+        self.app.create_connection(self.app.project_path)
+        #self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
+        cur = self.app.conn.cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
@@ -867,18 +872,14 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
-        self.settings['conn'].commit()
-        self.app = App()
-
-        self.app.create_connection(self.settings['path'])
-        self.app.add_relations_table()
+        self.app.conn.commit()
+        #self.app.add_relations_table()
         try:
             # get and display some project details
-            self.ui.textEdit.append("\n" + _("New project: ") + self.settings['path'] + _(" created."))
+            self.ui.textEdit.append("\n" + _("New project: ") + self.app.project_path + _(" created."))
             #self.settings['projectName'] = self.path.rpartition('/')[2]
-            self.ui.textEdit.append(_("Opening: ") + self.settings['path'])
-            self.setWindowTitle("QualCoder " + self.settings['projectName'])
-            #cur = self.settings['conn'].cursor()
+            self.ui.textEdit.append(_("Opening: ") + self.app.project_path)
+            self.setWindowTitle("QualCoder " + self.app.project_name)
             cur.execute('select sqlite_version()')
             self.ui.textEdit.append("SQLite version: " + str(cur.fetchone()))
             cur.execute("select databaseversion, date, memo, about from project")
@@ -891,16 +892,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 + _("DB Version:") + str(self.project['databaseversion']) + "\n"
                 + _("Date: ") + str(self.project['date']) + "\n"
                 + _("About: ") + str(self.project['about']) + "\n"
-                + _("Coder:") + str(self.settings['codername']) + "\n"
+                + _("Coder:") + str(self.app.settings['codername']) + "\n"
                 + "========")
         except Exception as e:
             msg = _("Problem creating database ")
-            logger.warning(msg + self.settings['path'] + " Exception:" + str(e))
-            self.ui.textEdit.append("\n" + msg + "\n" + self.settings['path'])
+            logger.warning(msg + self.app.project_path + " Exception:" + str(e))
+            self.ui.textEdit.append("\n" + msg + "\n" + self.app.project_path)
             self.ui.textEdit.append(str(e))
             self.close_project()
             return
-        self.open_project(self.settings['path'])
+        self.open_project(self.app.project_path)
 
     def change_settings(self):
         """ Change default settings - the coder name, font, font size. Non-modal.
@@ -916,51 +917,49 @@ class MainWindow(QtWidgets.QMainWindow):
     def project_memo(self):
         """ Give the entire project a memo. Modal dialog. """
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
-        ui = DialogMemo(self.settings, _("Memo for project ") + self.settings['projectName'],
+        ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
             memo)
         self.dialogList.append(ui)
         ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
-            self.settings['conn'].commit()
+            self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))
 
     def open_project(self, path=""):
         """ Open an existing project.
         Also save a backup datetime stamped copy at the same time. """
 
-        if self.settings['projectName'] != "":
+        if self.app.project_name != "":
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                _('Open project directory'), self.settings['directory'])
+                _('Open project directory'), self.app.settings['directory'])
         if path == "" or path is False:
             return
         if len(path) > 3 and path[-4:] == ".qda":
-            self.settings['path'] = path
             msg = ""
             try:
-                self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
                 self.app.create_connection(path)
             except Exception as e:
-                self.settings['conn'] = None
+                self.app.conn = None
                 msg += str(e)
                 logger.debug(str(e))
-        if self.settings['conn'] is None:
+        if self.app.conn is None:
             QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
-                self.settings['path'] + _(" is not a .qda file "))
-            self.settings['path'] = ""
+                path + _(" is not a .qda file "))
+            self.app.project_path = ""
+            self.app.project_name = ""
             return
+
         # get and display some project details
-        self.settings['path'] = path
-        self.settings['projectName'] = self.settings['path'].rpartition('/')[2]
-        self.settings['directory'] = self.settings['path'].rpartition('/')[0]
-        self.setWindowTitle("QualCoder " + self.settings['projectName'])
-        cur = self.settings['conn'].cursor()
+        self.app.append_recent_project(self.app.project_path)
+        self.setWindowTitle("QualCoder " + self.app.project_name)
+        cur = self.app.conn.cursor()
         cur.execute("select databaseversion, date, memo, about from project")
         result = cur.fetchall()[-1]
         self.project['databaseversion'] = result[0]
@@ -968,24 +967,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
 
-        if int(self.project['databaseversion'][1:]) < 2:
-            self.app.add_relations_table()
+        #if int(self.project['databaseversion'][1:]) < 2:
+        #    self.app.add_relations_table()
 
         # Save a datetime stamped backup
         if self.app.settings['backup_on_open'] == 'True':
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
             if self.app.settings['backup_av_files'] == 'True':
-                shutil.copytree(self.settings['path'], backup)
+                shutil.copytree(self.app.project_path, backup)
             else:
-                shutil.copytree(self.settings['path'], backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
+                shutil.copytree(self.app.project_path, backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             self.ui.textEdit.append(_("Project backup created: ") + backup)
 
-        self.ui.textEdit.append(_("Project Opened: ") + self.settings['projectName']
+        self.ui.textEdit.append(_("Project Opened: ") + self.app.project_name
             + "\n========\n"
-            + _("Path: ") + self.settings['path'] + "\n"
-            + _("Directory: ") + self.settings['directory'] + "\n"
+            + _("Path: ") + self.app.project_path + "\n"
+            + _("Directory: ") + self.app.settings['directory'] + "\n"
             + _("Database version: ") + self.project['databaseversion'] + ". "
             + _("Date: ") + str(self.project['date']) + "\n"
             + _("About: ") + self.project['about']
@@ -995,17 +994,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def close_project(self):
         """ Close an open project. """
 
-        self.ui.textEdit.append("Closing project: " + self.settings['projectName'] + "\n========\n")
+        self.ui.textEdit.append("Closing project: " + self.app.project_name + "\n========\n")
         try:
-            self.settings['conn'].commit()
-            self.settings['conn'].close()
+            self.app.conn.commit()
+            self.app.conn.close()
         except:
             pass
-        self.conn = None
-        self.settings['conn'] = None
-        self.settings['path'] = ""
-        self.settings['projectName'] = ""
-        self.settings['directory'] = ""
+        self.app.conn = None
+        self.app.project_path = ""
+        self.app.project_name = ""
+        self.app.settings['directory'] = ""
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.clean_dialog_refs()

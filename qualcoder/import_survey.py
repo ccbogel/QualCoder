@@ -54,7 +54,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogImportSurvey(QtWidgets.QDialog):
-    ''' Import case and file attributes from a csv file. EXTEND LATER
+    """ Import case and file attributes from a csv file. EXTEND LATER
     The first row must contain a header row of the attribute names.
     The first column must contain unique identifiers for each response (the cases)
     this then allows automatic assignment of attributes to each case
@@ -64,31 +64,36 @@ class DialogImportSurvey(QtWidgets.QDialog):
     Some GUI elements cannot be changed to anotherlanguage:
     Quote format: NONE, MINIMAL, ALL
     Field type: character, numeric qualitative
-    '''
+    """
 
-    settings = None
+    app = None
     fields = []
     fields_type = []
     delimiter = ""
+    filepath = ""
     headerIndex = 0  # table column index for header context menu actions
     data = []  # obtained from csv file
     preexisting_fields = []  # atribute names already in database
     parent_textEdit = None
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
         ''' Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise get a double-up of accept signals. '''
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.delimiter = ","
         self.fields = []
+        self.filepath = ""
 
         # Set up the user interface from Designer.
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Import()
         self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.ui.lineEdit_delimiter.setText(self.delimiter)
         self.ui.lineEdit_delimiter.textChanged.connect(self.options_changed)
         self.ui.comboBox_quote.currentIndexChanged['QString'].connect(self.options_changed)
@@ -96,7 +101,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_menu)
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name from attribute_type where caseOrFile='case'")
         result = cur.fetchall()
         self.preexisting_fields = []
@@ -109,19 +114,20 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fill_tableWidget()
 
     def get_csv_file(self):
-        ''' Check for a .csv extension. Determine number of fields. Load the data. '''
+        ''' Check for a .csv extension. Determine number of fields. Load the data.
+        Also called when import options changed '''
 
         self.fields = []
         self.fields_type = []
         self.data = []
-
-        filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-            _('Select survey file'), self.settings['directory'], "(*.csv)")
-        if not ok or filepath == "":
-            super(DialogImportSurvey, self).reject()
-            self.close()
-            return
-        if filepath[-4:].lower() != ".csv":
+        if self.filepath == "":
+            self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select survey file'), self.app.settings['directory'], "(*.csv)")
+            if not ok or self.filepath == "":
+                super(DialogImportSurvey, self).reject()
+                self.close()
+                return
+        if self.filepath[-4:].lower() != ".csv":
             msg = self.filepath + "\n" + _("is not a .csv file.\nFile not imported")
             QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
             logger.warning(msg)
@@ -130,12 +136,12 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.close()
             return
         #logger.debug("self.filepath:" + self.filepath)
-        name_split = filepath.split("/")
+        name_split = self.filepath.split("/")
         filename = name_split[-1]
-        destination = self.settings['path'] + "/documents/" + filename
-        copyfile(filepath, destination)
+        destination = self.app.project_path + "/documents/" + filename
+        copyfile(self.filepath, destination)
         self.data = []
-        with open(filepath, 'r', newline='') as f:
+        with open(self.filepath, 'r', newline='') as f:
             delimiter_ = self.ui.lineEdit_delimiter.text()
             if delimiter_ == '':
                 msg = _("A column delimiter has not been set.")
@@ -156,9 +162,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 for row in reader:
                     self.data.append(row)
             except csv.Error as e:
-                logger.error(('file %s, line %d: %s' % (filepath, reader.line_num, e)))
+                logger.error(('file %s, line %d: %s' % (self.filepath, reader.line_num, e)))
                 self.parent_textEdit.append(_(_("Row error: ")) + str(reader.line_num) + "  " + str(e))
-        self.setWindowTitle(_(_("Importing from: ")) + filepath.split('/')[-1])
+        self.setWindowTitle(_(_("Importing from: ")) + self.filepath.split('/')[-1])
         self.fields = self.data[0]
         self.data = self.data[1:]
 
@@ -203,10 +209,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
         if len(ids) > len(ids_set):
             msg = _("There are duplicated identifiers in the first column.\nFile not imported")
             QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
-            self.parent_textEdit.append(filepath + " " + msg)
+            self.parent_textEdit.append(self.filepath + " " + msg)
             return
 
-        msg = _("Survey file: ") + filepath + "\n"
+        msg = _("Survey file: ") + self.filepath + "\n"
         msg += _("Fields: ") + str(len(self.fields)) + ". "
         msg += _("Rows: ") + str(len(self.data))
         logger.info(msg)
@@ -232,13 +238,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
         ''' Insert case, attributes, attribute values and qualitative text. '''
 
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         name_and_caseids = []
         for c in self.data:
             try:
                 cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)",
-                (c[0], "", self.settings['codername'], now_date))
-                self.settings['conn'].commit()
+                (c[0], "", self.app.settings['codername'], now_date))
+                self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 caseid = cur.fetchone()[0]
                 name_and_caseids.append([c[0], caseid])
@@ -261,9 +267,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if self.fields_type[col] != "qualitative" and col > 0:  # col==0 is the case identifier
                 if name not in existing_attr_names:
                     logger.debug(name + " is not in case attribute_types. Adding.")
-                    cur.execute(sql, (name, now_date, self.settings['codername'], "",
+                    cur.execute(sql, (name, now_date, self.app.settings['codername'], "",
                         self.fields_type[col], 'case'))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
 
         # Look for pre-existing attributes that are not in the survey and insert blank value rows if present
         survey_field_names = []
@@ -274,8 +280,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if name not in survey_field_names:
                 for name_id in name_and_caseids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,'',?,?,?,?)"
-                    cur.execute(sql, (name, name_id[1], 'case', now_date, self.settings['codername']))
-        self.settings['conn'].commit()
+                    cur.execute(sql, (name, name_id[1], 'case', now_date, self.app.settings['codername']))
+        self.app.conn.commit()
 
         # insert non-qualitative values to each case using caseids
         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
@@ -285,8 +291,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     for col in range(1, len(val)):
                         if self.fields_type[col] != "qualitative":
                             cur.execute(sql, (self.fields[col], val[col], name_id[1], 'case',
-                            now_date, self.settings['codername']))
-        self.settings['conn'].commit()
+                            now_date, self.app.settings['codername']))
+        self.app.conn.commit()
 
         # insert qualitative data into source table
         source_sql = "insert into source(name,fulltext,memo,owner,date, mediapath) values(?,?,?,?,?, Null)"
@@ -304,20 +310,20 @@ class DialogImportSurvey(QtWidgets.QDialog):
                         pos0 = len(fulltext) - 1
                         fulltext += self.data[row][field] + "\n\n"
                         pos1 = len(fulltext) - 2
-                        case_text = [self.settings['codername'], now_date, "", pos0, pos1, name_and_caseids[row][1]]
+                        case_text = [self.app.settings['codername'], now_date, "", pos0, pos1, name_and_caseids[row][1]]
                         case_text_list.append(case_text)
                 # add the current time to the file name to ensure uniqueness and to
                 # prevent sqlite Integrity Error. Do not use now_date which contains colons
                 now = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
-                cur.execute(source_sql, (self.fields[field] +"_" + now, fulltext, "", self.settings['codername'], now_date))
-                self.settings['conn'].commit()
+                cur.execute(source_sql, (self.fields[field] +"_" + now, fulltext, "", self.app.settings['codername'], now_date))
+                self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 fid = cur.fetchone()[0]
                 case_text_sql = "insert into case_text (owner, date, memo, pos0, pos1, caseid, fid) values(?,?,?,?,?,?,?)"
                 for case_text in case_text_list:
                     case_text.append(fid)
                     cur.execute(case_text_sql, case_text)
-                    self.settings['conn'].commit()
+                    self.app.conn.commit()
                     #logger.debug("Case_text: " + str(case_text))
 
         logger.info(_("Survey imported"))
@@ -334,13 +340,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
         if len(self.delimiter) > 1 and self.delimiter != "\t":
             self.ui.lineEdit_delimiter.setText(self.delimiter[0:1])
             self.delimiter = self.delimiter[0:1]
-        if self.filepath == "":
-            self.get_csv_file()
-        else:
-            self.get_csv_file(self.filepath)
+        self.get_csv_file()
 
     def fill_tableWidget(self):
-        ''' fill table widget with data '''
+        ''' Fill table widget with data. '''
 
         numRows = self.ui.tableWidget.rowCount()
         for row in range(0, numRows):

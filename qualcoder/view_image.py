@@ -98,7 +98,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scale = 1.0
         self.selection = None
         self.get_image_files()
-        self.codeslistmodel = DictListModel({})
+        #self.codeslistmodel = DictListModel({})
         self.get_codes_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -139,7 +139,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
         #self.linktypes = self.app.get_linktypes()
-        self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
+        #self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
         #print(self.codeslistmodel)  # tmp
 
     def get_coded_areas(self):
@@ -475,7 +475,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     def coded_area_memo(self, item):
         """ Add memo to this coded area. """
 
-        ui = DialogMemo(self.app.settings, _("Memo for coded area of ") + self.file_['name'],
+        ui = DialogMemo(self.app, _("Memo for coded area of ") + self.file_['name'],
             item['memo'])
         ui.exec_()
         memo = ui.memo

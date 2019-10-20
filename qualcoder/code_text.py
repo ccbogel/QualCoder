@@ -73,7 +73,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     NAME_COLUMN = 0
     ID_COLUMN = 1
     MEMO_COLUMN = 2
-    settings = None
+    app = None
     parent_textEdit = None
     codes = []
     categories = []
@@ -90,14 +90,13 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
 
         super(DialogCodeText, self).__init__()
         self.app = app
-        self.settings = app.settings
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.codes = []
         #self.linktypes = {}
         self.categories = []
         self.filenames = self.app.get_text_filenames()
-        self.codeslistmodel = DictListModel({})
+        #self.codeslistmodel = DictListModel({})
         self.annotations = self.app.get_annotations()
         self.search_indices = []
         self.search_index = 0
@@ -110,7 +109,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
-        self.ui.label_coder.setText("Coder: " + self.settings['codername'])
+        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.ui.label_file.setText("File: Not selected")
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
@@ -264,7 +263,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
         #self.linktypes = self.app.get_linktypes()
-        self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
+        #self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
@@ -602,7 +601,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if newCodeText is None:
             return
         code_color = colors[randint(0, len(colors) - 1)]
-        item = {'name': newCodeText, 'memo': "", 'owner': self.settings['codername'],
+        item = {'name': newCodeText, 'memo': "", 'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
         'color': code_color}
         cur = self.app.conn.cursor()
@@ -632,7 +631,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if newCatText is None:
             return
         item = {'name': newCatText, 'cid': None, 'memo': "",
-        'owner': self.settings['codername'],
+        'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
@@ -735,7 +734,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, _("Memo for Code: ") + self.codes[found]['name'], self.codes[found]['memo'])
+            ui = DialogMemo(self.app, _("Memo for Code: ") + self.codes[found]['name'], self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo != self.codes[found]['memo']:
@@ -757,7 +756,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, _("Memo for Category: ") + self.categories[found]['name'], self.categories[found]['memo'])
+            ui = DialogMemo(self.app, _("Memo for Category: ") + self.categories[found]['name'], self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo != self.categories[found]['memo']:
@@ -932,7 +931,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         codingsql += " where fid=? "
         if not self.ui.checkBox_show_coders.isChecked():
             codingsql += " and owner=? "
-            sql_values.append(self.settings['codername'])
+            sql_values.append(self.app.settings['codername'])
         cur = self.app.conn.cursor()
         cur.execute(codingsql, sql_values)
         code_results = cur.fetchall()
@@ -1011,7 +1010,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         # add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
-        'pos0': pos0, 'pos1': pos1, 'owner': self.settings['codername'], 'memo': "",
+        'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self.code_text.append(coded)
         self.highlight()
@@ -1061,7 +1060,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             return
         unmarked = None
         for item in self.code_text:
-            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.settings['codername']:
+            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                 unmarked = item
         if unmarked is None:
             return
@@ -1069,7 +1068,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         # delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
-            (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.settings['codername']))
+            (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
         if unmarked in self.code_text:
             self.code_text.remove(unmarked)
@@ -1106,9 +1105,9 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         # add new item to annotations, add to database and update GUI
         if item is None:
             item = {'fid': int(self.filename['id']), 'pos0': pos0, 'pos1': pos1,
-            'memo': str(annotation), 'owner': self.settings['codername'],
+            'memo': str(annotation), 'owner': self.app.settings['codername'],
             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
-        ui = DialogMemo(self.settings, _("Annotation: ") + details, item['memo'])
+        ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
         if item['memo'] != "":
@@ -1181,7 +1180,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             for startPos in textStarts:
                 item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(findText),
                 'pos0': startPos, 'pos1': startPos + len(findText),
-                'owner': self.settings['codername'], 'memo': "",
+                'owner': self.app.settings['codername'], 'memo': "",
                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
                 cur = self.app.conn.cursor()
                 cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\

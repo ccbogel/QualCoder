@@ -128,7 +128,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
-        self.codeslistmodel = DictListModel({})
+        #self.codeslistmodel = DictListModel({})
         self.get_codes_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -219,7 +219,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.codes, self.categories = self.app.get_data()
         cur = self.app.conn.cursor()
         #self.linktypes = self.app.get_linktypes()
-        self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
+        #self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """

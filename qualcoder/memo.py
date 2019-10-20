@@ -53,30 +53,29 @@ class DialogMemo(QtWidgets.QDialog):
     Dialog to view and edit memo text.
     """
 
+    app = None
     title = ""
-    table_id = ""
-    table = ""
     memo = ""
 
-    def __init__(self, settings,title="", memo=""):
-        ''' Table  and table_id are needed for selecting the text from the relevant table.
-        '''
+    def __init__(self, app, title="", memo=""):
+        """  """
 
         super(DialogMemo, self).__init__(parent=None)  # overrride accept method
-        #logger.debug("table: " + table + "   table_id:" + str(table_id) + "  type: " + str(type(table_id)))
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.memo = memo
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.setWindowTitle(title)
-        self.ui.textEdit.setFontPointSize(self.settings.get('fontsize',12))
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
 
     def accept(self):
-        ''' Accepted button overridden method '''
+        """ Accepted button overridden method. """
 
         self.memo = self.ui.textEdit.toPlainText()
         super(DialogMemo, self).accept()

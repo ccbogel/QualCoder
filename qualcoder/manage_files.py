@@ -192,7 +192,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
-                ui = DialogMemo(self.app.settings, _("Memo for file ") + self.source[x]['name'],
+                ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo
@@ -200,7 +200,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.app.conn.commit()
             else:
-                ui = DialogMemo(self.app.settings, _("Memo for file ") + self.source[x]['name'],
+                ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                 self.source[x]['memo'])
                 ui.exec_()
                 self.source[x]['memo'] = ui.memo

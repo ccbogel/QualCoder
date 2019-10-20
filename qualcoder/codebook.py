@@ -50,19 +50,19 @@ def exception_handler(exception_type, value, tb_obj):
 class Codebook():
     """ Create a codebook and export to file. """
 
-    settings = None
+    app = None
     parent_textEdit = None
     code_names = []
     categories = []
     tree = None
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
-        self.get_code_names_and_frequencies()
-        self.get_categories()
+        self.code_names, self.categories = self.app.get_data()
+        self.get_code_frequencies()
         self.tree = QtWidgets.QTreeWidget()
         self.fill_tree()
         self.export()
@@ -155,11 +155,11 @@ class Codebook():
         filename = "codebook.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-        _("Select directory to save file"), self.settings['directory'], options)
+        _("Select directory to save file"), self.app.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
-        filedata = _("Codebook for ") + self.settings['projectName'] + "\r\n========"
+        filedata = _("Codebook for ") + self.app.project_name + "\r\n========"
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         item = it.value()
         while item:
@@ -207,7 +207,7 @@ class Codebook():
             depth += 1
         return depth
 
-    def get_categories(self):
+    '''def get_categories(self):
         """ Called from init, delete category. """
 
         self.categories = []
@@ -216,20 +216,21 @@ class Codebook():
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
+            'date': row[3], 'memo': row[4], 'supercatid': row[5]})'''
 
-    def get_code_names_and_frequencies(self):
-        """ Called from init. First get all the codes, then for each code, get the
+    def get_code_frequencies(self):
+        """ Called from init. For each code, get the
         frequency from coded text, images and audio/video. """
 
-        self.code_names = []
+        '''self.code_names = []
         cur = self.settings['conn'].cursor()
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
         result = cur.fetchall()
         for row in result:
             self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6], 'freq': 0})
+            'cid': row[4], 'catid': row[5], 'color': row[6], 'freq': 0})'''
 
+        cur = self.app.conn.cursor()
         for c in self.code_names:
             c['freq'] = 0
             cur.execute("select count(cid) from code_text where cid=?", [c['cid'], ])
