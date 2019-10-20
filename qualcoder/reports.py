@@ -60,19 +60,19 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
     """ Show code and category frequencies, overall and for each coder.
-    This is for text coding and image coding. """
+    This is for text, image and av coding. """
 
-    settings = None
+    app = None
     parent_textEdit = None
     coders = []
     categories = []
     codes = []
-    coded_images_and_text = []
+    coded = []  # to refactor name
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.get_data()
         self.calculate_code_frequencies()
@@ -80,10 +80,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
-        self.ui.treeWidget.setFont(treefont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
 
@@ -94,13 +96,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         columns with the coder frequencies.
         """
 
-        cur = self.settings['conn'].cursor()
-        self.coders = []
-        cur.execute("select distinct owner from code_text union select distinct owner from code_image")
-        result = cur.fetchall()
-        self.coders = []
-        for row in result:
-            self.coders.append(row[0])
+        cur = self.app.conn.cursor()
+
         self.categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
         result = cur.fetchall()
@@ -115,15 +112,26 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
             'cid': row[4], 'catid': row[5], 'color': row[6],
             'display_list': [row[0], 'cid:' + str(row[4])]})
-        self.coded_images_and_text = []
+
+        self.coders = []
+        cur.execute("select distinct owner from code_text union select distinct owner from code_image")
+        result = cur.fetchall()
+        self.coders = []
+        for row in result:
+            self.coders.append(row[0])
+        self.coded = []
         cur.execute("select cid, owner from code_text")
         result = cur.fetchall()
         for row in result:
-            self.coded_images_and_text.append(row)
+            self.coded.append(row)
         cur.execute("select cid, owner from code_image")
         result = cur.fetchall()
         for row in result:
-            self.coded_images_and_text.append(row)
+            self.coded.append(row)
+        cur.execute("select cid, owner from code_av")
+        result = cur.fetchall()
+        for row in result:
+            self.coded.append(row)
 
     def calculate_code_frequencies(self):
         """ Calculate the frequency of each code for all coders and the total.
@@ -135,7 +143,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             total = 0
             for cn in self.coders:
                 count = 0
-                for cit in self.coded_images_and_text:
+                for cit in self.coded:
                     if cit[1] == cn and cit[0] == c['cid']:
                         count += 1
                         total += 1
@@ -192,7 +200,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filename = "CODING FREQUENCIES.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.settings['directory'], options)
+            _("Select directory to save file"), self.app.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
@@ -322,7 +330,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 class DialogReportCoderComparisons(QtWidgets.QDialog):
     """ Compare coded text sequences between coders using Cohen's Kappa. """
 
-    settings = None
+    app = None
     parent_textEdit = None
     coders = []
     selected_coders = []
@@ -331,10 +339,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     file_summaries = []
     comparisons = ""
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.comparisons = ""
         self.get_data()
@@ -345,10 +353,12 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
-        self.ui.treeWidget.setFont(treefont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
@@ -358,23 +368,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """ Called from init. gets coders, code_names, categories, file_summaries.
         Images are not loaded. """
 
-        self.categories = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
-
-        self.code_names = []
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
-        result = cur.fetchall()
-        for row in result:
-            self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6],
-            'Agree%':'','A and B':'','Not A Not B':'','Disagree%':'','A not B':'','B not A':'','K':''
-            })
-        self.coders = []
+        self.code_names, self.categories = self.app.get_data()
+        cur = self.app.conn.cursor()
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         cur.execute(sql)
         result = cur.fetchall()
@@ -421,7 +416,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        #TODO maybe use settings default directory here
+        #TODO maybe use app settings default directory here
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
             os.path.expanduser('~'))
         if filename[0] == "":
@@ -476,7 +471,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
         # loop through each source file
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
         for f in self.file_summaries:
             #logger.debug("file summary ", f)

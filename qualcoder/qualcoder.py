@@ -57,7 +57,7 @@ from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
-from view_graph import ViewGraph
+#from view_graph import ViewGraph
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 import view_graph
@@ -478,7 +478,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.triggered.connect(self.image_coding)
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
-        self.ui.actionView_Graph.triggered.connect(self.view_graph)
+        #self.ui.actionView_Graph.triggered.connect(self.view_graph)
         self.ui.actionView_Graph_2.triggered.connect(self.view_graph_original)
 
         # reports menu
@@ -574,7 +574,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_sql(self):
         """ Run SQL statements on database. """
 
-        ui = DialogSQL(self.settings, self.ui.textEdit)
+        ui = DialogSQL(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -584,7 +584,7 @@ class MainWindow(QtWidgets.QMainWindow):
         NOT CURRENTLY IMPLEMENTED, FOR FUTURE EXPANSION.
         '''
 
-        ui = DialogTextMining(self.settings, self.ui.textEdit)
+        ui = DialogTextMining(self.app, self.ui.textEdit)
         ui.show()"""
 
     def report_coding_comparison(self):
@@ -593,7 +593,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCoderComparison":
                 return
-        ui = DialogReportCoderComparisons(self.settings, self.ui.textEdit)
+        ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -604,7 +604,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeFrequencies":
                 return
-        ui = DialogReportCodeFrequencies(self.settings, self.ui.textEdit)
+        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -612,20 +612,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
-        print("qualcoder.view_graph_original\n", self.settings)  # tmp
-        print("qualcoder.view_graph_original\n", self.app.settings)  # tmp
         ui = DialogReportCodes(self.settings, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
 
-    def view_graph(self):
+    '''def view_graph(self):
         """ Show acyclic graph of codes and categories. """
 
         ui = view_graph.ViewGraph(self.app)
         self.dialogList.append(ui)
         ui.show()
-        self.clean_dialog_refs()
+        self.clean_dialog_refs()'''
 
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
@@ -1063,7 +1061,7 @@ def gui(project_path,view,force_quit):
 def cli():
     pass
 
-@cli.command()
+'''@cli.command()
 @click.argument('project-path')
 def interactive(project_path):
     with open(path + "/GUI/default.stylesheet", "r") as fh:
@@ -1100,7 +1098,7 @@ def graph(project_path,cat_id,gui,**kwargs):
         win = view_graph.MainWindow(app=qual_app)
         win.view.drawGraph(graph)
         win.show()
-        sys.exit(app.exec_())
+        sys.exit(app.exec_())'''
 
 if __name__ == "__main__":
     gui()

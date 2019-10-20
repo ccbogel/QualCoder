@@ -77,7 +77,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     source = []
     app = None
-    textDialog = None
+    text_dialog = None
     headerLabels = ["Name", "Memo", "Date", "Id"]
     NAME_COLUMN = 0
     MEMO_COLUMN = 1
@@ -94,6 +94,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textEdit
         self.dialogList = []
+        self.attributes = []
         self.load_file_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
@@ -121,7 +122,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by name")
+        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)")
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
@@ -260,11 +261,54 @@ class DialogManageFiles(QtWidgets.QDialog):
             #logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
+    def is_caselinked_or_coded_or_annotated(self, fid):
+        """ Check for text linked to case, coded or annotated text.
+        param: fid   the text file id
+        return: True or False
+        """
+
+        cur = self.app.conn.cursor()
+        sql = "select pos0,pos1 from case_text where fid=?"
+        cur.execute(sql, [fid, ])
+        case_linked = cur.fetchall()
+        sql = "select pos0,pos1 from annotation where fid=?"
+        cur.execute(sql, [fid, ])
+        annote_linked = cur.fetchall()
+        sql = "select pos0,pos1 from code_text where fid=?"
+        cur.execute(sql, [fid, ])
+        code_linked = cur.fetchall()
+        if case_linked != [] or annote_linked != [] or code_linked != []:
+            return True
+        return False
+
+    def highlight(self, fid, textEdit):
+        """ Add coding and annotation highlights. """
+        cur = self.app.conn.cursor()
+        sql = "select pos0,pos1 from annotation where fid=? union all select pos0,pos1 from code_text where fid=?"
+        cur.execute(sql, [fid, fid])
+        annoted_coded = cur.fetchall()
+        format_ = QtGui.QTextCharFormat()
+        format_.setFontFamily(self.app.settings['font'])
+        format_.setFontPointSize(self.app.settings['fontsize'])
+
+        # remove formatting
+        cursor = textEdit.textCursor()
+        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(len(textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(format_)
+        # add formatting
+        for item in annoted_coded:
+            cursor.setPosition(int(item[0]), QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(int(item[1]), QtGui.QTextCursor.KeepAnchor)
+            format_.setFontUnderline(True)
+            format_.setUnderlineColor(QtCore.Qt.red)
+            cursor.setCharFormat(format_)
+
     def view(self):
         """ View and edit text file contents.
         Alternatively view an image or other media. """
 
-        # need to relaod this, as transcribed files can be changed via view_av, and are otherwise not
+        # need to reload this, as transcribed files can be changed via view_av, and are otherwise not
         # updated
         self.load_file_data()
 
@@ -280,34 +324,209 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.view_av(x)
                 return
 
-        Dialog = QtWidgets.QDialog()
-        ui = Ui_Dialog_memo()
-        ui.setupUi(Dialog)
-        ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
-        ui.textEdit.setPlainText(self.source[x]['fulltext'])
-        Dialog.setWindowTitle(_("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") ")
-        Dialog.exec_()
-        text = ui.textEdit.toPlainText()
+        restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
+        # cannot easily edit file text of there are linked cases, codes or annotations
+        self.text_dialog = QtWidgets.QDialog()
+        self.text_ui = Ui_Dialog_memo()
+        self.text_ui.setupUi(self.text_dialog)
+        self.text_ui.textEdit.setReadOnly(restricted)
+        if restricted:
+            self.text_ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.text_ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.text_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
+        self.text_ui.textEdit.setPlainText(self.source[x]['fulltext'])
+        self.highlight(self.source[x]['id'], self.text_ui.textEdit)
+
+        title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
+        if restricted:
+            title += "RESTRICTED EDIT"
+        self.text_dialog.setWindowTitle(title)
+        self.text_dialog.exec_()
+        text = self.text_ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
-            return
-        cur = self.app.conn.cursor()
-        # cannot edit file text of there are linked cases, codes or annotations
-        sql = "select * from case_text where fid=?"
-        cur.execute(sql, [self.source[x]['id'], ])
-        ca_linked = cur.fetchall()
-        sql = "select * from annotation where fid=?"
-        cur.execute(sql, [self.source[x]['id'], ])
-        a_linked = cur.fetchall()
-        sql = "select * from code_text where fid=?"
-        cur.execute(sql, [self.source[x]['id'], ])
-        c_linked = cur.fetchall()
-        if ca_linked != [] or a_linked != [] or c_linked != []:
-            msg = _("Cannot edit file text, there are codes, cases or annotations linked to this file")
-            QtWidgets.QMessageBox.warning(None, _('Warning'), msg, QtWidgets.QMessageBox.Ok)
             return
 
         self.source[x]['fulltext'] = text
+        cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
+        self.app.conn.commit()
+
+    def textEdit_menu(self, position):
+        """ Context menu for selection of small sections of text to be edited.
+        The section of text must be only non-annotated and non-coded or
+        only annotated or coded. """
+
+        x = self.ui.tableWidget.currentRow()
+        menu = QtWidgets.QMenu()
+        ActionItemEdit = menu.addAction(_("Edit text maximum 20 characters"))
+        action = menu.exec_(self.text_ui.textEdit.mapToGlobal(position))
+        text_cursor = self.text_ui.textEdit.textCursor()
+        if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
+            msg = _("Select a section of text, maximum 20 characters.\nThe selection must be either all underlined or all not-underlined.")
+            QtWidgets.QMessageBox.warning(None, _('No text selected'), msg, QtWidgets.QMessageBox.Ok)
+            return
+        result = self.crossover_check(x, text_cursor)
+        if result['crossover']:
+            return
+
+        if action == ActionItemEdit:
+            self.restricted_edit_text(x, text_cursor)
+            # reload text
+            self.text_ui.textEdit.setPlainText(self.source[x]['fulltext'])
+            self.highlight(self.source[x]['id'], self.text_ui.textEdit)
+
+    def crossover_check(self, x, text_cursor):
+        """ Check text selection for codes and annotations that cross over with non-coded
+        and non-annotated sections. User can only select coded or non-coded text, this makes
+        updating changes much simpler.
+
+        param: x the current table row
+        param: text_cursor  - the document cursor
+        return: dictionary of crossover indication and of whether selection os entirely coded annotated or neither """
+
+        response = {"crossover": True, "coded_section":[], "annoted_section":[], "cased_section":[]}
+        msg = _("Please select text that does not have a combination of coded and uncoded text.")
+        msg += _(" Nor a combination of annotated and un-annotated text.\n")
+        selstart = text_cursor.selectionStart()
+        selend = text_cursor.selectionEnd()
+        msg += _("Selection start: ") + str(selstart) + _(" Selection end: ") + str(selend) + "\n"
+        cur = self.app.conn.cursor()
+        sql = "select pos0,pos1 from code_text where fid=? and "
+        sql += "((pos0>? and pos0<?)  or (pos1>? and pos1<?)) "
+        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
+        code_crossover = cur.fetchall()
+        if code_crossover != []:
+            msg += _("Code crossover: ") + str(code_crossover)
+            QtWidgets.QMessageBox.warning(None, _('Codes cross over text'), msg, QtWidgets.QMessageBox.Ok)
+            return response
+        # find if the selected text is coded
+        sql = "select pos0,pos1 from code_text where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['coded_section'] = cur.fetchall()
+        sql = "select pos0,pos1 from annotation where fid=? and "
+        sql += "((pos0>? and pos0<?) or (pos1>? and pos1<?))"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
+        annote_crossover = cur.fetchall()
+        if annote_crossover != []:
+            msg += _("Annotation crossover: ") + str(annote_crossover)
+            QtWidgets.QMessageBox.warning(None, _('Annotations cross over text'), msg, QtWidgets.QMessageBox.Ok)
+            return response
+        # find if the selected text is annotated
+        sql = "select pos0,pos1 from annotation where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['annoted_section'] = cur.fetchall()
+        response['crossover'] = False
+        # find if the selected text is assigned to case
+        sql = "select pos0,pos1, id from case_text where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['cased_section'] = cur.fetchall()
+        response['crossover'] = False
+        return response
+
+    def restricted_edit_text(self, x, text_cursor):
+        """ Restricted edit of small sections of text. selected text can be replaced.
+        Mainly used for fixing spelling mistakes.
+        original text is here: self.source[x]['fulltext']
+
+        param: x the current table row
+        param: text_cursor  - the document cursor
+        """
+
+        txt = text_cursor.selectedText()
+        selstart = text_cursor.selectionStart()
+        selend = text_cursor.selectionEnd()
+
+        if len(txt) > 20:
+            msg = _("Can only edit small selections of text, up to 20 characters in length.") + "\n"
+            msg += _("You selected " + str(len(txt)) + _(" characters"))
+            QtWidgets.QMessageBox.warning(None, _('Too much text selected'), msg, QtWidgets.QMessageBox.Ok)
+            return
+
+        edit_dialog = QtWidgets.QDialog()
+        edit_ui = Ui_Dialog_memo()
+        edit_ui.setupUi(edit_dialog)
+        edit_dialog.resize(400, 60)
+        edit_dialog.setWindowTitle(_("Edit text: start") +str(selstart) + _(" end:") + str(selend))
+        edit_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
+        edit_ui.textEdit.setPlainText(txt)
+        edit_dialog.exec_()
+        new_text = edit_ui.textEdit.toPlainText()
+
+        # split original text and fix
+        original_text = self.source[x]['fulltext']
+        before = self.source[x]['fulltext'][0:text_cursor.selectionStart()]
+        after = self.source[x]['fulltext'][text_cursor.selectionEnd():len(self.source[x]['fulltext'])]
+        fulltext = before + new_text + after
+
+        # update database with the new fulltext
+        self.source[x]['fulltext'] = fulltext
+        cur = self.app.conn.cursor()
+        sql = "update source set fulltext=? where id=?"
+        cur.execute(sql, [fulltext, self.source[x]['id']])
+        self.app.conn.commit()
+        length_diff = len(new_text) - len(txt)
+        if length_diff == 0:
+            return
+        """ UPDATE CODES//CASES/ANNOTATIONS located after the selected text
+        Update database for codings, annotations and case linkages.
+        Find affected codings annotations and case linkages.
+        All codes, annotations and case linkages that occur after this text selection can be easily updated
+        by adding the length diff to the pos0 and pos1 fields. """
+        cur = self.app.conn.cursor()
+        # find cases after this text section
+        sql = "select id, pos0,pos1 from case_text where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_case_linked = cur.fetchall()
+        # find annotations after this text selection
+        sql = "select anid,pos0,pos1 from annotation where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_annote_linked = cur.fetchall()
+        # find codes after this text selection section
+        sql = "select pos0,pos1 from code_text where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_code_linked = cur.fetchall()
+        txt = text_cursor.selectedText()
+        #print("cursor selstart", text_cursor.selectionStart())
+        #print("cursor selend", text_cursor.selectionEnd())
+        #print("length_diff", length_diff, "\n")
+
+        for i in post_case_linked:
+            #print(i)
+            #print(i[0], i[1] + length_diff, i[2] + length_diff)
+            #print("lengths ", len(original_text), i[2] - i[1])
+            sql = "update case_text set pos0=?, pos1=? where id=?"
+            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
+        for i in post_annote_linked:
+            sql = "update annotation set pos0=?, pos1=? where anid=?"
+            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
+        for i in post_code_linked:
+            sql = "update code_text set pos0=?,pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[0] + length_diff, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        self.app.conn.commit()
+
+        # UPDATE THE CODED AND/OR ANNOTATED SECTION
+        # The crossover dictionary contains annotations and codes for this section
+        # need to extend or reduce the code or annotation length
+        # the coded text stored in code_text also need to be updated
+        crossovers = self.crossover_check(x, text_cursor)
+        # Codes in this selection
+        for i in crossovers['coded_section']:
+            #print("selected text coded: ", i)
+            sql = "update code_text set seltext=?,pos1=? where fid=? and pos0=? and pos1=?"
+            newtext = fulltext[i[0]:i[1] + length_diff]
+            cur.execute(sql, [newtext, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        # Annotations in this selection
+        for i in crossovers['annoted_section']:
+            #print("selected text annoted: ", i)
+            sql = "update annotation set pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        for i in crossovers['cased_section']:
+            #print("selected text as case: ", i)
+            sql = "update case_text set pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
         self.app.conn.commit()
 
     def view_av(self, x):
@@ -351,9 +570,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
 
     def create(self):
-        ''' Create a new text file by entering text into the dialog.
-        Implements the QtDesigner memo dialog '''
-
+        """ Create a new text file by entering text into the dialog.
+        Implements the QtDesigner memo dialog. """
         name, ok = QtWidgets.QInputDialog.getText(self, _('New File'), _('Enter the file name:'))
         if not ok:
             return
@@ -378,6 +596,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
             (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
         self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+        entry['id'] = id_
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
@@ -734,8 +955,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def fill_table(self):
-        """ Fill the table widget with file data. """
+        """ Reload the file data and Fill the table widget with file data. """
 
+        self.load_file_data()
         self.ui.tableWidget.setColumnCount(len(self.headerLabels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)

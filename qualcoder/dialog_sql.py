@@ -25,7 +25,6 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 '''
 
-#from Dialog_QueryDetails import Dialog_QueryDetails
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
@@ -59,7 +58,8 @@ class DialogSQL(QtWidgets.QDialog):
     A gui to allow the user to enter sql queries and return results.
     Data outputs are as tab (or other) separated files. '''
 
-    settings = None
+    app = None
+    schema = None
     parent_textEdit = None
     sql = ""
     joinData = []
@@ -69,11 +69,11 @@ class DialogSQL(QtWidgets.QDialog):
     queryTime = ""  # for label tooltip
     queryFilters = ""  # for label tooltip
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.queryTime = ""
         self.queryFilters = ""
@@ -82,6 +82,9 @@ class DialogSQL(QtWidgets.QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         #self.setWindowTitle("Query: " + self.queryname)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         highlighter = Highlighter(self.ui.textEdit_sql)
@@ -101,10 +104,10 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.splitter_2.setSizes([10, 290])
 
     def export_file(self):
-        ''' Load resultset.
-        Export results to a delimited .csv file using \r\n as line separators. '''
+        """ Load result set and export results to a delimited .csv file
+        using \r\n as line separators. """
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         sql = self.ui.textEdit_sql.toPlainText()
         try:
             cur.execute(sql)
@@ -148,8 +151,8 @@ class DialogSQL(QtWidgets.QDialog):
         QtWidgets.QMessageBox.information(None, _("Text file export"), file_name)
 
     def get_item(self):
-        ''' Get the selected table name or tablename.fieldname and add to the sql text
-        at the current cursor position. '''
+        """ Get the selected table name or tablename.fieldname and add to the sql text
+        at the current cursor position. """
 
         item_text = self.ui.treeWidget.currentItem().text(0)
         index = self.ui.treeWidget.currentIndex()
@@ -164,7 +167,7 @@ class DialogSQL(QtWidgets.QDialog):
         cursor.insertText(" " + item_text + " ")
 
     def run_SQL(self):
-        ''' Run the sql text and add the results to the results text edit. '''
+        """ Run the sql text and add the results to the results text edit. """
 
         # clear tableWidget and file data
         numRows = self.ui.tableWidget_results.rowCount()
@@ -175,7 +178,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.label.setText(_("Running query. Please wait."))
         QtWidgets.QApplication.processEvents()  # stops gui freeze
         self.sql = self.ui.textEdit_sql.toPlainText()
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         self.sql = str(self.sql)
         QtWidgets.QApplication.processEvents()  # stops gui freeze
         try:
@@ -193,13 +196,13 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.label.setText(_("Table created"))
             if self.sql[0:12].upper() == "CREATE INDEX":
                 self.ui.label.setText(_("Index created"))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if self.sql[0:6].upper() == "DELETE":
                 self.ui.label.setText(str(cur.rowcount) + _(" rows deleted"))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if self.sql[0:6].upper() == "UPDATE":
                 self.ui.label.setText(str(cur.rowcount) + _(" rows updated"))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             colNames = []
             if cur.description is not None:
                 colNames = list(map(lambda x: x[0], cur.description))  # gets column names
@@ -225,17 +228,17 @@ class DialogSQL(QtWidgets.QDialog):
             self.ui.label.setText(_("SQL Error"))
             self.ui.label.setToolTip(str(e))
         self.results = None
-        self.settings['conn'].commit()
+        self.app.conn.commit()
 
     def get_schema_update_treeWidget(self):
-        ''' Get table schema from database, and update the tables_an_views tree widget.
-        The schema needs to be updated when drop table or create queries are run. '''
+        """ Get table schema from database, and update the tables_an_views tree widget.
+        The schema needs to be updated when drop table or create queries are run. """
 
-        # get schema
-        self.settings["schema"] = []
+        self.schema = []
         tableDict = {}
-        cur = self.settings["conn"]
-        result = cur.execute("SELECT sql, type, name FROM sqlite_master WHERE type IN ('table', 'view') ")
+        cur = self.app.conn.cursor()
+        cur.execute("SELECT sql, type, name FROM sqlite_master WHERE type IN ('table', 'view') ")
+        result = cur.fetchall()
         for row in result:
             tableName = row[2]
             fields = []
@@ -245,11 +248,11 @@ class DialogSQL(QtWidgets.QDialog):
             for field in fieldResults:
                 fields.append(field)
             tableDict[tableName] = fields
-        self.settings["schema"] = tableDict
+        self.schema = tableDict
 
         # update tables and views in tree widget
         tablesAndViews = []
-        for k in self.settings["schema"].keys():
+        for k in self.schema.keys():
             tablesAndViews.append(k)
         tablesAndViews.sort()
         self.ui.treeWidget.clear()
@@ -261,7 +264,7 @@ class DialogSQL(QtWidgets.QDialog):
             if tableOrView == "view":
                 topItem.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
             self.ui.treeWidget.addTopLevelItem(topItem)
-            for field in self.settings["schema"][tableName]:
+            for field in self.schema[tableName]:
                 fieldItem = QtWidgets.QTreeWidgetItem()
                 if tableOrView == "view":
                     fieldItem.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
@@ -281,8 +284,8 @@ class DialogSQL(QtWidgets.QDialog):
 
     # sql text edit widget context menu
     def sql_menu(self, position):
-        ''' add context menu to textedit_sql
-         includes:cut ctrlX copy ctrlC paste ctrlV delete select_all ctrlA  '''
+        """ add context menu to textedit_sql
+         includes:cut ctrlX copy ctrlC paste ctrlV delete select_all ctrlA. """
         menu = QtWidgets.QMenu()
         action_SelectAll = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
@@ -330,7 +333,7 @@ class DialogSQL(QtWidgets.QDialog):
 
     # start table results context menu section
     def table_menu(self, position):
-        ''' Context menu for table_results '''
+        """ Context menu for table_results. """
 
         menu = QtWidgets.QMenu()
         try:
@@ -360,19 +363,19 @@ class DialogSQL(QtWidgets.QDialog):
     #TODO need to store or determine type of data to do this
 
     def sort_ascending(self):
-        ''' Sort rows on selected column in ascending order '''
+        """ Sort rows on selected column in ascending order. """
 
         self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.AscendingOrder)
         self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" asc]"))
 
     def sort_descending(self):
-        ''' Sort rows on selected column in descending order '''
+        """ Sort rows on selected column in descending order. """
 
         self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.DescendingOrder)
         self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" desc]"))
 
     def filter_text_like(self):
-        ''' Hide rows where cells in the column do not contain the text fragment '''
+        """ Hide rows where cells in the column do not contain the text fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
         QtWidgets.QLineEdit.Normal, str(self.cellValue))
@@ -385,7 +388,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
 
     def filter_text_starts_with(self):
-        ''' Hide rows where cells in the column do not contain the text start fragment. '''
+        """ Hide rows where cells in the column do not contain the text start fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
         QtWidgets.QLineEdit.Normal, str(self.cellValue))
@@ -399,7 +402,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
 
     def filter_cell_value(self):
-        ''' Hide rows that do not have the selected cell value '''
+        """ Hide rows that do not have the selected cell value. """
 
         for r in range(0, self.ui.tableWidget_results.rowCount()):
             if self.ui.tableWidget_results.item(r, self.col).text() != self.cellValue:
@@ -409,7 +412,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
 
     def show_all_rows(self):
-        ''' Remove all hidden rows '''
+        """ Remove all hidden rows. """
 
         for r in range(0, self.ui.tableWidget_results.rowCount()):
                 self.ui.tableWidget_results.setRowHidden(r, False)
