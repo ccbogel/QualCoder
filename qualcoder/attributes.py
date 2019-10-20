@@ -62,17 +62,17 @@ class DialogManageAttributes(QtWidgets.QDialog):
     VALUETYPE_COLUMN = 2
     MEMO_COLUMN = 3
 
-    settings = None
+    app = None
     parent_tetEdit = None
     attributes = []
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.attribute_type = []
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
         for row in result:
@@ -82,8 +82,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.fill_tableWidget()
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
@@ -116,14 +117,14 @@ class DialogManageAttributes(QtWidgets.QDialog):
             case_or_file = "file"
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        item = {'name': newText, 'memo': "", 'owner': self.settings['codername'],
+        item = {'name': newText, 'memo': "", 'owner': self.app.settings['codername'],
             'date': now_date, 'valuetype': valuetype,
             'caseOrFile': case_or_file}
         self.attribute_type.append(item)
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
             ,(item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         sql = "select id from source"
         cur.execute(sql)
         ids = cur.fetchall()
@@ -133,8 +134,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
             ids = cur.fetchall()
         for id_ in ids:
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.settings['codername']))
-        self.settings['conn'].commit()
+            cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.app.settings['codername']))
+        self.app.conn.commit()
         self.fill_tableWidget()
         self.parent_textEdit.append(_("Attribute added: ") + item['name'])
 
@@ -157,10 +158,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
             for attr in self.attribute_type:
                 if attr['name'] == name:
                     self.parent_textEdit.append(_("Attribute deleted: ") + attr['name'])
-                    cur = self.settings['conn'].cursor()
+                    cur = self.app.conn.cursor()
                     cur.execute("delete from attribute where name = ?", (name,))
                     cur.execute("delete from attribute_type where name = ?", (name,))
-        self.settings['conn'].commit()
+        self.app.conn.commit()
         self.attribute_type = []
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
@@ -183,9 +184,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
             memo = ui.memo
             if memo != self.attribute_type[x]['memo']:
                 self.attribute_type[x]['memo'] = memo
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update attribute_type set memo=? where name=?", (memo, self.attribute_type[x]['name']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
             if memo == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
@@ -208,10 +209,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
                     update = False
             if update:
                 # update attribute type list and database
-                cur = self.settings['conn'].cursor()
+                cur = self.app.conn.cursor()
                 cur.execute("update attribute_type set name=? where name=?", (newText, self.attribute_type[x]['name']))
                 cur.execute("update attribute set name=? where name=?", (newText, self.attribute_type[x]['name']))
-                self.settings['conn'].commit()
+                self.app.conn.commit()
                 self.attribute_type[x]['name'] = newText
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.attribute_type[x]['name'])

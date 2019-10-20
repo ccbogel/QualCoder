@@ -98,6 +98,9 @@ class App(object):
     Settings does not contain project name, project path or db connection.
     """
 
+    conn = None
+    project_path = None
+
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
@@ -491,9 +494,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # help menu
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionAbout.triggered.connect(self.about)
-
-        new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(new_font)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.settings_report()
 
     def hide_menu_options(self):
@@ -518,6 +521,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
+        self.ui.actionView_Graph_2.setEnabled(False)
         self.ui.actionExport_codebook.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
@@ -547,7 +551,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
-        self.ui.actionView_Graph.setEnabled(True)
+        self.ui.actionView_Graph.setEnabled(False)
+        self.ui.actionView_Graph_2.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(True)
@@ -612,7 +617,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
-        ui = DialogReportCodes(self.settings, self.ui.textEdit)
+        ui = DialogReportCodes(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -655,7 +660,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
-        ui = DialogManageAttributes(self.settings, self.ui.textEdit)
+        ui = DialogManageAttributes(self.app, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
 
@@ -864,6 +869,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.settings['conn'].commit()
         self.app = App()
+
         self.app.create_connection(self.settings['path'])
         self.app.add_relations_table()
         try:
