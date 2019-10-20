@@ -926,6 +926,7 @@ class Refi_export(QtWidgets.QDialog):
                             shutil.copyfile(self.app.project_path + s['mediapath'],
                                 self.app.settings['directory'] + '/' + s['filename'])
                     except FileNotFoundError as e:
+                        print("ERROR HERE line 929")
                         print(e)
             if s['mediapath'] is None:  # a document
                 try:
@@ -1000,11 +1001,11 @@ class Refi_export(QtWidgets.QDialog):
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<Project '
         self.xml += 'xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-        self.xml += 'name="' + self.settings['projectName'] + '" '
+        self.xml += 'name="' + self.app.project_name + '" '
         self.xml += 'origin="Qualcoder-1.4" '
         guid = self.create_guid()
         self.xml += 'creatingUserGUID="' + guid + '" '  # there is no creating user in QualCoder
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select date from project")
         result = cur.fetchone()
         self.xml += 'creationDateTime="' + self.convert_timestamp(result[0]) + '" '
