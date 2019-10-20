@@ -416,12 +416,13 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        #TODO maybe use app settings default directory here
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
-            os.path.expanduser('~'))
-        if filename[0] == "":
+        filename = "CODER_COMPARISON.txt"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.settings['directory'], options)
+        if directory == "":
             return
-        filename = filename[0] + ".txt"
+        filename = directory + "/" + filename
         f = open(filename, 'w')
         f.write(self.comparisons)
         f.close()
@@ -633,9 +634,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         Export reports as plain text, ODT, html or csv.
     """
     #TODO - export case matrix
-    #TODO - export coded data as csv with codes as column headings
 
-    settings = None
+    app = None
     parent_textEdit = None
     code_names = []
     coders = [""]
@@ -649,18 +649,20 @@ class DialogReportCodes(QtWidgets.QDialog):
     case_ids = ""
     attribute_selection = ""
 
-    def __init__(self, settings, parent_textEdit):
+    def __init__(self, app, parent_textEdit):
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parent_textEdit = parent_textEdit
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
-        self.ui.treeWidget.setFont(treefont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
@@ -677,20 +679,8 @@ class DialogReportCodes(QtWidgets.QDialog):
     def get_data(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
 
-        self.categories = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
-        self.code_names = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
-        result = cur.fetchall()
-        for row in result:
-            self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
+        self.code_names, self.categories = self.app.get_data()
+        cur = self.app.conn.cursor()
         self.coders = []
         cur.execute("select distinct owner from code_text")
         result = cur.fetchall()
@@ -797,7 +787,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
-            self.settings['directory'])
+            self.app.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".txt"
@@ -816,7 +806,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
-            self.settings['directory'])
+            self.app.settings['directory'])
         #    os.path.expanduser('~'))
         if filename[0] == "":
             return
@@ -918,7 +908,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     row += 1
 
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
-            self.settings['directory'])
+            self.app.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".csv"
@@ -940,7 +930,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
-            self.settings['directory'])
+            self.app.settings['directory'])
         if filename[0] == "":
             return
         filename = filename[0] + ".html"
@@ -991,7 +981,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 try:
                     # add audio/video to folder
                     if not os.path.isfile(foldername + item['avname']):
-                        copyfile(self.settings['path'] + item['avname'], foldername + item['avname'])
+                        copyfile(self.app.project_path + item['avname'], foldername + item['avname'])
                     mediatype = item['avname'][1:6]
                     extension = item['avname'][item['avname'].rfind('.') + 1:]
                     extra = "</p><" + mediatype + " controls>"
@@ -1089,7 +1079,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.text_results = []
         self.image_results = []
         self.av_results = []
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
 
         # get coded text/images/av via selected files
         parameters = []
@@ -1488,7 +1478,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Scale image, add resource to document, insert image.
         """
 
-        path = self.settings['path'] + img['mediapath']
+        path = self.app.project_path + img['mediapath']
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
@@ -1505,7 +1495,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # need unique image names or the same image from the same path is reproduced
-        imagename = self.settings['path'] + '/images/' + str(counter) + '-' + img['mediapath']
+        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
         cursor = text_edit.textCursor()
@@ -1583,7 +1573,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
 
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
         cases = cur.fetchall()
         vertical_labels = []
@@ -1620,7 +1610,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
         self.case_ids = ""
-        ui = DialogSelectAttributeParameters(self.settings)
+        ui = DialogSelectAttributeParameters(self.app)
         ok = ui.exec_()
         if not ok:
             self.attribute_selection = []
@@ -1646,19 +1636,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
-        filenames = []
-        self.file_ids = ""
         self.case_ids = ""
         self.attribute_selection = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select id, name from source")
-        result = cur.fetchall()
-        for row in result:
-            filenames.append({'id': row[0], 'name': row[1]})
-            self.file_ids += "," + str(row[0])
+        filenames = self.app.get_filenames()
+        self.file_ids = ""
+        for row in filenames:
+            self.file_ids += "," + str(row['id'])
         if len(self.file_ids) > 0:
             self.file_ids = self.file_ids[1:]
-
         ui = DialogSelectFile(filenames, _("Select files to view"), "many")
         ok = ui.exec_()
         tooltip = _("Files selected:")
@@ -1689,7 +1674,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.file_ids = ""
         self.case_ids = ""
         self.attribute_selection = []
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases")
         result = cur.fetchall()
         for row in result:
