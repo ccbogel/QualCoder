@@ -28,9 +28,9 @@ https://qualcoder.wordpress.com/
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import datetime
+import logging
 import os
 import sys
-import logging
 import traceback
 
 from GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
@@ -60,17 +60,17 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     OPERATOR_COLUMN = 3
     VALUE_LIST_COLUMN = 4
 
-    settings = None
+    app = None
     attribute_type = []
     parameters = []
 
-    def __init__(self, settings, parent=None):
+    def __init__(self, app, parent=None):
 
         super(DialogSelectAttributeParameters, self).__init__(parent)  # overrride accept method
         sys.excepthook = exception_handler
-        self.settings = settings
+        self.app = app
         self.parameters = []
-        cur = self.settings['conn'].cursor()
+        cur = self.app.conn.cursor()
         sql = "select name, valuetype, memo, caseOrFile from attribute_type"
         cur.execute(sql)
         result = cur.fetchall()
@@ -81,8 +81,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_report_attribute_parameters()
         self.ui.setupUi(self)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
-        self.setFont(newfont)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.fill_tableWidget()
         #self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
