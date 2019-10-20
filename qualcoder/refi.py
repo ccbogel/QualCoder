@@ -433,7 +433,7 @@ class Refi_import():
         Some Coding selections match the Case guid. So re-align to Case selections.
         """
 
-        cur = self.app..conn.cursor()
+        cur = self.app.conn.cursor()
 
         # Remove Code and code_text
         case_texts = []
@@ -893,7 +893,7 @@ class Refi_export(QtWidgets.QDialog):
         Then create zip wih suffix .qdpx
         '''
 
-        project_name = self.app.project_name'][:-4]
+        project_name = self.app.project_name[:-4]
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
         #print("REFI-QDA EXPORT prep_path: ", prep_path)  # tmp
         try:
@@ -1772,7 +1772,7 @@ class Refi_export(QtWidgets.QDialog):
         examine is set to true and then to false when creating the xml """
 
         self.categories = []
-        cur = self.app..conn.cursor()
+        cur = self.app.conn.cursor()
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
         result = cur.fetchall()
         for row in result:

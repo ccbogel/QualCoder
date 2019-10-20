@@ -755,7 +755,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         values = [self.media_data['id'], self.segment['start_msecs'],
             self.segment['end_msecs'], cid, self.segment['memo'],
             datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            self.settings['codername']]
+            self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
@@ -987,7 +987,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, _("Memo for Code ") + self.codes[found]['name'],
+            ui = DialogMemo(self.app, _("Memo for Code ") + self.codes[found]['name'],
             self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
@@ -1010,7 +1010,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.settings, _("Memo for Category ") + self.categories[found]['name'],
+            ui = DialogMemo(self.app, _("Memo for Category ") + self.categories[found]['name'],
             self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
@@ -1316,7 +1316,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = {'fid': self.transcription[0], 'pos0': pos0, 'pos1': pos1,
             'memo': str(annotation), 'owner': self.app.settings['codername'],
             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
-        ui = DialogMemo(self.app.settings, _("Annotation: ") + details, item['memo'])
+        ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
         if item['memo'] != "":
@@ -1550,7 +1550,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         Reload_segment is set to True, so on playing media, the update event will reload
         all segments. """
 
-        ui = DialogMemo(self.app.settings, _("Memo for segment"), self.segment["memo"])
+        ui = DialogMemo(self.app, _("Memo for segment"), self.segment["memo"])
         ui.exec_()
         if self.segment['memo'] == ui.memo:
             return

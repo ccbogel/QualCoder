@@ -359,7 +359,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     def image_memo(self):
         """ Create a memo for the image file. """
 
-        ui = DialogMemo(self.app.settings, _("Memo for image ") + self.file_['name'],
+        ui = DialogMemo(self.app, _("Memo for image ") + self.file_['name'],
             self.file_['memo'])
         ui.exec_()
         cur = self.app.conn.cursor()
