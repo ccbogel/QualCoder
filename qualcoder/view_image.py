@@ -324,7 +324,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.change_scale()
 
     def draw_coded_areas(self):
-        """ draw coded areas with scaling.
+        """ Draw coded areas with scaling. This coder is shown in red rectangles.
+        Other coders are shown via magenta rectangles.
         Remove items first, as this is called after a coded area is unmarked. """
 
         for item in self.code_areas:
@@ -333,6 +334,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for c in self.codes:
                     if c['cid'] == item['cid']:
                         tooltip = c['name'] + " (" + item['owner'] + ")"
+                        tooltip += "\nMemo: " + item['memo']
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
                 width = item['width'] * self.scale
@@ -348,7 +350,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         self.scene.addItem(rect_item)
 
     def fill_code_label(self):
-        """ Fill code label with curently selected item's code name. """
+        """ Fill code label with currently selected item's code name. """
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
@@ -461,10 +463,14 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.unmark(item)
 
     def find_coded_areas_for_pos(self, pos):
-        """ Find any coded areas for this position. """
+        """ Find any coded areas for this position AND for this coder.
+
+        param: pos
+        returns: None or coded item
+        """
 
         for item in self.code_areas:
-            if item['id'] == self.file_['id']:
+            if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
                 #print(pos, item['x1'], item['y1'], item['width'], item['height'])
                 if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
                     and pos.y() >= item['y1'] * self.scale and pos.y() <= (item['y1'] + item['height']) * self.scale:
@@ -484,6 +490,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
             self.app.conn.commit()
+        # re-draw to update memos in tooltips
+        self.draw_coded_areas()
 
     def unmark(self, item):
         """ Remove coded area. """
@@ -763,7 +771,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.app.settings, _("Memo for Code ") + self.codes[found]['name'],
+            ui = DialogMemo(self.app, _("Memo for Code ") + self.codes[found]['name'],
             self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
@@ -786,7 +794,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     found = i
             if found == -1:
                 return
-            ui = DialogMemo(self.app.settings, _("Memo for Category: ") + self.categories[found]['name'],
+            ui = DialogMemo(self.app, _("Memo for Category: ") + self.categories[found]['name'],
             self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
