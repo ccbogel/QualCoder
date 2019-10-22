@@ -585,7 +585,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("Filename in use"), QtWidgets.QMessageBox.Ok)
             return
 
-        ui = DialogMemo(self.app.settings, _("Creating a new file: ") + name)
+        ui = DialogMemo(self.app, _("Creating a new file: ") + name)
         ui.exec_()
         filetext = ui.memo
         # update database
