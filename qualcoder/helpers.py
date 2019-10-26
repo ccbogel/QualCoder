@@ -1,8 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-from information import DialogInformation
-
+try:
+    from information import DialogInformation
+except:
+    from .information import DialogInformation
 
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
@@ -19,7 +21,9 @@ def msecs_to_mins_and_secs(msecs):
 class CodedMediaMixin:
     def coded_media(self, data):
         """ Display all coded media for this code.
-        Coded media comes from ALL files and ALL coders. """
+        Coded media comes from ALL files and ALL coders.
+        This is called from code_text
+        """
 
         ui = DialogInformation("Coded text : " + data['name'], "")
         cur = self.app.conn.cursor()
@@ -60,7 +64,7 @@ class CodedMediaMixin:
             ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7])
             img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
             #self.put_image_into_textedit(img, counter, ui.ui.textEdit)  # cannot do this
-            dimensions = "x: " + str(int(img['x1'])) + ", y: " + str(int(img['y1'])) + ", width: " 
+            dimensions = "x: " + str(int(img['x1'])) + ", y: " + str(int(img['y1'])) + ", width: "
             dimensions += str(int(img['width'])) + ", height: " + str(int(img['height']))
             ui.ui.textEdit.append(dimensions)
             ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")

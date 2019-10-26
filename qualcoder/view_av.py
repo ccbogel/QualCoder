@@ -46,15 +46,26 @@ try:
 except Exception as e:
     print(e)
 
-from add_item_name import DialogAddItemName
-from color_selector import DialogColorSelect
-from color_selector import colors
-from confirm_delete import DialogConfirmDelete
-from GUI.ui_dialog_code_av import Ui_Dialog_code_av
-from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from memo import DialogMemo
-from qtmodels import DictListModel, ListObjectModel
-from select_file import DialogSelectFile
+try:
+    from add_item_name import DialogAddItemName
+    from color_selector import DialogColorSelect
+    from color_selector import colors
+    from confirm_delete import DialogConfirmDelete
+    from GUI.ui_dialog_code_av import Ui_Dialog_code_av
+    from GUI.ui_dialog_view_av import Ui_Dialog_view_av
+    from memo import DialogMemo
+    from qtmodels import DictListModel, ListObjectModel
+    from select_file import DialogSelectFile
+except:
+    from .add_item_name import DialogAddItemName
+    from .color_selector import DialogColorSelect
+    from .color_selector import colors
+    from .confirm_delete import DialogConfirmDelete
+    from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
+    from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
+    from .memo import DialogMemo
+    from .qtmodels import DictListModel, ListObjectModel
+    from .select_file import DialogSelectFile
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

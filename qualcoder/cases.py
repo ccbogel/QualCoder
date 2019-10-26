@@ -36,15 +36,26 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from GUI.ui_dialog_cases import Ui_Dialog_cases
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
-from memo import DialogMemo
-from select_file import DialogSelectFile
-from view_av import DialogViewAV
-from view_image import DialogViewImage
+try:
+    from add_item_name import DialogAddItemName
+    from confirm_delete import DialogConfirmDelete
+    from GUI.ui_dialog_cases import Ui_Dialog_cases
+    from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+    from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+    from memo import DialogMemo
+    from select_file import DialogSelectFile
+    from view_av import DialogViewAV
+    from view_image import DialogViewImage
+except:
+    from .add_item_name import DialogAddItemName
+    from .confirm_delete import DialogConfirmDelete
+    from .GUI.ui_dialog_cases import Ui_Dialog_cases
+    from .GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
+    from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+    from .memo import DialogMemo
+    from .select_file import DialogSelectFile
+    from .view_av import DialogViewAV
+    from .view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

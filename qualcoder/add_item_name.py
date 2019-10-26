@@ -32,7 +32,10 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_add_item import Ui_Dialog_add_item
+try:
+    from GUI.ui_dialog_add_item import Ui_Dialog_add_item
+except:
+    from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -108,7 +111,7 @@ class DialogLinkTo(QtWidgets.QDialog):
         super(DialogLinkTo, self).__init__(parent)  # overrride accept method
         self.linktype = None
         self.linkitem = None
-        self.linktypes = linktypes 
+        self.linktypes = linktypes
         self.model = model
 
         self.setupUi()

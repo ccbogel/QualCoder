@@ -38,15 +38,26 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from color_selector import DialogColorSelect
-from color_selector import colors
-from GUI.ui_dialog_code_image import Ui_Dialog_code_image
-from GUI.ui_dialog_view_image import Ui_Dialog_view_image
-from memo import DialogMemo
-from qtmodels import DictListModel, ListObjectModel
-from select_file import DialogSelectFile
+try:
+    from add_item_name import DialogAddItemName
+    from confirm_delete import DialogConfirmDelete
+    from color_selector import DialogColorSelect
+    from color_selector import colors
+    from GUI.ui_dialog_code_image import Ui_Dialog_code_image
+    from GUI.ui_dialog_view_image import Ui_Dialog_view_image
+    from memo import DialogMemo
+    #from qtmodels import DictListModel, ListObjectModel
+    from select_file import DialogSelectFile
+except:
+    from .add_item_name import DialogAddItemName
+    from .confirm_delete import DialogConfirmDelete
+    from .color_selector import DialogColorSelect
+    from .color_selector import colors
+    from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
+    from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
+    from .memo import DialogMemo
+    #from .qtmodels import DictListModel, ListObjectModel
+    from .select_file import DialogSelectFile
 
 
 path = os.path.abspath(os.path.dirname(__file__))

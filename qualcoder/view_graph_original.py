@@ -37,9 +37,14 @@ import traceback
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 
-from GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
-from information import DialogInformation
-from memo import DialogMemo
+try:
+    from GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
+    from information import DialogInformation
+    from memo import DialogMemo
+except:
+    from .GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
+    from .information import DialogInformation
+    from .memo import DialogMemo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

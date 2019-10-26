@@ -38,7 +38,10 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_import import Ui_Dialog_Import
+try:
+    from GUI.ui_dialog_import import Ui_Dialog_Import
+except:
+    from .GUI.ui_dialog_import import Ui_Dialog_Import
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

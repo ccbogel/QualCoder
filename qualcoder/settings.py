@@ -32,7 +32,10 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_settings import Ui_Dialog_settings
+try:
+    from GUI.ui_dialog_settings import Ui_Dialog_settings
+except:
+    from .GUI.ui_dialog_settings import Ui_Dialog_settings
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))

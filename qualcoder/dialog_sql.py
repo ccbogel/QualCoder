@@ -35,8 +35,12 @@ from datetime import datetime
 import logging
 import traceback
 
-from GUI.ui_dialog_SQL import Ui_Dialog_sql
-from highlighter import Highlighter
+try:
+    from GUI.ui_dialog_SQL import Ui_Dialog_sql
+    from highlighter import Highlighter
+except:
+    from .GUI.ui_dialog_SQL import Ui_Dialog_sql
+    from .highlighter import Highlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
