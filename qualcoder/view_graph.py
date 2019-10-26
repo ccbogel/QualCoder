@@ -44,10 +44,16 @@ except:
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
-from GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
-from information import DialogInformation
-from memo import DialogMemo
-from helpers import CodedMediaMixin
+try:
+    from GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
+    from information import DialogInformation
+    from memo import DialogMemo
+    from helpers import CodedMediaMixin
+except:
+    from .GUI.ui_visualise_graph import Ui_Dialog_visualiseGraph
+    from .information import DialogInformation
+    from .memo import DialogMemo
+    from .helpers import CodedMediaMixin
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
