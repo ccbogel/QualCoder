@@ -43,6 +43,7 @@
     <addaction name="actionProject_Exchange_Export"/>
     <addaction name="actionREFI_Codebook_import"/>
     <addaction name="actionREFI_QDA_Project_import"/>
+    <addaction name="actionRQDA_Project_import"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -277,6 +278,11 @@
   <action name="actionView_Graph_2">
    <property name="text">
     <string>View Graph 2</string>
+   </property>
+  </action>
+  <action name="actionRQDA_Project_import">
+   <property name="text">
+    <string>RQDA Project import</string>
    </property>
   </action>
  </widget>
