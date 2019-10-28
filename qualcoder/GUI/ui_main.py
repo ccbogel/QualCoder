@@ -111,6 +111,8 @@ class Ui_MainWindow(object):
         self.actionREFI_QDA_Project_import.setObjectName("actionREFI_QDA_Project_import")
         self.actionView_Graph_2 = QtWidgets.QAction(MainWindow)
         self.actionView_Graph_2.setObjectName("actionView_Graph_2")
+        self.actionRQDA_Project_import = QtWidgets.QAction(MainWindow)
+        self.actionRQDA_Project_import.setObjectName("actionRQDA_Project_import")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.actionClose_Project)
@@ -121,6 +123,7 @@ class Ui_MainWindow(object):
         self.menuProject.addAction(self.actionProject_Exchange_Export)
         self.menuProject.addAction(self.actionREFI_Codebook_import)
         self.menuProject.addAction(self.actionREFI_QDA_Project_import)
+        self.menuProject.addAction(self.actionRQDA_Project_import)
         self.menuProject.addSeparator()
         self.menuProject.addAction(self.actionExit)
         self.menuFiles_and_Cases.addAction(self.actionManage_files)
@@ -196,6 +199,7 @@ class Ui_MainWindow(object):
         self.actionREFI_Codebook_import.setText(_translate("MainWindow", "REFI-QDA Codebook import"))
         self.actionREFI_QDA_Project_import.setText(_translate("MainWindow", "REFI-QDA Project import"))
         self.actionView_Graph_2.setText(_translate("MainWindow", "View Graph 2"))
+        self.actionRQDA_Project_import.setText(_translate("MainWindow", "RQDA Project import"))
 
 
 if __name__ == "__main__":
