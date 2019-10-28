@@ -186,7 +186,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == self.MEMO_COLUMN:
-            ui = DialogMemo(self.settings, _("Memo for Attribute ") + self.attribute_type[x]['name'],
+            ui = DialogMemo(self.app, _("Memo for Attribute ") + self.attribute_type[x]['name'],
             self.attribute_type[x]['memo'])
             ui.exec_()
             memo = ui.memo
