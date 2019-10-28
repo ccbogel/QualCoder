@@ -56,6 +56,7 @@ try:
     from memo import DialogMemo
     from refi import Refi_export, Refi_import
     from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+    from rqda import Rqda_import
     #from text_mining import DialogTextMining
     from view_av import DialogCodeAV
     from view_graph_original import ViewGraphOriginal
@@ -75,6 +76,7 @@ except:
     from .memo import DialogMemo
     from .refi import Refi_export, Refi_import
     from .reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+    from .rqda import Rqda_import
     #from text_mining import DialogTextMining
     from .view_av import DialogCodeAV
     from .view_graph_original import ViewGraphOriginal
@@ -489,6 +491,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_export.triggered.connect(self.REFI_codebook_export)
         self.ui.actionREFI_Codebook_import.triggered.connect(self.REFI_codebook_import)
         self.ui.actionREFI_QDA_Project_import.triggered.connect(self.REFI_project_import)
+        self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
         self.ui.actionExit.triggered.connect(self.closeEvent)
 
         # file cases and journals menu
@@ -522,7 +525,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings_report()
 
     def hide_menu_options(self):
-        """ No project opened, hide these menu options """
+        """ No project opened, hide most menu options.
+         Enable project import options."""
 
         # project menu
         self.ui.actionClose_Project.setEnabled(False)
@@ -531,6 +535,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_export.setEnabled(False)
         self.ui.actionREFI_Codebook_import.setEnabled(False)
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
+        self.ui.actionRQDA_Project_import.setEnabled(True)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -553,7 +558,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(False)
 
     def show_menu_options(self):
-        """ Project opened, show these menu options """
+        """ Project opened, show most menu options.
+         Disable project import options. """
 
         # project menu
         self.ui.actionClose_Project.setEnabled(True)
@@ -562,6 +568,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_export.setEnabled(True)
         self.ui.actionREFI_Codebook_import.setEnabled(True)
         self.ui.actionREFI_QDA_Project_import.setEnabled(False)
+        self.ui.actionRQDA_Project_import.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
@@ -806,7 +813,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.close_project()
         self.ui.textEdit.append("IMPORTING REFI-QDA PROJECT")
         self.new_project()
-        # check for project created succesfully
+        # check project created successfully
         if self.app.project_name == "":
             QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
             return
@@ -817,6 +824,18 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "Images, audio, video, transcripts not tested.\n"
         msg += "Sets and Graphs not imported."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
+
+    def rqda_project_import(self):
+        """ Import an RQDA format project into a new poject space. """
+
+        self.close_project()
+        self.ui.textEdit.append("IMPORTING RQDA PROJECT")
+        self.new_project()
+        # check project created successfully
+        if self.app.project_name == "":
+            QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
+            return
+        Rqda_import(self.app, self.ui.textEdit)
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
