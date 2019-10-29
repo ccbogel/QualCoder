@@ -6,7 +6,7 @@
 	<meta name="generator" content="LibreOffice 5.1.6.2 (Linux)"/>
 	<meta name="author" content="colin-2 "/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2019-04-14T17:22:27.609240117"/>
+	<meta name="changed" content="2019-10-29T21:22:17.011521707"/>
 	<style type="text/css">
 		@page { margin: 2cm }
 		p { margin-bottom: 0.21cm; color: #000000 }
@@ -23,12 +23,14 @@
 <body lang="en-US" text="#000000" dir="ltr">
 <h1 class="western">About QualCoder</h1>
 <h2 class="western">Version:</h2>
-<p style="margin-bottom: 0cm">QualCoder 1.3, 2019 April 14</p>
-<p style="margin-bottom: 0cm">Depends on Python 3.x, PyQt5, lxml,
-qpdf, Pillow, vlc</p>
-<p style="margin-bottom: 0cm">Tested on: Linux Mint 18, Ubuntu 18</p>
-<p style="margin-bottom: 0cm">Partly tested on: Lubuntu, Windows 10.
-MacOS</p>
+<p style="margin-bottom: 0cm">QualCoder 1.4.1</p>
+<p style="margin-bottom: 0cm">2019 October 29</p>
+<p style="margin-bottom: 0cm">Depends on python 3.x, pyqt5 lxml
+Pillow ebooklib ply chardet click pikepdf pdfminer.six</p>
+<p style="margin-bottom: 0cm">VLC should also be installed.</p>
+<p style="margin-bottom: 0cm">Tested on: Linux Mint 18, Ubuntu 19.04,
+Windows 10</p>
+<p style="margin-bottom: 0cm">Has been used on: Lubuntu, MacOS</p>
 <p style="margin-bottom: 0cm"><br/>
 
 </p>
@@ -49,13 +51,14 @@ Erkalović (<a href="https://github.com/aerkalov">https://github.com/aerkalov</a
 <p>To various members on github for supporting this project.</p>
 <h2 class="western">Other details</h2>
 <p>The qda data folder contains folders for imported documents,
-images and audio. It also contains the sqlite database, named
+images, audio and video. It also contains the sqlite database, named
 data.qda, to store coding data.</p>
-<p>QualCoder creates QualCoder.log and QualCoder_settings.txt files
-in your home directory. The settings file contains the name of the
-current coder, a default working directory and choice of font. The
-log file records program errors and some user actions.</p>
-<p>QualCoder is written in python 3 using Qt for the graphical
+<p>QualCoder creates a .qualcoder folder inside your home directory.
+This contains QualCoder.log, config.ini (for settings) and
+recent_project.txt (for automatic loading of the most recent
+project). The config file contains the name of the current coder, a
+default working directory and choice of font.</p>
+<p>QualCoder is written in python 3 using Qt5 for the graphical
 interface.</p>
 <h2 class="western">License</h2>
 <p>MIT License</p>
