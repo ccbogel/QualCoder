@@ -26,7 +26,8 @@ ui_dialog_view_image.py \
 ui_main.py \
 ui_queryDetails.py \
 ui_report_attribute_parameters.py \
-ui_visualise_graph.py 
+ui_visualise_graph.py \
+ui_visualise_graph.original.py
 TRANSLATIONS    = app_de.ts \
                   app_fr.ts
 CODECFORTR      = ISO-8859-5
