@@ -5,8 +5,9 @@ def readme():
         return f.read()
 
 setup(
-    name='QualCoder',
-    version='1.3',
+    setup_requires=["wheel"],
+    name='qualcoder',
+    version='1.4.1',
     description='Qualitative data analysis',
     long_description=readme(),
     classifiers=[
@@ -22,6 +23,7 @@ setup(
         # ('share/applications/', ['qualcoder.desktop'])
     # ],
     packages=find_packages(),
+    package_data={'qualcoder': ['*.xsd', 'GUI/*.html', 'GUI/NotoSans-hinted/*.ttf']},
     keywords='qualitative data analysis',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
