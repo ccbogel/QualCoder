@@ -45,6 +45,9 @@ Install the Python dependencies using `pip`:
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
+Another option is shown here [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher.
+ You can make an alias to the file and place it on your desktop.
+ 
 ## Dependencies
 Required
 
