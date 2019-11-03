@@ -104,18 +104,19 @@ class ViewGraphOriginal(QDialog):
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.ui.pushButton_view.pressed.connect(self.do_graph)
+        #self.ui.pushButton_view.pressed.connect(self.list_graph)
+        self.ui.pushButton_view.pressed.connect(self.circular_graph)
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         menu.addAction('sample')
         menu.exec_(event.globalPos())
 
-    def do_graph(self):
-        """ Create a circular acyclic graph
-        default font size is 8.  """
+    def create_initial_model(self):
+        """ Create inital model
 
-        self.scene.clear()
+        return: categories, oces, model  """
+
         cats = deepcopy(self.categories)
         codes = deepcopy(self.code_names)
 
@@ -141,14 +142,26 @@ class ViewGraphOriginal(QDialog):
                 if c['depth'] == 0:
                     c['fontsize'] = 10
         model = cats + codes
+        return cats, codes, model
 
-        # Default is all categories and codes
+    def get_refined_model_with_depth_and_category_counts(self, cats, model):
+        """ The default model contains all categories and codes.
+        Can limit to a selected category, via combo box selection.
+
+        param: cats - list of categories
+        param: model - model containing all categories and codes
+
+        return: catid_counts - used for circular graph
+        return: model
+        """
+
         top_node = self.ui.comboBox.currentText()
         if top_node == "All":
             top_node = None
         for c in cats:
             if c['name'] == top_node:
                 top_node = c
+                top_node['supercatid'] = None  # required for list graph
         model = self.get_node_with_children(top_node, model)
 
         ''' Look at each category and determine the depth.
@@ -166,6 +179,73 @@ class ViewGraphOriginal(QDialog):
                         supercatid = s['supercatid']
                 c['depth'] = depth
         catid_counts = Counter(supercatid_list)
+
+        return catid_counts, model
+
+    def list_graph(self):
+        """ Create a list graph with the categories on the left and codes on the right
+        """
+
+        self.scene.clear()
+        cats, codes, model = self.create_initial_model()
+        catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
+
+        # calculate x values
+        longest = 0
+        for m in model:
+            if len(m['name']) > longest:
+                longest = len(m['name'])
+        for i, m in enumerate(model):
+            x = 10 + m['depth'] * longest * 6
+            m['x'] = x
+
+        # need to order the model so that codes and categories are in correct y positions
+        ordered_model = []
+        #get_top_items
+        remove_items = []
+        for m in model:
+            if m['supercatid'] is None:
+                ordered_model.append(m)
+                remove_items.append(m)
+        for item in remove_items:
+            model.remove(item)
+        i = 0
+        while i < 1000 and len(model) > 0:
+            for index, o in enumerate(ordered_model):
+                remove_items = []
+                for m in model:
+                    # add child categories and codes
+                    # both use supercatid to identfiy the parent
+                    if o['catid'] == m['supercatid']:
+                        ordered_model.insert(index + 1, m)
+                        remove_items.append(m)
+                for item in remove_items:
+                    model.remove(item)
+            i += 1
+
+        # Now add y values to orderd list
+        y = 10
+        for m in ordered_model:
+            y += 28
+            m['y'] = y
+            self.scene.addItem(TextGraphicsItem(self.app, m))
+
+        # Add link which includes the scene text items and associated data, add links before text_items
+        for m in self.scene.items():
+            if isinstance(m, TextGraphicsItem):
+                for n in self.scene.items():
+                    if isinstance(n, TextGraphicsItem) and m.data['supercatid'] is not None and m.data['supercatid'] == n.data['catid'] and n.data['depth'] < m.data['depth']:
+                        #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
+                        item = LinkGraphicsItem(m, n)
+                        self.scene.addItem(item)
+
+    def circular_graph(self):
+        """ Create a circular acyclic graph
+        default font size is 8.  """
+
+        self.scene.clear()
+        cats, codes, model = self.create_initial_model()
+        catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
 
         # assign angles to each item segment
         for cat_key in catid_counts.keys():
@@ -339,18 +419,18 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     data = None
     border_rect = None
     font = None
-    settings = None
+    app = None
 
     def __init__(self, app, data):
         super(TextGraphicsItem, self).__init__(None)
 
+        self.app = app
         self.conn = app.conn
-        self.settings = app.settings
         self.project_path = app.project_path
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
-        self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
+        self.font = QtGui.QFont(self.app.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
         self.setFont(self.font)
         self.setPlainText(self.data['name'])
         if self.data['cid'] is None:
@@ -415,14 +495,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
-            ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
+            ui = DialogMemo(self.app, "Memo for Code " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
             self.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo(self.settings, "Memo for Category " + data['name'], data['memo'])
+            ui = DialogMemo(self.app, "Memo for Category " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
