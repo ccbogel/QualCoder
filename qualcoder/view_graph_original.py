@@ -104,8 +104,16 @@ class ViewGraphOriginal(QDialog):
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        #self.ui.pushButton_view.pressed.connect(self.list_graph)
-        self.ui.pushButton_view.pressed.connect(self.circular_graph)
+        self.ui.pushButton_view.pressed.connect(self.view_layout)
+
+    def view_layout(self):
+        """ On pushButton_view pressed, show list view or circular view. """
+
+        if self.ui.checkBox_listview.isChecked():
+            self.list_graph()
+        else:
+            self.circular_graph()
+
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
