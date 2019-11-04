@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1098</width>
-    <height>753</height>
+    <height>744</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>40</height>
+       <height>60</height>
       </size>
      </property>
      <property name="title">
@@ -67,11 +67,24 @@
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>650</x>
         <y>0</y>
         <width>421</width>
         <height>30</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_listview">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>30</y>
+        <width>141</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>List view</string>
       </property>
      </widget>
     </widget>
