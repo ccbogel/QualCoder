@@ -41,46 +41,25 @@ import configparser
 import click
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-try:
-    from settings import DialogSettings
-    from attributes import DialogManageAttributes
-    from cases import DialogCases
-    from codebook import Codebook
-    from code_text import DialogCodeText
-    from dialog_sql import DialogSQL
-    from GUI.ui_main import Ui_MainWindow
-    from import_survey import DialogImportSurvey
-    from information import DialogInformation
-    from journals import DialogJournals
-    from manage_files import DialogManageFiles
-    from memo import DialogMemo
-    from refi import Refi_export, Refi_import
-    from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
-    from rqda import Rqda_import
-    #from text_mining import DialogTextMining
-    from view_av import DialogCodeAV
-    from view_graph_original import ViewGraphOriginal
-    from view_image import DialogCodeImage
-except:
-    from .settings import DialogSettings
-    from .attributes import DialogManageAttributes
-    from .cases import DialogCases
-    from .codebook import Codebook
-    from .code_text import DialogCodeText
-    from .dialog_sql import DialogSQL
-    from .GUI.ui_main import Ui_MainWindow
-    from .import_survey import DialogImportSurvey
-    from .information import DialogInformation
-    from .journals import DialogJournals
-    from .manage_files import DialogManageFiles
-    from .memo import DialogMemo
-    from .refi import Refi_export, Refi_import
-    from .reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
-    from .rqda import Rqda_import
-    #from text_mining import DialogTextMining
-    from .view_av import DialogCodeAV
-    from .view_graph_original import ViewGraphOriginal
-    from .view_image import DialogCodeImage
+from settings import DialogSettings
+from attributes import DialogManageAttributes
+from cases import DialogCases
+from codebook import Codebook
+from code_text import DialogCodeText
+from dialog_sql import DialogSQL
+from GUI.ui_main import Ui_MainWindow
+from import_survey import DialogImportSurvey
+from information import DialogInformation
+from journals import DialogJournals
+from manage_files import DialogManageFiles
+from memo import DialogMemo
+from refi import Refi_export, Refi_import
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from rqda import Rqda_import
+#from text_mining import DialogTextMining
+from view_av import DialogCodeAV
+from view_graph_original import ViewGraphOriginal
+from view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')

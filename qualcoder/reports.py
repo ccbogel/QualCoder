@@ -38,18 +38,12 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
-try:
-    from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-    from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-    from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-    from report_attributes import DialogSelectAttributeParameters
-    from select_file import DialogSelectFile
-except:
-    from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-    from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-    from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-    from .report_attributes import DialogSelectAttributeParameters
-    from .select_file import DialogSelectFile
+from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
+from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from report_attributes import DialogSelectAttributeParameters
+from select_file import DialogSelectFile
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
