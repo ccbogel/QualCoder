@@ -32,10 +32,8 @@ import traceback
 
 from PyQt5 import QtGui, QtWidgets
 
-try:
-    from GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
-except:
-    from .GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
+from GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

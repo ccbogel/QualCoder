@@ -32,10 +32,7 @@ import sys
 import logging
 import traceback
 
-try:
-    from GUI.ui_dialog_add_item import Ui_Dialog_add_item
-except:
-    from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
+from GUI.ui_dialog_add_item import Ui_Dialog_add_item
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

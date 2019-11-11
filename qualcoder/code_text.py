@@ -39,27 +39,15 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush
 
-try:
-    from add_item_name import DialogAddItemName
-    from color_selector import DialogColorSelect
-    from color_selector import colors
-    from confirm_delete import DialogConfirmDelete
-    from GUI.ui_dialog_codes import Ui_Dialog_codes
-    from helpers import CodedMediaMixin
-    from memo import DialogMemo
-    from qtmodels import DictListModel, ListObjectModel
-    from select_file import DialogSelectFile
-except:
-    from .add_item_name import DialogAddItemName
-    from .color_selector import DialogColorSelect
-    from .color_selector import colors
-    from .confirm_delete import DialogConfirmDelete
-    from .GUI.ui_dialog_codes import Ui_Dialog_codes
-    from .helpers import CodedMediaMixin
-    from .memo import DialogMemo
-    from .qtmodels import DictListModel, ListObjectModel
-    from .select_file import DialogSelectFile
-
+from add_item_name import DialogAddItemName
+from color_selector import DialogColorSelect
+from color_selector import colors
+from confirm_delete import DialogConfirmDelete
+from GUI.ui_dialog_codes import Ui_Dialog_codes
+from helpers import CodedMediaMixin
+from memo import DialogMemo
+from qtmodels import DictListModel, ListObjectModel
+from select_file import DialogSelectFile
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
