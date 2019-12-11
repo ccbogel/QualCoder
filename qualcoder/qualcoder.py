@@ -38,7 +38,6 @@ import sqlite3
 import traceback
 import configparser
 
-import click
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from settings import DialogSettings
@@ -1042,10 +1041,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.error(str(e))
         self.dialogList = tempList
 
-@click.command()
-@click.option('-p','--project-path')
-@click.option('-v','--view',is_flag=True)
-@click.option('--force-quit',is_flag=True)
+
 def gui(project_path,view,force_quit):
     qual_app = App()
     settings = qual_app.load_settings()
@@ -1077,48 +1073,6 @@ def gui(project_path,view,force_quit):
         ex.view_graph()
     sys.exit(app.exec_())
 
-@click.group()
-def cli():
-    pass
-
-'''@cli.command()
-@click.argument('project-path')
-def interactive(project_path):
-    with open(path + "/GUI/default.stylesheet", "r") as fh:
-        stylesheet = fh.read()
-    qual_app = App()
-    qual_app.create_connection(project_path)
-    from IPython import embed
-    embed()
-
-@cli.command()
-@click.argument('project-path')
-@click.option('-c','--cat-id',type=int)
-@click.option('-p','--prog',default='neato')
-@click.option('--rankdir',default='LR')
-@click.option('--gui',is_flag=True)
-def graph(project_path,cat_id,gui,**kwargs):
-    conn = sqlite3.connect(project_path + "/data.qda")
-    from . import view_graph
-    qual_app = App()
-    qual_app.create_connection(project_path)
-    codes,cats = qual_app.get_data()
-    codelinks = qual_app.get_code_name_links()
-    graph =  None
-    if cat_id:
-        topnode = view_graph.get_first_with_attr(cats,catid=cat_id)
-        if not topnode:
-            print('Nothing found for catid %s'%catid)
-        else:
-            graph = view_graph.plot_with_pygraphviz(cats,codes,codelinks,topnode=topnode,**kwargs)
-    else:
-        graph = view_graph.plot_with_pygraphviz(cats,codes,codelinks,**kwargs)
-    if gui and graph:
-        app = QtWidgets.QApplication(sys.argv)
-        win = view_graph.MainWindow(app=qual_app)
-        win.view.drawGraph(graph)
-        win.show()
-        sys.exit(app.exec_())'''
 
 if __name__ == "__main__":
     gui()
