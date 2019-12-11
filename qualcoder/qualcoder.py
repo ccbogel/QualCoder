@@ -1042,11 +1042,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dialogList = tempList
 
 
-def gui(project_path,view,force_quit):
+def gui():
     qual_app = App()
     settings = qual_app.load_settings()
-    if project_path is None:
-        project_path = qual_app.get_most_recent_projectpath()
+    project_path = qual_app.get_most_recent_projectpath()
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
@@ -1066,11 +1065,9 @@ def gui(project_path,view,force_quit):
             getlang = gettext.translation('de', localedir=path + '/locale', languages=['de'])
         app.installTranslator(translator)
     getlang.install()
-    ex = MainWindow(qual_app,force_quit=force_quit)
+    ex = MainWindow(qual_app)
     if project_path:
         ex.open_project(path=project_path)
-    if view:
-        ex.view_graph()
     sys.exit(app.exec_())
 
 
