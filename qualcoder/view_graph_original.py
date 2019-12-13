@@ -100,16 +100,14 @@ class ViewGraphOriginal(QDialog):
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.ui.pushButton_view.pressed.connect(self.view_layout)
+        self.ui.pushButton_view.pressed.connect(self.show_graph_type)
 
-    def view_layout(self):
-        """ On pushButton_view pressed, show list view or circular view. """
+    def show_graph_type(self):
 
         if self.ui.checkBox_listview.isChecked():
             self.list_graph()
         else:
             self.circular_graph()
-
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -155,7 +153,6 @@ class ViewGraphOriginal(QDialog):
         param: cats - list of categories
         param: model - model containing all categories and codes
 
-        return: catid_counts - used for circular graph
         return: model
         """
 
@@ -165,7 +162,6 @@ class ViewGraphOriginal(QDialog):
         for c in cats:
             if c['name'] == top_node:
                 top_node = c
-                top_node['supercatid'] = None  # required for list graph
         model = self.get_node_with_children(top_node, model)
 
         ''' Look at each category and determine the depth.
@@ -193,47 +189,39 @@ class ViewGraphOriginal(QDialog):
         self.scene.clear()
         cats, codes, model = self.create_initial_model()
         catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
+        #print("MODEL\n")
+        #for m in model:
+        #    print(m)
 
-        # calculate x values
-        longest = 0
-        for m in model:
-            if len(m['name']) > longest:
-                longest = len(m['name'])
-        for i, m in enumerate(model):
-            x = 10 + m['depth'] * longest * 6
-            m['x'] = x
-
-        # need to order the model so that codes and categories are in correct y positions
+        # order the model by supercatid, subcats, codes
         ordered_model = []
-        #get_top_items
-        remove_items = []
+        # Top level categories
         for m in model:
-            if m['supercatid'] is None:
+            if m['x'] is None and m['supercatid'] is None:
+                m['x'] = 10
                 ordered_model.append(m)
-                remove_items.append(m)
-        for item in remove_items:
-            model.remove(item)
+        for om in ordered_model:
+            model.remove(om)
+
+        # sub-categories and codes
         i = 0
         while i < 1000 and len(model) > 0:
-            for index, o in enumerate(ordered_model):
-                remove_items = []
-                for m in model:
-                    # add child categories and codes
-                    # both use supercatid to identfiy the parent
-                    if o['catid'] == m['supercatid']:
-                        ordered_model.insert(index + 1, m)
-                        remove_items.append(m)
-                for item in remove_items:
-                    model.remove(item)
+            for om in ordered_model:
+                for sub_cat in model:
+                    # subordinate categories
+                    if sub_cat['supercatid'] == om['catid'] and sub_cat['x'] is None:
+                        sub_cat['x'] = om['x'] + 120
+                        ordered_model.insert(ordered_model.index(om), sub_cat)
             i += 1
 
-        # Now add y values to orderd list
-        y = 10
-        for m in ordered_model:
-            y += 28
-            m['y'] = y
-            self.scene.addItem(TextGraphicsItem(self.app, m))
+        for i in range(0, len(ordered_model)):
+            ordered_model[i]['y'] = i * 30
 
+        model = ordered_model
+
+        # Add text items to the scene
+        for m in model:
+            self.scene.addItem(TextGraphicsItem(self.app, m))
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
@@ -423,18 +411,18 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     data = None
     border_rect = None
     font = None
-    app = None
+    settings = None
 
     def __init__(self, app, data):
         super(TextGraphicsItem, self).__init__(None)
 
-        self.app = app
         self.conn = app.conn
+        self.settings = app.settings
         self.project_path = app.project_path
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
-        self.font = QtGui.QFont(self.app.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
+        self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
         self.setFont(self.font)
         self.setPlainText(self.data['name'])
         if self.data['cid'] is None:
@@ -499,14 +487,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
-            ui = DialogMemo(self.app, "Memo for Code " + data['name'], data['memo'])
+            ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
             self.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo(self.app, "Memo for Category " + data['name'], data['memo'])
+            ui = DialogMemo(self.settings, "Memo for Category " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
