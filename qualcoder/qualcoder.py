@@ -201,8 +201,9 @@ class App(object):
         return res
 
     def calc_model(self, cats, codes):
-        """ Model dictinary containing all codes and categories
-        Keys are strings of catid:id or cid:id """
+        """ Model dictionary containing all codes and categories
+        Keys are strings of catid:id or cid:id
+        USED BY ?? """
 
         model = {}
         for cat in cats:
@@ -211,11 +212,9 @@ class App(object):
             model['cid:%s'%code['cid']] = code
         return model
 
-    def get_node_from_graph(self, node):
-        return self.model[node.name]
-
     def get_data(self):
-        """ Called from init and gets all the codes and categories. """
+        """ Called from init and gets all the codes and categories.
+        Called from ? """
 
         categories = []
         cur = self.conn.cursor()
@@ -281,7 +280,7 @@ class App(object):
         return {
             'codername': 'default',
             'font': 'Noto Sans',
-            'fontsize': 16,
+            'fontsize': 14,
             'treefontsize': 14,
             'directory': os.path.expanduser('~'),
             'showids': False,
@@ -291,7 +290,7 @@ class App(object):
         }
 
     def get_file_texts(self, fileids=None):
-        """ Get the text of all text files as a list of dictionaries.
+        """ Get the texts of all text files as a list of dictionaries.
         param: fileids - a list of fileids or None """
 
         cur = self.conn.cursor()
@@ -325,106 +324,6 @@ class App(object):
         for res in cur.fetchall():
             yield dict(zip(keys, res))
 
-    '''def read_user_preferences(self, path):
-        config = configparser.ConfigParser()
-
-    def get_linktypes(self):
-        cur = self.conn.cursor()
-        cur.execute("select name, memo,color,linetype, owner, date, linkid from links_type")
-        result = cur.fetchall()
-        res = {}
-        for row in result:
-            res[row[6]] = {
-                'name': row[0],
-                'memo': row[1],
-                'color':row[2],
-                'linetype':row[3],
-                'owner': row[4],
-                'date': row[5],
-                'linkid':row[6],
-            }
-        return res
-
-    def get_code_name_links(self):
-        cur = self.conn.cursor()
-        cur.execute(("select code_name_links.memo,"
-            "code_name_links.owner, code_name_links.date,"
-            "links_type.color, links_type.name, from_id, to_id from code_name_links"
-            " inner join links_type on code_name_links.linkid = links_type.linkid "
-        ))
-        result = cur.fetchall()
-        res = []
-        for row in result:
-            res.append({'memo': row[0], 'owner': row[1], 'date': row[2],
-                'color': row[3], 'name': row[4], 'from_id': row[5], 'to_id': row[6]})
-        return res
-
-    def add_relations_table(self):
-        cur = self.conn.cursor()
-        cur.execute(("CREATE TABLE links_type (linkid integer primary key,"
-            "name text,"
-            "memo text,"
-            "color text,"
-            "linetype text,"
-            "date text,"
-            "owner text,"
-            "unique(name));"))
-        cur.execute(("CREATE TABLE code_name_links (id integer primary key,"
-            "linkid int NOT NULL,"
-            "from_id int NOT NULL,"
-            "to_id int NOT NULL,"
-            "owner text,"
-            "date text,"
-            "memo text,"
-            "FOREIGN KEY (linkid) REFERENCES links_type(linkid) ON DELETE CASCADE,"
-            "FOREIGN KEY (from_id) REFERENCES code_name(cid) ON DELETE CASCADE,"
-            "FOREIGN KEY (to_id) REFERENCES code_name(cid) ON DELETE CASCADE);"
-        ))
-        cur.execute(("CREATE TABLE code_text_links (id integer primary key,"
-            "linkid int NOT NULL,"
-            "from_id int NOT NULL,"
-            "to_id int NOT NULL,"
-            "owner text,"
-            "date text,"
-            "memo text,"
-            "FOREIGN KEY (linkid) REFERENCES links_type(linkid) ON DELETE CASCADE,"
-            "FOREIGN KEY (from_id) REFERENCES code_text(cid) ON DELETE CASCADE,"
-            "FOREIGN KEY (to_id) REFERENCES code_text(cid) ON DELETE CASCADE);"
-        ))
-        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
-
-        self.conn.commit()
-
-    def add_code_name_link(self, linkid, from_cid, to_cid, memo=''):
-        item = {
-            'linkid': linkid,
-            'from_id': from_cid,
-            'to_id': to_cid,
-            'memo': memo,
-            'owner': self.settings['codername'],
-            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        cur = self.conn.cursor()
-        cur.execute(
-            "insert into code_name_links (linkid,from_id,to_id,owner,date,memo) values(?,?,?,?,?,?)",
-            (item['linkid'], item['from_id'],item['to_id'],item['owner'], item['date'],item['memo'])
-        )
-        self.conn.commit()
-        cur.execute("select last_insert_rowid()")
-        item['relid'] = cur.fetchone()[0]
-        return item
-
-    def set_link_field(self, linkid, key, value):
-        cur = self.conn.cursor()
-        cur.execute("update links_type set %s=? where linkid=?"%key, (value, linkid))
-        self.conn.commit()
-
-    def delete_link(self, linkid):
-        cur = self.conn.cursor()
-        cur.execute("delete from code_name_links where linkid=?", [linkid])
-        cur.execute("delete from links_type where linkid=?", [linkid])
-        self.conn.commit()'''
-
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -432,12 +331,12 @@ class MainWindow(QtWidgets.QMainWindow):
     core data is stored in data.qda sqlite file.
     Journal and coding dialogs can be shown non-modally - multiple dialogs open.
     There is a risk of a clash if two coding windows are open with the same file text or
-    two journals open with the same journal entry. """
+    two journals open with the same journal entry.
 
-    """# Note: App.settings does not contain projectName, conn or path (to database)
-    settings = {"conn": None, "directory": home, "projectName": "", "showids": 'False',
-    'path': home, "codername": "default", "font": "Noto Sans", "fontsize": 10,
-    'treefontsize': 10, "language": "en", "backup_on_open": 'True', "backup_av_files": 'True'}"""
+    Note: App.settings does not contain projectName, conn or path (to database)
+    app.project_name and app.project_path contain these.
+    """
+
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
 
@@ -576,6 +475,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
         msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
         msg += _("Directory") + ": " + self.app.settings['directory'] + "\n"
+        msg += _("Project_path:") + self.app.project_path + "\n"
         msg += _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
@@ -628,14 +528,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
-
-    '''def view_graph(self):
-        """ Show acyclic graph of codes and categories. """
-
-        ui = view_graph.ViewGraph(self.app)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()'''
 
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
@@ -982,13 +874,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
 
-        #if int(self.project['databaseversion'][1:]) < 2:
-        #    self.app.add_relations_table()
-
         # Save a datetime stamped backup
         if self.app.settings['backup_on_open'] == 'True':
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            backup = self.settings['path'][0:-4] + "_BACKUP_" + nowdate + ".qda"
+            backup = self.app.project_path[0:-4] + "_BACKUP_" + nowdate + ".qda"
             if self.app.settings['backup_av_files'] == 'True':
                 shutil.copytree(self.app.project_path, backup)
             else:
