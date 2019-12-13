@@ -24,6 +24,8 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+
+might need: sudo pip install pdfminer.six
 '''
 
 import logging
@@ -37,12 +39,20 @@ import traceback
 import zipfile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+
+pdfminer_installed = True
+try:
+    from pdfminer.pdfpage import PDFPage
+    from pdfminer.pdfparser import PDFParser
+    from pdfminer.pdfdocument import PDFDocument
+    from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+    from pdfminer.converter import PDFPageAggregator
+    from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+except:  # ModuleNotFoundError
+    pdfminer_installed = False
+    text = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
+    text += "For Windows run the following in the command prmpt: pip install pdfminer.six"
+    QtWidgets.QMessageBox.critical(None, _('pdfminer is not installed.'), _(text))
 
 import ebooklib
 from ebooklib import epub
@@ -633,6 +643,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.load_file_text(f)
                 known_file_type = True
             if f.split('.')[-1].lower() in ('pdf'):
+                if pdfminer_installed is False:
+                    text = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
+                    text += "For Windows run the following in the command prmpt: pip install pdfminer.six"
+                    QtWidgets.QMessageBox.critical(None, _('pdfminer is not installed.'), _(text))
+                    return
                 destination += "/documents/" + filename
                 # remove encryption from pdf if possible, for Linux
                 if platform.system() == "Linux":
