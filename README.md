@@ -8,15 +8,21 @@ Instructions and other information are available here: https://qualcoder.wordpre
 
 ## INSTALLATION
 You will need to have a python3.x version installed.
-You will also need to have pyqt5 and lxml to get text from docx files.
 You will also need to have a vlc player installed - for audio and video. 
 
 ### Linux:
 
+You can install the latest debian package from (https://github.com/ccbogel/QualCoder-Debians)[https://github.com/ccbogel/QualCoder-Debians]
 
-Once a python 3.x is installed, make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
+You might need to run this command from the terminal for pdf importing:
 
-./install.sh
+`sudo pip install pdfminer.six`
+
+If not using the debian pacakge:
+
+Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
+
+`./install.sh`
 
 The qualcoder folder should be in the same directory as the install.sh script.
 
@@ -28,7 +34,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-python -m pip install pyqt5 lxml Pillow ebooklib ply chardet click pikepdf pdfminer.six
+`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
@@ -41,7 +47,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5 lxml pillow six`ebooklib ply chardet click pikepdf pdfminer.six
+`pip install pyqt5 lxml pillow six ebooklib ply chardet pikepdf pdfminer.six`
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
@@ -66,8 +72,6 @@ Required
 * ply
 
 * chardet
-
-* click
 
 * pikepdf
 
