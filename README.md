@@ -36,6 +36,10 @@ Install dependencies in the command prompt:
 
 `python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
 
+or this:
+
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
+
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
 Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
