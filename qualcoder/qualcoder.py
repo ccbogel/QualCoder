@@ -27,20 +27,20 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-import re
+import configparser
 import datetime
 import gettext
 import logging
 import os
+import re
 import shutil
-import sys
 import sqlite3
+import sys
 import traceback
-import configparser
+import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from settings import DialogSettings
 from attributes import DialogManageAttributes
 from cases import DialogCases
 from codebook import Codebook
@@ -55,6 +55,7 @@ from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
+from settings import DialogSettings
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
@@ -540,9 +541,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Help dialog. """
 
-        ui = DialogInformation("Help contents", "GUI/en_Help.html")
-        self.dialogList.append(ui)
-        ui.show()
+        webbrowser.open("GUI/en_Help.html")
         self.clean_dialog_refs()
 
     def about(self):
