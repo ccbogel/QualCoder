@@ -47,7 +47,7 @@ Alternatively move to the qualcoder directory and run the qualcoder.py file in f
 `python qualcoder.py`  or `py qualcoder.py`
 
 Sometime there are problems recognising the audio/video VLC library file: libvlc.dll  
-Some somutions are here: (https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)[https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1]
+Some solutions are to add the path of the file here: [https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1](https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)
 
 
 ### MacOS
