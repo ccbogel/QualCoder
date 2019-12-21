@@ -36,13 +36,18 @@ Install dependencies in the command prompt:
 
 `python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
 
-or this:
+or:
 
 `py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
-Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
+Alternatively move to the qualcoder directory and run the qualcoder.py file in from command prompt: 
+
+`python qualcoder.py`  or `py qualcoder.py`
+
+Sometime there are problems recognising the audio/video VLC library file: libvlc.dll  
+Some somutions are here: (https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)[https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1]
 
 
 ### MacOS
