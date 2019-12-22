@@ -27,20 +27,20 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-import configparser
+import re
 import datetime
 import gettext
 import logging
 import os
-import re
 import shutil
-import sqlite3
 import sys
+import sqlite3
 import traceback
-import webbrowser
+import configparser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from settings import DialogSettings
 from attributes import DialogManageAttributes
 from cases import DialogCases
 from codebook import Codebook
@@ -55,7 +55,6 @@ from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
-from settings import DialogSettings
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
@@ -541,7 +540,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Help dialog. """
 
-        webbrowser.open("GUI/en_Help.html")
+        ui = DialogInformation("Help contents", "GUI/en_Help.html")
+        self.dialogList.append(ui)
+        ui.show()
         self.clean_dialog_refs()
 
     def about(self):
@@ -951,6 +952,9 @@ def gui():
         if lang == "de":
             translator.load(path + "/locale/de/app_de.qm")
             getlang = gettext.translation('de', localedir=path + '/locale', languages=['de'])
+        if lang == "es":
+            translator.load(path + "/locale/es/app_es.qm")
+            getlang = gettext.translation('es', localedir=path + '/locale', languages=['es'])
         app.installTranslator(translator)
     getlang.install()
     ex = MainWindow(qual_app)
