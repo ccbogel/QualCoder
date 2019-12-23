@@ -12,7 +12,7 @@ You will also need to have a vlc player installed - for audio and video.
 
 ### Linux:
 
-You can install the latest debian package from (https://github.com/ccbogel/QualCoder-Debians)[https://github.com/ccbogel/QualCoder-Debians]
+You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
 
 You might need to run this command from the terminal for pdf importing:
 
