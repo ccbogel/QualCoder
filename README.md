@@ -92,13 +92,14 @@ Required
 * Testing has mostly been performed on Ubuntu, Linux Mint and Windows 10. Some usage conducted with Lubuntu and Apple MacOSX.
 
 ## Future plans
+* Change from pdfminer.six to pdfminer3
 * Reports:
     * Word count report
     * Possibly look at text mining
 * Text mining
     * word cloud, word visualisations
 * General
-    * Translations for GUI (some translations in Gernam and French).
+    * Translations for GUI.
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
