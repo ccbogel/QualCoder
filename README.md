@@ -16,7 +16,7 @@ You can install the latest debian package from https://github.com/ccbogel/QualCo
 
 You might need to run this command from the terminal for pdf importing:
 
-`sudo pip install pdfminer.six`
+`sudo python3 -m pip install pdfminer.six`
 
 If not using the debian pacakge:
 
