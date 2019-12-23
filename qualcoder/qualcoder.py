@@ -541,7 +541,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Display help information in browser. """
 
-        webbrowser.open("GUI/en_Help.html")
+        webbrowser.open(path + "/GUI/en_Help.html")
         self.clean_dialog_refs()
 
     def about(self):
