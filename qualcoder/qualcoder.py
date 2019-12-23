@@ -27,16 +27,17 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-import re
+import configparser
 import datetime
 import gettext
 import logging
 import os
+import re
 import shutil
 import sys
 import sqlite3
 import traceback
-import configparser
+import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -538,11 +539,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def help(self):
-        """ Help dialog. """
+        """ Display help information in browser. """
 
-        ui = DialogInformation("Help contents", "GUI/en_Help.html")
-        self.dialogList.append(ui)
-        ui.show()
+        webbrowser.open("GUI/en_Help.html")
         self.clean_dialog_refs()
 
     def about(self):
