@@ -120,8 +120,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        self.ui.checkBox_show_coders.setEnabled(False)  # to allow viewing other codes, todo
-        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # todo
+        self.ui.checkBox_show_coders.setEnabled(False)  # to allow viewing other codes, todo maybe?
+        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # todo maybe?
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -168,7 +168,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                # top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -178,7 +177,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             #except Exception as e:
             #    logger.debug(e, item)
 
-        ''' add child categories. look at each unmatched category, iterate through tree
+        ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child, then remove matched categories from the list '''
         count = 0
         while len(cats) > 0 or count < 10000:
@@ -193,7 +192,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                         if c['memo'] != "":
                             memo = _("Memo")
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        # child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         child.setToolTip(0, c['owner'] + "\n" + c['date'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -211,7 +209,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                # top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -231,11 +228,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    # child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setToolTip(0, c['owner'] + "\n" + c['date'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
-                    c['catid'] = -1  # make unmatchable
+                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
@@ -290,7 +286,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     try:
                         if self.sourceText:
                             for match in pattern.finditer(self.sourceText):
-                                # get result as first dictionary item
+                                # Get result as first dictionary item
                                 filedata = self.app.get_file_texts([self.filename['id'], ])[0]
                                 self.search_indices.append((filedata,match.start(), len(match.group(0))))
                     except:
@@ -471,8 +467,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
-            #cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-            #cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -509,7 +503,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         item['cid'] = cid
         self.codes.append(item)
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
         color = item['color']
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
@@ -539,7 +532,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
         self.ui.treeWidget.addTopLevelItem(top_item)
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
@@ -548,7 +540,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
-            return  # avoid error as selected is now None
+            return  # Avoid error as selected is now None
         if selected.text(1)[0:3] == 'cid':
             self.delete_code(selected)
 
@@ -556,7 +548,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
         """
 
-        # find the code in the list, check to delete
+        # Find the code in the list, check to delete
         found = -1
         for i in range(0, len(self.codes)):
             if self.codes[i]['cid'] == int(selected.text(1)[4:]):
@@ -610,7 +602,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         """ View and edit a memo for a category or code. """
 
         if selected.text(1)[0:3] == 'cid':
-            # find the code in the list
+            # Find the code in the list
             found = -1
             for i in range(0, len(self.codes)):
                 if self.codes[i]['cid'] == int(selected.text(1)[4:]):
@@ -632,7 +624,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 self.parent_textEdit.append(_("Memo for code: ") + self.codes[found]['name'])
 
         if selected.text(1)[0:3] == 'cat':
-            # find the category in the list
+            # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
@@ -662,20 +654,20 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 _("New code name:"), QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other code has this text
+            # Check that no other code has this name
             for c in self.codes:
                 if c['name'] == new_name:
                     QtWidgets.QMessageBox.warning(None, _("Name in use"),
                     new_name + _(" is already in use, choose another name."), QtWidgets.QMessageBox.Ok)
                     return
-            # find the code in the list
+            # Find the code in the list
             found = -1
             for i in range(0, len(self.codes)):
                 if self.codes[i]['cid'] == int(selected.text(1)[4:]):
                     found = i
             if found == -1:
                 return
-            # update codes list and database
+            # Update codes list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
@@ -683,7 +675,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             self.codes[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
-            # update filter for tooltip
+            # Update filter for tooltip
             self.eventFilterTT.setCodes(self.code_text, self.codes)
             return
 
@@ -692,20 +684,20 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other category has this text
+            # Check that no other category has this name
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This code name is already in use.")
                     QtWidgets.QMessageBox.warning(None, _("Duplicate code name"), msg, QtWidgets.QMessageBox.Ok)
                     return
-            # find the category in the list
+            # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
                     found = i
             if found == -1:
                 return
-            # update category list and database
+            # Update category list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set name=? where catid=?",
             (new_name, self.categories[found]['catid']))
@@ -733,7 +725,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if new_color is None:
             return
         selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
-        #update codes list, database and color markings
+        # Update codes list, database and color markings
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
@@ -765,7 +757,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.sourceText = file_result['fulltext']
         self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
 
-        # get code text for this file and for this coder, or all coders
+        # Get code text for this file and for this coder, or all coders
         self.code_text = []
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
         codingsql += " where fid=? "
@@ -779,9 +771,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
             'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
         self.ui.textEdit.setPlainText(self.sourceText)
-        # update filter for tooltip
+        # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
-        # redo formatting
         self.unlight()
         self.highlight()
 
@@ -805,14 +796,14 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.textEdit.textCursor()
 
-            # add coding highlights
+            # Add coding highlights
             codes = {x['cid']:x for x in self.codes}
             for item in self.code_text:
                 cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
                 color = codes.get(item['cid'],{}).get('color',"#F8E0E0")  # default light red
                 fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
-                # highlight codes with memos - these are italicised
+                # Highlight codes with memos - these are italicised
                 if item['memo'] is not None and item['memo'] != "":
                     fmt.setFontItalic(True)
                 else:
@@ -820,7 +811,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     fmt.setFontWeight(QtGui.QFont.Normal)
                 cursor.setCharFormat(fmt)
 
-            # add annotation marks - these are in bold
+            # Add annotation marks - these are in bold
             for note in self.annotations:
                 if len(self.filename.keys()) > 0:  # will be zero if using autocode and no file is loaded
                     if note['fid'] == self.filename['id']:
@@ -848,7 +839,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         selectedText = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
-        # add the coded section to code text, add to database and update GUI
+        # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
@@ -856,7 +847,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.highlight()
         cur = self.app.conn.cursor()
 
-        # check for an existing duplicated marking first
+        # Check for an existing duplicated marking first
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
             (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
@@ -865,8 +856,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             _("This segment has already been coded with this code by ") + coded['owner'], QtWidgets.QMessageBox.Ok)
             return
 
-        #TODO should not get sqlite3.IntegrityError:
-        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
@@ -875,7 +864,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             self.app.conn.commit()
         except Exception as e:
             logger.debug(str(e))
-        # update filter for tooltip
+        # Update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
     def coded_in_text(self):
@@ -905,7 +894,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if unmarked is None:
             return
 
-        # delete from db, remove from coding and update highlights
+        # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
             (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
@@ -913,7 +902,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         if unmarked in self.code_text:
             self.code_text.remove(unmarked)
 
-        # update filter for tooltip and update code colours
+        # Update filter for tooltip and update code colours
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
         self.highlight()
@@ -934,15 +923,15 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         item = None
         details = ""
         annotation = ""
-        # find existing annotation at this position for this file
+        # Find annotation at this position for this file
         for note in self.annotations:
             if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.filename['id']:
                 item = note  # use existing annotation
                 details = item['owner'] + " " + item['date']
-        # exit method if no text selected and there is not annotation at this position
+        # Exit this method if no text selected and there is no annotation at this position
         if pos0 == pos1 and item is None:
             return
-        # add new item to annotations, add to database and update GUI
+        # Add new item to annotations, add to database and update GUI
         if item is None:
             item = {'fid': int(self.filename['id']), 'pos0': pos0, 'pos1': pos1,
             'memo': str(annotation), 'owner': self.app.settings['codername'],
@@ -963,7 +952,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             self.highlight()
             self.parent_textEdit.append(_("Annotation added at position: ") \
                 + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.filename['name'])
-        # if blank delete the annotation
+        # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
             cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
@@ -1016,7 +1005,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             currentfile = cur.fetchone()
             text = currentfile[2]
             textStarts = [match.start() for match in re.finditer(re.escape(findText), text)]
-            # add new items to database
+            # Add new items to database
             for startPos in textStarts:
                 item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(findText),
                 'pos0': startPos, 'pos1': startPos + len(findText),
@@ -1029,13 +1018,13 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                     item['pos1'], item['owner'], item['memo'], item['date']))
                 self.app.conn.commit()
 
-                # if this is the currently open file update the code text list and GUI
+                # If this is the currently open file update the code text list and GUI
                 if f['id'] == self.filename['id']:
                     self.code_text.append(item)
             self.highlight()
             self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
                 + _(". with text: ") + findText)
-        # update filter for tooltip
+        # Update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
 
@@ -1065,7 +1054,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             displayText = ""
-            # occasional None type error
+            # Occasional None type error
             if self.code_text is None:
                 #Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
@@ -1073,7 +1062,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                 if item['pos0'] <= pos and item['pos1'] >= pos:
                     if displayText == "":
                         displayText = item['name']
-                    else:  # can have multiple codes on same selected area
+                    else:  # Can have multiple codes on same selected area
                         try:
                             displayText += "\n" + item['name']
                         except Exception as e:
