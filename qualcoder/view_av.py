@@ -112,8 +112,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     def __init__(self, app, parent_textEdit):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
+        TODO maybe show other coders?
         """
-        #TODO maybe show other coders ?
 
         super(DialogCodeAV,self).__init__()
         sys.excepthook = exception_handler
@@ -129,8 +129,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
-        #self.codeslistmodel = DictListModel({})
-        self.get_codes_categories()
+        self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
@@ -161,7 +160,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_select.pressed.connect(self.select_media)
-        #TODO show other coders, maybe?
         #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -172,18 +170,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
-        # a displaydialog named ddialog
+        # A display-dialog named ddialog
         # Otherwise, the vlc player hogs all the mouse events
         self.ddialog = QtWidgets.QDialog()
-        # enable custom window hint
+        # Enable custom window hint
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        # disable close button, only close through closing the Ui_Dialog_code_av
+        # Disable close button, only close through closing the Ui_Dialog_code_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.resize(640, 480)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        if platform.system() == "Darwin":  # for MacOS
+        if platform.system() == "Darwin":  # For MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
@@ -206,21 +204,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
 
-        # set the scene for coding stripes
-        # matches the designer file graphics view
+        # Set the scene for coding stripes
+        # Matches the designer file graphics view size
         self.scene_width = 990
         self.scene_height = 110
         self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
 
-    def get_codes_categories(self):
-        """ Called from init, delete category/code. """
+    def get_codes_and_categories(self):
+        """ Called from init, delete category/code, event_filter. """
 
         self.codes, self.categories = self.app.get_data()
-        cur = self.app.conn.cursor()
-        #self.linktypes = self.app.get_linktypes()
-        #self.codeslistmodel.reset_data({x['cid']: x for x in self.codes})
 
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
@@ -542,8 +537,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
         integer variables, so you need a factor; the higher the factor, the
         more precise are the results (1000 should suffice).
-        Called by:
-
         """
 
         self.timer.stop()
@@ -730,7 +723,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
-        QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
+        QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
         Also use eventFilter for QGraphicsView.
         """
@@ -740,7 +733,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
-                self.get_codes_categories()
+                self.get_codes_and_categories()
                 self.fill_tree()
         return False
 
@@ -948,7 +941,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None
-        self.get_codes_categories()
+        self.get_codes_and_categories()
         self.fill_tree()
         self.load_segments()
 
@@ -974,7 +967,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
         selected = None
-        self.get_codes_categories()
+        self.get_codes_and_categories()
         self.fill_tree()
 
     def add_edit_code_memo(self, selected):
