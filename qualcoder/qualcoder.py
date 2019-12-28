@@ -149,14 +149,6 @@ class App(object):
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
-        #self._load_model()
-
-    '''def _load_model(self):
-        """ Creates list of dictionaries of codes and categories.
-        Creates dictionary model containing all codes and categories """
-
-        self.codes, self.categories = self.get_data()
-        self.model = self.calc_model(self.categories, self.codes)'''
 
     def get_code_names(self):
         cur = self.conn.cursor()
@@ -206,6 +198,7 @@ class App(object):
         Keys are strings of catid:id or cid:id
         USED BY ?? """
 
+        #TODO delete this method
         model = {}
         for cat in cats:
             model['catid:%s'%cat['catid']] = cat
@@ -282,7 +275,7 @@ class App(object):
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
-            'treefontsize': 14,
+            'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
             'language': 'en',
@@ -487,6 +480,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_sql(self):
         """ Run SQL statements on database. """
 
+        #TODO incorporate self.dialogList to update code/category changes
+
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
@@ -503,6 +498,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
+        #TODO incorporate self.dialogList to update code/category changes
+
         for d in self.dialogList:
             if type(d).__name__ == "DialogCoderComparison":
                 return
@@ -513,6 +510,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
+
+        #TODO incorporate self.dialogList to update code/category changes
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeFrequencies":
@@ -525,6 +524,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
+        #TODO incorporate self.dialogList to update code/category changes
+
         ui = DialogReportCodes(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
@@ -532,6 +533,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
+
+        #TODO incorporate self.dialogList to update code/category changes
 
         ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
@@ -613,6 +616,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
+        #TODO incorporate self.dialogList to update code/category changes
+
         ui = DialogCodeText(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -623,6 +628,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
+        #TODO incorporate self.dialogList to update code/category changes
+
         ui = DialogCodeImage(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -632,6 +639,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def av_coding(self):
         """ Create edit and delete codes. Apply and remove codes to segements of the
         audio or video file. Added try block in case VLC bindings do not work. """
+
+        #TODO incorporate self.dialogList to update code/category changes
 
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit)
@@ -762,7 +771,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.project_name = self.app.project_path.rpartition('/')[2]
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
         self.app.create_connection(self.app.project_path)
-        #self.settings['conn'] = sqlite3.connect(self.settings['path'] + "/data.qda")
         cur = self.app.conn.cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
@@ -779,7 +787,6 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.app.conn.commit()
-        #self.app.add_relations_table()
         try:
             # get and display some project details
             self.ui.textEdit.append("\n" + _("New project: ") + self.app.project_path + _(" created."))
