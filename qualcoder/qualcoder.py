@@ -940,7 +940,6 @@ class MainWindow(QtWidgets.QMainWindow):
         ''' This is to assist: Update code and category tree in DialogCodeImage,
         DialogCodeAV, DialogCodeText, DialogReportCodes '''
 
-        print("updating tmp")
         for d in self.dialogList:
             print(type(d))
             if isinstance(d, DialogCodeText):
