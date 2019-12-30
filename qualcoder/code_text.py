@@ -73,6 +73,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     ID_COLUMN = 1
     MEMO_COLUMN = 2
     app = None
+    dialog_list = None
     parent_textEdit = None
     codes = []
     categories = []
@@ -85,10 +86,11 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     search_index = 0
     eventFilter = None
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
 
         super(DialogCodeText, self).__init__()
         self.app = app
+        self.dialog_list = dialog_list
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.codes = []
@@ -149,6 +151,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             return
         self.ui.label_code.setText("Code: " + current.text(0))
 
+    #TODO fill tree from app
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -508,6 +511,15 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.ui.treeWidget.addTopLevelItem(top_item)
         self.ui.treeWidget.setCurrentItem(top_item)
         self.parent_textEdit.append(_("New code: ") + item['name'])
+        self.update_dialog_codes_and_categories()
+
+    def update_dialog_codes_and_categories(self):
+        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
+        DialogCodeText, DialogReportCodes """
+
+        print("dialog list len: ", len(self.dialog_list))
+        for d in self.dialog_list:
+            print(d, type(d))
 
     def add_category(self):
         """ When button pressed, add a new category.

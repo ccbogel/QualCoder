@@ -87,6 +87,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     Create codes and categories.  """
 
     app = None
+    dialog_list = None
     parent_textEdit = None
     filename = None
     files = []
@@ -109,7 +110,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     # transcribed timepositions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
         TODO maybe show other coders?
@@ -118,6 +119,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         super(DialogCodeAV,self).__init__()
         sys.excepthook = exception_handler
         self.app = app
+        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
@@ -225,7 +227,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo")])
-        print(self.app.settings)  # tmp
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -238,7 +239,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -263,7 +263,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        #child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         child.setToolTip(0, c['owner'] + "\n" + c['date'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -281,7 +280,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -301,7 +299,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setToolTip(0, c['owner'] + "\n" + c['date'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)

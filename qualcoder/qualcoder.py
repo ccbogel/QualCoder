@@ -480,8 +480,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_sql(self):
         """ Run SQL statements on database. """
 
-        #TODO incorporate self.dialogList to update code/category changes
-
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
         ui.show()
@@ -526,7 +524,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #TODO incorporate self.dialogList to update code/category changes
 
-        ui = DialogReportCodes(self.app, self.ui.textEdit)
+        ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -534,7 +532,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
-        #TODO incorporate self.dialogList to update code/category changes
+        #TODO maybe incorporate self.dialogList to update code/category changes
 
         ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
@@ -618,7 +616,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #TODO incorporate self.dialogList to update code/category changes
 
-        ui = DialogCodeText(self.app, self.ui.textEdit)
+        ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()
@@ -630,7 +628,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #TODO incorporate self.dialogList to update code/category changes
 
-        ui = DialogCodeImage(self.app, self.ui.textEdit)
+        ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
         ui.show()
@@ -643,7 +641,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #TODO incorporate self.dialogList to update code/category changes
 
         try:
-            ui = DialogCodeAV(self.app, self.ui.textEdit)
+            ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.dialogList.append(ui)
             ui.show()
@@ -745,7 +743,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
         images, audio and video.
         Note the database does not keep a table specifically for users (coders), instead
-        usernames can be freely entered through the settings dialog and are collated from coded text, images and a/v.
+        usernames can be freely entered through the settings dialog and are collated from
+        coded text, images and a/v.
         """
 
         self.app = App()
@@ -935,6 +934,23 @@ class MainWindow(QtWidgets.QMainWindow):
             except RuntimeError as e:
                 logger.error(str(e))
         self.dialogList = tempList
+        self.update_dialog_lists_in_modeless_dialogs()
+
+    def update_dialog_lists_in_modeless_dialogs(self):
+        ''' This is to assist: Update code and category tree in DialogCodeImage,
+        DialogCodeAV, DialogCodeText, DialogReportCodes '''
+
+        print("updating tmp")
+        for d in self.dialogList:
+            print(type(d))
+            if isinstance(d, DialogCodeText):
+                d.dialog_list = self.dialogList
+            if isinstance(d, DialogCodeAV):
+                d.dialog_list = self.dialogList
+            if isinstance(d, DialogCodeImage):
+                d.dialog_list = self.dialogList
+            if isinstance(d, DialogReportCodes):
+                d.dialog_list = self.dialogList
 
 
 def gui():

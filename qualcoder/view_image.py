@@ -65,6 +65,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
     app = None
+    dialog_list = None
     parent_textEdit = None
     filename = None
     pixmap = None
@@ -77,7 +78,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
         """ Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
@@ -87,6 +88,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         super(DialogCodeImage,self).__init__()
         sys.excepthook = exception_handler
         self.app = app
+        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
