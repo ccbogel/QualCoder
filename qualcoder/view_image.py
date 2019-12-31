@@ -288,30 +288,45 @@ class DialogCodeImage(QtWidgets.QDialog):
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
         DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes, as could not import """
+        Not using isinstance for other classes as could not import the classes to test
+        against. There was an import error.
+        Using try except blocks for each instance, as instance may have been deleted.
+        """
 
         for d in self.dialog_list:
             if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.unlight()
-                d.highlight()
-                d.get_coded_text_update_eventfilter_tooltips()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.unlight()
+                    d.highlight()
+                    d.get_coded_text_update_eventfilter_tooltips()
+                except RuntimeError as e:
+                    pass
             if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.load_segments()
-                d.unlight()
-                d.highlight()
-                d.get_coded_text_update_eventfilter_tooltips()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.load_segments()
+                    d.unlight()
+                    d.highlight()
+                    d.get_coded_text_update_eventfilter_tooltips()
+                except RuntimeError as e:
+                    pass
             if isinstance(d, DialogCodeImage):
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.get_coded_areas()
-                d.draw_coded_areas()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.get_coded_areas()
+                    d.draw_coded_areas()
+                except RuntimeError as e:
+                    pass
             if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                d.get_data()
-                d.fill_tree()
+                try:
+                    d.get_data()
+                    d.fill_tree()
+                except RuntimeError as e:
+                    pass
 
     def change_scale(self):
         """ Resize image. Triggered by user change in slider.
