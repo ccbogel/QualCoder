@@ -941,7 +941,6 @@ class MainWindow(QtWidgets.QMainWindow):
         DialogCodeAV, DialogCodeText, DialogReportCodes '''
 
         for d in self.dialogList:
-            print(type(d))
             if isinstance(d, DialogCodeText):
                 d.dialog_list = self.dialogList
             if isinstance(d, DialogCodeAV):
