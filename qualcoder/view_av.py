@@ -40,7 +40,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-
 try:
     import vlc
 except Exception as e:
@@ -53,9 +52,8 @@ from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from memo import DialogMemo
-from qtmodels import DictListModel, ListObjectModel
+#from qtmodels import DictListModel, ListObjectModel
 from select_file import DialogSelectFile
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -107,6 +105,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     # for transcribed text
     annotations = []
     code_text = []
+    transcription = None  # A tuple of id, fulltext, name
     # transcribed timepositions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
@@ -126,6 +125,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.annotations = []
         self.code_text = []
         self.time_positions = []
+        self.transcription = None
         self.media_data = None
         self.segment['start'] = None
         self.segment['end'] = None
@@ -156,9 +156,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        treefont = QtGui.QFont(self.app.settings['font'],
-            self.app.settings['treefontsize'], QtGui.QFont.Normal)
-        self.ui.treeWidget.setFont(treefont)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
         self.ui.pushButton_select.pressed.connect(self.select_media)
@@ -432,8 +432,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
 
-        # get code text for this file and for this coder, or all coders
-        self.code_text = []
+        self.get_coded_text_update_eventfilter_tooltips()
+        '''self.code_text = []
         coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
         coding_sql += " where fid=? "
         #if not self.ui.checkBox_show_coders.isChecked():
@@ -448,6 +448,31 @@ class DialogCodeAV(QtWidgets.QDialog):
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         # redo textEdit formatting
+        self.unlight()
+        self.highlight()'''
+
+    def get_coded_text_update_eventfilter_tooltips(self):
+        ''' Called by load_media, and from other dialogs on update '''
+
+        if self.transcription is None:
+            return
+        sql_values = []
+        sql_values.append(self.transcription[0])
+        # Get code text for this file and for this coder, or all coders
+        self.code_text = []
+        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
+        codingsql += " where fid=? "
+        '''if not self.ui.checkBox_show_coders.isChecked():
+            codingsql += " and owner=? "
+            sql_values.append(self.app.settings['codername'])'''
+        cur = self.app.conn.cursor()
+        cur.execute(codingsql, sql_values)
+        code_results = cur.fetchall()
+        for row in code_results:
+            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
+            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+        # Update filter for tooltip and redo formatting
+        self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
         self.highlight()
 
@@ -717,6 +742,34 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action == ActionItemAssignSegment:
             self.assign_segment_to_code(selected)
 
+    def update_dialog_codes_and_categories(self):
+        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
+        DialogCodeText, DialogReportCodes.
+        Not using isinstance for other classes, as could not import """
+
+        for d in self.dialog_list:
+            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if isinstance(d, DialogCodeAV):
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.load_segments()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.get_coded_areas()
+                d.draw_coded_areas()
+            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
+                d.get_data()
+                d.fill_tree()
+
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
@@ -730,8 +783,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
-                self.get_codes_and_categories()
-                self.fill_tree()
         return False
 
     def assign_segment_to_code(self, selected):
@@ -793,6 +844,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_cat set supercatid=? where catid=?",
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
         # find the code in the list
         if item.text(1)[0:3] == 'cid':
@@ -811,17 +863,17 @@ class DialogCodeAV(QtWidgets.QDialog):
                     return
                 catid = int(parent.text(1).split(':')[1])
                 self.codes[found]['catid'] = catid
-
             cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=? where cid=?",
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
         Called by item_moved_update_data when a code is moved onto another code. """
 
-        msg = _("Merge code: ") + item['name'] + "\n==> " + parent.text(0)
+        msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
@@ -833,8 +885,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
-            #cur.execute("delete from code_name_links where from_id=?", [old_cid, ])
-            #cur.execute("delete from code_name_links where to_id=?", [old_cid, ])
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
@@ -843,6 +893,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(msg)
         self.load_segments()
 
@@ -864,16 +915,16 @@ class DialogCodeAV(QtWidgets.QDialog):
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code added: ") + item['name'])
-        cur.execute("select last_insert_rowid()")
+        self.update_dialog_codes_and_categories()
+        '''cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
         self.codes.append(item)
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
         color = item['color']
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)
+        self.ui.treeWidget.setCurrentItem(top_item)'''
 
     def add_category(self):
         """ Add a new category.
@@ -893,15 +944,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
-        cur.execute("select last_insert_rowid()")
+        self.update_dialog_codes_and_categories()
+        '''cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
         self.parent_textEdit.append(_("Category added: ") + item['name'])
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
-        self.ui.treeWidget.addTopLevelItem(top_item)
+        self.ui.treeWidget.addTopLevelItem(top_item)'''
 
     def delete_category_or_code(self, selected):
         """ Determine if category or code is to be deleted. """
@@ -933,14 +984,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
-        #cur.execute("delete from code_name_links where from_id=?", [code_['cid'], ])
-        #cur.execute("delete from code_name_links where to_id=?", [code_['cid'], ])
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
-        self.load_segments()
+        self.update_dialog_codes_and_categories()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -964,8 +1011,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
+        self.update_dialog_codes_and_categories()
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo. """
@@ -1015,6 +1061,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category. Checks that the proposed code or category name is
@@ -1043,9 +1090,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
             self.parent_textEdit.append(_("Code renamed: ") + self.codes[found]['name'] + " ==> " + new_name)
-            self.codes[found]['name'] = new_name
+            self.update_dialog_codes_and_categories()
+            '''self.codes[found]['name'] = new_name
             selected.setData(0, QtCore.Qt.DisplayRole, new_name)
-            self.load_segments()
+            self.load_segments()'''
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -1072,8 +1120,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
-            self.categories[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            self.update_dialog_codes_and_categories()
+            '''self.categories[found]['name'] = new_name
+            selected.setData(0, QtCore.Qt.DisplayRole, new_name)'''
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
@@ -1099,7 +1148,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
-        self.load_segments()
+        self.update_dialog_codes_and_categories()
+        #self.load_segments()
 
     # Methods used with the textEdit transcribed text
     def unlight(self):
