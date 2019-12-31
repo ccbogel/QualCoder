@@ -65,6 +65,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
     app = None
+    dialog_list = None
     parent_textEdit = None
     filename = None
     pixmap = None
@@ -77,7 +78,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
         """ Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
@@ -87,6 +88,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         super(DialogCodeImage,self).__init__()
         sys.excepthook = exception_handler
         self.app = app
+        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
@@ -283,6 +285,34 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.setValue(99)
         self.draw_coded_areas()
 
+    def update_dialog_codes_and_categories(self):
+        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
+        DialogCodeText, DialogReportCodes.
+        Not using isinstance for other classes, as could not import """
+
+        for d in self.dialog_list:
+            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.load_segments()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if isinstance(d, DialogCodeImage):
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.get_coded_areas()
+                d.draw_coded_areas()
+            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
+                d.get_data()
+                d.fill_tree()
+
     def change_scale(self):
         """ Resize image. Triggered by user change in slider.
         Also called by unmark, as all items need to be redrawn. """
@@ -312,6 +342,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         Other coders are shown via magenta rectangles.
         Remove items first, as this is called after a coded area is unmarked. """
 
+        if self.file_ is None:
+            return
         for item in self.code_areas:
             if item['id'] == self.file_['id']:
                 tooltip = ""
@@ -396,8 +428,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
-                self.get_codes_and_categories()
-                self.fill_tree()
+                self.update_dialog_codes_and_categories()
 
         if object is self.scene:
             #logger.debug(event.type(), type(event))
@@ -568,6 +599,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_cat set supercatid=? where catid=?",
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
         # Find the code in the list
         if item.text(1)[0:3] == 'cid':
@@ -586,11 +618,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                     return
                 catid = int(parent.text(1).split(':')[1])
                 self.codes[found]['catid'] = catid
-
             cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=? where cid=?",
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
@@ -617,6 +649,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
         self.parent_textEdit.append(msg)
+        self.update_dialog_codes_and_categories()
 
     def add_code(self):
         """ Use add_item dialog to get new code text.
@@ -635,7 +668,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
-        cur.execute("select last_insert_rowid()")
+        '''cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
         self.codes.append(item)
@@ -643,7 +676,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         color = item['color']
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)
+        self.ui.treeWidget.setCurrentItem(top_item)'''
+        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New code: ") + item['name'])
 
     def add_category(self):
@@ -664,14 +698,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
-        cur.execute("select last_insert_rowid()")
+        '''cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
-        self.ui.treeWidget.addTopLevelItem(top_item)
+        self.ui.treeWidget.addTopLevelItem(top_item)'''
+        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
@@ -708,8 +742,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
+        self.update_dialog_codes_and_categories()
+        #self.get_codes_and_categories()
+        #self.fill_tree()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -733,8 +768,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
+        self.update_dialog_codes_and_categories()
+        #self.get_codes_and_categories()
+        #self.fill_tree()
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo. """
@@ -783,6 +819,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category. Checks that the proposed code or category name is
@@ -811,8 +848,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
             old_name = self.codes[found]['name']
-            self.codes[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            self.update_dialog_codes_and_categories()
+            #self.codes[found]['name'] = new_name
+            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Code renamed: ") + \
                 old_name + " ==> " + new_name)
             return
@@ -841,10 +879,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             old_name = self.categories[found]['name']
-            self.categories[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            #self.categories[found]['name'] = new_name
+            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Category renamed from: ") + \
                 old_name + " ==> " + new_name)
+            self.update_dialog_codes_and_categories()
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
@@ -870,6 +909,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
 
 
 class DialogViewImage(QtWidgets.QDialog):

@@ -44,7 +44,6 @@ from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencie
 from report_attributes import DialogSelectAttributeParameters
 from select_file import DialogSelectFile
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -64,16 +63,18 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     This is for text, image and av coding. """
 
     app = None
+    dialog_list = None
     parent_textEdit = None
     coders = []
     categories = []
     codes = []
     coded = []  # to refactor name
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
 
         sys.excepthook = exception_handler
         self.app = app
+        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.get_data()
         self.calculate_code_frequencies()
@@ -637,6 +638,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     #TODO - export case matrix
 
     app = None
+    dialog_list = None
     parent_textEdit = None
     code_names = []
     coders = [""]
@@ -650,9 +652,10 @@ class DialogReportCodes(QtWidgets.QDialog):
     case_ids = ""
     attribute_selection = ""
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
         sys.excepthook = exception_handler
         self.app = app
+        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.get_data()
         QtWidgets.QDialog.__init__(self)
@@ -707,7 +710,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -751,7 +753,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                #top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -771,7 +772,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    #child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable

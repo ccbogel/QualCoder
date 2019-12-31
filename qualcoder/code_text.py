@@ -73,6 +73,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     ID_COLUMN = 1
     MEMO_COLUMN = 2
     app = None
+    dialog_list = None
     parent_textEdit = None
     codes = []
     categories = []
@@ -85,10 +86,11 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     search_index = 0
     eventFilter = None
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, dialog_list):
 
         super(DialogCodeText, self).__init__()
         self.app = app
+        self.dialog_list = dialog_list
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.codes = []
@@ -395,8 +397,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
-                self.get_codes_and_categories()
-                self.fill_tree()
         return False
 
     def item_moved_update_data(self, item, parent):
@@ -427,6 +427,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_cat set supercatid=? where catid=?",
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
         # find the code in the list
         if item.text(1)[0:3] == 'cid':
@@ -450,6 +451,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_name set catid=? where cid=?",
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
+            self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
@@ -477,6 +479,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.app.conn.commit()
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
+        self.update_dialog_codes_and_categories()
+        #TODO
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
@@ -501,13 +505,43 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
-        self.codes.append(item)
+        '''self.codes.append(item)
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
         color = item['color']
         top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
         self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)
+        self.ui.treeWidget.setCurrentItem(top_item)'''
         self.parent_textEdit.append(_("New code: ") + item['name'])
+        self.update_dialog_codes_and_categories()
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def update_dialog_codes_and_categories(self):
+        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
+        DialogCodeText, DialogReportCodes.
+        Not using isinstance as could not import the classes to test against"""
+
+        for d in self.dialog_list:
+            if isinstance(d, DialogCodeText):
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.load_segments()
+                d.unlight()
+                d.highlight()
+                d.get_coded_text_update_eventfilter_tooltips()
+            if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
+                d.get_codes_and_categories()
+                d.fill_tree()
+                d.get_coded_areas()
+                d.draw_coded_areas()
+            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
+                d.get_data()
+                d.fill_tree()
 
     def add_category(self):
         """ When button pressed, add a new category.
@@ -526,13 +560,14 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
-        cur.execute("select last_insert_rowid()")
+        self.update_dialog_codes_and_categories()
+        '''cur.execute("select last_insert_rowid()")
         catid = cur.fetchone()[0]
         item['catid'] = catid
         self.categories.append(item)
         # update widget
         top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        self.ui.treeWidget.addTopLevelItem(top_item)
+        self.ui.treeWidget.addTopLevelItem(top_item)'''
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
@@ -567,11 +602,12 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
+        #self.get_codes_and_categories()
+        #self.fill_tree()
+        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
         # update filter for tooltip
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        #self.eventFilterTT.setCodes(self.code_text, self.codes)
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -594,8 +630,9 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
         selected = None
-        self.get_codes_and_categories()
-        self.fill_tree()
+        #self.get_codes_and_categories()
+        #self.fill_tree()
+        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
     def add_edit_memo(self, selected):
@@ -644,6 +681,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             else:
                 selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
+        self.update_dialog_codes_and_categories()
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
@@ -672,11 +710,12 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
             old_name = self.codes[found]['name']
-            self.codes[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            #self.codes[found]['name'] = new_name
+            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
+            self.update_dialog_codes_and_categories()
             # Update filter for tooltip
-            self.eventFilterTT.setCodes(self.code_text, self.codes)
+            #self.eventFilterTT.setCodes(self.code_text, self.codes)
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -703,8 +742,9 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             old_name = self.categories[found]['name']
-            self.categories[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            #self.categories[found]['name'] = new_name
+            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
+            self.update_dialog_codes_and_categories()
             self.parent_textEdit.append(_("Category renamed from: ") + old_name + _(" to: ") + new_name)
 
     def change_code_color(self, selected):
@@ -731,7 +771,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
-        self.highlight()
+        self.update_dialog_codes_and_categories()
+        #self.highlight()
 
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
@@ -755,8 +796,17 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         file_result = self.app.get_file_texts([filedata['id']])[0]
         sql_values.append(int(file_result['id']))
         self.sourceText = file_result['fulltext']
+        self.ui.textEdit.setPlainText(self.sourceText)
         self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
+        self.get_coded_text_update_eventfilter_tooltips()
 
+    def get_coded_text_update_eventfilter_tooltips(self):
+        ''' Called by view_file, and from other dialogs on update '''
+
+        if self.filename is None:
+            return
+        sql_values = []
+        sql_values.append(int(self.filename['id']))
         # Get code text for this file and for this coder, or all coders
         self.code_text = []
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
@@ -770,7 +820,6 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         for row in code_results:
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
             'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
-        self.ui.textEdit.setPlainText(self.sourceText)
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
