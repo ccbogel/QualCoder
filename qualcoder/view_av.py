@@ -344,6 +344,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
         #TODO possibly add checkbox and load segments for ALL coders
+        #TODO but this might be too congested when drawn
         #if not self.ui.checkBox_show_coders.isChecked():
         sql += " and code_av.owner=? "
         values = [self.media_data['id']]
@@ -745,30 +746,43 @@ class DialogCodeAV(QtWidgets.QDialog):
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
         DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes, as could not import """
+        Not using isinstance for other classes, as could not import. There was an import error.
+        Using try except blocks for each instance, as instance may have been deleted. """
 
         for d in self.dialog_list:
             if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.unlight()
-                d.highlight()
-                d.get_coded_text_update_eventfilter_tooltips()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.unlight()
+                    d.highlight()
+                    d.get_coded_text_update_eventfilter_tooltips()
+                except RuntimeError as e:
+                    pass
             if isinstance(d, DialogCodeAV):
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.load_segments()
-                d.unlight()
-                d.highlight()
-                d.get_coded_text_update_eventfilter_tooltips()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.load_segments()
+                    d.unlight()
+                    d.highlight()
+                    d.get_coded_text_update_eventfilter_tooltips()
+                except RuntimeError as e:
+                    pass
             if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
-                d.get_codes_and_categories()
-                d.fill_tree()
-                d.get_coded_areas()
-                d.draw_coded_areas()
+                try:
+                    d.get_codes_and_categories()
+                    d.fill_tree()
+                    d.get_coded_areas()
+                    d.draw_coded_areas()
+                except RuntimeError as e:
+                    pass
             if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                d.get_data()
-                d.fill_tree()
+                try:
+                    d.get_data()
+                    d.fill_tree()
+                except RuntimeError as e:
+                    pass
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
