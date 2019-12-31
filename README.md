@@ -91,13 +91,14 @@ Required
 ## Issues
 * Testing has mostly been performed on Ubuntu, Linux Mint and Windows 10. Some usage conducted with Lubuntu and Apple MacOSX.
 
-## Future plans
+## Future Plans
+*  Improve manual transcription. keyboard shortcuts for speaker, paste timestamp, rewind several seconds.
 * Change from pdfminer.six to pdfminer3
 * Reports:
-    * Word count report
-    * Possibly look at text mining
+    * Word count report maybe
 * Text mining
     * word cloud, word visualisations
+* Other visualisations
 * General
     * Translations for GUI.
 
