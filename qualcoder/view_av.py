@@ -1783,6 +1783,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Add key options to textEdit_transcription to improve manual transcribing.
         Options are:
             ctrl + r to rewind 3 seconds.
+            xtrl + s to start/pause
             ctrl + t to insert timestamp in format [hh.mm.ss]
             ctrl + n to enter a new speakers name into shortcuts
             ctrl + 1 .. 8 to insert speaker in format [speaker name]
@@ -1849,7 +1850,9 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.speaker_list.pop()
                 self.speaker_list.append(name)
             self.add_speaker_names_to_label()
-
+        # KEY  83 MODS  20 ctrl + s pause/play toggle
+        if key == 83 and mods == 20:
+            self.play_pause()
         return True
 
     def add_speaker_names_to_label(self):
@@ -1920,8 +1923,9 @@ class DialogViewAV(QtWidgets.QDialog):
         hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
         srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
+        transcription = self.ui.textEdit_transcription.toPlainText()
         self.time_positions = []
-        for match in re.finditer(mmss1, self.transcription[1]):
+        for match in re.finditer(mmss1, transcription):
             stamp = match.group()[1:-1]
             s = stamp.split(':')
             try:
@@ -1929,7 +1933,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        for match in re.finditer(hhmmss1, self.transcription[1]):
+        for match in re.finditer(hhmmss1, transcription):
             stamp = match.group()[1:-1]
             s = stamp.split(':')
             try:
@@ -1937,7 +1941,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        for match in re.finditer(mmss2, self.transcription[1]):
+        for match in re.finditer(mmss2, transcription):
             stamp = match.group()[1:-1]
             s = stamp.split('.')
             try:
@@ -1945,7 +1949,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        for match in re.finditer(hhmmss2, self.transcription[1]):
+        for match in re.finditer(hhmmss2, transcription):
             stamp = match.group()[1:-1]
             s = stamp.split('.')
             try:
@@ -1953,7 +1957,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        for match in re.finditer(hhmmss_sss, self.transcription[1]):
+        for match in re.finditer(hhmmss_sss, transcription):
             # Format #00:12:34.567#
             stamp = match.group()[1:-1]
             s = stamp.split(':')
@@ -1963,7 +1967,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        for match in re.finditer(srt, self.transcription[1]):
+        for match in re.finditer(srt, transcription):
             # Format 09:33:04,100 --> 09:33:09,600  skip the arrow and second time position
             stamp = match.group()[0:12]
             s = stamp.split(':')
@@ -1974,11 +1978,6 @@ class DialogViewAV(QtWidgets.QDialog):
             except:
                 pass
         #print(self.time_positions)
-
-    def test(self):
-        ''' Test keyboard shortcuts '''
-
-        QtWidgets.QMessagebox.information(None, "TEST", "escape pressed")
 
     def set_position(self):
         """ Set the movie position according to the position slider.
