@@ -1660,6 +1660,7 @@ class DialogViewAV(QtWidgets.QDialog):
     transcription = None
     time_positions = []
     speaker_list = []
+    can_transcribe = True
 
     def __init__(self, app, media_data, parent=None):
 
@@ -1673,7 +1674,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
-        #TODO add speaker names
+        self.can_transcribe = True
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
@@ -1681,6 +1682,9 @@ class DialogViewAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.label_speakers.setStyleSheet(font)
         self.setWindowTitle(self.media_data['mediapath'])
 
         # Get the transcription text and fill textedit
@@ -1694,11 +1698,15 @@ class DialogViewAV(QtWidgets.QDialog):
             annoted = cur.fetchall()
             if coded != [] and annoted != []:
                 self.ui.textEdit_transcription.setReadOnly(True)
+                self.can_transcribe = False
+                self.ui.label_speakers.setVisible(False)
+                self.ui.label_transcription.setToolTip("")
             else:
                 self.ui.textEdit_transcription.installEventFilter(self)
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
-            #TODO get speaker names from bracketed text
+            self.get_speaker_names_from_bracketed_text()
+            self.add_speaker_names_to_label()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -1772,21 +1780,25 @@ class DialogViewAV(QtWidgets.QDialog):
         #self.play_pause()
 
     def eventFilter(self, object, event):
-        ''' Add key options to textEdit_transcription to improve manual transcribing.
+        """ Add key options to textEdit_transcription to improve manual transcribing.
         Options are:
             ctrl + r to rewind 3 seconds.
             ctrl + t to insert timestamp in format [hh.mm.ss]
-            ctrl + 1 .. 9 to insert speaker in format [speaker name]
-        '''
+            ctrl + n to enter a new speakers name into shortcuts
+            ctrl + 1 .. 8 to insert speaker in format [speaker name]
+        """
 
         if object != self.ui.textEdit_transcription:
             return False
         if event.type() != 7:  # QtGui.QKeyEvent
             return False
-        #print(event, event.type())
+        # Following options only available if can transcribe
+        if not self.can_transcribe:
+            return False
+
         key = event.key()
         mods = event.nativeModifiers()
-        print("KEY ", key, "MODS ", mods)
+        #print("KEY ", key, "MODS ", mods)
 
         # KEY  82 MODS  20 ctrl r
         # rewind 3 seconds
@@ -1797,6 +1809,7 @@ class DialogViewAV(QtWidgets.QDialog):
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
+
         # KEY  84 MODS  20  ctrl t
         # insert timestamp, format [hh.mm.ss]
         if key == 84 and mods == 20:
@@ -1811,20 +1824,78 @@ class DialogViewAV(QtWidgets.QDialog):
                 hours = '0' + hours
             ts = '\n[' + str(hours) + '.' + remainder_mins + '.' + secs + ']'
             self.ui.textEdit_transcription.insertPlainText(ts)
-        # KEY  49 .. 57 MODS  20  ctrl 1 .. 9
+        # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
         # insert speaker
-        if key in range(49, 58) and mods == 20:
-            #TODO incorporate speaker names
-            speaker = '[' + 'testspeaker' + ']'
+        if key in range(49, 57) and mods == 20:
+            list_pos = key - 49
+            speaker = ""
+            try:
+                speaker = self.speaker_list[list_pos]
+            except:
+                return False
+            speaker = '[' + speaker + ']'
             self.ui.textEdit_transcription.insertPlainText(speaker)
 
+        # KEY  78 MODS  20 ctrl + n
+        if key == 78 and mods == 20:
+            self.pause()
+            name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name","Name:", QtWidgets.QLineEdit.Normal, "")
+            if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
+                return False
+            if len(self.speaker_list) < 8:
+                self.speaker_list.append(name)
+            if len(self.speaker_list) == 8:
+                # replace last name in the list, if list over 8
+                self.speaker_list.pop()
+                self.speaker_list.append(name)
+            self.add_speaker_names_to_label()
 
         return True
 
+    def add_speaker_names_to_label(self):
+        """ Add speaker names to label, four on each line. """
+
+        text = ""
+        for i, n in enumerate(self.speaker_list):
+            if i == 4:
+                text += "\n"
+            text += str(i + 1) + ": " + n + "  "
+        self.ui.label_speakers.setText(text)
+
+    def get_speaker_names_from_bracketed_text(self):
+        """ Parse text for [] to find speaker names.
+        If needed limit to 8 names. """
+
+        if self.transcription is None:
+            return
+        text = self.transcription[1]
+        start = False
+        ts_and_names = ""
+        for c in text:
+            if c == '[':
+                start = True
+            if c == ']':
+                start = False
+            if start:
+                ts_and_names = ts_and_names + c
+        ts_and_names = ts_and_names.split('[')
+        names = []
+        for n in ts_and_names:
+            if n.find('.') == -1 and n.find(':') == -1 and n != '':
+                tidy_n = n.replace('\n', '')
+                tidy_n = n.strip()
+                names.append(tidy_n)
+        names = list(set(names))
+        if len(names) > 8:
+            names = names[0:8]
+        self.speaker_list = names
 
     def scroll_transcribed_checkbox_changed(self):
         """ If checked, then cannot edit the textEdit_transcribed. """
 
+        if not self.can_transcribe:
+            # occurs if there is coded or annotated text.
+            return
         if self.ui.checkBox_scroll_transcript.isChecked():
             self.ui.textEdit_transcription.setReadOnly(True)
         else:
@@ -1953,6 +2024,16 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
+
+    def pause(self):
+        """ Pause any playback. Called when entering a new speakers name
+        during manual transcription. """
+
+        if self.mediaplayer.is_playing():
+            self.mediaplayer.pause()
+            self.ui.pushButton_play.setText(_("Play"))
+            self.is_paused = True
+            self.timer.stop()
 
     def stop(self):
         """ Stop vlc player. Set position slider to the start.
