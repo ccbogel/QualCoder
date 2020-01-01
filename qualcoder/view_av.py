@@ -1659,6 +1659,7 @@ class DialogViewAV(QtWidgets.QDialog):
     media = None
     transcription = None
     time_positions = []
+    speaker_list = []
 
     def __init__(self, app, media_data, parent=None):
 
@@ -1671,6 +1672,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.media_data = media_data
         self.is_paused = True
         self.time_positions = []
+        self.speaker_list = []
+        #TODO add speaker names
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
@@ -1682,11 +1685,20 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext from source where name = ?", [media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext from source where name=?", [media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
+            cur.execute("select cid from  code_text where fid=?", [self.transcription[0],])
+            coded = cur.fetchall()
+            cur.execute("select anid from  annotation where fid=?", [self.transcription[0],])
+            annoted = cur.fetchall()
+            if coded != [] and annoted != []:
+                self.ui.textEdit_transcription.setReadOnly(True)
+            else:
+                self.ui.textEdit_transcription.installEventFilter(self)
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
+            #TODO get speaker names from bracketed text
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -1758,6 +1770,57 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
+
+    def eventFilter(self, object, event):
+        ''' Add key options to textEdit_transcription to improve manual transcribing.
+        Options are:
+            ctrl + r to rewind 3 seconds.
+            ctrl + t to insert timestamp in format [hh.mm.ss]
+            ctrl + 1 .. 9 to insert speaker in format [speaker name]
+        '''
+
+        if object != self.ui.textEdit_transcription:
+            return False
+        if event.type() != 7:  # QtGui.QKeyEvent
+            return False
+        #print(event, event.type())
+        key = event.key()
+        mods = event.nativeModifiers()
+        print("KEY ", key, "MODS ", mods)
+
+        # KEY  82 MODS  20 ctrl r
+        # rewind 3 seconds
+        if key == 82 and mods == 20:
+            time_msecs = self.mediaplayer.get_time() - 3000
+            if time_msecs < 0:
+                time_msecs = 0
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.play()
+            self.mediaplayer.set_position(pos)
+        # KEY  84 MODS  20  ctrl t
+        # insert timestamp, format [hh.mm.ss]
+        if key == 84 and mods == 20:
+            time_msecs = self.mediaplayer.get_time()
+            mins_secs = msecs_to_mins_and_secs(time_msecs)
+            mins = int(mins_secs.split('.')[0])
+            secs = mins_secs.split('.')[1]
+            hours = int(mins / 60)
+            remainder_mins = str(mins - hours * 60)
+            hours = str(hours)
+            if len(hours) == 1:
+                hours = '0' + hours
+            ts = '\n[' + str(hours) + '.' + remainder_mins + '.' + secs + ']'
+            self.ui.textEdit_transcription.insertPlainText(ts)
+        # KEY  49 .. 57 MODS  20  ctrl 1 .. 9
+        # insert speaker
+        if key in range(49, 58) and mods == 20:
+            #TODO incorporate speaker names
+            speaker = '[' + 'testspeaker' + ']'
+            self.ui.textEdit_transcription.insertPlainText(speaker)
+
+
+        return True
+
 
     def scroll_transcribed_checkbox_changed(self):
         """ If checked, then cannot edit the textEdit_transcribed. """
@@ -1840,6 +1903,11 @@ class DialogViewAV(QtWidgets.QDialog):
             except:
                 pass
         #print(self.time_positions)
+
+    def test(self):
+        ''' Test keyboard shortcuts '''
+
+        QtWidgets.QMessagebox.information(None, "TEST", "escape pressed")
 
     def set_position(self):
         """ Set the movie position according to the position slider.
