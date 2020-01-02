@@ -682,9 +682,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
-        msg += "Text code positions do not line up with some imports.\n"
-        msg += "Images, audio, video, transcripts not tested.\n"
-        msg += "Sets and Graphs not imported."
+        msg += "Image codings not imported.\n"
+        msg += "PDFs not imported\n"
+        msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
+        msg += "Sets and Graphs not imported as QualCoders does not have this functionality.\n"
+        msg += "External sources over 2GB not imported."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
 
     def rqda_project_import(self):
