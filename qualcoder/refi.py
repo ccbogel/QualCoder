@@ -71,7 +71,7 @@ class Refi_import():
     users = []
     cases = []
     sources = []
-    variables = []  # contains dictionary of Variable guid, name, varaible application (cases or files/sources), last_insert_id, text or other
+    variables = []  # contains dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     parent_textEdit = None
     app = None
     tree = None
@@ -309,12 +309,19 @@ class Refi_import():
         cur = self.app.conn.cursor()
         for e in element.getchildren():
             #print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
-            name = e.get("name").split(':')[1]
-            caseOrFile = e.get("name").split(':')[0]
-            if caseOrFile == "Cases":
-                caseOrFile = "case"
-            else:
-                caseOrFile = "file"  # is this always true, need to test?
+            # <Variable name="Cases:something"> or ?
+            name = ""
+            caseOrFile = "file"
+            try:
+                name = e.get("name").split(':')[1]
+                caseOrFile = e.get("name").split(':')[0]
+                if caseOrFile == "Cases":
+                    caseOrFile = "case"
+                else:
+                    caseOrFile = "file"
+            except IndexError:
+                name = e.get("name")
+
             valuetype = e.get("typeOfVariable")  # may need to tweak Text
             if valuetype in("Text", "Boolean", "Date", "DateTime"):
                 valuetype = "character"
@@ -462,7 +469,6 @@ class Refi_import():
         Example format:
         <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
-
         :param element:
         """
 
@@ -527,7 +533,6 @@ class Refi_import():
         e.g. path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
         """
         #TODO check this works
-        print("Load audio source todo")
         name = element.get("name")
         guid = element.get("guid")
         creating_user_guid = element.get("creatingUser")
@@ -574,7 +579,6 @@ class Refi_import():
         Load the description and codings into sqlite.
         """
         #TODO check this works
-        print("Load video source todo")
         name = element.get("name")
         guid = element.get("guid")
         creating_user_guid = element.get("creatingUser")
@@ -619,6 +623,9 @@ class Refi_import():
     def load_text_source(self, element):
         """ Load this text source into sqlite.
          Add the description and the text codings.
+
+         When testing with Nvivo export: import from docx or txt
+         the txt needs an additional character.
          """
 
         cur = self.app.conn.cursor()
@@ -644,11 +651,29 @@ class Refi_import():
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
                  'owner': self.app.settings['codername'], 'date': create_date, 'guid': guid}
         # Read the text and enter into sqlite source table
+        # Check plain text file line endinfgs for Windows \r\n
+        add_ending = False
+        with open(plain_path,"rb") as f:
+            while True:
+                c = f.read(1)
+                if not c or c == b'\n':
+                    break
+                if c == b'\r':
+                    if f.read(1) == b'\n':
+                        #print('rn')
+                        add_ending = True
+                    #print('r')
+                    pass
+            #print('n')
         try:
             with open(plain_path) as f:
                 fulltext = f.read()
                 #if fulltext[0:6] == "\ufeff":  # associated with notepad files
                 #    fulltext = fulltext[6:]
+
+                # Replace fixes mismatched coding with line endings on import from Windows text files.
+                if add_ending:
+                    fulltext = fulltext.replace('\n', '\n\n')
                 source['fulltext'] = fulltext
                 # logger.debug("type fulltext: " + str(type(entry['fulltext'])))
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
@@ -880,7 +905,7 @@ class Refi_export(QtWidgets.QDialog):
         '''
         .qde zipfile
         Internal files are identified in the path attribute of the source element by the URL naming scheme internal://
-        /sources folder
+        /Sources folder
         Audio and video source file size:
         The maximum size in bytes allowed for an internal file is 2,147,483,647 bytes (2^31−1 bytes, or 2 GiB
         minus 1 byte). An exporting application must detect file size limit during export and inform the
@@ -890,7 +915,7 @@ class Refi_export(QtWidgets.QDialog):
         Plain text, PDF
         Images must be jpeg or png
 
-        Create an unzipped folder with a /sources folder and project.qde xml document
+        Create an unzipped folder with a /Sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
         '''
 
@@ -903,7 +928,7 @@ class Refi_export(QtWidgets.QDialog):
             logger.error(_("Project export error ") + _(" .qualcoder preperatory path not found"))
         try:
             os.mkdir(prep_path)
-            os.mkdir(prep_path + "/sources")
+            os.mkdir(prep_path + "/Sources")
         except Exception as e:
             logger.error(_("Project export error ") + str(e))
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
@@ -917,7 +942,7 @@ class Refi_export(QtWidgets.QDialog):
             exit(0)
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
-            destination = '/sources/' + s['filename']
+            destination = '/Sources/' + s['filename']
             if s['mediapath'] is not None:
                     try:
                         if s['external'] is None:
@@ -938,15 +963,15 @@ class Refi_export(QtWidgets.QDialog):
                         f.write(s['fulltext'])
                 # Also need to add the plain text file as a source
                 # plaintext has different guid from richtext
-                with open(prep_path + '/sources/' + s['plaintext_filename'], 'w') as f:
+                with open(prep_path + '/Sources/' + s['plaintext_filename'], 'w') as f:
                     f.write(s['fulltext'])
         for notefile in self.note_files:
-            with open(prep_path + '/sources/' + notefile[0], 'w') as f:
+            with open(prep_path + '/Sources/' + notefile[0], 'w') as f:
                 f.write(notefile[1])
 
         export_path = self.app.project_path[:-4]
         shutil.make_archive(export_path, 'zip', prep_path)
-        os.rename(export_path + ".zip", export_path + ".qpdx")
+        os.rename(export_path + ".zip", export_path + ".qdpx")
         try:
             shutil.rmtree(prep_path)
         except FileNotFoundError:
@@ -1080,7 +1105,7 @@ class Refi_export(QtWidgets.QDialog):
     def create_note_xml(self, journal):  #guid, text, user, datetime, name=""):
         """ Create a Note xml for journal entries
         Appends xml in notes list.
-        Appends file name and journal text in notes_files list. This is exported to sources folder.
+        Appends file name and journal text in notes_files list. This is exported to Sources folder.
         Called by: notes_xml
         Format:
         <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
@@ -1511,9 +1536,11 @@ class Refi_export(QtWidgets.QDialog):
                 if sp[2] == coded[0]:
                     xml += sp[0]
             xml += '" toSyncPoint="'
+            doubleup = False
             for sp in sync_list:
-                if sp[2] == coded[1]:
+                if sp[2] == coded[1] and doubleup is False:
                     xml += sp[0]
+                    doubleup = True
             xml += '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" >\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(coded[2]) + '" />\n'

@@ -193,7 +193,7 @@ class App(object):
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         return res
 
-    def calc_model(self, cats, codes):
+    '''def calc_model(self, cats, codes):
         """ Model dictionary containing all codes and categories
         Keys are strings of catid:id or cid:id
         USED BY ?? """
@@ -204,7 +204,7 @@ class App(object):
             model['catid:%s'%cat['catid']] = cat
         for code in codes:
             model['cid:%s'%code['cid']] = code
-        return model
+        return model'''
 
     def get_data(self):
         """ Called from init and gets all the codes and categories.
@@ -496,8 +496,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
-        #TODO incorporate self.dialogList to update code/category changes
-
         for d in self.dialogList:
             if type(d).__name__ == "DialogCoderComparison":
                 return
@@ -508,8 +506,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
-
-        #TODO incorporate self.dialogList to update code/category changes
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeFrequencies":
@@ -522,8 +518,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
-        #TODO incorporate self.dialogList to update code/category changes
-
         ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
@@ -531,8 +525,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
-
-        #TODO maybe incorporate self.dialogList to update code/category changes
 
         ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
@@ -614,8 +606,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
-        #TODO incorporate self.dialogList to update code/category changes
-
         ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -626,8 +616,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        #TODO incorporate self.dialogList to update code/category changes
-
         ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -637,8 +625,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def av_coding(self):
         """ Create edit and delete codes. Apply and remove codes to segements of the
         audio or video file. Added try block in case VLC bindings do not work. """
-
-        #TODO incorporate self.dialogList to update code/category changes
 
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
@@ -849,21 +835,23 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
+            #print("appsettings dir ", self.app.settings['directory'])  # tmp
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
                 _('Open project directory'), self.app.settings['directory'])
         if path == "" or path is False:
             return
+        msg = ""
         if len(path) > 3 and path[-4:] == ".qda":
-            msg = ""
             try:
                 self.app.create_connection(path)
             except Exception as e:
                 self.app.conn = None
-                msg += str(e)
-                logger.debug(str(e))
+                msg += " " + str(e)
+                logger.debug(msg)
         if self.app.conn is None:
+            msg += "\n" + path
             QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
-                path + _(" is not a .qda file "))
+                msg)
             self.app.project_path = ""
             self.app.project_name = ""
             return
