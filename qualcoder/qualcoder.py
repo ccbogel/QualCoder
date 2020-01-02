@@ -835,21 +835,23 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
+            #print("appsettings dir ", self.app.settings['directory'])  # tmp
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
                 _('Open project directory'), self.app.settings['directory'])
         if path == "" or path is False:
             return
+        msg = ""
         if len(path) > 3 and path[-4:] == ".qda":
-            msg = ""
             try:
                 self.app.create_connection(path)
             except Exception as e:
                 self.app.conn = None
-                msg += str(e)
-                logger.debug(str(e))
+                msg += " " + str(e)
+                logger.debug(msg)
         if self.app.conn is None:
+            msg += "\n" + path
             QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
-                path + _(" is not a .qda file "))
+                msg)
             self.app.project_path = ""
             self.app.project_name = ""
             return
