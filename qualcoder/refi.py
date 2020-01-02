@@ -66,6 +66,14 @@ class Refi_import():
     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
     """
 
+    #TODO TESTING
+    #TODO parse_sources PDF if e.tag == "{urn:QDA-XML:project:1.0}PDFSource
+    #TODO load_picture_source load codings
+    #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
+    #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
+    #TODO TEST load_text_source if importing Windows endings on Windows OS requires line-ending 2 char replacement
+
+
     file_path = None
     codes = []
     users = []
@@ -220,9 +228,10 @@ class Refi_import():
             return counter
 
         #SHOULD NOT GET HERE
-        print("SHOULD NOT BE HERE")
-        '''print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
-        return counter'''
+        print("SHOULD NOT GET HERE")
+        print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
+        QtWidgets.QMessageBox.warning(None, "tag: " + e.tag +"  " + e.text + " " + e.get("name") + " " + e.get("color") +" " + e.get("isCodable"))
+        return counter
 
     def import_project(self):
         """ Import REFI-QDA standard project into a new project space.
@@ -263,27 +272,28 @@ class Refi_import():
         for c in children:
             #print(c.tag)
             if c.tag == "{urn:QDA-XML:project:1.0}Users":
-                self.parent_textEdit.append(_("Parse users"))
-                self.parse_users(c)
+
+                count = self.parse_users(c)
+                self.parent_textEdit.append(_("Parse users. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}CodeBook":
                 codes = c.getchildren()[0]  # <Codes> tag is only element
-                counter = 0
+                count = 0
                 for code in codes:
                     # recursive search through each Code in Codes
-                    counter += self.sub_codes(code, None)
-                self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(counter)))
+                    count += self.sub_codes(code, None)
+                self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Variables":
-                self.parent_textEdit.append(_("Parse and loading variables"))
-                self.parse_variables(c)
+                count = self.parse_variables(c)
+                self.parent_textEdit.append(_("Parse variables. Loaded File: " + str(count[0]) + ", Case: "+ str(count[1])))
             if c.tag == "{urn:QDA-XML:project:1.0}Cases":
-                self.parent_textEdit.append(_("Parsing and loading cases"))
-                self.parse_cases(c)
+                count = self.parse_cases(c)
+                self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Sources":
-                self.parent_textEdit.append(_("Parsing and loading sources"))
-                self.parse_sources(c)
+                count = self.parse_sources(c)
+                self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                self.parent_textEdit.append(_("Parsing and loading journal notes"))
-                self.parse_notes(c)
+                count = self.parse_notes(c)
+                self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Description":
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
@@ -303,10 +313,14 @@ class Refi_import():
         typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
 
         :param element
+
+        :return count of variables
         """
 
         now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
+        casevarcount = 0
+        filevarcount = 0
         for e in element.getchildren():
             #print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
             # <Variable name="Cases:something"> or ?
@@ -343,13 +357,17 @@ class Refi_import():
                     "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
                     , (name, now_date, self.app.settings['codername'], memo, caseOrFile, valuetype))
                 self.app.conn.commit()
-                #cur.execute("select last_insert_rowid()")
-                #last_insert_id = cur.fetchone()[0]
+                if caseOrFile == "case":
+                    casevarcount += 1
+                else:
+                    filevarcount += 1
+
             except sqlite3.IntegrityError as e:
                 QtWidgets.QMessageBox.warning(None, _("Variable import error"), _("Variable name already exists: ") + name)
 
             # refer to the variables later
             self.variables.append(variable)
+        return [filevarcount, casevarcount]
 
     def parse_cases(self, element):
         """ Parse the Cases element.
@@ -378,7 +396,7 @@ class Refi_import():
 
         now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
-
+        count = 0
         for e in element.getchildren():
             #print(e.tag, e.get("name"), e.get("guid"))
 
@@ -400,6 +418,7 @@ class Refi_import():
                 cur.execute("select last_insert_rowid()")
                 item['caseid'] = cur.fetchone()[0]
                 self.cases.append(item)
+                count += 1
             except Exception as e:
                 self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e))
                 logger.error("item:" + str(item) + ", " + str(e))
@@ -434,6 +453,7 @@ class Refi_import():
                     sql = "update attribute set value=? where name=? and attr_type='case'and id=?"
                     cur.execute(sql, (value, attr_name, item['caseid']))
                     self.app.conn.commit()
+        return count
 
     def clean_up_case_codes_and_case_text(self):
         """ Some Code guids match the Case guids. So remove these Codes.
@@ -470,8 +490,11 @@ class Refi_import():
         <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
         :param element:
+
+        :return count of sources
         """
 
+        count = 0
         for e in element.getchildren():
             #print(e.tag, e.get("name"))
             if e.tag == "{urn:QDA-XML:project:1.0}TextSource":
@@ -484,13 +507,14 @@ class Refi_import():
                 self.load_video_source(e)  # TESTING
             #TODOif e.tag == "{urn:QDA-XML:project:1.0}PDFSource":
             #    self.load_pdf_source(e)
+            count += 1
+        return count
 
     def load_picture_source(self, element):
         """ Load this picture source.
          Load the description and codings into sqlite.
          """
 
-        print("Load picture source todo")
         name = element.get("name")
         guid = element.get("guid")
         creating_user_guid = element.get("creatingUser")
@@ -672,8 +696,9 @@ class Refi_import():
                 #    fulltext = fulltext[6:]
 
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
+                #TODO TEST if importing windows endings on Windows OS requires 2 char replacement
                 if add_ending:
-                    fulltext = fulltext.replace('\n', '\n\n')
+                    fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
                 # logger.debug("type fulltext: " + str(type(entry['fulltext'])))
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
@@ -768,10 +793,12 @@ class Refi_import():
         </Note>
 
         :param element Notes
+
+        : return count of Notes
         """
 
         cur = self.app.conn.cursor()
-
+        count = 0
         for e in element.getchildren():
             #print(e.tag, e.get("name"), e.get("plainTextPath"))
             name = e.get("name")
@@ -796,6 +823,8 @@ class Refi_import():
             cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
             (name, jentry, creating_user, create_date))
             self.app.conn.commit()
+            count += 1
+        return count
 
     def parse_project_description(self, element):
         """ Parse the Description element
@@ -819,11 +848,16 @@ class Refi_import():
         There is no user table in QualCoder sqlite.
         Store each user in dictionary with name and guid.
         :param Users element
+
+        :return count of users
         """
 
+        count = 0
         for e in element.getchildren():
             #print(e.tag, e.get("name"), e.get("guid"))
             self.users.append({"name": e.get("name"), "guid": e.get("guid")})
+            count += 1
+        return count
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD
