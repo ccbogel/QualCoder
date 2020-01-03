@@ -681,8 +681,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
-        msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
-        msg += "Image codings not imported.\n"
+        msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
         msg += "PDFs not imported\n"
         msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
         msg += "Sets and Graphs not imported as QualCoders does not have this functionality.\n"

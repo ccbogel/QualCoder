@@ -66,9 +66,7 @@ class Refi_import():
     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
     """
 
-    #TODO TESTING
     #TODO parse_sources PDF if e.tag == "{urn:QDA-XML:project:1.0}PDFSource
-    #TODO load_picture_source load codings
     #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO TEST load_text_source if importing Windows endings on Windows OS requires line-ending 2 char replacement
@@ -539,7 +537,6 @@ class Refi_import():
             shutil.copyfile(source_path, destination)
         except Exception as e:
             self.parent_textEdit.append(_('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
-
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
             (name, '', creating_user, create_date, media_path, None))
@@ -547,7 +544,51 @@ class Refi_import():
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
 
-        #TODO load codings
+        # Parse PictureSelection elements for Coding elements and load these
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
+                self._load_codings_for_picture(id_, e)
+
+    def _load_codings_for_picture(self, id_, element):
+        ''' Load coded rectangles for pictures
+        Example format:
+        <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1"
+        firstX="783" firstY="1238" secondX="1172" secondY="1788"
+        name="some wording."
+        creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" creationDateTime="2019-03-09T23:19:07Z">
+        <Coding guid="7a7e80ca-ed8c-4006-86b3-731e36baca19" creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" >
+        <CodeRef targetGUID="1b594544-2954-4b67-86ff-fb552f090ba8"/>
+        </Coding></PictureSelection>
+        '''
+
+        firstX = int(element.get("firstX"))
+        firstY = int(element.get("firstY"))
+        secondX = int(element.get("secondX"))
+        secondY = int(element.get("secondY"))
+        width = secondX - firstX
+        height = secondY - firstY
+        memo = element.get("name")
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        cur = self.app.conn.cursor()
+        for e in element:
+            if e.tag == "{urn:QDA-XML:project:1.0}Coding":
+                # Get the code id from the CodeRef guid
+                cid = None
+                codeRef = e.getchildren()[0]
+                for c in self.codes:
+                    if c['guid'] == codeRef.get("targetGUID"):
+                        cid = c['cid']
+                cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,\
+                    date, owner) values(?,?,?,?,?,?,?,?,?)", (id_, firstX, firstY,
+                    width, height, cid, memo, create_date, creating_user))
+                self.app.conn.commit()
 
     def load_audio_source(self, element):
         """ Load audio source into .
@@ -597,6 +638,11 @@ class Refi_import():
         #TODO load transcript
         #TODO transcript contains SynchPoints AKA timestamps
         #TODO load codings
+        '''
+        <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1" firstX="783" firstY="1238" secondX="1172" secondY="1788" name="a stylised faced on the lecture slide.
+        " creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" creationDateTime="2019-03-09T23:19:07Z">
+        <Coding guid="7a7e80ca-ed8c-4006-86b3-731e36baca19" creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" ><CodeRef targetGUID="1b594544-2954-4b67-86ff-fb552f090ba8"/>
+        </Coding></PictureSelection>'''
 
     def load_video_source(self, element):
         """ Load this video source into .
@@ -722,7 +768,7 @@ class Refi_import():
         except Exception as e:
             self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + rich_path_full + "\nto: " + destination + '\n' + str(e))
 
-        # ParsePlainTextSelection elements for Coding elements and load these
+        # Parse PlainTextSelection elements for Coding elements and load these
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
                 self._load_codings_for_text(source, e)
@@ -744,8 +790,6 @@ class Refi_import():
         < CodeRef targetGUID = "2dfba8c9-59f5-4424-99d6-ea9bce18134b" / >
         < / Coding >
         < / PlainTextSelection >
-
-         Inconsistent positioning of pos0 and pos1 from import of plain text from Nvivo.
 
         :param entry - the source text dictionary
         :param element - the PlainTextSelection element
