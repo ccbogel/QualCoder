@@ -306,7 +306,7 @@ class Refi_import():
         <Description />
         </Variable>
 
-        TODO variables assigned to files
+        TODO variables assigned to files - to check
 
         typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
 
@@ -503,18 +503,16 @@ class Refi_import():
                 self.load_audio_source(e)  # TESTING
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSource":
                 self.load_video_source(e)  # TESTING
-            #TODOif e.tag == "{urn:QDA-XML:project:1.0}PDFSource":
-            #    self.load_pdf_source(e)
+            if e.tag == "{urn:QDA-XML:project:1.0}PDFSource":
+                self.load_pdf_source(e)  # TESTING
             count += 1
         return count
 
-    def load_picture_source(self, element):
-        """ Load this picture source.
-         Load the description and codings into sqlite.
-         """
+    def name_creating_user_create_date_source_path_helper(self, element):
+        """ Helper method to obtain name, guid, creating user, create date from each source """
 
         name = element.get("name")
-        guid = element.get("guid")
+        #guid = element.get("guid")
         creating_user_guid = element.get("creatingUser")
         creating_user = "default"
         for u in self.users:
@@ -524,9 +522,25 @@ class Refi_import():
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
 
-        # paths starts with internal://
-        path = element.get("path").split('internal:/')[1]
-        source_path = self.folder_name + '/Sources' + path
+        # path starts with internal:// or relative:///
+        path = element.get("path")
+        if path is not None and path.find("internal://") == 0:
+            path = element.get("path").split('internal:/')[1]
+            source_path = self.folder_name + '/Sources' + path
+        if path is not None and path.find("relative:///") == 0:
+            source_path = self.app.project_path + "../" + path.split('relative:///')[1]
+        if path is None:
+            source_path = element.get("plainTextPath").split('internal:/')[1]
+            source_path = self.folder_name + '/Sources' + source_path
+
+        return name, creating_user, create_date, source_path
+
+    def load_picture_source(self, element):
+        """ Load this picture source.
+         Load the description and codings into sqlite.
+         """
+
+        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda images folder and rename into original name
         #print(source_path)
@@ -597,26 +611,8 @@ class Refi_import():
         path to file can be internal or relative.
         e.g. path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
         """
-        #TODO check this works
-        name = element.get("name")
-        guid = element.get("guid")
-        creating_user_guid = element.get("creatingUser")
-        creating_user = "default"
-        for u in self.users:
-            if u['guid'] == creating_user_guid:
-                creating_user = u['name']
-        create_date = element.get("creationDateTime")
-        create_date = create_date.replace('T', ' ')
-        create_date = create_date.replace('Z', '')
 
-        # path starts with internal:// or relative:///
-        path = element.get("path")
-        if path.find("internal://") == 0:
-            path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + '/Sources' + path
-        if path.find("relative:///") == 0:
-            source_path = self.app.project_path + "../" + path.split('relative:///')[1]
-            print("RELATIVE AUDIO PATH: " + source_path)  # tmp
+        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda audio folder and rename into original name
         #print(source_path)
@@ -648,26 +644,8 @@ class Refi_import():
         """ Load this video source into .
         Load the description and codings into sqlite.
         """
-        #TODO check this works
-        name = element.get("name")
-        guid = element.get("guid")
-        creating_user_guid = element.get("creatingUser")
-        creating_user = "default"
-        for u in self.users:
-            if u['guid'] == creating_user_guid:
-                creating_user = u['name']
-        create_date = element.get("creationDateTime")
-        create_date = create_date.replace('T', ' ')
-        create_date = create_date.replace('Z', '')
 
-        # paths starts with internal:// or relative:///
-        path = element.get("path")
-        if path.find("internal://") == 0:
-            path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + '/Sources' + path
-        if path.find("relative:///") == 0:
-            source_path = self.app.project_path + "../" + path.split('relative:///')[1]
-            print("RELATIVE AUDIO PATH: " + source_path)  # tmp
+        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda video folder and rename into original name
         #print(source_path)
@@ -690,40 +668,62 @@ class Refi_import():
         #TODO transcript contains SynchPoints AKA timestamps
         #TODO load codings
 
+    def load_pdf_source(self, element):
+        """ Load the pdf and text representation into sqlite. """
+
+        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+
+        # Copy file into .qda documents folder and rename into original name
+        #print(source_path)
+        destination = self.app.project_path + "/documents/" + name
+        #print(destination)
+        try:
+            shutil.copyfile(source_path, destination)
+            print("PDF IMPORT", source_path, destination)
+        except Exception as e:
+            self.parent_textEdit.append(_('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        """ The PDF source contains a text representation:
+        <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
+        modifyingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" modifiedDateTime="2018‐03‐27T18:01:07Z"
+        creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" creationDateTime="2018‐03‐27T18:01:07Z"
+        guid="142EB46D‐612E‐4593‐A385‐D0E5D04D1288" name="Representation_for_Pay de Limónpdf">
+
+        The representation contains text codings:
+        <PlainTextSelection startPosition="297" modifyingUser="AD68FBE7‐E1EE‐4A82‐A279‐
+        23CC698C89EB" modifiedDateTime="2018‐03‐27T19:11:47Z" creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐
+        23CC698C89EB" creationDateTime="2018‐03‐27T19:11:47Z" endPosition="498" guid="95916796‐D0A0‐4B49‐
+        80B0‐5A5C8B94AE13" name="favoritos. 2 horas 30 minuto Para la bas...">
+        <Coding creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB"
+        creationDateTime="2018‐03‐27T19:11:47Z" guid="5C931701‐6CD4‐4A2B‐A553‐F1DDE2EAC46D">
+        <CodeRef targetGUID="AE6D04CE‐D987‐4FC8‐AF97‐D72CA6FFD08F"/></Coding></PlainTextSelection>
+        </Representation>
+        """
+        for e in element:
+            if e.tag == "{urn:QDA-XML:project:1.0}Represenation":
+                self.load_text_source(e)
+
     def load_text_source(self, element):
         """ Load this text source into sqlite.
          Add the description and the text codings.
-
-         When testing with Nvivo export: import from docx or txt
-         the txt needs an additional character.
+         When testing with Windows Nvivo export: import from docx or txt
+         the text needs an additional character.
          """
 
-        cur = self.app.conn.cursor()
-        name = element.get("name")
-        guid = element.get("guid")
-        creating_user_guid = element.get("creatingUser")
-        creating_user = "default"
-        for u in self.users:
-            if u['guid'] == creating_user_guid:
-                creating_user = u['name']
-        create_date = element.get("creationDateTime")
-        create_date = create_date.replace('T', ' ')
-        create_date = create_date.replace('Z', '')
-        # paths starts with internal://
-        plain_path = element.get("plainTextPath").split('internal:/')[1]
-        plain_path = self.folder_name + '/Sources' + plain_path
+        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
 
+        cur = self.app.conn.cursor()
         # find Description to complete memo
         memo = ""
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = e.text
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
-                 'owner': self.app.settings['codername'], 'date': create_date, 'guid': guid}
-        # Read the text and enter into sqlite source table
-        # Check plain text file line endinfgs for Windows \r\n
+                 'owner': self.app.settings['codername'], 'date': create_date}
+
+        # Check plain text file line endings for Windows 2 character \r\n
         add_ending = False
-        with open(plain_path,"rb") as f:
+        with open(source_path,"rb") as f:
             while True:
                 c = f.read(1)
                 if not c or c == b'\n':
@@ -735,14 +735,17 @@ class Refi_import():
                     #print('r')
                     pass
             #print('n')
+
+        # Read the text and enter into sqlite source table
         try:
-            with open(plain_path) as f:
+            with open(source_path) as f:
                 fulltext = f.read()
                 #if fulltext[0:6] == "\ufeff":  # associated with notepad files
                 #    fulltext = fulltext[6:]
 
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
-                #TODO TEST if importing windows endings on Windows OS requires 2 char replacement
+                # Due to 2 charachter line endings
+                #TODO TEST if importing Windows endings on Windows OS that it requires the 2 char line-ending replacement
                 if add_ending:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
@@ -755,19 +758,13 @@ class Refi_import():
                 source['id'] = id_
                 self.sources.append(source)
         except Exception as e:
-            self.parent_textEdit.append(_("Cannot read from TextSource: ") + plain_path + "\n" + str(e))
-
-        # Copy file into .qda documents folder and rename into original name
-        rich_path = element.get("richTextPath").split('internal:/')[1]
-        rich_path_full = self.folder_name + '/Sources' + rich_path
-        #print(rich_path_full)
-        destination = self.app.project_path + "/documents/" + name + '.' + rich_path.split('.')[-1]
-        #print(destination)
+            self.parent_textEdit.append(_("Cannot read from TextSource: ") + source_path + "\n" + str(e))
+        destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
         try:
-            shutil.copyfile(rich_path_full, destination)
+            shutil.copyfile(source_path, destination)
+            print("TEXT IMPORT", source_path, destination)
         except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + rich_path_full + "\nto: " + destination + '\n' + str(e))
-
+            self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         # Parse PlainTextSelection elements for Coding elements and load these
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
@@ -1844,7 +1841,8 @@ class Refi_export(QtWidgets.QDialog):
         Usernames are drawn from coded text, images and a/v."""
 
         self. users = []
-        sql = "select distinct owner from  code_image union select owner from code_text union select owner from code_av"
+        sql = "select distinct owner from code_image union select owner from code_text union \
+        select owner from source union select owner from code_av"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         result = cur.fetchall()
