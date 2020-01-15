@@ -377,13 +377,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.triggered.connect(self.image_coding)
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
-        #self.ui.actionView_Graph.triggered.connect(self.view_graph)
-        self.ui.actionView_Graph_2.triggered.connect(self.view_graph_original)
 
         # reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
+        self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -419,7 +418,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
-        self.ui.actionView_Graph_2.setEnabled(False)
         self.ui.actionExport_codebook.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
@@ -451,8 +449,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
-        self.ui.actionView_Graph.setEnabled(False)
-        self.ui.actionView_Graph_2.setEnabled(True)
+        self.ui.actionView_Graph.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(True)
@@ -461,6 +458,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(True)
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
+        self.ui.actionText_mining.setVisible(False)
 
     def settings_report(self):
         msg = _("Settings")
