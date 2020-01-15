@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -64,8 +64,6 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
-    <addaction name="actionView_Graph"/>
-    <addaction name="actionView_Graph_2"/>
     <addaction name="actionExport_codebook"/>
    </widget>
    <widget class="QMenu" name="menuReports">
@@ -75,6 +73,7 @@
     <addaction name="actionCoding_reports"/>
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCode_frequencies"/>
+    <addaction name="actionView_Graph"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
    </widget>
