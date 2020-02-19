@@ -170,14 +170,14 @@ class DialogCases(QtWidgets.QDialog):
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(name, now_date, self.settings['codername'], "", 'case', valuetype))
+            ,(name, now_date, self.app.settings['codername'], "", 'case', valuetype))
         self.app.conn.commit()
         sql = "select caseid from cases"
         cur.execute(sql)
         case_ids = cur.fetchall()
         for id_ in case_ids:
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            cur.execute(sql, (name, "", id_[0], 'case', now_date, self.settings['codername']))
+            cur.execute(sql, (name, "", id_[0], 'case', now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
