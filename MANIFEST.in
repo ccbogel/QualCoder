@@ -1,5 +1,0 @@
-include README
-include qualcoder.png
-include requirements.txt
-recursive-include qualcoder/GUI *.stylesheet
-recursive-include qualcoder/locale *
