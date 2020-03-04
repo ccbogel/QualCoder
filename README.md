@@ -14,7 +14,7 @@ You will also need to have a vlc player installed - for audio and video.
 
 You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
 
-You might need to run this command from the terminal for pdf importing:
+You also need to run this command from the terminal for pdf importing:
 
 `sudo python3 -m pip install pdfminer.six`
 
