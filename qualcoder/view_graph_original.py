@@ -410,12 +410,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     data = None
     border_rect = None
+    app = None
     font = None
     settings = None
 
     def __init__(self, app, data):
         super(TextGraphicsItem, self).__init__(None)
 
+        self.app = app
         self.conn = app.conn
         self.settings = app.settings
         self.project_path = app.project_path
@@ -487,14 +489,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Add or edit memos for codes and categories. """
 
         if data['cid'] is not None:
-            ui = DialogMemo(self.settings, "Memo for Code " + data['name'], data['memo'])
+            ui = DialogMemo(self.app, "Memo for Code " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
             self.conn.commit()
         if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo(self.settings, "Memo for Category " + data['name'], data['memo'])
+            ui = DialogMemo(self.app, "Memo for Category " + data['name'], data['memo'])
             ui.exec_()
             self.data['memo'] = ui.memo
             cur = self.conn.cursor()
