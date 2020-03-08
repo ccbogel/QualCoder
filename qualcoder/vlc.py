@@ -152,10 +152,8 @@ def find_lib():
                 programfiles = os.environ["ProgramFiles"]
                 homedir = os.environ["HOMEDRIVE"]
                 for p in ('{programfiles}\\VideoLan{libname}', '{homedir}:\\VideoLan{libname}',
-                          '{programfiles}{libname}',           '{homedir}:{libname}'):
-                    p = p.format(homedir = homedir,
-                                 programfiles = programfiles,
-                                 libname = '\\VLC\\' + libname)
+                          '{programfiles}{libname}', '{homedir}:{libname}'):
+                    p = p.format(homedir = homedir, programfiles = programfiles, libname = '\\VLC\\' + libname)
                     if os.path.exists(p):
                         plugin_path = os.path.dirname(p)
                         break
@@ -167,7 +165,12 @@ def find_lib():
                  # restore cwd after dll has been loaded
                 os.chdir(p)
             else:  # may fail
-                dll = ctypes.CDLL(libname)
+                # if plugin_path is still None try a known location
+                # Below line is a last resort for importing the dll after the usual vlc module fails to import
+                p = "C:\Program Files\VideoLAN\VLC\libvlc.dll"
+                plugin_path = os.path.dirname(p)
+                dll = ctypes.CDLL(p)
+                #dll = ctypes.CDLL(libname)  # orignal vlc code
         else:
             plugin_path = os.path.dirname(p)
             dll = ctypes.CDLL(p)

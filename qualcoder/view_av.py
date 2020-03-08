@@ -47,11 +47,6 @@ try:
 except Exception as e:
     if sys.platform.startswith("win"):
         imp = False
-        try:
-            import vlc_winmod as vlc
-            imp = True
-        except:
-            pass
     if not imp:
         msg = "view_av. Cannot import vlc\n"
         msg += str(e) + "\n"
