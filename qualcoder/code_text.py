@@ -1044,14 +1044,22 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         dialog = QtWidgets.QInputDialog(None)
         dialog.setWindowTitle(_("Automatic coding"))
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setToolTip(_("Use | to code multiple texts"))
         dialog.setLabelText(_("Autocode files with the current code for this text:") +"\n" + item.text(0))
         dialog.resize(200, 20)
         ok = dialog.exec_()
         if not ok:
             return
-        findText = str(dialog.textValue())
-        if findText == "" or findText is None:
+        find_text = str(dialog.textValue())
+        if find_text == "" or find_text is None:
             return
+        texts = find_text.split('|')
+        tmp = list(set(texts))
+        texts = []
+        for t in tmp:
+            if t != "":
+                texts.append(t)
+
         ui = DialogSelectFile(self.filenames, _("Select file to view"), "many")
         ok = ui.exec_()
         if not ok:
@@ -1059,34 +1067,37 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         files = ui.get_selected()
         if len(files) == 0:
             return
-        filenames = ""
-        for f in files:
-            filenames += f['name'] + " "
-            cur = self.app.conn.cursor()
-            cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
-                [f['id']])
-            currentfile = cur.fetchone()
-            text = currentfile[2]
-            textStarts = [match.start() for match in re.finditer(re.escape(findText), text)]
-            # Add new items to database
-            for startPos in textStarts:
-                item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(findText),
-                'pos0': startPos, 'pos1': startPos + len(findText),
-                'owner': self.app.settings['codername'], 'memo': "",
-                'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-                cur = self.app.conn.cursor()
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                    owner,memo,date) values(?,?,?,?,?,?,?,?)"
-                    , (item['cid'], item['fid'], item['seltext'], item['pos0'],
-                    item['pos1'], item['owner'], item['memo'], item['date']))
-                self.app.conn.commit()
 
-                # If this is the currently open file update the code text list and GUI
-                if f['id'] == self.filename['id']:
-                    self.code_text.append(item)
-            self.highlight()
-            self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
-                + _(". with text: ") + findText)
+        for txt in texts:
+            filenames = ""
+            for f in files:
+                filenames += f['name'] + " "
+                cur = self.app.conn.cursor()
+                cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
+                    [f['id']])
+                currentfile = cur.fetchone()
+                text = currentfile[2]
+                textStarts = [match.start() for match in re.finditer(re.escape(txt), text)]
+                # Add new items to database
+                for startPos in textStarts:
+                    item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
+                    'pos0': startPos, 'pos1': startPos + len(txt),
+                    'owner': self.app.settings['codername'], 'memo': "",
+                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                    cur = self.app.conn.cursor()
+                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                        owner,memo,date) values(?,?,?,?,?,?,?,?)"
+                        , (item['cid'], item['fid'], item['seltext'], item['pos0'],
+                        item['pos1'], item['owner'], item['memo'], item['date']))
+                    self.app.conn.commit()
+
+                    # If this is the currently open file update the code text list and GUI
+                    if f['id'] == self.filename['id']:
+                        self.code_text.append(item)
+                self.highlight()
+                self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
+                    + _(". with text: ") + txt)
+
         # Update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
