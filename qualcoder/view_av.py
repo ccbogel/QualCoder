@@ -33,6 +33,7 @@ import os
 import platform
 from random import randint
 import re
+import subprocess
 import sys
 import traceback
 
@@ -40,10 +41,24 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
+vlc_msg = ""
 try:
     import vlc
 except Exception as e:
-    print(e)
+    if sys.platform.startswith("win"):
+        imp = False
+        try:
+            import vlc_winmod as vlc
+            imp = True
+        except:
+            pass
+    if not imp:
+        msg = "view_av. Cannot import vlc\n"
+        msg += str(e) + "\n"
+        msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
+        msg += "32 bit python AND 32 bit VLC installed."
+        print(msg)
+        vlc_msg = msg
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
@@ -120,6 +135,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app = app
         self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
+        if vlc_msg != "":
+            self.parent_textEdit.append(vlc_msg)
         self.codes = []
         self.categories = []
         self.annotations = []
