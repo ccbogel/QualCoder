@@ -3,7 +3,7 @@ QualCoder is a qualitative data analysis application written in python3 and pyqt
 
 QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu 19.04, Linux Mint 18.04 Lubuntu 18.04. It has not been throughly tested on Windows 10 and Mac OS.
+This project has been tested under Ubuntu 19.04, Linux Mint 18.04 Lubuntu 18.04, Windows 10. It has not been throughly tested on Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the Github Wiki.
 
 ## INSTALLATION
@@ -34,11 +34,11 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
+`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
 
 or:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pikepdf pdfminer.six`
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
@@ -56,7 +56,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pikepdf pdfminer.six`
+`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six`
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
@@ -64,7 +64,7 @@ Another option is shown here [https://www.maketecheasier.com/run-python-script-i
  You can make an alias to the file and place it on your desktop.
  
 ## Dependencies
-Required
+Required:
 
 * Python 3.x version
 
@@ -82,14 +82,12 @@ Required
 
 * chardet
 
-* pikepdf
-
 * pdfminer.six
+
+Optional:
 
 * vlc
 
-## Issues
-* Testing has mostly been performed on Ubuntu, Linux Mint and Windows 10. Some usage conducted with Lubuntu and Apple MacOSX.
 
 ## Future plans
 * Improve manual transcription. keyboard shortcuts for speaker, paste timestamp, rewind several seconds.
