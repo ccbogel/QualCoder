@@ -353,32 +353,34 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.change_scale()
 
     def draw_coded_areas(self):
-        """ Draw coded areas with scaling. This coder is shown in red rectangles.
-        Other coders are shown via magenta rectangles.
+        """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
+        Other coders are shown via dotline rectangles.
         Remove items first, as this is called after a coded area is unmarked. """
 
         if self.file_ is None:
             return
         for item in self.code_areas:
             if item['id'] == self.file_['id']:
+                color = QtGui.QColor('#AA0000')  # Default color
+                color = None
                 tooltip = ""
                 for c in self.codes:
                     if c['cid'] == item['cid']:
                         tooltip = c['name'] + " (" + item['owner'] + ")"
                         tooltip += "\nMemo: " + item['memo']
+                        color = QtGui.QColor(c['color'])
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
                 width = item['width'] * self.scale
                 height = item['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-                rect_item.setPen(QtGui.QPen(QtCore.Qt.red, 2, QtCore.Qt.DashLine))
+                rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
-                if self.ui.checkBox_show_coders.isChecked() and item['owner'] != self.app.settings['codername']:
-                    rect_item.setPen(QtGui.QPen(QtCore.Qt.magenta, 2, QtCore.Qt.DashLine))
+                if item['owner'] == self.app.settings['codername']:
                     self.scene.addItem(rect_item)
-                else:
-                    if item['owner'] == self.app.settings['codername']:
-                        self.scene.addItem(rect_item)
+                if self.ui.checkBox_show_coders.isChecked() and item['owner'] != self.app.settings['codername']:
+                    rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DotLine))
+                    self.scene.addItem(rect_item)
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -580,7 +582,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         item['imid'] = imid
         self.code_areas.append(item)
         rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        rect_item.setPen(QtGui.QPen(QtCore.Qt.red, 2, QtCore.Qt.DashLine))
+        color = None
+        for i in range(0, len(self.codes)):
+            if self.codes[i]['cid'] == int(cid):
+                color = QtGui.QColor(self.codes[i]['color'])
+        if color is None:
+            print("ERROR")
+            return
+        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
         rect_item.setToolTip(code_.text(0))
         self.scene.addItem(rect_item)
         self.selection = None
@@ -683,15 +692,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
-        '''cur.execute("select last_insert_rowid()")
-        cid = cur.fetchone()[0]
-        item['cid'] = cid
-        self.codes.append(item)
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        color = item['color']
-        top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
-        self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)'''
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New code: ") + item['name'])
 
@@ -713,13 +713,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
-        '''cur.execute("select last_insert_rowid()")
-        catid = cur.fetchone()[0]
-        item['catid'] = catid
-        self.categories.append(item)
-        # update widget
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        self.ui.treeWidget.addTopLevelItem(top_item)'''
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
@@ -758,8 +751,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         selected = None
         self.update_dialog_codes_and_categories()
-        #self.get_codes_and_categories()
-        #self.fill_tree()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -784,8 +775,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         selected = None
         self.update_dialog_codes_and_categories()
-        #self.get_codes_and_categories()
-        #self.fill_tree()
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo. """
