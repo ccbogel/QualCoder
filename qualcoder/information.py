@@ -66,17 +66,22 @@ class DialogInformation(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(title)
         if filename != "":
-            # Changed to relative path for pyinstaller
-            #scriptdir = os.path.dirname(os.path.abspath(__file__))
-            #html_file = os.path.join(scriptdir, filename)
-            html_file = filename
             try:
+                scriptdir = os.path.dirname(os.path.abspath(__file__))
+                html_file = scriptdir + '/' + filename
                 with open(html_file, 'r', encoding='utf8') as f:
                     self.text = f.read()
                 self.ui.textEdit.setHtml(self.text)
             except Exception as e:
-                print(e)
-                self.text = _("Cannot open file.")
+                # Try relative path for pyinstaller
+                html_file = filename
+                try:
+                    with open(html_file, 'r', encoding='utf8') as f:
+                        self.text = f.read()
+                    self.ui.textEdit.setHtml(self.text)
+                except Exception as e:
+                    print(e)
+                    self.text = _("Cannot open file.")
 
     def setHtml(self, html):
         ''' This method is used to populate the textEdit.
