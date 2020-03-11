@@ -38,9 +38,7 @@ import sys
 import sqlite3
 import traceback
 import webbrowser
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 from settings import DialogSettings
 from attributes import DialogManageAttributes
 from cases import DialogCases
@@ -247,7 +245,9 @@ class App(object):
     def merge_settings_with_default_stylesheet(self, settings):
         stylesheet = []
         pattern = re.compile('^Q|[*]')
-        with open(path + "/GUI/default.stylesheet", "r") as fh:
+        # Changed to relative directory for pyinstaller
+        #with open(path + "/GUI/default.stylesheet", "r") as fh:
+        with open("GUI/default.stylesheet", "r") as fh:
             cur_element = None
             for line in fh:
                 if pattern.match(line):

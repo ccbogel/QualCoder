@@ -910,15 +910,14 @@ class Refi_import():
 
         :return true or false passing validation
         """
-
-        file_xsd = path + "/Codebook.xsd"
+        # Change to relative path for pyinstaller
+        #file_xsd = path + "/Codebook.xsd"
+        file_xsd = "Codebook.xsd"
         if xsd_type != "codebook":
-            file_xsd = path + "/Project-mrt2019.xsd"
-        #print(file_xsd)
+            # Change to relative path for pyinstaller
+            #file_xsd = path + "/Project-mrt2019.xsd"
+            file_xsd = "Project-mrt2019.xsd"
         try:
-            #print("Validating:{0}".format(self.xml))
-            #print("xsd_file:{0}".format(file_xsd))
-            #xml_doc = etree.tostring(self.xml)
             xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
             xsd_doc = etree.parse(file_xsd)
             xmlschema = etree.XMLSchema(xsd_doc)
@@ -1015,6 +1014,7 @@ class Refi_export(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             print(e)
             exit(0)
+        txt_errors = ""
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
             destination = '/Sources/' + s['filename']
@@ -1027,7 +1027,8 @@ class Refi_export(QtWidgets.QDialog):
                             shutil.copyfile(self.app.project_path + s['mediapath'],
                                 self.app.settings['directory'] + '/' + s['filename'])
                     except FileNotFoundError as e:
-                        print("ERROR HERE line 929")
+                        txt_errors += "Error in media export: " + s['filename'] + "\n" + str(e)
+                        print("ERROR in refi.export_project. media export: " + s['filename'])
                         print(e)
             if s['mediapath'] is None:  # a document
                 try:
@@ -1039,7 +1040,12 @@ class Refi_export(QtWidgets.QDialog):
                 # Also need to add the plain text file as a source
                 # plaintext has different guid from richtext
                 with open(prep_path + '/Sources/' + s['plaintext_filename'], 'w') as f:
-                    f.write(s['fulltext'])
+                    try:
+                        f.write(s['fulltext'])
+                    except Exception as e:
+                        txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(e)
+                        logger.error(str(e) + '\nIn plaintext file export: ' + s['plaintext_filename'])
+                        print(e)
         for notefile in self.note_files:
             with open(prep_path + '/Sources/' + notefile[0], 'w') as f:
                 f.write(notefile[1])
@@ -1057,6 +1063,9 @@ class Refi_export(QtWidgets.QDialog):
         msg += "Large > 2GBfiles are not stored externally."
         msg += "This project exchange is not compliant with the exchange standard.\n"
         msg += "REFI-QDA EXPERIMENTAL FUNCTION."
+        if txt_errors != "":
+            msg += "\nErrors: "
+            msg += txt_errors
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
 
     def export_codebook(self):
@@ -2006,15 +2015,15 @@ class Refi_export(QtWidgets.QDialog):
             No return value
         """
 
-        file_xsd = path + "/Codebook.xsd"
+        # Change to relative import for pyinstaller
+        #file_xsd = path + "/Codebook.xsd"
+        file_xsd =  "Codebook.xsd"
         if xsd_type != "codebook":
-            file_xsd = path + "/Project-mrt2019.xsd"
-        print(file_xsd)
+            # Change to relative import for pyinstaller
+            #file_xsd = path + "/Project-mrt2019.xsd"
+            file_xsd = "Project-mrt2019.xsd"
         try:
-            print("Validating:{0}".format(self.xml))
-            print("xsd_file:{0}".format(file_xsd))
-            #xml_doc = etree.tostring(self.xml)
-            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
+            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))
             xsd_doc = etree.parse(file_xsd)
             xmlschema = etree.XMLSchema(xsd_doc)
             xmlschema.assert_(xml_doc)

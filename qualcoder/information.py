@@ -66,10 +66,12 @@ class DialogInformation(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle(title)
         if filename != "":
-            scriptdir = os.path.dirname(os.path.abspath(__file__))
-            htmlFile = os.path.join(scriptdir, filename)
+            # Changed to relative path for pyinstaller
+            #scriptdir = os.path.dirname(os.path.abspath(__file__))
+            #html_file = os.path.join(scriptdir, filename)
+            html_file = filename
             try:
-                with open(htmlFile, 'r', encoding='utf8') as f:
+                with open(html_file, 'r', encoding='utf8') as f:
                     self.text = f.read()
                 self.ui.textEdit.setHtml(self.text)
             except Exception as e:
