@@ -910,13 +910,24 @@ class Refi_import():
 
         :return true or false passing validation
         """
-        # Change to relative path for pyinstaller
-        #file_xsd = path + "/Codebook.xsd"
+
         file_xsd = "Codebook.xsd"
+        # Check if relative path needed, for pyinstaller
+        try:
+            with open(file_xsd, 'r', encoding='utf8') as f:
+                text = f.read()
+        except:
+            file_xsd = path + "/Codebook.xsd"
+
         if xsd_type != "codebook":
-            # Change to relative path for pyinstaller
-            #file_xsd = path + "/Project-mrt2019.xsd"
+            # Check if relative path needed, for pyinstaller
             file_xsd = "Project-mrt2019.xsd"
+            try:
+                with open(file_xsd, 'r', encoding='utf8') as f:
+                    text = f.read()
+            except:
+                file_xsd = path + "/Project-mrt2019.xsd"
+
         try:
             xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
             xsd_doc = etree.parse(file_xsd)
@@ -2015,13 +2026,23 @@ class Refi_export(QtWidgets.QDialog):
             No return value
         """
 
-        # Change to relative import for pyinstaller
-        #file_xsd = path + "/Codebook.xsd"
-        file_xsd =  "Codebook.xsd"
+        file_xsd = "Codebook.xsd"
+        # Check if relative path needed, for pyinstaller
+        try:
+            with open(file_xsd, 'r', encoding='utf8') as f:
+                text = f.read()
+        except:
+            file_xsd = path + "/Codebook.xsd"
+
         if xsd_type != "codebook":
-            # Change to relative import for pyinstaller
-            #file_xsd = path + "/Project-mrt2019.xsd"
+            # Check if relative path needed, for pyinstaller
             file_xsd = "Project-mrt2019.xsd"
+            try:
+                with open(file_xsd, 'r', encoding='utf8') as f:
+                    text = f.read()
+            except:
+                file_xsd = path + "/Project-mrt2019.xsd"
+
         try:
             xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))
             xsd_doc = etree.parse(file_xsd)
