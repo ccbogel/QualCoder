@@ -243,11 +243,18 @@ class App(object):
         return res
 
     def merge_settings_with_default_stylesheet(self, settings):
+
+        file_ = "GUI/default.stylesheet"
+        # Check if relative path needed, for pyinstaller
+        try:
+            with open(file_, 'r') as f:
+                text = f.read()
+        except:
+            file_ = path + "/GUI/default.stylesheet"
+
         stylesheet = []
         pattern = re.compile('^Q|[*]')
-        # Changed to relative directory for pyinstaller
-        #with open(path + "/GUI/default.stylesheet", "r") as fh:
-        with open("GUI/default.stylesheet", "r") as fh:
+        with open(file_, "r") as fh:
             cur_element = None
             for line in fh:
                 if pattern.match(line):
