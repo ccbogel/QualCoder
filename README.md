@@ -90,7 +90,7 @@ Optional:
 
 
 ## Future plans
-* Improve manual transcription. keyboard shortcuts for speaker, paste timestamp, rewind several seconds.
+* Improve packaging for easier installation: currently investigating use of pyinstaller
 * Change from pdfminer.six to pdfminer3
 * Reports:
         Word count report maybe
