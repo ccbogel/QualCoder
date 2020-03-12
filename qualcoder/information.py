@@ -49,39 +49,32 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogInformation(QtWidgets.QDialog):
     """
-    Dialog to display details from html and text files for PyQDA development, version and license;
-    and for help information.
+    Dialog to display about information from html and text files for PyQDA development,
+    version and license.
+    The html is coded below because it avoids potential data file import errors with pyinstaller.
+    Called from:
+         qualcoder.MainWindow.about
+         view_graph_original.ViewGraphOriginal.list_graph.TextGraphicsItem
+         view_graph_original.ViewGraphOriginal.circular_graph.TextGraphicsItem
     """
 
     title = ""
     text = ""
 
-    def __init__(self, title, filename="", parent=None):
+    def __init__(self, title, html="", parent=None):
         ''' Display information text in dialog.
-        If no filename is given, open a blank dialog to be populated later '''
+        If no html is given, fill with About html.
+        '''
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
         self.setWindowTitle(title)
-        if filename != "":
-            try:
-                scriptdir = os.path.dirname(os.path.abspath(__file__))
-                html_file = scriptdir + '/' + filename
-                with open(html_file, 'r', encoding='utf8') as f:
-                    self.text = f.read()
-                self.ui.textEdit.setHtml(self.text)
-            except Exception as e:
-                # Try relative path for pyinstaller
-                html_file = filename
-                try:
-                    with open(html_file, 'r', encoding='utf8') as f:
-                        self.text = f.read()
-                    self.ui.textEdit.setHtml(self.text)
-                except Exception as e:
-                    print(e)
-                    self.text = _("Cannot open file.")
+        if html == "":
+            self.setHtml(a)
+        else:
+            self.setHtml(html)
 
     def setHtml(self, html):
         ''' This method is used to populate the textEdit.
@@ -101,4 +94,59 @@ if __name__ == "__main__":
     ui = DialogInformation("a title", "a filename")
     ui.show()
     sys.exit(app.exec_())
+
+a = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">\
+<html><head>\
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>\
+	<style type="text/css">\
+	@page { margin: 2cm }\
+	h1 { margin-bottom: 0.21cm; color: #000000 }\
+	h1.western { font-family: "Arial", sans-serif; font-size: 16pt }\
+	h2 { margin-bottom: 0.21cm; color: #000000 }\
+	h2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }\
+	</style>\
+</head><body>\
+<h1 class="western">About QualCoder</h1>\
+<h2 class="western">Version:</h2>\
+<p>QualCoder 1.8 2020 March 11</p>\
+<p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six</p>\
+<p>VLC should also be installed.</p>\
+<p>Tested on: Linux Mint 18.04, Ubuntu 19.04, Lubuntu 18.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\
+<p></p>\
+<h2 class="western">Acknowledgements</h2>\
+<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
+<p>Mike MacCana for the source code for the docx module.</p>\
+<p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
+<p>ebooklib: Aleksandar Erkalović (<a href="https://github.com/aerkalov">https://github.com/aerkalov</a>)</p>\
+<p>The VideoLAN team for the bindings to VLC</p>\
+<p>To various members on github for supporting this project.</p>\
+<h2 class="western">Other details</h2\
+<p>The qda data folder contains folders for imported documents, '
+a += 'images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
+<p>QualCoder creates a .qualcoder folder inside your home directory. '
+a += 'This contains QualCoder.log, config.ini (for settings) and '
+a += 'recent_project.txt. The config file contains the name of the current coder, '
+a += 'default working directory and selected font.</p>\
+<p>QualCoder is written in python 3 using Qt5 for the graphical interface.</p>\
+<p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
+<h2 class="western">License</h2>\
+<p>MIT License</p>\
+<p>Copyright (c) 2020 Colin Curtain</p>\
+<p>Permission is hereby granted, free of charge, to any person<br />\
+obtaining a copy of this software and associated documentation files<br />\
+(the &quot;Software&quot;), to deal in the Software without<br />\
+restriction, including without limitation the rights to use, copy,<br />\
+modify, merge, publish, distribute, sublicense, and/or sell copies of<br />\
+the Software, and to permit persons to whom the Software is furnished<br />\
+to do so, subject to the following conditions:</p>\
+<p>The above copyright notice and this permission notice shall be <br />\
+included in all copies or substantial portions of the Software.</p>\
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF<br />\
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE<br />\
+WARRANTIES OF MERCHANTABILITY,</p>\
+<p>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT<br />\
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,<br />\
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR<br />\
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR<br />\
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></body></html>'
 

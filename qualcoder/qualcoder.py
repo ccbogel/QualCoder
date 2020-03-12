@@ -243,30 +243,20 @@ class App(object):
         return res
 
     def merge_settings_with_default_stylesheet(self, settings):
+        """ Originally had separate stylesheet file. Now stylesheet is coded because
+        avoids potential data file import errors with pyinstaller. """
 
-        file_ = "GUI/default.stylesheet"
-        # Check if relative path needed, for pyinstaller
-        try:
-            with open(file_, 'r') as f:
-                text = f.read()
-        except:
-            file_ = path + "/GUI/default.stylesheet"
-
-        stylesheet = []
-        pattern = re.compile('^Q|[*]')
-        with open(file_, "r") as fh:
-            cur_element = None
-            for line in fh:
-                if pattern.match(line):
-                    cur_element = line.strip()
-                    stylesheet.append(line.strip())
-                elif 'font-size' in line and cur_element == '*':
-                    stylesheet.append('   font-size:%.0fpx;'%settings.get('fontsize'))
-                elif 'font-size' in line and cur_element == 'QTreeWidget':
-                    stylesheet.append('   font-size:%.0fpx;'%settings.get('treefontsize'))
-                else:
-                    stylesheet.append(line.rstrip())
-        return '\n'.join(stylesheet)
+        stylesheet = "* {font-size: 16px;}\n\
+        QWidget:focus {border: 2px solid #f89407;}\n\
+        QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QGroupBox {border: None;}\n\
+        QGroupBox:focus {border: 3px solid #ffaa00;}\n\
+        QTextEdit:focus {border: 2px solid #ffaa00;}\n\
+        QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QTreeWidget {font-size: 14px;}"
+        stylesheet = stylesheet.replace("* {font-size: 16", "* {font-size:" + str(settings.get('fontsize')))
+        stylesheet = stylesheet.replace("QTreeWidget {font-size: 14", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        return stylesheet
 
     def load_settings(self):
         res = self._load_config_ini()
@@ -548,7 +538,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
                 return
-        ui = DialogInformation("About", "GUI/About.html")
+        ui = DialogInformation("About", "")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
