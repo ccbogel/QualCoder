@@ -529,7 +529,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Display help information in browser. """
 
-        webbrowser.open(path + "/GUI/en_Help.html")
+        webbrowser.open(path + "/GUI/QualCoder_Manual.pdf")
         self.clean_dialog_refs()
 
     def about(self):
@@ -727,6 +727,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Note the database does not keep a table specifically for users (coders), instead
         usernames can be freely entered through the settings dialog and are collated from
         coded text, images and a/v.
+        v2 had added column in code_text table to link to avid in code_av table.
         """
 
         self.app = App()
@@ -763,10 +764,10 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
         cur.execute("CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
         cur.execute("CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
-        cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, unique(cid,fid,pos0,pos1, owner));")
+        cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v1',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.app.conn.commit()
         try:
             # get and display some project details
