@@ -737,10 +737,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         if import_file[-5:].lower() == ".epub":
             book = epub.read_epub(import_file)
             for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-                #print(d.get_content())
-                bytes_ = d.get_body_content()
-                string = bytes_.decode('utf-8')
-                text += html_to_text(string) + "\n"
+                try:
+                    #print(d.get_content())
+                    bytes_ = d.get_body_content()
+                    string = bytes_.decode('utf-8')
+                    text += html_to_text(string) + "\n"
+                except TypeError as e:
+                    logger.debug("ebooklib get_body_content error " + str(e))
         # import PDF
         if import_file[-4:].lower() == '.pdf':
             fp = open(import_file, 'rb')  # read binary mode
