@@ -42,6 +42,7 @@ try:
     import vlc
 except:
     pass
+from xsd import codebook, project
 import zipfile
 
 from PyQt5 import QtWidgets
@@ -64,20 +65,19 @@ class Refi_import():
 
     """
     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
+    Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
     """
 
     #TODO parse_sources PDF if e.tag == "{urn:QDA-XML:project:1.0}PDFSource
     #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
-    #TODO TEST load_text_source if importing Windows endings on Windows OS requires line-ending 2 char replacement
-
 
     file_path = None
     codes = []
     users = []
     cases = []
     sources = []
-    variables = []  # contains dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    variables = []  # lost of dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     parent_textEdit = None
     app = None
     tree = None
@@ -110,12 +110,14 @@ class Refi_import():
         """ Import REFI-QDA standard codebook into opened project.
         Codebooks do not validate using the qdasoftware.org Codebook.xsd generated on 2017-10-05 16:17z"""
 
-        #with open(self.file_path, "r") as xml_file:
-        #    self.xml = xml_file.read()
-        #result = self.xml_validation("codebook")
-        #print(result)
+        """
+        with open(self.file_path, "r") as xml_file:
+            self.xml = xml_file.read()
+        result = self.xml_validation("codebook")
+        print("PARSING: ", result)
         # Typical error with codebook XSD validation:
         # PARSING ERROR: StartTag: invalid element name, line 3, column 2 (Codebook.xsd, line 3)
+        """
 
         tree = etree.parse(self.file_path)  # get element tree object
         root = tree.getroot()
@@ -911,26 +913,12 @@ class Refi_import():
         :return true or false passing validation
         """
 
-        file_xsd = "Codebook.xsd"
-        # Check if relative path needed, for pyinstaller
-        try:
-            with open(file_xsd, 'r', encoding='utf8') as f:
-                text = f.read()
-        except:
-            file_xsd = path + "/Codebook.xsd"
-
+        file_xsd = codebook
         if xsd_type != "codebook":
-            # Check if relative path needed, for pyinstaller
-            file_xsd = "Project-mrt2019.xsd"
-            try:
-                with open(file_xsd, 'r', encoding='utf8') as f:
-                    text = f.read()
-            except:
-                file_xsd = path + "/Project-mrt2019.xsd"
-
+            file_xsd = project
         try:
-            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))  #  self.xml)
-            xsd_doc = etree.parse(file_xsd)
+            xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))
+            xsd_doc = etree.fromstring(bytes(file_xsd, "utf-8"))
             xmlschema = etree.XMLSchema(xsd_doc)
             xmlschema.assert_(xml_doc)
             return True
@@ -2026,26 +2014,12 @@ class Refi_export(QtWidgets.QDialog):
             No return value
         """
 
-        file_xsd = "Codebook.xsd"
-        # Check if relative path needed, for pyinstaller
-        try:
-            with open(file_xsd, 'r', encoding='utf8') as f:
-                text = f.read()
-        except:
-            file_xsd = path + "/Codebook.xsd"
-
+        file_xsd = codebook
         if xsd_type != "codebook":
-            # Check if relative path needed, for pyinstaller
-            file_xsd = "Project-mrt2019.xsd"
-            try:
-                with open(file_xsd, 'r', encoding='utf8') as f:
-                    text = f.read()
-            except:
-                file_xsd = path + "/Project-mrt2019.xsd"
-
+            file_xsd = project
         try:
             xml_doc = etree.fromstring(bytes(self.xml, "utf-8"))
-            xsd_doc = etree.parse(file_xsd)
+            xsd_doc = etree.fromstring(bytes(file_xsd, "utf-8"))
             xmlschema = etree.XMLSchema(xsd_doc)
             xmlschema.assert_(xml_doc)
             return True
