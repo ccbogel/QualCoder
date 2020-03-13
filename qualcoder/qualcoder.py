@@ -864,6 +864,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
 
+        # check avid column in code_text table
+        # database version < 2
+        try:
+            cur.execute("select avid from code_text")
+        except:
+            cur.execute("ALTER TABLE code_text ADD avid integer;")
+            self.app.conn.commit()
+
         # Save a datetime stamped backup
         if self.app.settings['backup_on_open'] == 'True':
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
