@@ -76,7 +76,7 @@ Required:
 
 * six
 
-* eboklib
+* ebooklib
 
 * ply
 
