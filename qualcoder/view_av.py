@@ -108,7 +108,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     metadata = None
     is_paused = False
     segment = {}
-    link_to_segment = {}  #TODO
+    text_for_segment = {}
     timer = QtCore.QTimer()
 
     # for transcribed text
@@ -121,7 +121,6 @@ class DialogCodeAV(QtWidgets.QDialog):
     def __init__(self, app, parent_textEdit, dialog_list):
         """ Show list of audio and video files.
         Can create a transcribe file from the audio / video.
-        TODO maybe show other coders?
         """
 
         super(DialogCodeAV,self).__init__()
@@ -142,7 +141,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
-        self.link_to_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None}
+        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -383,7 +382,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene.clear()
         for s in segments:
             self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler,
-                self.mediaplayer, self.timer, self.is_paused, self.ui.pushButton_play))
+                self.mediaplayer, self.timer, self.is_paused, self.ui.pushButton_play,
+                self.text_for_segment, self.media))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -917,15 +917,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code added: ") + item['name'])
         self.update_dialog_codes_and_categories()
-        '''cur.execute("select last_insert_rowid()")
-        cid = cur.fetchone()[0]
-        item['cid'] = cid
-        self.codes.append(item)
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        color = item['color']
-        top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
-        self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)'''
 
     def add_category(self):
         """ Add a new category.
@@ -946,14 +937,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
-        '''cur.execute("select last_insert_rowid()")
-        catid = cur.fetchone()[0]
-        item['catid'] = catid
-        self.parent_textEdit.append(_("Category added: ") + item['name'])
-        self.categories.append(item)
-        # update widget
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        self.ui.treeWidget.addTopLevelItem(top_item)'''
 
     def delete_category_or_code(self, selected):
         """ Determine if category or code is to be deleted. """
@@ -1092,9 +1075,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.parent_textEdit.append(_("Code renamed: ") + self.codes[found]['name'] + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
-            '''self.codes[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)
-            self.load_segments()'''
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -1122,8 +1102,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
-            '''self.categories[found]['name'] = new_name
-            selected.setData(0, QtCore.Qt.DisplayRole, new_name)'''
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
@@ -1207,35 +1185,35 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        ActionItemUnmark = menu.addAction(_("Unmark"))
+        action_unmark = menu.addAction(_("Unmark"))
         if selectedText != "":
-            ActionItemMark = menu.addAction(_("Mark"))
-            ActionItemAnnotate = menu.addAction(_("Annotate"))
-            ActionItemCopy = menu.addAction(_("Copy to clipboard"))
-            ActionItemLink = menu.addAction(_("Link text to segment"))
-        Action_video_position_timestamp = -1
+            action_mark = menu.addAction(_("Mark"))
+            action_annotate = menu.addAction(_("Annotate"))
+            action_copy = menu.addAction(_("Copy to clipboard"))
+            action_link = menu.addAction(_("Prepare text_link to segment"))
+        action_video_position_timestamp = -1
         for ts in self.time_positions:
             #print(ts, cursor.position())
             if cursor.position() >= ts[0] and cursor.position() <= ts[1]:
-                Action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
+                action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-        if selectedText != "" and action == ActionItemCopy:
+        if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
-        if selectedText != "" and action == ActionItemMark:
+        if selectedText != "" and action == action_mark:
             self.mark()
-        if action == ActionItemUnmark:
+        if action == action_unmark:
             self.unmark(cursor.position())
-        if selectedText != "" and action == ActionItemAnnotate:
+        if selectedText != "" and action == action_annotate:
             self.annotate(cursor.position())
         try:
-            if action == Action_video_position_timestamp:
+            if action == action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
         except:
             pass
-        if selectedText != "" and action == ActionItemLink:
-            self.link_text_to_segment()
+        if selectedText != "" and action == action_link:
+            self.prepare_link_text_to_segment()
 
-    def link_text_to_segment(self):
+    def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
 
         selectedText = self.ui.textEdit.textCursor().selectedText()
@@ -1243,15 +1221,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         if pos0 == pos1:  # Something quirky happened
             return
-        self.link_to_segment['cid'] = None
-        self.link_to_segment['fid'] = self.transcription[0]
-        self.link_to_segment['seltext'] = selectedText
-        self.link_to_segment['pos0'] = pos0
-        self.link_to_segment['pos1'] = pos1
-        self.link_to_segment['owner'] = self.app.settings['codername']
-        self.link_to_segment['memo'] = ""
-        self.link_to_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(self.link_to_segment)
+        self.text_for_segment['cid'] = None
+        self.text_for_segment['fid'] = self.transcription[0]
+        self.text_for_segment['seltext'] = selectedText
+        self.text_for_segment['pos0'] = pos0
+        self.text_for_segment['pos1'] = pos1
+        self.text_for_segment['owner'] = self.app.settings['codername']
+        self.text_for_segment['memo'] = ""
+        self.text_for_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.text_for_segment['avid'] = None
+        #print(self.text_for_segment)
 
     def set_video_to_timestamp_position(self, position):
         """ Set the video position to this time stamp.
@@ -1531,27 +1510,32 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     timer = None
     is_paused = None
     play_button = None
+    text_for_segment = None
+    media = None
 
-    def __init__(self, app, segment, scaler, mediaplayer, timer, is_paused, play_button):
-        super(SegmentGraphicsItem, self).__init__(None)
+    def __init__(self, app, segment, scaler, mediaplayer, timer, is_paused, play_button,
+        text_for_segment, media):
+            super(SegmentGraphicsItem, self).__init__(None)
 
-        self.app = app
-        self.segment = segment
-        self.scaler = scaler
-        self.mediaplayer = mediaplayer
-        self.timer = timer
-        self.is_paused = is_paused
-        self.play_button = play_button
-        self.reload_segment = False
-        self.setFlag(self.ItemIsSelectable, True)
-        tooltip = self.segment['codename'] + " "
-        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
-        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
-        tooltip += seg_time
-        if self.segment['memo'] != "":
-            tooltip += "\n" + _("Memo: ") + self.segment['memo']
-        self.setToolTip(tooltip)
-        self.draw_segment()
+            self.app = app
+            self.segment = segment
+            self.scaler = scaler
+            self.mediaplayer = mediaplayer
+            self.timer = timer
+            self.is_paused = is_paused
+            self.play_button = play_button
+            self.text_for_segment = text_for_segment
+            self.media = media
+            self.reload_segment = False
+            self.setFlag(self.ItemIsSelectable, True)
+            tooltip = self.segment['codename'] + " "
+            seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
+            seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+            tooltip += seg_time
+            if self.segment['memo'] != "":
+                tooltip += "\n" + _("Memo: ") + self.segment['memo']
+            self.setToolTip(tooltip)
+            self.draw_segment()
 
     def contextMenuEvent(self, event):
         """
@@ -1561,19 +1545,96 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         """
 
         menu = QtWidgets.QMenu()
-        menu.addAction(_('Memo for segment'))
-        menu.addAction(_('Delete segment'))
-        menu.addAction(_('Play segment'))
-        #TODO add assign text to segment
+        action_memo = menu.addAction(_('Memo for segment'))
+        action_delete = menu.addAction(_('Delete segment'))
+        action_play = menu.addAction(_('Play segment'))
+        action_edit_start = menu.addAction(_('Edit segment start position'))  #TODO
+        action_edit_end = menu.addAction(_('Edit segment end position'))  #TODO
+        if self.text_for_segment['seltext'] is not None:
+            action_link = menu.addAction(_('Link text to segment'))  #TODO
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == _('Memo for segment'):
+        if action == action_memo:
             self.edit_memo()
-        if action.text() == _('Delete segment'):
+        if action == action_delete:
             self.delete()
-        if action.text() == _('Play segment'):
+        if action == action_play:
             self.play_segment()
+        if action == action_edit_start:
+            self.edit_segment_start()
+        if action == action_edit_end:
+            self.edit_segment_end()
+        if self.text_for_segment['seltext'] is not None and action == action_link:
+            self.link_text_to_segment()
+
+    def link_text_to_segment(self):
+        """ Link text to this segment. this will add a code to the text and insert
+        a code_text entry into database. """
+
+        self.text_for_segment['cid'] = self.segment['cid']
+        self.text_for_segment['avid'] = self.segment['avid']
+
+        # check for an existing duplicated marking first
+        cur = self.app.conn.cursor()
+        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
+            (self.text_for_segment['cid'], self.text_for_segment['fid'], self.text_for_segment['pos0'], self.text_for_segment['pos1'], self.text_for_segment['owner']))
+        result = cur.fetchall()
+        if len(result) > 0:
+            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
+            _("This segment has already been coded with this code."), QtWidgets.QMessageBox.Ok)
+            return
+
+        #print(self.text_for_segment)
+        try:
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (self.text_for_segment['cid'],
+                self.text_for_segment['fid'],self.text_for_segment['seltext'],
+                self.text_for_segment['pos0'], self.text_for_segment['pos1'],
+                self.text_for_segment['owner'], self.text_for_segment['memo'],
+                self.text_for_segment['date'], self.text_for_segment['avid']))
+            self.app.conn.commit()
+        except Exception as e:
+            logger.debug(str(e))
+        #TODO update textedit
+        # update filter for tooltip
+        #self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
+
+    def edit_segment_start(self):
+        """ Edit segment start time. """
+
+        i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment start in mseconds",
+            "Edit time in milliseconds\n1000 msecs = 1 second:", self.segment['pos0'], 1,
+            self.segment['pos1'] - 1, 5)
+        if not ok_pressed:
+            return
+        if i < 1:
+            return
+        self.segment['pos0'] = i
+        sql = "update code_av set pos0=? where avid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [i, self.segment['avid']])
+        self.app.conn.commit()
+        self.draw_segment()
+
+    def edit_segment_end(self):
+        """ Edit segment end time """
+
+        duration = self.media.get_duration()
+        i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment end in mseconds",
+            "Edit time in milliseconds\n1000 msecs = 1 second:", self.segment['pos1'],
+            self.segment['pos0'] + 1, duration - 1, 5)
+        if not ok_pressed:
+            return
+        if i < 1:
+            return
+        self.segment['pos1'] = i
+        sql = "update code_av set pos1=? where avid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [i, self.segment['avid']])
+        self.app.conn.commit()
+        self.draw_segment()
 
     def play_segment(self):
         """  """
