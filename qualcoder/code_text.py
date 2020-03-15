@@ -316,21 +316,24 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
+
+        selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        ActionItemMark = menu.addAction(_("Mark"))
         ActionItemUnmark = menu.addAction(_("Unmark"))
-        ActionItemAnnotate = menu.addAction(_("Annotate"))
-        ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+        if selectedText != "":
+            ActionItemMark = menu.addAction(_("Mark"))
+            ActionItemAnnotate = menu.addAction(_("Annotate"))
+            ActionItemCopy = menu.addAction(_("Copy to clipboard"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-        if action == ActionItemCopy:
+        if selectedText != "" and action == ActionItemCopy:
             self.copy_selected_text_to_clipboard()
-        if action == ActionItemMark:
+        if selectedText != "" and action == ActionItemMark:
             self.mark()
         cursor = self.ui.textEdit.cursorForPosition(position)
+        if selectedText != "" and action == ActionItemAnnotate:
+            self.annotate(cursor.position())
         if action == ActionItemUnmark:
             self.unmark(cursor.position())
-        if action == ActionItemAnnotate:
-            self.annotate(cursor.position())
 
     def copy_selected_text_to_clipboard(self):
         """ Copy text to clipboard for external use.
