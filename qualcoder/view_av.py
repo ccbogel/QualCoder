@@ -381,9 +381,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
         for s in segments:
-            self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler,
-                self.mediaplayer, self.timer, self.is_paused, self.ui.pushButton_play,
-                self.text_for_segment, self.media))
+            self.scene.addItem(SegmentGraphicsItem(s, scaler, self.text_for_segment, self))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -1500,32 +1498,22 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Draws coded segment line. The media duration determines the scaler for the line length and position.
     y values are pre-calculated and stored in the segment data.
+    Refernces Dialog_code_av for variables and methods.
     """
 
-    app = None
     segment = None
     scaler = None
     reload_segment = False
-    mediaplayer = None
-    timer = None
-    is_paused = None
-    play_button = None
     text_for_segment = None
-    media = None
+    code_av_dialog = None
 
-    def __init__(self, app, segment, scaler, mediaplayer, timer, is_paused, play_button,
-        text_for_segment, media):
+    def __init__(self, segment, scaler, text_for_segment, code_av_dialog):
             super(SegmentGraphicsItem, self).__init__(None)
 
-            self.app = app
             self.segment = segment
             self.scaler = scaler
-            self.mediaplayer = mediaplayer
-            self.timer = timer
-            self.is_paused = is_paused
-            self.play_button = play_button
             self.text_for_segment = text_for_segment
-            self.media = media
+            self.code_av_dialog = code_av_dialog
             self.reload_segment = False
             self.setFlag(self.ItemIsSelectable, True)
             tooltip = self.segment['codename'] + " "
@@ -1548,10 +1536,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_memo = menu.addAction(_('Memo for segment'))
         action_delete = menu.addAction(_('Delete segment'))
         action_play = menu.addAction(_('Play segment'))
-        action_edit_start = menu.addAction(_('Edit segment start position'))  #TODO
-        action_edit_end = menu.addAction(_('Edit segment end position'))  #TODO
+        action_edit_start = menu.addAction(_('Edit segment start position'))
+        action_edit_end = menu.addAction(_('Edit segment end position'))
         if self.text_for_segment['seltext'] is not None:
-            action_link = menu.addAction(_('Link text to segment'))  #TODO
+            action_link = menu.addAction(_('Link text to segment'))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1574,9 +1562,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.text_for_segment['cid'] = self.segment['cid']
         self.text_for_segment['avid'] = self.segment['avid']
-
         # check for an existing duplicated marking first
-        cur = self.app.conn.cursor()
+        cur = self.code_av_dialog.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
             (self.text_for_segment['cid'], self.text_for_segment['fid'], self.text_for_segment['pos0'], self.text_for_segment['pos1'], self.text_for_segment['owner']))
         result = cur.fetchall()
@@ -1584,7 +1571,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             QtWidgets.QMessageBox.warning(None, _("Already Coded"),
             _("This segment has already been coded with this code."), QtWidgets.QMessageBox.Ok)
             return
-
         #print(self.text_for_segment)
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
@@ -1593,12 +1579,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                 self.text_for_segment['pos0'], self.text_for_segment['pos1'],
                 self.text_for_segment['owner'], self.text_for_segment['memo'],
                 self.text_for_segment['date'], self.text_for_segment['avid']))
-            self.app.conn.commit()
+            self.code_av_dialog.app.conn.commit()
         except Exception as e:
             logger.debug(str(e))
-        #TODO update textedit
-        # update filter for tooltip
-        #self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
 
     def edit_segment_start(self):
@@ -1613,15 +1597,15 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             return
         self.segment['pos0'] = i
         sql = "update code_av set pos0=? where avid=?"
-        cur = self.app.conn.cursor()
+        cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, [i, self.segment['avid']])
-        self.app.conn.commit()
+        self.code_av_dialog.app.conn.commit()
         self.draw_segment()
 
     def edit_segment_end(self):
         """ Edit segment end time """
 
-        duration = self.media.get_duration()
+        duration = self.code_av_dialog.media.get_duration()
         i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment end in mseconds",
             "Edit time in milliseconds\n1000 msecs = 1 second:", self.segment['pos1'],
             self.segment['pos0'] + 1, duration - 1, 5)
@@ -1631,9 +1615,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             return
         self.segment['pos1'] = i
         sql = "update code_av set pos1=? where avid=?"
-        cur = self.app.conn.cursor()
+        cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, [i, self.segment['avid']])
-        self.app.conn.commit()
+        self.code_av_dialog.app.conn.commit()
         self.draw_segment()
 
     def play_segment(self):
@@ -1641,12 +1625,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         #self.timer.stop()
         #pos = self.ui.horizontalSlider.value()
-        pos = self.segment['pos0'] / self.mediaplayer.get_media().get_duration()
-        self.mediaplayer.play()
-        self.mediaplayer.set_position(pos)
-        self.is_paused = False
-        self.play_button.setText(_("Pause"))
-        self.timer.start()
+        pos = self.segment['pos0'] / self.code_av_dialog.mediaplayer.get_media().get_duration()
+        self.code_av_dialog.mediaplayer.play()
+        self.code_av_dialog.mediaplayer.set_position(pos)
+        self.code_av_dialog.is_paused = False
+        self.code_av_dialog.ui.pushButton_play.setText(_("Pause"))
+        self.code_av_dialog.timer.start()
 
     def delete(self):
         """ Mark segment for deletion. Does not actually delete segment item, but hides
@@ -1668,16 +1652,16 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.reload_segment = True
         sql = "delete from code_av where avid=?"
         values = [self.segment['avid']]
-        cur = self.app.conn.cursor()
+        cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
-        self.app.conn.commit()
+        self.code_av_dialog.app.conn.commit()
 
     def edit_memo(self):
         """ View, edit or delete memo for this segment.
         Reload_segment is set to True, so on playing media, the update event will reload
         all segments. """
 
-        ui = DialogMemo(self.app, _("Memo for segment"), self.segment["memo"])
+        ui = DialogMemo(self.code_av_dialog.app, _("Memo for segment"), self.segment["memo"])
         ui.exec_()
         if self.segment['memo'] == ui.memo:
             return
@@ -1686,9 +1670,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         sql = "update code_av set memo=?, date=? where avid=?"
         values = [self.segment['memo'],
             datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
-        cur = self.app.conn.cursor()
+        cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
-        self.app.conn.commit()
+        self.code_av_dialog.app.conn.commit()
         tooltip = self.segment['codename'] + " "
         seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
         seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
