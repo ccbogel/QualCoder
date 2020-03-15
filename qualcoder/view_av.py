@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Copyright (c) 2019 Colin Curtain
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ import os
 import platform
 from random import randint
 import re
-import subprocess
 import sys
 import traceback
 
@@ -62,7 +61,6 @@ from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from memo import DialogMemo
-#from qtmodels import DictListModel, ListObjectModel
 from select_file import DialogSelectFile
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -110,6 +108,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     metadata = None
     is_paused = False
     segment = {}
+    link_to_segment = {}  #TODO
     timer = QtCore.QTimer()
 
     # for transcribed text
@@ -143,6 +142,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
+        self.link_to_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None}
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -345,8 +345,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.load_segments()
 
     def load_segments(self):
-        """ Get coded segments for this file, for this coder, or all coders.
-        Currently only for this coder. Called from select_media. """
+        """ Get coded segments for this file and for this coder.
+        Called from select_media. """
 
         if self.media_data is None:
             return
@@ -355,9 +355,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql += " code_av.owner, code_name.name, code_name.color from code_av"
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
-        #TODO possibly add checkbox and load segments for ALL coders
-        #TODO but this might be too congested when drawn
-        #if not self.ui.checkBox_show_coders.isChecked():
         sql += " and code_av.owner=? "
         values = [self.media_data['id']]
         values.append(self.app.settings['codername'])
@@ -425,7 +422,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
-
         # Get the transcribed text and fill textedit
         cur = self.app.conn.cursor()
         cur.execute("select id, fulltext, name from source where name = ?", [self.media_data['name'] + ".transcribed"])
@@ -444,46 +440,25 @@ class DialogCodeAV(QtWidgets.QDialog):
         for row in result:
             self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
-
         self.get_coded_text_update_eventfilter_tooltips()
-        '''self.code_text = []
-        coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
-        coding_sql += " where fid=? "
-        #if not self.ui.checkBox_show_coders.isChecked():
-        coding_sql += " and owner=? "
-        #    sql_values.append(self.settings['codername'])
-        #cur.execute(coding_sql, sql_values)
-        cur.execute(coding_sql, (self.transcription[0], self.app.settings['codername']))
-        code_results = cur.fetchall()
-        for row in code_results:
-            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-            'pos0': row[3], 'pos1':row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
-        # update filter for tooltip
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
-        # redo textEdit formatting
-        self.unlight()
-        self.highlight()'''
 
     def get_coded_text_update_eventfilter_tooltips(self):
         ''' Called by load_media, and from other dialogs on update '''
 
         if self.transcription is None:
             return
-        sql_values = []
-        sql_values.append(self.transcription[0])
-        # Get code text for this file and for this coder, or all coders
-        self.code_text = []
-        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
-        codingsql += " where fid=? "
-        '''if not self.ui.checkBox_show_coders.isChecked():
-            codingsql += " and owner=? "
-            sql_values.append(self.app.settings['codername'])'''
+        # Get code text for this file and for this coder
+        sql_values = [self.transcription[0], self.app.settings['codername']]
         cur = self.app.conn.cursor()
+        self.code_text = []
+        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, avid from code_text"
+        codingsql += " where fid=? and owner=?"
         cur.execute(codingsql, sql_values)
         code_results = cur.fetchall()
         for row in code_results:
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6],
+            'memo': row[7], 'avid': row[8]})
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
@@ -1230,30 +1205,53 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
 
         cursor = self.ui.textEdit.cursorForPosition(position)
+        selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        ActionItemMark = menu.addAction(_("Mark"))
         ActionItemUnmark = menu.addAction(_("Unmark"))
-        ActionItemAnnotate = menu.addAction(_("Annotate"))
-        ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+        if selectedText != "":
+            ActionItemMark = menu.addAction(_("Mark"))
+            ActionItemAnnotate = menu.addAction(_("Annotate"))
+            ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+            ActionItemLink = menu.addAction(_("Link text to segment"))
         Action_video_position_timestamp = -1
         for ts in self.time_positions:
             #print(ts, cursor.position())
             if cursor.position() >= ts[0] and cursor.position() <= ts[1]:
                 Action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-        if action == ActionItemCopy:
+        if selectedText != "" and action == ActionItemCopy:
             self.copy_selected_text_to_clipboard()
-        if action == ActionItemMark:
+        if selectedText != "" and action == ActionItemMark:
             self.mark()
         if action == ActionItemUnmark:
             self.unmark(cursor.position())
-        if action == ActionItemAnnotate:
+        if selectedText != "" and action == ActionItemAnnotate:
             self.annotate(cursor.position())
         try:
             if action == Action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
         except:
             pass
+        if selectedText != "" and action == ActionItemLink:
+            self.link_text_to_segment()
+
+    def link_text_to_segment(self):
+        """ Select text in transcription and prepare variable to be linked to a/v segment. """
+
+        selectedText = self.ui.textEdit.textCursor().selectedText()
+        pos0 = self.ui.textEdit.textCursor().selectionStart()
+        pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        if pos0 == pos1:  # Something quirky happened
+            return
+        self.link_to_segment['cid'] = None
+        self.link_to_segment['fid'] = self.transcription[0]
+        self.link_to_segment['seltext'] = selectedText
+        self.link_to_segment['pos0'] = pos0
+        self.link_to_segment['pos1'] = pos1
+        self.link_to_segment['owner'] = self.app.settings['codername']
+        self.link_to_segment['memo'] = ""
+        self.link_to_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(self.link_to_segment)
 
     def set_video_to_timestamp_position(self, position):
         """ Set the video position to this time stamp.
@@ -1566,6 +1564,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction(_('Memo for segment'))
         menu.addAction(_('Delete segment'))
         menu.addAction(_('Play segment'))
+        #TODO add assign text to segment
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1608,7 +1607,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.reload_segment = True
         sql = "delete from code_av where avid=?"
         values = [self.segment['avid']]
-        cur = self.appconn.cursor()
+        cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
 
@@ -1704,6 +1703,7 @@ class DialogViewAV(QtWidgets.QDialog):
         cur.execute("select id, fulltext from source where name=?", [media_data['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
+            self.ui.textEdit_transcription.installEventFilter(self)
             cur.execute("select cid from  code_text where fid=?", [self.transcription[0],])
             coded = cur.fetchall()
             cur.execute("select anid from  annotation where fid=?", [self.transcription[0],])
@@ -1715,6 +1715,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_transcription.setToolTip("")
             else:
                 self.ui.textEdit_transcription.installEventFilter(self)
+                self.ui.label_memo.setText(_("Memo. In transcription area: ctrl+r ctrl+s ctrl+t ctrl+1-8"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
@@ -1793,6 +1794,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def eventFilter(self, object, event):
         """ Add key options to textEdit_transcription to improve manual transcribing.
+        Can only use htese options if the transcription is not coded.
         Options are:
             ctrl + r to rewind 3 seconds.
             xtrl + s to start/pause
@@ -1808,7 +1810,6 @@ class DialogViewAV(QtWidgets.QDialog):
         # Following options only available if can transcribe
         if not self.can_transcribe:
             return False
-
         key = event.key()
         mods = event.nativeModifiers()
         #print("KEY ", key, "MODS ", mods)
