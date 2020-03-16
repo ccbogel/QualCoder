@@ -1705,7 +1705,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         values = [self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
+        sql = "update code_text set avid=null where avid=?"
+        cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
 
     def edit_memo(self):
         """ View, edit or delete memo for this segment.
