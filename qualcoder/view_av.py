@@ -110,6 +110,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     segment = {}
     text_for_segment = {}
     timer = QtCore.QTimer()
+    play_segment_end = None
 
     # for transcribed text
     annotations = []
@@ -141,6 +142,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
+        self.play_segment_end = None
         self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
@@ -441,22 +443,26 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def get_coded_text_update_eventfilter_tooltips(self):
-        ''' Called by load_media, and from other dialogs on update '''
+        """ Called by load_media, update_dialog_codes_and_categories,
+        Segment_Graphics_Item.link_text_to_segment. """
 
         if self.transcription is None:
             return
         # Get code text for this file and for this coder
-        sql_values = [self.transcription[0], self.app.settings['codername']]
+        values = [self.transcription[0], self.app.settings['codername']]
         cur = self.app.conn.cursor()
         self.code_text = []
-        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, avid from code_text"
-        codingsql += " where fid=? and owner=?"
-        cur.execute(codingsql, sql_values)
+        sql = "select code_text.cid, code_text.fid, seltext, code_text.pos0, code_text.pos1, "
+        sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1 "
+        sql += "from code_text left join code_av on code_text.avid = code_av.avid "
+        sql += " where code_text.fid=? and code_text.owner=?"
+        cur.execute(sql, values)
         code_results = cur.fetchall()
         for row in code_results:
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
             'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6],
-            'memo': row[7], 'avid': row[8]})
+            'memo': row[7], 'avid': row[8], 'av_pos0': row[9], 'av_pos1': row[10]})
+
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
@@ -580,6 +586,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
             self.is_paused = False
+            self.play_segment_end = None
 
     def stop(self):
         """ Stop vlc player. Set position slider to the start.
@@ -591,6 +598,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_play.setText(_("Play"))
         self.timer.stop()
         self.ui.horizontalSlider.setProperty("value", 0)
+        self.play_segment_end = None
 
         # set combobox display of audio track to the first one, or leave it blank if it contains no items
         if self.ui.comboBox_tracks.count() > 0:
@@ -632,7 +640,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         """ For long transcripts, update the relevant text position in the textEdit to match the
         video's current position.
-        time_postion list itme: [text_pos0, text_pos1, milliseconds]
+        time_postion list item: [text_pos0, text_pos1, milliseconds]
         """
         if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit.toPlainText() != "":
             for i in range(1, len(self.time_positions)):
@@ -650,6 +658,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             # This fixes that "bug".
             if not self.is_paused:
                 self.stop()
+
+        # If only playing a segment, need to pause at end of segment
+        if self.play_segment_end is not None:
+            if self.play_segment_end < msecs:
+                self.play_segment_end = None
+                self.play_pause()
 
     def closeEvent(self, event):
         """ Stop the vlc player on close. """
@@ -1217,7 +1231,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         selectedText = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
-        if pos0 == pos1:  # Something quirky happened
+        if pos0 == pos1:
             return
         self.text_for_segment['cid'] = None
         self.text_for_segment['fid'] = self.transcription[0]
@@ -1392,6 +1406,7 @@ class ToolTip_EventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
     The tool top text is changed according to its position in the text.
     If over a coded section the codename is displayed in the tooltip.
+    Need to add av time segments to the code_text where relevant.
     """
 
     codes = None
@@ -1413,25 +1428,27 @@ class ToolTip_EventFilter(QtCore.QObject):
             cursor = receiver.cursorForPosition(helpEvent.pos())
             pos = cursor.position()
             receiver.setToolTip("")
-            displayText = ""
+            text = ""
             # occasional None type error
             if self.code_text is None:
                 #Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
-                    if displayText == "":
-                        displayText = item['name']
-                    else:  # can have multiple codes on same selected area
-                        try:
-                            displayText += "\n" + item['name']
-                        except Exception as e:
-                            msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
-                            msg += str(item) + "\n" + self.code_text
-                            logger.error(msg)
-            if displayText != "":
-                receiver.setToolTip(displayText)
-
+                    #print(item)
+                    try:
+                        if text != "":
+                            text = text + "\n"
+                        text += item['name']  # += as can have multiple codes on same position
+                        if item['avid'] is not None:
+                            text += " [" + msecs_to_mins_and_secs(item['av_pos0'])
+                            text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
+                    except Exception as e:
+                        msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
+                        msg += str(item) + "\n" + self.code_text
+                        logger.error(msg)
+            if text != "":
+                receiver.setToolTip(text)
         #Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
@@ -1630,6 +1647,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.mediaplayer.set_position(pos)
         self.code_av_dialog.is_paused = False
         self.code_av_dialog.ui.pushButton_play.setText(_("Pause"))
+        self.code_av_dialog.play_segment_end = self.segment['pos1']
         self.code_av_dialog.timer.start()
 
     def delete(self):
