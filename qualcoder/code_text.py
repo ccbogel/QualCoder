@@ -316,23 +316,27 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
-
+        cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        ActionItemUnmark = menu.addAction(_("Unmark"))
+        action_unmark = None
+        for item in self.code_text:
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                action_unmark = menu.addAction(_("Unmark"))
+                break
         if selectedText != "":
-            ActionItemMark = menu.addAction(_("Mark"))
-            ActionItemAnnotate = menu.addAction(_("Annotate"))
-            ActionItemCopy = menu.addAction(_("Copy to clipboard"))
+            action_mark = menu.addAction(_("Mark"))
+            action_annotate = menu.addAction(_("Annotate"))
+            action_copy = menu.addAction(_("Copy to clipboard"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-        if selectedText != "" and action == ActionItemCopy:
+        if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
-        if selectedText != "" and action == ActionItemMark:
+        if selectedText != "" and action == action_mark:
             self.mark()
         cursor = self.ui.textEdit.cursorForPosition(position)
-        if selectedText != "" and action == ActionItemAnnotate:
+        if selectedText != "" and action == action_annotate:
             self.annotate(cursor.position())
-        if action == ActionItemUnmark:
+        if action == action_unmark:
             self.unmark(cursor.position())
 
     def copy_selected_text_to_clipboard(self):
