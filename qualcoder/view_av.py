@@ -100,6 +100,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     file_ = None
     codes = []
     categories = []
+    code_text = []
     ddialog = None
     media_data = None
     instance = None
@@ -108,7 +109,9 @@ class DialogCodeAV(QtWidgets.QDialog):
     metadata = None
     is_paused = False
     segment = {}
-    text_for_segment = {}
+    segments = []
+    text_for_segment = {}  # when linking text to segment
+    segment_for_text = None  # when linking segment to text
     timer = QtCore.QTimer()
     play_segment_end = None
 
@@ -143,7 +146,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
         self.play_segment_end = None
+        self.segments = []
         self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
+        self.segment_for_text = None
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -351,7 +356,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.media_data is None:
             return
-        segments = []
+        self.segments = []
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
         sql += " code_av.owner, code_name.name, code_name.color from code_av"
         sql += " join code_name on code_name.cid=code_av.cid"
@@ -363,26 +368,26 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql, values)
         code_results = cur.fetchall()
         for row in code_results:
-            segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
+            self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
             'pos1': row[3], 'cid':row[4], 'memo': row[5], 'date': row[6],
             'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
         # Fix overlapping segments by incrementing y values so segment is shown on a different line
-        for i in range(0, len(segments) - 1):
-            for j in range(i + 1, len(segments)):
-                if (segments[j]['pos0'] >= segments[i]['pos0'] and  \
-                segments[j]['pos0'] <= segments[i]['pos1'] and \
-                segments[i]['y'] == segments[j]['y']) or \
-                (segments[j]['pos0'] <= segments[i]['pos0'] and  \
-                segments[j]['pos1'] >= segments[i]['pos0'] and \
-                segments[i]['y'] == segments[j]['y']):
+        for i in range(0, len(self.segments) - 1):
+            for j in range(i + 1, len(self.segments)):
+                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and  \
+                self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
+                self.segments[i]['y'] == self.segments[j]['y']) or \
+                (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and  \
+                self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
+                self.segments[i]['y'] == self.segments[j]['y']):
                     #print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
                     #print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
                     # to overcome the overlap, add to the y value of the i segment
-                    segments[j]['y'] += 10
+                    self.segments[j]['y'] += 10
         # Draw coded segments in scene
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
-        for s in segments:
+        for s in self.segments:
             self.scene.addItem(SegmentGraphicsItem(s, scaler, self.text_for_segment, self))
 
     def load_media(self):
@@ -683,6 +688,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         time = self.ui.label_time.text()
         time = time[6:]
+        # time may be blank, if video has not been played
+        if time == "":
+            time = "0.00"
         time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
@@ -1197,12 +1205,24 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        action_unmark = menu.addAction(_("Unmark"))
+        action_unmark = None
+        action_play_text = None
+        play_text_avid = None
+        for item in self.code_text:
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                if item['avid'] is not None:
+                    action_play_text = menu.addAction(_("Play text"))
+                    play_text_avid = item['avid']
+                action_unmark = menu.addAction(_("Unmark"))
+                break
         if selectedText != "":
             action_mark = menu.addAction(_("Mark"))
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-            action_link = menu.addAction(_("Prepare text_link to segment"))
+            if self.segment_for_text is None:
+                action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))
+            if self.segment_for_text is not None:
+                action_link_segment_to_text = menu.addAction(_("Link to segment to text"))
         action_video_position_timestamp = -1
         for ts in self.time_positions:
             #print(ts, cursor.position())
@@ -1213,8 +1233,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.copy_selected_text_to_clipboard()
         if selectedText != "" and action == action_mark:
             self.mark()
-        if action == action_unmark:
+        if action_unmark is not None and action == action_unmark:
             self.unmark(cursor.position())
+        if action_play_text is not None and action == action_play_text:
+            self.play_text(play_text_avid)
         if selectedText != "" and action == action_annotate:
             self.annotate(cursor.position())
         try:
@@ -1222,8 +1244,57 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.set_video_to_timestamp_position(cursor.position())
         except:
             pass
-        if selectedText != "" and action == action_link:
+        if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
             self.prepare_link_text_to_segment()
+        if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
+            self.link_segment_to_text()
+
+    def play_text(self, avid):
+        """ Play the audio/video for this coded text selection that is mapped to an a/v segment. """
+
+        segment = None
+        for s in self.segments:
+            if s['avid'] == avid:
+                segment = s
+                break
+        if segment is None:
+            return
+        pos = segment['pos0'] / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.play()
+        self.mediaplayer.set_position(pos)
+        self.is_paused = False
+        self.ui.pushButton_play.setText(_("Pause"))
+        self.play_segment_end = segment['pos1']
+        self.timer.start()
+
+    def link_segment_to_text(self):
+        """ Link selected segment to selected text """
+
+        i = {}
+        i['cid'] = self.segment_for_text['cid']
+        i['fid'] = self.transcription[0]
+        i['seltext'] = self.ui.textEdit.textCursor().selectedText()
+        i['pos0'] = self.ui.textEdit.textCursor().selectionStart()
+        i['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
+        i['owner'] = self.app.settings['codername']
+        i['memo'] = ""
+        i['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        i['avid'] = self.segment_for_text['avid']
+
+        #TODO should not get sqlite3.IntegrityError:
+        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (i['cid'], i['fid'], i['seltext'],
+                i['pos0'], i['pos1'], i['owner'], i['memo'], i['date'], i['avid']))
+            self.app.conn.commit()
+        except Exception as e:
+            print(e)
+            logger.debug(str(e))
+        # update codes and filter for tooltip
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.segment_for_text = None
 
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
@@ -1445,7 +1516,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                             text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
                     except Exception as e:
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
-                        msg += str(item) + "\n" + self.code_text
+                        msg += str(item) + "\n" + str(self.code_text)
                         logger.error(msg)
             if text != "":
                 receiver.setToolTip(text)
@@ -1556,7 +1627,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_edit_start = menu.addAction(_('Edit segment start position'))
         action_edit_end = menu.addAction(_('Edit segment end position'))
         if self.text_for_segment['seltext'] is not None:
-            action_link = menu.addAction(_('Link text to segment'))
+            action_link_text = menu.addAction(_('Link text to segment'))
+        if self.code_av_dialog.ui.textEdit.toPlainText() != "" and self.text_for_segment['seltext'] is None:
+            action_link_segment = menu.addAction(_("Select segment to link to text"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1570,8 +1643,15 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.edit_segment_start()
         if action == action_edit_end:
             self.edit_segment_end()
-        if self.text_for_segment['seltext'] is not None and action == action_link:
+        if self.text_for_segment['seltext'] is not None and action == action_link_text:
             self.link_text_to_segment()
+        if self.text_for_segment['seltext'] is None and action == action_link_segment:
+            self.link_segment_to_text()
+
+    def link_segment_to_text(self):
+        """ Prepare Dialog_code_av to link segment to text """
+
+        self.code_av_dialog.segment_for_text = self.segment
 
     def link_text_to_segment(self):
         """ Link text to this segment. this will add a code to the text and insert
@@ -1672,7 +1752,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         values = [self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
+        sql = "update code_text set avid=null where avid=?"
+        cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
 
     def edit_memo(self):
         """ View, edit or delete memo for this segment.
