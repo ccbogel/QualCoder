@@ -688,6 +688,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         time = self.ui.label_time.text()
         time = time[6:]
+        # time may be blank, if video has not been played
+        if time == "":
+            time = "0.00"
         time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
@@ -1216,7 +1219,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_mark = menu.addAction(_("Mark"))
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-            action_link = menu.addAction(_("Prepare text_link to segment"))
+            if self.segment_for_text is None:
+                action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))
+            if self.segment_for_text is not None:
+                action_link_segment_to_text = menu.addAction(_("Link to segment to text"))
         action_video_position_timestamp = -1
         for ts in self.time_positions:
             #print(ts, cursor.position())
@@ -1238,8 +1244,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.set_video_to_timestamp_position(cursor.position())
         except:
             pass
-        if selectedText != "" and action == action_link:
+        if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
             self.prepare_link_text_to_segment()
+        if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
+            self.link_segment_to_text()
 
     def play_text(self, avid):
         """ Play the audio/video for this coded text selection that is mapped to an a/v segment. """
@@ -1258,6 +1266,35 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_play.setText(_("Pause"))
         self.play_segment_end = segment['pos1']
         self.timer.start()
+
+    def link_segment_to_text(self):
+        """ Link selected segment to selected text """
+
+        i = {}
+        i['cid'] = self.segment_for_text['cid']
+        i['fid'] = self.transcription[0]
+        i['seltext'] = self.ui.textEdit.textCursor().selectedText()
+        i['pos0'] = self.ui.textEdit.textCursor().selectionStart()
+        i['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
+        i['owner'] = self.app.settings['codername']
+        i['memo'] = ""
+        i['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        i['avid'] = self.segment_for_text['avid']
+
+        #TODO should not get sqlite3.IntegrityError:
+        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (i['cid'], i['fid'], i['seltext'],
+                i['pos0'], i['pos1'], i['owner'], i['memo'], i['date'], i['avid']))
+            self.app.conn.commit()
+        except Exception as e:
+            print(e)
+            logger.debug(str(e))
+        # update codes and filter for tooltip
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.segment_for_text = None
 
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
@@ -1591,7 +1628,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_edit_end = menu.addAction(_('Edit segment end position'))
         if self.text_for_segment['seltext'] is not None:
             action_link_text = menu.addAction(_('Link text to segment'))
-        if self.text_for_segment['seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
+        if self.code_av_dialog.ui.textEdit.toPlainText() != "" and self.text_for_segment['seltext'] is None:
             action_link_segment = menu.addAction(_("Select segment to link to text"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
@@ -1614,8 +1651,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     def link_segment_to_text(self):
         """ Prepare Dialog_code_av to link segment to text """
 
-        print("Link segment to text")
-        print(self.segment)
         self.code_av_dialog.segment_for_text = self.segment
 
     def link_text_to_segment(self):
