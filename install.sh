@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "This installer is for Linux installations only"
+echo "This installer uses apt package management"
 echo "qualcoder will be copied to the directory /usr/share/"
 echo "These actions require owner (sudo) permission"
 echo "The installer will also install dependencies"
