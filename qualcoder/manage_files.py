@@ -89,11 +89,12 @@ class DialogManageFiles(QtWidgets.QDialog):
     source = []
     app = None
     text_dialog = None
-    headerLabels = ["Name", "Memo", "Date", "Id"]
-    NAME_COLUMN = 0
-    MEMO_COLUMN = 1
-    DATE_COLUMN = 2
-    ID_COLUMN = 3
+    header_labels = []
+    ICON_COLUMN = 0
+    NAME_COLUMN = 1
+    MEMO_COLUMN = 2
+    DATE_COLUMN = 3
+    ID_COLUMN = 4
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for additem dialog
     parent_textEdit = None
@@ -139,13 +140,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
             'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         # attributes
-        self.headerLabels = [_("Name"), _("Memo"), _("Date"), _("Id")]
+        self.header_labels = [" ", _("Name"), _("Memo"), _("Date"), _("Id")]
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         result = cur.fetchall()
         self.attribute_names = []
         for n in result:
-            self.headerLabels.append(n[0])
+            self.header_labels.append(n[0])
             self.attribute_names.append({'name': n[0]})
         sql = "select attribute.name, value, id from attribute join attribute_type on \
         attribute_type.name=attribute.name where attribute_type.caseOrFile='file'"
@@ -264,7 +265,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
-            attribute_name = self.headerLabels[y]
+            attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
@@ -464,7 +465,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         new_text = edit_ui.textEdit.toPlainText()
 
         # split original text and fix
-        original_text = self.source[x]['fulltext']
+        #original_text = self.source[x]['fulltext']
         before = self.source[x]['fulltext'][0:text_cursor.selectionStart()]
         after = self.source[x]['fulltext'][text_cursor.selectionEnd():len(self.source[x]['fulltext'])]
         fulltext = before + new_text + after
@@ -865,47 +866,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 tagged = False
         return text
 
-    '''def convert_odt_to_html(self, import_file):
-        """ Convert odt to very rough equivalent with headings, list items and tables for
-        html display in qTextEdits.
-        NOT CURRENTLY USED. """
-
-        odt_file = zipfile.ZipFile(import_file)
-        data = str(odt_file.read('content.xml'))  # bytes class to string
-        #https://stackoverflow.com/questions/18488734/python3-unescaping-non-ascii-characters
-        data = str(bytes([ord(char) for char in data.encode("utf_8").decode("unicode_escape")]), "utf_8")
-        data_start = data.find("</text:sequence-decls>")
-        data_end = data.find("</office:text>")
-        if data_start == -1 or data_end == -1:
-            logger.warning("ODT IMPORT ERROR")
-            return ""
-        data = data[data_start + 22: data_end]
-        data = data.replace('text:outline-level="1">', 'text:outline-level="1"><h1>')
-        data = data.replace('text:outline-level="2">', 'text:outline-level="2"><h1>')
-        data = data.replace('text:outline-level="3">', 'text:outline-level="3"><h1>')
-        data = data.replace('</text:h>', '</h1>')
-        data = data.replace('<text:list-item>', '<li>')
-        data = data.replace('</text:list-item>', '</li>')
-        data = data.replace('</text:span>', '')
-        data = data.replace('<text:p', '<p><text:p')
-        data = data.replace('</text:p>', '</p>')
-        data = data.replace('<table:table table:name=', '<table><table:table table:name=')
-        data = data.replace('</table:table>', '</table>')
-        data = data.replace('<table:table-row', '<tr><table:table-row')
-        data = data.replace('</table:table-row>', '</tr></table:table-row>')
-        data = data.replace('<table:table-cell', '<td style="border:1px solid black"><table:table-cell')
-        data = data.replace('</table:table-cell>', '</td>')
-        text = ""
-        tagged = False
-        for i in range(0, len(data)):
-            if data[i: i + 6] == "<text:" or data[i: i + 7] == "<table:":
-                tagged = True
-            if not tagged:
-                text += data[i]
-            if data[i] == ">":
-                tagged = False
-        return text'''
-
     def export(self):
         """ Export fulltext to a plain text file, filename will have .txt ending. """
 
@@ -977,10 +937,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Reload the file data and Fill the table widget with file data. """
 
         self.load_file_data()
-        self.ui.tableWidget.setColumnCount(len(self.headerLabels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
@@ -1004,7 +963,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, iditem)
             # add the attribute values
             for a in self.attributes:
-                for col, header in enumerate(self.headerLabels):
+                for col, header in enumerate(self.header_labels):
                     #print(fid, a[2], a[0], header)
                     #print(type(fid), type(a[2]), type(a[0]), type(header))
                     if fid == a[2] and a[0] == header:
