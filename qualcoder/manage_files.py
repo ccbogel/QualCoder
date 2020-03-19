@@ -90,11 +90,10 @@ class DialogManageFiles(QtWidgets.QDialog):
     app = None
     text_dialog = None
     header_labels = []
-    ICON_COLUMN = 0
-    NAME_COLUMN = 1
-    MEMO_COLUMN = 2
-    DATE_COLUMN = 3
-    ID_COLUMN = 4
+    NAME_COLUMN = 0
+    MEMO_COLUMN = 1
+    DATE_COLUMN = 2
+    ID_COLUMN = 3
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for additem dialog
     parent_textEdit = None
@@ -140,7 +139,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
             'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         # attributes
-        self.header_labels = [" ", _("Name"), _("Memo"), _("Date"), _("Id")]
+        self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id")]
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         result = cur.fetchall()
@@ -933,6 +932,25 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.source.remove(item)
         self.fill_table()
 
+    def get_icon(self, name):
+        ''' Get icon to put in table. Helper method for fill_table
+
+         parameter: filename
+
+         return: QIcon '''
+
+        icon_text = QtGui.QIcon("GUI/text.png")
+        icon_play = QtGui.QIcon("GUI/play.png")
+        icon_picture = QtGui.QIcon("GUI/picture.png")
+
+        suffix = name[-4:].lower()
+        print(name, "  ", suffix)
+        if suffix in (".png", ".jpg", "jpeg"):
+            return icon_picture
+        if suffix in (".mp4", ".mov", ".avi", ".mkv", ".mp3", ".wav", ".ogg"):
+            return icon_play
+        return icon_text
+
     def fill_table(self):
         """ Reload the file data and Fill the table widget with file data. """
 
@@ -946,7 +964,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
+            icon = self.get_icon(data['name'])
             name_item = QtWidgets.QTableWidgetItem(data['name'])
+            name_item.setIcon(icon)
             #name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
