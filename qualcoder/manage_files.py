@@ -866,29 +866,55 @@ class DialogManageFiles(QtWidgets.QDialog):
         return text
 
     def export(self):
-        """ Export fulltext to a plain text file, filename will have .txt ending. """
+        """ Export files to selected directory.
+        If an imported file was from a docx, odt, pdf, html, epub then export the original file
+        and also export the plain text version.
+        """
 
-        x = self.ui.tableWidget.currentRow()
-        if self.source[x]['mediapath'] is not None:
-            return
-        filename = self.source[x]['name']
-        if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx"):
-            filename = filename[0:len(filename) - 5]
-        if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
-            filename = filename[0:len(filename) - 4]
-        filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), os.getenv('HOME'), options)
-        if directory !="":
-            filename = directory + "/" + filename
+        if directory == "":
+            return
+        x = self.ui.tableWidget.currentRow()
+        filename = self.source[x]['name']
+        msg = directory + "/" + filename
+        filename_txt = None
+        if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
+            filename_txt = filename[0:len(filename) - 5] + ".txt"
+        if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
+            filename_txt = filename[0:len(filename) - 4] + ".txt"
+        # Below is for transcribed files and for user created text files within QualCoder
+        if self.source[x]['mediapath'] is None and filename_txt is None:
+            filename_txt = filename + ".txt"
+            msg = ""  # added to below
+        if filename_txt is not None:
+            filename_txt = directory + "/" + filename_txt
             #logger.info(_("Exporting to ") + filename)
             filedata = self.source[x]['fulltext']
-            f = open(filename, 'w')
+            f = open(filename_txt, 'w')
             f.write(filedata)
             f.close()
-        QtWidgets.QMessageBox.information(None, _("File Exported"), str(filename))
-        self.parent_textEdit.append(filename + _(" exported to ") + directory)
+        # export audio, video, picture files
+        if self.source[x]['mediapath'] is not None:
+            file_path = self.app.project_path + self.source[x]['mediapath']
+            destination = directory + "/" + filename
+            try:
+                copyfile(file_path, destination)
+            except FileNotFoundError:
+                pass
+        # export pdf, docx, odt, epub, html files if located in documents directory
+        if self.source[x]['mediapath'] is None:
+            file_path = self.app.project_path + "/documents/" + self.source[x]['name']
+            destination = directory + "/" + self.source[x]['name']
+            try:
+                copyfile(file_path, destination)
+            except FileNotFoundError:
+                pass
+        if filename_txt is not None:
+            msg += "\n" + directory + "/" + filename_txt
+        QtWidgets.QMessageBox.information(None, _("File Exported"), msg)
+        self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
     def delete(self):
         """ Delete file from database and update model and widget.
@@ -942,9 +968,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon_text = QtGui.QIcon("GUI/text.png")
         icon_play = QtGui.QIcon("GUI/play.png")
         icon_picture = QtGui.QIcon("GUI/picture.png")
-
         suffix = name[-4:].lower()
-        print(name, "  ", suffix)
         if suffix in (".png", ".jpg", "jpeg"):
             return icon_picture
         if suffix in (".mp4", ".mov", ".avi", ".mkv", ".mp3", ".wav", ".ogg"):
@@ -967,7 +991,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = self.get_icon(data['name'])
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
-            #name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            # having un-editable file names helps with assigning icons
+            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
