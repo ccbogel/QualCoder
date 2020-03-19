@@ -121,9 +121,47 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export.clicked.connect(self.export)
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.fill_table()
 
-    def load_file_data(self):
+    def table_menu(self, position):
+        """ Context menu for displaying table rows in differing order """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        text = None
+        try:
+            text = str(self.ui.tableWidget.item(row, col).text())
+        except:
+            pass
+        #print(self.row, self.col, self.cellValue)
+        if col < 4:
+            menu = QtWidgets.QMenu()
+            action_alphabetic = menu.addAction(_("Alphabetic order"))
+            action_date = menu.addAction(_("Date order"))
+            action_type = menu.addAction(_("File type order"))
+            action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+            if action == action_alphabetic:
+                self.load_file_data()
+            if action == action_date:
+                self.load_file_data("date")
+            if action == action_type:
+                self.load_file_data("mediapath")
+            self.fill_table()
+        #TODO
+        '''
+        # Hide rows that do not match this value
+        if col > 3:
+            print(row, col, text)
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                try:
+                    if self.ui.tableWidget.item(row, col).text().find(text) == -1:
+                        self.ui.tableWidget.setRowHidden(r, True)
+                except:  # None type
+                    pass'''
+
+    def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
@@ -133,7 +171,12 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)")
+        sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)"
+        if order_by == "date":
+            sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
+        if order_by == "mediapath":
+            sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
+        cur.execute(sql)
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
@@ -978,7 +1021,6 @@ class DialogManageFiles(QtWidgets.QDialog):
     def fill_table(self):
         """ Reload the file data and Fill the table widget with file data. """
 
-        self.load_file_data()
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
