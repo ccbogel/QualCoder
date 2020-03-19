@@ -222,7 +222,7 @@ class DialogSQL(QtWidgets.QDialog):
             self.ui.tableWidget_results.resizeRowsToContents()
             sqlString = str(self.sql).upper()
             if sqlString.find("CREATE ") == 0 or sqlString.find("DROP ") == 0 or sqlString.find("ALTER ") == 0:
-                self.getSchemaUpdateTreeWidget()
+                self.get_schema_update_treeWidget()
         except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
             QtWidgets.QMessageBox.critical(None, _('Error'), str(e), QtWidgets.QMessageBox.Ok)
             self.ui.label.setText(_("SQL Error"))

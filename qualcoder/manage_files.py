@@ -973,6 +973,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         # delete text source
         if self.source[x]['mediapath'] is None:
+            try:
+                os.remove(self.app.project_path + "/documents/" + self.source[x]['name'])
+            except Exception as e:
+                logger.warning(_("Deleting file error: ") + str(e))
             cur.execute("delete from source where id = ?", [fileId])
             cur.execute("delete from code_text where fid = ?", [fileId])
             cur.execute("delete from annotation where fid = ?", [fileId])
@@ -981,17 +985,19 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
             cur.execute(sql, [fileId])
             self.app.conn.commit()
-        # delete image source
+        # delete image audio video source
         if self.source[x]['mediapath'] is not None:
             filepath = self.app.project_path + self.source[x]['mediapath']
             try:
                 os.remove(filepath)
             except Exception as e:
-                logger.warning(_("Deleting image error: ") + str(e))
+                logger.warning(_("Deleting file error: ") + str(e))
             cur.execute("delete from source where id = ?", [fileId])
             cur.execute("delete from code_image where id = ?", [fileId])
+            cur.execute("delete from code_av where id = ?", [fileId])
             sql = "delete from attribute where attr_type in (select attribute_type.name from "
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
+            #TODO remove av links from text source
             cur.execute(sql, [fileId])
             self.app.conn.commit()
 
