@@ -964,7 +964,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Also, delete files from sub-directories. """
 
         x = self.ui.tableWidget.currentRow()
-        fileId = self.source[x]['id']
+        file_id = self.source[x]['id']
         ui = DialogConfirmDelete(self.source[x]['name'])
         ok = ui.exec_()
 
@@ -977,33 +977,40 @@ class DialogManageFiles(QtWidgets.QDialog):
                 os.remove(self.app.project_path + "/documents/" + self.source[x]['name'])
             except Exception as e:
                 logger.warning(_("Deleting file error: ") + str(e))
-            cur.execute("delete from source where id = ?", [fileId])
-            cur.execute("delete from code_text where fid = ?", [fileId])
-            cur.execute("delete from annotation where fid = ?", [fileId])
-            cur.execute("delete from case_text where fid = ?", [fileId])
+            cur.execute("delete from source where id = ?", [file_id])
+            cur.execute("delete from code_text where fid = ?", [file_id])
+            cur.execute("delete from annotation where fid = ?", [file_id])
+            cur.execute("delete from case_text where fid = ?", [file_id])
             sql = "delete from attribute where attr_type in (select attribute_type.name from "
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
-            cur.execute(sql, [fileId])
+            cur.execute(sql, [file_id])
             self.app.conn.commit()
         # delete image audio video source
         if self.source[x]['mediapath'] is not None:
+            # Remove avid links in code_text
+            sql = "select avid from code_av where id=?"
+            cur.execute(sql, (file_id, ))
+            avids = cur.fetchall()
+            sql = "update code_text set avid=null where avid=?"
+            for avid in avids:
+                cur.execute(sql, (avid[0], ))
+            self.app.conn.commit()
+            # Remove folder file, database stored coded sections and source details
             filepath = self.app.project_path + self.source[x]['mediapath']
             try:
                 os.remove(filepath)
             except Exception as e:
                 logger.warning(_("Deleting file error: ") + str(e))
-            cur.execute("delete from source where id = ?", [fileId])
-            cur.execute("delete from code_image where id = ?", [fileId])
-            cur.execute("delete from code_av where id = ?", [fileId])
+            cur.execute("delete from source where id = ?", [file_id])
+            cur.execute("delete from code_image where id = ?", [file_id])
+            cur.execute("delete from code_av where id = ?", [file_id])
             sql = "delete from attribute where attr_type in (select attribute_type.name from "
             sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
-            #TODO remove av links from text source
-            cur.execute(sql, [fileId])
+            cur.execute(sql, [file_id])
             self.app.conn.commit()
-
         self.parent_textEdit.append(_("Deleted: ") + self.source[x]['name'])
         for item in self.source:
-            if item['id'] == fileId:
+            if item['id'] == file_id:
                 self.source.remove(item)
         self.fill_table()
 
