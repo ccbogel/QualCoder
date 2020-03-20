@@ -135,36 +135,55 @@ class DialogManageFiles(QtWidgets.QDialog):
         text = None
         try:
             text = str(self.ui.tableWidget.item(row, col).text())
+            # some blanks cells contain None and some contain blank strings
+            if text == "":
+                text = None
         except:
             pass
         #print(self.row, self.col, self.cellValue)
+        # action cannot be None otherwise may default to one of the actionsbelow depending on column clicked
+        menu = QtWidgets.QMenu()
+        action_view = menu.addAction(_("View"))
+        action_alphabetic = 1
+        action_date = 1
+        action_type = 1
+        action_by_value = 1
         if col < 4:
-            menu = QtWidgets.QMenu()
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
             action_type = menu.addAction(_("File type order"))
-            action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
-            if action == action_alphabetic:
-                self.order_by = ""
-                self.load_file_data()
-            if action == action_date:
-                self.order_by = "date"
-                self.load_file_data()
-                self.fill_table()
-            if action == action_type:
-                self.order_by = "filetype"
-                self.load_file_data()
-        #TODO
-        '''
-        # Hide rows that do not match this value
         if col > 3:
-            print(row, col, text)
+            action_by_value = menu.addAction(_("Show this value"))
+        action_export = menu.addAction(_("Export"))
+        action_delete = menu.addAction(_("Delete"))
+        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+
+        if action == action_view:
+            self.view()
+        if action == action_export:
+            self.export()
+        if action== action_delete:
+            self.delete()
+        if action == action_alphabetic:
+            self.order_by = ""
+            self.load_file_data()
+        if action == action_date:
+            self.order_by = "date"
+            self.load_file_data()
+            self.fill_table()
+        if action == action_type:
+            self.order_by = "filetype"
+            self.load_file_data()
+        if action == action_by_value:
+            # Hide rows that do not match this value, text can be None type
+            # Cell items can be None or exist with ''
             for r in range(0, self.ui.tableWidget.rowCount()):
-                try:
-                    if self.ui.tableWidget.item(row, col).text().find(text) == -1:
-                        self.ui.tableWidget.setRowHidden(r, True)
-                except:  # None type
-                    pass'''
+                item = self.ui.tableWidget.item(r, col)
+                # items can be None or appear to be None when item text == ''
+                if text is None and (item is not None and len(item.text()) > 0):
+                    self.ui.tableWidget.setRowHidden(r, True)
+                if text is not None and (item is None or item.text().find(text) == -1):
+                    self.ui.tableWidget.setRowHidden(r, True)
 
     def load_file_data(self):
         """ Documents images and audio contain the filetype suffix.
@@ -1067,7 +1086,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             iditem = QtWidgets.QTableWidgetItem(str(fid))
             iditem.setFlags(iditem.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, iditem)
-            # add the attribute values
+            # Add the attribute values
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     #print(fid, a[2], a[0], header)
