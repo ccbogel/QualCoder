@@ -688,9 +688,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         time = self.ui.label_time.text()
         time = time[6:]
-        # time may be blank, if video has not been played
-        if time == "":
-            time = "0.00"
         time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
@@ -1270,31 +1267,17 @@ class DialogCodeAV(QtWidgets.QDialog):
     def link_segment_to_text(self):
         """ Link selected segment to selected text """
 
-        i = {}
-        i['cid'] = self.segment_for_text['cid']
-        i['fid'] = self.transcription[0]
-        i['seltext'] = self.ui.textEdit.textCursor().selectedText()
-        i['pos0'] = self.ui.textEdit.textCursor().selectionStart()
-        i['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
-        i['owner'] = self.app.settings['codername']
-        i['memo'] = ""
-        i['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        i['avid'] = self.segment_for_text['avid']
-
-        #TODO should not get sqlite3.IntegrityError:
-        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
-        try:
-            cur = self.app.conn.cursor()
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (i['cid'], i['fid'], i['seltext'],
-                i['pos0'], i['pos1'], i['owner'], i['memo'], i['date'], i['avid']))
-            self.app.conn.commit()
-        except Exception as e:
-            print(e)
-            logger.debug(str(e))
-        # update codes and filter for tooltip
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.segment_for_text = None
+        item = {}
+        item['cid'] = self.segment_for_text['cid']
+        item['fid'] = self.transcription[0]
+        item['seltext'] = self.ui.textEdit.textCursor().selectedText()
+        item['pos0'] = self.ui.textEdit.textCursor().selectionStart()
+        item['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
+        item['owner'] = self.app.settings['codername']
+        item['memo'] = ""
+        item['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        item['avid'] = self.segment_for_text['avid']
+        print("TOLINK TO PLONK IN DB\n", item)
 
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
@@ -1628,7 +1611,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_edit_end = menu.addAction(_('Edit segment end position'))
         if self.text_for_segment['seltext'] is not None:
             action_link_text = menu.addAction(_('Link text to segment'))
-        if self.code_av_dialog.ui.textEdit.toPlainText() != "" and self.text_for_segment['seltext'] is None:
+        if self.text_for_segment['seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
             action_link_segment = menu.addAction(_("Select segment to link to text"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
