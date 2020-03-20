@@ -98,6 +98,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     attribute_names = []  # list of dictionary name:value for additem dialog
     parent_textEdit = None
     dialogList = []
+    order_by = ""
 
     def __init__(self, app, parent_textEdit):
 
@@ -106,7 +107,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_textEdit = parent_textEdit
         self.dialogList = []
         self.attributes = []
-        self.load_file_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
@@ -123,7 +123,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.fill_table()
+        self.order_by = ""
+        self.load_file_data()
+        #self.fill_table()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -143,12 +145,15 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_type = menu.addAction(_("File type order"))
             action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
             if action == action_alphabetic:
+                self.order_by = ""
                 self.load_file_data()
             if action == action_date:
-                self.load_file_data("date")
+                self.order_by = "date"
+                self.load_file_data()
+                self.fill_table()
             if action == action_type:
-                self.load_file_data("mediapath")
-            self.fill_table()
+                self.order_by = "filetype"
+                self.load_file_data()
         #TODO
         '''
         # Hide rows that do not match this value
@@ -161,7 +166,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 except:  # None type
                     pass'''
 
-    def load_file_data(self, order_by=""):
+    def load_file_data(self):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
@@ -171,10 +176,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.source = []
         cur = self.app.conn.cursor()
+        # default alphabetic order
         sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)"
-        if order_by == "date":
+        if self.order_by == "date":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
-        if order_by == "mediapath":
+        if self.order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
         cur.execute(sql)
         result = cur.fetchall()
@@ -197,6 +203,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attributes = []
         for row in result:
             self.attributes.append(row)
+        self.fill_table()
 
     def add_attribute(self):
         """ When add button pressed, opens the addItem dialog to get new attribute text.
@@ -267,13 +274,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
 
     def cell_modified(self):
-        """ If the filename has been changed in the table widget update the database.
-        Need to preserve the relationship between an audio/video file and its related
-        transcribed file. Attribute values can be changed. """
+        """ Attribute values can be changed.
+        Filenames cannot be changed. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        if y == self.NAME_COLUMN:
+        '''if y == self.NAME_COLUMN:
             new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
 
             # check that no other source file has this text and this is is not empty
@@ -303,7 +309,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("update source set name=? where id=?", (new_text, self.source[x]['id']))
                 self.app.conn.commit()
             else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])
+                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])'''
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
@@ -361,10 +367,6 @@ class DialogManageFiles(QtWidgets.QDialog):
     def view(self):
         """ View and edit text file contents.
         Alternatively view an image or other media. """
-
-        # need to reload this, as transcribed files can be changed via view_av, and are otherwise not
-        # updated
-        self.load_file_data()
 
         x = self.ui.tableWidget.currentRow()
         if self.source[x]['mediapath'] is not None:
@@ -1012,6 +1014,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for item in self.source:
             if item['id'] == file_id:
                 self.source.remove(item)
+        self.load_file_data()
         self.fill_table()
 
     def get_icon(self, name):
@@ -1024,11 +1027,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon_text = QtGui.QIcon("GUI/text.png")
         icon_play = QtGui.QIcon("GUI/play.png")
         icon_picture = QtGui.QIcon("GUI/picture.png")
+        icon_sound = QtGui.QIcon("GUI/sound.png")
         suffix = name[-4:].lower()
         if suffix in (".png", ".jpg", "jpeg"):
             return icon_picture
-        if suffix in (".mp4", ".mov", ".avi", ".mkv", ".mp3", ".wav", ".ogg"):
+        if suffix in (".mp4", ".mov", ".avi", ".mkv"):
             return icon_play
+        if suffix in (".mp3", ".wav", ".ogg"):
+            return icon_sound
         return icon_text
 
     def fill_table(self):
