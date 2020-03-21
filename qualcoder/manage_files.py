@@ -125,7 +125,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.order_by = ""
         self.load_file_data()
-        #self.fill_table()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
