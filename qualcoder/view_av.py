@@ -1575,7 +1575,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     segment = None
     scaler = None
     reload_segment = False
-    text_for_segment = None
+    #text_for_segment = None
     code_av_dialog = None
 
     def __init__(self, segment, scaler, text_for_segment, code_av_dialog):
@@ -1583,7 +1583,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
             self.segment = segment
             self.scaler = scaler
-            self.text_for_segment = text_for_segment
+            #self.text_for_segment = text_for_segment
             self.code_av_dialog = code_av_dialog
             self.reload_segment = False
             self.setFlag(self.ItemIsSelectable, True)
@@ -1611,9 +1611,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_play = menu.addAction(_('Play segment'))
         action_edit_start = menu.addAction(_('Edit segment start position'))
         action_edit_end = menu.addAction(_('Edit segment end position'))
-        if self.text_for_segment['seltext'] is not None:
+        if self.code_av_dialog.text_for_segment['seltext'] is not None:
             action_link_text = menu.addAction(_('Link text to segment'))
-        if self.text_for_segment['seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
+        if self.code_av_dialog.text_for_segment['seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
             action_link_segment = menu.addAction(_("Select segment to link to text"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
@@ -1628,9 +1628,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.edit_segment_start()
         if action == action_edit_end:
             self.edit_segment_end()
-        if self.text_for_segment['seltext'] is not None and action == action_link_text:
+        if self.code_av_dialog.text_for_segment['seltext'] is not None and action == action_link_text:
             self.link_text_to_segment()
-        if self.text_for_segment['seltext'] is None and action == action_link_segment:
+        if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment:
             self.link_segment_to_text()
 
     def link_segment_to_text(self):
@@ -1642,30 +1642,29 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         """ Link text to this segment. this will add a code to the text and insert
         a code_text entry into database. """
 
-        self.text_for_segment['cid'] = self.segment['cid']
-        self.text_for_segment['avid'] = self.segment['avid']
+        seg = self.code_av_dialog.text_for_segment
+        seg['cid'] = self.segment['cid']
+        seg['avid'] = self.segment['avid']
         # check for an existing duplicated marking first
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-            (self.text_for_segment['cid'], self.text_for_segment['fid'], self.text_for_segment['pos0'], self.text_for_segment['pos1'], self.text_for_segment['owner']))
+            (seg['cid'], seg['fid'], seg['pos0'], seg['pos1'], seg['owner']))
         result = cur.fetchall()
         if len(result) > 0:
             QtWidgets.QMessageBox.warning(None, _("Already Coded"),
             _("This segment has already been coded with this code."), QtWidgets.QMessageBox.Ok)
             return
-        #print(self.text_for_segment)
         try:
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (self.text_for_segment['cid'],
-                self.text_for_segment['fid'],self.text_for_segment['seltext'],
-                self.text_for_segment['pos0'], self.text_for_segment['pos1'],
-                self.text_for_segment['owner'], self.text_for_segment['memo'],
-                self.text_for_segment['date'], self.text_for_segment['avid']))
+        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (seg['cid'],
+            seg['fid'],seg['seltext'], seg['pos0'], seg['pos1'],
+            seg['owner'], seg['memo'], seg['date'], seg['avid']))
             self.code_av_dialog.app.conn.commit()
-        except Exception as e:
-            logger.debug(str(e))
+        except exception as e:
+            print(e)
+        #print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
-        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
+        self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
 
     def edit_segment_start(self):
         """ Edit segment start time. """
@@ -1703,10 +1702,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.draw_segment()
 
     def play_segment(self):
-        """  """
+        """ Play segment section. Stop at end of segment. """
 
-        #self.timer.stop()
-        #pos = self.ui.horizontalSlider.value()
         pos = self.segment['pos0'] / self.code_av_dialog.mediaplayer.get_media().get_duration()
         self.code_av_dialog.mediaplayer.play()
         self.code_av_dialog.mediaplayer.set_position(pos)
