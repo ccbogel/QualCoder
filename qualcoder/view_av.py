@@ -1291,7 +1291,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
-        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date,avid) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
             item['seltext'], item['pos0'], item['pos1'], item['owner'],
             item['memo'], item['date'], item['avid']))
