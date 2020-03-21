@@ -1655,12 +1655,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             _("This segment has already been coded with this code."), QtWidgets.QMessageBox.Ok)
             return
         try:
-        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (seg['cid'],
             seg['fid'],seg['seltext'], seg['pos0'], seg['pos1'],
             seg['owner'], seg['memo'], seg['date'], seg['avid']))
             self.code_av_dialog.app.conn.commit()
-        except exception as e:
+        except Exception as e:
             print(e)
         #print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
