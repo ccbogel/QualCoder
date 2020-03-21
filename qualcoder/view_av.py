@@ -449,7 +449,8 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
-        Segment_Graphics_Item.link_text_to_segment. """
+        Segment_Graphics_Item.link_text_to_segment.
+        link_segment_to_text"""
 
         if self.transcription is None:
             return
@@ -1265,7 +1266,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.timer.start()
 
     def link_segment_to_text(self):
-        """ Link selected segment to selected text """
+        """ Link selected segment to selected text. """
 
         item = {}
         item['cid'] = self.segment_for_text['cid']
@@ -1277,7 +1278,28 @@ class DialogCodeAV(QtWidgets.QDialog):
         item['memo'] = ""
         item['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         item['avid'] = self.segment_for_text['avid']
-        print("TOLINK TO PLONK IN DB\n", item)
+        cur = self.app.conn.cursor()
+        # check for an existing duplicated marking first
+        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
+            (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
+        result = cur.fetchall()
+        if len(result) > 0:
+            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
+            _("This segment has already been coded with this code by ") + item['owner'],
+            QtWidgets.QMessageBox.Ok)
+            return
+        # Should not get sqlite3.IntegrityError:
+        # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        try:
+        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            memo,date,avid) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
+            item['seltext'], item['pos0'], item['pos1'], item['owner'],
+            item['memo'], item['date'], item['avid']))
+        self.app.conn.commit()
+        except Exception as e:
+            logger.debug(str(e))
+        # update codes and filter for tooltip
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
@@ -1359,8 +1381,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             QtWidgets.QMessageBox.Ok)
             return
 
-        #TODO should not get sqlite3.IntegrityError:
-        #TODO UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
+        # Should not get sqlite3.IntegrityError:
+        # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
@@ -1369,8 +1391,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
         except Exception as e:
             logger.debug(str(e))
-        # update filter for tooltip
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        # update coded, filter for tooltip
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
