@@ -1603,6 +1603,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         the Dialog screen position.
         """
 
+        action_link_segment = 1
+        action_link_text = 1
         menu = QtWidgets.QMenu()
         action_memo = menu.addAction(_('Memo for segment'))
         action_delete = menu.addAction(_('Delete segment'))
