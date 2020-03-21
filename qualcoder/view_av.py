@@ -1295,7 +1295,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             memo,date,avid) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
             item['seltext'], item['pos0'], item['pos1'], item['owner'],
             item['memo'], item['date'], item['avid']))
-        self.app.conn.commit()
+            self.app.conn.commit()
         except Exception as e:
             logger.debug(str(e))
         # update codes and filter for tooltip
