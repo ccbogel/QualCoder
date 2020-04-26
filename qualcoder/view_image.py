@@ -624,6 +624,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
+            return
 
         # Find the code in the list
         if item.text(1)[0:3] == 'cid':
