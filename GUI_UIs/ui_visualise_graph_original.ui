@@ -51,19 +51,6 @@
        <string>Black and white</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_fontsize">
-      <property name="geometry">
-       <rect>
-        <x>370</x>
-        <y>0</y>
-        <width>281</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Categories larger font</string>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
@@ -87,13 +74,51 @@
        <string>List view</string>
       </property>
      </widget>
+     <widget class="QComboBox" name="comboBox_fontsize">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>0</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>6</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="text">
+       <string>Font size</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>pushButton_view</tabstop>
+  <tabstop>checkBox_blackandwhite</tabstop>
+  <tabstop>checkBox_listview</tabstop>
+  <tabstop>comboBox_fontsize</tabstop>
+  <tabstop>comboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
