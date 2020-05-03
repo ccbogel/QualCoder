@@ -96,6 +96,10 @@ class ViewGraphOriginal(QDialog):
         self.ui = Ui_Dialog_visualiseGraph_original()
         self.ui.setupUi(self)
         self.ui.comboBox.addItems(combobox_list)
+        fsize_list = []
+        for i in range(8, 32, 2):
+            fsize_list.append(str(i))
+        self.ui.comboBox_fontsize.addItems(fsize_list)
         # set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
@@ -130,7 +134,7 @@ class ViewGraphOriginal(QDialog):
             c['angle'] = None
             if self.ui.checkBox_blackandwhite.isChecked():
                 c['color'] = "#FFFFFF"
-            c['fontsize'] = 8
+            c['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
         for c in cats:
             c['depth'] = 0
             c['x'] = None
@@ -138,11 +142,7 @@ class ViewGraphOriginal(QDialog):
             c['cid'] = None
             c['angle'] = None
             c['color'] = '#FFFFFF'
-            c['fontsize'] = 8
-            if self.ui.checkBox_fontsize.isChecked():
-                c['fontsize'] = 9
-                if c['depth'] == 0:
-                    c['fontsize'] = 10
+            c['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
         model = cats + codes
         return cats, codes, model
 
@@ -162,6 +162,7 @@ class ViewGraphOriginal(QDialog):
         for c in cats:
             if c['name'] == top_node:
                 top_node = c
+                top_node['supercatid'] = None  # must set this to None
         model = self.get_node_with_children(top_node, model)
 
         ''' Look at each category and determine the depth.
@@ -189,9 +190,6 @@ class ViewGraphOriginal(QDialog):
         self.scene.clear()
         cats, codes, model = self.create_initial_model()
         catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
-        #print("MODEL\n")
-        #for m in model:
-        #    print(m)
 
         # order the model by supercatid, subcats, codes
         ordered_model = []
@@ -424,10 +422,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.data = data
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
-        self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
-        self.setFont(self.font)
-        self.setPlainText(self.data['name'])
+        if self.data['cid'] is not None:
+            self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Normal)
+            self.setFont(self.font)
+            self.setPlainText(self.data['name'])
         if self.data['cid'] is None:
+            self.font = QtGui.QFont(self.settings['font'], self.data['fontsize'], QtGui.QFont.Bold)
+            self.setFont(self.font)
             self.setPlainText(self.data['name'])
         self.setPos(self.data['x'], self.data['y'])
         self.document().contentsChanged.connect(self.text_changed)
