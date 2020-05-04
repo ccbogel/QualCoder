@@ -88,23 +88,27 @@ class ViewGraphOriginal(QDialog):
         self.app = app
         self.settings = app.settings
         self.conn = app.conn
-        self.code_names, self.categories = app.get_data()
-        combobox_list = ['All']
-        for c in self.categories:
-            combobox_list.append(c['name'])
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_visualiseGraph_original()
         self.ui.setupUi(self)
-        self.ui.comboBox.addItems(combobox_list)
         fsize_list = []
-        for i in range(8, 32, 2):
+        for i in range(8, 22, 2):
             fsize_list.append(str(i))
         self.ui.comboBox_fontsize.addItems(fsize_list)
         # set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.ui.pushButton_view.pressed.connect(self.show_graph_type)
+        self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
+        self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
+        self.ui.comboBox_fontsize.currentIndexChanged.connect(self.show_graph_type)
+        self.code_names, self.categories = app.get_data()
+
+        self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
+        combobox_list = ['All']
+        for c in self.categories:
+            combobox_list.append(c['name'])
+        self.ui.comboBox.addItems(combobox_list)
 
     def show_graph_type(self):
 
@@ -213,9 +217,19 @@ class ViewGraphOriginal(QDialog):
             i += 1
 
         for i in range(0, len(ordered_model)):
-            ordered_model[i]['y'] = i * 30
-
+            ordered_model[i]['y'] = i * (int(self.ui.comboBox_fontsize.currentText()) * 3)
         model = ordered_model
+
+        # expand scene width and height if needed
+        max_x = self.scene.getWidth()
+        max_y = self.scene.getHeight()
+        for m in model:
+             if m['x'] > max_x - 50:
+                 max_x = m['x'] + 50
+             if m['y'] > max_y - 20:
+                 max_y = m['y'] + 40
+        self.scene.setWidth(max_x)
+        self.scene.setHeight(max_y)
 
         # Add text items to the scene
         for m in model:
@@ -251,7 +265,7 @@ class ViewGraphOriginal(QDialog):
         '''
         c_x = self.scene.getWidth() / 3
         c_y = self.scene.getHeight() / 2
-        r = 180
+        r = 220
         rx_expander = c_x / c_y  # screen is landscape, so stretch x position
         x_is_none = True
         i = 0
