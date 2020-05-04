@@ -117,10 +117,10 @@ class ViewGraphOriginal(QDialog):
         else:
             self.circular_graph()
 
-    def contextMenuEvent(self, event):
+    """def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         menu.addAction('sample')
-        menu.exec_(event.globalPos())
+        menu.exec_(event.globalPos())"""
 
     def create_initial_model(self):
         """ Create inital model
@@ -705,14 +705,42 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     from_pos = None
     to_widget = None
     to_pos = None
+    line_width = 1.5
+    line_type = QtCore.Qt.SolidLine
+    line_color = QtCore.Qt.black
 
     def __init__(self, from_widget, to_widget):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
-        self.setFlag(self.ItemIsSelectable, True)
+        #self.setFlag(self.ItemIsSelectable, True)
+        self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.calculatePointsAndDraw()
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+        menu.addAction('Thicker')
+        menu.addAction('Thinner')
+        menu.addAction('Dotted')
+        menu.addAction('Red')
+        action = menu.exec_(QtGui.QCursor.pos())
+        if action.text() == 'Thicker':
+            self.line_width = self.line_width + 0.5
+            if self.line_width > 5:
+                self.line_width = 5
+            self.redraw()
+        if action.text() == 'Thinner':
+            self.line_width = self.line_width - 0.5
+            if self.line_width < 1:
+                self.line_width = 1
+            self.redraw()
+        if action.text() == 'Dotted':
+            self.line_type = QtCore.Qt.DotLine
+            self.redraw()
+        if action.text() == 'Red':
+            self.line_color = QtCore.Qt.red
+            self.redraw()
 
     def redraw(self):
         """ Called from mouse move and release events. """
@@ -762,8 +790,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
 
-        linkWidth = 1
-        self.setPen(QtGui.QPen(QtCore.Qt.black, linkWidth, QtCore.Qt.SolidLine))
+        self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
 
 
