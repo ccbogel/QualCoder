@@ -13,6 +13,7 @@ You will also need to have a vlc player installed - for audio and video.
 ### Linux:
 
 You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
+
 You may need to add unstable repos as described at https://www.binarytides.com/enable-testing-repo-debian/
 
 You also need to run this command from the terminal for pdf importing:
@@ -30,12 +31,6 @@ Make the install.sh executable and run the install.sh script from the terminal. 
 The qualcoder folder should be in the same directory as the install.sh script.
 
 This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
-
-### Using venv
-
-1. It is recommended to create a virtualenvironment,  `python3 -m venv venv` which will create a directory named `venv` which is your new virtual environment.
-2. activate the new environment: `source venv\bin\activate`
-3. Install all the requirements, before cd into the directory holding the source code of qualcoder: `python3 -m pip install .`
 
 
 ### Windows: 
