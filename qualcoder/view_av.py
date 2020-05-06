@@ -1866,7 +1866,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_transcription.setToolTip("")
             else:
                 self.ui.textEdit_transcription.installEventFilter(self)
-                self.ui.label_memo.setText(_("Memo. In transcription area: ctrl+r ctrl+s ctrl+t ctrl+1-8"))
+                self.ui.label_memo.setText(_("Transcription area: ctrl+r ctrl+s ctrl+t ctrl+n ctrl+1-8"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
