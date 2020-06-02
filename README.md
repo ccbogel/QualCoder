@@ -114,5 +114,5 @@ See [https://github.com/ccbogel/QualCoder-Debians](https://github.com/ccbogel/Qu
 ## Publications using QualCoder
 Local–global linkages: Challenges in organizing functional communities for ecosocial justice. Joel Izlar, Journal of Community Practice 27(3-4) 2019
 
-Barriers to Health: Understanding the Barriers Faced by Community Intervention Projects. Vera Landrum, The University of Southern Mississippi 2020, Availablr from: https://aquila.usm.edu/cgi/viewcontent.cgi?article=1772&context=masters_theses
+Barriers to Health: Understanding the Barriers Faced by Community Intervention Projects. Vera Landrum, The University of Southern Mississippi 2020, Available from: https://aquila.usm.edu/cgi/viewcontent.cgi?article=1772&context=masters_theses
 
