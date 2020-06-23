@@ -231,6 +231,18 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.parent_textEdit.append(msg)
             self.fields = []
             return
+
+        # check for appropriate quote format
+        # inappropriate may produce error IndexError: list index out of range
+        quote_format_error = False
+        for val in self.data:
+            if len(val) != len(self.fields_type):
+                quote_format_error = True
+        if quote_format_error:
+            msg = _("Number of fields does not match header\nPossible wrong quote format")
+            logger.error(_("Survey not loaded: ") + msg)
+            QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), msg)
+            return
         self.insert_data()
         super(DialogImportSurvey, self).accept()
 
