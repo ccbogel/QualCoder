@@ -121,3 +121,5 @@ Local–global linkages: Challenges in organizing functional communities for eco
 
 Barriers to Health: Understanding the Barriers Faced by Community Intervention Projects. Vera Landrum, The University of Southern Mississippi 2020, Available from: https://aquila.usm.edu/cgi/viewcontent.cgi?article=1772&context=masters_theses
 
+Framing food geographies. S Ramsey, 
+
