@@ -187,6 +187,8 @@ class Codebook():
                         memo = i['memo']
                         owner = i['owner']
             filedata += _(", Owner: ") + owner
+            if memo is None:
+                memo = ""
             filedata += "\r\n" + prefix + _("Memo: ") + memo
 
             it += 1

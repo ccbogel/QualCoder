@@ -108,7 +108,7 @@ a = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">\
 </head><body>\
 <h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
-<p>QualCoder 1.8 2020 March 11</p>\
+<p>QualCoder 1.9 2020 March 11</p>\
 <p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six</p>\
 <p>VLC should also be installed.</p>\
 <p>Tested on: Linux Mint 18.04, Ubuntu 19.04, Lubuntu 18.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\

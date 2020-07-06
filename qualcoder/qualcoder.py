@@ -506,7 +506,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeFrequencies":
                 return
-        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
+        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
@@ -833,9 +833,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
-            #print("appsettings dir ", self.app.settings['directory'])  # tmp
+            #print("appsettings dir ", self.app.settings['directory'], os.path.expanduser('~') )  # tmp
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                _('Open project directory'), self.app.settings['directory'])
+                _('Open project directory'), os.path.expanduser('~') )
         if path == "" or path is False:
             return
         msg = ""
