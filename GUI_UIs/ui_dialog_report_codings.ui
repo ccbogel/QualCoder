@@ -50,7 +50,7 @@
      <widget class="QPushButton" name="pushButton_caseselect">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>420</x>
         <y>50</y>
         <width>191</width>
         <height>27</height>
@@ -76,7 +76,7 @@
      <widget class="QPushButton" name="pushButton_fileselect">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>420</x>
         <y>20</y>
         <width>191</width>
         <height>27</height>
@@ -115,7 +115,7 @@
      <widget class="QPushButton" name="pushButton_search">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>630</x>
         <y>30</y>
         <width>121</width>
         <height>61</height>
@@ -128,8 +128,8 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>30</y>
+        <x>20</x>
+        <y>0</y>
         <width>61</width>
         <height>22</height>
        </rect>
@@ -141,17 +141,17 @@
      <widget class="QComboBox" name="comboBox_coders">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>10</x>
         <y>20</y>
-        <width>221</width>
-        <height>34</height>
+        <width>211</width>
+        <height>30</height>
        </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>420</x>
         <y>80</y>
         <width>191</width>
         <height>27</height>
@@ -187,6 +187,32 @@
        <string>Export csv file</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_by_sentence">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>80</y>
+        <width>171</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>by sentence</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_text_context">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>20</y>
+        <width>181</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>text context</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -205,6 +231,9 @@
      </property>
      <property name="text">
       <string>Search selections:</string>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
