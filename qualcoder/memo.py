@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -67,6 +67,7 @@ class DialogMemo(QtWidgets.QDialog):
         self.memo = memo
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)

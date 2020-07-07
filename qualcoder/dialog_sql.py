@@ -82,6 +82,7 @@ class DialogSQL(QtWidgets.QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)

@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 import sqlite3
 import csv
@@ -91,6 +91,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Import()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -242,7 +243,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
             msg = _("Number of fields does not match header\nPossible wrong quote format")
             logger.error(_("Survey not loaded: ") + msg)
             QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), msg)
-            return
+            returncoder
+
         self.insert_data()
         super(DialogImportSurvey, self).accept()
 

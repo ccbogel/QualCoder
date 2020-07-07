@@ -102,6 +102,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.get_codes_and_categories()
         self.ui = Ui_Dialog_codes()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)

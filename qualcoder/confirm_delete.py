@@ -25,7 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 '''
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -57,6 +57,7 @@ class DialogConfirmDelete(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_confirmDelete()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.label.setText(text)
 
 

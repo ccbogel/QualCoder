@@ -30,7 +30,7 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets, QtCore
 
 from GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
 
@@ -71,6 +71,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui = Ui_Dialog_colour_selector()
         self.ui.setupUi(self)
         self.setupUi()
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.selected_color = prev_color
 
     def color_selected(self):

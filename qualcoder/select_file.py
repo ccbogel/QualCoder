@@ -70,6 +70,7 @@ class DialogSelectFile(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_selectfile()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
         self.selection_mode = selectionmode
         self.dict_list = data

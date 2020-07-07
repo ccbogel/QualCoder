@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 '''
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -70,6 +70,7 @@ class DialogInformation(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
         if html == "":
             self.setHtml(a)

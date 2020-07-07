@@ -91,6 +91,7 @@ class ViewGraphOriginal(QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_visualiseGraph_original()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         fsize_list = []
         for i in range(8, 22, 2):
             fsize_list.append(str(i))
