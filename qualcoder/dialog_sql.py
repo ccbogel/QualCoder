@@ -113,7 +113,7 @@ class DialogSQL(QtWidgets.QDialog):
         try:
             cur.execute(sql)
         except Exception as e:
-            QtWidgets.QMessageBox.error(None, 'SQL error', str(e))
+            QtWidgets.QMessageBox.warning(None, 'SQL error', str(e))
             return
 
         results = cur.fetchall()
