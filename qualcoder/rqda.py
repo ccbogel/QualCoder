@@ -32,16 +32,18 @@ import logging
 from lxml import etree
 from operator import itemgetter
 import os
+from random import randint
 import re
 import shutil
 import sqlite3
 import sys
 import traceback
 import uuid
-
 import zipfile
 
 from PyQt5 import QtWidgets
+
+from color_selector import colors
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -102,7 +104,8 @@ class Rqda_import():
         return yyyy + "-" + mm + "-" + dd + " " + hh_mm_ss
 
     def import_data(self):
-        """  """
+        """ Code colours are randomly created.
+         The codername in qlaucoder settings is set to the first owner found in RQDA """
 
         r_cur = self.conn.cursor()
         q_cur = self.app.conn.cursor()
@@ -118,8 +121,9 @@ class Rqda_import():
         r_cur.execute("select fid,position,annotation, owner, date from annotation")
         res = r_cur.fetchall()
         for r in res:
-            q_cur.execute("insert into annotation (fid, pos0, pos1, memo, owner, date) values (?,?,?,?,?,?)",
-                [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
+            if r[3] != "" and r[3] is not None:
+                q_cur.execute("insert into annotation (fid, pos0, pos1, memo, owner, date) values (?,?,?,?,?,?)",
+                    [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
         r_cur.execute("select name,journal, owner, date from journal")
         res = r_cur.fetchall()
         for r in res:
@@ -142,22 +146,25 @@ class Rqda_import():
         r_cur.execute("select id, name, memo,color, owner, date from freecode")
         res = r_cur.fetchall()
         for r in res:
+            code_color = colors[randint(0, len(colors) - 1)]
             treecode = None
             for t in treecodes:
                 if t[0] == r[0]:
                     treecode = t[1]  # the corresponding catid
             q_cur.execute("insert into code_name (cid, catid,name, memo,color, owner, date) values (?,?,?,?,?,?,?)",
-                [r[0],treecode, r[1], r[2], r[3], r[4], self.convert_date(r[5])])
+                [r[0],treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
         r_cur.execute("select cid, fid, seltext,selfirst,selend,memo, owner, date from coding")
         res = r_cur.fetchall()
         for r in res:
-            q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
+            if r[2] != "" and r[2] is not None:
+                q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
         r_cur.execute("select cid, fid, seltext,selfirst,selend,memo, owner, date from coding2")
         res = r_cur.fetchall()
         for r in res:
-            q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
+            if r[2] != "" and r[2] is not None:
+                q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
 
         # attribute class = character or numeric
         r_cur.execute("select distinct variable from caseAttr")
@@ -188,6 +195,15 @@ class Rqda_import():
             q_cur.execute("insert into case_text (caseid,fid,pos0,pos1,owner,memo, date) values(?,?,?,?,?,?,?)",
                 [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
         self.app.conn.commit()
+
+        # Change the user name to the owner name from RQDA
+        sql = "select owner from code_text"
+        q_cur.execute(sql)
+        result = q_cur.fetchone()
+        if result is None:
+            return
+        self.app.settings['codername'] = result[0]
+        self.app.write_config_ini(self.app.settings)
 
 """
  done project (databaseversion text, date text,dateM text, memo text,about text, imageDir text
