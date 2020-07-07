@@ -1145,7 +1145,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                 #Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
-                if item['pos0'] <= pos and item['pos1'] >= pos:
+                if item['pos0'] <= pos and item['pos1'] >= pos and item['seltext'] is not None:
                     if displayText == "":
                         displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + item['seltext'] + "</p>"
                     else:  # Can have multiple codes on same selected area
