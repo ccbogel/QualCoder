@@ -187,19 +187,6 @@
        <string>Export csv file</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_by_sentence">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>80</y>
-        <width>171</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>by sentence</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
