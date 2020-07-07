@@ -869,12 +869,14 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cursor = self.ui.textEdit.textCursor()
 
             # Add coding highlights
+            #TODO use brush style to highlight overlaps - might be too hard to implement
             codes = {x['cid']:x for x in self.codes}
             for item in self.code_text:
                 cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
                 color = codes.get(item['cid'],{}).get('color',"#F8E0E0")  # default light red
-                fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
+                brush = QtGui.QBrush(QtGui.QColor(color))
+                fmt.setBackground(brush)
                 # Highlight codes with memos - these are italicised
                 if item['memo'] is not None and item['memo'] != "":
                     fmt.setFontItalic(True)
@@ -1114,7 +1116,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
 class ToolTip_EventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
     The tool top text is changed according to its position in the text.
-    If over a coded section the codename is displayed in the tooltip.
+    If over a coded section the codename(s) are displayed in the tooltip.
     """
 
     codes = None
@@ -1127,6 +1129,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             for c in self.codes:
                 if item['cid'] == c['cid']:
                     item['name'] = c['name']
+                    item['color'] = c['color']
 
     def eventFilter(self, receiver, event):
         #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
@@ -1144,13 +1147,13 @@ class ToolTip_EventFilter(QtCore.QObject):
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
                     if displayText == "":
-                        displayText = item['name']
+                        displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + item['seltext'] + "</p>"
                     else:  # Can have multiple codes on same selected area
                         try:
-                            displayText += "\n" + item['name']
+                            displayText += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + item['seltext'] + "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
-                            msg += str(item) + "\n" + self.code_text
+                            msg += str(item) + "<br /" + self.code_text
                             logger.error(msg)
             if displayText != "":
                 receiver.setToolTip(displayText)
