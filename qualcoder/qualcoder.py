@@ -910,6 +910,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.clean_dialog_refs()
+        self.setWindowTitle("QualCoder")
 
     def clean_dialog_refs(self):
         """ Test the list of dialog refs to see if they have been cleared
