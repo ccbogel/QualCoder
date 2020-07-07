@@ -43,7 +43,8 @@ class CodedMediaMixin:
         results = cur.fetchall()
         # Text
         for row in results:
-            title = '<span style=\"background-color:' + row[COLOR] + '\">'
+            # added str() to color to catch any RQDA color import errors, should not occur now
+            title = '<span style=\"background-color:' + str(row[COLOR]) + '\">'
             title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
             title += ", Coder: <em>" + row[OWNER] + "</em> "
             title += ", " + str(row[POS0]) + " - " + str(row[POS1])
