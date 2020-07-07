@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_codings.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_reportCodings(object):
     def setupUi(self, Dialog_reportCodings):
@@ -24,13 +26,13 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_exporttext.setGeometry(QtCore.QRect(760, 60, 211, 27))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
         self.pushButton_caseselect = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_caseselect.setGeometry(QtCore.QRect(390, 50, 191, 27))
+        self.pushButton_caseselect.setGeometry(QtCore.QRect(420, 50, 191, 27))
         self.pushButton_caseselect.setObjectName("pushButton_caseselect")
         self.pushButton_exporthtml = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_exporthtml.setGeometry(QtCore.QRect(760, 0, 211, 27))
         self.pushButton_exporthtml.setObjectName("pushButton_exporthtml")
         self.pushButton_fileselect = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_fileselect.setGeometry(QtCore.QRect(390, 20, 191, 27))
+        self.pushButton_fileselect.setGeometry(QtCore.QRect(420, 20, 191, 27))
         self.pushButton_fileselect.setObjectName("pushButton_fileselect")
         self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit.setGeometry(QtCore.QRect(10, 80, 211, 30))
@@ -40,16 +42,16 @@ class Ui_Dialog_reportCodings(object):
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
         self.pushButton_search = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_search.setGeometry(QtCore.QRect(610, 30, 121, 61))
+        self.pushButton_search.setGeometry(QtCore.QRect(630, 30, 121, 61))
         self.pushButton_search.setObjectName("pushButton_search")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
-        self.label_2.setGeometry(QtCore.QRect(10, 30, 61, 22))
+        self.label_2.setGeometry(QtCore.QRect(20, 0, 61, 22))
         self.label_2.setObjectName("label_2")
         self.comboBox_coders = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_coders.setGeometry(QtCore.QRect(90, 20, 221, 34))
+        self.comboBox_coders.setGeometry(QtCore.QRect(10, 20, 211, 30))
         self.comboBox_coders.setObjectName("comboBox_coders")
         self.pushButton_attributeselect = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_attributeselect.setGeometry(QtCore.QRect(390, 80, 191, 27))
+        self.pushButton_attributeselect.setGeometry(QtCore.QRect(420, 80, 191, 27))
         self.pushButton_attributeselect.setObjectName("pushButton_attributeselect")
         self.pushButton_exportodt = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_exportodt.setGeometry(QtCore.QRect(760, 30, 211, 27))
@@ -57,10 +59,14 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_export_csv = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_export_csv.setGeometry(QtCore.QRect(760, 90, 211, 27))
         self.pushButton_export_csv.setObjectName("pushButton_export_csv")
+        self.checkBox_text_context = QtWidgets.QCheckBox(self.groupBox)
+        self.checkBox_text_context.setGeometry(QtCore.QRect(230, 20, 181, 23))
+        self.checkBox_text_context.setObjectName("checkBox_text_context")
         self.verticalLayout.addWidget(self.groupBox)
         self.label_selections = QtWidgets.QLabel(Dialog_reportCodings)
         self.label_selections.setMinimumSize(QtCore.QSize(0, 50))
         self.label_selections.setMaximumSize(QtCore.QSize(16777213, 50))
+        self.label_selections.setScaledContents(True)
         self.label_selections.setWordWrap(True)
         self.label_selections.setObjectName("label_selections")
         self.verticalLayout.addWidget(self.label_selections)
@@ -108,6 +114,7 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_attributeselect.setText(_translate("Dialog_reportCodings", "Attribute selection"))
         self.pushButton_exportodt.setText(_translate("Dialog_reportCodings", "Export ODT file"))
         self.pushButton_export_csv.setText(_translate("Dialog_reportCodings", "Export csv file"))
+        self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "text context"))
         self.label_selections.setText(_translate("Dialog_reportCodings", "Search selections:"))
 
 
@@ -119,4 +126,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_reportCodings)
     Dialog_reportCodings.show()
     sys.exit(app.exec_())
-
