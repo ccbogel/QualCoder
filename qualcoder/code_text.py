@@ -1147,9 +1147,19 @@ class ToolTip_EventFilter(QtCore.QObject):
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
                     seltext = seltext.replace("\r", "")
-
-                    if len(seltext) > 60:
-                        seltext = seltext[0:20] + " ... " + seltext[len(seltext) - 20:]
+                    # if sleected text is long just show start end snippets with a readable cut off (ie not cut off halway through a word)
+                    if len(seltext) > 90:
+                        pretext = seltext[0:40].split(' ')
+                        posttext = seltext[len(seltext) - 40:].split(' ')
+                        try:
+                            pretext = pretext[:-1]
+                        except:
+                            pass
+                        try:
+                            posttext = posttext[1:]
+                        except:
+                            pass
+                        seltext = " ".join(pretext) + " ... " + " ".join(posttext)
                     if displayText == "":
                         displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
                     else:  # Can have multiple codes on same selected area
