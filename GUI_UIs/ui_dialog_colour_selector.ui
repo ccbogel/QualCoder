@@ -35,17 +35,17 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_colour">
+  <widget class="QLabel" name="label_colour_old">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>311</width>
+     <width>101</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>colour</string>
+    <string>old</string>
    </property>
   </widget>
   <widget class="QTableWidget" name="tableWidget">
@@ -154,6 +154,19 @@
      <string>New Column</string>
     </property>
    </column>
+  </widget>
+  <widget class="QLabel" name="label_colour_new">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>30</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>new</string>
+   </property>
   </widget>
  </widget>
  <resources/>
