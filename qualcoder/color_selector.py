@@ -107,6 +107,7 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem()
                 codeColor = colors[row * 10 + col]
                 item.setBackground(QtGui.QBrush(QtGui.QColor(codeColor)))
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
 
