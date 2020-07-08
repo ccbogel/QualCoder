@@ -74,11 +74,11 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.selected_color = prev_color
         # preset with the current colour
-        palette = self.ui.label_colour.palette()
+        palette = self.ui.label_colour_old.palette()
         c = QtGui.QColor(self.selected_color)
         palette.setColor(QtGui.QPalette.Window, c)
-        self.ui.label_colour.setPalette(palette)
-        self.ui.label_colour.setAutoFillBackground(True)  # important
+        self.ui.label_colour_old.setPalette(palette)
+        self.ui.label_colour_old.setAutoFillBackground(True)  # important
 
     def color_selected(self):
         """ Get colour selection from table widget. """
@@ -86,11 +86,11 @@ class DialogColorSelect(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         self.selected_color = colors[x * 10 + y]
-        palette = self.ui.label_colour.palette()
+        palette = self.ui.label_colour_new.palette()
         c = QtGui.QColor(self.selected_color)
         palette.setColor(QtGui.QPalette.Window, c)
-        self.ui.label_colour.setPalette(palette)
-        self.ui.label_colour.setAutoFillBackground(True)  # important
+        self.ui.label_colour_new.setPalette(palette)
+        self.ui.label_colour_new.setAutoFillBackground(True)  # important
 
     def get_color(self):
         """ Get the selected color from selected table widget cell. """
