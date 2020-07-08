@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_main.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -21,7 +23,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -113,8 +115,11 @@ class Ui_MainWindow(object):
         self.actionView_Graph_2.setObjectName("actionView_Graph_2")
         self.actionRQDA_Project_import = QtWidgets.QAction(MainWindow)
         self.actionRQDA_Project_import.setObjectName("actionRQDA_Project_import")
+        self.actionOpen_Recent_Project = QtWidgets.QAction(MainWindow)
+        self.actionOpen_Recent_Project.setObjectName("actionOpen_Recent_Project")
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
+        self.menuProject.addAction(self.actionOpen_Recent_Project)
         self.menuProject.addAction(self.actionClose_Project)
         self.menuProject.addAction(self.actionProject_Memo)
         self.menuProject.addAction(self.actionSettings)
@@ -199,6 +204,7 @@ class Ui_MainWindow(object):
         self.actionREFI_QDA_Project_import.setText(_translate("MainWindow", "REFI-QDA Project import"))
         self.actionView_Graph_2.setText(_translate("MainWindow", "View Graph 2"))
         self.actionRQDA_Project_import.setText(_translate("MainWindow", "RQDA Project import"))
+        self.actionOpen_Recent_Project.setText(_translate("MainWindow", "Open Recent Project"))
 
 
 if __name__ == "__main__":
@@ -209,4 +215,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
