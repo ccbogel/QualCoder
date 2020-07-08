@@ -833,9 +833,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         if path == "" or path is False:
-            #print("appsettings dir ", self.app.settings['directory'], os.path.expanduser('~') )  # tmp
+            default_directory = self.app.settings['directory']
+            if default_directory == "":
+                default_directory = os.path.expanduser('~')
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                _('Open project directory'), os.path.expanduser('~') )
+                _('Open project directory'), default_directory)
         if path == "" or path is False:
             return
         msg = ""
