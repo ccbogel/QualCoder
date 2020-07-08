@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_colour_selector.ui'
 #
-# Created by: PyQt5 UI code generator 5.9
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_colour_selector(object):
     def setupUi(self, Dialog_colour_selector):
@@ -22,9 +24,9 @@ class Ui_Dialog_colour_selector(object):
         self.buttonBox.setOrientation(QtCore.Qt.Vertical)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.label_colour = QtWidgets.QLabel(Dialog_colour_selector)
-        self.label_colour.setGeometry(QtCore.QRect(10, 30, 311, 31))
-        self.label_colour.setObjectName("label_colour")
+        self.label_colour_old = QtWidgets.QLabel(Dialog_colour_selector)
+        self.label_colour_old.setGeometry(QtCore.QRect(10, 30, 101, 31))
+        self.label_colour_old.setObjectName("label_colour_old")
         self.tableWidget = QtWidgets.QTableWidget(Dialog_colour_selector)
         self.tableWidget.setGeometry(QtCore.QRect(10, 100, 521, 221))
         self.tableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -68,6 +70,9 @@ class Ui_Dialog_colour_selector(object):
         self.tableWidget.setHorizontalHeaderItem(9, item)
         self.tableWidget.horizontalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setVisible(False)
+        self.label_colour_new = QtWidgets.QLabel(Dialog_colour_selector)
+        self.label_colour_new.setGeometry(QtCore.QRect(150, 30, 101, 31))
+        self.label_colour_new.setObjectName("label_colour_new")
 
         self.retranslateUi(Dialog_colour_selector)
         self.buttonBox.accepted.connect(Dialog_colour_selector.accept)
@@ -77,7 +82,7 @@ class Ui_Dialog_colour_selector(object):
     def retranslateUi(self, Dialog_colour_selector):
         _translate = QtCore.QCoreApplication.translate
         Dialog_colour_selector.setWindowTitle(_translate("Dialog_colour_selector", "Colour selector"))
-        self.label_colour.setText(_translate("Dialog_colour_selector", "colour"))
+        self.label_colour_old.setText(_translate("Dialog_colour_selector", "old"))
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("Dialog_colour_selector", "New Row"))
         item = self.tableWidget.verticalHeaderItem(1)
@@ -112,6 +117,7 @@ class Ui_Dialog_colour_selector(object):
         item.setText(_translate("Dialog_colour_selector", "New Column"))
         item = self.tableWidget.horizontalHeaderItem(9)
         item.setText(_translate("Dialog_colour_selector", "New Column"))
+        self.label_colour_new.setText(_translate("Dialog_colour_selector", "new"))
 
 
 if __name__ == "__main__":
@@ -122,4 +128,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_colour_selector)
     Dialog_colour_selector.show()
     sys.exit(app.exec_())
-
