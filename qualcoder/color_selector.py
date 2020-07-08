@@ -73,6 +73,12 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.setupUi()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.selected_color = prev_color
+        # preset with the current colour
+        palette = self.ui.label_colour.palette()
+        c = QtGui.QColor(self.selected_color)
+        palette.setColor(QtGui.QPalette.Window, c)
+        self.ui.label_colour.setPalette(palette)
+        self.ui.label_colour.setAutoFillBackground(True)  # important
 
     def color_selected(self):
         """ Get colour selection from table widget. """
@@ -117,4 +123,3 @@ if __name__ == "__main__":
     ui = DialogColorSelect("#101010")
     ui.show()
     sys.exit(app.exec_())
-
