@@ -31,6 +31,7 @@ import configparser
 import datetime
 import gettext
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import re
 import shutil
@@ -75,10 +76,11 @@ except OSError:
     pass
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
-     datefmt='%Y/%m/%d %I:%M', filename=logfile)
+     datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
+handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
+logger.addHandler(handler)
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
