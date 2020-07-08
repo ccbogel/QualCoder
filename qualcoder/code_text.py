@@ -364,11 +364,9 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         ActionItemDelete = menu.addAction(_("Delete"))
         ActionItemChangeColor = None
         ActionShowCodedMedia = None
-        #ActionLinkTo = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
-            #ActionLinkTo = menu.addAction(_("Link to"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None :
             if selected is not None and action == ActionItemChangeColor:
@@ -1146,11 +1144,18 @@ class ToolTip_EventFilter(QtCore.QObject):
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos and item['seltext'] is not None:
+                    # keep the snippets short
+                    seltext = item['seltext']
+                    seltext = seltext.replace("\n", "")
+                    seltext = seltext.replace("\r", "")
+
+                    if len(seltext) > 60:
+                        seltext = seltext[0:20] + " ... " + seltext[len(seltext) - 20:]
                     if displayText == "":
-                        displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + item['seltext'] + "</p>"
+                        displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
                     else:  # Can have multiple codes on same selected area
                         try:
-                            displayText += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + item['seltext'] + "</p>"
+                            displayText += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                             msg += str(item) + "<br /" + self.code_text

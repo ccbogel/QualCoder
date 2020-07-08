@@ -25,7 +25,7 @@ class CodedMediaMixin:
         This is called from code_text
         """
 
-        ui = DialogInformation("Coded text : " + data['name'], "")
+        ui = DialogInformation("Coded text : " + data['name'], "<br />")
         cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1
