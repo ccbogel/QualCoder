@@ -434,6 +434,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
             return
 
         # find the code in the list
@@ -458,6 +459,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_name set catid=? where cid=?",
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
+            self.app.delete_backup = False
             self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
@@ -484,10 +486,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
+        self.app.delete_backup = False
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
-        #TODO
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
@@ -509,15 +511,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
+        self.app.delete_backup = False
         cur.execute("select last_insert_rowid()")
         cid = cur.fetchone()[0]
         item['cid'] = cid
-        '''self.codes.append(item)
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'cid:' + str(item['cid']), ""])
-        color = item['color']
-        top_item.setBackground(0, QBrush(QtGui.QColor(color), Qt.SolidPattern))
-        self.ui.treeWidget.addTopLevelItem(top_item)
-        self.ui.treeWidget.setCurrentItem(top_item)'''
         self.parent_textEdit.append(_("New code: ") + item['name'])
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
@@ -582,13 +579,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
-        '''cur.execute("select last_insert_rowid()")
-        catid = cur.fetchone()[0]
-        item['catid'] = catid
-        self.categories.append(item)
-        # update widget
-        top_item = QtWidgets.QTreeWidgetItem([item['name'], 'catid:' + str(item['catid']), ""])
-        self.ui.treeWidget.addTopLevelItem(top_item)'''
+        self.app.delete_backup = False
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
@@ -622,13 +613,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_av where cid=?", [code_['cid'], ])
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         self.app.conn.commit()
+        self.app.delete_backup = False
         selected = None
-        #self.get_codes_and_categories()
-        #self.fill_tree()
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
-        # update filter for tooltip
-        #self.eventFilterTT.setCodes(self.code_text, self.codes)
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -651,9 +639,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
         selected = None
-        #self.get_codes_and_categories()
-        #self.fill_tree()
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
     def add_edit_memo(self, selected):
@@ -675,6 +662,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
@@ -697,6 +685,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
             if memo == "":
                 selected.setData(2, QtCore.Qt.DisplayRole, "")
             else:
@@ -730,13 +719,10 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur = self.app.conn.cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
+            self.app.delete_backup = False
             old_name = self.codes[found]['name']
-            #self.codes[found]['name'] = new_name
-            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
             self.update_dialog_codes_and_categories()
-            # Update filter for tooltip
-            #self.eventFilterTT.setCodes(self.code_text, self.codes)
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -762,9 +748,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur.execute("update code_cat set name=? where catid=?",
             (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
+            self.app.delete_backup = False
             old_name = self.categories[found]['name']
-            #self.categories[found]['name'] = new_name
-            #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.update_dialog_codes_and_categories()
             self.parent_textEdit.append(_("Category renamed from: ") + old_name + _(" to: ") + new_name)
 
@@ -792,8 +777,8 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
+        self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
-        #self.highlight()
 
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
@@ -867,7 +852,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cursor = self.ui.textEdit.textCursor()
 
             # Add coding highlights
-            #TODO use brush style to highlight overlaps - might be too hard to implement
+            #TODO use different brush style to highlight overlaps - might be too hard to implement
             codes = {x['cid']:x for x in self.codes}
             for item in self.code_text:
                 cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
@@ -934,6 +919,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
                 coded['memo'], coded['date']))
             self.app.conn.commit()
+            self.app.delete_backup = False
         except Exception as e:
             logger.debug(str(e))
         # Update filter for tooltip
@@ -971,6 +957,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
             (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.delete_backup = False
         if unmarked in self.code_text:
             self.code_text.remove(unmarked)
 
@@ -1017,6 +1004,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 values(?,?,?,?,?,?)" ,(item['fid'], item['pos0'], item['pos1'],
                 item['memo'], item['owner'], item['date']))
             self.app.conn.commit()
+            self.app.delete_backup = False
             cur.execute("select last_insert_rowid()")
             anid = cur.fetchone()[0]
             item['anid'] = anid
@@ -1029,6 +1017,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
             cur = self.app.conn.cursor()
             cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
             self.app.conn.commit()
+            self.app.delete_backup = False
             for note in self.annotations:
                 if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
                     self.annotations.remove(note)
@@ -1099,6 +1088,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                         , (item['cid'], item['fid'], item['seltext'], item['pos0'],
                         item['pos1'], item['owner'], item['memo'], item['date']))
                     self.app.conn.commit()
+                    self.app.delete_backup = False
 
                     # If this is the currently open file update the code text list and GUI
                     if f['id'] == self.filename['id']:

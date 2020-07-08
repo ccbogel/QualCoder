@@ -342,6 +342,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
+        self.app.delete_backup = False
 
     def options_changed(self):
         ''' When import options are changed do the import and ultimately fill the table.

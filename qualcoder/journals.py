@@ -132,6 +132,7 @@ class DialogJournals(QtWidgets.QDialog):
             if self.journals[j]['jid'] == self.current_jid:
                 current_j = j
         self.journals[current_j]['jentry'] = self.ui.textEdit.toPlainText()
+        self.app.delete_backup = False
 
     def closeEvent(self, event):
         ''' Save journal text changes to database. '''

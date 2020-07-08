@@ -195,14 +195,18 @@ class DialogSQL(QtWidgets.QDialog):
             #extra messaging where rows will be zero
             if self.sql[0:12].upper() == "CREATE TABLE":
                 self.ui.label.setText(_("Table created"))
+                self.app.delete_backup = False
             if self.sql[0:12].upper() == "CREATE INDEX":
                 self.ui.label.setText(_("Index created"))
+                self.app.delete_backup = False
                 self.app.conn.commit()
             if self.sql[0:6].upper() == "DELETE":
                 self.ui.label.setText(str(cur.rowcount) + _(" rows deleted"))
+                self.app.delete_backup = False
                 self.app.conn.commit()
             if self.sql[0:6].upper() == "UPDATE":
                 self.ui.label.setText(str(cur.rowcount) + _(" rows updated"))
+                self.app.delete_backup = False
                 self.app.conn.commit()
             colNames = []
             if cur.description is not None:

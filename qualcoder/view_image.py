@@ -402,6 +402,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute('update source set memo=? where id=?', (ui.memo, self.file_['id']))
         self.app.conn.commit()
         self.file_['memo'] = ui.memo
+        self.app.delete_backup = False
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -492,8 +493,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         if action.text() == _('Memo'):
             self.coded_area_memo(item)
+            self.app.delete_backup = False
         if action.text() == _('Unmark'):
             self.unmark(item)
+            self.app.delete_backup = False
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for this coder.
@@ -594,6 +597,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         rect_item.setToolTip(code_.text(0))
         self.scene.addItem(rect_item)
         self.selection = None
+        self.app.delete_backup = False
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -625,6 +629,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
             return
 
         # Find the code in the list
@@ -649,6 +654,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
@@ -676,6 +682,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def add_code(self):
         """ Use add_item dialog to get new code text.
@@ -696,6 +703,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New code: ") + item['name'])
+        self.app.delete_backup = False
 
     def add_category(self):
         """ Add a new category.
@@ -717,6 +725,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New category: ") + item['name'])
+        self.app.delete_backup = False
 
     def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
@@ -753,6 +762,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         selected = None
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -777,6 +787,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         selected = None
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo. """
@@ -802,6 +813,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
 
         if selected.text(1)[0:3] == 'cat':
             # find the category in the list
@@ -825,6 +837,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
 
     def rename_category_or_code(self, selected):
@@ -859,6 +872,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             #selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Code renamed: ") + \
                 old_name + " ==> " + new_name)
+            self.app.delete_backup = False
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -890,6 +904,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.parent_textEdit.append(_("Category renamed from: ") + \
                 old_name + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
@@ -916,6 +931,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
 
 class DialogViewImage(QtWidgets.QDialog):

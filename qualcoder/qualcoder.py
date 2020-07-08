@@ -98,12 +98,17 @@ class App(object):
     conn = None
     project_path = ""
     project_name = ""
+    # Can delete the most current back up if the project has not been altered
+    delete_backup_path_name = ""
+    delete_backup = True
 
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
         self.project_path = ""
         self.project_name = ""
+        self.delete_backup = True
+        self.delete_backup_path_name = ""
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
@@ -191,19 +196,6 @@ class App(object):
             'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         return res
 
-    '''def calc_model(self, cats, codes):
-        """ Model dictionary containing all codes and categories
-        Keys are strings of catid:id or cid:id
-        USED BY ?? """
-
-        #TODO delete this method
-        model = {}
-        for cat in cats:
-            model['catid:%s'%cat['catid']] = cat
-        for code in codes:
-            model['cid:%s'%code['cid']] = code
-        return model'''
-
     def get_data(self):
         """ Called from init and gets all the codes and categories.
         Called from ? """
@@ -234,13 +226,13 @@ class App(object):
         config = configparser.ConfigParser()
         config.read(self.configpath)
         default =  config['DEFAULT']
-        res = dict(default)
+        result = dict(default)
         # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
-            res['fontsize'] = default.getint('fontsize')
+            result['fontsize'] = default.getint('fontsize')
         if 'treefontsize' in default:
-            res['treefontsize'] = default.getint('treefontsize')
-        return res
+            result['treefontsize'] = default.getint('treefontsize')
+        return result
 
     def merge_settings_with_default_stylesheet(self, settings):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
@@ -259,12 +251,12 @@ class App(object):
         return stylesheet
 
     def load_settings(self):
-        res = self._load_config_ini()
-        if not len(res):
+        result = self._load_config_ini()
+        if not len(result):
             self.write_config_ini(self.default_settings)
             logger.info('Initilaized config.ini')
-            res = self._load_config_ini()
-        return res
+            result = self._load_config_ini()
+        return result
 
     @property
     def default_settings(self):
@@ -701,6 +693,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Close all dialogs and database connection.
         If selected via menu option exit: event == False
         If selected via window x close: event == QtGui.QCloseEvent
+        Close project will also delete a backup if a backup was made and no changes occured.
         """
 
         if not self.force_quit:
@@ -708,7 +701,10 @@ class MainWindow(QtWidgets.QMainWindow):
             reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
             QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.Yes:
+                # close project before the dialog list, as close project clean the dialogs
+                self.close_project()
                 self.dialogList = None
+
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -824,6 +820,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute('update project set memo=?', (ui.memo,))
             self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))
+            self.app.delete_backup = False
 
     def open_project(self, path=""):
         """ Open an existing project.
@@ -886,6 +883,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             self.ui.textEdit.append(_("Project backup created: ") + backup)
 
+            self.app.delete_backup_path_name = backup
+            delete_backup = True
+
         self.ui.textEdit.append(_("Project Opened: ") + self.app.project_name
             + "\n========\n"
             + _("Path: ") + self.app.project_path + "\n"
@@ -905,9 +905,21 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.close()
         except:
             pass
+
+        #print(self.app.delete_backup_path_name)
+        #print(self.app.delete_backup)
+        # delete the backup folder
+        if self.app.delete_backup_path_name != "" and self.app.delete_backup:
+            try:
+                shutil.rmtree(self.app.delete_backup_path_name)
+            except Exception as e:
+                print(str(e))
+
         self.app.conn = None
         self.app.project_path = ""
         self.app.project_name = ""
+        self.app.delete_backup_path_name = ""
+        self.app.delete_backup = True
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.clean_dialog_refs()

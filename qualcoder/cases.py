@@ -183,6 +183,7 @@ class DialogCases(QtWidgets.QDialog):
         self.load_cases_and_attributes()
         self.fill_tableWidget()
         self.parent_textEdit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + valuetype)
+        self.app.delete_backup = False
 
     def textBrowser_menu(self, position):
         ''' Context menu for textBrowser. Mark, unmark, annotate, copy. '''
@@ -291,6 +292,7 @@ class DialogCases(QtWidgets.QDialog):
         self.load_cases_and_attributes()
         self.fill_tableWidget()
         msg = _("Cases and attributes imported from: ") + filename
+        self.app.delete_backup = False
         self.parent_textEdit.append(msg)
         logger.info(msg)
 
@@ -325,6 +327,7 @@ class DialogCases(QtWidgets.QDialog):
         self.cases.append(item)
         self.fill_tableWidget()
         self.parent_textEdit.append(_("Case added: ") + item['name'])
+        self.app.delete_backup = False
 
     def delete_case(self):
         """ When delete button pressed, case is deleted from model and database. """
@@ -359,6 +362,7 @@ class DialogCases(QtWidgets.QDialog):
                     sql = "delete from attribute where id=? and attr_type='case'"
                     cur.execute(sql, [id])
                     self.app.conn.commit()
+        self.app.delete_backup = False
         self.fill_tableWidget()
 
     def cell_modified(self):
@@ -389,6 +393,7 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
             (value, self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
+        self.app.delete_backup = False
 
     def cell_selected(self):
         """ Highlight case text if a file is selected.
@@ -435,6 +440,7 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Yes")))
+            self.app.delete_backup = False
 
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
@@ -508,6 +514,7 @@ class DialogCases(QtWidgets.QDialog):
         msg = casefile['name'] + _(" added to case.")
         QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
         self.parent_textEdit.append(msg)
+        self.app.delete_backup = False
 
     def select_file(self):
         """ When open file button is pressed a dialog of filenames is presented to the user.
@@ -678,6 +685,7 @@ class DialogCases(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update source set memo=? where id=?', (self.source[x]['memo'], self.source[x]['id']))
             self.app.conn.commit()
+            self.app.delete_backup = False
 
     def mark(self):
         """ Mark selected text in file with currently selected case. """
@@ -709,6 +717,7 @@ class DialogCases(QtWidgets.QDialog):
         cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
             ,(item['caseid'],item['fid'],item['pos0'],item['pos1'],item['owner'],item['date'],item['memo']))
         self.app.conn.commit()
+        self.app.delete_backup = False
 
     def unmark(self):
         """ Remove case marking from selected text in selected file. """
@@ -734,6 +743,7 @@ class DialogCases(QtWidgets.QDialog):
             self.case_text.remove(unmarked)
         self.unlight()
         self.highlight()
+        self.app.delete_backup = False
 
     def automark(self):
         """ Automark text in one or more files with selected case. """
@@ -802,6 +812,7 @@ class DialogCases(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _('Warning'),
                   _("End mark did not match up: ") + str(warnings))
         self.ui.tableWidget.clearSelection()
+        self.app.delete_backup = False
 
 
 class DialogGetStartAndEndMarks(QtWidgets.QDialog):

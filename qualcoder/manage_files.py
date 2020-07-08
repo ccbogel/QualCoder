@@ -250,6 +250,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
             ,(name, now_date, self.app.settings['codername'], "", 'file', valuetype))
         self.app.conn.commit()
+        self.app.delete_backup = False
         sql = "select id from source"
         cur.execute(sql)
         ids = cur.fetchall()
@@ -337,6 +338,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
+            self.app.delete_backup = False
             #logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
@@ -605,6 +607,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
         self.app.conn.commit()
 
+        self.app.delete_backup = False
+
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
         Added try block in case VLC bindings do not work.
@@ -678,6 +682,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
+        self.app.delete_backup = False
 
     def import_files(self):
         """ Import files and store into relevant directories (documents, images, ?audio?).
@@ -747,6 +752,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     _("Unknown file type for import") + ":\n" + f)
         self.load_file_data()
         self.fill_table()
+        self.app.delete_backup = False
 
     def load_media_reference(self, mediapath):
         """ Load media reference information for audio video images. """
@@ -1036,6 +1042,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.source.remove(item)
         self.load_file_data()
         self.fill_table()
+        self.app.delete_backup = False
 
     def get_icon(self, name):
         ''' Get icon to put in table. Helper method for fill_table

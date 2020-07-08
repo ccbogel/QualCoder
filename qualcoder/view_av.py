@@ -823,6 +823,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.load_segments()
         self.clear_segment()
+        self.app.delete_backup = False
 
     def clear_segment(self):
         """ Called by assign_segment_to code. """
@@ -889,6 +890,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
@@ -907,6 +909,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
             self.app.conn.commit()
+            self.app.delete_backup = False
         except Exception as e:
             e = str(e)
             msg = _("Cannot merge codes, unmark overlapping text.") + "\n" + e
@@ -937,6 +940,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code added: ") + item['name'])
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def add_category(self):
         """ Add a new category.
@@ -957,6 +961,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             , (item['name'], item['memo'], item['owner'], item['date'], None))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def delete_category_or_code(self, selected):
         """ Determine if category or code is to be deleted. """
@@ -992,6 +997,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
         selected = None
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -1016,6 +1022,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
         selected = None
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo. """
@@ -1042,6 +1049,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
 
         if selected.text(1)[0:3] == 'cat':
             # find the category in the list
@@ -1065,6 +1073,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
+                self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
 
     def rename_category_or_code(self, selected):
@@ -1095,6 +1104,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.parent_textEdit.append(_("Code renamed: ") + self.codes[found]['name'] + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -1122,6 +1132,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
+            self.app.delete_backup = False
 
     def change_code_color(self, selected):
         """ Change the color of the currently selected code. """
@@ -1141,14 +1152,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         if new_color is None:
             return
         selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
-        #update codes list and database
+        # update codes list and database
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
         (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
-        #self.load_segments()
+        self.app.delete_backup = False
 
     # Methods used with the textEdit transcribed text
     def unlight(self):
@@ -1298,6 +1309,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item['seltext'], item['pos0'], item['pos1'], item['owner'],
             item['memo'], item['date'], item['avid']))
             self.app.conn.commit()
+            self.app.delete_backup = False
         except Exception as e:
             logger.debug(str(e))
         # update codes and filter for tooltip
@@ -1306,21 +1318,20 @@ class DialogCodeAV(QtWidgets.QDialog):
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
 
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         if pos0 == pos1:
             return
         self.text_for_segment['cid'] = None
         self.text_for_segment['fid'] = self.transcription[0]
-        self.text_for_segment['seltext'] = selectedText
+        self.text_for_segment['seltext'] = selected_text
         self.text_for_segment['pos0'] = pos0
         self.text_for_segment['pos1'] = pos1
         self.text_for_segment['owner'] = self.app.settings['codername']
         self.text_for_segment['memo'] = ""
         self.text_for_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.text_for_segment['avid'] = None
-        #print(self.text_for_segment)
 
     def set_video_to_timestamp_position(self, position):
         """ Set the video position to this time stamp.
@@ -1391,6 +1402,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
                 coded['memo'], coded['date']))
             self.app.conn.commit()
+            self.app.delete_backup = False
         except Exception as e:
             logger.debug(str(e))
         # update coded, filter for tooltip
@@ -1413,6 +1425,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
             (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
+        self.app.delete_backup = False
         if unmarked in self.code_text:
             self.code_text.remove(unmarked)
 
@@ -1459,6 +1472,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 values(?,?,?,?,?,?)" ,(item['fid'], item['pos0'], item['pos1'],
                 item['memo'], item['owner'], item['date']))
             self.app.conn.commit()
+            self.app.delete_backup = False
             cur.execute("select last_insert_rowid()")
             anid = cur.fetchone()[0]
             item['anid'] = anid
@@ -1509,7 +1523,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             text = ""
             # occasional None type error
             if self.code_text is None:
-                #Call Base Class Method to Continue Normal Event Processing
+                # Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
@@ -1527,7 +1541,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                         logger.error(msg)
             if text != "":
                 receiver.setToolTip(text)
-        #Call Base Class Method to Continue Normal Event Processing
+        # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
 
@@ -1599,15 +1613,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     segment = None
     scaler = None
     reload_segment = False
-    #text_for_segment = None
     code_av_dialog = None
 
+    #TODO text_for_segment is not needed now
     def __init__(self, segment, scaler, text_for_segment, code_av_dialog):
             super(SegmentGraphicsItem, self).__init__(None)
 
             self.segment = segment
             self.scaler = scaler
-            #self.text_for_segment = text_for_segment
             self.code_av_dialog = code_av_dialog
             self.reload_segment = False
             self.setFlag(self.ItemIsSelectable, True)
@@ -1684,6 +1697,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             seg['fid'],seg['seltext'], seg['pos0'], seg['pos1'],
             seg['owner'], seg['memo'], seg['date'], seg['avid']))
             self.code_av_dialog.app.conn.commit()
+            self.app.delete_backup = False
         except Exception as e:
             print(e)
         #print(self.code_av_dialog.text_for_segment)  # tmp
@@ -1706,6 +1720,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur.execute(sql, [i, self.segment['avid']])
         self.code_av_dialog.app.conn.commit()
         self.draw_segment()
+        self.app.delete_backup = False
 
     def edit_segment_end(self):
         """ Edit segment end time """
@@ -1724,6 +1739,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur.execute(sql, [i, self.segment['avid']])
         self.code_av_dialog.app.conn.commit()
         self.draw_segment()
+        self.app.delete_backup = False
 
     def play_segment(self):
         """ Play segment section. Stop at end of segment. """
@@ -1762,6 +1778,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        self.app.delete_backup = False
 
     def edit_memo(self):
         """ View, edit or delete memo for this segment.
@@ -1780,6 +1797,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
+        self.app.delete_backup = False
         tooltip = self.segment['codename'] + " "
         seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
         seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
@@ -2274,11 +2292,6 @@ class DialogViewAV(QtWidgets.QDialog):
             text = self.ui.textEdit_transcription.toPlainText()
             cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
             self.app.conn.commit()
-
-
-
-
-
-
-
+        # following will occur even if memo is not changed
+        self.app.delete_backup = False
 
