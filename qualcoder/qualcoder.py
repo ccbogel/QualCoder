@@ -832,8 +832,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.project_name != "":
             self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
+        default_directory = self.app.settings['directory']
         if path == "" or path is False:
-            default_directory = self.app.settings['directory']
             if default_directory == "":
                 default_directory = os.path.expanduser('~')
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
@@ -908,7 +908,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.conn = None
         self.app.project_path = ""
         self.app.project_name = ""
-        self.app.settings['directory'] = ""
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.clean_dialog_refs()
