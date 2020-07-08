@@ -391,6 +391,15 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.label_code.setText(_("NO CODE SELECTED"))
             return
         self.ui.label_code.setText(_("Code: ") + current.text(0))
+        # update background colour of label
+        for c in self.codes:
+            if current.text(0) == c['name']:
+                palette = self.ui.label_code.palette()
+                code_color = QtGui.QColor(c['color'])
+                palette.setColor(QtGui.QPalette.Window, code_color)
+                self.ui.label_code.setPalette(palette)
+                self.ui.label_code.setAutoFillBackground(True)
+                break
 
     def image_memo(self):
         """ Create a memo for the image file. """

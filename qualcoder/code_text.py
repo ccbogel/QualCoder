@@ -144,13 +144,22 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
     def fill_code_label(self):
-        """ Fill code label with currently selected item's code name. """
+        """ Fill code label with currently selected item's code name and colour. """
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.setText(_("NO CODE SELECTED"))
             return
         self.ui.label_code.setText("Code: " + current.text(0))
+        # update background colour of label
+        for c in self.codes:
+            if current.text(0) == c['name']:
+                palette = self.ui.label_code.palette()
+                code_color = QtGui.QColor(c['color'])
+                palette.setColor(QtGui.QPalette.Window, code_color)
+                self.ui.label_code.setPalette(palette)
+                self.ui.label_code.setAutoFillBackground(True)
+                break
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
