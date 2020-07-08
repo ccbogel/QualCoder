@@ -55,6 +55,7 @@ from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
+from select_file import DialogSelectFile
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
@@ -113,23 +114,23 @@ class App(object):
     def read_previous_project_paths(self):
         """ Recent project path is stored in .qualcoder/recent_projects.txt """
 
-        res = []
+        result = []
         try:
             with open(self.persist_path, 'r') as f:
                 for line in f:
-                    res.append(line.strip())
+                    result.append(line.strip())
         except:
             logger.debug('No previous projects found')
-        return res
+        return result
 
     def append_recent_project(self, path):
         """ Add project path as first entry to .qualcoder/recent_projects.txt """
 
-        res = self.read_previous_project_paths()
-        if not res or path != res[0]:
-            res.append(path)
+        result = self.read_previous_project_paths()
+        if not result or path != result[0]:
+            result.append(path)
             with open(self.persist_path, 'w') as f:
-                for i, line in enumerate(reversed(res)):
+                for i, line in enumerate(reversed(result)):
                     f.write(line)
                     f.write(os.linesep)
                     if i > 10:
@@ -138,9 +139,9 @@ class App(object):
     def get_most_recent_projectpath(self):
         """ Get most recent project path from .qualcoder/recent_projects.txt """
 
-        res = self.read_previous_project_paths()
-        if res:
-            return res[0]
+        result = self.read_previous_project_paths()
+        if result:
+            return result[0]
 
     def create_connection(self, project_path):
         """ Create connection to recent project and load codes, categories and model """
@@ -341,6 +342,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # project menu
         self.ui.actionCreate_New_Project.triggered.connect(self.new_project)
         self.ui.actionOpen_Project.triggered.connect(self.open_project)
+        self.ui.actionOpen_Recent_Project.triggered.connect(self.open_recent_project)
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
         self.ui.actionClose_Project.triggered.connect(self.close_project)
         self.ui.actionSettings.triggered.connect(self.change_settings)
@@ -673,7 +675,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
 
     def rqda_project_import(self):
-        """ Import an RQDA format project into a new poject space. """
+        """ Import an RQDA format project into a new project space. """
 
         self.close_project()
         self.ui.textEdit.append("IMPORTING RQDA PROJECT")
@@ -817,6 +819,21 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
+
+    def open_recent_project(self):
+        """ Present recent projects for user to select from and open. """
+
+        projects_with_duplicates = self.app.read_previous_project_paths()
+        tmp_list = list(set(projects_with_duplicates))
+        projects = []
+        for item in tmp_list:
+            projects.append({'name': item})
+        ui = DialogSelectFile(projects, _("Select project to open"), "single")
+        ok = ui.exec_()
+        if ok:
+            project = ui.get_selected()  # list of dictionaries
+            project_path = project['name']
+            self.open_project(project_path)
 
     def open_project(self, path=""):
         """ Open an existing project.

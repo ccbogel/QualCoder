@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -35,6 +35,7 @@
     </property>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
+    <addaction name="actionOpen_Recent_Project"/>
     <addaction name="actionClose_Project"/>
     <addaction name="actionProject_Memo"/>
     <addaction name="actionSettings"/>
@@ -282,6 +283,11 @@
   <action name="actionRQDA_Project_import">
    <property name="text">
     <string>RQDA Project import</string>
+   </property>
+  </action>
+  <action name="actionOpen_Recent_Project">
+   <property name="text">
+    <string>Open Recent Project</string>
    </property>
   </action>
  </widget>
