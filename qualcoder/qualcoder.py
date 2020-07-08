@@ -69,12 +69,6 @@ if not os.path.exists(home + '/.qualcoder'):
         print("Cannot add .qualcoder folder to home directory\n" + str(e))
         raise
 logfile = home + '/.qualcoder/QualCoder.log'
-# Delete log file on first opening so that file sizes are more managable
-try:
-    os.remove(logfile)
-except OSError:
-    pass
-
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
      datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
 logger = logging.getLogger(__name__)
