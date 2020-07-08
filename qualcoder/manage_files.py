@@ -404,6 +404,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.text_dialog = QtWidgets.QDialog()
         self.text_ui = Ui_Dialog_memo()
         self.text_ui.setupUi(self.text_dialog)
+        self.text_dialog.setWindowFlags(self.text_dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.text_ui.textEdit.setReadOnly(restricted)
         if restricted:
             self.text_ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
