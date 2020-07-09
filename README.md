@@ -89,19 +89,18 @@ Required:
 
 * pdfminer.six
 
-Optional:
+Future plan module:
 
-* vlc
+* xlrd    for importing a survey from Microsoft Excel 
 
 
 ## Future plans
-* Improve packaging for easier installation: currently investigating use of pyinstaller
+* Improve packaging for easier installation: currently investigating use of pyinstaller - without much success
 * Change from pdfminer.six to pdfminer3
 * Reports:
         Word count report maybe
-* Text mining
+* Text mining - maybe ?
     * word cloud, word visualisations
-* Other visualisations
 * General
     * Translations for GUI.
 
