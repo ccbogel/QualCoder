@@ -43,8 +43,8 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
+from information import DialogInformation
 from GUI.ui_dialog_codes import Ui_Dialog_codes
-from helpers import CodedMediaMixin
 from memo import DialogMemo
 from qtmodels import DictListModel, ListObjectModel
 from select_file import DialogSelectFile
@@ -62,8 +62,20 @@ def exception_handler(exception_type, value, tb_obj):
     logger.error(_("Uncaught exception:") + "\n" + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
+def msecs_to_mins_and_secs(msecs):
+    """ Convert milliseconds to minutes and seconds.
+    msecs is an integer. Minutes and seconds output is a string.
+    called by: coded_media_dialog   """
 
-class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
+    secs = int(msecs / 1000)
+    mins = int(secs / 60)
+    remainder_secs = str(secs - mins * 60)
+    if len(remainder_secs) == 1:
+        remainder_secs = "0" + remainder_secs
+    return str(mins) + "." + remainder_secs
+
+
+class DialogCodeText(QtWidgets.QWidget):
     ''' Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
     Trialled using setHtml for documents, but on marking text Html formatting was replaced, also
@@ -398,7 +410,7 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                         found = code
                         break
                 if found:
-                    self.coded_media(found)
+                    self.coded_media_dialog(found)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identfiy treeWidgetItem drop events.
@@ -413,6 +425,109 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
         return False
+
+    def coded_media_dialog(self, data):
+        """ Display all coded media for this code, in a separate dialog.
+        Coded media comes from ALL files and ALL coders.
+        param:
+            data: code dictionary
+        """
+        ui = DialogInformation("Coded text : " + data['name'], " ")
+        cur = self.app.conn.cursor()
+        CODENAME = 0
+        COLOR = 1
+        SOURCE_NAME = 2
+        POS0 = 3
+        POS1 = 4
+        SELTEXT = 5
+        OWNER = 6
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, code_text.owner from "
+        sql += "code_text "
+        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
+        sql += " where code_name.cid =" + str(data['cid']) + " "
+        sql += " order by source.name, pos0, code_text.owner "
+        cur.execute(sql)
+        results = cur.fetchall()
+        # Text
+        for row in results:
+            title = '<span style=\"background-color:' + row[COLOR] + '\">'
+            title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
+            title += ", Coder: <em>" + row[OWNER] + "</em> "
+            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
+            ui.ui.textEdit.insertHtml(title)
+            ui.ui.textEdit.append(row[SELTEXT] + "\n\n")
+
+        # Images
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+        sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+        sql += "where code_name.cid =" + str(data['cid']) + " "
+        sql += " order by source.name, code_image.owner "
+        cur.execute(sql)
+        results = cur.fetchall()
+        for counter, row in enumerate(results):
+            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[8] + '</span>')
+            ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7] + '<br />')
+            img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
+            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
+            ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")
+
+        # Media
+        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
+        sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
+        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+        sql += "where code_name.cid = " + str(data['cid']) + " "
+        sql += " order by source.name, code_av.owner "
+        cur.execute(sql)
+        results = cur.fetchall()
+        for row in results:
+            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[7] + '</span>')
+            start = msecs_to_mins_and_secs(row[3])
+            end = msecs_to_mins_and_secs(row[4])
+            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] Coder: ' + row[6])
+            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
+        ui.exec_()
+
+    def put_image_into_textedit(self, img, counter, text_edit):
+        """ Scale image, add resource to document, insert image.
+        A counter is important as each image slice needs a unique name, counter adds
+        the uniqueness to the name.
+        Called by: coded_media_dialog
+        param:
+            img: image data dictionary with file location and width, height, position data
+            counter: a changing counter is needed to make discrete different images
+            text_edit:  the widget that shows the data
+
+        """
+
+        path = self.app.project_path + img['mediapath']
+        document = text_edit.document()
+        image = QtGui.QImageReader(path).read()
+        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        # scale to max 300 wide or high. perhaps add option to change maximum limit?
+        scaler = 1.0
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 300:
+            scaler_w = 300 / image.width()
+        if image.height() > 300:
+            scaler_h = 300 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        # need unique image names or the same image from the same path is reproduced
+        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        url = QtCore.QUrl(imagename)
+        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        cursor = text_edit.textCursor()
+        image_format = QtGui.QTextImageFormat()
+        image_format.setWidth(image.width() * scaler)
+        image_format.setHeight(image.height() * scaler)
+        image_format.setName(url.toString())
+        cursor.insertImage(image_format)
+        text_edit.insertHtml("<br />")
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -938,37 +1053,59 @@ class DialogCodeText(CodedMediaMixin, QtWidgets.QWidget):
         """ When coded text is clicked on, the code name is displayed in the label above
         the text edit widget. """
 
-        labelText = _("Coded: ")
-        self.ui.label_coded.setText(labelText)
+        # default for anything uncoded
+        self.ui.label_coded.hide()
+
+        text = _("Coded: ")
+        self.ui.label_coded.setText(text)
         pos = self.ui.textEdit.textCursor().position()
         for item in self.code_text:
             if item['pos0'] <= pos and item['pos1'] >= pos:
                 # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 for code in self.codes:
                     if code['cid'] == item['cid']:
-                        labelText = _("Coded: ") + code['name']
-        self.ui.label_coded.setText(labelText)
+                        text = text + code['name'] + ";"
+                        palette = self.ui.label_coded.palette()
+                        code_color = QtGui.QColor(code['color'])
+                        palette.setColor(QtGui.QPalette.Window, code_color)
+                        self.ui.label_coded.setPalette(palette)
+                        self.ui.label_coded.setAutoFillBackground(True)
+                        self.ui.label_coded.show()
+
+        self.ui.label_coded.setText(text)
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
 
         if self.filename == {}:
             return
-        unmarked = None
+        unmarked_list = []
         for item in self.code_text:
             if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
-                unmarked = item
-        if unmarked is None:
+                unmarked_list.append(item)
+        if unmarked_list == []:
+            return
+        to_unmark = None
+        if len(unmarked_list) == 1:
+            to_unmark = unmarked_list[0]
+        # multiple codes to selet from
+        if len(unmarked_list) > 1:
+            ui = DialogSelectFile(unmarked_list, _("Select code to unmark"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            to_unmark = ui.get_selected()
+        if to_unmark is None:
             return
 
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
-            (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
+            (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
-        if unmarked in self.code_text:
-            self.code_text.remove(unmarked)
+        if to_unmark in self.code_text:
+            self.code_text.remove(to_unmark)
 
         # Update filter for tooltip and update code colours
         self.eventFilterTT.setCodes(self.code_text, self.codes)
