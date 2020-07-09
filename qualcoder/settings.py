@@ -67,9 +67,12 @@ class DialogSettings(QtWidgets.QDialog):
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.setFont(new_font)
         self.ui.fontComboBox.setCurrentFont(new_font)
-        # get coder names from code_text, images and av
-        # Note: does no appear to require a distinct clause
-        sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
+        # get coder names from all tables
+        # Note: does not appear to require a distinct clause
+        sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
+        sql += " union select owner from cases union select owner from journal union select owner from attribute "
+        sql += "union select owner from source union select owner from annotation union select owner from code_name "
+        sql += "union select owner from code_cat"
         coders = [""]
         if self.app.conn is not None:
             cur = self.app.conn.cursor()
