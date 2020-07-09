@@ -571,7 +571,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.fill_code_counts_in_tree()
 
     def code_area(self, p1):
-        """ Created coded area coordinates from mouse release.
+        """ Create coded area coordinates from mouse release.
         The point and width and height mush be based on the original image size,
         so add in scale factor. """
 
@@ -580,7 +580,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         if code_.text(1)[0:3] == 'cat':
             return
-        cid = code_.text(1)[4:]
+        cid = int(code_.text(1)[4:])  # must be integer
         x = self.selection.x()
         y = self.selection.y()
         #print("x", x, "y", y, "scale", self.scale)
