@@ -172,7 +172,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo")])
+        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -253,6 +253,27 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item = it.value()
         self.ui.treeWidget.expandAll()
 
+    def fill_code_counts_in_tree(self):
+        """ Count instances of each code for current coder and in the selected file. """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        sql = "select count(cid) from code_image where cid=? and id=? and owner=?"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            if item.text(1)[0:4] == "cid:":
+                cid = str(item.text(1)[4:])
+                cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
+                result = cur.fetchone()
+                if result[0] > 0:
+                    item.setText(3, str(result[0]))
+                else:
+                    item.setText(3, "")
+            it += 1
+            item = it.value()
+
     def select_image(self):
         """  A dialog of filenames is presented to the user.
         The selected image file is then displayed for coding. """
@@ -285,6 +306,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
         self.draw_coded_areas()
+        self.fill_code_counts_in_tree()
 
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
@@ -546,6 +568,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.conn.commit()
         self.get_coded_areas()
         self.change_scale()
+        self.fill_code_counts_in_tree()
 
     def code_area(self, p1):
         """ Created coded area coordinates from mouse release.
@@ -607,6 +630,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.addItem(rect_item)
         self.selection = None
         self.app.delete_backup = False
+        self.fill_code_counts_in_tree()
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.

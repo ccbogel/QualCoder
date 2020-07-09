@@ -174,13 +174,14 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
 
     def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes. """
+        """ Fill tree widget, top level items are main categories and unlinked codes.
+        The Count column counts the number of times that code has been used by selected coder in selected file. """
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo")])
+        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         self.ui.treeWidget.setColumnHidden(1, True)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
@@ -259,6 +260,29 @@ class DialogCodeText(QtWidgets.QWidget):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
+        self.fill_code_counts_in_tree()
+
+    def fill_code_counts_in_tree(self):
+        """ Count instances of each code for current coder and in the selected file. """
+
+        if self.filename is None:
+            return
+        cur = self.app.conn.cursor()
+        sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            #print(item.text(0), item.text(1), item.text(2), item.text(3))
+            if item.text(1)[0:4] == "cid:":
+                cid = str(item.text(1)[4:])
+                cur.execute(sql, [cid, self.filename['id'], self.app.settings['codername']])
+                result = cur.fetchone()
+                if result[0] > 0:
+                    item.setText(3, str(result[0]))
+                else:
+                    item.setText(3, "")
+            it += 1
+            item = it.value()
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code. """
@@ -427,7 +451,7 @@ class DialogCodeText(QtWidgets.QWidget):
         return False
 
     def coded_media_dialog(self, data):
-        """ Display all coded media for this code, in a separate dialog.
+        """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files and ALL coders.
         param:
             data: code dictionary
@@ -929,6 +953,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setPlainText(self.sourceText)
         self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
         self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
 
     def get_coded_text_update_eventfilter_tooltips(self):
         ''' Called by view_file, and from other dialogs on update '''
@@ -1026,9 +1051,8 @@ class DialogCodeText(QtWidgets.QWidget):
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         self.code_text.append(coded)
         self.highlight()
-        cur = self.app.conn.cursor()
-
         # Check for an existing duplicated marking first
+        cur = self.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
             (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
@@ -1036,7 +1060,6 @@ class DialogCodeText(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(None, _("Already Coded"),
             _("This segment has already been coded with this code by ") + coded['owner'], QtWidgets.QMessageBox.Ok)
             return
-
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
@@ -1048,6 +1071,7 @@ class DialogCodeText(QtWidgets.QWidget):
             logger.debug(str(e))
         # Update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.fill_code_counts_in_tree()
 
     def coded_in_text(self):
         """ When coded text is clicked on, the code name is displayed in the label above
@@ -1111,6 +1135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
         self.highlight()
+        self.fill_code_counts_in_tree()
 
     def annotate(self, location):
         """ Add view, or remove an annotation for selected text.
@@ -1243,8 +1268,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
                     + _(". with text: ") + txt)
 
-        # Update filter for tooltip
+        # Update tooltip filter and code tree code counts
         self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.fill_code_counts_in_tree()
 
 
 class ToolTip_EventFilter(QtCore.QObject):

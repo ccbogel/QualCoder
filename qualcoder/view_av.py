@@ -245,7 +245,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo")])
+        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
@@ -326,6 +326,35 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = it.value()
         self.ui.treeWidget.expandAll()
 
+    def fill_code_counts_in_tree(self):
+        """ Count instances of each code for current coder and in the selected file. """
+
+        if self.media_data is None:
+            return
+        cur = self.app.conn.cursor()
+        sql = "select count(cid) from code_av where cid=? and id=? and owner=?"
+        sql_txt = "select count(cid) from code_text where cid=? and fid=? and owner=?"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            if item.text(1)[0:4] == "cid:":
+                cid = str(item.text(1)[4:])
+                cur.execute(sql, [cid, self.media_data['id'], self.app.settings['codername']])
+                result_av = cur.fetchone()
+                result_txt = [0]
+                try:  # may not have a text file
+                    cur.execute(sql_txt, [cid, self.transcription[0], self.app.settings['codername']])
+                    result_txt = cur.fetchone()
+                except:
+                    pass
+                result = result_av[0] + result_txt[0]
+                if result > 0:
+                    item.setText(3, str(result))
+                else:
+                    item.setText(3, "")
+            it += 1
+            item = it.value()
+
     def select_media(self):
         """ Get all the media files. A dialog of filenames is presented to the user.
         The selected media file is then displayed for coding. """
@@ -350,6 +379,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_coding.setEnabled(True)
         self.load_media()
         self.load_segments()
+        self.fill_code_counts_in_tree()
 
     def load_segments(self):
         """ Get coded segments for this file and for this coder.
@@ -687,6 +717,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.ui.pushButton_coding.text() == _("Clear segment"):
             self.clear_segment()
+            self.fill_code_counts_in_tree()
             return
         time = self.ui.label_time.text()
         time = time[6:]
@@ -824,6 +855,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.load_segments()
         self.clear_segment()
         self.app.delete_backup = False
+        self.fill_code_counts_in_tree()
 
     def clear_segment(self):
         """ Called by assign_segment_to code. """
@@ -1407,6 +1439,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             logger.debug(str(e))
         # update coded, filter for tooltip
         self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
@@ -1433,6 +1466,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.unlight()
         self.highlight()
+        self.fill_code_counts_in_tree()
 
     def annotate(self, location):
         """ Add view, or remove an annotation for selected text.
