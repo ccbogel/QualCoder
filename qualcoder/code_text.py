@@ -135,7 +135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        self.ui.checkBox_show_coders.setEnabled(False)  # to allow viewing other codes, todo maybe?
+        self.ui.checkBox_show_coders.hide()  # to allow viewing other codes, todo maybe?
         #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # todo maybe?
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
