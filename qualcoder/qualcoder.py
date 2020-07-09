@@ -791,7 +791,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(str(e))
             self.close_project()
             return
-        self.open_project(self.app.project_path)
+        # new project, so tell open project NOT to backup, as there will be nothing in there to backup
+        self.open_project(self.app.project_path, "yes")
 
     def change_settings(self):
         """ Change default settings - the coder name, font, font size. Non-modal.
@@ -835,9 +836,14 @@ class MainWindow(QtWidgets.QMainWindow):
             project_path = project['name']
             self.open_project(project_path)
 
-    def open_project(self, path=""):
+    def open_project(self, path="", newproject="no"):
         """ Open an existing project.
-        Also save a backup datetime stamped copy at the same time. """
+        if set, also save a backup datetime stamped copy at the same time.
+        Do not backup on a newly created project, as it wont contain data.
+        param:
+            path: if path is "" then get the path from a dialog, otherwise use the supplied path
+            newproject: yes or no  if yes then do not make an initial backup
+        """
 
         if self.app.project_name != "":
             self.close_project()
@@ -886,7 +892,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
 
         # Save a datetime stamped backup
-        if self.app.settings['backup_on_open'] == 'True':
+        if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             backup = self.app.project_path[0:-4] + "_BACKUP_" + nowdate + ".qda"
             if self.app.settings['backup_av_files'] == 'True':
@@ -895,7 +901,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.copytree(self.app.project_path, backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             self.ui.textEdit.append(_("Project backup created: ") + backup)
-
+            # delete backup path - delete the backup if no changes occured in the project during the session
             self.app.delete_backup_path_name = backup
             delete_backup = True
 
