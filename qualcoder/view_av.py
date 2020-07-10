@@ -248,6 +248,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
+        else:
+            self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
@@ -258,7 +260,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
+                top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -282,7 +284,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, c['owner'] + "\n" + c['date'])
+                        child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -299,7 +301,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
+                top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -318,7 +320,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setToolTip(0, c['owner'] + "\n" + c['date'])
+                    child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -1265,7 +1267,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_unmark = menu.addAction(_("Unmark"))
                 break
         if selectedText != "":
-            action_mark = menu.addAction(_("Mark"))
+            if self.ui.treeWidget.currentItem() is not None:
+                action_mark = menu.addAction(_("Mark"))
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
             if self.segment_for_text is None:
@@ -1280,7 +1283,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
-        if selectedText != "" and action == action_mark:
+        if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
         if action_unmark is not None and action == action_unmark:
             self.unmark(cursor.position())

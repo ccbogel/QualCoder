@@ -175,6 +175,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
+        else:
+            self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
@@ -185,7 +187,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
+                top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -209,7 +211,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, c['owner'] + "\n" + c['date'])
+                        child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -226,7 +228,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setToolTip(0, c['owner'] + "\n" + c['date'])
+                top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -245,7 +247,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setToolTip(0, c['owner'] + "\n" + c['date'])
+                    child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
