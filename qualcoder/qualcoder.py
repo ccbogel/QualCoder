@@ -201,14 +201,14 @@ class App(object):
 
         categories = []
         cur = self.conn.cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by name")
+        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         for row in result:
             categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
             'date': row[3], 'memo': row[4], 'supercatid': row[5]})
         code_names = []
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
@@ -670,9 +670,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
         msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
-        msg += "PDFs not imported\n"
         msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
-        msg += "Sets and Graphs not imported as QualCoders does not have this functionality.\n"
+        msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
         msg += "External sources over 2GB not imported."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
 
