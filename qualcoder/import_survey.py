@@ -28,14 +28,20 @@ https://qualcoder.wordpress.com/
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
-import sqlite3
+
 import csv
-import re
 import datetime
-from shutil import copyfile
-import os
-import sys
 import logging
+from shutil import copyfile
+openpyxl_module = True
+try:
+    from openpyxl import load_workbook
+except Exception as e:
+    openpyxl_module = False
+import os
+import re
+import sqlite3
+import sys
 import traceback
 
 from GUI.ui_dialog_import import Ui_Dialog_Import
@@ -75,6 +81,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
     data = []  # obtained from csv file
     preexisting_fields = []  # atribute names already in database
     parent_textEdit = None
+    success = False  # ability to load file and has individual ids in first column
+    fail_msg = ""
 
     def __init__(self, app, parent_textEdit):
         ''' Need to comment out the connection accept signal line in ui_Dialog_Import.py.
@@ -108,47 +116,63 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.preexisting_fields = []
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
-        self.get_csv_file()
-        if self.fields == []:
-            super(DialogImportSurvey, self).reject()
+        self.success = self.get_data_file()
+        if not self.success:
+            self.ui.groupBox.setTitle("")
+            self.ui.tableWidget.hide()
+            self.ui.lineEdit_delimiter.hide()
+            self.ui.comboBox_quote.hide()
+            self.ui.label_delimiter.hide()
+            self.ui.label_quotefmt.hide()
+            self.ui.label_information.hide()
+            self.ui.label_msg.setText(self.fail_msg)
             self.parent_textEdit.append(_("Survey not imported."))
-        self.fill_tableWidget()
-
-    def get_csv_file(self):
-        ''' Check for a .csv extension. Determine number of fields. Load the data.
-        Also called when import options changed '''
-
-        self.fields = []
-        self.fields_type = []
-        self.data = []
-        if self.filepath == "":
-            self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                _('Select survey file'), self.app.settings['directory'], "(*.csv)")
-            if not ok or self.filepath == "":
-                super(DialogImportSurvey, self).reject()
-                self.close()
-                return
-        if self.filepath[-4:].lower() != ".csv":
-            msg = self.filepath + "\n" + _("is not a .csv file.\nFile not imported")
-            QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
-            logger.warning(msg)
-            self.parent_textEdit.append(_("Survey not imported. Survey not a csv file: ") + self.filepath)
             super(DialogImportSurvey, self).reject()
             self.close()
-            return
-        #logger.debug("self.filepath:" + self.filepath)
-        name_split = self.filepath.split("/")
-        filename = name_split[-1]
-        destination = self.app.project_path + "/documents/" + filename
-        copyfile(self.filepath, destination)
+        else:
+            self.fill_tableWidget()
+
+    def read_xlsx_file(self):
+        """ Read the data from the xlsx file. """
+
+        if openpyxl_module is False:
+            self.fail_msg = _("Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
+            #QtWidgets.QMessageBox.warning(None, _("Warning"), self.fail_msg)
+            return False
+        self.data = []
+        wb = load_workbook(filename=self.filepath)
+        sheet = wb.active
+        for value in sheet.iter_rows(values_only=True):
+            # some rows may be complete blank so ignore importation
+            if (set(value)) != {None}:
+                # values are tuples, convert to list, and remove 'None' string
+                row = []
+                for item in value:
+                    if item is None:
+                        row.append("")
+                    else:
+                        row.append(item)
+                self.data.append(row)
+        # Widgets are not needed
+        self.ui.lineEdit_delimiter.hide()
+        self.ui.comboBox_quote.hide()
+        self.ui.label_delimiter.hide()
+        self.ui.label_quotefmt.hide()
+        self.ui.label_information.hide()
+        self.ui.groupBox.setMinimumSize(QtCore.QSize(0, 30))
+        self.ui.groupBox.setMaximumSize(QtCore.QSize(16777215, 30))
+        return True
+
+    def read_csv_file(self):
+        """ Read the data from the csv file """
+
         self.data = []
         with open(self.filepath, 'r', newline='') as f:
             delimiter_ = self.ui.lineEdit_delimiter.text()
             if delimiter_ == '':
                 msg = _("A column delimiter has not been set.")
                 QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
-                return
-
+                return False
             if delimiter_ in ('ta', 'tab'):
                 delimiter_ = "\t"
             # The English text is in the GUI - do not translate with qt linguist
@@ -164,7 +188,49 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     self.data.append(row)
             except csv.Error as e:
                 logger.error(('file %s, line %d: %s' % (self.filepath, reader.line_num, e)))
-                self.parent_textEdit.append(_(_("Row error: ")) + str(reader.line_num) + "  " + str(e))
+                self.parent_textEdit.append(_("Row error: ") + str(reader.line_num) + "  " + str(e))
+                self.fail_msg(_("Row error: ") + str(e))
+                return False
+        return True
+
+    def get_data_file(self):
+        ''' Check for a .csv or .xlsx extension.
+        Determine number of fields. Load the data.
+        Also called when import options changed. '''
+
+        self.fields = []
+        self.fields_type = []
+        self.data = []
+        if self.filepath == "":
+            self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select survey file'), self.app.settings['directory'], "(*.csv *.xlsx)")
+            if not ok or self.filepath == "":
+                self.fail_msg = _("No file selected")
+                return False
+        if self.filepath[-5:].lower() != ".xlsx" and self.filepath[-4:].lower() != ".csv":
+            self.fail_msg = self.filepath + "\n" + _("is not a .csv or .xlsx file.\nFile not imported")
+            #QtWidgets.QMessageBox.warning(None, _("Warning"), self.fail_msg)
+            logger.warning(self.fail_msg)
+            self.parent_textEdit.append(_("Survey not imported. Survey not a csv or xlsx file: ") + self.filepath)
+            return False
+        # copy file into project folder
+        #logger.debug("self.filepath:" + self.filepath)
+        name_split = self.filepath.split("/")
+        filename = name_split[-1]
+        destination = self.app.project_path + "/documents/" + filename
+        copyfile(self.filepath, destination)
+
+        if self.filepath[-4:].lower() == ".csv":
+            success = self.read_csv_file()
+            if not success:
+                self.parent_textEdit.append(_("Survey not imported.") + self.filepath)
+                return False
+        else:
+            success = self.read_xlsx_file()
+            if not success:
+                self.parent_textEdit.append(_("Survey not imported.") + self.filepath)
+                return False
+
         self.setWindowTitle(_(_("Importing from: ")) + self.filepath.split('/')[-1])
         self.fields = self.data[0]
         self.data = self.data[1:]
@@ -208,21 +274,26 @@ class DialogImportSurvey(QtWidgets.QDialog):
             ids.append(row[0])
         ids_set = set(ids)
         if len(ids) > len(ids_set):
-            msg = _("There are duplicated identifiers in the first column.\nFile not imported")
-            QtWidgets.QMessageBox.warning(None, _("Warning"), msg)
-            self.parent_textEdit.append(self.filepath + " " + msg)
-            return
+            self.fail_msg = _("There are duplicated identifiers in the first column.\nFile not imported")
+            #QtWidgets.QMessageBox.warning(None, _("Warning"), self.fail_msg)
+            self.parent_textEdit.append(self.filepath + " " + self.fail_msg)
+            return False
 
         msg = _("Survey file: ") + self.filepath + "\n"
         msg += _("Fields: ") + str(len(self.fields)) + ". "
         msg += _("Rows: ") + str(len(self.data))
         logger.info(msg)
         self.parent_textEdit.append(msg)
-        QtWidgets.QMessageBox.information(None, _("Survey check"), msg)
+        #QtWidgets.QMessageBox.information(None, _("Survey check"), msg)
+        return True
 
     def accept(self):
         ''' Check the table details are valid and import the data into a new table or
         append to an existing table. '''
+
+        if not self.success:
+            super(DialogImportSurvey, self).accept()
+            return
 
         # check for duplicate field names
         if len(self.fields) != len(set(self.fields)):
@@ -243,7 +314,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             msg = _("Number of fields does not match header\nPossible wrong quote format")
             logger.error(_("Survey not loaded: ") + msg)
             QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), msg)
-            returncoder
+            return
 
         self.insert_data()
         super(DialogImportSurvey, self).accept()
@@ -263,10 +334,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 caseid = cur.fetchone()[0]
                 name_and_caseids.append([c[0], caseid])
             except sqlite3.IntegrityError as e:
-                msg = str(e) + _(" - Duplicate case names, either in the file, or duplicates with existing cases in the project")
-                logger.error(_("Survey not loaded: ") + msg)
-                QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), msg)
-                self.parent_textEdit.append(_("Survey not loaded: ") + msg)
+                self.fail_msg = str(e) + _(" - Duplicate case names, either in the file, or duplicates with existing cases in the project")
+                logger.error(_("Survey not loaded: ") + self.fail_msg)
+                QtWidgets.QMessageBox.warning(None, _("Survey not loaded"), self.fail_msg)
+                self.parent_textEdit.append(_("Survey not loaded: ") + self.fail_msg)
                 return
 
         # insert non-qualitative attribute types, except if they are already present
@@ -320,9 +391,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 fulltext = ""
                 for row in range(0, len(self.data)):
                     if self.data[row][field] != "":
-                        fulltext += "[" + self.data[row][0] + "] "
+                        fulltext += "[" + str(self.data[row][0]) + "] "
                         pos0 = len(fulltext) - 1
-                        fulltext += self.data[row][field] + "\n\n"
+                        fulltext += str(self.data[row][field]) + "\n\n"
                         pos1 = len(fulltext) - 2
                         case_text = [self.app.settings['codername'], now_date, "", pos0, pos1, name_and_caseids[row][1]]
                         case_text_list.append(case_text)
@@ -342,6 +413,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
+        QtWidgets.QMessageBox.information(None, _("Survey imported"), _("Survey imported"))
         self.app.delete_backup = False
 
     def options_changed(self):
@@ -355,7 +427,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         if len(self.delimiter) > 1 and self.delimiter != "\t":
             self.ui.lineEdit_delimiter.setText(self.delimiter[0:1])
             self.delimiter = self.delimiter[0:1]
-        self.get_csv_file()
+        self.read_csv_file()
 
     def fill_tableWidget(self):
         ''' Fill table widget with data. '''
