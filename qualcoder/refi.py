@@ -284,7 +284,8 @@ class Refi_import():
                 self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Variables":
                 count = self.parse_variables(c)
-                self.parent_textEdit.append(_("Parse variables. Loaded File: " + str(count[0]) + ", Case: "+ str(count[1])))
+                self.parent_textEdit.append(_("Parse file variables. Loaded: ") + str(count[0]))
+                self.parent_textEdit.append(_("Parse case variables. Loaded: ") + str(count[1]))
             if c.tag == "{urn:QDA-XML:project:1.0}Cases":
                 count = self.parse_cases(c)
                 self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
@@ -300,6 +301,11 @@ class Refi_import():
             QtWidgets.QApplication.processEvents()
         self.clean_up_case_codes_and_case_text()
         self.parent_textEdit.append(self.file_path + _(" loaded."))
+
+        # Change the user name to an owner name from the import
+        if len(self.users) > 0:
+            self.app.settings['codername'] = self.users[0]['name']
+            self.app.write_config_ini(self.app.settings)
 
     def parse_variables(self, element):
         """ Parse the Variables element.
@@ -764,7 +770,7 @@ class Refi_import():
         destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
         try:
             shutil.copyfile(source_path, destination)
-            print("TEXT IMPORT", source_path, destination)
+            #print("TEXT IMPORT", source_path, destination)
         except Exception as e:
             self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         # Parse PlainTextSelection elements for Coding elements and load these
