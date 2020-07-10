@@ -396,12 +396,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
-        Add, rename, memo, move or delete code or category. Change code color. """
+        Add, rename, memo, move or delete code or category. Change code color.
+        Assign selected text to current hovered code. """
 
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         selected = self.ui.treeWidget.currentItem()
         #logger.debug("Selected parent: " + selected.parent())
         #index = self.ui.treeWidget.currentIndex()
+        ActionAssignSelectedText = None
+        if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
+            ActionAssignSelectedText = menu.addAction("Assign selected text")
         ActionItemAddCode = menu.addAction(_("Add a new code"))
         ActionItemAddCategory = menu.addAction(_("Add a new category"))
         ActionItemRename = menu.addAction(_("Rename"))
@@ -414,6 +419,8 @@ class DialogCodeText(QtWidgets.QWidget):
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None :
+            if selected is not None and action == ActionAssignSelectedText:
+                self.mark()
             if selected is not None and action == ActionItemChangeColor:
                 self.change_code_color(selected)
             elif action == ActionItemAddCategory:

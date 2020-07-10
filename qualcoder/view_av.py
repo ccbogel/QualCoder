@@ -749,10 +749,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Context menu for treeWidget items.
         Add, rename, memo, move or delete code or category. Change code color. """
 
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         selected = self.ui.treeWidget.currentItem()
         #logger.debug("selected paremt: " + str(selected.parent()))
         #logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
+        ActionAssignSelectedText = None
+        if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
+            ActionAssignSelectedText = menu.addAction("Assign selected text")
         ActionItemAssignSegment = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
@@ -765,6 +769,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             ActionItemChangeColor = menu.addAction(_("Change code color"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionAssignSelectedText:
+            self.mark()
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
         if action == ActionItemAddCategory:
