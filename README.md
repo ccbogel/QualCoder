@@ -39,11 +39,11 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six xlrd`
+`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
 
 or:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six xlrd`
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
@@ -61,7 +61,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six xlrd`
+`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six`
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
@@ -89,15 +89,12 @@ Required:
 
 * pdfminer.six
 
-Future planned module:
-
-* xlrd    for importing a survey from Microsoft Excel 
-
 
 ## Future plans
 * Improve packaging for easier installation: currently investigating use of pyinstaller - without much success
 * make use of the xlrd python package to import surveys from Microsoft Excel
 * Change from pdfminer.six to pdfminer3
+* Import survey from Excel xlxs
 * Reports:
         Word count report maybe
 * Text mining - maybe ?
