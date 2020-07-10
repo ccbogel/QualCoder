@@ -39,11 +39,11 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
+`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six xlrd`
 
 or:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six xlrd`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
@@ -61,7 +61,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six`
+`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six xlrd`
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
