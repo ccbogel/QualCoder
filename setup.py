@@ -32,7 +32,8 @@ setup(
         'ebooklib',
         'pdfminer.six',
         'ply',
-        'chardet'
+        'chardet',
+        'xlrd'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
