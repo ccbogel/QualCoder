@@ -244,7 +244,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(3)
+        self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
@@ -426,8 +426,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     def load_media(self):
         """ Add media to media dialog. """
 
-        self.ddialog.setWindowTitle(self.media_data['mediapath'])
-        self.setWindowTitle(self.media_data['mediapath'])
+        self.ddialog.setWindowTitle(self.media_data['name'])
+        self.setWindowTitle(_("Media coding: ") + self.media_data['name'])
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
         except Exception as e:

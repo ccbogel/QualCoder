@@ -180,7 +180,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(3)
+        self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
@@ -965,6 +965,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.setWindowTitle(_("Code text: ") + self.filename['name'])
 
     def get_coded_text_update_eventfilter_tooltips(self):
         ''' Called by view_file, and from other dialogs on update '''

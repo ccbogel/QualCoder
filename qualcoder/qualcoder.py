@@ -39,8 +39,9 @@ import sys
 import sqlite3
 import traceback
 import webbrowser
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from settings import DialogSettings
+
 from attributes import DialogManageAttributes
 from cases import DialogCases
 from codebook import Codebook
@@ -56,6 +57,7 @@ from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
 from select_file import DialogSelectFile
+from settings import DialogSettings
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal

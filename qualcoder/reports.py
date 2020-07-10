@@ -188,6 +188,23 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 sub_cats.remove(leaf_cat)
             counter += 1
 
+        # temp
+        # header
+        header = ["Code Tree", "Id"]
+        for coder in self.coders:
+            header.append(coder)
+        header.append("Total")
+        print("HEADER")
+        print(header)
+        print("\n")
+
+        for c in self.codes:
+            print(c)
+
+        print("\n\n")
+        for c in self.categories:
+            print(c)
+
     def depthgauge(self, item):
         """ Get depth for treewidget item. """
 
@@ -701,8 +718,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(3)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo")])
+        self.ui.treeWidget.setColumnCount(4)
+        self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo"), _("Count")])
+        if self.app.settings['showids'] == 'False':
+            self.ui.treeWidget.setColumnHidden(1, True)
+        else:
+            self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
@@ -713,6 +734,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -737,7 +759,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         #logger.debug("Adding item: " + c['name'])
                         remove_list.append(c)
@@ -758,6 +780,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -776,11 +799,39 @@ class DialogReportCodes(QtWidgets.QDialog):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
+        self.fill_code_counts_in_tree()
         self.ui.treeWidget.expandAll()
+
+    def fill_code_counts_in_tree(self):
+        """ Count instances of each code from all coders and all files. """
+
+        cur = self.app.conn.cursor()
+        sql = "select count(cid) from code_text where cid=? union "
+        sql += "select count(cid) from code_av where cid=? union "
+        sql += "select count(cid) from code_image where cid=?"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            #print(item.text(0), item.text(1), item.text(2), item.text(3))
+            if item.text(1)[0:4] == "cid:":
+                cid = str(item.text(1)[4:])
+                cur.execute(sql, [cid, cid, cid])  # , self.app.settings['codername']])
+                result = cur.fetchall()
+                print("len result ", len(result))
+                total = 0
+                for row in result:
+                    total = total + row[0]
+                if total > 0:
+                    item.setText(3, str(total))
+                else:
+                    item.setText(3, "")
+            it += 1
+            item = it.value()
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.

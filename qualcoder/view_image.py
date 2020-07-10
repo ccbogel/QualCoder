@@ -118,7 +118,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
-        self.setWindowTitle("Image coding")
+        self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.pushButton_memo.pressed.connect(self.image_memo)
@@ -171,7 +171,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(3)
+        self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
