@@ -33,7 +33,7 @@ setup(
         'pdfminer.six',
         'ply',
         'chardet',
-        'xlrd'
+        'openpxyl'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
