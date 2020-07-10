@@ -18,7 +18,7 @@ You may need to add unstable repos as described at https://www.binarytides.com/e
 
 You also need to run this command from the terminal for pdf importing:
 
-`sudo python3 -m pip install pdfminer.six`
+`sudo python3 -m pip install pdfminer.six openpyxl`
 
 If not using the debian pacakge:
 
@@ -39,11 +39,11 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install dependencies in the command prompt:
 
-`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
+`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
 or:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six`
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
 To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
 
@@ -61,7 +61,7 @@ Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.video
 
 Install the Python dependencies using `pip`:
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six`
+`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
 
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
@@ -88,6 +88,8 @@ Required:
 * chardet
 
 * pdfminer.six
+
+* openpxyl   (not yet implemented 10 Jul 2020)
 
 
 ## Future plans
