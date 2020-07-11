@@ -4,7 +4,7 @@ ui_dialog_attribute_type.py \
 ui_dialog_cases.py \
 ui_dialog_code_av.py \
 ui_dialog_code_image.py \
-ui_dialog_codes.py \
+ui_dialog_code_text.py \
 ui_dialog_colour_selector.py \
 ui_dialog_confirm_delete.py \
 ui_dialog_import.py \
