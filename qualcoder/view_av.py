@@ -188,6 +188,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
         self.fill_tree()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
@@ -237,6 +238,47 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter. """
 
         self.codes, self.categories = self.app.get_data()
+
+    def assign_selected_text_to_code(self):
+        """ Assign selected text on left-click on code in tree. """
+
+        current = self.ui.treeWidget.currentItem()
+        if current.text(1)[0:3] == 'cat':
+            return
+        code_for_underlining = None
+        for c in self.codes:
+            if current.text(0) == c['name']:
+                code_for_underlining = c
+                break
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        if len(selected_text) > 0:
+            self.mark()
+        self.underline_text_of_this_code(code_for_underlining)
+
+    def underline_text_of_this_code(self, code_for_underlining):
+        """ User interface, highlight coded text selections for the currently selected code.
+        Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
+        param:
+            code_for_underlining: dictionary of the code to be underlined """
+
+        # Remove all underlining
+        selstart = 0
+        selend = len(self.ui.textEdit.toPlainText())
+        format = QtGui.QTextCharFormat()
+        format.setUnderlineStyle(QtGui.QTextCharFormat.NoUnderline)
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(selstart)
+        cursor.setPosition(selend, QtGui.QTextCursor.KeepAnchor)
+        cursor.mergeCharFormat(format)
+        # Apply underlining in for selected coded text
+        format = QtGui.QTextCharFormat()
+        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
+        cursor = self.ui.textEdit.textCursor()
+        for coded_text in self.code_text:
+            if coded_text['cid'] == code_for_underlining['cid']:
+                cursor.setPosition(int(coded_text['pos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(coded_text['pos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.mergeCharFormat(format)
 
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
@@ -756,9 +798,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         #logger.debug("selected paremt: " + str(selected.parent()))
         #logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
-        ActionAssignSelectedText = None
+        '''ActionAssignSelectedText = None
         if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionAssignSelectedText = menu.addAction("Assign selected text")
+            ActionAssignSelectedText = menu.addAction("Assign selected text")'''
         ActionItemAssignSegment = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
@@ -771,8 +813,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             ActionItemChangeColor = menu.addAction(_("Change code color"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionAssignSelectedText:
-            self.mark()
+        '''if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionAssignSelectedText:
+            self.mark()'''
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
         if action == ActionItemAddCategory:

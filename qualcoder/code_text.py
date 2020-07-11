@@ -165,7 +165,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.label_code.setText(_("NO CODE SELECTED"))
             return
         self.ui.label_code.setText("Code: " + current.text(0))
-        # update background colour of label
+        # update background colour of label and store current code for underlining
+        code_for_underlining = None
         for c in self.codes:
             if current.text(0) == c['name']:
                 palette = self.ui.label_code.palette()
@@ -173,10 +174,37 @@ class DialogCodeText(QtWidgets.QWidget):
                 palette.setColor(QtGui.QPalette.Window, code_color)
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
+                code_for_underlining = c
                 break
-        selectedText = self.ui.textEdit.textCursor().selectedText()
-        if len(selectedText) > 0:
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        if len(selected_text) > 0:
             self.mark()
+        self.underline_text_of_this_code(code_for_underlining)
+
+    def underline_text_of_this_code(self, code_for_underlining):
+        """ User interface, highlight coded text selections for the currently selected code.
+        Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
+        param:
+            code_for_underlining: dictionary of the code to be underlined """
+
+        # Remove all underlining
+        selstart = 0
+        selend = len(self.ui.textEdit.toPlainText())
+        format = QtGui.QTextCharFormat()
+        format.setUnderlineStyle(QtGui.QTextCharFormat.NoUnderline)
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(selstart)
+        cursor.setPosition(selend, QtGui.QTextCursor.KeepAnchor)
+        cursor.mergeCharFormat(format)
+        # Apply underlining in for selected coded text
+        format = QtGui.QTextCharFormat()
+        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
+        cursor = self.ui.textEdit.textCursor()
+        for coded_text in self.code_text:
+            if coded_text['cid'] == code_for_underlining['cid']:
+                cursor.setPosition(int(coded_text['pos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(coded_text['pos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.mergeCharFormat(format)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
@@ -305,7 +333,7 @@ class DialogCodeText(QtWidgets.QWidget):
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
         If case sensitive is checked then text searched is matched for case sensitivity.
-        If search escaped is checked ?
+        If search escaped is checked - removed this option for now
         """
 
         if len(self.search_indices) == 0:
@@ -319,13 +347,13 @@ class DialogCodeText(QtWidgets.QWidget):
             flags = 0
             if not self.ui.checkBox_search_case.isChecked():
                 flags |= re.IGNORECASE
-            if self.ui.checkBox_search_escaped.isChecked():
+            '''if self.ui.checkBox_search_escaped.isChecked():
                 pattern = re.compile(re.escape(search_term), flags)
             else:
                 try:
                     pattern = re.compile(search_term, flags)
                 except:
-                    logger.warning('Bad escape')
+                    logger.warning('Bad escape')'''
             if pattern is not None:
                 self.search_indices = []
                 if self.ui.checkBox_search_all_files.isChecked():
@@ -413,9 +441,9 @@ class DialogCodeText(QtWidgets.QWidget):
         selected = self.ui.treeWidget.currentItem()
         #logger.debug("Selected parent: " + selected.parent())
         #index = self.ui.treeWidget.currentIndex()
-        ActionAssignSelectedText = None
+        '''ActionAssignSelectedText = None
         if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionAssignSelectedText = menu.addAction("Assign selected text")
+            ActionAssignSelectedText = menu.addAction("Assign selected text")'''
         ActionItemAddCode = menu.addAction(_("Add a new code"))
         ActionItemAddCategory = menu.addAction(_("Add a new category"))
         ActionItemRename = menu.addAction(_("Rename"))
@@ -428,8 +456,8 @@ class DialogCodeText(QtWidgets.QWidget):
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None :
-            if selected is not None and action == ActionAssignSelectedText:
-                self.mark()
+            '''if selected is not None and action == ActionAssignSelectedText:
+                self.mark()'''
             if selected is not None and action == ActionItemChangeColor:
                 self.change_code_color(selected)
             elif action == ActionItemAddCategory:
@@ -453,7 +481,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.coded_media_dialog(found)
 
     def eventFilter(self, object, event):
-        """ Using this event filter to identfiy treeWidgetItem drop events.
+        """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
@@ -1028,7 +1056,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setBackground(brush)
                 # Highlight codes with memos - these are italicised
                 if item['memo'] is not None and item['memo'] != "":
-                    fmt.setFontItalic(True)
+                    fmt.setFontItalic(True)  #TODO I dont think this works, perhaps delete
                 else:
                     fmt.setFontItalic(False)
                     fmt.setFontWeight(QtGui.QFont.Normal)
