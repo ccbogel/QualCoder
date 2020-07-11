@@ -264,6 +264,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         header.append("Total")
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
+        if self.app.settings['showids'] == 'False':
+            self.ui.treeWidget.setColumnHidden(1, True)
+        else:
+            self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
