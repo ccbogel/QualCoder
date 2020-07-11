@@ -1323,7 +1323,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
                     seltext = seltext.replace("\r", "")
-                    # if sleected text is long just show start end snippets with a readable cut off (ie not cut off halway through a word)
+                    # if selected text is long just show start end snippets with a readable cut off (ie not cut off halway through a word)
                     if len(seltext) > 90:
                         pretext = seltext[0:40].split(' ')
                         posttext = seltext[len(seltext) - 40:].split(' ')
@@ -1337,13 +1337,18 @@ class ToolTip_EventFilter(QtCore.QObject):
                             pass
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
                     if displayText == "":
-                        displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
+                        try:
+                            displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
+                        except Exception as e:
+                            msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
+                            msg += str(item)
+                            logger.error(msg)
                     else:  # Can have multiple codes on same selected area
                         try:
                             displayText += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
                         except Exception as e:
-                            msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
-                            msg += str(item) + "<br /" + self.code_text
+                            msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
+                            msg += str(item)
                             logger.error(msg)
             if displayText != "":
                 receiver.setToolTip(displayText)
