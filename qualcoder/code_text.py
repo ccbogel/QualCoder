@@ -157,7 +157,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
     def fill_code_label(self):
-        """ Fill code label with currently selected item's code name and colour. """
+        """ Fill code label with currently selected item's code name and colour.
+         Also, if text is highlighted, assign the text to this code. """
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
@@ -173,6 +174,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
                 break
+        selectedText = self.ui.textEdit.textCursor().selectedText()
+        if len(selectedText) > 0:
+            self.mark()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
