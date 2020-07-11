@@ -97,19 +97,20 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         Calls calculate_code_frequency - for each code.
         Adds a list item that is ready to be used by the treeWidget to display multiple
         columns with the coder frequencies.
+        No useing the app.get_data method as this adds extra columns for each end user
         """
 
         cur = self.app.conn.cursor()
 
         self.categories = []
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
+        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
             'date': row[3], 'memo': row[4], 'supercatid': row[5],
             'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
@@ -194,16 +195,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
-        print("HEADER")
-        print(header)
-        print("\n")
-
+        '''
+        #print("HEADER\n", header, "\n")
         for c in self.codes:
             print(c)
 
         print("\n\n")
         for c in self.categories:
             print(c)
+        '''
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """
@@ -822,7 +822,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cid = str(item.text(1)[4:])
                 cur.execute(sql, [cid, cid, cid])  # , self.app.settings['codername']])
                 result = cur.fetchall()
-                print("len result ", len(result))
                 total = 0
                 for row in result:
                     total = total + row[0]
