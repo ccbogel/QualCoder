@@ -44,7 +44,7 @@ from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from information import DialogInformation
-from GUI.ui_dialog_codes import Ui_Dialog_codes
+from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
 from qtmodels import DictListModel, ListObjectModel
 from select_file import DialogSelectFile
@@ -112,7 +112,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.get_codes_and_categories()
-        self.ui = Ui_Dialog_codes()
+        self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -122,7 +122,8 @@ class DialogCodeText(QtWidgets.QWidget):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
-        self.ui.label_file.setText("File: Not selected")
+        #TODO delete following widget from ui file
+        self.ui.label_file.hide()
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -135,8 +136,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        self.ui.checkBox_show_coders.hide()  # to allow viewing other codes, todo maybe?
-        #self.ui.checkBox_show_coders.stateChanged.connect(self.view_file)   # todo maybe?
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -995,25 +994,21 @@ class DialogCodeText(QtWidgets.QWidget):
         sql_values.append(int(file_result['id']))
         self.sourceText = file_result['fulltext']
         self.ui.textEdit.setPlainText(self.sourceText)
-        self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
+        #self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.setWindowTitle(_("Code text: ") + self.filename['name'])
 
     def get_coded_text_update_eventfilter_tooltips(self):
-        ''' Called by view_file, and from other dialogs on update '''
+        """ Called by view_file, and from other dialogs on update. """
 
         if self.filename is None:
             return
-        sql_values = []
-        sql_values.append(int(self.filename['id']))
-        # Get code text for this file and for this coder, or all coders
+        sql_values = [int(self.filename['id']), self.app.settings['codername']]
+        # Get code text for this file and for this coder
         self.code_text = []
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
-        codingsql += " where fid=? "
-        if not self.ui.checkBox_show_coders.isChecked():
-            codingsql += " and owner=? "
-            sql_values.append(self.app.settings['codername'])
+        codingsql += " where fid=? and owner=? "
         cur = self.app.conn.cursor()
         cur.execute(codingsql, sql_values)
         code_results = cur.fetchall()
