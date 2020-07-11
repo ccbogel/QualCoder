@@ -196,8 +196,8 @@ class App(object):
         return res
 
     def get_data(self):
-        """ Called from init and gets all the codes and categories.
-        Called from ? """
+        """ Called from init and gets all the codes, categories.
+        Called from code_text, code_av, code_image, reports """
 
         categories = []
         cur = self.conn.cursor()
@@ -273,6 +273,7 @@ class App(object):
 
     def get_file_texts(self, fileids=None):
         """ Get the texts of all text files as a list of dictionaries.
+        Called by DialogCodeText.search_for_text
         param: fileids - a list of fileids or None """
 
         cur = self.conn.cursor()
@@ -296,15 +297,32 @@ class App(object):
         return res
 
     def get_code_texts(self, text):
+        """ Get all the coded text that contains the text parameter.
+        Called by: ???
+        param:
+            text: a string
+        """
+
         cur = self.conn.cursor()
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
-        cur.execute(
-            codingsql,
-            [text],
-        )
+        cur.execute(codingsql, [text],)
         keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
         for res in cur.fetchall():
             yield dict(zip(keys, res))
+
+    def get_coder_names_in_project(self):
+        """ Get all coder nmes fro mall tables.
+        Useful when opening a project and the settings codername is from another project. """
+
+        cur = self.conn.cursor()
+        sql = "select owner from code_image union select owner from code_text union select owner from code_av "
+        sql += "union select owner from cases union select owner from source union select owner from code_name"
+        cur.execute(sql)
+        res = cur.fetchall()
+        names = []
+        for r in res:
+            names.append(r[0])
+        return names
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -544,7 +562,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def import_survey(self):
-        """ Import survey flat sheet: csv file.
+        """ Import survey flat sheet: csv file or xlsx.
         Create cases and assign attributes to cases.
         Identify qualitative questions and assign these data to the source table for
         coding and review. Modal dialog. """
@@ -832,10 +850,11 @@ class MainWindow(QtWidgets.QMainWindow):
             projects.append({'name': item})
         ui = DialogSelectFile(projects, _("Select project to open"), "single")
         ok = ui.exec_()
-        if ok:
-            project = ui.get_selected()  # list of dictionaries
-            project_path = project['name']
-            self.open_project(project_path)
+        if not ok:
+            return
+        project = ui.get_selected()  # list of dictionaries
+        project_path = project['name']
+        self.open_project(project_path)
 
     def open_project(self, path="", newproject="no"):
         """ Open an existing project.
@@ -872,6 +891,15 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.project_path = ""
             self.app.project_name = ""
             return
+
+        # Check that the coder name from setting ini file is in the project
+        # If not then replace with a name in the project
+        names = self.app.get_coder_names_in_project()
+        print(names)
+        if self.app.settings['codername'] not in names and len(names) > 0:
+            self.app.settings['codername'] = names[0]
+            self.app.write_config_ini(self.app.settings)
+            self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
 
         # get and display some project details
         self.app.append_recent_project(self.app.project_path)
