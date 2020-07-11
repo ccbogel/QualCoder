@@ -672,7 +672,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
         msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
         msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "External sources over 2GB not imported."
+        msg += "External sources over 2GB not imported or linked to."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
 
     def rqda_project_import(self):

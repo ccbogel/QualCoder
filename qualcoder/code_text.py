@@ -141,6 +141,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_escaped.hide()  #TODO to remove from GUI later
         self.ui.pushButton_search_results.setEnabled(False)
         self.ui.pushButton_search_results.pressed.connect(self.move_to_next_search_text)
         self.ui.treeWidget.setDragEnabled(True)
