@@ -860,6 +860,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not backup on a newly created project, as it wont contain data.
+        A backup is created if settings backuop is True.
+        The backup is deleted, if no changes occured.
+        Backups are created using the date and 24 hour suffix: _BKUP_yyyymmdd_hh
+        Backups are not replaced within the same hour.
         param:
             path: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
@@ -921,12 +925,17 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("ALTER TABLE code_text ADD avid integer;")
             self.app.conn.commit()
 
-        # Save a datetime stamped backup
+        # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
-            nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            backup = self.app.project_path[0:-4] + "_BACKUP_" + nowdate + ".qda"
+            nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
+            backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
             if self.app.settings['backup_av_files'] == 'True':
-                shutil.copytree(self.app.project_path, backup)
+                try:
+                    shutil.copytree(self.app.project_path, backup)
+                except FileExistsError as e:
+                    msg = _("There is already a backup with this name")
+                    print(str(e) + "\n" + msg)
+                    logger.warning(_(msg) + "\n" + str(e))
             else:
                 shutil.copytree(self.app.project_path, backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
