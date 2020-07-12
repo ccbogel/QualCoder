@@ -892,10 +892,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.project_name = ""
             return
 
+        #TODO Probably a design flaw to have the current coders name in the config.ini file
+        #TODO as is would change when opening differnt projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
         names = self.app.get_coder_names_in_project()
-        print(names)
         if self.app.settings['codername'] not in names and len(names) > 0:
             self.app.settings['codername'] = names[0]
             self.app.write_config_ini(self.app.settings)
