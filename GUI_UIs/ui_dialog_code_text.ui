@@ -73,19 +73,6 @@
        <string>Coder:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_coded1">
-      <property name="geometry">
-       <rect>
-        <x>680</x>
-        <y>30</y>
-        <width>331</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>.</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
@@ -195,19 +182,6 @@
        <string>Escaped</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_coded2">
-      <property name="geometry">
-       <rect>
-        <x>680</x>
-        <y>62</y>
-        <width>331</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>.</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_codes_in_text">
       <property name="geometry">
        <rect>
@@ -219,6 +193,32 @@
       </property>
       <property name="text">
        <string>Clicked text codes</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_coded1">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>30</y>
+        <width>381</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_coded2">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>60</y>
+        <width>381</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>.</string>
       </property>
      </widget>
     </widget>
