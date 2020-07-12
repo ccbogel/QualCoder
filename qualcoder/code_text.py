@@ -136,10 +136,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-        self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
+        self.ui.lineEdit_search.setEnabled(False)
+        #self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_escaped.hide()  # TODO to remove from GUI later
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
-        self.ui.checkBox_search_escaped.hide()  #TODO to remove from GUI later
+        self.ui.checkBox_search_case.setEnabled(False)
         self.ui.pushButton_search_results.setEnabled(False)
         self.ui.pushButton_search_results.pressed.connect(self.move_to_next_search_text)
         self.ui.treeWidget.setDragEnabled(True)
@@ -153,8 +156,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_coded2.hide()
         self.ui.pushButton_coded1.clicked.connect(self.highlight_from_text_code1)
         self.ui.pushButton_coded2.clicked.connect(self.highlight_from_text_code2)
-        #self.ui.splitter.setSizes([150, 400])
-        self.ui.leftsplitter.setSizes([100, 0])
+        self.ui.splitter.setSizes([150, 400])
+        #self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
@@ -339,8 +342,10 @@ class DialogCodeText(QtWidgets.QWidget):
         If search escaped is checked - removed this option for now
         """
 
+        if self.filename is None:
+            return
         if len(self.search_indices) == 0:
-            self.ui.pushButton_search_results.setEnabled(False)
+           self.ui.pushButton_search_results.setEnabled(False)
         self.search_indices = []
         self.search_index = -1
         search_term = self.ui.lineEdit_search.text()
@@ -357,6 +362,11 @@ class DialogCodeText(QtWidgets.QWidget):
                     pattern = re.compile(search_term, flags)
                 except:
                     logger.warning('Bad escape')'''
+            try:
+                pattern = re.compile(search_term, flags)
+            except:
+                logger.warning('Bad escape')
+
             if pattern is not None:
                 self.search_indices = []
                 if self.ui.checkBox_search_all_files.isChecked():
@@ -1001,6 +1011,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.setWindowTitle(_("Code text: ") + self.filename['name'])
+        self.ui.lineEdit_search.setEnabled(True)
+        self.ui.checkBox_search_case.setEnabled(True)
+        self.ui.checkBox_search_all_files.setEnabled(True)
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update. """
