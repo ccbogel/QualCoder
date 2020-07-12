@@ -201,7 +201,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.mergeCharFormat(format)
         # Apply underlining in for selected coded text
         format = QtGui.QTextCharFormat()
-        format.setUnderlineStyle(QtGui.QTextCharFormat.WaveUnderline)
+        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
         cursor = self.ui.textEdit.textCursor()
         for coded_text in self.code_text:
             if coded_text['cid'] == code_for_underlining['cid']:

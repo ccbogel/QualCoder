@@ -533,10 +533,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         values = [self.transcription[0], self.app.settings['codername']]
         cur = self.app.conn.cursor()
         self.code_text = []
+        # seltext length, longest first, so overlapping shorter text is superimposed.
         sql = "select code_text.cid, code_text.fid, seltext, code_text.pos0, code_text.pos1, "
         sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1 "
         sql += "from code_text left join code_av on code_text.avid = code_av.avid "
-        sql += " where code_text.fid=? and code_text.owner=?"
+        sql += " where code_text.fid=? and code_text.owner=? order by length(seltext) desc"
         cur.execute(sql, values)
         code_results = cur.fetchall()
         for row in code_results:
