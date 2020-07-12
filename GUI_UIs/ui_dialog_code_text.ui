@@ -64,7 +64,7 @@
       <property name="geometry">
        <rect>
         <x>360</x>
-        <y>6</y>
+        <y>3</y>
         <width>271</width>
         <height>28</height>
        </rect>
@@ -73,33 +73,17 @@
        <string>Coder:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_file">
-      <property name="geometry">
-       <rect>
-        <x>640</x>
-        <y>7</y>
-        <width>458</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>File:</string>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_coded">
+     <widget class="QLabel" name="label_coded1">
       <property name="geometry">
        <rect>
         <x>680</x>
-        <y>70</y>
-        <width>361</width>
-        <height>28</height>
+        <y>30</y>
+        <width>331</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="text">
-       <string>Right click to mark and unmark selected text</string>
+       <string>.</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_code">
@@ -115,12 +99,12 @@
        <string>Right click below to create new codes and categories</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="label_search">
       <property name="geometry">
        <rect>
         <x>15</x>
         <y>40</y>
-        <width>201</width>
+        <width>181</width>
         <height>26</height>
        </rect>
       </property>
@@ -130,13 +114,16 @@
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>225</x>
+        <x>210</x>
         <y>37</y>
-        <width>281</width>
+        <width>231</width>
         <height>32</height>
        </rect>
       </property>
@@ -144,38 +131,12 @@
        <string>Case sensitive search</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_search_frequency">
-      <property name="geometry">
-       <rect>
-        <x>800</x>
-        <y>40</y>
-        <width>151</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_search_frequency_2">
-      <property name="geometry">
-       <rect>
-        <x>790</x>
-        <y>40</y>
-        <width>151</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_search_results">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>450</x>
         <y>37</y>
-        <width>161</width>
+        <width>121</width>
         <height>32</height>
        </rect>
       </property>
@@ -202,7 +163,7 @@
      <widget class="QCheckBox" name="checkBox_search_all_files">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>550</x>
         <y>70</y>
         <width>88</width>
         <height>22</height>
@@ -232,6 +193,32 @@
       </property>
       <property name="text">
        <string>Escaped</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coded2">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>62</y>
+        <width>331</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_codes_in_text">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>0</y>
+        <width>371</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clicked text codes</string>
       </property>
      </widget>
     </widget>
