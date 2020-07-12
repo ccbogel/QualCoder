@@ -59,9 +59,6 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_export_csv = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_export_csv.setGeometry(QtCore.QRect(760, 90, 211, 27))
         self.pushButton_export_csv.setObjectName("pushButton_export_csv")
-        self.checkBox_text_context = QtWidgets.QCheckBox(self.groupBox)
-        self.checkBox_text_context.setGeometry(QtCore.QRect(230, 20, 181, 23))
-        self.checkBox_text_context.setObjectName("checkBox_text_context")
         self.verticalLayout.addWidget(self.groupBox)
         self.label_selections = QtWidgets.QLabel(Dialog_reportCodings)
         self.label_selections.setMinimumSize(QtCore.QSize(0, 50))
@@ -114,7 +111,6 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_attributeselect.setText(_translate("Dialog_reportCodings", "Attribute selection"))
         self.pushButton_exportodt.setText(_translate("Dialog_reportCodings", "Export ODT file"))
         self.pushButton_export_csv.setText(_translate("Dialog_reportCodings", "Export csv file"))
-        self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "text context"))
         self.label_selections.setText(_translate("Dialog_reportCodings", "Search selections:"))
 
 
