@@ -123,7 +123,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         #TODO delete following widget from ui file
-        self.ui.label_file.hide()
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -150,7 +149,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
-        self.ui.splitter.setSizes([150, 400])
+        self.ui.pushButton_coded1.hide()
+        self.ui.pushButton_coded2.hide()
+        self.ui.pushButton_coded1.clicked.connect(self.highlight_from_text_code1)
+        self.ui.pushButton_coded2.clicked.connect(self.highlight_from_text_code2)
+        #self.ui.splitter.setSizes([150, 400])
         self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
@@ -162,6 +165,7 @@ class DialogCodeText(QtWidgets.QWidget):
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.setText(_("NO CODE SELECTED"))
+            self.ui.label_code.setStyleSheet("QLabel { background-color : None; }");
             return
         self.ui.label_code.setText("Code: " + current.text(0))
         # update background colour of label and store current code for underlining
@@ -197,7 +201,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.mergeCharFormat(format)
         # Apply underlining in for selected coded text
         format = QtGui.QTextCharFormat()
-        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
+        format.setUnderlineStyle(QtGui.QTextCharFormat.WaveUnderline)
         cursor = self.ui.textEdit.textCursor()
         for coded_text in self.code_text:
             if coded_text['cid'] == code_for_underlining['cid']:
@@ -388,7 +392,7 @@ class DialogCodeText(QtWidgets.QWidget):
         next_result = self.search_indices[self.search_index]
         # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
         if self.filename is None or self.filename['id'] != next_result[0]['id']:
-            self.view_file(next_result[0])
+            self.load_file(next_result[0])
         cur.setPosition(next_result[1])
         cur.setPosition(cur.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cur)
@@ -980,12 +984,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if ok:
             # filename is dictionary with id and name
             self.filename = ui.get_selected()
-            self.view_file(self.filename)
+            self.load_file(self.filename)
         else:
             self.ui.textEdit.clear()
 
-    def view_file(self, filedata):
-        """ Get and display file text for this file.
+    def load_file(self, filedata):
+        """ Load and display file text for this file.
         Get and display coding highlights. """
 
         self.filename = filedata
@@ -994,21 +998,21 @@ class DialogCodeText(QtWidgets.QWidget):
         sql_values.append(int(file_result['id']))
         self.sourceText = file_result['fulltext']
         self.ui.textEdit.setPlainText(self.sourceText)
-        #self.ui.label_file.setText("File " + str(file_result['id']) + " : " + file_result['name'])
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.setWindowTitle(_("Code text: ") + self.filename['name'])
 
     def get_coded_text_update_eventfilter_tooltips(self):
-        """ Called by view_file, and from other dialogs on update. """
+        """ Called by load_file, and from other dialogs on update. """
 
         if self.filename is None:
             return
         sql_values = [int(self.filename['id']), self.app.settings['codername']]
         # Get code text for this file and for this coder
         self.code_text = []
+        # seltext length, longest first, so overlapping shorter text is superimposed.
         codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
-        codingsql += " where fid=? and owner=? "
+        codingsql += " where fid=? and owner=? order by length(seltext) desc"
         cur = self.app.conn.cursor()
         cur.execute(codingsql, sql_values)
         code_results = cur.fetchall()
@@ -1118,25 +1122,59 @@ class DialogCodeText(QtWidgets.QWidget):
         the text edit widget. """
 
         # default for anything uncoded
-        self.ui.label_coded.hide()
+        self.ui.pushButton_coded1.hide()
+        self.ui.pushButton_coded2.hide()
 
-        text = _("Coded: ")
-        self.ui.label_coded.setText(text)
+        text = ""  #_("Coded: ")
+        self.ui.pushButton_coded1.setText(text)
+        self.ui.pushButton_coded2.setText(text)
         pos = self.ui.textEdit.textCursor().position()
+        codes_here = []
         for item in self.code_text:
             if item['pos0'] <= pos and item['pos1'] >= pos:
                 # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 for code in self.codes:
                     if code['cid'] == item['cid']:
-                        text = text + code['name'] + ";"
-                        palette = self.ui.label_coded.palette()
-                        code_color = QtGui.QColor(code['color'])
-                        palette.setColor(QtGui.QPalette.Window, code_color)
-                        self.ui.label_coded.setPalette(palette)
-                        self.ui.label_coded.setAutoFillBackground(True)
-                        self.ui.label_coded.show()
+                        codes_here.append(code)
+        # can show up to two codes for this location
+        for i, c in enumerate(codes_here):
+            if i == 0:
+                self.ui.pushButton_coded1.setStyleSheet("background-color: " + c['color'])
+                self.ui.pushButton_coded1.setText(c['name'])
+                self.ui.pushButton_coded1.show()
+            if i == 1:
+                self.ui.pushButton_coded2.setStyleSheet("background-color: " + c['color'])
+                self.ui.pushButton_coded2.setText(c['name'])
+                self.ui.pushButton_coded2.show()
 
-        self.ui.label_coded.setText(text)
+    def highlight_from_text_code1(self):
+        """ Coded in text button pressed. Highlight all coded text. """
+
+        codename = self.ui.pushButton_coded1.text()
+        self.select_tree_item_by_code_name(codename)
+
+    def highlight_from_text_code2(self):
+        """ Coded in text button pressed. Highlight all coded text. """
+
+        codename = self.ui.pushButton_coded2.text()
+        self.select_tree_item_by_code_name(codename)
+
+    def select_tree_item_by_code_name(self, codename):
+        """ Set a tree item code. This sill call fill_code_label and
+         put the selected code in the top left code label and
+         underline matching text in the textedit.
+         param:
+            codename: a string of the codename
+         """
+
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            if item.text(0) == codename:
+                self.ui.treeWidget.setCurrentItem(item)
+            it += 1
+            item = it.value()
+        self.fill_code_label()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
