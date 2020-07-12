@@ -50,9 +50,9 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>0</y>
-        <width>181</width>
+        <x>360</x>
+        <y>39</y>
+        <width>191</width>
         <height>32</height>
        </rect>
       </property>
@@ -63,9 +63,9 @@
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>3</y>
-        <width>271</width>
+        <x>10</x>
+        <y>40</y>
+        <width>341</width>
         <height>28</height>
        </rect>
       </property>
@@ -76,10 +76,10 @@
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>67</y>
-        <width>441</width>
-        <height>31</height>
+        <x>10</x>
+        <y>73</y>
+        <width>401</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="text">
@@ -89,8 +89,8 @@
      <widget class="QLabel" name="label_search">
       <property name="geometry">
        <rect>
-        <x>15</x>
-        <y>40</y>
+        <x>170</x>
+        <y>0</y>
         <width>181</width>
         <height>26</height>
        </rect>
@@ -108,22 +108,22 @@
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>37</y>
-        <width>231</width>
+        <x>360</x>
+        <y>0</y>
+        <width>191</width>
         <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Case sensitive search</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_search_results">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>37</y>
-        <width>121</width>
+        <x>560</x>
+        <y>0</y>
+        <width>111</width>
         <height>32</height>
        </rect>
       </property>
@@ -134,9 +134,9 @@
      <widget class="QCheckBox" name="checkBox_search_case">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>70</y>
-        <width>88</width>
+        <x>690</x>
+        <y>0</y>
+        <width>171</width>
         <height>22</height>
        </rect>
       </property>
@@ -144,15 +144,15 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Case</string>
+       <string>Case sensitive</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_all_files">
       <property name="geometry">
        <rect>
-        <x>550</x>
-        <y>70</y>
-        <width>88</width>
+        <x>870</x>
+        <y>0</y>
+        <width>141</width>
         <height>22</height>
        </rect>
       </property>
@@ -160,47 +160,15 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>All</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_search_escaped">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>630</x>
-        <y>70</y>
-        <width>31</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search escaped (no special regex characters)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Escaped</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_codes_in_text">
-      <property name="geometry">
-       <rect>
-        <x>680</x>
-        <y>0</y>
-        <width>371</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Clicked text codes</string>
+       <string>All files</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_coded1">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>740</x>
         <y>30</y>
-        <width>381</width>
+        <width>321</width>
         <height>25</height>
        </rect>
       </property>
@@ -211,9 +179,9 @@
      <widget class="QPushButton" name="pushButton_coded2">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>740</x>
         <y>60</y>
-        <width>381</width>
+        <width>321</width>
         <height>25</height>
        </rect>
       </property>
@@ -263,6 +231,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_view_file</tabstop>
+  <tabstop>lineEdit_search</tabstop>
+  <tabstop>pushButton_search_results</tabstop>
+  <tabstop>checkBox_search_case</tabstop>
+  <tabstop>checkBox_search_all_files</tabstop>
+  <tabstop>pushButton_auto_code</tabstop>
+  <tabstop>pushButton_coded1</tabstop>
+  <tabstop>pushButton_coded2</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>textEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
