@@ -35,12 +35,15 @@ import sys
 import traceback
 
 from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
+from GUI.ui_dialog_memo import Ui_Dialog_memo  # where used here?
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from memo import DialogMemo
 from report_attributes import DialogSelectAttributeParameters
 from select_file import DialogSelectFile
 
@@ -659,6 +662,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Export reports as plain text, ODT, html or csv.
     """
     #TODO - export case matrix
+    #TODO text context in separate dialog
 
     app = None
     dialog_list = None
@@ -702,6 +706,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
         self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
         self.ui.pushButton_export_csv.clicked.connect(self.export_csv_file)
+        self.eventFilterTT = ToolTip_EventFilter()
+        self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        self.ui.textEdit.setReadOnly(True)
+
         self.ui.splitter.setSizes([100, 200, 0])
 
     def get_data(self):
@@ -839,7 +847,6 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
         QTextWriter supports plaintext, ODF and HTML.
-        TODO? add default directory to export to
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -982,7 +989,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         folder.
         POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
         need for a separate folder that the html file links to.
-        TODO? add default directory to export to
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -1083,12 +1089,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         case selection dialog. If cases are selected this overrides file selections that
         the user has entered.
         The third pathway is based on attribute selection, which may include files or cases.
-
-        The textEdit.document is filled with the search results.
-        Results are drawn from the textEdit.document to fill reports in .txt and .odt formats.
-        Results are drawn from the textEdit.document and html_links variable to fill reports in html format.
-        Results are drawn from self.text_results, self.image_results and self.av_results to prepare a csv file.
         """
+
+        # self.ui.textEdit.blockSignals(True) - does not work when filling textedit
+        try:
+            self.ui.textEdit.cursorPositionChanged.disconnect(self.show_context_of_clicked_heading)
+        except:
+            pass
 
         coder = self.ui.comboBox_coders.currentText()
         #self.html_results = ""
@@ -1464,6 +1471,18 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.av_results.append(row)
 
+        self.fill_text_edit_with_search_results()
+
+    def fill_text_edit_with_search_results(self):
+        """ The textEdit.document is filled with the search results.
+        Results are drawn from the textEdit.document to fill reports in .txt and .odt formats.
+        Results are drawn from the textEdit.document and html_links variable to fill reports in html format.
+        Results are drawn from self.text_results, self.image_results and self.av_results to prepare a csv file.
+        The results are converted from tuples to dictionaries.
+        As results are added to the textEdit, positions for the headings (code, file, codername) are recorded for
+        right-click context menu to display contextualised coding in another dialog.
+        """
+
         fileOrCase = ""  # default for attributes selection
         if self.file_ids != "":
             fileOrCase = "File"
@@ -1516,15 +1535,35 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.av_results = tmp
 
         # Put results into the textEdit.document
+        # Add textedit positioning for context on clicking appropriate heading in results
+        # block signals of text cursor moving when filling text edit - stops context dialog appearing
+        # discinnected in search
+
         for row in self.text_results:
+            startpos = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
+            endpos = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            row['textedit_start'] = startpos
+            row['textedit_end'] = endpos
         for i, row in enumerate(self.image_results):
+            startpos = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
+            endpos = len(self.ui.textEdit.toPlainText())
             self.put_image_into_textedit(row, i, self.ui.textEdit)
+            row['textedit_start'] = startpos
+            row['textedit_end'] = endpos
         for i, row in enumerate(self.av_results):
+            startpos = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
+            endpos = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            row['textedit_start'] = startpos
+            row['textedit_end'] = endpos
+
+        self.eventFilterTT.setTextResults(self.text_results)
+        self.ui.textEdit.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
+
         # Need to resize splitter as it automatically adjusts to 50%/50%
         self.ui.splitter.setSizes([100, 300])
 
@@ -1570,12 +1609,48 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     @staticmethod
     def html_heading(item):
-        """ Takes a dictionary item and creates a heading for the coded text portion.
+        """ Takes a dictionary item and creates a n html heading for the coded text portion.
+        param:
+            item: dictionary of code, file or case, positions, text, coder
         """
 
         html = "<br /><em><span style=\"background-color:" + item['color'] + "\">" + item['codename'] + "</span>, "
-        html += " "+ item['file_or_case'] + ": " + item['file_or_casename'] + ", " + item['coder'] + "</em><br />"
+        html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
+        html += ", " + item['coder'] + "</em><br />"
         return html
+
+    def show_context_of_clicked_heading(self):
+        """ Heading (code, file, owner) clicked so show context of coding in dialog. """
+
+        pos = self.ui.textEdit.textCursor().position()
+        coded_text = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                coded_text = row
+                break
+        if coded_text is None:
+            return
+        self.view_text_result_in_context(coded_text)
+
+    def view_text_result_in_context(self, coded_text):
+        """ View the coded text in context of the original text file in a separate modal dialog. """
+
+        file_list = self.app.get_file_texts([coded_text['fid'], ])
+        file_text = file_list[0]
+        title = ""
+        if coded_text['file_or_case'] == "File":
+            title = _("File: ") + coded_text['file_or_casename']
+        if coded_text['file_or_case'] == "Case":
+            title = _("Case: ") +coded_text['file_or_casename'] + ", " + file_text['name']
+        memo = DialogMemo(self.app, title, file_text['fulltext'])
+        cursor = memo.ui.textEdit.textCursor()
+        cursor.setPosition(coded_text['pos0'], QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(coded_text['pos1'], QtGui.QTextCursor.KeepAnchor)
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(coded_text['color']))
+        fmt.setBackground(brush)
+        cursor.setCharFormat(fmt)
+        memo.exec_()
 
     def fill_matrix(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
@@ -1752,5 +1827,30 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_selections.setText(tooltip)
 
 
+class ToolTip_EventFilter(QtCore.QObject):
+    """ Used to add a dynamic tooltip for the textEdit.
+    wording to left click for context of text in the original file are displayed in the tooltip.
+    """
+
+    text_results = None
+
+    def setTextResults(self, text_results):
+        self.text_results = text_results
+
+    def eventFilter(self, receiver, event):
+        #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+        if event.type() == QtCore.QEvent.ToolTip:
+            helpEvent = QHelpEvent(event)
+            cursor = QtGui.QTextCursor()
+            cursor = receiver.cursorForPosition(helpEvent.pos())
+            pos = cursor.position()
+            receiver.setToolTip("")
+            if self.text_results is not None:
+                for item in self.text_results:
+                    if pos >= item['textedit_start'] and pos < item['textedit_end']:
+                        msg = _("Click to view coding in the original file.")
+                        receiver.setToolTip(msg)
+        #Call Base Class Method to Continue Normal Event Processing
+        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
 
