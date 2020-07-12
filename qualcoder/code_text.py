@@ -151,8 +151,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         self.ui.pushButton_coded1.hide()
         self.ui.pushButton_coded2.hide()
+        self.ui.pushButton_coded3.hide()
         self.ui.pushButton_coded1.clicked.connect(self.highlight_from_text_code1)
         self.ui.pushButton_coded2.clicked.connect(self.highlight_from_text_code2)
+        self.ui.pushButton_coded3.clicked.connect(self.highlight_from_text_code3)
         self.ui.splitter.setSizes([150, 400])
         #self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
@@ -1127,16 +1129,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     def coded_in_text(self):
-        """ When coded text is clicked on, the code name is displayed in the label above
+        """ When coded text is clicked on, the code name is displayed in the buttons above
         the text edit widget. """
 
         # default for anything uncoded
         self.ui.pushButton_coded1.hide()
+        self.ui.pushButton_coded1.setToolTip("")
         self.ui.pushButton_coded2.hide()
+        self.ui.pushButton_coded2.setToolTip("")
+        self.ui.pushButton_coded3.hide()
+        self.ui.pushButton_coded3.setToolTip("")
 
-        text = ""  #_("Coded: ")
+        text = ""
         self.ui.pushButton_coded1.setText(text)
         self.ui.pushButton_coded2.setText(text)
+        self.ui.pushButton_coded3.setText(text)
         pos = self.ui.textEdit.textCursor().position()
         codes_here = []
         for item in self.code_text:
@@ -1146,15 +1153,23 @@ class DialogCodeText(QtWidgets.QWidget):
                     if code['cid'] == item['cid']:
                         codes_here.append(code)
         # can show up to two codes for this location
+        fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
         for i, c in enumerate(codes_here):
             if i == 0:
-                self.ui.pushButton_coded1.setStyleSheet("background-color: " + c['color'])
+                self.ui.pushButton_coded1.setStyleSheet(fontsize + "background-color: " + c['color'])
                 self.ui.pushButton_coded1.setText(c['name'])
+                self.ui.pushButton_coded1.setToolTip(c['name'])
                 self.ui.pushButton_coded1.show()
             if i == 1:
-                self.ui.pushButton_coded2.setStyleSheet("background-color: " + c['color'])
+                self.ui.pushButton_coded2.setStyleSheet(fontsize + "background-color: " + c['color'])
                 self.ui.pushButton_coded2.setText(c['name'])
+                self.ui.pushButton_coded2.setToolTip(c['name'])
                 self.ui.pushButton_coded2.show()
+            if i == 2:
+                self.ui.pushButton_coded3.setStyleSheet(fontsize + "background-color: " + c['color'])
+                self.ui.pushButton_coded3.setText(c['name'])
+                self.ui.pushButton_coded3.setToolTip(c['name'])
+                self.ui.pushButton_coded3.show()
 
     def highlight_from_text_code1(self):
         """ Coded in text button pressed. Highlight all coded text. """
@@ -1166,6 +1181,12 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Coded in text button pressed. Highlight all coded text. """
 
         codename = self.ui.pushButton_coded2.text()
+        self.select_tree_item_by_code_name(codename)
+
+    def highlight_from_text_code3(self):
+        """ Coded in text button pressed. Highlight all coded text. """
+
+        codename = self.ui.pushButton_coded3.text()
         self.select_tree_item_by_code_name(codename)
 
     def select_tree_item_by_code_name(self, codename):
