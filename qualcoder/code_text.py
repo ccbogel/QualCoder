@@ -122,7 +122,6 @@ class DialogCodeText(QtWidgets.QWidget):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
-        #TODO delete following widget from ui file
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -137,8 +136,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
-        #self.ui.checkBox_search_escaped.stateChanged.connect(self.search_for_text)
-        self.ui.checkBox_search_escaped.hide()  # TODO to remove from GUI later
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
@@ -339,7 +336,6 @@ class DialogCodeText(QtWidgets.QWidget):
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
         If case sensitive is checked then text searched is matched for case sensitivity.
-        If search escaped is checked - removed this option for now
         """
 
         if self.filename is None:
