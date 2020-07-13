@@ -177,7 +177,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.order_by = "filetype"
             self.load_file_data()
         if action == action_order_by_value:
-            self.order_by = "attribute:" + str(col)
+            self.order_by = "attribute:" + self.header_labels[col]
             self.load_file_data()
 
         if action == action_equals_value:
@@ -193,7 +193,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
-         Need to add placeholder attribute values for these, if missing. """
+         Need to add placeholder attribute values for these, if missing.
+         Similarly,if a file is delete, check and reomve any isolated attribute values. """
 
         cur = self.app.conn.cursor()
         sql = "select id from source "
@@ -232,11 +233,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         video files.
         """
 
-        # check a placeholder attribute is present for the file
-        # add if missing
+        # check a placeholder attribute is present for the file, add if missing
         self.check_attribute_placeholders()
         self.source = []
         cur = self.app.conn.cursor()
+        placeholders = None
         # default alphabetic order
         sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)"
         if self.order_by == "date":
@@ -244,9 +245,23 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
         if self.order_by[:10] == "attribute:":
-            col = self.order_by[10:]
-            #TODO sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
-        cur.execute(sql)
+            attribute_name = self.order_by[10:]
+            print(attribute_name)
+            # two types of ordering character or numeric
+            cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
+            attr_type = cur.fetchone()[0]
+            sql = 'select source.name, source.id, "", mediapath, source.memo, source.owner, source.date \
+                from source  join attribute on attribute.id = source.id \
+                where attribute.attr_type = "file" and attribute.name=? '
+            if attr_type == "character":
+                sql += 'order by lower(attribute.value) asc '
+            else:
+                sql += 'order by cast(attribute.value as numeric) asc'
+            placeholders = [attribute_name]
+        if placeholders is not None:
+            cur.execute(sql, placeholders)
+        else:
+            cur.execute(sql)
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
