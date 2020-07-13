@@ -1808,7 +1808,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.case_ids = ""
         self.attribute_selection = []
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, name from cases")
+        cur.execute("select caseid, name from cases order by lower(name)")
         result = cur.fetchall()
         for row in result:
             casenames.append({'caseid': row[0], 'name': row[1]})
