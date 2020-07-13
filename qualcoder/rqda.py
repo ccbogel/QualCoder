@@ -196,6 +196,22 @@ class Rqda_import():
                 [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
         self.app.conn.commit()
 
+        # Keep a copy of the text sources in the QualCoder documents folder
+        r_cur.execute("select name, file from source")
+        res = r_cur.fetchall()
+        for r in res:
+            name = r[0]
+            if name[:-4] in (".pdf", ".odt", ".htm"):
+                name = name[:-4] + ".txt"
+            if name[:-5] in (".html", ".docx"):
+                name  = name[:-5] + ".txt"
+            destination = self.app.project_path + "/documents/" + name
+            print(destination)  # tmp
+            f = open(destination, 'w')
+            f.write(r[1])
+            f.close()
+            logger.info("Text file exported to " + destination)
+
         # Change the user name to the owner name from RQDA
         sql = "select owner from code_text"
         q_cur.execute(sql)
