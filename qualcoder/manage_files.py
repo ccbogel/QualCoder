@@ -330,6 +330,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
 
+        if y == self.NAME_COLUMN:
+            self.view()
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
@@ -351,7 +353,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Memo"))
 
     def cell_modified(self):
         """ Attribute values can be changed.
@@ -1182,7 +1184,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, self.DATE_COLUMN, date_item)
             memoitem = data['memo']
             if memoitem != None and memoitem != "":
-                self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+                self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             fid = data['id']
             if fid is None:
                 fid = ""
