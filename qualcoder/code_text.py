@@ -144,7 +144,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        self.ui.comboBox_codes_in_text.activated.connect(self.combo_code_activated)
+        self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
         self.ui.label_codes_count.setEnabled(False)
         self.ui.label_codes_clicked_in_text.setEnabled(False)
@@ -1133,7 +1133,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
-    def combo_code_activated(self):
+    def combo_code_selected(self):
         """ Combobox code item clicked on.
         highlight this coded text. """
 
@@ -1186,19 +1186,24 @@ class DialogCodeText(QtWidgets.QWidget):
         # can show multiple codes for this location
         fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
         self.ui.comboBox_codes_in_text.clear()
-        code_names = []
-        for i, c in enumerate(codes_here):
+        code_names = [""]
+        for c in codes_here:
             code_names.append(c['name'])
         #print(codes_here)
+        if len(codes_here) < 2:
+            self.ui.label_codes_count.setText("")
+            self.ui.label_codes_clicked_in_text.setText(_("No overlapping codes"))
         if len(codes_here) > 1:
             self.ui.comboBox_codes_in_text.setEnabled(True)
             self.ui.label_codes_count.setEnabled(True)
             self.ui.label_codes_clicked_in_text.setEnabled(True)
+            self.ui.label_codes_clicked_in_text.setText(_("overlapping codes. Select to highlight."))
 
-        self.ui.label_codes_count.setText(str(len(code_names)))
+        self.ui.label_codes_count.setText(str(len(code_names) - 1))
         self.ui.comboBox_codes_in_text.addItems(code_names)
-        for i in range(0, len(code_names)):
+        for i in range(1, len(code_names)):
             self.ui.comboBox_codes_in_text.setItemData(i, code_names[i], QtCore.Qt.ToolTipRole)
+            self.ui.comboBox_codes_in_text.setItemData(i, QtGui.QColor(codes_here[i - 1]['color']), QtCore.Qt.BackgroundRole)
 
     def select_tree_item_by_code_name(self, codename):
         """ Set a tree item code. This sill call fill_code_label and
