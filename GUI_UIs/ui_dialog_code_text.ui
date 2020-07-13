@@ -19,13 +19,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>130</height>
+       <height>120</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>130</height>
+       <height>120</height>
       </size>
      </property>
      <property name="title">
@@ -51,7 +51,7 @@
       <property name="geometry">
        <rect>
         <x>360</x>
-        <y>39</y>
+        <y>40</y>
         <width>191</width>
         <height>32</height>
        </rect>
@@ -121,23 +121,10 @@
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_search_results">
-      <property name="geometry">
-       <rect>
-        <x>560</x>
-        <y>0</y>
-        <width>111</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>0 of 0</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_search_case">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>720</x>
         <y>0</y>
         <width>171</width>
         <height>22</height>
@@ -153,7 +140,7 @@
      <widget class="QCheckBox" name="checkBox_search_all_files">
       <property name="geometry">
        <rect>
-        <x>870</x>
+        <x>900</x>
         <y>0</y>
         <width>141</width>
         <height>22</height>
@@ -166,43 +153,111 @@
        <string>All files</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_coded1">
+     <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>588</x>
+        <y>0</y>
+        <width>81</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>0 / 0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_codes_clicked_in_text">
+      <property name="geometry">
+       <rect>
+        <x>640</x>
+        <y>46</y>
+        <width>431</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>No overlapping codes</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_codes_count">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>46</y>
+        <width>41</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>30</y>
+        <width>531</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>554</x>
         <y>40</y>
-        <width>451</width>
-        <height>25</height>
+        <width>16</width>
+        <height>91</height>
        </rect>
       </property>
-      <property name="text">
-       <string>.</string>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_coded2">
+     <widget class="QComboBox" name="comboBox_codes_in_text">
       <property name="geometry">
        <rect>
-        <x>630</x>
-        <y>70</y>
-        <width>451</width>
-        <height>25</height>
+        <x>580</x>
+        <y>80</y>
+        <width>491</width>
+        <height>31</height>
        </rect>
-      </property>
-      <property name="text">
-       <string>.</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_coded3">
+     <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>630</x>
-        <y>100</y>
-        <width>451</width>
+        <x>560</x>
+        <y>0</y>
+        <width>21</width>
         <height>25</height>
        </rect>
       </property>
       <property name="text">
-       <string>.</string>
+       <string>&lt;</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>0</y>
+        <width>21</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&gt;</string>
       </property>
      </widget>
     </widget>
@@ -250,12 +305,12 @@
  <tabstops>
   <tabstop>pushButton_view_file</tabstop>
   <tabstop>lineEdit_search</tabstop>
-  <tabstop>pushButton_search_results</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
   <tabstop>checkBox_search_case</tabstop>
   <tabstop>checkBox_search_all_files</tabstop>
   <tabstop>pushButton_auto_code</tabstop>
-  <tabstop>pushButton_coded1</tabstop>
-  <tabstop>pushButton_coded2</tabstop>
+  <tabstop>comboBox_codes_in_text</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>
