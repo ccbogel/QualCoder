@@ -1609,12 +1609,18 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     @staticmethod
     def html_heading(item):
-        """ Takes a dictionary item and creates a n html heading for the coded text portion.
+        """ Takes a dictionary item and creates a html heading for the coded text portion.
         param:
             item: dictionary of code, file or case, positions, text, coder
         """
 
-        html = "<br /><em><span style=\"background-color:" + item['color'] + "\">" + item['codename'] + "</span>, "
+        html = "<br />"
+        if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
+            item['file_or_casename'][-5:].lower() in (".html", ".docx", ".epub") or \
+            item['file_or_casename'][-12:] == ".transcribed":
+            html += "[VIEW] "
+        html += "<em><span style=\"background-color:" + item['color'] + "\">"
+        html += item['codename'] + "</span>, "
         html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
         html += ", " + item['coder'] + "</em><br />"
         return html
