@@ -215,6 +215,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute(insert_sql, placeholders)
                     self.app.conn.commit()
 
+        # Check and delete attribute values where file has been deleted
+        att_to_del_sql = "SELECT distinct attribute.id FROM  attribute where \
+        attribute.id not in (select source.id from source) order by attribute.id asc"
+        cur.execute(att_to_del_sql)
+        res = cur.fetchall()
+        for r in res:
+            cur.execute("delete from attribute where id=?", [r[0],])
+            self.app.conn.commit()
+
     def load_file_data(self):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question.
@@ -1079,8 +1088,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_text where fid = ?", [file_id])
             cur.execute("delete from annotation where fid = ?", [file_id])
             cur.execute("delete from case_text where fid = ?", [file_id])
-            sql = "delete from attribute where attr_type in (select attribute_type.name from "
-            sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
+            sql = "delete from attribute where attr_type ='file' and id=?"
             cur.execute(sql, [file_id])
             self.app.conn.commit()
         # delete image audio video source
@@ -1102,10 +1110,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from source where id = ?", [file_id])
             cur.execute("delete from code_image where id = ?", [file_id])
             cur.execute("delete from code_av where id = ?", [file_id])
-            sql = "delete from attribute where attr_type in (select attribute_type.name from "
-            sql += "attribute_type where id=? and attribute_type.caseOrFile='file')"
+            sql = "delete from attribute where attr_type='file' and id=?"
             cur.execute(sql, [file_id])
             self.app.conn.commit()
+
+        self.check_attribute_placeholders()
+
         self.parent_textEdit.append(_("Deleted: ") + self.source[x]['name'])
         for item in self.source:
             if item['id'] == file_id:
