@@ -126,8 +126,8 @@ class Ui_Dialog_code_text(object):
         self.checkBox_search_all_files.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search all files</p></body></html>"))
         self.checkBox_search_all_files.setText(_translate("Dialog_code_text", "All files"))
         self.label_search_totals.setText(_translate("Dialog_code_text", "0 / 0"))
-        self.label_codes_clicked_in_text.setText(_translate("Dialog_code_text", "Overlapping codes at clicked position"))
-        self.label_codes_count.setText(_translate("Dialog_code_text", "0"))
+        self.label_codes_clicked_in_text.setText(_translate("Dialog_code_text", "No overlapping codes"))
+        self.label_codes_count.setText(_translate("Dialog_code_text", "."))
         self.pushButton_previous.setText(_translate("Dialog_code_text", "<"))
         self.pushButton_next.setText(_translate("Dialog_code_text", ">"))
 
