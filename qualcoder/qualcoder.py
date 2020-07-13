@@ -175,7 +175,7 @@ class App(object):
     def get_text_filenames(self):
         """ Get filenames of textfiles only. """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where mediapath is Null")
+        cur.execute("select id, name from source where mediapath is Null order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
