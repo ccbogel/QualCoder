@@ -140,8 +140,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
-        self.ui.pushButton_search_results.setEnabled(False)
-        self.ui.pushButton_search_results.pressed.connect(self.move_to_next_search_text)
+        self.ui.pushButton_previous.setEnabled(False)
+        self.ui.pushButton_next.setEnabled(False)
+        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        self.ui.comboBox_codes_in_text.activated.connect(self.combo_code_activated)
+        self.ui.comboBox_codes_in_text.setEnabled(False)
+        self.ui.label_codes_count.setEnabled(False)
+        self.ui.label_codes_clicked_in_text.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -149,12 +155,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
-        self.ui.pushButton_coded1.hide()
-        self.ui.pushButton_coded2.hide()
-        self.ui.pushButton_coded3.hide()
-        self.ui.pushButton_coded1.clicked.connect(self.highlight_from_text_code1)
-        self.ui.pushButton_coded2.clicked.connect(self.highlight_from_text_code2)
-        self.ui.pushButton_coded3.clicked.connect(self.highlight_from_text_code3)
         self.ui.splitter.setSizes([150, 400])
         #self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
@@ -203,6 +203,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.mergeCharFormat(format)
         # Apply underlining in for selected coded text
         format = QtGui.QTextCharFormat()
+        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
         format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
         cursor = self.ui.textEdit.textCursor()
         for coded_text in self.code_text:
@@ -343,11 +344,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.filename is None:
             return
         if len(self.search_indices) == 0:
-           self.ui.pushButton_search_results.setEnabled(False)
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
         self.search_indices = []
         self.search_index = -1
         search_term = self.ui.lineEdit_search.text()
-        self.ui.pushButton_search_results.setText("0 / 0")
+        self.ui.label_search_totals.setText("0 / 0")
         if len(search_term) >= 2:
             pattern = None
             flags = 0
@@ -387,8 +389,25 @@ class DialogCodeText(QtWidgets.QWidget):
                     except:
                         logger.exception('Failed searching current file for %s',search_term)
                 if len(self.search_indices) > 0:
-                    self.ui.pushButton_search_results.setEnabled(True)
-                self.ui.pushButton_search_results.setText("0 / " + str(len(self.search_indices)))
+                    self.ui.pushButton_next.setEnabled(True)
+                    self.ui.pushButton_previous.setEnabled(True)
+                self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+
+    def move_to_previous_search_text(self):
+        """ Push button pressed to move to previous search text position. """
+
+        self.search_index -= 1
+        if self.search_index == -1:
+            self.search_index = len(self.search_indices) - 1
+        cur = self.ui.textEdit.textCursor()
+        prev_result = self.search_indices[self.search_index]
+        # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
+        if self.filename is None or self.filename['id'] != prev_result[0]['id']:
+            self.load_file(prev_result[0])
+        cur.setPosition(prev_result[1])
+        cur.setPosition(cur.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cur)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
@@ -404,7 +423,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.setPosition(next_result[1])
         cur.setPosition(cur.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cur)
-        self.ui.pushButton_search_results.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
@@ -1012,6 +1031,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
+        self.ui.lineEdit_search.setText("")
+        self.ui.label_search_totals.setText("0 / 0")
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update. """
@@ -1081,6 +1102,120 @@ class DialogCodeText(QtWidgets.QWidget):
                         formatB = QtGui.QTextCharFormat()
                         formatB.setFontWeight(QtGui.QFont.Bold)
                         cursor.mergeCharFormat(formatB)
+        self.apply_overline_to_overlaps()
+
+    def apply_overline_to_overlaps(self):
+        """ Apply overline format to coded text sections which are overlapping. """
+
+        overlapping = []
+        overlaps = []
+        for i in self.code_text:
+            #print(item['pos0'], type(item['pos0']), item['pos1'], type(item['pos1']))
+            for j in self.code_text:
+                if j != i:
+                    if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
+                        #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
+                        if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                            overlaps.append([j['pos0'], j['pos1']])
+                        elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                            overlaps.append([i['pos0'], i['pos1']])
+                        elif j['pos0'] > i['pos0']:
+                            overlaps.append([j['pos0'], i['pos1']])
+                        else:  # j['pos0'] < i['pos0']:
+                            overlaps.append([j['pos1'], i['pos0']])
+        #print(overlaps)
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        for o in overlaps:
+            fmt = QtGui.QTextCharFormat()
+            fmt.setFontOverline(True)
+            cursor.setPosition(o[0], QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
+            cursor.mergeCharFormat(fmt)
+
+    def combo_code_activated(self):
+        """ Combobox code item clicked on.
+        highlight this coded text. """
+
+        current_text = self.ui.comboBox_codes_in_text.currentText()
+        #print(current_text)
+        current_code = None
+        for code in self.codes:
+            if code['name'] == current_text:
+                current_code = code
+                break
+        if current_code is None:
+            return
+        #print(current_code)
+        pos = self.ui.textEdit.textCursor().position()
+        codes_here = []
+        for item in self.code_text:
+            if item['pos0'] <= pos and item['pos1'] >= pos and item['cid'] == current_code['cid']:
+                current_coded_text = item
+                break
+        #print(current_coded_text)
+        # remove formatting
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+        # reapply formatting
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(current_code['color']))
+        fmt.setBackground(brush)
+        cursor.setCharFormat(fmt)
+
+        self.apply_overline_to_overlaps()
+
+    def coded_in_text(self):
+        """ When coded text is clicked on, the code names at this location are
+        displayed in the combobox above the text edit widget.
+        Only enabled if 2 or more codes are here. """
+
+        self.ui.comboBox_codes_in_text.setEnabled(False)
+        self.ui.label_codes_count.setEnabled(False)
+        self.ui.label_codes_clicked_in_text.setEnabled(False)
+        pos = self.ui.textEdit.textCursor().position()
+        codes_here = []
+        for item in self.code_text:
+            if item['pos0'] <= pos and item['pos1'] >= pos:
+                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
+                for code in self.codes:
+                    if code['cid'] == item['cid']:
+                        codes_here.append(code)
+        # can show multiple codes for this location
+        fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
+        self.ui.comboBox_codes_in_text.clear()
+        code_names = []
+        for i, c in enumerate(codes_here):
+            code_names.append(c['name'])
+        #print(codes_here)
+        if len(codes_here) > 1:
+            self.ui.comboBox_codes_in_text.setEnabled(True)
+            self.ui.label_codes_count.setEnabled(True)
+            self.ui.label_codes_clicked_in_text.setEnabled(True)
+
+        self.ui.label_codes_count.setText(str(len(code_names)))
+        self.ui.comboBox_codes_in_text.addItems(code_names)
+        for i in range(0, len(code_names)):
+            self.ui.comboBox_codes_in_text.setItemData(i, code_names[i], QtCore.Qt.ToolTipRole)
+
+    def select_tree_item_by_code_name(self, codename):
+        """ Set a tree item code. This sill call fill_code_label and
+         put the selected code in the top left code label and
+         underline matching text in the textedit.
+         param:
+            codename: a string of the codename
+         """
+
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        while item:
+            if item.text(0) == codename:
+                self.ui.treeWidget.setCurrentItem(item)
+            it += 1
+            item = it.value()
+        self.fill_code_label()
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -1127,84 +1262,6 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.fill_code_counts_in_tree()
-
-    def coded_in_text(self):
-        """ When coded text is clicked on, the code name is displayed in the buttons above
-        the text edit widget. """
-
-        # default for anything uncoded
-        self.ui.pushButton_coded1.hide()
-        self.ui.pushButton_coded1.setToolTip("")
-        self.ui.pushButton_coded2.hide()
-        self.ui.pushButton_coded2.setToolTip("")
-        self.ui.pushButton_coded3.hide()
-        self.ui.pushButton_coded3.setToolTip("")
-
-        text = ""
-        self.ui.pushButton_coded1.setText(text)
-        self.ui.pushButton_coded2.setText(text)
-        self.ui.pushButton_coded3.setText(text)
-        pos = self.ui.textEdit.textCursor().position()
-        codes_here = []
-        for item in self.code_text:
-            if item['pos0'] <= pos and item['pos1'] >= pos:
-                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
-                for code in self.codes:
-                    if code['cid'] == item['cid']:
-                        codes_here.append(code)
-        # can show up to two codes for this location
-        fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
-        for i, c in enumerate(codes_here):
-            if i == 0:
-                self.ui.pushButton_coded1.setStyleSheet(fontsize + "background-color: " + c['color'])
-                self.ui.pushButton_coded1.setText(c['name'])
-                self.ui.pushButton_coded1.setToolTip(c['name'])
-                self.ui.pushButton_coded1.show()
-            if i == 1:
-                self.ui.pushButton_coded2.setStyleSheet(fontsize + "background-color: " + c['color'])
-                self.ui.pushButton_coded2.setText(c['name'])
-                self.ui.pushButton_coded2.setToolTip(c['name'])
-                self.ui.pushButton_coded2.show()
-            if i == 2:
-                self.ui.pushButton_coded3.setStyleSheet(fontsize + "background-color: " + c['color'])
-                self.ui.pushButton_coded3.setText(c['name'])
-                self.ui.pushButton_coded3.setToolTip(c['name'])
-                self.ui.pushButton_coded3.show()
-
-    def highlight_from_text_code1(self):
-        """ Coded in text button pressed. Highlight all coded text. """
-
-        codename = self.ui.pushButton_coded1.text()
-        self.select_tree_item_by_code_name(codename)
-
-    def highlight_from_text_code2(self):
-        """ Coded in text button pressed. Highlight all coded text. """
-
-        codename = self.ui.pushButton_coded2.text()
-        self.select_tree_item_by_code_name(codename)
-
-    def highlight_from_text_code3(self):
-        """ Coded in text button pressed. Highlight all coded text. """
-
-        codename = self.ui.pushButton_coded3.text()
-        self.select_tree_item_by_code_name(codename)
-
-    def select_tree_item_by_code_name(self, codename):
-        """ Set a tree item code. This sill call fill_code_label and
-         put the selected code in the top left code label and
-         underline matching text in the textedit.
-         param:
-            codename: a string of the codename
-         """
-
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        while item:
-            if item.text(0) == codename:
-                self.ui.treeWidget.setCurrentItem(item)
-            it += 1
-            item = it.value()
-        self.fill_code_label()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
@@ -1320,6 +1377,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Input dialog too narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
         dialog.setWindowTitle(_("Automatic coding"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
         dialog.setLabelText(_("Autocode files with the current code for this text:") +"\n" + item.text(0))
