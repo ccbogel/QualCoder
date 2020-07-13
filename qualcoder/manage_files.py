@@ -147,13 +147,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_alphabetic = 1
         action_date = 1
         action_type = 1
-        action_by_value = 1
+        action_equals_value = 1
+        action_order_by_value = 1
         if col < 4:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
             action_type = menu.addAction(_("File type order"))
         if col > 3:
-            action_by_value = menu.addAction(_("Show this value"))
+            action_equals_value = menu.addAction(_("Show this value"))
+            action_order_by_value = menu.addAction(_("Order by this attribute"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
@@ -174,7 +176,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_type:
             self.order_by = "filetype"
             self.load_file_data()
-        if action == action_by_value:
+        if action == action_order_by_value:
+            self.order_by = "attribute:" + str(col)
+            self.load_file_data()
+
+        if action == action_equals_value:
             # Hide rows that do not match this value, text can be None type
             # Cell items can be None or exist with ''
             for r in range(0, self.ui.tableWidget.rowCount()):
@@ -185,6 +191,30 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if text is not None and (item is None or item.text().find(text) == -1):
                     self.ui.tableWidget.setRowHidden(r, True)
 
+    def check_attribute_placeholders(self):
+        """ Files can be added after attributes are in the project.
+         Need to add placeholder attribute values for these, if missing. """
+
+        cur = self.app.conn.cursor()
+        sql = "select id from source "
+        cur.execute(sql)
+        sources = cur.fetchall()
+        sql = 'select name from attribute_type where caseOrFile ="file"'
+        cur.execute(sql)
+        attr_types = cur.fetchall()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for s in sources:
+            for a in attr_types:
+                sql = "select value from attribute where id=? and name=?"
+                cur.execute(sql, (s[0], a[0]))
+                res = cur.fetchone()
+                #print("file", s[0],"attr", a[0], " res", res, type(res))
+                if res is None:
+                    print("No attr placeholder found")
+                    placeholders = [a[0], s[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
+                    cur.execute(insert_sql, placeholders)
+                    self.app.conn.commit()
+
     def load_file_data(self):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question.
@@ -193,6 +223,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         video files.
         """
 
+        # check a placeholder attribute is present for the file
+        # add if missing
+        self.check_attribute_placeholders()
         self.source = []
         cur = self.app.conn.cursor()
         # default alphabetic order
@@ -201,6 +234,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
         if self.order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
+        if self.order_by[:10] == "attribute:":
+            col = self.order_by[10:]
+            #TODO sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
         cur.execute(sql)
         result = cur.fetchall()
         for row in result:
@@ -679,6 +715,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
+
+        # Add file attribute placeholders
+        att_sql = 'select name from attribute_type where caseOrFile ="file"'
+        cur.execute(att_sql)
+        attr_types = cur.fetchall()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for a in attr_types:
+            placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
+            cur.execute(insert_sql, placeholders)
+            self.app.conn.commit()
+
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
@@ -786,6 +833,18 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("select last_insert_rowid()")
             id_ = cur.fetchone()[0]
             entry['id'] = id_
+
+            # Add file attribute placeholders
+            att_sql = 'select name from attribute_type where caseOrFile ="file"'
+            cur.execute(att_sql)
+            attr_types = cur.fetchall()
+            insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+            for a in attr_types:
+                placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    self.app.settings['codername']]
+                cur.execute(insert_sql, placeholders)
+                self.app.conn.commit()
+
             self.parent_textEdit.append(entry['name'] + _(" imported."))
             self.source.append(entry)
 
@@ -892,6 +951,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
+
+        # Add file attribute placeholders
+        att_sql = 'select name from attribute_type where caseOrFile ="file"'
+        cur.execute(att_sql)
+        attr_types = cur.fetchall()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for a in attr_types:
+            placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
+            cur.execute(insert_sql, placeholders)
+            self.app.conn.commit()
+
         self.parent_textEdit.append(entry['name'] + _(" imported."))
         self.source.append(entry)
 
