@@ -699,9 +699,28 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
+
+        # hide select buttons if there are no files, cases or attributes
+        cur = self.app.conn.cursor()
+        sql = "select count(id) from source"
+        cur.execute(sql)
+        res = cur.fetchone()
+        if res[0] == 0:
+            self.ui.pushButton_fileselect.setEnabled(False)
         self.ui.pushButton_fileselect.clicked.connect(self.select_files)
+        sql = "select count(caseid) from cases"
+        cur.execute(sql)
+        res = cur.fetchone()
+        if res[0] == 0:
+            self.ui.pushButton_caseselect.setEnabled(False)
         self.ui.pushButton_caseselect.clicked.connect(self.select_cases)
+        sql = "select count(name) from attribute_type"
+        cur.execute(sql)
+        res = cur.fetchone()
+        if res[0] == 0:
+            self.ui.pushButton_attributeselect.setEnabled(False)
         self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
+
         self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
         self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
         self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
