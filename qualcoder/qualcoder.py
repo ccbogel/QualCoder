@@ -163,9 +163,19 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames. """
+        """ Get all filenames. As id, name """
         cur = self.conn.cursor()
         cur.execute("select id, name from source order by lower(name)")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1]})
+        return res
+
+    def get_casenames(self):
+        """ Get all casenames. As id, name """
+        cur = self.conn.cursor()
+        cur.execute("select caseid, name from cases order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:

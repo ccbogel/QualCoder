@@ -1807,8 +1807,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         tooltip = _("Files selected:")
         if ok:
             tmp_ids = ""
-            selectedFiles = ui.get_selected()  # list of dictionaries
-            for row in selectedFiles:
+            selected_files = ui.get_selected()  # list of dictionaries
+            for row in selected_files:
                 tmp_ids += "," + str(row['id'])
                 tooltip += " " + row['name']
             if len(tmp_ids) > 0:
@@ -1828,28 +1828,29 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
-        casenames = []
         self.file_ids = ""
-        self.case_ids = ""
         self.attribute_selection = []
-        cur = self.app.conn.cursor()
-        cur.execute("select caseid, name from cases order by lower(name)")
-        result = cur.fetchall()
-        for row in result:
-            casenames.append({'caseid': row[0], 'name': row[1]})
+        casenames = self.app.get_casenames()
+        print(casenames)
+        self.case_ids = ""
+        for row in casenames:
+            self.case_ids += "," + str(row['id'])
+        self.case_ids = self.case_ids[1:]
         ui = DialogSelectFile(casenames, _("Select cases to view"), "many")
         ok = ui.exec_()
         tooltip = _("Cases selected:")
         if ok:
             tmp_ids = ""
-            selectedCases = ui.get_selected()  # list of dictionaries
-            for row in selectedCases:
-                tmp_ids += "," + str(row['caseid'])
+            selected_cases = ui.get_selected()  # list of dictionaries
+            for row in selected_cases:
+                tmp_ids += "," + str(row['id'])
                 tooltip += " " + row['name']
             if len(tmp_ids) > 0:
                 self.case_ids = tmp_ids[1:]
                 self.ui.pushButton_caseselect.setToolTip(tooltip)
                 self.ui.label_selections.setText(tooltip)
+            else:
+                self.ui.label_selections.setText(_("Cases selected: All"))
 
 
 class ToolTip_EventFilter(QtCore.QObject):
