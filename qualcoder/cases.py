@@ -439,7 +439,7 @@ class DialogCases(QtWidgets.QDialog):
             if self.cases[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Yes")))
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             self.app.delete_backup = False
 
     def fill_tableWidget(self):
@@ -458,7 +458,7 @@ class DialogCases(QtWidgets.QDialog):
             memotmp = c['memo']
             if memotmp is not None and memotmp != "":
                 self.ui.tableWidget.setItem(row, self.MEMO_COLUMN,
-                QtWidgets.QTableWidgetItem(_("Yes")))
+                QtWidgets.QTableWidgetItem(_("Memo")))
             cid = c['caseid']
             if cid is None:
                 cid = ""
