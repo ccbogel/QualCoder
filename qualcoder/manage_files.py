@@ -122,6 +122,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export.clicked.connect(self.export)
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.order_by = ""
@@ -322,6 +323,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + valuetype)
 
+    def cell_double_clicked(self):
+        """  """
+
+        x = self.ui.tableWidget.currentRow()
+        y = self.ui.tableWidget.currentColumn()
+
+        if y == self.NAME_COLUMN:
+            self.view()
+
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
@@ -330,8 +340,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
 
-        if y == self.NAME_COLUMN:
-            self.view()
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
