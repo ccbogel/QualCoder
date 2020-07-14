@@ -154,7 +154,7 @@ class App(object):
 
     def get_code_names(self):
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -165,7 +165,7 @@ class App(object):
     def get_filenames(self):
         """ Get all filenames. """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source")
+        cur.execute("select id, name from source order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -469,6 +469,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionText_mining.setVisible(False)
 
     def settings_report(self):
+        """ Display general settings and project summary """
         msg = _("Settings")
         msg += "\n========\n"
         msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
@@ -917,6 +918,36 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['memo'] = result[2]
         self.project['about'] = result[3]
 
+        details = ""
+        sql = "select memo from project"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Project memo: ") + str(res[0]) + "\n"
+        sql = "select count(id) from source"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Files: ") + str(res[0]) + "\n"
+        sql = "select count(caseid) from cases"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Cases: ") + str(res[0]) + "\n"
+        sql = "select count(catid) from code_cat"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Code categories: ") + str(res[0]) + "\n"
+        sql = "select count(cid) from code_name"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Codes: ") + str(res[0]) + "\n"
+        sql = "select count(attrid) from attribute"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Attributes: ") + str(res[0]) + "\n"
+        sql = "select count(jid) from journal"
+        cur.execute(sql)
+        res = cur.fetchone()
+        details += _("Journals: ") + str(res[0]) + "\n"
+
         # check avid column in code_text table
         # database version < 2
         try:
@@ -944,14 +975,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.delete_backup_path_name = backup
             delete_backup = True
 
-        self.ui.textEdit.append(_("Project Opened: ") + self.app.project_name
-            + "\n========\n"
-            + _("Path: ") + self.app.project_path + "\n"
-            + _("Directory: ") + self.app.settings['directory'] + "\n"
-            + _("Database version: ") + self.project['databaseversion'] + ". "
-            + _("Date: ") + str(self.project['date']) + "\n"
-            + _("About: ") + self.project['about']
-            + "\n========\n")
+        msg = "\n========\n" + _("Project Opened: ") + self.app.project_name + "\n"
+        msg += _("Path: ") + self.app.project_path + "\n"
+        msg += _("Directory: ") + self.app.settings['directory'] + "\n"
+        msg += _("Database version: ") + self.project['databaseversion'] + ". "
+        msg+= _("Date: ") + str(self.project['date']) + "\n"
+        #msg += _("About: ") + self.project['about'] + "\n"
+        msg += details + "========\n"
+        self.ui.textEdit.append(msg)
         self.show_menu_options()
 
     def close_project(self):
