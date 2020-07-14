@@ -97,7 +97,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        self.ui.pushButton_addfiles.clicked.connect(self.add_file_to_case)
+        self.ui.pushButton_addfiles.clicked.connect(self.add_selected_files_to_case)
         self.ui.pushButton_openfile.clicked.connect(self.select_file)
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.pushButton_autoassign.clicked.connect(self.automark)
@@ -475,9 +475,9 @@ class DialogCases(QtWidgets.QDialog):
         if self.app.settings['showids'] == 'True':
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
 
-    def add_file_to_case(self):
+    def add_selected_files_to_case(self):
         """ When select file button is pressed a dialog of filenames is presented to the user.
-        The entire text of the selected file is then added to the selected case.
+        The entire text of the selected files is then added to the selected case.
         """
 
         x = self.ui.tableWidget.currentRow()
@@ -485,36 +485,56 @@ class DialogCases(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _('Warning'), _("No case was selected"))
             return
         ui = DialogSelectFile(self.source,
-        _("Select entire file for case: ") + self.cases[x]['name'], "single")
+        _("Select entire file for case: ") + self.cases[x]['name'], "multiple")
         ok = ui.exec_()
         if not ok:
             return
-        casefile = ui.get_selected()
-        #logger.debug(casefile)
+        file_list = ui.get_selected()
+        if file_list == []:  # if not file_list
+            return
+        msg = ""
+        for file_to_add_to_case in file_list:
+            msg += self.add_file_to_case(x, file_to_add_to_case)
+        QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
+        self.parent_textEdit.append(msg)
+        self.app.delete_backup = False
+
+    #TODO Remove file from case
+    def remove_file_from_case(self, x):
+        pass
+
+    def add_file_to_case(self, x, casefile):
+        """ The entire text of the selected file is added to the selected case.
+        Also a non-text file is linked to to the case here. The text positions will be 0 and 0.
+        param:
+            x: integer of the current selected case
+            casefile: dictionary of name, id, fulltext, mediapath, memo, owner, date
+        return:
+            msg: string message for link process or error
+        """
+
         text_len = 0
         if casefile['fulltext'] is not None:
             text_len = len(casefile['fulltext'])
-        newlink = {'caseid': self.cases[x]['caseid'], 'fid': casefile['id'], 'pos0': 0,
+        link = {'caseid': self.cases[x]['caseid'], 'fid': casefile['id'], 'pos0': 0,
         'pos1': text_len, 'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
         cur = self.app.conn.cursor()
-        # check for an existing duplicated liked file first
+        # check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
-            (newlink['caseid'], newlink['fid'], newlink['pos0'], newlink['pos1']))
+            (link['caseid'], link['fid'], link['pos0'], link['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Linked"),
-            _("This file has already been linked to this case"))
-            return
+            msg = _("This file has already been linked to this case ") + casefile['name']
+            return msg
+        # even non-text files can be assigned tothe case here
         cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
-            ,(newlink['caseid'],newlink['fid'],newlink['pos0'],newlink['pos1'],
-            newlink['owner'],newlink['date'], newlink['memo']))
+            ,(link['caseid'], link['fid'], link['pos0'], link['pos1'],
+            link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
-        msg = casefile['name'] + _(" added to case.")
-        QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
-        self.parent_textEdit.append(msg)
-        self.app.delete_backup = False
+        msg = casefile['name'] + _(" added to case.") + "\n"
+        return msg
 
     def select_file(self):
         """ When open file button is pressed a dialog of filenames is presented to the user.
