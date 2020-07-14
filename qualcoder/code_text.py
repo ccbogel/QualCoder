@@ -1138,7 +1138,6 @@ class DialogCodeText(QtWidgets.QWidget):
         highlight this coded text. """
 
         current_text = self.ui.comboBox_codes_in_text.currentText()
-        #print(current_text)
         current_code = None
         for code in self.codes:
             if code['name'] == current_text:
@@ -1165,6 +1164,7 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setBackground(brush)
         cursor.setCharFormat(fmt)
 
+        self.select_tree_item_by_code_name(current_text)
         self.apply_overline_to_overlaps()
 
     def coded_in_text(self):
