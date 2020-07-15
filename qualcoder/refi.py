@@ -572,7 +572,7 @@ class Refi_import():
                 self._load_codings_for_picture(id_, e)
 
     def _load_codings_for_picture(self, id_, element):
-        ''' Load coded rectangles for pictures
+        """ Load coded rectangles for pictures
         Example format:
         <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1"
         firstX="783" firstY="1238" secondX="1172" secondY="1788"
@@ -581,7 +581,7 @@ class Refi_import():
         <Coding guid="7a7e80ca-ed8c-4006-86b3-731e36baca19" creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" >
         <CodeRef targetGUID="1b594544-2954-4b67-86ff-fb552f090ba8"/>
         </Coding></PictureSelection>
-        '''
+        """
 
         firstX = int(element.get("firstX"))
         firstY = int(element.get("firstY"))
@@ -1072,6 +1072,7 @@ class Refi_export(QtWidgets.QDialog):
             msg += "\nErrors: "
             msg += txt_errors
         QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
+        self.parent_textEdit.append(_("Project exported") + "\n" + _(msg))
 
     def export_codebook(self):
         """ Export REFI format codebook. """
@@ -1090,9 +1091,11 @@ class Refi_export(QtWidgets.QDialog):
             msg = "Codebook has been exported to "
             msg += filename
             QtWidgets.QMessageBox.information(None, _("Codebook exported"), _(msg))
+            self.parent_textEdit.append(_("Codebook exported") +"\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
             QtWidgets.QMessageBox.information(None, _("Codebook NOT exported"), str(e))
+            self.parent_textEdit.append(_("Codebook NOTexported") + "\n" + _(msg))
 
     def user_guid(self, username):
         """ Requires a username. returns matching guid """
