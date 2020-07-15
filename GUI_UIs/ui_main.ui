@@ -33,12 +33,19 @@
     <property name="title">
      <string>Project</string>
     </property>
+    <widget class="QMenu" name="menuOpen_Recent_Project">
+     <property name="title">
+      <string>Open Recent Project</string>
+     </property>
+     <addaction name="actionNone"/>
+    </widget>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
-    <addaction name="actionOpen_Recent_Project"/>
+    <addaction name="menuOpen_Recent_Project"/>
     <addaction name="actionClose_Project"/>
     <addaction name="actionProject_Memo"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionProject_summary"/>
     <addaction name="separator"/>
     <addaction name="actionREFI_Codebook_export"/>
     <addaction name="actionProject_Exchange_Export"/>
@@ -285,9 +292,14 @@
     <string>RQDA Project import</string>
    </property>
   </action>
-  <action name="actionOpen_Recent_Project">
+  <action name="actionProject_summary">
    <property name="text">
-    <string>Open Recent Project</string>
+    <string>Project summary</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="text">
+    <string>None</string>
    </property>
   </action>
  </widget>
