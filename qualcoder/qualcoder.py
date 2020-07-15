@@ -114,19 +114,35 @@ class App(object):
         self.settings = self.load_settings()
 
     def read_previous_project_paths(self):
-        """ Recent project path is stored in .qualcoder/recent_projects.txt """
+        """ Recent project path is stored in .qualcoder/recent_projects.txt
+        Also remove paths that no longer exist. """
 
-        result = []
+        previous = []
         try:
             with open(self.persist_path, 'r') as f:
                 for line in f:
-                    result.append(line.strip())
+                    previous.append(line.strip())
         except:
             logger.debug('No previous projects found')
+
+        # check and remove paths that no longer exist
+        result = []
+        for p in previous:
+            if os.path.exists(p):
+                if p not in result:
+                    result.append(p)
+        if previous != result:
+            with open(self.persist_path, 'w') as f:
+                for i, line in enumerate(reversed(result)):
+                    f.write(line)
+                    f.write(os.linesep)
+                    if i > 10:
+                        break
         return result
 
     def append_recent_project(self, path):
-        """ Add project path as first entry to .qualcoder/recent_projects.txt """
+        """ Add project path as first entry to .qualcoder/recent_projects.txt
+        """
 
         result = self.read_previous_project_paths()
         if not result or path != result[0]:
@@ -349,6 +365,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
     dialogList = []  # keeps active and track of non-modal windows
+    recent_projects = []  # a list of recent projects for the qmenu
 
     def __init__(self, app, force_quit=False):
         """ Set up user interface from ui_main.py file. """
@@ -371,46 +388,125 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # project menu
         self.ui.actionCreate_New_Project.triggered.connect(self.new_project)
+        self.ui.actionCreate_New_Project.setShortcut('Ctrl+N')
         self.ui.actionOpen_Project.triggered.connect(self.open_project)
-        self.ui.actionOpen_Recent_Project.triggered.connect(self.open_recent_project)
+        self.ui.actionOpen_Project.setShortcut('Ctrl+O')
+        #self.ui.actionOpen_Recent_Project.triggered.connect(self.open_recent_project)
+        self.fill_recent_projects_menu_actions()
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
+        self.ui.actionProject_Memo.setShortcut('Ctrl+M')
         self.ui.actionClose_Project.triggered.connect(self.close_project)
+        self.ui.actionClose_Project.setShortcut('Ctrl+X')
         self.ui.actionSettings.triggered.connect(self.change_settings)
+        self.ui.actionSettings.setShortcut('Ctrl+S')
+        self.ui.actionProject_summary.triggered.connect(self.project_summary_report)
+        self.ui.actionProject_summary.setShortcut('Alt+S')
         self.ui.actionProject_Exchange_Export.triggered.connect(self.REFI_project_export)
         self.ui.actionREFI_Codebook_export.triggered.connect(self.REFI_codebook_export)
         self.ui.actionREFI_Codebook_import.triggered.connect(self.REFI_codebook_import)
         self.ui.actionREFI_QDA_Project_import.triggered.connect(self.REFI_project_import)
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
         self.ui.actionExit.triggered.connect(self.closeEvent)
+        self.ui.actionExit.setShortcut('Ctrl+Q')
 
         # file cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
+        self.ui.actionManage_files.setShortcut('Ctrl+F')
         self.ui.actionManage_journals.triggered.connect(self.journals)
+        self.ui.actionManage_journals.setShortcut('Ctrl+J')
         self.ui.actionManage_cases.triggered.connect(self.manage_cases)
+        self.ui.actionManage_cases.setShortcut('Ctrl+C')
         self.ui.actionManage_attributes.triggered.connect(self.manage_attributes)
+        self.ui.actionManage_attributes.setShortcut('Ctrl+A')
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
+        self.ui.actionImport_survey.setShortcut('Alt+I')
 
         # codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
+        self.ui.actionCodes.setShortcut('Ctrl+T')
         self.ui.actionCode_image.triggered.connect(self.image_coding)
+        self.ui.actionCode_image.setShortcut('Ctrl+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
+        self.ui.actionCode_audio_video.setShortcut('Ctrl+V')
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
         # reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
+        self.ui.actionCoding_reports.setShortcut('Ctrl+R')
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
+        self.ui.actionView_Graph.setShortcut('Ctrl+G')
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
         # help menu
         self.ui.actionContents.triggered.connect(self.help)
+        self.ui.actionContents.setShortcut('Ctrl+H')
         self.ui.actionAbout.triggered.connect(self.about)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.settings_report()
+
+    def fill_recent_projects_menu_actions(self):
+        """ Get the recent projects from the .qualcoder txt file.
+        Add up to 7 recent projects to the menu. """
+
+        self.recent_projects = self.app.read_previous_project_paths()
+        if len(self.recent_projects) > 0:
+            self.ui.menuOpen_Recent_Project.removeAction(self.ui.actionNone)
+        #TODO must be a better way to do this
+        for i, r in enumerate(self.recent_projects):
+            if i == 0:
+                action0 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action0)
+                action0.triggered.connect(self.project0)
+            if i == 1:
+                action1 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action1)
+                action1.triggered.connect(self.project1)
+            if i == 2:
+                action2 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action2)
+                action2.triggered.connect(self.project2)
+            if i == 3:
+                action3 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action3)
+                action3.triggered.connect(self.project3)
+            if i == 4:
+                action4 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action4)
+                action4.triggered.connect(self.project4)
+            if i == 5:
+                action5 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action5)
+                action5.triggered.connect(self.project5)
+            if i == 6:
+                action6 = QtWidgets.QAction(r, self)
+                self.ui.menuOpen_Recent_Project.addAction(action5)
+                action6.triggered.connect(self.project6)
+
+    def project0(self):
+        self.open_project(self.recent_projects[0])
+
+    def project1(self):
+        self.open_project(self.recent_projects[1])
+
+    def project2(self):
+        self.open_project(self.recent_projects[2])
+
+    def project3(self):
+        self.open_project(self.recent_projects[3])
+
+    def project4(self):
+        self.open_project(self.recent_projects[4])
+
+    def project5(self):
+        self.open_project(self.recent_projects[5])
+
+    def project5(self):
+        self.open_project(self.recent_projects[6])
 
     def hide_menu_options(self):
         """ No project opened, hide most menu options.
@@ -851,7 +947,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    def open_recent_project(self):
+    '''def open_recent_project(self):
         """ Present recent projects for user to select from and open. """
 
         projects_with_duplicates = self.app.read_previous_project_paths()
@@ -865,7 +961,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         project = ui.get_selected()  # list of dictionaries
         project_path = project['name']
-        self.open_project(project_path)
+        self.open_project(project_path)'''
 
     def open_project(self, path="", newproject="no"):
         """ Open an existing project.
@@ -882,6 +978,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.app.project_name != "":
             self.close_project()
+
         self.setWindowTitle("QualCoder" + _("Open Project"))
         default_directory = self.app.settings['directory']
         if path == "" or path is False:
@@ -916,50 +1013,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.settings['codername'] = names[0]
             self.app.write_config_ini(self.app.settings)
             self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
-
         # get and display some project details
         self.app.append_recent_project(self.app.project_path)
         self.setWindowTitle("QualCoder " + self.app.project_name)
-        cur = self.app.conn.cursor()
-        cur.execute("select databaseversion, date, memo, about from project")
-        result = cur.fetchall()[-1]
-        self.project['databaseversion'] = result[0]
-        self.project['date'] = result[1]
-        self.project['memo'] = result[2]
-        self.project['about'] = result[3]
-
-        details = ""
-        sql = "select memo from project"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Project memo: ") + str(res[0]) + "\n"
-        sql = "select count(id) from source"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Files: ") + str(res[0]) + "\n"
-        sql = "select count(caseid) from cases"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Cases: ") + str(res[0]) + "\n"
-        sql = "select count(catid) from code_cat"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Code categories: ") + str(res[0]) + "\n"
-        sql = "select count(cid) from code_name"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Codes: ") + str(res[0]) + "\n"
-        sql = "select count(attrid) from attribute"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Attributes: ") + str(res[0]) + "\n"
-        sql = "select count(jid) from journal"
-        cur.execute(sql)
-        res = cur.fetchone()
-        details += _("Journals: ") + str(res[0]) + "\n"
+        self.project_summary_report()
 
         # check avid column in code_text table
         # database version < 2
+        cur = self.app.conn.cursor()
         try:
             cur.execute("select avid from code_text")
         except:
@@ -985,15 +1046,59 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.delete_backup_path_name = backup
             delete_backup = True
 
-        msg = "\n========\n" + _("Project Opened: ") + self.app.project_name + "\n"
+        msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
+        self.ui.textEdit.append(msg)
+        self.project_summary_report()
+        self.show_menu_options()
+
+    def project_summary_report(self):
+        """ Add a summary of the project to the tet edit.
+         Display project memo, and code, attribute, journal, files frequencies."""
+
+        cur = self.app.conn.cursor()
+        cur.execute("select databaseversion, date, memo, about from project")
+        result = cur.fetchall()[-1]
+        self.project['databaseversion'] = result[0]
+        self.project['date'] = result[1]
+        self.project['memo'] = result[2]
+        #self.project['about'] = result[3]
+        msg = "========\n"
+        msg += _("Date time now:") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\n"
+        msg += self.app.project_name + "\n"
         msg += _("Path: ") + self.app.project_path + "\n"
         msg += _("Directory: ") + self.app.settings['directory'] + "\n"
-        msg += _("Database version: ") + self.project['databaseversion'] + ". "
-        msg+= _("Date: ") + str(self.project['date']) + "\n"
-        #msg += _("About: ") + self.project['about'] + "\n"
-        msg += details + "========\n"
+        #msg += _("Database version: ") + self.project['databaseversion'] + ". "
+        msg+= _("Project date: ") + str(self.project['date']) + "\n"
+        sql = "select memo from project"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Project memo: ") + str(res[0]) + "\n"
+        sql = "select count(id) from source"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Files: ") + str(res[0]) + "\n"
+        sql = "select count(caseid) from cases"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Cases: ") + str(res[0]) + "\n"
+        sql = "select count(catid) from code_cat"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Code categories: ") + str(res[0]) + "\n"
+        sql = "select count(cid) from code_name"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Codes: ") + str(res[0]) + "\n"
+        sql = "select count(name) from attribute_type"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Attributes: ") + str(res[0]) + "\n"
+        sql = "select count(jid) from journal"
+        cur.execute(sql)
+        res = cur.fetchone()
+        msg += _("Journals: ") + str(res[0]) + "\n"
+        msg += "========\n"
         self.ui.textEdit.append(msg)
-        self.show_menu_options()
 
     def close_project(self):
         """ Close an open project. """
