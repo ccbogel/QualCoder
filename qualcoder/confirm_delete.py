@@ -47,9 +47,9 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogConfirmDelete(QtWidgets.QDialog):
-    ''' A generic confirm delete dialog '''
-
-    labelText = ""
+    """ Generic conform delete dialog, showing some text.
+    param:
+        text: a string for display """
 
     def __init__(self, text):
 

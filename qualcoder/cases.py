@@ -69,6 +69,8 @@ class DialogCases(QtWidgets.QDialog):
     NAME_COLUMN = 0  # also primary key
     MEMO_COLUMN = 1
     ID_COLUMN = 2
+    FILES_COLUMN = 3
+    header_labels = []
     app = None
     parent_textEdit = None
     source = []
@@ -99,6 +101,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.pushButton_addfiles.clicked.connect(self.add_selected_files_to_case)
         self.ui.pushButton_openfile.clicked.connect(self.select_file)
+        self.ui.pushButton_remove_file.clicked.connect(self.remove_file_from_case)
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.pushButton_autoassign.clicked.connect(self.automark)
         self.ui.pushButton_view.clicked.connect(self.view)
@@ -129,13 +132,16 @@ class DialogCases(QtWidgets.QDialog):
         cur.execute("select name, memo, owner, date, caseid from cases")
         result = cur.fetchall()
         for row in result:
+            sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+            cur.execute(sql, [row[4], ])
+            files = cur.fetchall()
             self.cases.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'caseid': row[4]})
+            'caseid': row[4], 'files': files})
         cur.execute("select name from attribute_type where caseOrFile='case'")
         attribute_names = cur.fetchall()
-        self.headerLabels = ["Name", "Memo", "Id"]
+        self.header_labels = ["Name", "Memo", "Id", "Files"]
         for i in attribute_names:
-            self.headerLabels.append(i[0])
+            self.header_labels.append(i[0])
         sql = "select attribute.name, value, id from attribute where attr_type='case'"
         cur.execute(sql)
         result = cur.fetchall()
@@ -309,7 +315,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         # update case list and database
         item = {'name': newCaseText, 'memo': "", 'owner': self.app.settings['codername'],
-                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
         cur = self.app.conn.cursor()
         cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
             ,(item['name'],item['memo'],item['owner'],item['date']))
@@ -388,7 +394,7 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.item(x, y).setText(self.cases[x]['name'])
         if y > 2:  # update attribute value
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
-            attribute_name = self.headerLabels[y]
+            attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
             (value, self.cases[x]['caseid'], attribute_name))
@@ -442,6 +448,15 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             self.app.delete_backup = False
 
+        if y == self.FILES_COLUMN:
+            # list of dictionary of names
+            filenames = []
+            for f in self.cases[x]['files']:
+                filenames.append({'name': f[1]})
+            ui = DialogSelectFile(filenames, _("Files for case: ") + self.cases[x]['name'], "multiple")
+            ok = ui.exec_()
+            # file_list = ui.get_selected()
+
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
 
@@ -449,8 +464,8 @@ class DialogCases(QtWidgets.QDialog):
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
 
-        self.ui.tableWidget.setColumnCount(len(self.headerLabels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(self.headerLabels)
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         for row, c in enumerate(self.cases):
             self.ui.tableWidget.insertRow(row)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN,
@@ -462,10 +477,17 @@ class DialogCases(QtWidgets.QDialog):
             cid = c['caseid']
             if cid is None:
                 cid = ""
-            self.ui.tableWidget.setItem(row, self.ID_COLUMN, QtWidgets.QTableWidgetItem(str(cid)))
+            item = QtWidgets.QTableWidgetItem(str(cid))
+            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            self.ui.tableWidget.setItem(row, self.ID_COLUMN, item)
+            # Number of files assigned to case
+            item = QtWidgets.QTableWidgetItem(str(len(c['files'])))
+            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
+
             # add the attribute values
             for a in self.attributes:
-                for col, header in enumerate(self.headerLabels):
+                for col, header in enumerate(self.header_labels):
                     if cid == a[2] and a[0] == header:
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.verticalHeader().setVisible(False)
@@ -495,13 +517,61 @@ class DialogCases(QtWidgets.QDialog):
         msg = ""
         for file_to_add_to_case in file_list:
             msg += self.add_file_to_case(x, file_to_add_to_case)
+        # update files assigned to the case
+        cur = self.app.conn.cursor()
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+        cur.execute(sql, [self.cases[x]['caseid'], ])
+        files = cur.fetchall()
+        self.cases[x]['files'] = files
+        self.fill_tableWidget()
         QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
         self.parent_textEdit.append(msg)
         self.app.delete_backup = False
 
     #TODO Remove file from case
     def remove_file_from_case(self, x):
-        pass
+        """ Remove file from case """
+
+        x = self.ui.tableWidget.currentRow()
+        if x == -1:
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No case was selected"))
+            return
+        # list of dictionary of names
+        filenames = []
+        for f in self.cases[x]['files']:
+            filenames.append({'name': f[1]})
+        ui = DialogSelectFile(filenames, _("Remove files from case: ") + self.cases[x]['name'], "multiple")
+        ok = ui.exec_()
+        files_to_remove_list = ui.get_selected()
+        files_to_remove = ""
+        for f in files_to_remove_list:
+            files_to_remove += "\n" + f['name']
+        if not ok or files_to_remove_list == []:
+            return
+        ui = DialogConfirmDelete(files_to_remove)
+        ok = ui.exec_()
+        if not ok:
+            return
+        cur = self.app.conn.cursor()
+        sql = "delete from case_text where caseid=? and fid=?"
+        for f in files_to_remove_list:
+            fid = None
+            for f_tup in self.cases[x]['files']:
+                if f_tup[1] == f['name']:
+                    fid = f_tup[0]
+            try:
+                cur.execute(sql, [self.cases[x]['caseid'], fid])
+                self.app.conn.commit()
+                self.parent_textEdit.append(f['name'] + " removed from case " + self.cases[x]['name'])
+            except Exception as e:
+                print(e)
+                logger.debug(str(e))
+        # update files in case
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+        cur.execute(sql, [self.cases[x]['caseid'], ])
+        files = cur.fetchall()
+        self.cases[x]['files'] = files
+        self.fill_tableWidget()
 
     def add_file_to_case(self, x, casefile):
         """ The entire text of the selected file is added to the selected case.
