@@ -175,7 +175,7 @@
        <rect>
         <x>990</x>
         <y>40</y>
-        <width>171</width>
+        <width>191</width>
         <height>32</height>
        </rect>
       </property>
@@ -210,6 +210,19 @@
       </property>
       <property name="text">
        <string>Add attribute</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_remove_file">
+      <property name="geometry">
+       <rect>
+        <x>990</x>
+        <y>0</y>
+        <width>191</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove file</string>
       </property>
      </widget>
     </widget>
