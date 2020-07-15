@@ -39,6 +39,23 @@
      </property>
      <addaction name="actionNone"/>
     </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionProject_Exchange_Export"/>
+     <addaction name="actionREFI_Codebook_export"/>
+     <addaction name="actionExport_codebook"/>
+    </widget>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <addaction name="actionImport_survey"/>
+     <addaction name="actionREFI_Codebook_import"/>
+     <addaction name="actionREFI_QDA_Project_import"/>
+     <addaction name="actionRQDA_Project_import"/>
+    </widget>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
     <addaction name="menuOpen_Recent_Project"/>
@@ -47,11 +64,8 @@
     <addaction name="actionSettings"/>
     <addaction name="actionProject_summary"/>
     <addaction name="separator"/>
-    <addaction name="actionREFI_Codebook_export"/>
-    <addaction name="actionProject_Exchange_Export"/>
-    <addaction name="actionREFI_Codebook_import"/>
-    <addaction name="actionREFI_QDA_Project_import"/>
-    <addaction name="actionRQDA_Project_import"/>
+    <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -62,7 +76,6 @@
     <addaction name="actionManage_files"/>
     <addaction name="actionManage_cases"/>
     <addaction name="actionManage_journals"/>
-    <addaction name="actionImport_survey"/>
     <addaction name="actionManage_attributes"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
@@ -72,7 +85,6 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
-    <addaction name="actionExport_codebook"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
@@ -280,11 +292,6 @@
   <action name="actionREFI_QDA_Project_import">
    <property name="text">
     <string>REFI-QDA Project import</string>
-   </property>
-  </action>
-  <action name="actionView_Graph_2">
-   <property name="text">
-    <string>View Graph 2</string>
    </property>
   </action>
   <action name="actionRQDA_Project_import">
