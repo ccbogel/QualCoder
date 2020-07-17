@@ -683,6 +683,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCases":
+                d.show()
                 return
         ui = DialogCases(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -696,6 +697,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogManageFiles":
+                d.show()
                 return
         ui = DialogManageFiles(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -707,6 +709,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogJournals":
+                d.show()
                 return
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
