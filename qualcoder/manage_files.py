@@ -1051,109 +1051,135 @@ class DialogManageFiles(QtWidgets.QDialog):
             _("Select directory to save file"), os.getenv('HOME'), options)
         if directory == "":
             return
-        x = self.ui.tableWidget.currentRow()
-        filename = self.source[x]['name']
-        msg = directory + "/" + filename
-        filename_txt = None
-        if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
-            filename_txt = filename[0:len(filename) - 5] + ".txt"
-        if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
-            filename_txt = filename[0:len(filename) - 4] + ".txt"
-        # Below is for transcribed files and for user created text files within QualCoder
-        if self.source[x]['mediapath'] is None and filename_txt is None:
-            filename_txt = filename + ".txt"
-            msg = ""  # added to below
-        if filename_txt is not None:
-            filename_txt = directory + "/" + filename_txt
-            #logger.info(_("Exporting to ") + filename)
-            filedata = self.source[x]['fulltext']
-            f = open(filename_txt, 'w')
-            f.write(filedata)
-            f.close()
-        # export audio, video, picture files
-        if self.source[x]['mediapath'] is not None:
-            file_path = self.app.project_path + self.source[x]['mediapath']
-            destination = directory + "/" + filename
-            try:
-                copyfile(file_path, destination)
-            except FileNotFoundError:
-                pass
-        # export pdf, docx, odt, epub, html files if located in documents directory
-        if self.source[x]['mediapath'] is None:
-            file_path = self.app.project_path + "/documents/" + self.source[x]['name']
-            destination = directory + "/" + self.source[x]['name']
-            try:
-                copyfile(file_path, destination)
-            except FileNotFoundError:
-                pass
-        if filename_txt is not None:
-            msg += "\n" + directory + "/" + filename_txt
-        QtWidgets.QMessageBox.information(None, _("File Exported"), msg)
+        index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
+        rows = []
+        for i in index_list:
+            rows.append(i.row())
+        rows = list(set(rows))  # duplicate rows due to multiple columns
+        if len(rows) == 0:
+            return
+        names = _("Export to ") + directory + "\n"
+        for row in rows:
+            names = names + self.source[row]['name'] + "\n"
+        ui = DialogConfirmDelete(names, _("Export files"))
+        ok = ui.exec_()
+        if not ok:
+            return
+
+        # redo ms as filenames may change for created files and for original file documents
+        msg = _("Export to ") + directory + "\n"
+        for row in rows:
+            filename = self.source[row]['name']
+            filename_txt = None
+            if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
+                filename_txt = filename[0:len(filename) - 5] + ".txt"
+            if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
+                filename_txt = filename[0:len(filename) - 4] + ".txt"
+            # Below is for transcribed files and for user created text files within QualCoder
+            if self.source[row]['mediapath'] is None and filename_txt is None:
+                filename_txt = filename + ".txt"
+            if filename_txt is not None:
+                filename_txt = directory + "/" + filename_txt
+                #logger.info(_("Exporting to ") + filename)
+                filedata = self.source[row]['fulltext']
+                f = open(filename_txt, 'w')
+                f.write(filedata)
+                f.close()
+                msg += filename_txt + "\n"
+            # export audio, video, picture files
+            if self.source[row]['mediapath'] is not None:
+                file_path = self.app.project_path + self.source[row]['mediapath']
+                destination = directory + "/" + filename
+                try:
+                    copyfile(file_path, destination)
+                    msg += destination + "\n"
+                except FileNotFoundError:
+                    pass
+            # export pdf, docx, odt, epub, html files if located in documents directory
+            if self.source[row]['mediapath'] is None:
+                file_path = self.app.project_path + "/documents/" + self.source[row]['name']
+                destination = directory + "/" + self.source[row]['name']
+                try:
+                    copyfile(file_path, destination)
+                    msg += destination + "\n"
+                except FileNotFoundError:
+                    pass
+            #if filename_txt is not None:
+            #    msg += "\n" + directory + "/" + filename_txt
+        QtWidgets.QMessageBox.information(None, _("Files Exported"), msg)
         self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
     def delete(self):
-        """ Delete file from database and update model and widget.
+        """ Delete files from database and update model and widget.
         Also, delete files from sub-directories. """
 
-        x = self.ui.tableWidget.currentRow()
-        file_id = self.source[x]['id']
-        ui = DialogConfirmDelete(self.source[x]['name'])
+        index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
+        rows = []
+        for i in index_list:
+            rows.append(i.row())
+        rows = list(set(rows))  # duplicate rows due to multiple columns
+        if len(rows) == 0:
+            return
+        names = ""
+        for row in rows:
+            names = names + self.source[row]['name'] + "\n"
+        ui = DialogConfirmDelete(names)
         ok = ui.exec_()
-
         if not ok:
             return
+
         cur = self.app.conn.cursor()
-        # delete text source
-        if self.source[x]['mediapath'] is None:
-            try:
-                os.remove(self.app.project_path + "/documents/" + self.source[x]['name'])
-            except Exception as e:
-                logger.warning(_("Deleting file error: ") + str(e))
-            cur.execute("delete from source where id = ?", [file_id])
-            cur.execute("delete from code_text where fid = ?", [file_id])
-            cur.execute("delete from annotation where fid = ?", [file_id])
-            cur.execute("delete from case_text where fid = ?", [file_id])
-            sql = "delete from attribute where attr_type ='file' and id=?"
-            cur.execute(sql, [file_id])
-            self.app.conn.commit()
-        # delete image audio video source
-        if self.source[x]['mediapath'] is not None:
-            # Remove avid links in code_text
-            sql = "select avid from code_av where id=?"
-            cur.execute(sql, (file_id, ))
-            avids = cur.fetchall()
-            sql = "update code_text set avid=null where avid=?"
-            for avid in avids:
-                cur.execute(sql, (avid[0], ))
-            self.app.conn.commit()
-            # Remove folder file, database stored coded sections and source details
-            filepath = self.app.project_path + self.source[x]['mediapath']
-            try:
-                os.remove(filepath)
-            except Exception as e:
-                logger.warning(_("Deleting file error: ") + str(e))
-            cur.execute("delete from source where id = ?", [file_id])
-            cur.execute("delete from code_image where id = ?", [file_id])
-            cur.execute("delete from code_av where id = ?", [file_id])
-            sql = "delete from attribute where attr_type='file' and id=?"
-            cur.execute(sql, [file_id])
-            self.app.conn.commit()
+        for row in rows:
+            file_id = self.source[row]['id']
+            # delete text source
+            if self.source[row]['mediapath'] is None:
+                try:
+                    os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
+                except Exception as e:
+                    logger.warning(_("Deleting file error: ") + str(e))
+                cur.execute("delete from source where id = ?", [file_id])
+                cur.execute("delete from code_text where fid = ?", [file_id])
+                cur.execute("delete from annotation where fid = ?", [file_id])
+                cur.execute("delete from case_text where fid = ?", [file_id])
+                sql = "delete from attribute where attr_type ='file' and id=?"
+                cur.execute(sql, [file_id])
+                self.app.conn.commit()
+            # delete image audio video source
+            if self.source[row]['mediapath'] is not None:
+                # Remove avid links in code_text
+                sql = "select avid from code_av where id=?"
+                cur.execute(sql, (file_id, ))
+                avids = cur.fetchall()
+                sql = "update code_text set avid=null where avid=?"
+                for avid in avids:
+                    cur.execute(sql, (avid[0], ))
+                self.app.conn.commit()
+                # Remove folder file, database stored coded sections and source details
+                filepath = self.app.project_path + self.source[row]['mediapath']
+                try:
+                    os.remove(filepath)
+                except Exception as e:
+                    logger.warning(_("Deleting file error: ") + str(e))
+                cur.execute("delete from source where id = ?", [file_id])
+                cur.execute("delete from code_image where id = ?", [file_id])
+                cur.execute("delete from code_av where id = ?", [file_id])
+                sql = "delete from attribute where attr_type='file' and id=?"
+                cur.execute(sql, [file_id])
+                self.app.conn.commit()
 
-        self.check_attribute_placeholders()
-
-        self.parent_textEdit.append(_("Deleted: ") + self.source[x]['name'])
-        for item in self.source:
-            if item['id'] == file_id:
-                self.source.remove(item)
+            self.check_attribute_placeholders()
+            self.parent_textEdit.append(_("Deleted: ") + self.source[row]['name'])
+            for item in self.source:
+                if item['id'] == file_id:
+                    self.source.remove(item)
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
 
     def get_icon(self, name):
         ''' Get icon to put in table. Helper method for fill_table
-
-         parameter: filename
-
+         parameter:
+            name: a filename
          return: QIcon '''
 
         icon_text = QtGui.QIcon("GUI/text.png")
@@ -1174,7 +1200,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
@@ -1190,9 +1215,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             date_item = QtWidgets.QTableWidgetItem(data['date'])
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.DATE_COLUMN, date_item)
-            memoitem = data['memo']
-            if memoitem != None and memoitem != "":
-                self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
+            memo_string = ""
+            if data['memo'] is not None and data['memo'] != "":
+                memo_string = _("Memo")
+            memo_item = QtWidgets.QTableWidgetItem(memo_string)
+            memo_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, memo_item)
             fid = data['id']
             if fid is None:
                 fid = ""

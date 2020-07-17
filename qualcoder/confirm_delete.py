@@ -51,7 +51,7 @@ class DialogConfirmDelete(QtWidgets.QDialog):
     param:
         text: a string for display """
 
-    def __init__(self, text):
+    def __init__(self, text, title=""):
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
@@ -59,6 +59,8 @@ class DialogConfirmDelete(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.label.setText(text)
+        if title != "":
+            self.setWindowTitle(title)
 
 
 if __name__ == "__main__":
