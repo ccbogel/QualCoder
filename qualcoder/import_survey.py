@@ -85,8 +85,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
     fail_msg = ""
 
     def __init__(self, app, parent_textEdit):
-        ''' Need to comment out the connection accept signal line in ui_Dialog_Import.py.
-         Otherwise get a double-up of accept signals. '''
+        """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
+         Otherwise get a double-up of accept signals. """
 
         sys.excepthook = exception_handler
         self.app = app
@@ -153,6 +153,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     else:
                         row.append(item)
                 self.data.append(row)
+        self.fields = self.data[0]
+        self.data = self.data[1:]
         # Widgets are not needed
         self.ui.lineEdit_delimiter.hide()
         self.ui.comboBox_quote.hide()
@@ -191,6 +193,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 self.parent_textEdit.append(_("Row error: ") + str(reader.line_num) + "  " + str(e))
                 self.fail_msg(_("Row error: ") + str(e))
                 return False
+        self.fields = self.data[0]
+        self.data = self.data[1:]
         return True
 
     def get_data_file(self):
@@ -207,6 +211,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if not ok or self.filepath == "":
                 self.fail_msg = _("No file selected")
                 return False
+        # check of csv or xlsx
         if self.filepath[-5:].lower() != ".xlsx" and self.filepath[-4:].lower() != ".csv":
             self.fail_msg = self.filepath + "\n" + _("is not a .csv or .xlsx file.\nFile not imported")
             #QtWidgets.QMessageBox.warning(None, _("Warning"), self.fail_msg)
@@ -232,8 +237,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 return False
 
         self.setWindowTitle(_(_("Importing from: ")) + self.filepath.split('/')[-1])
-        self.fields = self.data[0]
-        self.data = self.data[1:]
 
         # clean field names
         removes = "!@#$%^&*()-+=[]{}\|;:,.<>/?~`"
