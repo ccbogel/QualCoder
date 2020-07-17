@@ -660,9 +660,13 @@ class DialogReportCodes(QtWidgets.QDialog):
     """ Get reports on coded text/images/audio/video using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, html or csv.
+
+        Text context of a coded text portion is shown in the thord splitter pan in a text edit.
+        Case matrix is also shown in a qtablewidget in the third splitter pane.
+        If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the text in context.
+
     """
     #TODO - export case matrix
-    #TODO text context in separate dialog
 
     app = None
     dialog_list = None
@@ -1658,7 +1662,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.view_text_result_in_context(coded_text)
 
     def view_text_result_in_context(self, coded_text):
-        """ View the coded text in context of the original text file in a separate modal dialog. """
+        """ View the coded text in context of the original text file in the third split pane.
+        The third split pane contains a tablewidget. So add a textedit to this.
+        If a case matrix is shown, this method override it and replaces the matrix with the text in context.
+        """
 
         file_list = self.app.get_file_texts([coded_text['fid'], ])
         file_text = file_list[0]
@@ -1667,23 +1674,23 @@ class DialogReportCodes(QtWidgets.QDialog):
             title = _("File: ") + coded_text['file_or_casename']
         if coded_text['file_or_case'] == "Case":
             title = _("Case: ") +coded_text['file_or_casename'] + ", " + file_text['name']
-        memo = DialogMemo(self.app, title, file_text['fulltext'])
-        cursor = memo.ui.textEdit.textCursor()
+        te = QtWidgets.QTextEdit()
+        te.setPlainText(file_text['fulltext'])
+        cursor = te.textCursor()
         cursor.setPosition(coded_text['pos0'], QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(coded_text['pos1'], QtGui.QTextCursor.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(coded_text['color']))
         fmt.setBackground(brush)
         cursor.setCharFormat(fmt)
-        memo.exec_()
+        self.ui.splitter.replaceWidget(2, te)
+        self.ui.splitter.setSizes([100,100, 200])
 
     def fill_matrix(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
         First identify top-lvel categories and codes. Then map all other codes to the
         top-level cataegories. Fill tableWidget with columns of top-level items and rows
         of cases. """
-
-        self.ui.splitter.setSizes([0, 300, 300])
 
         # get top level categories and codes
         items = self.ui.treeWidget.selectedItems()
@@ -1737,10 +1744,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         vertical_labels = []
         for c in cases:
             vertical_labels.append(c[1])
-        self.ui.tableWidget.setColumnCount(len(horizontal_labels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
-        self.ui.tableWidget.setRowCount(len(cases))
-        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
+
+        # need to dynamically replace the existing table widget. Becuase, the tablewidget may
+        # already have been replaced with a textEdit (file selection the view text in context)
+        ta = QtWidgets.QTableWidget()
+        ta.setColumnCount(len(horizontal_labels))
+        ta.setHorizontalHeaderLabels(horizontal_labels)
+        ta.setRowCount(len(cases))
+        ta.setVerticalHeaderLabels(vertical_labels)
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
@@ -1756,9 +1767,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(i))
                         self.put_image_into_textedit(i, counter, txt_edit)
-                self.ui.tableWidget.setCellWidget(row, col, txt_edit)
-        self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.tableWidget.resizeRowsToContents()
+                ta.setCellWidget(row, col, txt_edit)
+        ta.resizeColumnsToContents()
+        ta.resizeRowsToContents()
+        self.ui.splitter.replaceWidget(2, ta)
+        self.ui.splitter.setSizes([100, 300, 300])
 
     def select_attributes(self):
         """ Select attributes from case or file attributes for search method.
@@ -1831,7 +1844,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.file_ids = ""
         self.attribute_selection = []
         casenames = self.app.get_casenames()
-        print(casenames)
+        #print(casenames)
         self.case_ids = ""
         for row in casenames:
             self.case_ids += "," + str(row['id'])
