@@ -33,6 +33,7 @@ import gettext
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+import platform
 import re
 import shutil
 import sys
@@ -151,7 +152,7 @@ class App(object):
                 for i, line in enumerate(reversed(result)):
                     f.write(line)
                     f.write(os.linesep)
-                    if i > 10:
+                    if i > 8:
                         break
 
     def get_most_recent_projectpath(self):
@@ -391,7 +392,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCreate_New_Project.setShortcut('Ctrl+N')
         self.ui.actionOpen_Project.triggered.connect(self.open_project)
         self.ui.actionOpen_Project.setShortcut('Ctrl+O')
-        #self.ui.actionOpen_Recent_Project.triggered.connect(self.open_recent_project)
         self.fill_recent_projects_menu_actions()
         self.ui.actionProject_Memo.triggered.connect(self.project_memo)
         self.ui.actionProject_Memo.setShortcut('Ctrl+M')
@@ -453,8 +453,9 @@ class MainWindow(QtWidgets.QMainWindow):
         Add up to 7 recent projects to the menu. """
 
         self.recent_projects = self.app.read_previous_project_paths()
-        if len(self.recent_projects) > 0:
-            self.ui.menuOpen_Recent_Project.removeAction(self.ui.actionNone)
+        if len(self.recent_projects) == 0:
+            return
+        self.ui.menuOpen_Recent_Project.clear()  # removes the qtdesigner default action
         #TODO must be a better way to do this
         for i, r in enumerate(self.recent_projects):
             if i == 0:
@@ -575,17 +576,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def settings_report(self):
         """ Display general settings and project summary """
+
         msg = _("Settings")
         msg += "\n========\n"
         msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
         msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
         msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
-        msg += _("Directory") + ": " + self.app.settings['directory'] + "\n"
-        msg += _("Project_path:") + self.app.project_path + "\n"
-        msg += _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
+        msg += _("Working directory") + ": " +  self.app.settings['directory']
+        msg += "\n" + _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
         msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
+        if platform.system() == "Windows":
+            msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
         self.ui.textEdit.append(msg)
 
@@ -949,22 +952,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    '''def open_recent_project(self):
-        """ Present recent projects for user to select from and open. """
-
-        projects_with_duplicates = self.app.read_previous_project_paths()
-        tmp_list = list(set(projects_with_duplicates))
-        projects = []
-        for item in tmp_list:
-            projects.append({'name': item})
-        ui = DialogSelectFile(projects, _("Select project to open"), "single")
-        ok = ui.exec_()
-        if not ok:
-            return
-        project = ui.get_selected()  # list of dictionaries
-        project_path = project['name']
-        self.open_project(project_path)'''
-
     def open_project(self, path="", newproject="no"):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
@@ -1017,6 +1004,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
         # get and display some project details
         self.app.append_recent_project(self.app.project_path)
+        self.fill_recent_projects_menu_actions()
         self.setWindowTitle("QualCoder " + self.app.project_name)
         self.project_summary_report()
 
@@ -1057,6 +1045,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Add a summary of the project to the tet edit.
          Display project memo, and code, attribute, journal, files frequencies."""
 
+        os_type = platform.system()
         cur = self.app.conn.cursor()
         cur.execute("select databaseversion, date, memo, about from project")
         result = cur.fetchall()[-1]
@@ -1064,11 +1053,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
         #self.project['about'] = result[3]
-        msg = "========\n"
-        msg += _("Date time now:") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\n"
+        msg = "\n" + _("PROJECT SUMMARY")
+        msg += "\n========\n"
+        msg += _("Date time now: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
-        msg += _("Path: ") + self.app.project_path + "\n"
-        msg += _("Directory: ") + self.app.settings['directory'] + "\n"
+        msg += _("Project path: ") + self.app.project_path + "\n"
         #msg += _("Database version: ") + self.project['databaseversion'] + ". "
         msg+= _("Project date: ") + str(self.project['date']) + "\n"
         sql = "select memo from project"
@@ -1098,8 +1087,10 @@ class MainWindow(QtWidgets.QMainWindow):
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Journals: ") + str(res[0]) + "\n"
-        msg += "========\n"
+        msg += _("Journals: ") + str(res[0])
+        if platform.system() == "Windows":
+            msg += "\n" + _("Directory (folder) paths / represents \\")
+        msg += "\n========\n"
         self.ui.textEdit.append(msg)
 
     def close_project(self):
@@ -1111,9 +1102,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.close()
         except:
             pass
-
-        #print(self.app.delete_backup_path_name)
-        #print(self.app.delete_backup)
         # delete the backup folder
         if self.app.delete_backup_path_name != "" and self.app.delete_backup:
             try:
@@ -1129,6 +1117,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.clean_dialog_refs()
+        for d in self.dialogList:
+            d.destroy()
         self.setWindowTitle("QualCoder")
 
     def clean_dialog_refs(self):
@@ -1151,8 +1141,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_dialog_lists_in_modeless_dialogs()
 
     def update_dialog_lists_in_modeless_dialogs(self):
-        ''' This is to assist: Update code and category tree in DialogCodeImage,
-        DialogCodeAV, DialogCodeText, DialogReportCodes '''
+        """ This is to assist: Update code and category tree in DialogCodeImage,
+        DialogCodeAV, DialogCodeText, DialogReportCodes """
 
         for d in self.dialogList:
             if isinstance(d, DialogCodeText):
@@ -1162,6 +1152,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if isinstance(d, DialogCodeImage):
                 d.dialog_list = self.dialogList
             if isinstance(d, DialogReportCodes):
+                d.dialog_list = self.dialogList
+            if isinstance(d, DialogCases):
+                d.dialog_list = self.dialogList
+            if isinstance(d, DialogManageFiles):
                 d.dialog_list = self.dialogList
 
 
