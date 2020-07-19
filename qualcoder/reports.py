@@ -585,6 +585,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
         self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.hideColumn(1)
+        if self.app.settings['showids'] == 'True':
+            self.ui.treeWidget.showColumn(1)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
