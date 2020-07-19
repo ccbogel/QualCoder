@@ -416,7 +416,7 @@ class DialogCases(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update cases set memo=? where caseid=?', (self.cases[x]['memo'], self.cases[x]['caseid']))
             self.app.conn.commit()
-            if self.cases[x]['memo'] == "":
+            if self.cases[x]['memo'] == "" or self.cases[x]['memo'] is None:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
