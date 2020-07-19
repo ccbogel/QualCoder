@@ -184,7 +184,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "":
+                if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -208,7 +208,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 while item:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
-                        if c['memo'] != "":
+                        if c['memo'] != "" and c['memo'] is not None:
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(2, c['memo'])
@@ -225,7 +225,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "":
+                if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -243,7 +243,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "":
+                    if c['memo'] != "" and c['memo'] is not None:
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))

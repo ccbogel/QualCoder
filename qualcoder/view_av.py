@@ -299,7 +299,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "":
+                if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -340,7 +340,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "":
+                if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -358,7 +358,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "":
+                    if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
