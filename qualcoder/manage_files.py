@@ -891,12 +891,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Import from odt
         if import_file[-4:].lower() == ".odt":
             text = self.convert_odt_to_text(import_file)
+            text = text.replace("\n", "\n\n")  # add line to paragraph spacing for visual format
         # Import from docx
         if import_file[-5:].lower() == ".docx":
             #text = convert(importFile)  # uses docx_to_html
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
-            text = "\n".join(list_)
+            text = "\n\n".join(list_)  # add line to paragraph spacing for visual format
         # Import from epub
         if import_file[-5:].lower() == ".epub":
             book = epub.read_epub(import_file)
@@ -905,7 +906,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     #print(d.get_content())
                     bytes_ = d.get_body_content()
                     string = bytes_.decode('utf-8')
-                    text += html_to_text(string) + "\n"
+                    text += html_to_text(string) + "\n\n"  # add line to paragraph spacing for visual format
                 except TypeError as e:
                     logger.debug("ebooklib get_body_content error " + str(e))
         # import PDF
@@ -926,7 +927,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 layout = device.get_result()
                 for lt_obj in layout:
                     if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                        text += lt_obj.get_text()
+                        text += lt_obj.get_text() + "\n"  # add line to paragraph spacing for visual format
         # import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             importErrors = 0
@@ -1169,9 +1170,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
             self.check_attribute_placeholders()
             self.parent_textEdit.append(_("Deleted: ") + self.source[row]['name'])
-            for item in self.source:
-                if item['id'] == file_id:
-                    self.source.remove(item)
+        '''for item in self.source:
+            if item['id'] == file_id:
+                self.source.remove(item)'''
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
