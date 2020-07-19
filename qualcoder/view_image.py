@@ -45,7 +45,7 @@ from color_selector import colors
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from memo import DialogMemo
-from select_file import DialogSelectFile
+from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -280,7 +280,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         """  A dialog of filenames is presented to the user.
         The selected image file is then displayed for coding. """
 
-        ui = DialogSelectFile(self.files, _("Select file to view"), "single")
+        ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
         ok = ui.exec_()
         if ok:
             self.file_ = ui.get_selected()

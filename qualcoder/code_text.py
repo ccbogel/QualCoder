@@ -47,7 +47,7 @@ from information import DialogInformation
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
 from qtmodels import DictListModel, ListObjectModel
-from select_file import DialogSelectFile
+from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ class DialogCodeText(QtWidgets.QWidget):
     codes = []
     categories = []
     filenames = []
-    filename = None  # contains filename and file id returned from SelectFile
+    filename = None  # contains filename and file id returned from SelectItems
     sourceText = None
     code_text = []
     annotations = []
@@ -127,6 +127,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
         self.ui.textEdit.setReadOnly(True)
+        self.ui.textEdit.setStyleSheet
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1006,7 +1007,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ When view file button is pressed a dialog of filenames is presented to the user.
         The selected file is then displayed for coding. """
 
-        ui = DialogSelectFile(self.filenames, "Select file to view", "single")
+        ui = DialogSelectItems(self.app, self.filenames, "Select file to view", "single")
         ok = ui.exec_()
         if ok:
             # filename is dictionary with id and name
@@ -1284,7 +1285,7 @@ class DialogCodeText(QtWidgets.QWidget):
             to_unmark = unmarked_list[0]
         # multiple codes to selet from
         if len(unmarked_list) > 1:
-            ui = DialogSelectFile(unmarked_list, _("Select code to unmark"), "single")
+            ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
             if not ok:
                 return
@@ -1400,7 +1401,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if t != "":
                 texts.append(t)
 
-        ui = DialogSelectFile(self.filenames, _("Select file to view"), "many")
+        ui = DialogSelectItems(self.app, self.filenames, _("Select file to view"), "many")
         ok = ui.exec_()
         if not ok:
             return

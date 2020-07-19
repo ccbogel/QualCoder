@@ -33,20 +33,13 @@ import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-#try:
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from memo import DialogMemo
 from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
-'''except:
-    from .add_item_name import DialogAddItemName
-    from .confirm_delete import DialogConfirmDelete
-    from .memo import DialogMemo
-    from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
-    from .GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
-    from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute'''
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -106,6 +99,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
         New attribute is added to the model and database '''
 
         ui = DialogAddItemName(self.attribute_type, _("New attribute name"))
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        ui.setStyleSheet(font)
+        ui.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         ui.exec_()
         newText = ui.get_new_name()
         if newText is None or newText == "":
@@ -113,6 +110,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
         Dialog_type = QtWidgets.QDialog()
         ui = Ui_Dialog_attribute_type()
         ui.setupUi(Dialog_type)
+        Dialog_type.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        Dialog_type.setStyleSheet(font)
         ok = Dialog_type.exec_()
         valuetype = "character"
         if ok and ui.radioButton_numeric.isChecked():
@@ -120,6 +121,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
         Dialog_assign = QtWidgets.QDialog()
         ui = Ui_Dialog_assignAttribute()
         ui.setupUi(Dialog_assign)
+        Dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        Dialog_assign.setStyleSheet(font)
         ok = Dialog_assign.exec_()
         case_or_file = "case"
         if ok and ui.radioButton_files.isChecked():
@@ -146,7 +151,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.fill_tableWidget()
-        self.parent_textEdit.append(_("Attribute added: ") + item['name'])
+        self.parent_textEdit.append(_("Attribute added: ") + item['name'] + _(" to ") + _(case_or_file))
 
     def delete_attribute(self):
         ''' When delete button pressed, attribute is deleted from database '''

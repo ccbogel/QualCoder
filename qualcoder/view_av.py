@@ -61,7 +61,7 @@ from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from memo import DialogMemo
-from select_file import DialogSelectFile
+from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -412,7 +412,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             media_files.append({'name': row[0], 'id': row[1], 'memo': row[2],
                 'owner': row[3], 'date': row[4], 'mediapath': row[5]})
 
-        ui = DialogSelectFile(media_files, _("Select file to view"), "single")
+        ui = DialogSelectItems(self.app, media_files, _("Select file to view"), "single")
         ok = ui.exec_()
         if not ok:
             return

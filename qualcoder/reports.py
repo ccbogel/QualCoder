@@ -45,7 +45,7 @@ from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from memo import DialogMemo
 from report_attributes import DialogSelectAttributeParameters
-from select_file import DialogSelectFile
+from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1815,7 +1815,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.file_ids += "," + str(row['id'])
         if len(self.file_ids) > 0:
             self.file_ids = self.file_ids[1:]
-        ui = DialogSelectFile(filenames, _("Select files to view"), "many")
+        ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
         ok = ui.exec_()
         tooltip = _("Files selected:")
         if ok:
@@ -1849,7 +1849,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row in casenames:
             self.case_ids += "," + str(row['id'])
         self.case_ids = self.case_ids[1:]
-        ui = DialogSelectFile(casenames, _("Select cases to view"), "many")
+        ui = DialogSelectItems(self.app, casenames, _("Select cases to view"), "many")
         ok = ui.exec_()
         tooltip = _("Cases selected:")
         if ok:
