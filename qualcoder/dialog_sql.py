@@ -293,8 +293,7 @@ class DialogSQL(QtWidgets.QDialog):
          includes:cut ctrlX copy ctrlC paste ctrlV delete select_all ctrlA. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size: " + str(self.app.settings['fontsize']) +
-            "px} QMenu QWidget {font-size: " + str(self.app.settings['fontsize']) + "15px}")
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_SelectAll = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
         action_paste = menu.addAction(_("Paste"))
