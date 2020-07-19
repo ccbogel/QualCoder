@@ -53,16 +53,16 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogSQL(QtWidgets.QDialog):
-    ''' Uses single inheritance, sub-class QDialog and set up the user interface in
+    """ Uses single inheritance, sub-class QDialog and set up the user interface in
     the __init__() method.
     A gui to allow the user to enter sql queries and return results.
-    Data outputs are as tab (or other) separated files. '''
+    Data outputs are as tab (or other) separated files.
+    EXTRA_SQL is listed at end of module for additional complex queries. """
 
     app = None
     schema = None
     parent_textEdit = None
     sql = ""
-    joinData = []
     delimiter = "\t"  # default delimiter for file exports
     file_data = []  # for file exports
     results = None  # SQL results
@@ -282,7 +282,7 @@ class DialogSQL(QtWidgets.QDialog):
         joinItem = QtWidgets.QTreeWidgetItem()
         joinItem.setText(0, "-- Joins --")
         self.ui.treeWidget.addTopLevelItem(joinItem)
-        for join in self.joinData:
+        for join in EXTRA_SQL:
             jItem = QtWidgets.QTreeWidgetItem()
             jItem.setText(0, join)
             joinItem.addChild(jItem)
@@ -540,3 +540,8 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
                 return selfValue < otherValue
         else:
             return QtWidgets.QTableWidgetItem.__lt__(self, other)
+
+# Extra queries
+EXTRA_SQL = ["-- Case text\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
+from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
+where case_text.pos1 >0"]
