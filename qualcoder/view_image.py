@@ -442,6 +442,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Add, rename, memo, move or delete code or category. Change code color. """
 
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
         #print(selected.parent())
         #index = self.ui.treeWidget.currentIndex()
@@ -514,6 +515,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     return
 
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         menu.addAction(_('Memo'))
         menu.addAction(_('Unmark'))
         global_pos = QtGui.QCursor.pos()

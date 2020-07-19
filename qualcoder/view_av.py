@@ -796,6 +796,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
         #logger.debug("selected paremt: " + str(selected.parent()))
         #logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
@@ -1299,6 +1300,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
         action_play_text = None
         play_text_avid = None
@@ -1729,6 +1731,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_link_segment = 1
         action_link_text = 1
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo for segment'))
         action_delete = menu.addAction(_('Delete segment'))
         action_play = menu.addAction(_('Play segment'))

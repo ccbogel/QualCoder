@@ -291,7 +291,10 @@ class DialogSQL(QtWidgets.QDialog):
     def sql_menu(self, position):
         """ add context menu to textedit_sql
          includes:cut ctrlX copy ctrlC paste ctrlV delete select_all ctrlA. """
+
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size: " + str(self.app.settings['fontsize']) +
+            "px} QMenu QWidget {font-size: " + str(self.app.settings['fontsize']) + "15px}")
         action_SelectAll = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
         action_paste = menu.addAction(_("Paste"))
@@ -341,6 +344,7 @@ class DialogSQL(QtWidgets.QDialog):
         """ Context menu for table_results. """
 
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         try:
             self.row = self.ui.tableWidget_results.currentRow()
             self.col = self.ui.tableWidget_results.currentColumn()

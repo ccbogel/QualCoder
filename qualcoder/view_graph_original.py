@@ -91,6 +91,9 @@ class ViewGraphOriginal(QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_visualiseGraph_original()
         self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         fsize_list = []
         for i in range(8, 22, 2):
@@ -487,6 +490,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """
 
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         menu.addAction('Memo')
         if self.data['cid'] is not None:
             menu.addAction('Coded text and media')

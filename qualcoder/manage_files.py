@@ -144,6 +144,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         #print(self.row, self.col, self.cellValue)
         # action cannot be None otherwise may default to one of the actionsbelow depending on column clicked
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
         action_alphabetic = 1
         action_date = 1
