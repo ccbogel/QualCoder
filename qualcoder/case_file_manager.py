@@ -93,6 +93,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         font2 = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(font2)
+        self.ui.tableWidget.doubleClicked.connect(self.doubleClickedCell)
         self.ui.label_case.setText(_("Case: ") + self.case['name'])
         self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.pushButton_view.clicked.connect(self.view_file)
@@ -112,7 +113,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         """ Get files for this case """
 
         cur = self.app.conn.cursor()
-        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by lower(source.name) asc"
         cur.execute(sql, [self.case['caseid'], ])
         self.casefiles = cur.fetchall()
         sql = "select id, name, fulltext, mediapath, memo, owner, date from  source order by source.name asc"
@@ -244,6 +245,15 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.ui.tableWidget.showColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()
 
+    def doubleClickedCell(self, row):
+        """ Double click on a row allow viewing of that file.
+        rows begin at 0  to n.
+        param:
+            row: signal emitted by doubleclick event """
+
+        #print("double clicked", row.row())
+        self.view_file()
+
     def view_file(self):
         """ View text file in text browser. """
 
@@ -253,10 +263,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             index = index_list[0].row()
         if index is None:
             return
+        self.ui.textBrowser.setText("")
+        self.ui.tableWidget.selectRow(index)
         self.selected_text_file = None
-        if self.allfiles[index][FULLTEXT] is not None and self.allfiles[index][FULLTEXT] != "":
+        # a fulltext source is displaysed if filltext is present
+        # if the mediapath is None, this represents an A/V transcribed file
+        self.ui.label_file.setText(_("Displayed file:") + self.allfiles[index][NAME])
+        if self.allfiles[index][FULLTEXT] != "" and self.allfiles[index][FULLTEXT] is not None:
             self.selected_text_file = self.allfiles[index]
-            #print(self.allfiles[index])
             self.ui.textBrowser.setText(self.allfiles[index][FULLTEXT])
             self.load_case_text()
             self.unlight()
@@ -266,19 +280,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         dictionary = {'name': self.allfiles[index][NAME], 'mediapath': self.allfiles[index][MEDIAPATH],
                       'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0], 'date': self.allfiles[index][DATE],
                       'memo': self.allfiles[index][MEMO], 'fulltext': self.allfiles[index][FULLTEXT]}
-        try:
-            if self.allfiles[index][3][:6] == "/video":
-                ui = DialogViewAV(self.app, dictionary)
-                ui.exec_()
-            if self.allfiles[index][3][:6] == "/audio":
-                ui = DialogViewAV(self.app, dictionary)
-                ui.exec_()
-        except Exception as e:
-            logger.debug(str(e))
-            print(e)
-            QtWidgets.QMessageBox.warning(None, 'view av error', str(e), QtWidgets.QMessageBox.Ok)
-            return
-        if self.allfiles[index][3][:7] == "/images":
+        # the mediapath will be None for a .transcribed empty text media entry, so need to check for this
+        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:6] == "/video":
+            ui = DialogViewAV(self.app, dictionary)
+            ui.exec_()
+        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:6] == "/audio":
+            ui = DialogViewAV(self.app, dictionary)
+            ui.exec_()
+        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:7] == "/images":
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
             ui = DialogViewImage(self.app, dictionary)
             ui.exec_()
