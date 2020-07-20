@@ -307,21 +307,33 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
     def textBrowser_menu(self, position):
-        ''' Context menu for textBrowser. Mark, unmark, copy. '''
+        """ Context menu for textBrowser. Mark, unmark, copy. """
 
+        cursor = self.ui.textBrowser.cursorForPosition(position)
+        selected_text = self.ui.textBrowser.textCursor().selectedText()
+        print(selected_text)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         if self.ui.textBrowser.toPlainText() == "":
             return
-        ActionItemMark = menu.addAction(_("Mark"))
-        ActionItemUnmark = menu.addAction(_("Unmark"))
-        ActionItemCopy = menu.addAction("Copy")
+        action_mark = None
+        action_unmark = None
+        action_copy = None
+        if selected_text != "":
+            action_mark = menu.addAction(_("Mark"))
+            action_copy = menu.addAction("Copy")
+        for item in self.case_text:
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                action_unmark = menu.addAction(_("Unmark"))
+                break
         action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
-        if action == ActionItemMark:
+        if action is None:
+            return
+        if action == action_mark:
             self.mark()
-        if action == ActionItemUnmark:
+        if action == action_unmark:
             self.unmark(position)
-        if action == ActionItemCopy:
+        if action == action_copy:
             self.copy_selected_text_to_clipboard()
 
     def copy_selected_text_to_clipboard(self):
@@ -377,6 +389,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # selectedText = self.textBrowser.textCursor().selectedText()
         pos0 = self.ui.textBrowser.textCursor().selectionStart()
         pos1 = self.ui.textBrowser.textCursor().selectionEnd()
+        if pos0 == pos1:
+            return
         # add new item to case_text list and database and update GUI
         item = {'caseid': self.case['caseid'],
                 'fid': self.selected_text_file[ID],

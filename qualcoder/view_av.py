@@ -1330,6 +1330,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             if cursor.position() >= ts[0] and cursor.position() <= ts[1]:
                 action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
         if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:

@@ -448,6 +448,8 @@ class DialogCodeText(QtWidgets.QWidget):
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
         if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
@@ -1303,6 +1305,8 @@ class DialogCodeText(QtWidgets.QWidget):
         selectedText = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
+        if pos0 == pos1:
+            return
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
