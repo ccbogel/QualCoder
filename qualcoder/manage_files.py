@@ -769,8 +769,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def import_files(self):
         """ Import files and store into relevant directories (documents, images, ?audio?).
         Convert documents to plain text and store this in data.qda
-        Can import from plain text files, also import from html, odt and docx
-        Note importing from html, odt and docx all formatting is lost.
+        Can import from plain text files, also import from html, odt, docx and md
+        md is text markdown format.
+        Note importing from html, odt, docx all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as mp3, wav which are stored in an audio directory
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory
@@ -789,7 +790,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QApplication.processEvents()
             filename = f.split("/")[-1]
             destination = self.app.project_path
-            if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub'):
+            if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub', 'md'):
                 destination += "/documents/" + filename
                 copyfile(f, destination)
                 self.load_file_text(f)
@@ -797,7 +798,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if f.split('.')[-1].lower() in ('pdf'):
                 if pdfminer_installed is False:
                     text = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
-                    text += "For Windows run the following in the command prmpt: pip install pdfminer.six"
+                    text += "For Windows run the following in the command prompt: pip install pdfminer.six"
                     QtWidgets.QMessageBox.critical(None, _('pdfminer is not installed.'), _(text))
                     return
                 destination += "/documents/" + filename

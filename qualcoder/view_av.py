@@ -463,7 +463,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
         for s in self.segments:
-            self.scene.addItem(SegmentGraphicsItem(s, scaler, self.text_for_segment, self))
+            self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self.text_for_segment, self))
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -1698,15 +1698,16 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     Refernces Dialog_code_av for variables and methods.
     """
 
+    app = None
     segment = None
     scaler = None
     reload_segment = False
     code_av_dialog = None
 
-    #TODO text_for_segment is not needed now
-    def __init__(self, segment, scaler, text_for_segment, code_av_dialog):
+    def __init__(self, app, segment, scaler, text_for_segment, code_av_dialog):
             super(SegmentGraphicsItem, self).__init__(None)
 
+            self.app = app
             self.segment = segment
             self.scaler = scaler
             self.code_av_dialog = code_av_dialog

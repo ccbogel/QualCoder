@@ -91,6 +91,8 @@ class DialogSelectItems(QtWidgets.QDialog):
 
         if self.selection_mode == "single":
             current = self.ui.listView.currentIndex().row()
+            if current == -1:
+                return []
             return self.dict_list[int(current)]
         else:
             selected = []
