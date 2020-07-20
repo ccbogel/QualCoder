@@ -57,10 +57,10 @@ except:  # ModuleNotFoundError
 import ebooklib
 from ebooklib import epub
 
-from add_item_name import DialogAddItemName
+#from add_item_name import DialogAddItemName
+from add_attribute import DialogAddAttribute
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from html_parser import *
@@ -298,25 +298,19 @@ class DialogManageFiles(QtWidgets.QDialog):
         New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
-        ui = DialogAddItemName(check_names, _("New attribute name"))
-        ui.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        ui = DialogAddAttribute(self.app, check_names)
         ui.exec_()
-        name = ui.get_new_name()
-        if name is None or name == "":
+        name = ui.new_name
+        value_type = ui.value_type
+        if name == "":
             return
-        Dialog_type = QtWidgets.QDialog()
-        ui = Ui_Dialog_attribute_type()
-        ui.setupUi(Dialog_type)
-        ok = Dialog_type.exec_()
-        valuetype = "character"
-        if ok and ui.radioButton_numeric.isChecked():
-            valuetype = "numeric"
+
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(name, now_date, self.app.settings['codername'], "", 'file', valuetype))
+            ,(name, now_date, self.app.settings['codername'], "", 'file', value_type))
         self.app.conn.commit()
         self.app.delete_backup = False
         sql = "select id from source"
@@ -328,7 +322,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         self.load_file_data()
         self.fill_table()
-        self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + valuetype)
+        self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + value_type)
 
     def cell_double_clicked(self):
         """  """
