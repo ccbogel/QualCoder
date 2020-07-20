@@ -307,13 +307,12 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
     def textBrowser_menu(self, position):
-        """ Context menu for textBrowser. Mark, unmark, copy. """
+        """ Context menu for textBrowser. Mark, unmark, copy, select all. """
 
         if self.ui.textBrowser.toPlainText() == "":
             return
         cursor = self.ui.textBrowser.cursorForPosition(position)
         selected_text = self.ui.textBrowser.textCursor().selectedText()
-        print(selected_text)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_select_all = None
