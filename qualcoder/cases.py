@@ -41,7 +41,6 @@ from add_item_name import DialogAddItemName
 from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_cases import Ui_Dialog_cases
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 from memo import DialogMemo
 from select_items import DialogSelectItems

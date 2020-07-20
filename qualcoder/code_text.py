@@ -488,18 +488,20 @@ class DialogCodeText(QtWidgets.QWidget):
         txt_len = len(self.ui.textEdit.toPlainText())
         changed_start = 0
         changed_end = 0
+        int_dialog = QtWidgets.QInputDialog()
+        int_dialog.setWindowFlags(int_dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         if start_or_end == "start":
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
             print("start", min, max)
-            changed_start, ok = QtWidgets.QInputDialog.getInt(self, _("Change start position"), _("Change start character position.\nPositive or negative number:"), 0,min,max,1)
+            changed_start, ok = int_dialog.getInt(self, _("Change start position"), _("Change start character position.\nPositive or negative number:"), 0,min,max,1)
             if not ok:
                 return
         if start_or_end == "end":
             max = txt_len - code_to_edit['pos1']
             min = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
             print("end", min, max)
-            changed_end, ok = QtWidgets.QInputDialog.getInt(self, _("Change end position"), _("Change end character position.\nPositive or negative number:"), 0,min,max,1)
+            changed_end, ok = int_dialog.getInt(self, _("Change end position"), _("Change end character position.\nPositive or negative number:"), 0,min,max,1)
             if not ok:
                 return
         if changed_start == 0 and changed_end == 0:
