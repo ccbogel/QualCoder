@@ -321,9 +321,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         action_copy = None
         if selected_text == "":
             action_select_all = menu.addAction(_("Select all"))
-        if selected_text != "":
+        if selected_text != "" and not self.is_marked():
             action_mark = menu.addAction(_("Mark"))
-            action_copy = menu.addAction("Copy")
+        if selected_text != "":
+            action_copy = menu.addAction(_("Copy"))
         for item in self.case_text:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
@@ -339,6 +340,18 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.copy_selected_text_to_clipboard()
         if action == action_select_all:
             self.ui.textBrowser.selectAll()
+
+    def is_marked(self):
+        """ Check current text selection and return False if not marked and True if marked. """
+
+        pos0 = self.ui.textBrowser.textCursor().selectionStart()
+        pos1 = self.ui.textBrowser.textCursor().selectionEnd()
+        for c in self.case_text:
+            if pos0 >= c['pos0'] and pos0 <= c['pos1']:
+                return True
+            if pos1 >= c['pos0'] and pos1 <= c['pos1']:
+                return True
+        return False
 
     def copy_selected_text_to_clipboard(self):
 
