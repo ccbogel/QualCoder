@@ -595,7 +595,7 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             data: code dictionary
         """
-        ui = DialogInformation("Coded text : " + data['name'], " ")
+        ui = DialogInformation(self.app, "Coded text : " + data['name'], " ")
         cur = self.app.conn.cursor()
         CODENAME = 0
         COLOR = 1

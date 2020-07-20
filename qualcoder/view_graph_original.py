@@ -527,7 +527,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
-        ui = DialogInformation("Coded media for cases: " + self.data['name'], " ")
+        ui = DialogInformation(self.app, "Coded media for cases: " + self.data['name'], " ")
         cur = self.conn.cursor()
         CODENAME = 0
         COLOR = 1
@@ -645,7 +645,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Display all coded media for this code.
         Coded media comes from ALL files and ALL coders. """
 
-        ui = DialogInformation("Coded text : " + self.data['name'], " ")
+        ui = DialogInformation(self.app, "Coded text : " + self.data['name'], " ")
         cur = self.conn.cursor()
         CODENAME = 0
         COLOR = 1

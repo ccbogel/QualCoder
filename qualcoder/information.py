@@ -61,16 +61,18 @@ class DialogInformation(QtWidgets.QDialog):
     title = ""
     text = ""
 
-    def __init__(self, title, html="", parent=None):
-        ''' Display information text in dialog.
-        If no html is given, fill with About html.
-        '''
+    def __init__(self, app, title, html="", parent=None):
+        """Display information text in dialog.
+        If no html is given, fill with About html. """
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
+        font += '"' + app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.setWindowTitle(title)
         if html == "":
             self.setHtml(a)
@@ -78,39 +80,21 @@ class DialogInformation(QtWidgets.QDialog):
             self.setHtml(html)
 
     def setHtml(self, html):
-        ''' This method is used to populate the textEdit.
-        Usually called from a View_graph TextGraphicsItem via a context menu '''
+        """This method is used to populate the textEdit.
+        Usually called from a View_graph TextGraphicsItem via a context menu. """
 
         self.text = html
         self.ui.textEdit.setHtml(self.text)
 
     def accepted(self):
-        ''' Accepted button overridden method '''
+        """ Accepted button overridden method """
         self.information = self.ui.textEdit.toPlainText()
         self.ui.Dialog_information.accept()
 
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogInformation("a title", "a filename")
-    ui.show()
-    sys.exit(app.exec_())
-
-a = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">\
-<html><head>\
-	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>\
-	<style type="text/css">\
-	@page { margin: 2cm }\
-	h1 { margin-bottom: 0.21cm; color: #000000 }\
-	h1.western { font-family: "Arial", sans-serif; font-size: 16pt }\
-	h2 { margin-bottom: 0.21cm; color: #000000 }\
-	h2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }\
-	</style>\
-</head><body>\
-<h1 class="western">About QualCoder</h1>\
+a = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoder 1.9 2020 March 11</p>\
-<p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six</p>\
+<p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
 <p>VLC should also be installed.</p>\
 <p>Tested on: Linux Mint 18.04, Ubuntu 19.04, Lubuntu 18.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\
 <p></p>\
@@ -122,12 +106,12 @@ a = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">\
 <p>The VideoLAN team for the bindings to VLC</p>\
 <p>To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
-<p>The qda data folder contains folders for imported documents, '
-a += 'images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
-<p>QualCoder creates a .qualcoder folder inside your home directory. '
-a += 'This contains QualCoder.log, config.ini (for settings) and '
-a += 'recent_project.txt. The config file contains the name of the current coder, '
-a += 'default working directory and selected font.</p>\
+<p>The qda data folder contains folders for imported documents, \
+images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
+<p>QualCoder creates a .qualcoder folder inside your home directory. \
+This contains QualCoder.log, config.ini (for settings) and \
+recent_project.txt. The config file contains the name of the current coder, \
+default working directory and selected font.</p>\
 <p>QualCoder is written in python 3 using Qt5 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\
@@ -149,5 +133,10 @@ WARRANTIES OF MERCHANTABILITY,</p>\
 SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,<br />\
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR<br />\
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR<br />\
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></body></html>'
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>'
 
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    ui = DialogInformation(None, "a title", "")
+    ui.show()
+    sys.exit(app.exec_())

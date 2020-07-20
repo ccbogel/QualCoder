@@ -647,7 +647,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
 
     def help(self):
-        """ Display help information in browser. """
+        """ Display manual in browser. """
 
         webbrowser.open(path + "/GUI/QualCoder_Manual.pdf")
         self.clean_dialog_refs()
@@ -658,7 +658,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
                 return
-        ui = DialogInformation("About", "")
+        ui = DialogInformation(self.app, "About", "")
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
