@@ -294,6 +294,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddItemName(check_names, _("New attribute name"))
+        ui.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         ui.exec_()
         name = ui.get_new_name()
         if name is None or name == "":
