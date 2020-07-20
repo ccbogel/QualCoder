@@ -104,6 +104,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         sys.excepthook = exception_handler
         self.app = app
+        self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
         self.dialogList = []
         self.attributes = []
@@ -142,7 +143,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         except:
             pass
         #print(self.row, self.col, self.cellValue)
-        # action cannot be None otherwise may default to one of the actionsbelow depending on column clicked
+        # action cannot be None otherwise may default to one of the actions below depending on column clicked
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
