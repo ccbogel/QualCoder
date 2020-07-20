@@ -57,7 +57,7 @@ from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
-from select_file import DialogSelectFile
+from select_items import DialogSelectItems
 from settings import DialogSettings
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
@@ -1108,7 +1108,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.rmtree(self.app.delete_backup_path_name)
             except Exception as e:
                 print(str(e))
-
+        self.app.append_recent_project(self.app.project_path)
         self.app.conn = None
         self.app.project_path = ""
         self.app.project_name = ""
