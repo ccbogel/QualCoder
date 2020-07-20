@@ -57,7 +57,6 @@ except:  # ModuleNotFoundError
 import ebooklib
 from ebooklib import epub
 
-#from add_item_name import DialogAddItemName
 from add_attribute import DialogAddAttribute
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
@@ -95,7 +94,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     DATE_COLUMN = 2
     ID_COLUMN = 3
     default_import_directory = os.path.expanduser("~")
-    attribute_names = []  # list of dictionary name:value for additem dialog
+    attribute_names = []  # list of dictionary name:value for AddAtribute dialog
     parent_textEdit = None
     dialogList = []
     order_by = ""
@@ -292,9 +291,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
 
     def add_attribute(self):
-        """ When add button pressed, opens the addItem dialog to get new attribute text.
+        """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
         Then get the attribute type through a dialog.
-        AddItem dialog checks for duplicate attribute name.
+        AddAttribute dialog checks for duplicate attribute name.
         New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]

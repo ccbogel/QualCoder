@@ -36,6 +36,7 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
+from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
 from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
@@ -156,22 +157,16 @@ class DialogCases(QtWidgets.QDialog):
         for a in result:
             attribute_names.append({'name': a[0]})
         check_names = attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'caseid'}, {'name':'date'}]
-        ui = DialogAddItemName(check_names, _("New attribute name"))
+        ui = DialogAddAttribute(self.app, check_names)
         ui.exec_()
-        name = ui.get_new_name()
-        if name is None or name == "":
+        name = ui.new_name
+        value_type = ui.value_type
+        if name == "":
             return
-        Dialog_type = QtWidgets.QDialog()
-        ui = Ui_Dialog_attribute_type()
-        ui.setupUi(Dialog_type)
-        ok = Dialog_type.exec_()
-        valuetype = "character"
-        if ok and ui.radioButton_numeric.isChecked():
-            valuetype = "numeric"
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(name, now_date, self.app.settings['codername'], "", 'case', valuetype))
+            ,(name, now_date, self.app.settings['codername'], "", 'case', value_type))
         self.app.conn.commit()
         sql = "select caseid from cases"
         cur.execute(sql)
@@ -182,7 +177,7 @@ class DialogCases(QtWidgets.QDialog):
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
-        self.parent_textEdit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + valuetype)
+        self.parent_textEdit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
