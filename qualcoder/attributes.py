@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Copyright (c) 2019 Colin Curtain
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,10 @@ import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from add_item_name import DialogAddItemName
+from add_attribute import DialogAddAttribute
 from confirm_delete import DialogConfirmDelete
 from memo import DialogMemo
 from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
-from GUI.ui_dialog_attribute_type import Ui_Dialog_attribute_type
 from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 
@@ -55,8 +54,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogManageAttributes(QtWidgets.QDialog):
-    ''' Attribute management. Create and delete attributes in the attributes table.
-    '''
+    """ Attribute management. Create and delete attributes in the attributes table.
+    """
 
     NAME_COLUMN = 0
     CASE_FILE_COLUMN = 1
@@ -71,13 +70,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textEdit
-        self.attribute_type = []
-
+        self.attributes = []
         cur = self.app.conn.cursor()
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
         for row in result:
-            self.attribute_type.append({'name': row[0], 'date': row[1], 'owner': row[2],
+            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
             'memo': row[3], 'caseOrFile': row[4],'valuetype': row[5]})
 
         QtWidgets.QDialog.__init__(self)
@@ -94,30 +92,18 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
 
     def add_attribute(self):
-        ''' When add button pressed, open addItem dialog to get new attribute text.
+        """ When add button pressed, open addItem dialog to get new attribute text.
         AddItem dialog checks for duplicate attribute name.
-        New attribute is added to the model and database '''
+        New attribute is added to the model and database """
 
-        ui = DialogAddItemName(self.attribute_type, _("New attribute name"))
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        ui.setStyleSheet(font)
-        ui.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        check_names = self.attributes + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
+        ui = DialogAddAttribute(self.app, check_names)
         ui.exec_()
-        newText = ui.get_new_name()
-        if newText is None or newText == "":
+        name = ui.new_name
+        value_type = ui.value_type
+        if name == "":
             return
-        Dialog_type = QtWidgets.QDialog()
-        ui = Ui_Dialog_attribute_type()
-        ui.setupUi(Dialog_type)
-        Dialog_type.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        Dialog_type.setStyleSheet(font)
-        ok = Dialog_type.exec_()
-        valuetype = "character"
-        if ok and ui.radioButton_numeric.isChecked():
-            valuetype = "numeric"
+
         Dialog_assign = QtWidgets.QDialog()
         ui = Ui_Dialog_assignAttribute()
         ui.setupUi(Dialog_assign)
@@ -129,12 +115,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         case_or_file = "case"
         if ok and ui.radioButton_files.isChecked():
             case_or_file = "file"
-        # update attribute_type list and database
+        # update attributes list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        item = {'name': newText, 'memo': "", 'owner': self.app.settings['codername'],
-            'date': now_date, 'valuetype': valuetype,
+        item = {'name': name, 'memo': "", 'owner': self.app.settings['codername'],
+            'date': now_date, 'valuetype': value_type,
             'caseOrFile': case_or_file}
-        self.attribute_type.append(item)
+        self.attributes.append(item)
         cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
             ,(item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
@@ -154,92 +140,96 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.parent_textEdit.append(_("Attribute added: ") + item['name'] + _(" to ") + _(case_or_file))
 
     def delete_attribute(self):
-        ''' When delete button pressed, attribute is deleted from database '''
+        """ When delete button pressed, attribute is deleted from database. """
 
-        tableRowsToDelete = []  # for table widget ids
-        namesToDelete = []
+        rows_to_delete = []  # for table widget ids
+        names_to_delete = []
         for itemWidget in self.ui.tableWidget.selectedItems():
-            tableRowsToDelete.append(int(itemWidget.row()))
-            namesToDelete.append(self.ui.tableWidget.item(itemWidget.row(), 0).text())
-        tableRowsToDelete.sort(reverse=True)
-        if len(namesToDelete) == 0:
+            rows_to_delete.append(int(itemWidget.row()))
+            names_to_delete.append(self.ui.tableWidget.item(itemWidget.row(), 0).text())
+        rows_to_delete.sort(reverse=True)
+        if len(names_to_delete) == 0:
             return
-        ui = DialogConfirmDelete("\n".join(namesToDelete))
+        ui = DialogConfirmDelete("\n".join(names_to_delete))
         ok = ui.exec_()
         if not ok:
             return
-        for name in namesToDelete:
-            for attr in self.attribute_type:
+        for name in names_to_delete:
+            for attr in self.attributes:
                 if attr['name'] == name:
                     self.parent_textEdit.append(_("Attribute deleted: ") + attr['name'])
                     cur = self.app.conn.cursor()
                     cur.execute("delete from attribute where name = ?", (name,))
                     cur.execute("delete from attribute_type where name = ?", (name,))
         self.app.conn.commit()
-        self.attribute_type = []
+        self.attributes = []
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
         for row in result:
-            self.attribute_type.append({'name': row[0], 'date': row[1], 'owner': row[2],
+            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
             'memo': row[3], 'caseOrFile': row[4],'valuetype': row[5]})
         self.fill_tableWidget()
+        self.parent_textEdit.append(_("Attributes deleted: ") + ",".join(names_to_delete))
 
     def cell_selected(self):
-        ''' When the table widget memo cell is selected display the memo.
+        """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
-        If a new memo also show in table widget by displaying YES in the memo column '''
+        If a new memo also show in table widget by displaying Memo in the memo column. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == self.MEMO_COLUMN:
-            ui = DialogMemo(self.app, _("Memo for Attribute ") + self.attribute_type[x]['name'],
-            self.attribute_type[x]['memo'])
+            ui = DialogMemo(self.app, _("Memo for Attribute ") + self.attributes[x]['name'],
+            self.attributes[x]['memo'])
             ui.exec_()
             memo = ui.memo
-            if memo != self.attribute_type[x]['memo']:
-                self.attribute_type[x]['memo'] = memo
+            if memo != self.attributes[x]['memo']:
+                self.attributes[x]['memo'] = memo
                 cur = self.app.conn.cursor()
-                cur.execute("update attribute_type set memo=? where name=?", (memo, self.attribute_type[x]['name']))
+                cur.execute("update attribute_type set memo=? where name=?", (memo, self.attributes[x]['name']))
                 self.app.conn.commit()
             if memo == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Yes")))
-            self.attribute_type[x]['memo'] = str(memo)
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
+            self.attributes[x]['memo'] = str(memo)
 
     def cell_modified(self):
-        ''' If the attribute name has been changed in the table widget and update the database '''
+        """ If the attribute name has been changed in the table widget and update the database. """
+
         NAME_COLUMN = 0
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if y == NAME_COLUMN:
-            newText = str(self.ui.tableWidget.item(x, y).text()).strip()
+            new_name = str(self.ui.tableWidget.item(x, y).text()).strip()
             # check that no other attribute has this text and this is is not empty
             update = True
-            if newText == "":
+            if new_name == "":
                 update = False
-            for att in self.attribute_type:
-                if att['name'] == newText:
+            for att in self.attributes:
+                if att['name'] == new_name:
                     update = False
             if update:
                 # update attribute type list and database
                 cur = self.app.conn.cursor()
-                cur.execute("update attribute_type set name=? where name=?", (newText, self.attribute_type[x]['name']))
-                cur.execute("update attribute set name=? where name=?", (newText, self.attribute_type[x]['name']))
+                cur.execute("update attribute_type set name=? where name=?", (new_name, self.attributes[x]['name']))
+                cur.execute("update attribute set name=? where name=?", (new_name, self.attributes[x]['name']))
                 self.app.conn.commit()
-                self.attribute_type[x]['name'] = newText
+                self.parent_textEdit.append(_("Attribute renamed from: ") + self.attributes[x]['name'] + _(" to ") + new_name)
+                self.attributes[x]['name'] = new_name
+
             else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.attribute_type[x]['name'])
+                self.ui.tableWidget.item(x, y).setText(self.attributes[x]['name'])
 
     def fill_tableWidget(self):
-        ''' Fill the table widget with attribute details '''
+        """ Fill the table widget with attribute details. """
 
         rows = self.ui.tableWidget.rowCount()
         for i in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(4)
         self.ui.tableWidget.setHorizontalHeaderLabels([_("name"), _("caseOrFile"), _("valuetype"), _("memo")])
-        for row, a in enumerate(self.attribute_type):
+        for row, a in enumerate(self.attributes):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(a['name'])
             item.setToolTip(a['date'] + "\n" + a['owner'])
