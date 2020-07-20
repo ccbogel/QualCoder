@@ -228,7 +228,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         for i in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(4)
-        self.ui.tableWidget.setHorizontalHeaderLabels([_("name"), _("caseOrFile"), _("valuetype"), _("memo")])
+        self.ui.tableWidget.setHorizontalHeaderLabels([_("Name"), _("Assigned to"), _("Type"), _("Memo")])
         for row, a in enumerate(self.attributes):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(a['name'])
