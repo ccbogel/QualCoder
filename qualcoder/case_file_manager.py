@@ -309,16 +309,19 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     def textBrowser_menu(self, position):
         """ Context menu for textBrowser. Mark, unmark, copy. """
 
+        if self.ui.textBrowser.toPlainText() == "":
+            return
         cursor = self.ui.textBrowser.cursorForPosition(position)
         selected_text = self.ui.textBrowser.textCursor().selectedText()
         print(selected_text)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        if self.ui.textBrowser.toPlainText() == "":
-            return
+        action_select_all = None
         action_mark = None
         action_unmark = None
         action_copy = None
+        if selected_text == "":
+            action_select_all = menu.addAction(_("Select all"))
         if selected_text != "":
             action_mark = menu.addAction(_("Mark"))
             action_copy = menu.addAction("Copy")
@@ -335,6 +338,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.unmark(position)
         if action == action_copy:
             self.copy_selected_text_to_clipboard()
+        if action == action_select_all:
+            self.ui.textBrowser.selectAll()
 
     def copy_selected_text_to_clipboard(self):
 
