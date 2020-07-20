@@ -161,6 +161,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_order_by_value = menu.addAction(_("Order by this attribute"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
+        action_show_all = menu.addAction(_("Show all rows"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
 
         if action == action_view:
@@ -193,6 +194,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
                 if text is not None and (item is None or item.text().find(text) == -1):
                     self.ui.tableWidget.setRowHidden(r, True)
+        if action == action_show_all:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -463,6 +467,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Alternatively view an image or other media. """
 
         x = self.ui.tableWidget.currentRow()
+        self.ui.tableWidget.selectRow(x)
         if self.source[x]['mediapath'] is not None:
             if self.source[x]['mediapath'][:8] == "/images/":
                 self.view_image(x)
