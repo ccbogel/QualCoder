@@ -1302,6 +1302,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
+        action_start_pos = None
+        action_end_pos = None
         action_play_text = None
         play_text_avid = None
         for item in self.code_text:
@@ -1310,6 +1312,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     action_play_text = menu.addAction(_("Play text"))
                     play_text_avid = item['avid']
                 action_unmark = menu.addAction(_("Unmark"))
+                action_start_pos = menu.addAction(_("Change start position"))
+                action_end_pos = menu.addAction(_("Change end position"))
                 break
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
@@ -1345,6 +1349,62 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.prepare_link_text_to_segment()
         if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
+        if action == action_start_pos:
+            self.change_text_code_pos(cursor.position(), "start")
+        if action == action_end_pos:
+            self.change_text_code_pos(cursor.position(), "end")
+
+    def change_text_code_pos(self, location, start_or_end):
+        if self.filename == {}:
+            return
+        code_list = []
+        for item in self.code_text:
+            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+                code_list.append(item)
+        if code_list == []:
+            return
+        code_to_edit = None
+        if len(code_list) == 1:
+            code_to_edit = code_list[0]
+        # multiple codes to selet from
+        if len(code_list) > 1:
+            ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            code_to_edit = ui.get_selected()
+        if code_to_edit is None:
+            return
+        txt_len = len(self.ui.textEdit.toPlainText())
+        changed_start = 0
+        changed_end = 0
+        if start_or_end == "start":
+            max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
+            min = -1 * code_to_edit['pos0']
+            print("start", min, max)
+            changed_start, ok = QtWidgets.QInputDialog.getInt(self, _("Change start position"), _("Change start character position.\nPositive or negative number:"), 0,min,max,1)
+            if not ok:
+                return
+        if start_or_end == "end":
+            max = txt_len - code_to_edit['pos1']
+            min = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
+            print("end", min, max)
+            changed_end, ok = QtWidgets.QInputDialog.getInt(self, _("Change end position"), _("Change end character position.\nPositive or negative number:"), 0,min,max,1)
+            if not ok:
+                return
+        if changed_start == 0 and changed_end == 0:
+            return
+
+        # Update db, reload code_text and highlights
+        new_pos0 = code_to_edit['pos0'] + changed_start
+        new_pos1 = code_to_edit['pos1'] + changed_end
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=?, pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'], code_to_edit['pos1'], self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def play_text(self, avid):
         """ Play the audio/video for this coded text selection that is mapped to an a/v segment. """
@@ -1500,26 +1560,22 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
             return
-        unmarked = None
+        to_unmark = None
         for item in self.code_text:
             if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
-                unmarked = item
-        if unmarked is None:
+                to_unmark = item
+        if to_unmark is None:
             return
 
         # delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
-        cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=?",
-            (unmarked['cid'], unmarked['pos0'], unmarked['pos1'], self.app.settings['codername']))
+        cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
+            (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername'],
+            to_unmark['fid']))
         self.app.conn.commit()
         self.app.delete_backup = False
-        if unmarked in self.code_text:
-            self.code_text.remove(unmarked)
-
         # update filter for tooltip and update code colours
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
-        self.unlight()
-        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
     def annotate(self, location):
