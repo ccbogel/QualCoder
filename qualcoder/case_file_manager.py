@@ -268,7 +268,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.selected_text_file = None
         # a fulltext source is displaysed if filltext is present
         # if the mediapath is None, this represents an A/V transcribed file
-        self.ui.label_file.setText(_("Displayed file:") + self.allfiles[index][NAME])
+        self.ui.label_file.setText(_("Displayed file: ") + self.allfiles[index][NAME])
         if self.allfiles[index][FULLTEXT] != "" and self.allfiles[index][FULLTEXT] is not None:
             self.selected_text_file = self.allfiles[index]
             self.ui.textBrowser.setText(self.allfiles[index][FULLTEXT])
@@ -310,6 +310,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         ''' Context menu for textBrowser. Mark, unmark, copy. '''
 
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         if self.ui.textBrowser.toPlainText() == "":
             return
         ActionItemMark = menu.addAction(_("Mark"))
