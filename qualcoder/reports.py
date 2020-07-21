@@ -1748,7 +1748,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in cases:
             vertical_labels.append(c[1])
 
-        # need to dynamically replace the existing table widget. Becuase, the tablewidget may
+        # need to dynamically replace the existing table widget. Because, the tablewidget may
         # already have been replaced with a textEdit (file selection the view text in context)
         ta = QtWidgets.QTableWidget()
         ta.setColumnCount(len(horizontal_labels))
@@ -1771,8 +1771,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                         txt_edit.insertHtml(self.html_heading(i))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
-        ta.resizeColumnsToContents()
         ta.resizeRowsToContents()
+        ta.resizeColumnsToContents()
+        # maximise the space from one column or one row
+        if ta.columnCount() == 1:
+            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if ta.rowCount() == 1:
+            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.replaceWidget(2, ta)
         self.ui.splitter.setSizes([100, 300, 300])
 
