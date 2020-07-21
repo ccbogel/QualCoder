@@ -86,6 +86,13 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_case_file_manager()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogcasefilemanager_w'])
+            h = int(self.app.settings['dialogcasefilemanager_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -108,6 +115,12 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         #self.ui.textBrowser.anchorClicked.connect(self.link_clicked)
         self.get_files()
         self.fill_table()
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogcasefilemanager_w'] = new_size.size().width()
+        self.app.settings['dialogcasefilemanager_h'] = new_size.size().height()
 
     def get_files(self):
         """ Get files for this case """

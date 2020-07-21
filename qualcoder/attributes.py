@@ -81,6 +81,13 @@ class DialogManageAttributes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogmanageattributes_w'])
+            h = int(self.app.settings['dialogmanageattributes_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -90,6 +97,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogmanageattributes_w'] = new_size.size().width()
+        self.app.settings['dialogmanageattributes_h'] = new_size.size().height()
 
     def add_attribute(self):
         """ When add button pressed, open addItem dialog to get new attribute text.
