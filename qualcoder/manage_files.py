@@ -93,11 +93,11 @@ class DialogManageFiles(QtWidgets.QDialog):
     MEMO_COLUMN = 1
     DATE_COLUMN = 2
     ID_COLUMN = 3
+    rows_hidden = False
     default_import_directory = os.path.expanduser("~")
-    attribute_names = []  # list of dictionary name:value for AddAtribute dialog
+    attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
     parent_textEdit = None
     dialogList = []
-    order_by = ""
 
     def __init__(self, app, parent_textEdit):
 
@@ -125,7 +125,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.order_by = ""
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
 
     def table_menu(self, position):
@@ -146,22 +146,26 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
-        action_alphabetic = 1
-        action_date = 1
-        action_type = 1
-        action_equals_value = 1
-        action_order_by_value = 1
+        action_alphabetic = None
+        action_date = None
+        action_type = None
+        action_equals_value = None
+        action_order_by_value = None
+        action_show_all = None
         if col < 4:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
             action_type = menu.addAction(_("File type order"))
         if col > 3:
             action_equals_value = menu.addAction(_("Show this value"))
-            action_order_by_value = menu.addAction(_("Order by this attribute"))
+            action_order_by_value = menu.addAction(_("Order by attribute"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
-        action_show_all = menu.addAction(_("Show all rows"))
+        if self.rows_hidden:
+            action_show_all = menu.addAction(_("Show all rows"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:
+            return
 
         if action == action_view:
             self.view()
@@ -170,18 +174,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action== action_delete:
             self.delete()
         if action == action_alphabetic:
-            self.order_by = ""
             self.load_file_data()
         if action == action_date:
-            self.order_by = "date"
-            self.load_file_data()
+            self.load_file_data("date")
             self.fill_table()
         if action == action_type:
-            self.order_by = "filetype"
-            self.load_file_data()
+            self.load_file_data("filetype")
         if action == action_order_by_value:
-            self.order_by = "attribute:" + self.header_labels[col]
-            self.load_file_data()
+            self.load_file_data("attribute:" + self.header_labels[col])
 
         if action == action_equals_value:
             # Hide rows that do not match this value, text can be None type
@@ -193,9 +193,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
                 if text is not None and (item is None or item.text().find(text) == -1):
                     self.ui.tableWidget.setRowHidden(r, True)
+                    self.rows_hidden = True
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
+                self.rows_hidden = False
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -231,12 +233,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where id=?", [r[0],])
             self.app.conn.commit()
 
-    def load_file_data(self):
+    def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question.
         This also fills out the table header lables with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
+        param:
+            order_by: string ""= name, "date" = date, "filetype" = mediapath, "attribute:attribute name" selected atribute
         """
 
         # check a placeholder attribute is present for the file, add if missing
@@ -246,17 +250,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         placeholders = None
         # default alphabetic order
         sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)"
-        if self.order_by == "date":
+        if order_by == "date":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
-        if self.order_by == "filetype":
+        if order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
-        if self.order_by[:10] == "attribute:":
-            attribute_name = self.order_by[10:]
-            print(attribute_name)
+        if order_by[:10] == "attribute:":
+            attribute_name = order_by[10:]
             # two types of ordering character or numeric
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
-            sql = 'select source.name, source.id, "", mediapath, source.memo, source.owner, source.date \
+            sql = 'select source.name, source.id, fulltext, mediapath, source.memo, source.owner, source.date \
                 from source  join attribute on attribute.id = source.id \
                 where attribute.attr_type = "file" and attribute.name=? '
             if attr_type == "character":
@@ -1180,10 +1183,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def get_icon(self, name):
-        ''' Get icon to put in table. Helper method for fill_table
+        """ Get icon to put in table. Helper method for fill_table
          parameter:
             name: a filename
-         return: QIcon '''
+         return: QIcon """
 
         icon_text = QtGui.QIcon("GUI/text.png")
         icon_play = QtGui.QIcon("GUI/play.png")
