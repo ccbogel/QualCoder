@@ -134,10 +134,10 @@ class App(object):
                     result.append(p)
         if previous != result:
             with open(self.persist_path, 'w') as f:
-                for i, line in enumerate(reversed(result)):
+                for i, line in enumerate((result)):
                     f.write(line)
                     f.write(os.linesep)
-                    if i > 10:
+                    if i > 8:
                         break
         return result
 
