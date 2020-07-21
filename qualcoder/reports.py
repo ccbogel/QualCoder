@@ -695,6 +695,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogreportcodes_w'])
+            h = int(self.app.settings['dialogreportcodes_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -735,8 +742,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setReadOnly(True)
-
         self.ui.splitter.setSizes([100, 200, 0])
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogreportcodes_w'] = new_size.size().width()
+        self.app.settings['dialogreportcodes_h'] = new_size.size().height()
 
     def get_data(self):
         """ Called from init, delete category. Load codes, categories, and coders. """

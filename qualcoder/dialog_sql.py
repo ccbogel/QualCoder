@@ -82,6 +82,13 @@ class DialogSQL(QtWidgets.QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogsql_w'])
+            h = int(self.app.settings['dialogsql_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -103,6 +110,12 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.pushButton_export.clicked.connect(self.export_file)
         self.ui.splitter.setSizes([20, 180])
         self.ui.splitter_2.setSizes([10, 290])
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogsql_w'] = new_size.size().width()
+        self.app.settings['dialogsql_h'] = new_size.size().height()
 
     def export_file(self):
         """ Load result set and export results to a delimited .csv file

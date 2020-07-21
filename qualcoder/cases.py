@@ -91,6 +91,13 @@ class DialogCases(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogcases_w'])
+            h = int(self.app.settings['dialogcases_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -108,6 +115,12 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.anchorClicked.connect(self.link_clicked)
         self.fill_tableWidget()
         self.ui.splitter.setSizes([1, 1, 0])
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogcases_w'] = new_size.size().width()
+        self.app.settings['dialogcases_h'] = new_size.size().height()
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.

@@ -76,10 +76,10 @@ def msecs_to_mins_and_secs(msecs):
 
 
 class DialogCodeText(QtWidgets.QWidget):
-    ''' Code management. Add, delete codes. Mark and unmark text.
+    """ Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
     Trialled using setHtml for documents, but on marking text Html formatting was replaced, also
-    on unmarking text, the unmark was not immediately cleared (needed to reload the file) '''
+    on unmarking text, the unmark was not immediately cleared (needed to reload the file). """
 
     NAME_COLUMN = 0
     ID_COLUMN = 1
@@ -114,6 +114,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_codes_and_categories()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogcodetext_w'])
+            h = int(self.app.settings['dialogcodetext_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -157,9 +164,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         self.ui.splitter.setSizes([150, 400])
-        #self.ui.leftsplitter.setSizes([100, 0])
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogcodetext_w'] = new_size.size().width()
+        self.app.settings['dialogcodetext_h'] = new_size.size().height()
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name and colour.

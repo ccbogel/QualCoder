@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Copyright (c) 2019 Colin Curtain
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,13 @@ class DialogJournals(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogjournals_w'])
+            h = int(self.app.settings['dialogjouranls_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -106,8 +113,14 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_export.clicked.connect(self.export)
         self.ui.pushButton_delete.clicked.connect(self.delete)
 
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogjournals_w'] = new_size.size().width()
+        self.app.settings['dialogjournals_h'] = new_size.size().height()
+
     def view(self):
-        ''' View and edit journal contents in the textEdit '''
+        """ View and edit journal contents in the textEdit """
 
         x = self.ui.tableWidget.currentRow()
         if x == -1:
@@ -120,10 +133,10 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.blockSignals(False)
 
     def text_changed(self):
-        ''' journal entry is changed on changes to text edit.
+        """ journal entry is changed on changes to text edit.
         The signal is switched off when a different journal is loaded.
         Changes are not saved to database until dialog is closed.
-        '''
+        """
 
         if self.current_jid is None:
             return
@@ -135,7 +148,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def closeEvent(self, event):
-        ''' Save journal text changes to database. '''
+        """ Save journal text changes to database. """
 
         cur = self.app.conn.cursor()
         for j in self.journals:
@@ -149,7 +162,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.conn.commit()
 
     def create(self):
-        ''' Create a new journal by entering text into the dialog '''
+        """ Create a new journal by entering text into the dialog. """
 
         self.current_jid = None
         self.ui.textEdit.setPlainText("")
@@ -206,7 +219,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.setFocus()
 
     def export(self):
-        ''' Export journal to a plain text file, filename will have .txt ending '''
+        """ Export journal to a plain text file, filename will have .txt ending. """
 
         x = self.ui.tableWidget.currentRow()
         if x == -1:
@@ -227,7 +240,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.parent_textEdit.append(msg)
 
     def delete(self):
-        ''' Delete journal from database and update model and widget. '''
+        """ Delete journal from database and update model and widget. """
 
         x = self.ui.tableWidget.currentRow()
         if x == -1:
@@ -248,7 +261,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.parent_textEdit.append(_("Journal deleted: ") + journalname)
 
     def table_selection_changed(self):
-        ''' Update the journal text for the current selection. '''
+        """ Update the journal text for the current selection. """
 
         row = self.ui.tableWidget.currentRow()
         try:
@@ -260,8 +273,8 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.label_jname.setText(_("No journal selected"))
 
     def cell_modified(self):
-        ''' If the journal name has been changed in the table widget update the database
-        '''
+        """ If the journal name has been changed in the table widget update the database
+        """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()

@@ -243,6 +243,10 @@ class App(object):
         return code_names, categories
 
     def write_config_ini(self, settings):
+        """ Stores settings for fonts, current coder, directory, and window sizes in .qualcoder folder
+        Called by qualcoder.App.load_settings, qualcoder.MainWindow.open_project, settings.DialogSettings
+        """
+
         config = configparser.ConfigParser()
         config['DEFAULT'] = settings
         with open(self.configpath, 'w') as configfile:
@@ -259,6 +263,28 @@ class App(object):
         if 'treefontsize' in default:
             result['treefontsize'] = default.getint('treefontsize')
         return result
+
+    def check_and_add_window_sizings(self, data):
+        """ Newer feature to include width and height settings for many dialogs and main window.
+        :param data:  dictionary of most or all settings
+        :return: dictionary of settings
+        """
+
+        dict_len = len(data)
+        keys = ['mainwindow_w', 'mainwindow_h', 'dialogcodetext_w','dialogcodetext_h',
+        'dialogcodeimage_w', 'dialogcodeimage_h', 'dialogviewimage_w', 'dialogviewimage_h',
+        'dialogreportcodes_w', 'dialogreportcodes_h', 'dialogmanagefiles_w', 'dialogmanagefiles_h',
+        'dialogjournals_w', 'dialogjournals_h', 'dialogsql_w', 'dialogsql_h',
+        'dialogcases_w', 'dialogcases_h', 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
+        'dialogmanagesttributes_w', 'dialogmanageattributes_h']
+        for key in keys:
+            if key not in data:
+                data[key] = 0
+        # write out new ini file, if needed
+        if len(data) > dict_len:
+            self.write_config_ini(data)
+            logger.info('Added window sizings to config.ini')
+        return data
 
     def merge_settings_with_default_stylesheet(self, settings):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
@@ -280,8 +306,9 @@ class App(object):
         result = self._load_config_ini()
         if not len(result):
             self.write_config_ini(self.default_settings)
-            logger.info('Initilaized config.ini')
+            logger.info('Initialized config.ini')
             result = self._load_config_ini()
+        result = self.check_and_add_window_sizings(result)
         return result
 
     @property
@@ -296,6 +323,28 @@ class App(object):
             'language': 'en',
             'backup_on_open': True,
             'backup_av_files': True,
+            'mainwindow_w': 0,
+            'mainwindow_h': 0,
+            'dialogcodetext_w': 0,
+            'dialogcodetext_h': 0,
+            'dialogcodeimage_w': 0,
+            'dialogcodeimage_h': 0,
+            'dialogviewimage_w': 0,
+            'dialogviewimage_h': 0,
+            'dialogreportcodes_w': 0,
+            'dialogreportcodes_h': 0,
+            'dialogmanagefiles_w': 0,
+            'dialogmanagefiles_h': 0,
+            'dialogjournals_w': 0,
+            'dialogjournals_h': 0,
+            'dialogsql_w': 0,
+            'dialogsql_h': 0,
+            'dialogcases_w': 0,
+            'dialogcases_h': 0,
+            'dialogcasefilemanager_w': 0,
+            'dialogcasefilemanager_h': 0,
+            'dialogmanageattributes_w': 0,
+            'dialogmanageattributes_h': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -1120,6 +1169,10 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             d.destroy()
         self.setWindowTitle("QualCoder")
+
+        #TODO if settings have changed, particularly dialog sizes
+        self.app.write_config_ini(self.app.settings)
+
 
     def clean_dialog_refs(self):
         """ Test the list of dialog refs to see if they have been cleared

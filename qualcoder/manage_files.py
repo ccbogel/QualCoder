@@ -110,6 +110,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogmanagefiles_w'])
+            h = int(self.app.settings['dialogmanagefiles_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -127,6 +134,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogmanagefiles_w'] = new_size.size().width()
+        self.app.settings['dialogmanagefiles_h'] = new_size.size().height()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """

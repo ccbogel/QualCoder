@@ -133,6 +133,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         self.fill_tree()
 
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogcodeimage_w'] = new_size.size().width()
+        self.app.settings['dialogcodeimage_h'] = new_size.size().height()
+
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
 
@@ -992,6 +998,13 @@ class DialogViewImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogviewimage_w'])
+            h = int(self.app.settings['dialogviewimage_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -1015,6 +1028,12 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui.scrollArea.setWidget(self.label)
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.textEdit.setText(self.image_data['memo'])
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogviewimage_w'] = new_size.size().width()
+        self.app.settings['dialogviewimage_h'] = new_size.size().height()
 
     def change_scale(self):
         """ Resize image. Idea from:
