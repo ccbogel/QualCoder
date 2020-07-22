@@ -743,12 +743,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setReadOnly(True)
         self.ui.splitter.setSizes([100, 200, 0])
+        try:
+            s0 = int(self.app.settings['dialogreportcodes_splitter0'])
+            s1 = int(self.app.settings['dialogreportcodes_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1, 0])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
         self.app.settings['dialogreportcodes_w'] = new_size.size().width()
         self.app.settings['dialogreportcodes_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogreportcodes_splitter0'] = sizes[0]
+        self.app.settings['dialogreportcodes_splitter1'] = sizes[1]
 
     def get_data(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
@@ -1042,17 +1057,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
 
-        # Create folder of images and media and change html links
-        foldername = filename[:-5]
-        foldername_without_path = foldername.split('/')[-1]
-        try:
-            os.mkdir(foldername)
-            os.mkdir(foldername + "/audio")
-            os.mkdir(foldername + "/video")
-        except Exception as e:
-            logger.warning(_("html folder creation error ") + str(e))
-            QtWidgets.QMessageBox.warning(None, _("Folder creation"), foldername + _(" error"))
-            return
+        need_media_folders = False
+        for item in self.html_links:
+            if item['image'] is not None or item['avname'] is not None:
+                need_media_folders = True
+        if need_media_folders:
+            # Create folder of images and media and change html links
+            foldername = filename[:-5]
+            foldername_without_path = foldername.split('/')[-1]
+            try:
+                os.mkdir(foldername)
+                os.mkdir(foldername + "/audio")
+                os.mkdir(foldername + "/video")
+            except Exception as e:
+                logger.warning(_("html folder creation error ") + str(e))
+                QtWidgets.QMessageBox.warning(None, _("Folder creation"), foldername + _(" error"))
+                return
         html = ""
         try:
             with open(filename, 'r') as f:
@@ -1063,7 +1083,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         for item in self.html_links:
             if item['imagename'] is not None:
-                # [-3] has a counter, e.g. 1_, 2_ for each image eto make it distinct
+                # [-3] has a counter, e.g. 1_, 2_ for each image to make it distinct
                 imagename = item['imagename'].split('/')[-3] + item['imagename'].split('/')[-1]
                 #print("IN: ", imagename)
                 folder_link = filename[:-5] + "/" + imagename
@@ -1104,7 +1124,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         with open(filename, 'w') as f:
             f.write(html)
         msg = _("Report exported to: ") + filename
-        msg += "\n" + _("Image folder: ") + foldername
+        if need_media_folders:
+            msg += "\n" + _("Media folder: ") + foldername
         self.parent_textEdit.append(msg)
         QtWidgets.QMessageBox.information(None, _("HTML file saved"), msg)
 

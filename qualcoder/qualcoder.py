@@ -554,10 +554,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 action5 = QtWidgets.QAction(r, self)
                 self.ui.menuOpen_Recent_Project.addAction(action5)
                 action5.triggered.connect(self.project5)
-            if i == 6:
-                action6 = QtWidgets.QAction(r, self)
-                self.ui.menuOpen_Recent_Project.addAction(action5)
-                action6.triggered.connect(self.project6)
 
     def project0(self):
         self.open_project(self.recent_projects[0])
@@ -863,7 +859,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Follows the REFI standard. """
 
         self.close_project()
-        self.ui.textEdit.append("IMPORTING REFI-QDA PROJECT")
+        self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
@@ -881,7 +877,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Import an RQDA format project into a new project space. """
 
         self.close_project()
-        self.ui.textEdit.append("IMPORTING RQDA PROJECT")
+        self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
+        msg = _("Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
+        QtWidgets.QMessageBox.information(None, _("RQDA import steps"), msg)
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
