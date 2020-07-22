@@ -18,7 +18,7 @@ You may need to add unstable repos as described at https://www.binarytides.com/e
 
 On some Linux versions ypu will need to install pip
 
-`sudo apt install python3-pip'
+`sudo apt install python3-pip`
 
 You also need to run this command from the terminal for pdf importing:
 
