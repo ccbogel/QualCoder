@@ -109,13 +109,43 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.pushButton_runSQL.clicked.connect(self.run_SQL)
         self.ui.pushButton_export.clicked.connect(self.export_file)
         self.ui.splitter.setSizes([20, 180])
+        try:
+            s0 = int(self.app.settings['dialogsql_splitter_h0'])
+            s1 = int(self.app.settings['dialogsql_splitter_h1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_2.setSizes([10, 290])
+        try:
+            s0 = int(self.app.settings['dialogsql_splitter_v0'])
+            s1 = int(self.app.settings['dialogsql_splitter_v1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter_2.splitterMoved.connect(self.splitter2_sizes)
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
         self.app.settings['dialogsql_w'] = new_size.size().width()
         self.app.settings['dialogsql_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter (horizontal) and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogsql_splitter_h0'] = sizes[0]
+        self.app.settings['dialogsql_splitter_h1'] = sizes[1]
+
+    def splitter2_sizes(self, pos, index):
+        """ Detect size changes in splitter2 vertical and store in app.settings variable. """
+
+        sizes = self.ui.splitter_2.sizes()
+        self.app.settings['dialogsql_splitter_v0'] = sizes[0]
+        self.app.settings['dialogsql_splitter_v1'] = sizes[1]
 
     def export_file(self):
         """ Load result set and export results to a delimited .csv file

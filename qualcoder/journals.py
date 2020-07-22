@@ -81,7 +81,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.setupUi(self)
         try:
             w = int(self.app.settings['dialogjournals_w'])
-            h = int(self.app.settings['dialogjouranls_h'])
+            h = int(self.app.settings['dialogjournals_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
         except:
@@ -92,6 +92,14 @@ class DialogJournals(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         #self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        try:
+            s0 = int(self.app.settings['dialogjournals_splitter0'])
+            s1 = int(self.app.settings['dialogjournals_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
 
         for row, details in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
@@ -118,6 +126,13 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.app.settings['dialogjournals_w'] = new_size.size().width()
         self.app.settings['dialogjournals_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogjournals_splitter0'] = sizes[0]
+        self.app.settings['dialogjournals_splitter1'] = sizes[1]
 
     def view(self):
         """ View and edit journal contents in the textEdit """
@@ -166,7 +181,9 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.current_jid = None
         self.ui.textEdit.setPlainText("")
-        name, ok = QtWidgets.QInputDialog.getText(self, _('New journal'), _('Enter the journal name:'))
+        dialog = QtWidgets.QInputDialog()
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        name, ok = dialog.getText(self, _('New journal'), _('Enter the journal name:'))
         if not ok:
             return
         if name is None or name == "":

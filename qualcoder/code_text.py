@@ -164,6 +164,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         self.ui.splitter.setSizes([150, 400])
+        try:
+            s0 = int(self.app.settings['dialogcodetext_splitter0'])
+            s1 = int(self.app.settings['dialogcodetext_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
@@ -172,6 +180,13 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.app.settings['dialogcodetext_w'] = new_size.size().width()
         self.app.settings['dialogcodetext_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodetext_splitter0'] = sizes[0]
+        self.app.settings['dialogcodetext_splitter1'] = sizes[1]
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name and colour.

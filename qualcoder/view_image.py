@@ -131,6 +131,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        try:
+            s0 = int(self.app.settings['dialogcodeimage_splitter0'])
+            s1 = int(self.app.settings['dialogcodeimage_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.fill_tree()
 
     def resizeEvent(self, new_size):
@@ -138,6 +146,13 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeimage_w'] = new_size.size().width()
         self.app.settings['dialogcodeimage_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
+        self.app.settings['dialogcodeimage_splitter1'] = sizes[1]
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """

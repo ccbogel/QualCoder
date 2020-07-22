@@ -112,7 +112,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.textBrowser_menu)
         self.ui.textBrowser.setOpenLinks(False)
-        #self.ui.textBrowser.anchorClicked.connect(self.link_clicked)
+        try:
+            s0 = int(self.app.settings['dialogcasefilemanager_splitter0'])
+            s1 = int(self.app.settings['dialogcasefilemanager_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.get_files()
         self.fill_table()
 
@@ -121,6 +128,13 @@ class DialogCaseFileManager(QtWidgets.QDialog):
 
         self.app.settings['dialogcasefilemanager_w'] = new_size.size().width()
         self.app.settings['dialogcasefilemanager_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcasefilemanager_splitter0'] = sizes[0]
+        self.app.settings['dialogcasefilemanager_splitter1'] = sizes[1]
 
     def get_files(self):
         """ Get files for this case """

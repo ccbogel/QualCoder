@@ -114,13 +114,28 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
         self.fill_tableWidget()
-        self.ui.splitter.setSizes([1, 1, 0])
+        self.ui.splitter.setSizes([1, 1])
+        try:
+            s0 = int(self.app.settings['dialogcases_splitter0'])
+            s1 = int(self.app.settings['dialogcases_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+        except:
+            pass
+        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
 
     def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
+        """ Update the widget size details in the app.settings variable. """
 
         self.app.settings['dialogcases_w'] = new_size.size().width()
         self.app.settings['dialogcases_h'] = new_size.size().height()
+
+    def splitter_sizes(self, pos, index):
+        """ Detect size changes in splitter and store in app.settings variable. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcases_splitter0'] = sizes[0]
+        self.app.settings['dialogcases_splitter1'] = sizes[1]
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
