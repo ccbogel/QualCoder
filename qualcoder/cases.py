@@ -80,7 +80,7 @@ class DialogCases(QtWidgets.QDialog):
     case_text = []
     selected_case = None
     selected_file = None
-    caseTextViewed = []
+    display_text_links = [] # clickable links for audio video images as dictionaries of pos0, pos1, file id
     attributes = []
 
     def __init__(self, app, parent_textEdit):
@@ -111,8 +111,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
-        self.ui.textBrowser.setOpenLinks(False)
-        self.ui.textBrowser.anchorClicked.connect(self.link_clicked)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
         self.fill_tableWidget()
         self.ui.splitter.setSizes([1, 1, 0])
 
@@ -394,12 +394,12 @@ class DialogCases(QtWidgets.QDialog):
             return
         self.selected_case = self.cases[x]
 
-        # clear case text viewed if the caseid has changed
+        '''# clear case text viewed if the caseid has changed
         if self.caseTextViewed != [] and self.caseTextViewed[0]['caseid'] != self.selected_case['caseid']:
             self.caseTextViewed = []
             self.case_text = []
-            self.ui.textBrowser.clear()
-        #logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])
+            self.ui.textBrowser.clear()'''
+        #logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])'''
         # get case_text for this file
         if self.selected_file is not None:
             #logger.debug("File Selected: " + str(self.selected_file['id'])+"  "+self.selected_file['file'])
@@ -412,8 +412,8 @@ class DialogCases(QtWidgets.QDialog):
                 self.case_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
                 'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
-        if y == self.NAME_COLUMN:
-            self.view()
+        # if y == self.NAME_COLUMN:
+        self.view()
 
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
@@ -497,86 +497,139 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.setPlainText("")
         self.selected_file = None
         self.ui.label_filename.setText(_("Viewing text of case: ") + str(self.cases[row]['name']))
-        self.caseTextViewed = []
+        display_text = []
+        self.display_text_links = []
         cur = self.app.conn.cursor()
         cur.execute("select caseid, fid, pos0, pos1, owner, date, memo from case_text where caseid = ? order by fid, pos0",
             [self.selected_case['caseid'],])
         result = cur.fetchall()
         for row in result:
             caseText = ""
-            sourcename = ""
+            fname = ""
             mediapath = ""
             for src in self.source:
                 if src['id'] == row[1] and src['fulltext'] is not None:
                     caseText = src['fulltext'][int(row[2]):int(row[3])]
-                    sourcename = src['name']
+                    fname = src['name']
                 if src['id'] == row[1] and src['fulltext'] is None:
-                    sourcename = src['name']
+                    fname = src['name']
                     mediapath = src['mediapath']
-            self.caseTextViewed.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
+            display_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-            'text': caseText, 'sourcename': sourcename, 'mediapath': mediapath})
+            'text': caseText, 'name': fname, 'mediapath': mediapath})
 
-        for c in self.caseTextViewed:
+        for c in display_text:
             if c['mediapath'] == '':  # text source
-                html = "<p>File: " + c['sourcename'] + " Text: " + str(int(c['pos0'])) + ":" + str(int(c['pos1']))  + "</p>"
-                self.ui.textBrowser.append(html)
-                self.ui.textBrowser.append("<p>" + c['text'] + "</p>")
-            if c['mediapath'][:8] == "/images/":
-                html = '<br/><a href="' + c['mediapath'] + '"> Image: ' + c['sourcename'] + '</a>'
-                self.ui.textBrowser.append(html)
-                path = self.app.project_path + c['mediapath']
-                url = QtCore.QUrl(path)
-                '''document = self.ui.textBrowser.document()
-                image = QtGui.QImageReader(path).read()
-                document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+                header = "\n" + _("File: ") + c['name'] + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
+                self.ui.textBrowser.append(header)
+                fmt = QtGui.QTextCharFormat()
+                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
+                fmt.setForeground(brush)
                 cursor = self.ui.textBrowser.textCursor()
-                image_format = QtGui.QTextImageFormat()
-                scaler = 1.0
-                scaler_w = 1.0
-                scaler_h = 1.0
-                if image.width() > 300:
-                    scaler_w = 300 / image.width()
-                if image.height() > 300:
-                    scaler_h = 300 / image.height()
-                if scaler_w < scaler_h:
-                    scaler = scaler_w
-                else:
-                    scaler = scaler_h
-                image_format.setWidth(image.width() * scaler)
-                image_format.setHeight(image.height() * scaler)
-                image_format.setName(url.toString())
-                cursor.insertImage(image_format)
-                self.ui.textBrowser.append("<br/>")'''
-            if c['mediapath'][:8] == "/audio/" or c['mediapath'][:8] == "/video/":
-                html = '<p><a href="' + c['mediapath'] + '">' + _('A/V media: ') + c['sourcename'] + '</a></p>'
-                self.ui.textBrowser.append(html)
-                path = self.app.project_path + c['mediapath']
-                url = QtCore.QUrl(path)
+                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                pos1 = len(self.ui.textBrowser.toPlainText())
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(fmt)
+                formatB = QtGui.QTextCharFormat()
+                formatB.setFontWeight(QtGui.QFont.Bold)
+                cursor.mergeCharFormat(formatB)
 
-    def link_clicked(self, url):
+                self.ui.textBrowser.append(c['text'])
+
+            if c['mediapath'][:8] == "/images/":
+                header = "\n" + _('Image: ') + c['name']
+                self.ui.textBrowser.append(header)
+                fmt = QtGui.QTextCharFormat()
+                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.blue))
+                fmt.setForeground(brush)
+                cursor = self.ui.textBrowser.textCursor()
+                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                pos1 = len(self.ui.textBrowser.toPlainText())
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(fmt)
+                # maybe review this approach for copying data over
+                #Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
+                data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
+                        'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
+                self.display_text_links.append(data)
+
+            if c['mediapath'][:7] == "/audio/" or c['mediapath'][:7] == "/video/":
+                header = "\n" + _('AV media: ') + c['name']
+                self.ui.textBrowser.append(header)
+                fmt = QtGui.QTextCharFormat()
+                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.blue))
+                fmt.setForeground(brush)
+                cursor = self.ui.textBrowser.textCursor()
+                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                pos1 = len(self.ui.textBrowser.toPlainText())
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(fmt)
+                #Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
+                data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
+                        'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
+                self.display_text_links.append(data)
+
+    ''' # removed images from the case text view, as they were affecting vertical position of previous text - too much white space
+    document = self.ui.textBrowser.document()
+                    image = QtGui.QImageReader(path).read()
+                    document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+                    cursor = self.ui.textBrowser.textCursor()
+                    image_format = QtGui.QTextImageFormat()
+                    scaler = 1.0
+                    scaler_w = 1.0
+                    scaler_h = 1.0
+                    if image.width() > 300:
+                        scaler_w = 300 / image.width()
+                    if image.height() > 300:
+                        scaler_h = 300 / image.height()
+                    if scaler_w < scaler_h:
+                        scaler = scaler_w
+                    else:
+                        scaler = scaler_h
+                    image_format.setWidth(image.width() * scaler)
+                    image_format.setHeight(image.height() * scaler)
+                    image_format.setName(url.toString())
+                    cursor.insertImage(image_format)
+                    self.ui.textBrowser.append("<br/>")'''
+
+    #TODO review this
+    def link_clicked(self, position):
         """ View image or audio/video media in dialog.
         For A/V, added try block in case VLC bindings do not work.  """
 
-        x = -1
-        for i in range(0, len(self.source)):
-            if url.toString() == self.source[i]['mediapath']:
-                x = i
-        if x == -1:
+        print("Clicked")
+        cursor = self.ui.textBrowser.cursorForPosition(position)
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_link = None
+        for item in self.display_text_links:
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                action_link = menu.addAction(_("Open"))
+        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
+        if action is None:
             return
-        try:
-            ui = None
-            if self.source[x]['mediapath'][:6] == "/video":
-                ui = DialogViewAV(self.app, self.source[x])
-            if self.source[x]['mediapath'][:6] == "/audio":
-                ui = DialogViewAV(self.app, self.source[x])
-            if self.source[x]['mediapath'][:7] == "/images":
-                ui = DialogViewImage(self.app, self.source[x])
-            ui.exec_()
-        except Exception as e:
-            logger.debug(str(e))
-            print(e)
-            QtWidgets.QMessageBox.warning(None, 'view av/images error', str(e), QtWidgets.QMessageBox.Ok)
+
+        for item in self.display_text_links:
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                try:
+                    ui = None
+                    if item['mediapath'][:6] == "/video":
+                        print("Here1")
+                        ui = DialogViewAV(self.app, item)
+                    if item['mediapath'][:6] == "/audio":
+                        ui = DialogViewAV(self.app, item)
+                        print("Here2")
+                    if item['mediapath'][:7] == "/images":
+                        print("her3")
+                        ui = DialogViewImage(self.app, item)
+                    ui.exec_()
+                except Exception as e:
+                    logger.debug(str(e))
+                    print(e)
+                    QtWidgets.QMessageBox.warning(None, 'view av/images error', str(e), QtWidgets.QMessageBox.Ok)
 
 
 if __name__ == "__main__":
