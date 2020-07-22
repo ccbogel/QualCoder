@@ -595,12 +595,10 @@ class DialogCases(QtWidgets.QDialog):
                     cursor.insertImage(image_format)
                     self.ui.textBrowser.append("<br/>")'''
 
-    #TODO review this
     def link_clicked(self, position):
         """ View image or audio/video media in dialog.
         For A/V, added try block in case VLC bindings do not work.  """
 
-        print("Clicked")
         cursor = self.ui.textBrowser.cursorForPosition(position)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -617,13 +615,10 @@ class DialogCases(QtWidgets.QDialog):
                 try:
                     ui = None
                     if item['mediapath'][:6] == "/video":
-                        print("Here1")
                         ui = DialogViewAV(self.app, item)
                     if item['mediapath'][:6] == "/audio":
                         ui = DialogViewAV(self.app, item)
-                        print("Here2")
                     if item['mediapath'][:7] == "/images":
-                        print("her3")
                         ui = DialogViewImage(self.app, item)
                     ui.exec_()
                 except Exception as e:
