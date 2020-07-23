@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1129</width>
-    <height>715</height>
+    <width>989</width>
+    <height>694</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,56 +34,30 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_exporttext">
-      <property name="geometry">
-       <rect>
-        <x>760</x>
-        <y>60</y>
-        <width>211</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Export text file</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_caseselect">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>240</x>
         <y>50</y>
         <width>191</width>
         <height>27</height>
        </rect>
       </property>
       <property name="text">
-       <string>Case selection</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_exporthtml">
-      <property name="geometry">
-       <rect>
-        <x>760</x>
-        <y>0</y>
-        <width>211</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Export html file</string>
+       <string>Cases</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_fileselect">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>240</x>
         <y>20</y>
         <width>191</width>
         <height>27</height>
        </rect>
       </property>
       <property name="text">
-       <string>File selection</string>
+       <string>Files</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit">
@@ -101,12 +75,12 @@
        <rect>
         <x>10</x>
         <y>60</y>
-        <width>181</width>
+        <width>211</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Search text:</string>
+       <string>Text limiter:</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -115,10 +89,10 @@
      <widget class="QPushButton" name="pushButton_search">
       <property name="geometry">
        <rect>
-        <x>630</x>
-        <y>30</y>
+        <x>450</x>
+        <y>20</y>
         <width>121</width>
-        <height>61</height>
+        <height>27</height>
        </rect>
       </property>
       <property name="text">
@@ -151,41 +125,63 @@
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>240</x>
         <y>80</y>
         <width>191</width>
         <height>27</height>
        </rect>
       </property>
       <property name="text">
-       <string>Attribute selection</string>
+       <string>Attributes</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_exportodt">
+     <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>30</y>
-        <width>211</width>
-        <height>27</height>
+        <x>450</x>
+        <y>60</y>
+        <width>131</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Export ODT file</string>
+       <string>Export:</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_export_csv">
+     <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>90</y>
-        <width>211</width>
-        <height>27</height>
+        <x>450</x>
+        <y>80</y>
+        <width>91</width>
+        <height>25</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Export csv file</string>
-      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>html</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>odt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>csv</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </item>
@@ -200,7 +196,7 @@
      <property name="maximumSize">
       <size>
        <width>16777213</width>
-       <height>50</height>
+       <height>60</height>
       </size>
      </property>
      <property name="text">
@@ -247,8 +243,6 @@
   <tabstop>pushButton_fileselect</tabstop>
   <tabstop>pushButton_caseselect</tabstop>
   <tabstop>pushButton_search</tabstop>
-  <tabstop>pushButton_exporthtml</tabstop>
-  <tabstop>pushButton_exporttext</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>
