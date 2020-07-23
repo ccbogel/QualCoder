@@ -313,7 +313,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
-        ui = DialogAddAttribute(self.app, check_names)
+        ok = ui = DialogAddAttribute(self.app, check_names)
+        if not ok:
+            return
         ui.exec_()
         name = ui.new_name
         value_type = ui.value_type

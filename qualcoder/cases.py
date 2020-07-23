@@ -185,7 +185,9 @@ class DialogCases(QtWidgets.QDialog):
             attribute_names.append({'name': a[0]})
         check_names = attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'caseid'}, {'name':'date'}]
         ui = DialogAddAttribute(self.app, check_names)
-        ui.exec_()
+        ok = ui.exec_()
+        if not ok:
+            return
         name = ui.new_name
         value_type = ui.value_type
         if name == "":

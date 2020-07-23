@@ -111,7 +111,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
 
         check_names = self.attributes + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddAttribute(self.app, check_names)
-        ui.exec_()
+        ok = ui.exec_()
+        if not ok:
+            return
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
