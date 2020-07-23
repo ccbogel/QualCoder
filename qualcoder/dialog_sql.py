@@ -590,4 +590,17 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 # Extra queries
 EXTRA_SQL = ["-- Case text\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
-where case_text.pos1 >0"]
+where case_text.pos1 >0",
+'-- Codes, fileid and coded text\nselect  code_name.name as "codename",  \
+code_text.fid, code_text.pos0, code_text.pos1,  code_text.seltext  from  code_name \
+join  code_text on  code_name.cid = code_text.cid',
+'-- Coded text with each Case\n\nselect code_name.name as codename, cases.name as casename,\
+ code_text.pos0, code_text.pos1, code_text.fid, seltext as "coded text", code_text.owner \
+ from code_text join code_name on code_name.cid = code_text.cid \
+join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid \
+where \n\
+-- code_name.cid in ( code_ids ) -- provide your code ids \n\
+-- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
+-- and \n\
+(code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)'
+ ]
