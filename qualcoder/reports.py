@@ -28,6 +28,7 @@ https://qualcoder.wordpress.com/
 
 from copy import copy
 import csv
+import datetime
 import logging
 import os
 from shutil import copyfile
@@ -245,6 +246,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f = open(filename, 'w')
         text = _("Code frequencies") + "\n"
         text += self.app.project_name + "\n"
+        text += _("Date: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n"
+
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -459,7 +462,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        filename = "CODER_COMPARISON.txt"
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + " coder comparison.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.settings['directory'], options)
@@ -467,6 +471,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             return
         filename = directory + "/" + filename
         f = open(filename, 'w')
+        f.write(self.app.project_name + "\n")
+        f.write(_("Date: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
         f.write(self.comparisons)
         f.close()
         logger.info(_("Coder comparisons report exported to ") + filename)
