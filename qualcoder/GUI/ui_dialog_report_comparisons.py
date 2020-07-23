@@ -2,17 +2,19 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_report_comparisons.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_reportComparisons(object):
     def setupUi(self, Dialog_reportComparisons):
         Dialog_reportComparisons.setObjectName("Dialog_reportComparisons")
         Dialog_reportComparisons.setWindowModality(QtCore.Qt.NonModal)
-        Dialog_reportComparisons.resize(985, 715)
+        Dialog_reportComparisons.resize(750, 606)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_reportComparisons)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Dialog_reportComparisons)
@@ -21,7 +23,7 @@ class Ui_Dialog_reportComparisons(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_exporttext = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_exporttext.setGeometry(QtCore.QRect(660, 20, 211, 41))
+        self.pushButton_exporttext.setGeometry(QtCore.QRect(370, 70, 231, 41))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
         self.pushButton_run = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_run.setGeometry(QtCore.QRect(370, 20, 231, 41))
@@ -76,4 +78,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_reportComparisons)
     Dialog_reportComparisons.show()
     sys.exit(app.exec_())
-
