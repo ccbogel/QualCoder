@@ -100,9 +100,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         font2 = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(font2)
-        self.ui.tableWidget.doubleClicked.connect(self.doubleClickedCell)
-        self.ui.label_case.setText(_("Case: ") + self.case['name'])
         self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.ui.tableWidget.doubleClicked.connect(self.doubleClickedCell)
+        self.ui.tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.label_case.setText(_("Case: ") + self.case['name'])
         self.ui.pushButton_view.clicked.connect(self.view_file)
         self.ui.pushButton_auto_assign.clicked.connect(self.automark)
         self.ui.pushButton_add_files.clicked.connect(self.add_files_to_case)
@@ -146,6 +148,21 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         sql = "select id, name, fulltext, mediapath, memo, owner, date from  source order by source.name asc"
         cur.execute(sql)
         self.allfiles = cur.fetchall()
+        msg = _("Files linked: ") + str(len(self.casefiles)) + " / " + str(len(self.allfiles))
+        self.ui.label_files_linked.setText(msg)
+
+    def table_menu(self, position):
+        """ Context menu to add/remove files to case. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_add = menu.addAction(_("Add files to case"))
+        action_remove = menu.addAction(_("Remove files from case"))
+        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_add:
+            self.add_files_to_case()
+        if action == action_remove:
+            self.remove_files_from_case()
 
     def add_files_to_case(self):
         """ When select file button is pressed a dialog of filenames is presented to the user.
