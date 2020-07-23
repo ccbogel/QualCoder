@@ -113,6 +113,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
         self.fill_tableWidget()
         self.ui.splitter.setSizes([1, 1])
         try:
@@ -642,6 +644,21 @@ class DialogCases(QtWidgets.QDialog):
                     logger.debug(str(e))
                     print(e)
                     QtWidgets.QMessageBox.warning(None, 'view av/images error', str(e), QtWidgets.QMessageBox.Ok)
+
+    def textEdit_menu(self, position):
+        """ Context menu for textEdit. Select all, Copy. """
+
+        menu = QtWidgets.QMenu()
+        action_select_all = menu.addAction(_("Select all"))
+        action_copy = menu.addAction(_("Copy"))
+        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
+        if action == action_select_all:
+            self.ui.textBrowser.selectAll()
+        if action == action_copy:
+            selected_text = self.ui.textBrowser.textCursor().selectedText()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
 
 
 if __name__ == "__main__":
