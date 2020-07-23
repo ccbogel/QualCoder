@@ -780,7 +780,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogJournals":
-                d.show()
+                try:
+                    d.show()
+                except Exception as e:
+                    logger.debug(str(e))
                 return
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
