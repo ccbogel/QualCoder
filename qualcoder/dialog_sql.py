@@ -122,7 +122,7 @@ class DialogSQL(QtWidgets.QDialog):
             s0 = int(self.app.settings['dialogsql_splitter_v0'])
             s1 = int(self.app.settings['dialogsql_splitter_v1'])
             if s0 > 10 and s1 > 10:
-                self.ui.splitter.setSizes([s0, s1])
+                self.ui.splitter_2.setSizes([s0, s1])
         except:
             pass
         self.ui.splitter_2.splitterMoved.connect(self.splitter2_sizes)
