@@ -1191,7 +1191,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             pass
 
         coder = self.ui.comboBox_coders.currentText()
-        #self.html_results = ""
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
 
@@ -1658,12 +1657,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.eventFilterTT.setTextResults(self.text_results)
         self.ui.textEdit.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
 
-        # Need to resize splitter as it automatically adjusts to 50%/50%
-        self.ui.splitter.setSizes([100, 300])
-
-        # Fill case matrix
+        # Fill case matrix or clear third splitter pane.
         if self.case_ids != "":
             self.fill_matrix(self.text_results, self.image_results, self.av_results, self.case_ids)
+        else:
+            self.ui.splitter.replaceWidget(2, QtWidgets.QTableWidget())
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -1868,7 +1866,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for att in self.attribute_selection:
             label += att[0] + " " + att[3] + " "
             label += ','.join(att[4])
-            label += "; "
+            label += "| "
         self.ui.label_selections.setText(label)
 
     def select_files(self):
@@ -1880,7 +1878,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         the user must press select files button then cancel the dialog.
         """
 
-        self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         self.case_ids = ""
@@ -1900,7 +1897,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             files_text = ""
             for row in selected_files:
                 tmp_ids += "," + str(row['id'])
-                files_text += "; " + row['name']
+                files_text += "| " + row['name']
             files_text = files_text[2:]
             tooltip += files_text
             if len(tmp_ids) > 0:
@@ -1917,7 +1914,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         If neither are selected the default is all files are selected.
         """
 
-        self.ui.splitter.setSizes([300, 300, 0])
         self.ui.pushButton_fileselect.setToolTip("")
         self.ui.pushButton_caseselect.setToolTip("")
         self.file_ids = ""
@@ -1937,7 +1933,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cases_text = ""
             for row in selected_cases:
                 tmp_ids += "," + str(row['id'])
-                cases_text += "; " + row['name']
+                cases_text += "| " + row['name']
             cases_text = cases_text[2:]
             tooltip += cases_text
             if len(tmp_ids) > 0:
