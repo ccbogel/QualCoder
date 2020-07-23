@@ -85,6 +85,13 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        try:
+            w = int(self.app.settings['dialogreportcodefrequencies_w'])
+            h = int(self.app.settings['dialogreportcodefrequencies_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -94,6 +101,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogreportcodefrequencies_w'] = new_size.size().width()
+        self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()
 
     def get_data(self):
         """ Called from init. gets coders, code_names and categories.
@@ -220,7 +233,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding frequencies to text file. """
 
-        filename = "CODING FREQUENCIES.txt"
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + " code frequencies.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.settings['directory'], options)
@@ -229,7 +243,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filename = directory + "/" + filename
 
         f = open(filename, 'w')
-        text = _("CODING FREQUENCIES") + "\n"
+        text = _("Code frequencies") + "\n"
+        text += self.app.project_name + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)

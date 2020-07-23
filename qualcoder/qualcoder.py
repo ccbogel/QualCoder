@@ -281,7 +281,8 @@ class App(object):
         'dialogcodeimage_splitter1', 'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
         'dialogjournals_splitter0', 'dialogjournals_splitter1', 'dialogsql_splitter_h0',
         'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
-        'dialogcases_splitter0', 'dialogcases_splitter1',
+        'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
+        'dialogreportcodefrequencies_h',
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1'
                 ]
         for key in keys:
@@ -344,6 +345,8 @@ class App(object):
             'dialogviewimage_h': 0,
             'dialogreportcodes_w': 0,
             'dialogreportcodes_h': 0,
+            'dialogreportcodefrequencies_w': 0,
+            'dialogreportcodefrequencies_h': 0,
             'dialogreportcodes_splitter0': 1,
             'dialogreportcodes_splitter1': 1,
             'dialogmanagefiles_w': 0,
