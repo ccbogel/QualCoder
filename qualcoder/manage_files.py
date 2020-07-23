@@ -87,7 +87,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     source = []
     app = None
-    text_dialog = None
+    text_view = None
     header_labels = []
     NAME_COLUMN = 0
     MEMO_COLUMN = 1
@@ -492,24 +492,23 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
         # cannot easily edit file text of there are linked cases, codes or annotations
-        self.text_dialog = QtWidgets.QDialog()
-        self.text_ui = Ui_Dialog_memo()
-        self.text_ui.setupUi(self.text_dialog)
-        self.text_dialog.setWindowFlags(self.text_dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.text_ui.textEdit.setReadOnly(restricted)
+        #TODO use the Menu dialog and extend it?
+        self.text_view = DialogMemo(self.app, "",)
+        self.text_view.ui.textEdit.setReadOnly(restricted)
         if restricted:
-            self.text_ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-            self.text_ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
-        self.text_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
-        self.text_ui.textEdit.setPlainText(self.source[x]['fulltext'])
-        self.highlight(self.source[x]['id'], self.text_ui.textEdit)
+            self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
+        self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
 
         title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
         if restricted:
             title += "RESTRICTED EDIT"
-        self.text_dialog.setWindowTitle(title)
-        self.text_dialog.exec_()
-        text = self.text_ui.textEdit.toPlainText()
+        self.text_view.setWindowTitle(title)
+        ok = self.text_view.exec_()
+        if not ok:
+            return
+        text = self.text_view.ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
             return
 
@@ -525,9 +524,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         menu = QtWidgets.QMenu()
-        ActionItemEdit = menu.addAction(_("Edit text maximum 20 characters"))
-        action = menu.exec_(self.text_ui.textEdit.mapToGlobal(position))
-        text_cursor = self.text_ui.textEdit.textCursor()
+        actionItemEdit = menu.addAction(_("Edit text maximum 20 characters"))
+        action = menu.exec_(self.text_view.ui.textEdit.mapToGlobal(position))
+        text_cursor = self.text_view.ui.textEdit.textCursor()
         if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
             msg = _("Select a section of text, maximum 20 characters.\nThe selection must be either all underlined or all not-underlined.")
             QtWidgets.QMessageBox.warning(None, _('No text selected'), msg, QtWidgets.QMessageBox.Ok)
@@ -536,11 +535,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         if result['crossover']:
             return
 
-        if action == ActionItemEdit:
+        if action == actionItemEdit:
             self.restricted_edit_text(x, text_cursor)
             # reload text
-            self.text_ui.textEdit.setPlainText(self.source[x]['fulltext'])
-            self.highlight(self.source[x]['id'], self.text_ui.textEdit)
+            self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
+            self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
 
     def crossover_check(self, x, text_cursor):
         """ Check text selection for codes and annotations that cross over with non-coded
@@ -609,6 +608,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _('Too much text selected'), msg, QtWidgets.QMessageBox.Ok)
             return
 
+        #TODO maybe use DialogMemo again
         edit_dialog = QtWidgets.QDialog()
         edit_ui = Ui_Dialog_memo()
         edit_ui.setupUi(edit_dialog)
@@ -616,7 +616,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         edit_dialog.setWindowTitle(_("Edit text: start") +str(selstart) + _(" end:") + str(selend))
         edit_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
         edit_ui.textEdit.setPlainText(txt)
-        edit_dialog.exec_()
+        ok = edit_dialog.exec_()
+        if not ok:
+            return
         new_text = edit_ui.textEdit.toPlainText()
 
         # split original text and fix
