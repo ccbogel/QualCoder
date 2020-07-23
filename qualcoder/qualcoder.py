@@ -779,12 +779,15 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create and edit journals. """
 
         for d in self.dialogList:
+            # Had to add this code to fix error:
+            # __main__.clean_dialog_refs wrapped C/C++ object of type DialogJournals has been deleted
             if type(d).__name__ == "DialogJournals":
                 try:
                     d.show()
+                    return
                 except Exception as e:
                     logger.debug(str(e))
-                return
+
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
