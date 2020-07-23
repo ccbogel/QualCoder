@@ -141,21 +141,21 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-10</y>
-        <width>881</width>
-        <height>32</height>
+        <y>0</y>
+        <width>321</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>32</height>
+        <height>24</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>32</height>
+        <height>24</height>
        </size>
       </property>
       <property name="text">
@@ -166,25 +166,38 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>20</y>
-        <width>881</width>
-        <height>30</height>
+        <y>30</y>
+        <width>331</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>30</height>
+        <height>24</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>30</height>
+        <height>24</height>
        </size>
       </property>
       <property name="text">
        <string>File:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_files_linked">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>0</y>
+        <width>301</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Files linked: </string>
       </property>
      </widget>
     </widget>
