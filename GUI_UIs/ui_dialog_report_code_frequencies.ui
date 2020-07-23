@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>985</width>
-    <height>715</height>
+    <width>694</width>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,50 +22,37 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>50</height>
+       <height>60</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>50</height>
+       <height>60</height>
       </size>
      </property>
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_exporttext">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>10</y>
-        <width>241</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Export text file</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_selections">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>0</y>
         <width>481</width>
-        <height>40</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>40</height>
+        <height>26</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777213</width>
-        <height>40</height>
+        <height>26</height>
        </size>
       </property>
       <property name="text">
@@ -73,6 +60,19 @@
       </property>
       <property name="wordWrap">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_exporttext">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>351</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Export text file</string>
       </property>
      </widget>
     </widget>
@@ -97,9 +97,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>pushButton_exporttext</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
