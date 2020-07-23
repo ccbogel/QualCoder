@@ -709,6 +709,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
+        self.ui.label_selections.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
@@ -734,11 +735,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if res[0] == 0:
             self.ui.pushButton_attributeselect.setEnabled(False)
         self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
-
-        self.ui.pushButton_exporttext.clicked.connect(self.export_text_file)
-        self.ui.pushButton_exporthtml.clicked.connect(self.export_html_file)
-        self.ui.pushButton_exportodt.clicked.connect(self.export_odt_file)
-        self.ui.pushButton_export_csv.clicked.connect(self.export_csv_file)
+        self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        self.ui.comboBox_export.setEnabled(False)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setReadOnly(True)
@@ -896,6 +894,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                     item.setText(3, "")
             it += 1
             item = it.value()
+
+    def export_option_selected(self):
+        """ ComboBox export option selected. """
+
+        text = self.ui.comboBox_export.currentText()
+        if text == "":
+            return
+        if text == "html":
+            self.export_html_file()
+        if text == "odt":
+            self.export_odt_file()
+        if text == "txt":
+            self.export_text_file()
+        if text == "csv":
+            self.export_csv_file()
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
@@ -1177,22 +1190,23 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
         # Add search terms to textEdit
+        self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         parameters = self.ui.label_selections.text()
         self.ui.textEdit.insertPlainText(_("Search parameters") + ":\n" + parameters + "\n")
         if coder == "":
-            self.ui.textEdit.insertPlainText(_("Coding by: All coders"))
+            self.ui.textEdit.insertPlainText(_("Coding by: All coders") + "\n")
         else:
-            self.ui.textEdit.insertPlainText(_("Coding by: ") + coder)
+            self.ui.textEdit.insertPlainText(_("Coding by: ") + coder + "\n")
         if search_text != "":
-            self.ui.textEdit.insertPlainText(_("Search text: ") + search_text)
-        codes_string = "\n" + _("Codes: ")
+            self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
+        codes_string = "\n" + _("Codes: ") + "\n"
         for i in items:
             codes_string += i.text(0) + ". "
         self.ui.textEdit.insertPlainText(codes_string)
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # get selected codes from selected items
+        # Get selected codes from selected items
         code_ids = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
@@ -1862,9 +1876,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         if ok:
             tmp_ids = ""
             selected_files = ui.get_selected()  # list of dictionaries
+            files_text = ""
             for row in selected_files:
                 tmp_ids += "," + str(row['id'])
-                tooltip += " " + row['name']
+                files_text += "; " + row['name']
+            files_text = files_text[2:]
+            tooltip += files_text
             if len(tmp_ids) > 0:
                 self.file_ids = tmp_ids[1:]
                 self.ui.pushButton_fileselect.setToolTip(tooltip)
@@ -1892,13 +1909,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.case_ids = self.case_ids[1:]
         ui = DialogSelectItems(self.app, casenames, _("Select cases to view"), "many")
         ok = ui.exec_()
-        tooltip = _("Cases selected:")
+        tooltip = _("Cases selected: ")
         if ok:
             tmp_ids = ""
             selected_cases = ui.get_selected()  # list of dictionaries
+            cases_text = ""
             for row in selected_cases:
                 tmp_ids += "," + str(row['id'])
-                tooltip += " " + row['name']
+                cases_text += "; " + row['name']
+            cases_text = cases_text[2:]
+            tooltip += cases_text
             if len(tmp_ids) > 0:
                 self.case_ids = tmp_ids[1:]
                 self.ui.pushButton_caseselect.setToolTip(tooltip)
