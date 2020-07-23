@@ -229,7 +229,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filename = directory + "/" + filename
 
         f = open(filename, 'w')
-        text = _("CODING FREQUENCIES") + "\r\n"
+        text = _("CODING FREQUENCIES") + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -242,10 +242,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                text += "\r\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
+                text += "\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
                 text += ", Frequency: " + item.text(item_total_position)
             else:
-                text += "\r\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
+                text += "\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
                 text += _(", Frequency: ") + item.text(item_total_position)
             it += 1
             item = it.value()
