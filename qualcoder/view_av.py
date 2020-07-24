@@ -473,8 +473,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, _("Media not found"),
-                str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Media not found'))
+            mb.setText(str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
+            mb.exec_()
             self.closeEvent()
             return
         # clear comboBox tracks options and reload when playing/pausing
@@ -981,6 +984,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Called by item_moved_update_data when a code is moved onto another code. """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
+        #TODO font size in message box
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
@@ -1172,8 +1176,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, _("Name in use"),
-                    new_name + _(" Name already in use, choose another."), QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_('Name in use'))
+                    mb.setText(new_name + _(" Name already in use, choose another."))
+                    mb.exec_()
                     return
             # find the code in the list
             found = -1
@@ -1200,7 +1207,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
-                    QtWidgets.QMessageBox.warning(None, _("Duplicate category name"), msg, QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_('Duplicate category name'))
+                    mb.setText(msg)
+                    mb.exec_()
                     return
             # find the category in the list
             found = -1
@@ -1445,9 +1456,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
-            _("This segment has already been coded with this code by ") + item['owner'],
-            QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Already Coded'))
+            mb.setText(_("This segment has already been coded with this code by ") + item['owner'])
+            mb.exec_()
             return
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
@@ -1511,11 +1524,19 @@ class DialogCodeAV(QtWidgets.QDialog):
        """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No transcription"), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_('No transcription'))
+            mb.exec_()
             return
         item = self.ui.treeWidget.currentItem()
         if item is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("No code was selected"))
+            mb.exec_()
             return
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
@@ -1537,9 +1558,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
-            _("This segment has already been coded with this code by ") + coded['owner'],
-            QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Already Coded'))
+            mb.setText(_("This segment has already been coded with this code by ") + coded['owner'])
+            mb.exec_()
             return
 
         # Should not get sqlite3.IntegrityError:
@@ -1586,7 +1609,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No media transcription selected"))
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("No media transcription selected"))
+            mb.exec_()
             return
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
@@ -1836,8 +1863,11 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             (seg['cid'], seg['fid'], seg['pos0'], seg['pos1'], seg['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
-            _("This segment has already been coded with this code."), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Already Coded'))
+            mb.setText(_("This segment has already been coded with this code."))
+            mb.exec_()
             return
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
@@ -2078,8 +2108,11 @@ class DialogViewAV(QtWidgets.QDialog):
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, "Media not found",
-                str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Media not found'))
+            mb.setText(str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
+            mb.exec_()
             self.closeEvent()
             return
 
