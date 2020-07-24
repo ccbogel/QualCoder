@@ -1288,7 +1288,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.image_results.append(row)
 
-            # coded audio and video, also looks for search_text in coded segment meno
+            # coded audio and video, also looks for search_text in coded segment memo
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
             sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
@@ -1890,7 +1890,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.file_ids = self.file_ids[1:]
         ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
         ok = ui.exec_()
-        tooltip = _("Files selected:")
+        tooltip = _("Files selected: ")
         if ok:
             tmp_ids = ""
             selected_files = ui.get_selected()  # list of dictionaries

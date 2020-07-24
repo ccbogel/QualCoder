@@ -174,6 +174,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_order_by_value = menu.addAction(_("Order by attribute"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
+        print("hiden", self.rows_hidden)
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
@@ -206,11 +207,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
                 if text is not None and (item is None or item.text().find(text) == -1):
                     self.ui.tableWidget.setRowHidden(r, True)
-                    self.rows_hidden = True
+            self.rows_hidden = True
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
-                self.rows_hidden = False
+            self.rows_hidden = False
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -524,12 +525,19 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         actionItemEdit = menu.addAction(_("Edit text maximum 20 characters"))
         action = menu.exec_(self.text_view.ui.textEdit.mapToGlobal(position))
         text_cursor = self.text_view.ui.textEdit.textCursor()
         if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
             msg = _("Select a section of text, maximum 20 characters.\nThe selection must be either all underlined or all not-underlined.")
-            QtWidgets.QMessageBox.warning(None, _('No text selected'), msg, QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('No text selected'))
+            mb.setText(msg)
+            mb.exec_()
+            #mb(None, _('No text selected'), msg, QtWidgets.QMessageBox.Ok)
             return
         result = self.crossover_check(x, text_cursor)
         if result['crossover']:
@@ -563,7 +571,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         code_crossover = cur.fetchall()
         if code_crossover != []:
             msg += _("Code crossover: ") + str(code_crossover)
-            QtWidgets.QMessageBox.warning(None, _('Codes cross over text'), msg, QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Codes cross over text'))
+            mb.setText(msg)
+            mb.exec_()
             return response
         # find if the selected text is coded
         sql = "select pos0,pos1 from code_text where fid=? and ?>=pos0 and ?<=pos1"
@@ -575,7 +588,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         annote_crossover = cur.fetchall()
         if annote_crossover != []:
             msg += _("Annotation crossover: ") + str(annote_crossover)
-            QtWidgets.QMessageBox.warning(None, _('Annotations cross over text'), msg, QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Annotations cross over text'))
+            mb.setText(msg)
+            mb.exec_()
             return response
         # find if the selected text is annotated
         sql = "select pos0,pos1 from annotation where fid=? and ?>=pos0 and ?<=pos1"
@@ -605,7 +623,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         if len(txt) > 20:
             msg = _("Can only edit small selections of text, up to 20 characters in length.") + "\n"
             msg += _("You selected " + str(len(txt)) + _(" characters"))
-            QtWidgets.QMessageBox.warning(None, _('Too much text selected'), msg, QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setWindowTitle(_('Too much text selected'))
+            mb.setText(msg)
+            mb.exec_()
             return
 
         #TODO maybe use DialogMemo again
