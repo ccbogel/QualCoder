@@ -1202,11 +1202,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
         if len(items) == 0:
-            QtWidgets.QMessageBox.warning(None, _("No codes"), _("No codes have been selected."))
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('No codes'))
+            msg = _("No codes have been selected.")
+            mb.setText(msg)
+            mb.exec_()
             return
         if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
-            QtWidgets.QMessageBox.warning(None, _("Nothing selected"),
-                _("No files, cases or attributes have been selected."))
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Nothing selected'))
+            msg = _("No files, cases or attributes have been selected.")
+            mb.setText(msg)
+            mb.exec_()
             return
 
         # Add search terms to textEdit
