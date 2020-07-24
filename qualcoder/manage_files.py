@@ -1095,7 +1095,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), os.getenv('HOME'), options)
+            _("Select directory to save file"), self.app.settings['directory'], options)
         if directory == "":
             return
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
