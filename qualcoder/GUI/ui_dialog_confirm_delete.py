@@ -2,27 +2,28 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_confirm_delete.ui'
 #
-# Created: Fri Dec 28 23:53:21 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_confirmDelete(object):
     def setupUi(self, Dialog_confirmDelete):
         Dialog_confirmDelete.setObjectName("Dialog_confirmDelete")
-        Dialog_confirmDelete.resize(400, 243)
+        Dialog_confirmDelete.resize(345, 126)
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_confirmDelete)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(Dialog_confirmDelete)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_confirmDelete)
-        self.buttonBox.setGeometry(QtCore.QRect(290, 20, 81, 241))
-        self.buttonBox.setOrientation(QtCore.Qt.Vertical)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.label = QtWidgets.QLabel(Dialog_confirmDelete)
-        self.label.setGeometry(QtCore.QRect(30, 20, 251, 201))
-        self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.label.setWordWrap(True)
-        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog_confirmDelete)
         self.buttonBox.accepted.connect(Dialog_confirmDelete.accept)
@@ -32,7 +33,7 @@ class Ui_Dialog_confirmDelete(object):
     def retranslateUi(self, Dialog_confirmDelete):
         _translate = QtCore.QCoreApplication.translate
         Dialog_confirmDelete.setWindowTitle(_translate("Dialog_confirmDelete", "Confirm Delete"))
-        self.label.setText(_translate("Dialog_confirmDelete", "TextLabel"))
+        self.label.setText(_translate("Dialog_confirmDelete", "."))
 
 
 if __name__ == "__main__":
@@ -43,4 +44,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_confirmDelete)
     Dialog_confirmDelete.show()
     sys.exit(app.exec_())
-
