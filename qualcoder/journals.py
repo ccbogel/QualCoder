@@ -187,19 +187,32 @@ class DialogJournals(QtWidgets.QDialog):
         if not ok:
             return
         if name is None or name == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No name was entered"),
-                QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("No name was entered"))
+            mb.exec_()
             return
         # check for non-unique name
         if any(d['name'] == name for d in self.journals):
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Journal name in use"),
-                QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("Journal name in use"))
+            mb.exec_()
             return
         # Check for unusual characters in filename that would affect exporting
         valid = re.match('^[\ \w-]+$', name) is not None
         if not valid:
-            QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
-                _("In the journal name use only: a-z, A-z 0-9 - space"), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning - invalid characters'))
+            msg = _("In the journal name use only: a-z, A-z 0-9 - space")
+            mb.setText(msg)
+            mb.exec_()
             return
 
         # update database
@@ -253,7 +266,12 @@ class DialogJournals(QtWidgets.QDialog):
             f.write(data)
             f.close()
             msg = _("Journal exported to: ") + str(filename)
-            QtWidgets.QMessageBox.information(None, _("Journal export"), msg)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Journal export'))
+            mb.setText(msg)
+            mb.exec_()
             self.parent_textEdit.append(msg)
 
     def delete(self):
@@ -264,7 +282,7 @@ class DialogJournals(QtWidgets.QDialog):
             return
         journalname = self.journals[x]['name']
         #logger.debug(("Delete row: " + str(x)))
-        ui = DialogConfirmDelete(self.journals[x]['name'])
+        ui = DialogConfirmDelete(self.app, self.journals[x]['name'])
         ok = ui.exec_()
 
         if ok:
@@ -300,19 +318,31 @@ class DialogJournals(QtWidgets.QDialog):
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
-                QtWidgets.QMessageBox.warning(None, _('Warning'), _("No name was entered"),
-                    QtWidgets.QMessageBox.Ok)
+                mb = QtWidgets.QMessageBox()
+                mb.setIcon(QtWidgets.QMessageBox.Warning)
+                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                mb.setWindowTitle(_('Warning'))
+                mb.setText(_("No name was entered"))
+                mb.exec_()
                 update = False
             for c in self.journals:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, _('Warning'), _("Journal name in use"),
-                        QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setIcon(QtWidgets.QMessageBox.Warning)
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_('Warning'))
+                    mb.setText(_("Journal name in use"))
+                    mb.exec_()
                     update = False
             # Check for unusual characters in filename that would affect exporting
             valid = re.match('^[\ \w-]+$', new_name) is not None
             if not valid:
-                QtWidgets.QMessageBox.warning(None, _('Warning - invalid characters'),
-                    _("In the jornal name use only: a-z, A-z 0-9 - space"), QtWidgets.QMessageBox.Ok)
+                mb = QtWidgets.QMessageBox()
+                mb.setIcon(QtWidgets.QMessageBox.Warning)
+                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                mb.setWindowTitle(_('Warning - invalid characters'))
+                mb.setText(_("In the jornal name use only: a-z, A-z 0-9 - space"))
+                mb.exec_()
                 update = False
             if update:
                 # update source list and database

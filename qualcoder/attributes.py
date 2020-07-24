@@ -165,7 +165,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         rows_to_delete.sort(reverse=True)
         if len(names_to_delete) == 0:
             return
-        ui = DialogConfirmDelete("\n".join(names_to_delete))
+        ui = DialogConfirmDelete(self.app, "\n".join(names_to_delete))
         ok = ui.exec_()
         if not ok:
             return

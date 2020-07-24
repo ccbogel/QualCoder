@@ -1068,7 +1068,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete(_("Code: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -1094,7 +1094,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if found == -1:
             return
         category = self.categories[found]
-        ui = DialogConfirmDelete(_("Category: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -1906,7 +1906,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         event will reload all segments. """
 
         #print(self.segment)
-        ui = DialogConfirmDelete(_("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
+        ui = DialogConfirmDelete(self.app, _("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
         ok = ui.exec_()
         if not ok:
             return

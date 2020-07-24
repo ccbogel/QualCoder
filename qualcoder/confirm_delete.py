@@ -48,19 +48,26 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogConfirmDelete(QtWidgets.QDialog):
     """ Generic conform delete dialog, showing some text.
+    Called by: DialogManageFiles, attributes, cases, casefilemanager,
+    code_text, journals
+
     param:
         text: a string for display """
 
-    def __init__(self, text, title=""):
+    def __init__(self, app, text, title=""):
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_confirmDelete()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
+        font += '"' + app.settings['font'] + '";'
+        self.setStyleSheet(font)
         self.ui.label.setText(text)
         if title != "":
             self.setWindowTitle(title)
+        self.adjustSize()
 
 
 if __name__ == "__main__":

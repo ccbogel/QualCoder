@@ -238,7 +238,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             #print(self.allfiles[r])
             selected_files.append(self.allfiles[r])
             remove_msg += "\n" + self.allfiles[r][1]
-        ui = DialogConfirmDelete(remove_msg)
+        ui = DialogConfirmDelete(self.app, remove_msg)
         ok = ui.exec_()
         if not ok:
             return

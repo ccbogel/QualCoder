@@ -453,6 +453,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def highlight(self, fid, textEdit):
         """ Add coding and annotation highlights. """
+
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1 from annotation where fid=? union all select pos0,pos1 from code_text where fid=?"
         cur.execute(sql, [fid, fid])
@@ -1107,7 +1108,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         names = _("Export to ") + directory + "\n"
         for row in rows:
             names = names + self.source[row]['name'] + "\n"
-        ui = DialogConfirmDelete(names, _("Export files"))
+        ui = DialogConfirmDelete(self.app, names, _("Export files"))
         ok = ui.exec_()
         if not ok:
             return
@@ -1152,7 +1153,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     pass
             #if filename_txt is not None:
             #    msg += "\n" + directory + "/" + filename_txt
-        QtWidgets.QMessageBox.information(None, _("Files Exported"), msg)
+        mb = QtWidgets.QMessageBox()
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Files Exported'))
+        mb.setText(msg)
+        mb.exec_()
         self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
     def delete(self):
@@ -1169,7 +1174,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         names = ""
         for row in rows:
             names = names + self.source[row]['name'] + "\n"
-        ui = DialogConfirmDelete(names)
+        ui = DialogConfirmDelete(self.app, names)
         ok = ui.exec_()
         if not ok:
             return

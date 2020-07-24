@@ -134,7 +134,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
         self.ui.textEdit.setReadOnly(True)
-        self.ui.textEdit.setStyleSheet
+        #self.ui.textEdit.setStyleSheet(font)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -549,10 +549,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Copy text to clipboard for external use.
         For example adding text to another document. """
 
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         cb = QtWidgets.QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
-        cb.setText(selectedText, mode=cb.Clipboard)
+        cb.setText(selected_text, mode=cb.Clipboard)
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -919,7 +919,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete(_("Code: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -945,7 +945,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if found == -1:
             return
         category = self.categories[found]
-        ui = DialogConfirmDelete(_("Category: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return

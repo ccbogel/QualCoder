@@ -807,7 +807,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if found == -1:
             return
         code_ = self.codes[found]
-        ui = DialogConfirmDelete(_("Code: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return
@@ -833,7 +833,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if found == -1:
             return
         category = self.categories[found]
-        ui = DialogConfirmDelete(_("Category: ") + selected.text(0))
+        ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
         ok = ui.exec_()
         if not ok:
             return

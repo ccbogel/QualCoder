@@ -348,7 +348,7 @@ class DialogCases(QtWidgets.QDialog):
         tableRows_to_delete.sort(reverse=True)
         if len(caseNames_to_delete) == 0:
             return
-        ui = DialogConfirmDelete(caseNames_to_delete)
+        ui = DialogConfirmDelete(self.app, caseNames_to_delete)
         ok = ui.exec_()
         if not ok:
             return

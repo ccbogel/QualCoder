@@ -197,7 +197,13 @@ class Codebook():
         f = open(filename, 'w')
         f.write(filedata)
         f.close()
-        QtWidgets.QMessageBox.information(None, _("Codebook exported"), filename)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Codebook exported'))
+        msg = filename
+        mb.setText(msg)
+        mb.exec_()
         self.parent_textEdit.append(_("Codebook exported to ") + filename)
 
     def depthgauge(self, item):
@@ -209,28 +215,9 @@ class Codebook():
             depth += 1
         return depth
 
-    '''def get_categories(self):
-        """ Called from init, delete category. """
-
-        self.categories = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})'''
-
     def get_code_frequencies(self):
         """ Called from init. For each code, get the
         frequency from coded text, images and audio/video. """
-
-        '''self.code_names = []
-        cur = self.settings['conn'].cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
-        result = cur.fetchall()
-        for row in result:
-            self.code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6], 'freq': 0})'''
 
         cur = self.app.conn.cursor()
         for c in self.code_names:

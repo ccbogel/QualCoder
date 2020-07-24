@@ -85,12 +85,11 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.fill_tableWidget()
-        #self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
 
     def accept(self):
-        ''' Make a parameter list where operator and value are entered.
-        Check that values are acceptable for operator and for numeric type. '''
+        """ Make a parameter list where operator and value are entered.
+        Check that values are acceptable for operator and for numeric type. """
 
         self.parameters = []
         for x in range(0, self.ui.tableWidget.rowCount()):
@@ -136,8 +135,8 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         super(DialogSelectAttributeParameters, self).reject()
 
     def cell_modified(self):
-        ''' Values entered or changed in the values_list column. Allow value entry
-        only if the operator has been selected. '''
+        """ Values entered or changed in the values_list column. Allow value entry
+        only if the operator has been selected. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -151,15 +150,29 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
         if operator == '':
             self.ui.tableWidget.item(x, y).setText('')
-            QtWidgets.QMessageBox.warning(None, _('Warning'),_("No operator was selected"), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("No operator was selected"))
+            mb.exec_()
             return
         # enforce that value list is only one item for selected operators
         if operator in ('<','<=','>','>=','==','like') and len(values) > 1:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Too many values given for this operator"),
-                QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("Too many values given for this operator"))
+            mb.exec_()
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("Need 2 values for between"), QtWidgets.QMessageBox.Ok)
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Warning'))
+            mb.setText(_("Need 2 values for between"))
+            mb.exec_()
         # check numeric type
         type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
         if type_ == "numeric":
@@ -167,11 +180,16 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 try:
                     float(v)
                 except ValueError:
-                    QtWidgets.QMessageBox.warning(None, _('Warning'), v + _(" is not a number"), QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setIcon(QtWidgets.QMessageBox.Warning)
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_('Warning'))
+                    mb.setText(v + _(" is not a number"))
+                    mb.exec_()
                     self.ui.tableWidget.item(x, y).setText("")
 
     def fill_tableWidget(self):
-        ''' Fill the table widget with attribute name and type. '''
+        """ Fill the table widget with attribute name and type. """
 
         for row, a in enumerate(self.attribute_type):
             self.ui.tableWidget.insertRow(row)
