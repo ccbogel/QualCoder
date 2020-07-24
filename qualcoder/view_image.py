@@ -313,6 +313,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         source = self.app.project_path + self.file_['mediapath']
         image = QtGui.QImage(source)
         if image.isNull():
+            #TODO
             QtWidgets.QMessageBox.warning(None, _("Image Error"), _("Cannot open: ") + source)
             self.close()
             logger.warning("Cannot open image: " + source)
@@ -719,6 +720,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by item_moved_update_data when a code is moved onto another code. """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
+        #TODO might need to add font size
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
@@ -749,11 +751,11 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         ui = DialogAddItemName(self.codes, _("Add new code"))
         ui.exec_()
-        newCodeText = ui.get_new_name()
-        if newCodeText is None:
+        new_code_name = ui.get_new_name()
+        if new_code_name is None:
             return
         code_color = colors[randint(0, len(colors) - 1)]
-        item = {'name': newCodeText, 'memo': "", 'owner': self.app.settings['codername'],
+        item = {'name': new_code_name, 'memo': "", 'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
@@ -910,8 +912,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, _("Name in use"),
-                    new_name + _(" Choose another name"), QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_("Name in use"))
+                    mb.setText(new_name + _(" Choose another name"))
+                    mb.exec_()
                     return
             # Find the code in the list
             found = -1
@@ -942,7 +947,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
-                    QtWidgets.QMessageBox.warning(None, _("Duplicate category name"), msg, QtWidgets.QMessageBox.Ok)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_("Duplicate category name"))
+                    mb.setText(msg)
+                    mb.exec_()
                     return
             # find the category in the list
             found = -1
@@ -1027,10 +1036,18 @@ class DialogViewImage(QtWidgets.QDialog):
         try:
             source = self.app.project_path + self.image_data['mediapath']
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, _("Image error"), _("Image file not found: ") + source + "\n" + str(e))
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Image error'))
+            mb.setText(_("Image file not found: ") + source + "\n" + str(e))
+            mb.exec_()
         image = QtGui.QImage(source)
         if image.isNull():
-            QtWidgets.QMessageBox.warming(None, _("Image Error"), _("Cannot open: ") + source)
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Image error'))
+            mb.setText(_("Cannot open: ") + source)
+            mb.exec_()
             self.close()
             return
         self.pixmap = QtGui.QPixmap.fromImage(image)
