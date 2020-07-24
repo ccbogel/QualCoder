@@ -270,7 +270,13 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f.write(text)
         f.close()
         logger.info("Report exported to " + filename)
-        QtWidgets.QMessageBox.information(None, _("Text file Export"), filename + _(" exported"))
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('No Text file Export'))
+        msg = filename + _(" exported")
+        mb.setText(msg)
+        mb.exec_()
         self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
 
     def fill_tree(self):
@@ -476,8 +482,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         f.write(self.comparisons)
         f.close()
         logger.info(_("Coder comparisons report exported to ") + filename)
-        QtWidgets.QMessageBox.information(None, _("Text file Export"), filename)
-        self.parent_textEdit.append(_("Coder comparison text file exported to: ") + filename)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Text file export'))
+        msg = _("Coder comparison text file exported to: ") + filename
+        mb.setText(msg)
+        mb.exec_()
+        self.parent_textEdit.append(msg)
 
     def calculate_statistics(self):
         """ Iterate through tree widget, for all cids
@@ -948,7 +960,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setFormat(b'plaintext')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append(_("Report exported: ") + filename)
-        QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Report exported'))
+        mb.setText(filename)
+        mb.exec_()
 
     def export_odt_file(self):
         """ Export report to open document format with .odt ending.
@@ -968,7 +985,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         self.parent_textEdit.append(_("Report exported: ") + filename)
-        QtWidgets.QMessageBox.information(None, _("Report exported"), filename)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Report exported'))
+        mb.setText(filename)
+        mb.exec_()
 
     def export_csv_file(self):
         """ Export report to csv file.
@@ -1070,6 +1092,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             filewriter.writerow(codes_set)  # header row
             for row in csv_data:
                 filewriter.writerow(row)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Report exported'))
+        mb.setText(filename)
+        mb.exec_()
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
@@ -1161,7 +1189,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         if need_media_folders:
             msg += "\n" + _("Media folder: ") + foldername
         self.parent_textEdit.append(msg)
-        QtWidgets.QMessageBox.information(None, _("HTML file saved"), msg)
+        mb = QtWidgets.QMessageBox()
+        mb.setIcon(QtWidgets.QMessageBox.Warning)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Report exported'))
+        mb.setText(msg)
+        mb.exec_()
 
     def recursive_set_selected(self, item):
         """ Set all children of this item to be selected if the item is selected.
