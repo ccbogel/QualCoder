@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_journals.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_journals(object):
     def setupUi(self, Dialog_journals):
@@ -31,6 +33,9 @@ class Ui_Dialog_journals(object):
         self.label_jname = QtWidgets.QLabel(self.groupBox)
         self.label_jname.setGeometry(QtCore.QRect(485, 18, 571, 21))
         self.label_jname.setObjectName("label_jname")
+        self.label_jcount = QtWidgets.QLabel(self.groupBox)
+        self.label_jcount.setGeometry(QtCore.QRect(20, 50, 221, 20))
+        self.label_jcount.setObjectName("label_jcount")
         self.gridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(Dialog_journals)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
@@ -59,6 +64,7 @@ class Ui_Dialog_journals(object):
         self.pushButton_export.setText(_translate("Dialog_journals", "Export"))
         self.pushButton_delete.setText(_translate("Dialog_journals", "Delete"))
         self.label_jname.setText(_translate("Dialog_journals", "Journal:"))
+        self.label_jcount.setText(_translate("Dialog_journals", "Journals: "))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("Dialog_journals", "Name"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -75,4 +81,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_journals)
     Dialog_journals.show()
     sys.exit(app.exec_())
-
