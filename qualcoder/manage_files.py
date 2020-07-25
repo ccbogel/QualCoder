@@ -494,12 +494,14 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
         # cannot easily edit file text of there are linked cases, codes or annotations
-        #TODO use the Menu dialog and extend it?
         self.text_view = DialogMemo(self.app, "",)
         self.text_view.ui.textEdit.setReadOnly(restricted)
         if restricted:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-            self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+            self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_restricted_menu)
+        else:
+            self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_unrestricted_menu)
         self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
         self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
 
@@ -519,18 +521,43 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
         self.app.conn.commit()
 
-    def textEdit_menu(self, position):
+    def textEdit_unrestricted_menu(self, position):
+        """ Context menu for select al land copy of text.
+         Used inthe 'unrestricted' o.e. no coded text file. """
+
+        if self.text_view.ui.textEdit.toPlainText() == "":
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_select_all = menu.addAction(_("Select all"))
+        action_copy = menu.addAction(_("Copy"))
+        action = menu.exec_(self.text_view.ui.textEdit.mapToGlobal(position))
+        if action == action_copy:
+            selected_text = self.text_view.ui.textEdit.textCursor().selectedText()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_select_all:
+            self.text_view.ui.textEdit.selectAll()
+
+    def textEdit_restricted_menu(self, position):
         """ Context menu for selection of small sections of text to be edited.
         The section of text must be only non-annotated and non-coded or
-        only annotated or coded. """
+        only annotated or coded.
+        For use with a text file that has codes/annotations/casses linked to it."""
 
+        if self.text_view.ui.textEdit.toPlainText() == "":
+            return
+        selected_text = self.text_view.ui.textEdit.textCursor().selectedText()
+        text_cursor = self.text_view.ui.textEdit.textCursor()
         x = self.ui.tableWidget.currentRow()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        actionItemEdit = menu.addAction(_("Edit text maximum 20 characters"))
+        action_item_edit = menu.addAction(_("Edit text maximum 20 characters"))
+        action_select_all = menu.addAction(_("Select all"))
+        action_copy = menu.addAction(_("Copy"))
         action = menu.exec_(self.text_view.ui.textEdit.mapToGlobal(position))
-        text_cursor = self.text_view.ui.textEdit.textCursor()
-        if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
+        '''if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
             msg = _("Select a section of text, maximum 20 characters.\nThe selection must be either all underlined or all not-underlined.")
             mb = QtWidgets.QMessageBox()
             mb.setIcon(QtWidgets.QMessageBox.Warning)
@@ -538,17 +565,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             mb.setWindowTitle(_('No text selected'))
             mb.setText(msg)
             mb.exec_()
-            #mb(None, _('No text selected'), msg, QtWidgets.QMessageBox.Ok)
-            return
-        result = self.crossover_check(x, text_cursor)
-        if result['crossover']:
-            return
-
-        if action == actionItemEdit:
+            return'''
+        if action == action_item_edit and len(selected_text) > 0 and len(selected_text) < 21:
+            result = self.crossover_check(x, text_cursor)
+            if result['crossover']:
+                return
             self.restricted_edit_text(x, text_cursor)
             # reload text
             self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
             self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
+        if action == action_copy:
+            selected_text = self.text_view.ui.textEdit.textCursor().selectedText()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_select_all:
+            self.text_view.ui.textEdit.selectAll()
 
     def crossover_check(self, x, text_cursor):
         """ Check text selection for codes and annotations that cross over with non-coded
@@ -557,7 +589,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         param: x the current table row
         param: text_cursor  - the document cursor
-        return: dictionary of crossover indication and of whether selection os entirely coded annotated or neither """
+        return: dictionary of crossover indication and of whether selection is entirely coded annotated or neither """
 
         response = {"crossover": True, "coded_section":[], "annoted_section":[], "cased_section":[]}
         msg = _("Please select text that does not have a combination of coded and uncoded text.")
