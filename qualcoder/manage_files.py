@@ -1219,7 +1219,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.app.conn.commit()
 
             self.check_attribute_placeholders()
-            self.parent_textEdit.append(_("Deleted: ") + self.source[row]['name'])
+            self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
         '''for item in self.source:
             if item['id'] == file_id:
                 self.source.remove(item)'''
@@ -1249,6 +1249,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def fill_table(self):
         """ Reload the file data and Fill the table widget with file data. """
 
+        self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         rows = self.ui.tableWidget.rowCount()
