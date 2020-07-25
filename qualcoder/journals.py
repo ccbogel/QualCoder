@@ -101,6 +101,7 @@ class DialogJournals(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
 
+        self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
         for row, details in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
@@ -231,6 +232,8 @@ class DialogJournals(QtWidgets.QDialog):
         for r in self.journals:
             self.ui.tableWidget.removeRow(0)
         self.journals.append(journal)
+        self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
+
         for row, itm in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(itm['name'])
@@ -294,6 +297,7 @@ class DialogJournals(QtWidgets.QDialog):
                     self.journals.remove(item)
             self.ui.tableWidget.removeRow(x)
             self.parent_textEdit.append(_("Journal deleted: ") + journalname)
+            self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
 
     def table_selection_changed(self):
         """ Update the journal text for the current selection. """
