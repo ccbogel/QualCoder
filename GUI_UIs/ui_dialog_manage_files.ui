@@ -14,7 +14,7 @@
    <string>Files</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QTableWidget" name="tableWidget"/>
    </item>
    <item row="1" column="0">
@@ -109,6 +109,13 @@
        <string>Add Attribute</string>
       </property>
      </widget>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_fcount">
+     <property name="text">
+      <string>Files:</string>
+     </property>
     </widget>
    </item>
   </layout>
