@@ -743,6 +743,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_selections.setStyleSheet(font)
+        self.ui.label_counts.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
@@ -782,6 +783,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         except:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
+        self.ui.treeWidget.itemSelectionChanged.connect(self.display_counts)
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -1198,13 +1200,47 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def recursive_set_selected(self, item):
         """ Set all children of this item to be selected if the item is selected.
-        Recurse through any child categories. """
+        Recurse through any child categories.
+        Called by: search
+        """
+
         #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
         child_count = item.childCount()
         for i in range(child_count):
             if item.isSelected():
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
+
+    def display_counts(self):
+        """ Fill counts label with counts of selected codes/files/cases attributes. """
+
+        self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
+        items = self.ui.treeWidget.selectedItems()
+        codes_count = 0
+        for i in items:
+            if i.text(1)[0:3] == 'cid':
+                codes_count += 1
+        codes = _("Codes: ") + str(codes_count) + "/" + str(len(self.code_names))
+        files_count = len(self.file_ids.split(","))
+        if self.file_ids == "":
+            files_count = 0
+        filenames = self.app.get_filenames()
+        files = _("Files: ") + str(files_count) + "/" + str(len(filenames))
+        cases_count = len(self.case_ids.split(","))
+        if self.case_ids == "":
+            cases_count = 0
+        casenames = self.app.get_casenames()
+        cases = _("Cases: ") + str(cases_count) + "/" + str(len(casenames))
+        attribute_count = len(self.attribute_selection)
+        cur = self.app.conn.cursor()
+        sql = "select count(name) from attribute_type"
+        cur.execute(sql)
+        result = cur.fetchone()
+        if result is None:
+            result = [0]
+        attributes = _("Attributes: ") + str(attribute_count) + "/" + str(result[0])
+        msg = codes + "  " + files+ "  " + cases + "  " + attributes
+        self.ui.label_counts.setText(msg)
 
     def search(self):
         """ Search for selected codings.
@@ -1234,6 +1270,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # set all items under selected categories to be selected
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
+
         if len(items) == 0:
             mb = QtWidgets.QMessageBox()
             mb.setIcon(QtWidgets.QMessageBox.Warning)
@@ -1912,6 +1949,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             label += ','.join(att[4])
             label += "| "
         self.ui.label_selections.setText(label)
+        self.display_counts()
 
     def select_files(self):
         """ When select file button is pressed a dialog of filenames is presented to the user.
@@ -1950,6 +1988,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_selections.setText(tooltip)
             else:
                 self.ui.label_selections.setText(_("Files selected: All"))
+        self.display_counts()
 
     def select_cases(self):
         """ When select case button is pressed a dialog of case names is presented to the user.
@@ -1963,7 +2002,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.file_ids = ""
         self.attribute_selection = []
         casenames = self.app.get_casenames()
-        #print(casenames)
         self.case_ids = ""
         for row in casenames:
             self.case_ids += "," + str(row['id'])
@@ -1986,6 +2024,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_selections.setText(tooltip)
             else:
                 self.ui.label_selections.setText(_("Cases selected: All"))
+        self.display_counts()
 
 
 class ToolTip_EventFilter(QtCore.QObject):
