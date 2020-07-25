@@ -115,6 +115,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.fill_tableWidget()
         self.ui.splitter.setSizes([1, 1])
         try:
@@ -138,6 +139,16 @@ class DialogCases(QtWidgets.QDialog):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcases_splitter0'] = sizes[0]
         self.app.settings['dialogcases_splitter1'] = sizes[1]
+
+    def count_selected_items(self):
+        """ Update label with the count of selected rows """
+
+        indexes = self.ui.tableWidget.selectedIndexes()
+        ix = []
+        for i in indexes:
+            ix.append(i.row())
+        i = set(ix)
+        self.ui.label_cases.setText(_("Cases: ") + str(len(i)) + "/" + str(len(self.cases)))
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
@@ -462,6 +473,7 @@ class DialogCases(QtWidgets.QDialog):
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
 
+        self.ui.label_cases.setText(_("Cases: ") + str(len(self.cases)))
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
