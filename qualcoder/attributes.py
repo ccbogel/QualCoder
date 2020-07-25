@@ -97,12 +97,22 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
+        self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
         self.app.settings['dialogmanageattributes_w'] = new_size.size().width()
         self.app.settings['dialogmanageattributes_h'] = new_size.size().height()
+
+    def count_selected_items(self):
+        """ Update label with the count of selected items """
+        indexes = self.ui.tableWidget.selectedIndexes()
+        ix = []
+        for i in indexes:
+            ix.append(i.row())
+        i = set(ix)
+        self.ui.label.setText(_("Attributes: ") + str(len(i)) + "/" + str(len(self.attributes)))
 
     def add_attribute(self):
         """ When add button pressed, open addItem dialog to get new attribute text.
@@ -111,14 +121,11 @@ class DialogManageAttributes(QtWidgets.QDialog):
 
         check_names = self.attributes + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddAttribute(self.app, check_names)
-        ok = ui.exec_()
-        if not ok:
-            return
+        ui.exec_()  # ok = ui.exec_() does not pick up pressing the cancel button
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
             return
-
         Dialog_assign = QtWidgets.QDialog()
         ui = Ui_Dialog_assignAttribute()
         ui.setupUi(Dialog_assign)
@@ -126,9 +133,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         Dialog_assign.setStyleSheet(font)
-        ok = Dialog_assign.exec_()
+        Dialog_assign.exec_()
         case_or_file = "case"
-        if ok and ui.radioButton_files.isChecked():
+        if ui.radioButton_files.isChecked():
             case_or_file = "file"
         # update attributes list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -239,6 +246,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
     def fill_tableWidget(self):
         """ Fill the table widget with attribute details. """
 
+        self.ui.label.setText(_("Attributes: ") + str(len(self.attributes)))
         rows = self.ui.tableWidget.rowCount()
         for i in range(0, rows):
             self.ui.tableWidget.removeRow(0)
