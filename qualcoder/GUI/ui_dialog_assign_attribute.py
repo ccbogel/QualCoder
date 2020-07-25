@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_assign_attribute.ui'
 #
-# Created: Wed Dec  6 23:24:24 2017
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_assignAttribute(object):
     def setupUi(self, Dialog_assignAttribute):
@@ -29,7 +30,7 @@ class Ui_Dialog_assignAttribute(object):
         self.label.setObjectName("label")
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_assignAttribute)
         self.buttonBox.setGeometry(QtCore.QRect(130, 80, 221, 27))
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
 
         self.retranslateUi(Dialog_assignAttribute)
@@ -53,4 +54,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_assignAttribute)
     Dialog_assignAttribute.show()
     sys.exit(app.exec_())
-
