@@ -142,16 +142,23 @@ class DialogCases(QtWidgets.QDialog):
 
     def count_selected_items(self):
         """ Update label with the count of selected rows.
-         Also clear the textedit if multiple rows are selected. """
+         Also clear the textedit if multiple rows are selected.
+         :return
+            item_count """
 
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = []
         for i in indexes:
             ix.append(i.row())
-        i = set(ix)
-        self.ui.label_cases.setText(_("Cases: ") + str(len(i)) + "/" + str(len(self.cases)))
-        if len(i) > 1:
+        i = len(set(ix))
+        if i > 1:
             self.ui.textBrowser.clear()
+        case_name = ""
+        if i == 1:
+            case_name = self.ui.tableWidget.item(indexes[0].row(), 0).text()
+        self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)
+
+        return i
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
@@ -425,12 +432,9 @@ class DialogCases(QtWidgets.QDialog):
             self.case_text = []
             return
         self.selected_case = self.cases[x]
+        if self.count_selected_items() > 1:
+            return
 
-        '''# clear case text viewed if the caseid has changed
-        if self.caseTextViewed != [] and self.caseTextViewed[0]['caseid'] != self.selected_case['caseid']:
-            self.caseTextViewed = []
-            self.case_text = []
-            self.ui.textBrowser.clear()'''
         #logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])'''
         # get case_text for this file
         if self.selected_file is not None:
