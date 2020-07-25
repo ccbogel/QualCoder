@@ -83,6 +83,19 @@
        <string>Journal:</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_jcount">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>221</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Journals: </string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="0">
