@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_manage_files.ui'
 #
-# Created: Tue Feb 19 21:48:27 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_manage_files(object):
     def setupUi(self, Dialog_manage_files):
@@ -19,7 +20,7 @@ class Ui_Dialog_manage_files(object):
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
-        self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.tableWidget, 3, 0, 1, 1)
         self.groupBox = QtWidgets.QGroupBox(Dialog_manage_files)
         self.groupBox.setMinimumSize(QtCore.QSize(0, 60))
         self.groupBox.setTitle("")
@@ -43,6 +44,9 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_add_attribute.setGeometry(QtCore.QRect(340, 10, 201, 36))
         self.pushButton_add_attribute.setObjectName("pushButton_add_attribute")
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 1)
+        self.label_fcount = QtWidgets.QLabel(Dialog_manage_files)
+        self.label_fcount.setObjectName("label_fcount")
+        self.gridLayout.addWidget(self.label_fcount, 2, 0, 1, 1)
 
         self.retranslateUi(Dialog_manage_files)
         QtCore.QMetaObject.connectSlotsByName(Dialog_manage_files)
@@ -57,6 +61,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_delete.setText(_translate("Dialog_manage_files", "Delete"))
         self.pushButton_import.setText(_translate("Dialog_manage_files", "Import"))
         self.pushButton_add_attribute.setText(_translate("Dialog_manage_files", "Add Attribute"))
+        self.label_fcount.setText(_translate("Dialog_manage_files", "Files:"))
 
 
 if __name__ == "__main__":
@@ -67,4 +72,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_manage_files)
     Dialog_manage_files.show()
     sys.exit(app.exec_())
-
