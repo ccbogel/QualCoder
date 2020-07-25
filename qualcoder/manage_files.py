@@ -1093,17 +1093,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         and also export the plain text version.
         """
 
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
-        if directory == "":
-            return
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = []
         for i in index_list:
             rows.append(i.row())
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
+            return
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.settings['directory'], options)
+        if directory == "":
             return
         names = _("Export to ") + directory + "\n"
         for row in rows:
