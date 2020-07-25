@@ -141,7 +141,8 @@ class DialogCases(QtWidgets.QDialog):
         self.app.settings['dialogcases_splitter1'] = sizes[1]
 
     def count_selected_items(self):
-        """ Update label with the count of selected rows """
+        """ Update label with the count of selected rows.
+         Also clear the textedit if multiple rows are selected. """
 
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = []
@@ -149,6 +150,8 @@ class DialogCases(QtWidgets.QDialog):
             ix.append(i.row())
         i = set(ix)
         self.ui.label_cases.setText(_("Cases: ") + str(len(i)) + "/" + str(len(self.cases)))
+        if len(i) > 1:
+            self.ui.textBrowser.clear()
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
@@ -415,7 +418,6 @@ class DialogCases(QtWidgets.QDialog):
         """
 
         self.ui.textBrowser.clear()
-        self.ui.textBrowser.setPlainText("")
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         if x == -1:
