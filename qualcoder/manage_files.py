@@ -1122,7 +1122,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def export(self):
         """ Export files to selected directory.
         If an imported file was from a docx, odt, pdf, html, epub then export the original file
-        and also export the plain text version.
+        If the file was created within QualCoder (so only in the database), export as plain text.
         """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
@@ -1145,15 +1145,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not ok:
             return
 
-        # redo ms as filenames may change for created files and for original file documents
+        # redo msg as filenames may change for created files and for original file documents
         msg = _("Export to ") + directory + "\n"
         for row in rows:
             filename = self.source[row]['name']
             filename_txt = None
-            if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
+            '''if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
                 filename_txt = filename[0:len(filename) - 5] + ".txt"
             if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
-                filename_txt = filename[0:len(filename) - 4] + ".txt"
+                filename_txt = filename[0:len(filename) - 4] + ".txt" '''
             # Below is for transcribed files and for user created text files within QualCoder
             if self.source[row]['mediapath'] is None and filename_txt is None:
                 filename_txt = filename + ".txt"
