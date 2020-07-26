@@ -1161,7 +1161,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 filename_txt = directory + "/" + filename_txt
                 #logger.info(_("Exporting to ") + filename)
                 filedata = self.source[row]['fulltext']
-                f = open(filename_txt, 'w')
+                f = open(filename_txt, 'w', encoding='utf-8-sig')
                 f.write(filedata)
                 f.close()
                 msg += filename_txt + "\n"

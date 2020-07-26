@@ -172,7 +172,11 @@ class DialogSQL(QtWidgets.QDialog):
         self.delimiter = str(self.ui.comboBox_delimiter.currentText())
         if self.delimiter == "tab":
             self.delimiter = "\t"
-        f = open(file_name, 'w')
+        #f = open(file_name, 'w')
+        ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
+        Using a byte order mark so that other software recognised UTF-8
+        '''
+        f = open(file_name, 'w', encoding='utf-8-sig')
         # write the header row
         file_line = ""
         for item in col_names:
