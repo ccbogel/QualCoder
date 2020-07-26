@@ -1149,22 +1149,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         msg = _("Export to ") + directory + "\n"
         for row in rows:
             filename = self.source[row]['name']
-            filename_txt = None
             '''if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
                 filename_txt = filename[0:len(filename) - 5] + ".txt"
             if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
                 filename_txt = filename[0:len(filename) - 4] + ".txt" '''
-            # Below is for transcribed files and for user created text files within QualCoder
-            if self.source[row]['mediapath'] is None and filename_txt is None:
-                filename_txt = filename + ".txt"
-            if filename_txt is not None:
-                filename_txt = directory + "/" + filename_txt
-                #logger.info(_("Exporting to ") + filename)
-                filedata = self.source[row]['fulltext']
-                f = open(filename_txt, 'w', encoding='utf-8-sig')
-                f.write(filedata)
-                f.close()
-                msg += filename_txt + "\n"
             # export audio, video, picture files
             if self.source[row]['mediapath'] is not None:
                 file_path = self.app.project_path + self.source[row]['mediapath']
@@ -1175,14 +1163,27 @@ class DialogManageFiles(QtWidgets.QDialog):
                 except FileNotFoundError:
                     pass
             # export pdf, docx, odt, epub, html files if located in documents directory
+            original_document_stored = True
             if self.source[row]['mediapath'] is None:
                 file_path = self.app.project_path + "/documents/" + self.source[row]['name']
                 destination = directory + "/" + self.source[row]['name']
                 try:
                     copyfile(file_path, destination)
                     msg += destination + "\n"
-                except FileNotFoundError:
-                    pass
+                except FileNotFoundError as e:
+                    print(e)
+                    logger.warning(str(e))
+                    original_document_stored = False
+            # Export transcribed files and for user created text files within QualCoder
+            if self.source[row]['mediapath'] is None and not original_document_stored:
+                filename_txt = filename + ".txt"
+                filename_txt = directory + "/" + filename_txt
+                filedata = self.source[row]['fulltext']
+                f = open(filename_txt, 'w', encoding='utf-8-sig')
+                f.write(filedata)
+                f.close()
+                msg += filename_txt + "\n"
+
             #if filename_txt is not None:
             #    msg += "\n" + directory + "/" + filename_txt
         mb = QtWidgets.QMessageBox()
