@@ -282,7 +282,7 @@ class App(object):
         'dialogjournals_splitter0', 'dialogjournals_splitter1', 'dialogsql_splitter_h0',
         'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
         'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
-        'dialogreportcodefrequencies_h',
+        'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1'
                 ]
         for key in keys:
@@ -370,7 +370,9 @@ class App(object):
             'dialogcasefilemanager_splitter0': 1,
             'dialogcasefilemanager_splitter1': 1,
             'dialogmanageattributes_w': 0,
-            'dialogmanageattributes_h': 0
+            'dialogmanageattributes_h': 0,
+            'mainwindow_w': 0,
+            'mainwindow_h': 0,
         }
 
     def get_file_texts(self, fileids=None):
@@ -452,6 +454,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         #self.setWindowIcon(QtGui.QIcon("GUI/qualcoder.png"))
+        try:
+            w = int(self.app.settings['mainwindow_w'])
+            h = int(self.app.settings['mainwindow_h'])
+            if h > 40 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.hide_menu_options()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -522,6 +531,12 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.settings_report()
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['mainwindow_w'] = new_size.size().width()
+        self.app.settings['mainwindow_h'] = new_size.size().height()
 
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
