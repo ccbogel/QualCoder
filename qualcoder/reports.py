@@ -948,6 +948,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
         QTextWriter supports plaintext, ODF and HTML.
+        BUT QTextWriter does not support utf-8-sig
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -957,10 +958,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         if filename[0] == "":
             return
         filename = filename[0] + ".txt"
-        tw = QtGui.QTextDocumentWriter()
-        tw.setFileName(filename)
-        tw.setFormat(b'plaintext')  # byte array needed for Windows 10
-        tw.write(self.ui.textEdit.document())
+        #tw = QtGui.QTextDocumentWriter()
+        #tw.setFileName(filename)
+        #tw.setFormat(b'plaintext')  # byte array needed for Windows 10
+        #tw.setCodec('utf-8-sig') # This line does not work
+        #tw.write(self.ui.textEdit.document())
+        ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
+        Using a byte order mark so that other software recognised UTF-8
+        '''
+        data = self.ui.textEdit.toPlainText()
+        f = open(filename, 'w', encoding='utf-8-sig')
+        f.write(data)
+        f.close()
+
         self.parent_textEdit.append(_("Report exported: ") + filename)
         mb = QtWidgets.QMessageBox()
         mb.setIcon(QtWidgets.QMessageBox.Warning)
@@ -1088,7 +1098,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if filename[0] == "":
             return
         filename = filename[0] + ".csv"
-        with open(filename, 'w', encoding ='utf-8', newline='') as csvfile:
+        with open(filename, 'w', encoding ='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
