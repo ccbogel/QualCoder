@@ -468,6 +468,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_ui()
         self.show()
 
+        self.whichone = 0
+
+
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -527,6 +530,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionContents.setShortcut('Ctrl+H')
         self.ui.actionAbout.triggered.connect(self.about)
+
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -775,6 +779,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCases":
                 d.show()
+                d.activateWindow()
                 return
         ui = DialogCases(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -789,6 +794,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogManageFiles":
                 d.show()
+                d.activateWindow()
                 return
         ui = DialogManageFiles(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -804,6 +810,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogJournals":
                 try:
                     d.show()
+                    d.activateWindow()
                     return
                 except Exception as e:
                     logger.debug(str(e))
