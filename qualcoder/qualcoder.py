@@ -545,7 +545,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.recent_projects = self.app.read_previous_project_paths()
         if len(self.recent_projects) == 0:
             return
-        self.ui.menuOpen_Recent_Project.clear()  # removes the qtdesigner default action
+        # removes the qtdesigner default action. Also clears the section when a proect is closed
+        # so that the options for recent projects can be updated
+        self.ui.menuOpen_Recent_Project.clear()
         #TODO must be a better way to do this
         for i, r in enumerate(self.recent_projects):
             if i == 0:
@@ -1203,6 +1205,7 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 print(str(e))
         self.app.append_recent_project(self.app.project_path)
+        self.fill_recent_projects_menu_actions()
         self.app.conn = None
         self.app.project_path = ""
         self.app.project_name = ""
