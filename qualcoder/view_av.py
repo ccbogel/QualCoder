@@ -40,19 +40,22 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
+
 vlc_msg = ""
 try:
     import vlc
 except Exception as e:
+    vlc_msg = str(e) + "\n"
     if sys.platform.startswith("win"):
         imp = False
     if not imp:
+        msg = str(e) + "\n"
         msg = "view_av. Cannot import vlc\n"
-        msg += str(e) + "\n"
         msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
         msg += "32 bit python AND 32 bit VLC installed."
         print(msg)
         vlc_msg = msg
+    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
