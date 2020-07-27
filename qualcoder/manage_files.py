@@ -79,7 +79,11 @@ def exception_handler(exception_type, value, tb_obj):
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
     logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    mb = QtWidgets.QMessageBox()
+    mb.setStyleSheet("* {font-size: 12pt}")
+    mb.setWindowTitle(_('Uncaught Exception'))
+    mb.setText(text)
+    mb.exec_()
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -962,6 +966,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def load_file_text(self, import_file):
         """ Import from file types of odt, docx pdf, epub, txt, html, htm.
+        Implement character detection for txt imports.
         """
 
         text = ""
@@ -1019,6 +1024,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 text = html_to_text(fileText)
                 QtWidgets.QMessageBox.warning(None, _('Warning'), str(importErrors) + _(" lines not imported"))
         # Try importing as a plain text file.
+        #TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
+        #coding = chardet.detect(file.content).get('encoding')
+        #text = file.content[:10000].decode(coding)
         if text == "":
             import_errors = 0
             try:

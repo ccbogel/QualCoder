@@ -47,6 +47,7 @@ from attributes import DialogManageAttributes
 from cases import DialogCases
 from codebook import Codebook
 from code_text import DialogCodeText
+from copy import copy
 from dialog_sql import DialogSQL
 from GUI.ui_main import Ui_MainWindow
 from import_survey import DialogImportSurvey
@@ -87,7 +88,11 @@ def exception_handler(exception_type, value, tb_obj):
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
     logger.error(_("Uncaught exception : ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    mb = QtWidgets.QMessageBox()
+    mb.setStyleSheet("* {font-size: 12pt}")
+    mb.setWindowTitle(_('Uncaught Exception'))
+    mb.setText(text)
+    mb.exec_()
 
 
 class App(object):
@@ -101,18 +106,22 @@ class App(object):
     # Can delete the most current back up if the project has not been altered
     delete_backup_path_name = ""
     delete_backup = True
+    # Used as a default export location, which may be different from the working directory
+    last_export_directory = ""
 
     def __init__(self):
         sys.excepthook = exception_handler
         self.conn = None
         self.project_path = ""
         self.project_name = ""
+        self.last_export_directory = ""
         self.delete_backup = True
         self.delete_backup_path_name = ""
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
         self.settings = self.load_settings()
+        self.last_export_directory = copy(self.settings['directory'])
 
     def read_previous_project_paths(self):
         """ Recent project path is stored in .qualcoder/recent_projects.txt
@@ -284,7 +293,7 @@ class App(object):
         'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
         'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1'
-                ]
+        ]
         for key in keys:
             if key not in data:
                 data[key] = 0
