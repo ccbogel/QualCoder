@@ -1142,9 +1142,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
+            _("Select directory to save file"), self.app.last_export_directory, options)
         if directory == "":
             return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         names = _("Export to ") + directory + "\n"
         for row in rows:
             names = names + self.source[row]['name'] + "\n"

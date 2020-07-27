@@ -238,9 +238,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filename = shortname + " code frequencies.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
+            _("Select directory to save file"), self.app.last_export_directory, options)
         if directory == "":
             return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = directory + "/" + filename
 
         f = open(filename, 'w')
@@ -472,9 +474,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         filename = shortname + " coder comparison.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
+            _("Select directory to save file"), self.app.last_export_directory, options)
         if directory == "":
             return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = directory + "/" + filename
         f = open(filename, 'w')
         f.write(self.app.project_name + "\n")
@@ -954,9 +958,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
-            self.app.settings['directory'])
+            self.app.last_export_directory)
         if filename[0] == "":
             return
+        tmp = filename.split("/")[-1]
+        directory = filename[:len(filename) - len(tmp)]
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = filename[0] + ".txt"
         #tw = QtGui.QTextDocumentWriter()
         #tw.setFileName(filename)
@@ -987,10 +995,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
-            self.app.settings['directory'])
+            self.app.last_export_directory)
         #    os.path.expanduser('~'))
         if filename[0] == "":
             return
+        tmp = filename.split("/")[-1]
+        directory = filename[:len(filename) - len(tmp)]
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = filename[0] + ".odt"
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)
@@ -1094,9 +1106,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                     row += 1
 
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
-            self.app.settings['directory'])
+            self.app.last_export_directory)
         if filename[0] == "":
             return
+        tmp = filename.split("/")[-1]
+        directory = filename[:len(filename) - len(tmp)]
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = filename[0] + ".csv"
         with open(filename, 'w', encoding ='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
@@ -1121,9 +1137,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
-            self.app.settings['directory'])
+            self.app.last_export_directory)
         if filename[0] == "":
             return
+        tmp = filename.split("/")[-1]
+        directory = filename[:len(filename) - len(tmp)]
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
         filename = filename[0] + ".html"
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)

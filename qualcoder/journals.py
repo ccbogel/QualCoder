@@ -265,8 +265,10 @@ class DialogJournals(QtWidgets.QDialog):
         filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), os.path.expanduser('~'), options)
+            _("Select directory to save file"), self.app.last_export_directory, options)
         if directory:
+            if directory != self.app.last_export_directory:
+                self.app.last_export_directory = directory
             filename = directory + "/" + filename
             data = self.journals[x]['jentry']
             f = open(filename, 'w')

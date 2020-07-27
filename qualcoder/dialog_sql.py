@@ -164,11 +164,16 @@ class DialogSQL(QtWidgets.QDialog):
         if cur.description is not None:
             col_names = list(map(lambda x: x[0], cur.description))  # gets column names
         # os.getenv('HOME') does not work on Windows
-        tmp_name = os.path.expanduser('~') + "/Desktop/TEMP.csv"
+        tmp_name = self.app.last_export_directory + "/TEMP.csv"
         file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", tmp_name)
         if file_tuple[0] == "":
             return
         file_name = file_tuple[0]
+        tmp = file_name.split("/")[-1]
+        directory = file_name[:len(file_name) - len(tmp)]
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+
         self.delimiter = str(self.ui.comboBox_delimiter.currentText())
         if self.delimiter == "tab":
             self.delimiter = "\t"
