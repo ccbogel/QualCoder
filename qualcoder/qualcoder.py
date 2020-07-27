@@ -30,6 +30,7 @@ https://qualcoder.wordpress.com/
 import configparser
 import datetime
 import gettext
+import json  # to get latest release
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -39,6 +40,7 @@ import shutil
 import sys
 import sqlite3
 import traceback
+import urllib.request
 import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -462,6 +464,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.get_latest_github_release()
         #self.setWindowIcon(QtGui.QIcon("GUI/qualcoder.png"))
         try:
             w = int(self.app.settings['mainwindow_w'])
@@ -1105,7 +1108,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.project_name = ""
             return
 
-        #TODO Probably a design flaw to have the current coders name in the config.ini file
+        #TODO Potential design flaw to have the current coders name in the config.ini file
         #TODO as is would change when opening differnt projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
@@ -1144,7 +1147,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.copytree(self.app.project_path, backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
                 self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             self.ui.textEdit.append(_("Project backup created: ") + backup)
-            # delete backup path - delete the backup if no changes occured in the project during the session
+            # delete backup path - delete the backup if no changes occurred in the project during the session
             self.app.delete_backup_path_name = backup
             delete_backup = True
 
@@ -1214,12 +1217,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.close()
         except:
             pass
-        # delete the backup folder
-        if self.app.delete_backup_path_name != "" and self.app.delete_backup:
-            try:
-                shutil.rmtree(self.app.delete_backup_path_name)
-            except Exception as e:
-                print(str(e))
+        self.delete_backup_folders()
         self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
         self.app.conn = None
@@ -1233,10 +1231,48 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             d.destroy()
         self.setWindowTitle("QualCoder")
-
-        #TODO if settings have changed, particularly dialog sizes
         self.app.write_config_ini(self.app.settings)
 
+    def delete_backup_folders(self):
+        """ Delete the most current backup created on opening a project,
+        providing the project was not changed in any way.
+        Delete oldest backups if more that 8 are created.
+        Backup name format:
+        directories/projectname_BKUP_yyyymmdd_hh.qda
+        Keep up to SIX backups only. """
+
+        if self.app.project_path == "":
+            return
+        if self.app.delete_backup_path_name != "" and self.app.delete_backup:
+            try:
+                shutil.rmtree(self.app.delete_backup_path_name)
+            except Exception as e:
+                print(str(e))
+
+        # Delete oldest backups if there are more than 6
+        parts = self.app.project_path.split('/')
+        projectname_and_suffix = parts[-1]
+        directory = self.app.project_path[0:-len(projectname_and_suffix)]
+        projectname = projectname_and_suffix[:-4]
+        projectname_and_bkup = projectname + "_BKUP_"
+        lenname = len(projectname_and_bkup)
+        files_folders = os.listdir(directory)
+        backups = []
+        for f in files_folders:
+            if f[0:lenname] == projectname_and_bkup and f[-4:] == ".qda":
+                backups.append(f)
+        backups.sort()
+        to_remove = []
+        if len(backups) > 6:
+            to_remove = backups[6:]
+        if to_remove == []:
+            return
+        for f in to_remove:
+            try:
+                shutil.rmtree(directory + f)
+                self.ui.textEdit.append(_("Deleting: " + f))
+            except Exception as e:
+                print(str(e))
 
     def clean_dialog_refs(self):
         """ Test the list of dialog refs to see if they have been cleared
@@ -1274,6 +1310,27 @@ class MainWindow(QtWidgets.QMainWindow):
                 d.dialog_list = self.dialogList
             if isinstance(d, DialogManageFiles):
                 d.dialog_list = self.dialogList
+
+    def get_latest_github_release(self):
+        """ Get latest github release.
+        https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo
+        Dated May 2018
+        """
+
+        try:
+            _json = json.loads(urllib.request.urlopen(urllib.request.Request(
+                'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
+                headers={'Accept': 'application/vnd.github.v3+json'},
+            )).read())
+
+            self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
+            self.ui.textEdit.append(_json['html_url'] + "\n")
+            #print(_json['html_url'])
+            #print(_json['name'])
+            #asset = _json['assets'][0]
+            #urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])
+        except Exception as e:
+            logger.debug(str(e))
 
 
 def gui():
