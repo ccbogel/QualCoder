@@ -40,7 +40,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
-
+# https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
+try:
+    os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC')
+except Exception as e:
+    if sys.platform.startswith("win"):
+        QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
 vlc_msg = ""
 try:
     import vlc
