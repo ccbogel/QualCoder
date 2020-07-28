@@ -54,7 +54,7 @@ class Ui_Dialog_manage_files(object):
     def retranslateUi(self, Dialog_manage_files):
         _translate = QtCore.QCoreApplication.translate
         Dialog_manage_files.setWindowTitle(_translate("Dialog_manage_files", "Files"))
-        self.pushButton_view.setText(_translate("Dialog_manage_files", "View"))
+        self.pushButton_view.setText(_translate("Dialog_manage_files", "Open"))
         self.pushButton_create.setText(_translate("Dialog_manage_files", "Create"))
         self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Make sure the file name does not contain unusual characters such as \': ; &quot; \' otherwise it will raise an error when trying to save this file. Rename the file if needed.</p></body></html>"))
         self.pushButton_export.setText(_translate("Dialog_manage_files", "Export"))
