@@ -211,7 +211,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         # Disable close button, only close through closing the Ui_Dialog_code_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
-        self.ddialog.resize(640, 480)
+        self.ddialog.resize(1, 1)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
@@ -492,6 +492,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             mb.exec_()
             self.closeEvent()
             return
+        #TODO sizes
+        if self.media_data['mediapath'][0:7] != "/audio/":
+            self.ddialog.resize(640, 480)
+
         # clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
         # Put the media in the media player
@@ -2089,7 +2093,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowTitle(self.media_data['mediapath'])
-        self.ddialog.resize(640, 480)
+        self.ddialog.resize(1,1)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
@@ -2127,6 +2131,9 @@ class DialogViewAV(QtWidgets.QDialog):
             mb.exec_()
             self.closeEvent()
             return
+        if self.media_data['mediapath'][0:7] != "/audio/":
+            #TODO sizes
+            self.ddialog.resize(640, 480)
 
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
