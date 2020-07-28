@@ -1324,7 +1324,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         try:
             if _json['name'] != qualcoder_version:
-                html = '<span style="color:red">' + _("Latest Release: ") + _json['name'] + '</span>'
+                html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
                 self.ui.textEdit.append(html)
