@@ -67,6 +67,8 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
+qualcoder_version = "QualCoder 1.9"
+
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 if not os.path.exists(home + '/.qualcoder'):
@@ -1314,19 +1316,25 @@ class MainWindow(QtWidgets.QMainWindow):
         Dated May 2018
         """
 
-        try:
-            _json = json.loads(urllib.request.urlopen(urllib.request.Request(
-                'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
-                headers={'Accept': 'application/vnd.github.v3+json'},
-            )).read())
+        #try:
+        _json = json.loads(urllib.request.urlopen(urllib.request.Request(
+            'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
+            headers={'Accept': 'application/vnd.github.v3+json'},
+        )).read())
 
-            self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
-            self.ui.textEdit.append(_json['html_url'] + "\n")
-            #print(_json['html_url'])
-            #print(_json['name'])
-            #asset = _json['assets'][0]
-            #urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])
+        try:
+            if _json['name'] != qualcoder_version:
+                html = '<span style="color:red">' + _("Latest Release: ") + _json['name'] + '</span>'
+                self.ui.textEdit.append(html)
+                html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
+                self.ui.textEdit.append(html)
+            else:
+                self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
+                self.ui.textEdit.append(_json['html_url'] + "\n")
+                #asset = _json['assets'][0]
+                #urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])
         except Exception as e:
+            print(e)
             logger.debug(str(e))
 
 
