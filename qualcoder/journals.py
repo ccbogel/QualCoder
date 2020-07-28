@@ -34,8 +34,9 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_journals import Ui_Dialog_journals
+from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
+from GUI.ui_dialog_journals import Ui_Dialog_journals
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -186,27 +187,11 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.current_jid = None
         self.ui.textEdit.setPlainText("")
-        dialog = QtWidgets.QInputDialog()
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        name, ok = dialog.getText(self, _('New journal'), _('Enter the journal name:'))
-        if not ok:
-            return
-        if name is None or name == "":
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("No name was entered"))
-            mb.exec_()
-            return
-        # check for non-unique name
-        if any(d['name'] == name for d in self.journals):
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("Journal name in use"))
-            mb.exec_()
+
+        ui = DialogAddItemName(self.app, self.journals, _('New Journal'), _('Journal name'))
+        ui.exec_()
+        name = ui.get_new_name()
+        if name is None:
             return
         # Check for unusual characters in filename that would affect exporting
         valid = re.match('^[\ \w-]+$', name) is not None

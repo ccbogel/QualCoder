@@ -58,6 +58,7 @@ import ebooklib
 from ebooklib import epub
 
 from add_attribute import DialogAddAttribute
+from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
@@ -803,19 +804,12 @@ class DialogManageFiles(QtWidgets.QDialog):
     def create(self):
         """ Create a new text file by entering text into the dialog.
         Implements the QtDesigner memo dialog. """
-        name, ok = QtWidgets.QInputDialog.getText(self, _('New File'), _('Enter the file name:'))
-        if not ok:
-            return
-        if name is None or name == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'),
-                _("No filename was selected"), QtWidgets.QMessageBox.Ok)
-            return
-        # check for non-unique filename
-        if any(d['name'] == name for d in self.source):
-            QtWidgets.QMessageBox.warning(None, _('Warning'),
-                _("Filename in use"), QtWidgets.QMessageBox.Ok)
-            return
 
+        ui = DialogAddItemName(self.app, self.source,_('New File'), _('Enter file name'))
+        ui.exec_()
+        name = ui.get_new_name()
+        if name is None:
+            return
         ui = DialogMemo(self.app, _("Creating a new file: ") + name)
         ui.exec_()
         filetext = ui.memo
@@ -890,8 +884,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.load_file_text(destination)
                 else:
                     #TODO qpdf decrypt not implemented for windows, OSX
-                    QtWidgets.QMessageBox.warning(None, _('If import error occurs'),
-                    _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f)
+                    mb = QtWidgets.QMessageBox()
+                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                    mb.setWindowTitle(_('If import error occurs'))
+                    msg = _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f
+                    mb.setText(msg)
+                    mb.exec_()
                     copyfile(f, destination)
                     self.load_file_text(destination)
                 known_file_type = True

@@ -819,13 +819,13 @@ class DialogCodeText(QtWidgets.QWidget):
         duplicate code name. A random color is selected for the code.
         New code is added to data and database. """
 
-        ui = DialogAddItemName(self.codes, _("Add new code"))
+        ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec_()
-        newCodeText = ui.get_new_name()
-        if newCodeText is None:
+        code_name = ui.get_new_name()
+        if code_name is None:
             return
         code_color = colors[randint(0, len(colors) - 1)]
-        item = {'name': newCodeText, 'memo': "", 'owner': self.app.settings['codername'],
+        item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
         'color': code_color}
         cur = self.app.conn.cursor()
@@ -887,7 +887,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Note: the addItem dialog does the checking for duplicate category names
         Add the new category as a top level item. """
 
-        ui = DialogAddItemName(self.categories, _("Category"))
+        ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
         newCatText = ui.get_new_name()
         if newCatText is None:

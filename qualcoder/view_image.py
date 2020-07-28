@@ -752,7 +752,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Add_code_name dialog checks for duplicate code name.
         New code is added to data and database. """
 
-        ui = DialogAddItemName(self.codes, _("Add new code"))
+        ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec_()
         new_code_name = ui.get_new_name()
         if new_code_name is None:
@@ -773,7 +773,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Note: the addItem dialog does the checking for duplicate category names
         Add the new category as a top level item. """
 
-        ui = DialogAddItemName(self.categories, _("Category"))
+        ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
         newCatText = ui.get_new_name()
         if newCatText is None:

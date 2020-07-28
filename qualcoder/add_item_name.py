@@ -62,7 +62,7 @@ class DialogAddItemName(QtWidgets.QDialog):
     Dialog_addItem = None
     typeOfItem = ""  # for dialog title and label: Code or Category
 
-    def __init__(self, items, title, parent=None):
+    def __init__(self, app, items, title, text, parent=None):
         super(DialogAddItemName, self).__init__(parent)  # overrride accept method
 
         sys.excepthook = exception_handler
@@ -72,7 +72,10 @@ class DialogAddItemName(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_add_item()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
         self.setWindowTitle(title)
+        self.ui.label.setText(text)
         self.ui.lineEdit.setFocus(True)
 
     def accept(self):
@@ -90,9 +93,10 @@ class DialogAddItemName(QtWidgets.QDialog):
         self.close()
 
     def get_new_name(self):
-        ''' Get the new name '''
+        """ Get the new name """
 
         return self.newItem
+
 
 class DialogLinkTo(QtWidgets.QDialog):
     """
