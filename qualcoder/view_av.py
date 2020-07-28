@@ -223,6 +223,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
+        # enable custom window hint - must be set to enable customizing window controls
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        # disable close button, only close through closing the Ui_Dialog_view_av
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ddialog.show()
 
         # Create a vlc instance with an empty vlc media player
@@ -2088,10 +2093,11 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
-        # enable custom window hint
+        # enable custom window hint - must be set to enable customizing window controls
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
+        self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ddialog.setWindowTitle(self.media_data['mediapath'])
         self.ddialog.resize(1,1)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
