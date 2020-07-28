@@ -38,7 +38,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>View</string>
+       <string>Open</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_create">
