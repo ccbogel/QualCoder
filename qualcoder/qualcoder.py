@@ -609,9 +609,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def project5(self):
         self.open_project(self.recent_projects[5])
 
-    def project5(self):
-        self.open_project(self.recent_projects[6])
-
     def hide_menu_options(self):
         """ No project opened, hide most menu options.
          Enable project import options."""
