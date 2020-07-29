@@ -235,7 +235,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.ddialog.move(self.pos().x(), self.pos().y())
+
+        #TODO set video dialog position
+        #self.app.settings['video_abs_pos_x']
+        #self.app.settings['video_abs_pos_y']
         self.ddialog.show()
+
+
 
         # Create a vlc instance with an empty vlc media player
         self.instance = vlc.Instance()
@@ -257,12 +264,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogcodeav_w'] = new_size.size().width()
-        self.app.settings['dialogcodeav_h'] = new_size.size().height()
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter. """
@@ -804,11 +805,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop the vlc player on close.
         Capture the video window size. """
 
+        self.app.settings['dialogcodeav_w'] = self.size().width()
+        self.app.settings['dialogcodeav_h'] = self.size().height()
         size = self.ddialog.size()
         if size.width() > 40:
             self.app.settings['video_w'] = size.width()
         if size.height() > 40:
             self.app.settings['video_h'] = size.height()
+        # Get absolute video dialog position
+        self.app.settings['video_abs_pos_x'] = self.ddialog.pos().x()
+        self.app.settings['video_abs_pos_y'] = self.ddialog.pos().y()
+        self.app.settings['codeav_abs_pos_x'] = self.pos().x()
+        self.app.settings['codeav_abs_pos_y'] = self.pos().y()
         self.ddialog.close()
         self.stop()
 
@@ -2154,6 +2162,14 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 10)))
+        # always 0.0 here ?
+        x = self.pos().x()
+        y = self.pos().y()
+        print(x, y)
+        self.ddialog.move(self.ddialog.mapToGlobal(QtCore.QPoint(x, y)))
+
+        #self.app.settings['video_rel_pos_x']
+        #self.app.settings['video_rel_pos_y']
         self.ddialog.show()
 
         # Create a basic vlc instance
@@ -2215,12 +2231,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
-
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogviewav_w'] = new_size.size().width()
-        self.app.settings['dialogviewav_h'] = new_size.size().height()
 
     def eventFilter(self, object, event):
         """ Add key options to textEdit_transcription to improve manual transcribing.
@@ -2585,13 +2595,21 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def closeEvent(self, event):
         """ Stop the vlc player on close.
-        Capture the video window size. """
+        Record the dialog and video dialog0 size and positions.
+        Update the memo. """
 
+        self.app.settings['dialogviewav_w'] = self.size().width()
+        self.app.settings['dialogviewav_h'] = self.size().height()
         size = self.ddialog.size()
         if size.width() > 40:
             self.app.settings['video_w'] = size.width()
         if size.height() > 40:
             self.app.settings['video_h'] = size.height()
+        # Get absolute video dialog position
+        self.app.settings['video_abs_pos_x'] = self.ddialog.pos().x()
+        self.app.settings['video_abs_pos_y'] = self.ddialog.pos().y()
+        self.app.settings['viewav_abs_pos_x'] = self.pos().x()
+        self.app.settings['viewav_abs_pos_y'] = self.pos().y()
         self.ddialog.close()
         self.stop()
         memo = self.ui.textEdit.toPlainText()

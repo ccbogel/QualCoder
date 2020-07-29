@@ -104,8 +104,6 @@ class DialogJournals(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except:
             pass
-        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
-
         self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
         for row, details in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
@@ -126,19 +124,6 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_create.clicked.connect(self.create)
         self.ui.pushButton_export.clicked.connect(self.export)
         self.ui.pushButton_delete.clicked.connect(self.delete)
-
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogjournals_w'] = new_size.size().width()
-        self.app.settings['dialogjournals_h'] = new_size.size().height()
-
-    def splitter_sizes(self, pos, index):
-        """ Detect size changes in splitter and store in app.settings variable. """
-
-        sizes = self.ui.splitter.sizes()
-        self.app.settings['dialogjournals_splitter0'] = sizes[0]
-        self.app.settings['dialogjournals_splitter1'] = sizes[1]
 
     def view(self):
         """ View and edit journal contents in the textEdit """
@@ -169,7 +154,14 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def closeEvent(self, event):
-        """ Save journal text changes to database. """
+        """ Save journal text changes to database.
+        Save dialog and splitter dimensions. """
+
+        self.app.settings['dialogjournals_w'] = self.size().width()
+        self.app.settings['dialogjournals_h'] = self.size().height()
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogjournals_splitter0'] = sizes[0]
+        self.app.settings['dialogjournals_splitter1'] = sizes[1]
 
         cur = self.app.conn.cursor()
         for j in self.journals:

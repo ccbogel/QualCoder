@@ -140,11 +140,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
 
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
+    def closeEvent(self, event):
+        """ Save dialog and splitter dimensions. """
 
-        self.app.settings['dialogmanagefiles_w'] = new_size.size().width()
-        self.app.settings['dialogmanagefiles_h'] = new_size.size().height()
+        self.app.settings['dialogmanagefiles_w'] = self.size().width()
+        self.app.settings['dialogmanagefiles_h'] = self.size().height()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """

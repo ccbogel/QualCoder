@@ -141,18 +141,13 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except:
             pass
-        self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.fill_tree()
 
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
+    def closeEvent(self, event):
+        """ Save dialog and splitter dimensions. """
 
-        self.app.settings['dialogcodeimage_w'] = new_size.size().width()
-        self.app.settings['dialogcodeimage_h'] = new_size.size().height()
-
-    def splitter_sizes(self, pos, index):
-        """ Detect size changes in splitter and store in app.settings variable. """
-
+        self.app.settings['dialogcodeimage_w'] = self.size().width()
+        self.app.settings['dialogcodeimage_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
         self.app.settings['dialogcodeimage_splitter1'] = sizes[1]
@@ -1064,11 +1059,11 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.textEdit.setText(self.image_data['memo'])
 
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
+    def closeEvent(self, event):
+        """ Save dialog and splitter dimensions. """
 
-        self.app.settings['dialogviewimage_w'] = new_size.size().width()
-        self.app.settings['dialogviewimage_h'] = new_size.size().height()
+        self.app.settings['dialogviewimage_w'] = self.size().width()
+        self.app.settings['dialogviewimage_h'] = self.size().height()
 
     def change_scale(self):
         """ Resize image. Idea from:
