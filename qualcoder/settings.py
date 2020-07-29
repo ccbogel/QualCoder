@@ -49,8 +49,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogSettings(QtWidgets.QDialog):
-    ''' Settings for the coder name, coder table and to display ids.
-    '''
+    """ Settings for the coder name, coder table and to display ids. """
 
     settings = {}
 
@@ -68,7 +67,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
-        #self.setFont(new_font)
         self.ui.fontComboBox.setCurrentFont(new_font)
         # get coder names from all tables
         # Note: does not appear to require a distinct clause
@@ -89,6 +87,17 @@ class DialogSettings(QtWidgets.QDialog):
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
                 self.ui.comboBox_language.setCurrentIndex(index)
+        timestampformats = ["[mm.ss]", "[mm:ss]", "[hh.mm.ss]", "[hh:mm:ss]",
+                            "{hh.mm.ss}", "#hh:mm:ss.sss#"]
+        self.ui.comboBox_timestamp.addItems(timestampformats)
+        for index, ts in enumerate(timestampformats):
+            if ts == self.settings['timestampformat']:
+                self.ui.comboBox_timestamp.setCurrentIndex(index)
+        speakernameformats = ["[]", "{}"]
+        self.ui.comboBox_speaker.addItems(speakernameformats)
+        for index, snf in enumerate(speakernameformats):
+            if snf == self.settings['speakernameformat']:
+                self.ui.comboBox_speaker.setCurrentIndex(index)
         self.ui.spinBox.setValue(self.settings['fontsize'])
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
@@ -122,12 +131,12 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(False)
 
     def comboBox_coder_changed(self):
-        ''' Set the coder name to the current selection. '''
+        """ Set the coder name to the current selection. """
 
         self.ui.lineEdit_coderName.setText(self.ui.comboBox_coders.currentText())
 
     def choose_directory(self):
-        ''' Choose default project directory. '''
+        """ Choose default project directory. """
 
         directory = QtWidgets.QFileDialog.getExistingDirectory(self,
             _('Choose project directory'), self.settings['directory'])
@@ -148,6 +157,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['showids'] = 'False'
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
+        self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
+        self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
             self.settings['backup_on_open'] = 'True'
         else:
@@ -160,9 +171,9 @@ class DialogSettings(QtWidgets.QDialog):
         self.close()
 
     def save_settings(self):
-        ''' Save settings to text file in user's home directory.
+        """ Save settings to text file in user's home directory.
         Each setting has a variable identifier then a colon
-        followed by the value. '''
+        followed by the value. """
         self.app.write_config_ini(self.settings)
 
 

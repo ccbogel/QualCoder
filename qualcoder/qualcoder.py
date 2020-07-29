@@ -297,12 +297,16 @@ class App(object):
         'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
         'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
         'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
-        'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat'
+        'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat',
+        'speakernameformat'
         ]
         for key in keys:
             if key not in data:
                 data[key] = 0
-                if key == "timestampformat": data[key] = "[hh.mm.ss]"
+                if key == "timestampformat":
+                    data[key] = "[hh.mm.ss]"
+                if key == "speakername":
+                    data[key] = "[]"
         # write out new ini file, if needed
         if len(data) > dict_len:
             self.write_config_ini(data)
@@ -347,6 +351,7 @@ class App(object):
             'backup_on_open': True,
             'backup_av_files': True,
             'timestampformat': "[hh.mm.ss]",
+            'speakernameformat': "[]",
             'mainwindow_w': 0,
             'mainwindow_h': 0,
             'dialogcodetext_w': 0,
@@ -692,6 +697,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "\n" + _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Timestamp format") + ": " + self.app.settings['timestampformat'] + "\n"
+        msg += _("Speaker name format") + ": " + self.app.settings['speakernameformat'] + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
         msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
         if platform.system() == "Windows":
