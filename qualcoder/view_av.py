@@ -165,6 +165,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogcodeav_w'])
+            h = int(self.app.settings['dialogcodeav_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 200])
         # until any media is selected disable some widgets
@@ -250,6 +257,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogcodeav_w'] = new_size.size().width()
+        self.app.settings['dialogcodeav_h'] = new_size.size().height()
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter. """
@@ -497,9 +510,15 @@ class DialogCodeAV(QtWidgets.QDialog):
             mb.exec_()
             self.closeEvent()
             return
-        #TODO sizes
         if self.media_data['mediapath'][0:7] != "/audio/":
             self.ddialog.resize(640, 480)
+            try:
+                w = int(self.app.settings['video_w'])
+                h = int(self.app.settings['video_h'])
+                if h > 50 and w > 50:
+                    self.ddialog.resize(w, h)
+            except:
+                pass
 
         # clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
@@ -782,8 +801,14 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.play_pause()
 
     def closeEvent(self, event):
-        """ Stop the vlc player on close. """
+        """ Stop the vlc player on close.
+        Capture the video window size. """
 
+        size = self.ddialog.size()
+        if size.width() > 40:
+            self.app.settings['video_w'] = size.width()
+        if size.height() > 40:
+            self.app.settings['video_h'] = size.height()
         self.ddialog.close()
         self.stop()
 
@@ -2069,6 +2094,14 @@ class DialogViewAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
         self.ui.setupUi(self)
+        try:
+            w = int(self.app.settings['dialogviewav_w'])
+            h = int(self.app.settings['dialogviewav_h'])
+            if h > 50 and w > 50:
+                self.resize(w, h)
+        except:
+            pass
+
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -2148,9 +2181,14 @@ class DialogViewAV(QtWidgets.QDialog):
             self.closeEvent()
             return
         if self.media_data['mediapath'][0:7] != "/audio/":
-            #TODO sizes
             self.ddialog.resize(640, 480)
-
+            try:
+                w = int(self.app.settings['video_w'])
+                h = int(self.app.settings['video_h'])
+                if h > 50 and w > 50:
+                    self.ddialog.resize(w, h)
+            except:
+                pass
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
@@ -2175,9 +2213,14 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
-
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
+
+    def resizeEvent(self, new_size):
+        """ Update the widget size details in the app.settings variables """
+
+        self.app.settings['dialogviewav_w'] = new_size.size().width()
+        self.app.settings['dialogviewav_h'] = new_size.size().height()
 
     def eventFilter(self, object, event):
         """ Add key options to textEdit_transcription to improve manual transcribing.
@@ -2541,8 +2584,14 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.stop()
 
     def closeEvent(self, event):
-        """ Stop the vlc player on close. """
+        """ Stop the vlc player on close.
+        Capture the video window size. """
 
+        size = self.ddialog.size()
+        if size.width() > 40:
+            self.app.settings['video_w'] = size.width()
+        if size.height() > 40:
+            self.app.settings['video_h'] = size.height()
         self.ddialog.close()
         self.stop()
         memo = self.ui.textEdit.toPlainText()
