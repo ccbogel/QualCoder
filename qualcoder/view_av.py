@@ -2202,7 +2202,7 @@ class DialogViewAV(QtWidgets.QDialog):
         #print("KEY ", key, "MODS ", mods)
 
         # KEY  82 MODS  20 ctrl r
-        # rewind 3 seconds
+        # Rewind 3 seconds
         if key == 82 and mods == 20:
             time_msecs = self.mediaplayer.get_time() - 3000
             if time_msecs < 0:
@@ -2214,18 +2214,11 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == 84 and mods == 20:
             self.insert_timestamp()
         # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
-        # insert speaker
+        # Insert speaker
         if key in range(49, 57) and mods == 20:
-            list_pos = key - 49
-            speaker = ""
-            try:
-                speaker = self.speaker_list[list_pos]
-            except:
-                return False
-            speaker = '[' + speaker + ']'
-            self.ui.textEdit_transcription.insertPlainText(speaker)
-
+            self.insert_speakername(key)
         # KEY  78 MODS  20 ctrl + n
+        # Add new speaker to list
         if key == 78 and mods == 20:
             self.pause()
             name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name","Name:", QtWidgets.QLineEdit.Normal, "")
@@ -2242,6 +2235,21 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == 83 and mods == 20:
             self.play_pause()
         return True
+
+    def insert_speakername(self, key):
+        """ Insert speaker name using settings format of {} or [] """
+
+        list_pos = key - 49
+        speaker = ""
+        try:
+            speaker = self.speaker_list[list_pos]
+        except:
+            return False
+        if self.app.settings['speakernameformat'] == "[]":
+            speaker = '[' + speaker + ']'
+        else:
+            speaker = '{' + speaker + '}'
+        self.ui.textEdit_transcription.insertPlainText(speaker)
 
     def insert_timestamp(self):
         """ Insert timestamp using current format.
