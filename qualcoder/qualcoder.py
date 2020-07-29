@@ -298,7 +298,8 @@ class App(object):
         'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
         'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat',
-        'speakernameformat'
+        'speakernameformat', 'video_w', 'video_h', 'dialogcodeav_w', 'dialogcodeav_h',
+        'dialogviewav_w', 'dialogviewav_h'
         ]
         for key in keys:
             if key not in data:
@@ -397,6 +398,12 @@ class App(object):
             'dialogmanageattributes_h': 0,
             'mainwindow_w': 0,
             'mainwindow_h': 0,
+            'video_w': 0,
+            'video_h': 0,
+            'dialogcodeav_w': 0,
+            'dialogcodeav_h': 0,
+            'dialogviewav_w': 0,
+            'dialogviewav_h': 0
         }
 
     def get_file_texts(self, fileids=None):
