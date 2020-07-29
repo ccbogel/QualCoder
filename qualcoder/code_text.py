@@ -1110,6 +1110,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if ok:
             # filename is dictionary with id and name
             self.filename = ui.get_selected()
+            if self.filename == []:
+                return
             self.load_file(self.filename)
         else:
             self.ui.textEdit.clear()

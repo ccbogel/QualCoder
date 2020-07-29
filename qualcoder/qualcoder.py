@@ -93,7 +93,7 @@ def exception_handler(exception_type, value, tb_obj):
     print(text)
     logger.error(_("Uncaught exception : ") + text)
     mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
+    mb.setStyleSheet("* {font-size: 10pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
@@ -305,7 +305,7 @@ class App(object):
                 data[key] = 0
                 if key == "timestampformat":
                     data[key] = "[hh.mm.ss]"
-                if key == "speakername":
+                if key == "speakernameformat":
                     data[key] = "[]"
         # write out new ini file, if needed
         if len(data) > dict_len:
@@ -336,6 +336,9 @@ class App(object):
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
         result = self.check_and_add_additional_settings(result)
+        #TEMPORRY delete in a week
+        if result['speakernameformat'] == 0:
+            result['speakernameformat'] = "[]"
         return result
 
     @property
@@ -933,13 +936,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
         msg = _("Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
-        QtWidgets.QMessageBox.information(None, _("RQDA import steps"), msg)
+        mb = QtWidgets.QMessageBox()
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('RQDA import steps'))
+        mb.setText(msg)
+        mb.exec_()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Project creation'))
+            mb.setText(_("Project not successfully created"))
+            mb.exec_()
             return
         Rqda_import(self.app, self.ui.textEdit)
+        self.project_summary_report()
 
     def closeEvent(self, event):
         """ Override the QWindow close event.
