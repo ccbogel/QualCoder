@@ -578,7 +578,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Get a list of starting/ending characterpositions and time in milliseconds
         from transcribed text file.
 
-        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
+        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] {00.34.20}
+        #00:12:34.567#
         09:33:04,100 --> 09:33:09,600
 
         Converts hh mm ss to milliseconds with text positions stored in a list
@@ -588,6 +589,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
         mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
         hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss3 = "\{[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\}"
         hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#"  # allow for 1 to 3 msecs digits
         srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
@@ -617,6 +619,14 @@ class DialogCodeAV(QtWidgets.QDialog):
             except:
                 pass
         for match in re.finditer(hhmmss2, self.transcription[1]):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss3, self.transcription[1]):
             stamp = match.group()[1:-1]
             s = stamp.split('.')
             try:
@@ -2200,21 +2210,9 @@ class DialogViewAV(QtWidgets.QDialog):
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
-
         # KEY  84 MODS  20  ctrl t
-        # insert timestamp, format [hh.mm.ss]
         if key == 84 and mods == 20:
-            time_msecs = self.mediaplayer.get_time()
-            mins_secs = msecs_to_mins_and_secs(time_msecs)
-            mins = int(mins_secs.split('.')[0])
-            secs = mins_secs.split('.')[1]
-            hours = int(mins / 60)
-            remainder_mins = str(mins - hours * 60)
-            hours = str(hours)
-            if len(hours) == 1:
-                hours = '0' + hours
-            ts = '\n[' + str(hours) + '.' + remainder_mins + '.' + secs + ']'
-            self.ui.textEdit_transcription.insertPlainText(ts)
+            self.insert_timestamp()
         # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
         # insert speaker
         if key in range(49, 57) and mods == 20:
@@ -2244,6 +2242,45 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == 83 and mods == 20:
             self.play_pause()
         return True
+
+    def insert_timestamp(self):
+        """ Insert timestamp using current format.
+        Format options:
+        [mm.ss], [mm:ss], [hh.mm.ss], [hh:mm:ss],
+        {hh.mm.ss}, #hh:mm:ss.sss#
+        """
+
+        fmt = self.app.settings['timestampformat']
+
+        time_msecs = self.mediaplayer.get_time()
+        mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
+        mins = int(mins_secs.split('.')[0])
+        secs = mins_secs.split('.')[1]
+        hours = int(mins / 60)
+        remainder_mins = str(mins - hours * 60)
+        if len(remainder_mins) == 1:
+            remainder_mins = "0" + remainder_mins
+        hours = str(hours)
+        if len(hours) == 1:
+            hours = '0' + hours
+        ts = "\n"
+        if fmt == "[mm.ss]":
+            ts += '[' + str(mins) + '.' + secs + ']'
+        if fmt == "[mm:ss]":
+            ts += '[' + str(mins) + ':' + secs + ']'
+        if fmt == "[hh.mm.ss]":
+            ts += '[' + str(hours) + '.' + remainder_mins + '.' + secs + ']'
+        if fmt == "[hh:mm:ss]":
+            ts += '[' + str(hours) + ':' + remainder_mins + ':' + secs + ']'
+        if fmt == "{hh.mm.ss}":
+            ts += '{' + str(hours) + '.' + remainder_mins + '.' + secs + '}'
+        if fmt == "#hh:mm:ss.sss#":
+            msecs = "000"
+            tms_str = str(time_msecs)
+            if len(tms_str) > 2:
+                msecs = tms_str[-3:]
+            ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
+        self.ui.textEdit_transcription.insertPlainText(ts)
 
     def add_speaker_names_to_label(self):
         """ Add speaker names to label, four on each line. """
@@ -2300,7 +2337,8 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Get a list of starting/ending characterpositions and time in milliseconds
         from transcribed text file.
 
-        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] #00:12:34.567#
+        Example formats:  [00:34:12] [45:33] [01.23.45] [02.34] {00.34.20}
+        #00:12:34.567#
         09:33:04,100 --> 09:33:09,600
 
         Converts hh mm ss to milliseconds with text positions stored in a list
@@ -2310,6 +2348,7 @@ class DialogViewAV(QtWidgets.QDialog):
         hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
         mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
         hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss3 = "\{[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\}"
         hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
         srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
@@ -2340,6 +2379,14 @@ class DialogViewAV(QtWidgets.QDialog):
             except:
                 pass
         for match in re.finditer(hhmmss2, transcription):
+            stamp = match.group()[1:-1]
+            s = stamp.split('.')
+            try:
+                msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
+                self.time_positions.append([match.span()[0], match.span()[1], msecs])
+            except:
+                pass
+        for match in re.finditer(hhmmss3, transcription):
             stamp = match.group()[1:-1]
             s = stamp.split('.')
             try:
