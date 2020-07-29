@@ -31,6 +31,9 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.pushButton_exporttext = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_exporttext.setGeometry(QtCore.QRect(10, 30, 351, 25))
         self.pushButton_exporttext.setObjectName("pushButton_exporttext")
+        self.pushButton_exportcsv = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_exportcsv.setGeometry(QtCore.QRect(368, 30, 291, 25))
+        self.pushButton_exportcsv.setObjectName("pushButton_exportcsv")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodeFrequencies)
         self.groupBox_2.setTitle("")
@@ -51,6 +54,7 @@ class Ui_Dialog_reportCodeFrequencies(object):
         Dialog_reportCodeFrequencies.setWindowTitle(_translate("Dialog_reportCodeFrequencies", "Code frequencies"))
         self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Code and category frequencies: overall and by coder"))
         self.pushButton_exporttext.setText(_translate("Dialog_reportCodeFrequencies", "Export text file"))
+        self.pushButton_exportcsv.setText(_translate("Dialog_reportCodeFrequencies", "Export csv file"))
 
 
 if __name__ == "__main__":
