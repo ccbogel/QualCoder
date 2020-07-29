@@ -93,7 +93,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 self.resize(w, h)
         except:
             pass
+        #TODO
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -273,16 +276,60 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f.close()
         logger.info("Report exported to " + filename)
         mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
         mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('No Text file Export'))
+        mb.setWindowTitle(_('Text file Export'))
         msg = filename + _(" exported")
         mb.setText(msg)
         mb.exec_()
         self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
 
+    def export_csv_file(self):
+        """ Export data as csv. """
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + " code frequencies.csv"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        filename = directory + "/" + filename
+
+        data = ""
+        header = [_("Code Tree"), "Id"]
+        for coder in self.coders:
+            header.append(coder)
+        header.append("Total")
+        data += ",".join(header) + "\n"
+
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        item_total_position = 1 + len(self.coders)
+        while item:
+            line = ""
+            for i in range(0, len(header)):
+                line += "," + item.text(i)
+            data += line[1:] + "\n"
+            #self.depthgauge(item)
+            it += 1
+            item = it.value()
+        f = open(filename, 'w')
+        f.write(data)
+        f.close()
+        logger.info("Report exported to " + filename)
+        mb = QtWidgets.QMessageBox()
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('Csv file Export'))
+        msg = filename + _(" exported")
+        mb.setText(msg)
+        mb.exec_()
+        self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
+
     def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes. """
+        """ Fill tree widget, top level items are main categories and unlinked codes.
+        """
 
         cats = copy(self.categories)
         codes = copy(self.codes)
