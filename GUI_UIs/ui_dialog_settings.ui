@@ -302,7 +302,7 @@ You must store these files elsewhere.</string>
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="comboBox_speaker">
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -322,7 +322,7 @@ You must store these files elsewhere.</string>
   <tabstop>spinBox_treefontsize</tabstop>
   <tabstop>checkBox</tabstop>
   <tabstop>comboBox_timestamp</tabstop>
-  <tabstop>comboBox</tabstop>
+  <tabstop>comboBox_speaker</tabstop>
   <tabstop>checkBox_auto_backup</tabstop>
   <tabstop>checkBox_backup_AV_files</tabstop>
   <tabstop>pushButton_choose_directory</tabstop>
