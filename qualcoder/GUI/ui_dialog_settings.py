@@ -52,7 +52,7 @@ class Ui_Dialog_settings(object):
         self.label_2.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_2.setObjectName("label_2")
         self.comboBox_coders = QtWidgets.QComboBox(Dialog_settings)
-        self.comboBox_coders.setGeometry(QtCore.QRect(200, 67, 241, 33))
+        self.comboBox_coders.setGeometry(QtCore.QRect(200, 67, 241, 32))
         self.comboBox_coders.setObjectName("comboBox_coders")
         self.label_3 = QtWidgets.QLabel(Dialog_settings)
         self.label_3.setGeometry(QtCore.QRect(30, 220, 241, 41))
@@ -69,7 +69,7 @@ class Ui_Dialog_settings(object):
         self.label_4.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_4.setObjectName("label_4")
         self.comboBox_language = QtWidgets.QComboBox(Dialog_settings)
-        self.comboBox_language.setGeometry(QtCore.QRect(200, 110, 241, 33))
+        self.comboBox_language.setGeometry(QtCore.QRect(200, 110, 241, 32))
         self.comboBox_language.setObjectName("comboBox_language")
         self.checkBox_auto_backup = QtWidgets.QCheckBox(Dialog_settings)
         self.checkBox_auto_backup.setGeometry(QtCore.QRect(30, 310, 511, 23))
@@ -80,12 +80,19 @@ class Ui_Dialog_settings(object):
         self.checkBox_backup_AV_files.setChecked(True)
         self.checkBox_backup_AV_files.setObjectName("checkBox_backup_AV_files")
         self.label_5 = QtWidgets.QLabel(Dialog_settings)
-        self.label_5.setGeometry(QtCore.QRect(10, 270, 201, 21))
+        self.label_5.setGeometry(QtCore.QRect(30, 270, 141, 21))
         self.label_5.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_5.setObjectName("label_5")
         self.comboBox_timestamp = QtWidgets.QComboBox(Dialog_settings)
-        self.comboBox_timestamp.setGeometry(QtCore.QRect(220, 263, 211, 32))
+        self.comboBox_timestamp.setGeometry(QtCore.QRect(190, 263, 151, 32))
         self.comboBox_timestamp.setObjectName("comboBox_timestamp")
+        self.label_6 = QtWidgets.QLabel(Dialog_settings)
+        self.label_6.setGeometry(QtCore.QRect(350, 270, 151, 21))
+        self.label_6.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label_6.setObjectName("label_6")
+        self.comboBox_speaker = QtWidgets.QComboBox(Dialog_settings)
+        self.comboBox_speaker.setGeometry(QtCore.QRect(520, 263, 71, 32))
+        self.comboBox_speaker.setObjectName("comboBox_speaker")
 
         self.retranslateUi(Dialog_settings)
         self.buttonBox.accepted.connect(Dialog_settings.accept)
@@ -98,7 +105,8 @@ class Ui_Dialog_settings(object):
         Dialog_settings.setTabOrder(self.spinBox, self.spinBox_treefontsize)
         Dialog_settings.setTabOrder(self.spinBox_treefontsize, self.checkBox)
         Dialog_settings.setTabOrder(self.checkBox, self.comboBox_timestamp)
-        Dialog_settings.setTabOrder(self.comboBox_timestamp, self.checkBox_auto_backup)
+        Dialog_settings.setTabOrder(self.comboBox_timestamp, self.comboBox_speaker)
+        Dialog_settings.setTabOrder(self.comboBox_speaker, self.checkBox_auto_backup)
         Dialog_settings.setTabOrder(self.checkBox_auto_backup, self.checkBox_backup_AV_files)
         Dialog_settings.setTabOrder(self.checkBox_backup_AV_files, self.pushButton_choose_directory)
 
@@ -118,7 +126,8 @@ class Ui_Dialog_settings(object):
         self.checkBox_backup_AV_files.setText(_translate("Dialog_settings", "Backup video and audio files. Uncheck to speed up backups.\n"
 "Not recommended unless you have many large files slowing the backup.\n"
 "You must store these files elsewhere."))
-        self.label_5.setText(_translate("Dialog_settings", "Time stamp format"))
+        self.label_5.setText(_translate("Dialog_settings", "Time format"))
+        self.label_6.setText(_translate("Dialog_settings", "Speaker format"))
 
 
 if __name__ == "__main__":
