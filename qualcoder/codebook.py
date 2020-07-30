@@ -159,7 +159,7 @@ class Codebook():
         if directory == "":
             return
         filename = directory + "/" + filename
-        filedata = _("Codebook for ") + self.app.project_name + "\r\n========"
+        filedata = _("Codebook for ") + self.app.project_name + "\n========"
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         item = it.value()
         while item:
@@ -174,13 +174,13 @@ class Codebook():
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                filedata += "\r\n" + prefix + _("Category: ") + item.text(0) + ", " + item.text(1)
+                filedata += "\n" + prefix + _("Category: ") + item.text(0) + ", " + item.text(1)
                 for i in self.categories:
                     if i['catid'] == id_:
                         memo = i['memo']
                         owner = i['owner']
             else:
-                filedata += "\r\n" + prefix + _("Code: ") + item.text(0) + ", " + item.text(1)
+                filedata += "\n" + prefix + _("Code: ") + item.text(0) + ", " + item.text(1)
                 filedata += ", Frq: " + item.text(3)
                 for i in self.code_names:
                     if i['cid'] == id_:
@@ -189,7 +189,7 @@ class Codebook():
             filedata += _(", Owner: ") + owner
             if memo is None:
                 memo = ""
-            filedata += "\r\n" + prefix + _("Memo: ") + memo
+            filedata += "\n" + prefix + _("Memo: ") + memo
 
             it += 1
             item = it.value()
