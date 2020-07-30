@@ -1009,6 +1009,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for lt_obj in layout:
                     if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
                         text += lt_obj.get_text() + "\n"  # add line to paragraph spacing for visual format
+            # remove excess line endings, include those with one blank space on a line
+            text = text.replace('\n \n', '\n')
+            text = text.replace('\n\n\n', '\n\n')
+
         # import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             importErrors = 0
@@ -1028,7 +1032,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if text == "":
             import_errors = 0
             try:
-                with open(import_file, "r") as sourcefile:
+                # can get UnicodeDecode Error on Windows so using error handler
+                with open(import_file, "r", encoding="utf-8", errors="backslashreplace") as sourcefile:
                     while 1:
                         line = sourcefile.readline()
                         if not line:
