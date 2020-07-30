@@ -170,6 +170,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             h = int(self.app.settings['dialogcodeav_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
+            x = int(self.app.settings['codeav_abs_pos_x'])
+            y = int(self.app.settings['codeav_abs_pos_y'])
+            self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -229,20 +232,22 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
         # enable custom window hint - must be set to enable customizing window controls
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.ddialog.move(self.pos().x(), self.pos().y())
 
-        #TODO set video dialog position
-        #self.app.settings['video_abs_pos_x']
-        #self.app.settings['video_abs_pos_y']
-        self.ddialog.show()
-
-
+        ''' # Set video dialog position, with a default initial position
+        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
+        # ddialog is relative to self global position
+        try:
+        x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
+        y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
+        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
+        except:
+            pass
+        self.ddialog.show()'''
 
         # Create a vlc instance with an empty vlc media player
         self.instance = vlc.Instance()
@@ -518,8 +523,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 h = int(self.app.settings['video_h'])
                 if h > 50 and w > 50:
                     self.ddialog.resize(w, h)
+                x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
+                y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
+                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
             except:
                 pass
+        self.ddialog.show()
 
         # clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
@@ -813,8 +822,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         if size.height() > 40:
             self.app.settings['video_h'] = size.height()
         # Get absolute video dialog position
-        self.app.settings['video_abs_pos_x'] = self.ddialog.pos().x()
-        self.app.settings['video_abs_pos_y'] = self.ddialog.pos().y()
+        self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
+        self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
         self.app.settings['codeav_abs_pos_y'] = self.pos().y()
         self.ddialog.close()
@@ -2107,9 +2116,11 @@ class DialogViewAV(QtWidgets.QDialog):
             h = int(self.app.settings['dialogviewav_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
+            x = int(self.app.settings['viewav_abs_pos_x'])
+            y = int(self.app.settings['viewav_abs_pos_y'])
+            self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
-
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -2161,15 +2172,16 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 10)))
-        # always 0.0 here ?
-        x = self.pos().x()
-        y = self.pos().y()
-        print(x, y)
-        self.ddialog.move(self.ddialog.mapToGlobal(QtCore.QPoint(x, y)))
 
-        #self.app.settings['video_rel_pos_x']
-        #self.app.settings['video_rel_pos_y']
+        # Set video dialog position, with a default initial position
+        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
+        # ddialog is relative to self global position
+        try:
+            x = int(self.app.settings['viewav_video_pos_x']) - int(self.app.settings['viewav_abs_pos_x'])
+            y = int(self.app.settings['viewav_video_pos_y']) - int(self.app.settings['viewav_abs_pos_y'])
+            self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
+        except:
+            pass
         self.ddialog.show()
 
         # Create a basic vlc instance
@@ -2606,11 +2618,11 @@ class DialogViewAV(QtWidgets.QDialog):
         if size.height() > 40:
             self.app.settings['video_h'] = size.height()
         # Get absolute video dialog position
-        self.app.settings['video_abs_pos_x'] = self.ddialog.pos().x()
-        self.app.settings['video_abs_pos_y'] = self.ddialog.pos().y()
+        self.app.settings['viewav_video_pos_x'] = self.ddialog.pos().x()
+        self.app.settings['viewav_video_pos_y'] = self.ddialog.pos().y()
+        self.ddialog.close()
         self.app.settings['viewav_abs_pos_x'] = self.pos().x()
         self.app.settings['viewav_abs_pos_y'] = self.pos().y()
-        self.ddialog.close()
         self.stop()
         memo = self.ui.textEdit.toPlainText()
         cur = self.app.conn.cursor()

@@ -300,8 +300,8 @@ class App(object):
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat',
         'speakernameformat', 'video_w', 'video_h', 'dialogcodeav_w', 'dialogcodeav_h',
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
-        'dialogviewav_w', 'dialogviewav_h', 'video_abs_pos_x', 'video_abs_pos_y',
-
+        'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
+        'codeav_video_pos_x', 'codeav_video_pos_y'
         ]
         for key in keys:
             if key not in data:
@@ -402,8 +402,10 @@ class App(object):
             'mainwindow_h': 0,
             'video_w': 0,
             'video_h': 0,
-            'video_abs_pos_x': 0,
-            'video_abs_pos_y': 0,
+            'viewav_video_pos_x': 0,
+            'viewav_video_pos_y': 0,
+            'codeav_video_pos_x': 0,
+            'codeav_video_pos_y': 0,
             'dialogcodeav_w': 0,
             'dialogcodeav_h': 0,
             'codeav_abs_pos_x': 0,
