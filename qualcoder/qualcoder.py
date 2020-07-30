@@ -299,7 +299,9 @@ class App(object):
         'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
         'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat',
         'speakernameformat', 'video_w', 'video_h', 'dialogcodeav_w', 'dialogcodeav_h',
-        'dialogviewav_w', 'dialogviewav_h'
+        'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
+        'dialogviewav_w', 'dialogviewav_h', 'video_abs_pos_x', 'video_abs_pos_y',
+
         ]
         for key in keys:
             if key not in data:
@@ -400,10 +402,16 @@ class App(object):
             'mainwindow_h': 0,
             'video_w': 0,
             'video_h': 0,
+            'video_abs_pos_x': 0,
+            'video_abs_pos_y': 0,
             'dialogcodeav_w': 0,
             'dialogcodeav_h': 0,
+            'codeav_abs_pos_x': 0,
+            'codeav_abs_pos_y': 0,
             'dialogviewav_w': 0,
-            'dialogviewav_h': 0
+            'dialogviewav_h': 0,
+            'viewav_abs_pos_x': 0,
+            'viewav_abs_pos_y': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -566,6 +574,7 @@ class MainWindow(QtWidgets.QMainWindow):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.ui.textEdit.setReadOnly(True)
         self.settings_report()
 
     def resizeEvent(self, new_size):
@@ -707,7 +716,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "\n" + _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Timestamp format") + ": " + self.app.settings['timestampformat'] + "\n"
-        msg += _("Speaker name format") + ": " + self.app.settings['speakernameformat'] + "\n"
+        msg += _("Speaker name format") + ": " + str(self.app.settings['speakernameformat']) + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
         msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
         if platform.system() == "Windows":
@@ -1351,6 +1360,8 @@ class MainWindow(QtWidgets.QMainWindow):
             'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
             headers={'Accept': 'application/vnd.github.v3+json'},
         )).read())
+
+        self.ui.textEdit.append(_("This version: ") + qualcoder_version)
 
         try:
             if _json['name'] != qualcoder_version:
