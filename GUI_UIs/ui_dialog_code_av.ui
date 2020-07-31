@@ -14,7 +14,7 @@
    <string>Code Audio Video</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QSplitter" name="splitter_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -26,9 +26,15 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>990</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>16777215</width>
+        <width>990</width>
         <height>120</height>
        </size>
       </property>
@@ -66,7 +72,7 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="minimumSize">
       <size>
@@ -96,23 +102,10 @@
        <string>Play</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_stop">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>30</y>
-        <width>81</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stop</string>
-      </property>
-     </widget>
      <widget class="QSlider" name="horizontalSlider_vol">
       <property name="geometry">
        <rect>
-        <x>795</x>
+        <x>730</x>
         <y>37</y>
         <width>160</width>
         <height>18</height>
@@ -131,7 +124,7 @@
      <widget class="QLabel" name="label_volume">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>625</x>
         <y>36</y>
         <width>81</width>
         <height>20</height>
@@ -147,7 +140,7 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>295</x>
         <y>33</y>
         <width>151</width>
         <height>21</height>
@@ -160,7 +153,7 @@
      <widget class="QLabel" name="label_time_2">
       <property name="geometry">
        <rect>
-        <x>520</x>
+        <x>455</x>
         <y>33</y>
         <width>161</width>
         <height>21</height>
@@ -170,44 +163,10 @@
        <string>Duration: </string>
       </property>
      </widget>
-     <widget class="QSlider" name="horizontalSlider">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>991</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="minimum">
-       <number>0</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksBelow</enum>
-      </property>
-      <property name="tickInterval">
-       <number>10</number>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_coding">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>100</x>
         <y>30</y>
         <width>181</width>
         <height>27</height>
@@ -240,7 +199,7 @@
       <property name="geometry">
        <rect>
         <x>730</x>
-        <y>65</y>
+        <y>70</y>
         <width>271</width>
         <height>17</height>
        </rect>
@@ -266,7 +225,7 @@
       <property name="geometry">
        <rect>
         <x>660</x>
-        <y>53</y>
+        <y>60</y>
         <width>51</width>
         <height>28</height>
        </rect>
@@ -276,7 +235,7 @@
       <property name="geometry">
        <rect>
         <x>570</x>
-        <y>63</y>
+        <y>70</y>
         <width>81</width>
         <height>20</height>
        </rect>
@@ -303,11 +262,50 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="minimumSize">
+      <size>
+       <width>990</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>990</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>pushButton_play</tabstop>
-  <tabstop>pushButton_stop</tabstop>
   <tabstop>horizontalSlider_vol</tabstop>
  </tabstops>
  <resources/>

@@ -124,23 +124,10 @@
        <string>Play</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_stop">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>30</y>
-        <width>85</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stop</string>
-      </property>
-     </widget>
      <widget class="QSlider" name="horizontalSlider_vol">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>530</x>
         <y>40</y>
         <width>160</width>
         <height>18</height>
@@ -159,8 +146,8 @@
      <widget class="QLabel" name="label_volume">
       <property name="geometry">
        <rect>
-        <x>570</x>
-        <y>40</y>
+        <x>460</x>
+        <y>36</y>
         <width>61</width>
         <height>20</height>
        </rect>
@@ -175,8 +162,8 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>39</y>
+        <x>110</x>
+        <y>35</y>
         <width>161</width>
         <height>21</height>
        </rect>
@@ -188,8 +175,8 @@
      <widget class="QLabel" name="label_time_2">
       <property name="geometry">
        <rect>
-        <x>410</x>
-        <y>39</y>
+        <x>300</x>
+        <y>35</y>
         <width>161</width>
         <height>21</height>
        </rect>
@@ -198,44 +185,10 @@
        <string>Duration: </string>
       </property>
      </widget>
-     <widget class="QSlider" name="horizontalSlider">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>-10</y>
-        <width>1003</width>
-        <height>34</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="minimum">
-       <number>0</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksBelow</enum>
-      </property>
-      <property name="tickInterval">
-       <number>10</number>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_tracks">
       <property name="geometry">
        <rect>
-        <x>930</x>
+        <x>820</x>
         <y>33</y>
         <width>61</width>
         <height>28</height>
@@ -245,8 +198,8 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>830</x>
-        <y>40</y>
+        <x>720</x>
+        <y>36</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -273,11 +226,38 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>pushButton_play</tabstop>
-  <tabstop>pushButton_stop</tabstop>
   <tabstop>horizontalSlider_vol</tabstop>
   <tabstop>comboBox_tracks</tabstop>
   <tabstop>checkBox_scroll_transcript</tabstop>
