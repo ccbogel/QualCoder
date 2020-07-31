@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_view_av.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_view_av(object):
     def setupUi(self, Dialog_view_av):
@@ -45,27 +47,34 @@ class Ui_Dialog_view_av(object):
         self.pushButton_play = QtWidgets.QPushButton(self.groupBox_2)
         self.pushButton_play.setGeometry(QtCore.QRect(10, 30, 85, 27))
         self.pushButton_play.setObjectName("pushButton_play")
-        self.pushButton_stop = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_stop.setGeometry(QtCore.QRect(110, 30, 85, 27))
-        self.pushButton_stop.setObjectName("pushButton_stop")
         self.horizontalSlider_vol = QtWidgets.QSlider(self.groupBox_2)
-        self.horizontalSlider_vol.setGeometry(QtCore.QRect(640, 40, 160, 18))
+        self.horizontalSlider_vol.setGeometry(QtCore.QRect(530, 40, 160, 18))
         self.horizontalSlider_vol.setMaximum(100)
         self.horizontalSlider_vol.setProperty("value", 100)
         self.horizontalSlider_vol.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_vol.setObjectName("horizontalSlider_vol")
         self.label_volume = QtWidgets.QLabel(self.groupBox_2)
-        self.label_volume.setGeometry(QtCore.QRect(570, 40, 61, 20))
+        self.label_volume.setGeometry(QtCore.QRect(460, 36, 61, 20))
         self.label_volume.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_volume.setObjectName("label_volume")
         self.label_time = QtWidgets.QLabel(self.groupBox_2)
-        self.label_time.setGeometry(QtCore.QRect(220, 39, 161, 21))
+        self.label_time.setGeometry(QtCore.QRect(110, 35, 161, 21))
         self.label_time.setObjectName("label_time")
         self.label_time_2 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_time_2.setGeometry(QtCore.QRect(410, 39, 161, 21))
+        self.label_time_2.setGeometry(QtCore.QRect(300, 35, 161, 21))
         self.label_time_2.setObjectName("label_time_2")
-        self.horizontalSlider = QtWidgets.QSlider(self.groupBox_2)
-        self.horizontalSlider.setGeometry(QtCore.QRect(0, -10, 1003, 34))
+        self.comboBox_tracks = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboBox_tracks.setGeometry(QtCore.QRect(820, 33, 61, 28))
+        self.comboBox_tracks.setObjectName("comboBox_tracks")
+        self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setGeometry(QtCore.QRect(720, 36, 91, 20))
+        self.label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.label.setObjectName("label")
+        self.checkBox_scroll_transcript = QtWidgets.QCheckBox(self.groupBox_2)
+        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(10, 61, 511, 22))
+        self.checkBox_scroll_transcript.setObjectName("checkBox_scroll_transcript")
+        self.gridLayout.addWidget(self.groupBox_2, 3, 0, 1, 1)
+        self.horizontalSlider = QtWidgets.QSlider(Dialog_view_av)
         self.horizontalSlider.setMinimum(0)
         self.horizontalSlider.setMaximum(1000)
         self.horizontalSlider.setSingleStep(1)
@@ -74,22 +83,11 @@ class Ui_Dialog_view_av(object):
         self.horizontalSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.horizontalSlider.setTickInterval(10)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.comboBox_tracks = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_tracks.setGeometry(QtCore.QRect(930, 33, 61, 28))
-        self.comboBox_tracks.setObjectName("comboBox_tracks")
-        self.label = QtWidgets.QLabel(self.groupBox_2)
-        self.label.setGeometry(QtCore.QRect(830, 40, 91, 20))
-        self.label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.label.setObjectName("label")
-        self.checkBox_scroll_transcript = QtWidgets.QCheckBox(self.groupBox_2)
-        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(10, 61, 511, 22))
-        self.checkBox_scroll_transcript.setObjectName("checkBox_scroll_transcript")
-        self.gridLayout.addWidget(self.groupBox_2, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.horizontalSlider, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog_view_av)
         QtCore.QMetaObject.connectSlotsByName(Dialog_view_av)
-        Dialog_view_av.setTabOrder(self.pushButton_play, self.pushButton_stop)
-        Dialog_view_av.setTabOrder(self.pushButton_stop, self.horizontalSlider_vol)
+        Dialog_view_av.setTabOrder(self.pushButton_play, self.horizontalSlider_vol)
         Dialog_view_av.setTabOrder(self.horizontalSlider_vol, self.comboBox_tracks)
         Dialog_view_av.setTabOrder(self.comboBox_tracks, self.checkBox_scroll_transcript)
         Dialog_view_av.setTabOrder(self.checkBox_scroll_transcript, self.textEdit_transcription)
@@ -106,13 +104,12 @@ class Ui_Dialog_view_av(object):
         self.label_speakers.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Add a speaker name to shortcuts. In the text entry box press ctrl + n</p><p>Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.</p></body></html>"))
         self.label_speakers.setText(_translate("Dialog_view_av", "Speakers:"))
         self.pushButton_play.setText(_translate("Dialog_view_av", "Play"))
-        self.pushButton_stop.setText(_translate("Dialog_view_av", "Stop"))
         self.label_volume.setText(_translate("Dialog_view_av", "Volume"))
         self.label_time.setText(_translate("Dialog_view_av", "Time:"))
         self.label_time_2.setText(_translate("Dialog_view_av", "Duration: "))
-        self.horizontalSlider.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
         self.label.setText(_translate("Dialog_view_av", "Audio:"))
         self.checkBox_scroll_transcript.setText(_translate("Dialog_view_av", "Scroll transcript while playing. (Transcript is read only)"))
+        self.horizontalSlider.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
 
 
 if __name__ == "__main__":
@@ -123,4 +120,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_view_av)
     Dialog_view_av.show()
     sys.exit(app.exec_())
-
