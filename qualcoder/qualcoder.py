@@ -78,6 +78,17 @@ if not os.path.exists(home + '/.qualcoder'):
         print("Cannot add .qualcoder folder to home directory\n" + str(e))
         raise
 logfile = home + '/.qualcoder/QualCoder.log'
+# Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
+try:
+    f = open(logfile, "r")
+    data = file.read()
+    f.close()
+    if len(data) > 12000:
+        f.open(logfile, "w")
+        f.write(data[11000:])
+        f.close()
+except Exception as e:
+    print(e)
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
      datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
 logger = logging.getLogger(__name__)
