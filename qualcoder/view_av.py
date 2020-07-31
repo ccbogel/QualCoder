@@ -179,7 +179,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.splitter.setSizes([100, 200])
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
-        self.ui.pushButton_stop.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
 
@@ -257,7 +256,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
         self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
-        self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
@@ -454,7 +452,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         self.media_data = ui.get_selected()
         self.ui.pushButton_play.setEnabled(True)
-        self.ui.pushButton_stop.setEnabled(True)
         self.ui.horizontalSlider.setEnabled(True)
         self.ui.pushButton_coding.setEnabled(True)
         self.load_media()
@@ -2073,6 +2070,46 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.setLine(from_x, self.segment['y'], to_x, self.segment['y'])
 
 
+class JumpSlider(QtWidgets.QSlider):
+    """
+     https://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
+     """
+
+    def __init__(self):
+        super(JumpSlider, self).__init__(None)
+
+        self.setGeometry(QtCore.QRect(0, -10, 1003, 34))
+        self.setMinimum(0)
+        self.setMaximum(1000)
+        self.setSingleStep(1)
+        self.setProperty("value", 0)
+        self.setOrientation(QtCore.Qt.Horizontal)
+        self.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.setTickInterval(10)
+
+    def _FixPositionToInterval(self, ev):
+        """ Function to force the slider position to be on tick locations """
+
+        # Get the value from the slider
+        value = QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), ev.x(), self.width())
+        print(value)
+
+        # Get the desired tick interval from the slider
+        TickInterval=self.tickInterval()
+
+        # Convert the value to be only at the tick interval locations
+        value = round(value/TickInterval)*TickInterval
+
+        # Set the position of the slider based on the interval position
+        self.setValue(value)
+
+    def mousePressEvent(self, ev):
+        self._FixPositionToInterval(ev)
+
+    def mouseMoveEvent(self, ev):
+        self._FixPositionToInterval(ev)
+
+
 class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
@@ -2190,13 +2227,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
-
-        self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
-        self.ui.pushButton_stop.clicked.connect(self.stop)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
+        self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
+        #self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
 
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
@@ -2243,6 +2278,19 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
+
+    def set_position(self):
+        """ Set the movie position according to the position slider.
+        The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
+        integer variables, so you need a factor; the higher the factor, the
+        more precise are the results (1000 should suffice).
+        """
+
+        # Set the media position to where the slider was dragged
+        self.timer.stop()
+        pos = self.ui.horizontalSlider.value()
+        self.mediaplayer.set_position(pos / 1000.0)
+        self.timer.start()
 
     def eventFilter(self, object, event):
         """ Add key options to textEdit_transcription to improve manual transcribing.
@@ -2489,19 +2537,6 @@ class DialogViewAV(QtWidgets.QDialog):
                 pass
         #print(self.time_positions)
 
-    def set_position(self):
-        """ Set the movie position according to the position slider.
-        The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
-        integer variables, so you need a factor; the higher the factor, the
-        more precise are the results (1000 should suffice).
-        """
-
-        # Set the media position to where the slider was dragged
-        self.timer.stop()
-        pos = self.ui.horizontalSlider.value()
-        self.mediaplayer.set_position(pos / 1000.0)
-        self.timer.start()
-
     def audio_track_changed(self):
         """ Audio track changed.
         The video needs to be playing/paused before the combobox is filled with track options.
@@ -2568,6 +2603,7 @@ class DialogViewAV(QtWidgets.QDialog):
          Adds audio track options to combobox.
          Updates the current displayed media time. """
 
+        self.ui.horizontalSlider.blockSignals(True)
         # update audio track list, only works if media is playing
         if self.mediaplayer.audio_get_track_count() > 0 and self.ui.comboBox_tracks.count() == 0:
             tracks = self.mediaplayer.audio_get_track_description()
@@ -2580,7 +2616,9 @@ class DialogViewAV(QtWidgets.QDialog):
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         media_pos = int(self.mediaplayer.get_position() * 1000)
+
         self.ui.horizontalSlider.setValue(media_pos)
+
         msecs = self.mediaplayer.get_time()
         self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
 
@@ -2604,6 +2642,7 @@ class DialogViewAV(QtWidgets.QDialog):
             # This fixes that "bug".
             if not self.is_paused:
                 self.stop()
+        self.ui.horizontalSlider.blockSignals(False)
 
     def closeEvent(self, event):
         """ Stop the vlc player on close.
