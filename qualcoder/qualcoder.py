@@ -85,7 +85,7 @@ try:
     f.close()
     if len(data) > 12000:
         f.open(logfile, "w")
-        f.write(data[11000:])
+        f.write(data[10000:])
         f.close()
 except Exception as e:
     print(e)
