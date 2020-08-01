@@ -2297,7 +2297,7 @@ class DialogViewAV(QtWidgets.QDialog):
         Can only use these options if the transcription is not coded.
         Options are:
             ctrl + r to rewind 3 seconds.
-            xtrl + s to start/pause
+            crl + s OR ctrl + p to start/pause
             ctrl + t to insert timestamp in format [hh.mm.ss]
             ctrl + n to enter a new speakers name into shortcuts
             ctrl + 1 .. 8 to insert speaker in format [speaker name]
@@ -2344,8 +2344,8 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.speaker_list.pop()
                 self.speaker_list.append(name)
             self.add_speaker_names_to_label()
-        # KEY  83 MODS  20 (544 on Windows) ctrl + s pause/play toggle
-        if key == 83 and (mods == 20 or mods == 544):
+        # KEY  83 S 80 P + MODS  20 (544 on Windows) ctrl + s or ctrl + p pause/play toggle
+        if (key == 80 or key == 83) and (mods == 20 or mods == 544):
             self.play_pause()
         return True
 
