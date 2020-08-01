@@ -2312,7 +2312,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return False
         key = event.key()
         mods = event.nativeModifiers()
-        #print("KEY ", key, "MODS ", mods)
+        print("KEY ", key, "MODS ", mods)
 
         # KEY  82 MODS  20 (554 on Windows) ctrl r
         # Rewind 3 seconds
