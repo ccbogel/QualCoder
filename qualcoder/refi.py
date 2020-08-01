@@ -1040,7 +1040,7 @@ class Refi_export(QtWidgets.QDialog):
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
                         prep_path + destination)
                 except FileNotFoundError as e:
-                    with open(prep_path + destination, 'w') as f:
+                    with open(prep_path + destination, 'w', encoding="utf-8") as f:
                         f.write(s['fulltext'])
                 # Also need to add the plain text file as a source
                 # plaintext has different guid from richtext
