@@ -1389,7 +1389,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '">\n'
-                if s['memo'] != '':
+                if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
@@ -1402,7 +1402,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '">\n'
-                if s['memo'] != '':
+                if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += '<Representation guid="' + self.create_guid() + '" '
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
@@ -1419,7 +1419,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'path="internal://' + s['filename'] + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '" >\n'
-                if s['memo'] != '':
+                if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.picture_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
@@ -1434,7 +1434,7 @@ class Refi_export(QtWidgets.QDialog):
                     xml += 'path="absolute:///'+ self.app.settings['directory'] + '/' + s['filename'] + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'] + '" >\n'
-                if s['memo'] != '':
+                if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Audio')
