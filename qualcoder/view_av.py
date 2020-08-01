@@ -2294,7 +2294,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def eventFilter(self, object, event):
         """ Add key options to textEdit_transcription to improve manual transcribing.
-        Can only use htese options if the transcription is not coded.
+        Can only use these options if the transcription is not coded.
         Options are:
             ctrl + r to rewind 3 seconds.
             xtrl + s to start/pause
@@ -2314,25 +2314,25 @@ class DialogViewAV(QtWidgets.QDialog):
         mods = event.nativeModifiers()
         #print("KEY ", key, "MODS ", mods)
 
-        # KEY  82 MODS  20 ctrl r
+        # KEY  82 MODS  20 (554 on Windows) ctrl r
         # Rewind 3 seconds
-        if key == 82 and mods == 20:
+        if key == 82 and (mods == 20 or mods == 544):
             time_msecs = self.mediaplayer.get_time() - 3000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
-        # KEY  84 MODS  20  ctrl t
-        if key == 84 and mods == 20:
+        # KEY  84 MODS  20 (544 on Windows) ctrl t
+        if key == 84 and (mods == 20 or mods == 544):
             self.insert_timestamp()
         # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
         # Insert speaker
-        if key in range(49, 57) and mods == 20:
+        if key in range(49, 57) and (mods == 20 or mods == 544):
             self.insert_speakername(key)
-        # KEY  78 MODS  20 ctrl + n
+        # KEY  78 MODS  20 (544 on Windows) ctrl + n
         # Add new speaker to list
-        if key == 78 and mods == 20:
+        if key == 78 and (mods == 20 or mods == 544):
             self.pause()
             name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name","Name:", QtWidgets.QLineEdit.Normal, "")
             if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
@@ -2344,8 +2344,8 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.speaker_list.pop()
                 self.speaker_list.append(name)
             self.add_speaker_names_to_label()
-        # KEY  83 MODS  20 ctrl + s pause/play toggle
-        if key == 83 and mods == 20:
+        # KEY  83 MODS  20 (544 on Windows) ctrl + s pause/play toggle
+        if key == 83 and (mods == 20 or mods == 544):
             self.play_pause()
         return True
 
