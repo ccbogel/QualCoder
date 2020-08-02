@@ -1000,11 +1000,10 @@ class Refi_export(QtWidgets.QDialog):
 
         project_name = self.app.project_name[:-4]
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
-        #print("REFI-QDA EXPORT prep_path: ", prep_path)  # tmp
         try:
             shutil.rmtree(prep_path)
-        except FileNotFoundError :
-            logger.error(_("Project export error ") + _(" .qualcoder preperatory path not found"))
+        except FileNotFoundError:
+            pass
         try:
             os.mkdir(prep_path)
             os.mkdir(prep_path + "/Sources")
@@ -1057,6 +1056,8 @@ class Refi_export(QtWidgets.QDialog):
 
         export_path = self.app.project_path[:-4]
         shutil.make_archive(export_path, 'zip', prep_path)
+        #TODO
+        # Getting on Windows File Exists error
         os.rename(export_path + ".zip", export_path + ".qdpx")
         try:
             shutil.rmtree(prep_path)
