@@ -81,7 +81,7 @@ logfile = home + '/.qualcoder/QualCoder.log'
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
     f = open(logfile, "r")
-    data = file.read()
+    data = f.read()
     f.close()
     if len(data) > 12000:
         f.open(logfile, "w")
