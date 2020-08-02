@@ -514,17 +514,19 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.closeEvent()
             return
         if self.media_data['mediapath'][0:7] != "/audio/":
-            self.ddialog.resize(640, 480)
             try:
                 w = int(self.app.settings['video_w'])
+                if w < 100:
+                    w = 100
                 h = int(self.app.settings['video_h'])
-                if h > 50 and w > 50:
-                    self.ddialog.resize(w, h)
+                if h < 80:
+                    h = 80
+                self.ddialog.resize(w, h)
                 x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
                 y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
                 self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
             except:
-                pass
+                self.ddialog.resize(500, 400)
         self.ddialog.show()
 
         # clear comboBox tracks options and reload when playing/pausing
@@ -2070,46 +2072,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.setLine(from_x, self.segment['y'], to_x, self.segment['y'])
 
 
-class JumpSlider(QtWidgets.QSlider):
-    """
-     https://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
-     """
-
-    def __init__(self):
-        super(JumpSlider, self).__init__(None)
-
-        self.setGeometry(QtCore.QRect(0, -10, 1003, 34))
-        self.setMinimum(0)
-        self.setMaximum(1000)
-        self.setSingleStep(1)
-        self.setProperty("value", 0)
-        self.setOrientation(QtCore.Qt.Horizontal)
-        self.setTickPosition(QtWidgets.QSlider.TicksBelow)
-        self.setTickInterval(10)
-
-    def _FixPositionToInterval(self, ev):
-        """ Function to force the slider position to be on tick locations """
-
-        # Get the value from the slider
-        value = QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), ev.x(), self.width())
-        print(value)
-
-        # Get the desired tick interval from the slider
-        TickInterval=self.tickInterval()
-
-        # Convert the value to be only at the tick interval locations
-        value = round(value/TickInterval)*TickInterval
-
-        # Set the position of the slider based on the interval position
-        self.setValue(value)
-
-    def mousePressEvent(self, ev):
-        self._FixPositionToInterval(ev)
-
-    def mouseMoveEvent(self, ev):
-        self._FixPositionToInterval(ev)
-
-
 class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
@@ -2244,14 +2206,17 @@ class DialogViewAV(QtWidgets.QDialog):
             self.closeEvent()
             return
         if self.media_data['mediapath'][0:7] != "/audio/":
-            self.ddialog.resize(640, 480)
             try:
                 w = int(self.app.settings['video_w'])
+                if w < 100:
+                    w = 100
+                    w = 100
                 h = int(self.app.settings['video_h'])
-                if h > 50 and w > 50:
-                    self.ddialog.resize(w, h)
+                if h < 80:
+                    h = 80
+                self.ddialog.resize(w, h)
             except:
-                pass
+                self.ddialog.resize(500, 400)
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
@@ -2312,11 +2277,11 @@ class DialogViewAV(QtWidgets.QDialog):
             return False
         key = event.key()
         mods = event.nativeModifiers()
-        print("KEY ", key, "MODS ", mods)
-
+        print("KEY ", key, "MODS ", mods)  # tmp
         # KEY  82 MODS  20 (554 on Windows) ctrl r
         # Rewind 3 seconds
-        if key == 82 and (mods == 20 or mods == 544):
+        if key == QtCore.Qt.Key_R and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
+
             time_msecs = self.mediaplayer.get_time() - 3000
             if time_msecs < 0:
                 time_msecs = 0
@@ -2324,15 +2289,15 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
         # KEY  84 MODS  20 (544 on Windows) ctrl t
-        if key == 84 and (mods == 20 or mods == 544):
+        if key == QtCore.Qt.Key_T and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
             self.insert_timestamp()
         # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
         # Insert speaker
-        if key in range(49, 57) and (mods == 20 or mods == 544):
+        if key in range(49, 57) and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
             self.insert_speakername(key)
         # KEY  78 MODS  20 (544 on Windows) ctrl + n
         # Add new speaker to list
-        if key == 78 and (mods == 20 or mods == 544):
+        if key == QtCore.Qt.Key_N and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
             self.pause()
             name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name","Name:", QtWidgets.QLineEdit.Normal, "")
             if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
@@ -2345,7 +2310,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.speaker_list.append(name)
             self.add_speaker_names_to_label()
         # KEY  83 S 80 P + MODS  20 (544 on Windows) ctrl + s or ctrl + p pause/play toggle
-        if (key == 80 or key == 83) and (mods == 20 or mods == 544):
+        if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
             self.play_pause()
         return True
 
