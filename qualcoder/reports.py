@@ -1769,13 +1769,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             remainder_secs = str(secs0 - mins * 60)
             if len(remainder_secs) == 1:
                 remainder_secs = "0" + remainder_secs
-            text += " [" + str(mins) + "." + remainder_secs
+            text += " [" + str(mins) + ":" + remainder_secs
             secs1 = int(i[4] / 1000)
             mins = int(secs1 / 60)
             remainder_secs = str(secs1 - mins * 60)
             if len(remainder_secs) == 1:
                 remainder_secs = "0" + remainder_secs
-            text += " - " + str(mins) + "." + remainder_secs + "]"
+            text += " - " + str(mins) + ":" + remainder_secs + "]"
             self.html_links.append({'imagename': None, 'image': None,
                 'avname': i[7], 'av0': str(secs0), 'av1': str(secs1), 'avtext': text})
             if len(i[5]) > 0:

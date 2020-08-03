@@ -97,7 +97,7 @@ def msecs_to_mins_and_secs(msecs):
     remainder_secs = str(secs - mins * 60)
     if len(remainder_secs) == 1:
         remainder_secs = "0" + remainder_secs
-    return str(mins) + "." + remainder_secs
+    return str(mins) + ":" + remainder_secs
 
 
 class DialogCodeAV(QtWidgets.QDialog):
