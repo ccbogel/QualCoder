@@ -516,10 +516,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.media_data['mediapath'][0:7] != "/audio/":
             try:
                 w = int(self.app.settings['video_w'])
-                if w < 100:
-                    w = 100
                 h = int(self.app.settings['video_h'])
-                if h < 80:
+                if w < 100 or h < 80:
+                    w = 100
                     h = 80
                 self.ddialog.resize(w, h)
                 x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
@@ -2135,11 +2134,12 @@ class DialogViewAV(QtWidgets.QDialog):
         self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit_transcription.installEventFilter(self)
+            self.installEventFilter(self)  # for rewind, play/stop
             cur.execute("select cid from  code_text where fid=?", [self.transcription[0],])
             coded = cur.fetchall()
             cur.execute("select anid from  annotation where fid=?", [self.transcription[0],])
             annoted = cur.fetchall()
-            if coded != [] and annoted != []:
+            if coded != [] or annoted != []:
                 self.ui.textEdit_transcription.setReadOnly(True)
                 self.can_transcribe = False
                 self.ui.label_speakers.setVisible(False)
@@ -2208,11 +2208,9 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.media_data['mediapath'][0:7] != "/audio/":
             try:
                 w = int(self.app.settings['video_w'])
-                if w < 100:
-                    w = 100
-                    w = 100
                 h = int(self.app.settings['video_h'])
-                if h < 80:
+                if w < 100 or h < 80:
+                    w = 100
                     h = 80
                 self.ddialog.resize(w, h)
             except:
@@ -2268,36 +2266,36 @@ class DialogViewAV(QtWidgets.QDialog):
             ctrl + 1 .. 8 to insert speaker in format [speaker name]
         """
 
-        if object != self.ui.textEdit_transcription:
-            return False
+        #if object != self.ui.textEdit_transcription:
+        #    return False
         if event.type() != 7:  # QtGui.QKeyEvent
             return False
-        # Following options only available if can transcribe
-        if not self.can_transcribe:
-            return False
         key = event.key()
-        mods = event.nativeModifiers()
-        print("KEY ", key, "MODS ", mods)  # tmp
-        # KEY  82 MODS  20 (554 on Windows) ctrl r
-        # Rewind 3 seconds
-        if key == QtCore.Qt.Key_R and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
-
+        mods = event.modifiers()
+        #print("KEY ", key, "MODS ", mods)  # tmp
+        #  ctrl + s or ctrl + p pause/play toggle
+        if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
+            print("p")
+            self.play_pause()
+        # Rewind 3 seconds ctrl + r
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
+            print("r")
             time_msecs = self.mediaplayer.get_time() - 3000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
             self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
-        # KEY  84 MODS  20 (544 on Windows) ctrl t
-        if key == QtCore.Qt.Key_T and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
+        #  ctrl t
+        if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
-        # KEY  49 .. 56 MODS  20  ctrl 1 .. 8
+        # ctrl 1 .. 8
         # Insert speaker
-        if key in range(49, 57) and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
+        if key in range(49, 57) and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_speakername(key)
-        # KEY  78 MODS  20 (544 on Windows) ctrl + n
+        # ctrl + n
         # Add new speaker to list
-        if key == QtCore.Qt.Key_N and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
+        if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name","Name:", QtWidgets.QLineEdit.Normal, "")
             if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
@@ -2309,9 +2307,6 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.speaker_list.pop()
                 self.speaker_list.append(name)
             self.add_speaker_names_to_label()
-        # KEY  83 S 80 P + MODS  20 (544 on Windows) ctrl + s or ctrl + p pause/play toggle
-        if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and QtCore.Qt.Key_Control:  #(mods == 20 or mods == 544):
-            self.play_pause()
         return True
 
     def insert_speakername(self, key):

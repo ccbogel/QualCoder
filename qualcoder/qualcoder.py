@@ -1159,7 +1159,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         #TODO Potential design flaw to have the current coders name in the config.ini file
-        #TODO as is would change when opening differnt projects
+        #TODO as is would change when opening different projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
         names = self.app.get_coder_names_in_project()
@@ -1184,7 +1184,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
-            nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
+            self.save_backup()
+            '''nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
             backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
             if self.app.settings['backup_av_files'] == 'True':
                 try:
@@ -1199,12 +1200,40 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Project backup created: ") + backup)
             # delete backup path - delete the backup if no changes occurred in the project during the session
             self.app.delete_backup_path_name = backup
-            delete_backup = True
+            delete_backup = True'''
 
         msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+
+    def save_backup(self):
+        """ Save a date and hours stamped backup.
+        Do not backup if the name already exists.
+        A back up can be generated i nthe subsquent hour."""
+
+        nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
+        backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
+        # Do not try and create another backup with same date and hour
+        result = os.path.exists(backup)
+        if result:
+            return
+        if self.app.settings['backup_av_files'] == 'True':
+            try:
+                shutil.copytree(self.app.project_path, backup)
+            except FileExistsError as e:
+                msg = _("There is already a backup with this name")
+                print(str(e) + "\n" + msg)
+                logger.warning(_(msg) + "\n" + str(e))
+        else:
+            shutil.copytree(self.app.project_path, backup,
+            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
+                '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
+            self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+        self.ui.textEdit.append(_("Project backup created: ") + backup)
+        # delete backup path - delete the backup if no changes occurred in the project during the session
+        self.app.delete_backup_path_name = backup
+        #delete_backup = True
 
     def project_summary_report(self):
         """ Add a summary of the project to the tet edit.
