@@ -2364,6 +2364,11 @@ class DialogViewAV(QtWidgets.QDialog):
                 msecs = tms_str[-3:]
             ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
         self.ui.textEdit_transcription.insertPlainText("\n" + ts)
+        # Code here makes the current text location visible on the textEdit pane
+        textCursor = self.ui.textEdit_transcription.textCursor()
+        pos = textCursor.position()
+        textCursor.setPosition(pos)
+        self.ui.textEdit_transcription.setTextCursor(textCursor)
 
     def add_speaker_names_to_label(self):
         """ Add speaker names to label, four on each line. """
