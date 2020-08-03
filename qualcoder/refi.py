@@ -981,7 +981,7 @@ class Refi_export(QtWidgets.QDialog):
             self.export_project()
 
     def export_project(self):
-        '''
+        """
         .qde zipfile
         Internal files are identified in the path attribute of the source element by the URL naming scheme internal://
         /Sources folder
@@ -996,13 +996,13 @@ class Refi_export(QtWidgets.QDialog):
 
         Create an unzipped folder with a /Sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
-        '''
+        """
 
         project_name = self.app.project_name[:-4]
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
         try:
             shutil.rmtree(prep_path)
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             pass
         try:
             os.mkdir(prep_path)
@@ -1012,7 +1012,7 @@ class Refi_export(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
             exit(0)
         try:
-            with open(prep_path +'/project.qde', 'w') as f:
+            with open(prep_path +'/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as e:
             QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
@@ -1039,11 +1039,11 @@ class Refi_export(QtWidgets.QDialog):
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
                         prep_path + destination)
                 except FileNotFoundError as e:
-                    with open(prep_path + destination, 'w', encoding="utf-8") as f:
+                    with open(prep_path + destination, 'w', encoding="utf-8-sig") as f:
                         f.write(s['fulltext'])
                 # Also need to add the plain text file as a source
                 # plaintext has different guid from richtext
-                with open(prep_path + '/Sources/' + s['plaintext_filename'], 'w') as f:
+                with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
                     try:
                         f.write(s['fulltext'])
                     except Exception as e:
@@ -1051,18 +1051,18 @@ class Refi_export(QtWidgets.QDialog):
                         logger.error(str(e) + '\nIn plaintext file export: ' + s['plaintext_filename'])
                         print(e)
         for notefile in self.note_files:
-            with open(prep_path + '/Sources/' + notefile[0], 'w') as f:
+            with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
 
         export_path = self.app.project_path[:-4]
-        shutil.make_archive(export_path, 'zip', prep_path)
-        #TODO
-        # Getting on Windows File Exists error
-        os.rename(export_path + ".zip", export_path + ".qdpx")
+        shutil.make_archive(prep_path, 'zip', prep_path)
+        os.rename(prep_path + ".zip", prep_path + ".qdpx")
+        shutil.copyfile(prep_path + ".qdpx", export_path + ".qdpx")
         try:
             shutil.rmtree(prep_path)
-        except FileNotFoundError:
-            pass
+            os.remove(prep_path + ".qdpx")
+        except FileNotFoundError as e:
+            logger.debug(str(e))
         msg = export_path + ".qpdx\n"
         msg += "Coding for a/v transcripts is also exported as a <TextSource>.\n"
         msg += "Transcript syncronisation with a/v is approximated from textual timepoints in the transcript. "
