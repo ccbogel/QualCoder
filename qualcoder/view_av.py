@@ -978,7 +978,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
 
-        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
+        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove and self.media is not None:
             maxx = self.ui.horizontalSlider.size().width()
             proportion = event.pos().x() / maxx
             msecs = self.media.get_duration() * proportion
