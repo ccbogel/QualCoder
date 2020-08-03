@@ -2352,6 +2352,8 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             d = QtWidgets.QInputDialog()
+            d.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            d.setWindowFlags(d.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
             d.setWindowTitle(_("Speaker name"))
             d.setLabelText(_("Name:"))
             d.setInputMode(QtWidgets.QInputDialog.TextInput)
@@ -2359,16 +2361,6 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.add_speakername_to_list(d.textValue())
             else:
                 return False
-            '''name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name", "Name:", QtWidgets.QLineEdit.Normal, "")
-            if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
-                return False
-            if len(self.speaker_list) < 8:
-                self.speaker_list.append(name)
-            if len(self.speaker_list) == 8:
-                # replace last name in the list, if list over 8
-                self.speaker_list.pop()
-                self.speaker_list.append(name)
-            self.add_speaker_names_to_label()'''
         return True
 
     def add_speakername_to_list(self, name):
