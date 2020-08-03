@@ -254,8 +254,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+        self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
+        self.ui.horizontalSlider.setMouseTracking(True)
+        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
@@ -975,6 +977,13 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
+
+        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
+            maxx = self.ui.horizontalSlider.size().width()
+            proportion = event.pos().x() / maxx
+            msecs = self.media.get_duration() * proportion
+            time = msecs_to_mins_and_secs(msecs)
+            self.ui.horizontalSlider.setToolTip(time)
 
         if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent
             return False
@@ -2227,9 +2236,10 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
+        self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
+        self.ui.horizontalSlider.setMouseTracking(True)
+        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        #self.ui.horizontalSlider.sliderPressed.connect(self.set_position)
-
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
         except Exception as e:
@@ -2301,8 +2311,13 @@ class DialogViewAV(QtWidgets.QDialog):
             ctrl + 1 .. 8 to insert speaker in format [speaker name]
         """
 
-        #if object != self.ui.textEdit_transcription:
-        #    return False
+        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
+            maxx = self.ui.horizontalSlider.size().width()
+            proportion = event.pos().x() / maxx
+            msecs = self.media.get_duration() * proportion
+            time = msecs_to_mins_and_secs(msecs)
+            self.ui.horizontalSlider.setToolTip(time)
+
         if event.type() != 7:  # QtGui.QKeyEvent
             return False
         key = event.key()
