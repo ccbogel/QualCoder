@@ -2328,10 +2328,10 @@ class DialogViewAV(QtWidgets.QDialog):
         key = event.key()
         mods = event.modifiers()
         #print("KEY ", key, "MODS ", mods)
-        #  ctrl + s or ctrl + p pause/play toggle
+        #  ctrl s or ctrl p pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 3 seconds ctrl + r
+        # Rewind 3 seconds   Ctrl r
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
@@ -2342,18 +2342,24 @@ class DialogViewAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        #  ctrl t
+        #  Insert  timestamp Ctrl t
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
-        # ctrl 1 .. 8
-        # Insert speaker
+        # Insert speaker  Ctrl 1 .. 8
         if key in range(49, 57) and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_speakername(key)
-        # ctrl + n
-        # Add new speaker to list
+        # Add new speaker to list  Ctrl n
         if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
-            name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name", "Name:", QtWidgets.QLineEdit.Normal, "")
+            d = QtWidgets.QInputDialog()
+            d.setWindowTitle(_("Speaker name"))
+            d.setLabelText(_("Name:"))
+            d.setInputMode(QtWidgets.QInputDialog.TextInput)
+            if d.exec() == QtWidgets.QDialog.Accepted:
+                self.add_speakername_to_list(d.textValue())
+            else:
+                return False
+            '''name, ok = QtWidgets.QInputDialog.getText(self, "Speaker name", "Name:", QtWidgets.QLineEdit.Normal, "")
             if name == "" or name.find('.') == 0 or name.find(':') == 0 or not ok:
                 return False
             if len(self.speaker_list) < 8:
@@ -2362,8 +2368,23 @@ class DialogViewAV(QtWidgets.QDialog):
                 # replace last name in the list, if list over 8
                 self.speaker_list.pop()
                 self.speaker_list.append(name)
-            self.add_speaker_names_to_label()
+            self.add_speaker_names_to_label()'''
         return True
+
+    def add_speakername_to_list(self, name):
+        """ Perform checks on name before adding.
+         Ignore if blank or markers for timestamps or names are present."""
+
+        if name == "" or name.find('.') == 0 or name.find(':') == 0 or name.find('[') == 0 or name.find(']') == 0 \
+                or name.find('{') == 0 or name.find('}') == 0:
+            return
+        if len(self.speaker_list) < 8:
+            self.speaker_list.append(name)
+        if len(self.speaker_list) == 8:
+            # replace last name in the list, if list over 8
+            self.speaker_list.pop()
+            self.speaker_list.append(name)
+        self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
         """ Insert speaker name using settings format of {} or [] """
@@ -2391,8 +2412,8 @@ class DialogViewAV(QtWidgets.QDialog):
 
         time_msecs = self.mediaplayer.get_time()
         mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
-        mins = int(mins_secs.split('.')[0])
-        secs = mins_secs.split('.')[1]
+        mins = int(mins_secs.split(':')[0])
+        secs = mins_secs.split(':')[1]
         hours = int(mins / 60)
         remainder_mins = str(mins - hours * 60)
         if len(remainder_mins) == 1:
