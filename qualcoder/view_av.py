@@ -181,6 +181,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
+        self.installEventFilter(self)  # for rewind, play/stop
 
         # Prepare textEdit for coding transcribed text
         self.ui.textEdit.setPlainText("")
@@ -723,8 +724,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.timer.stop()
         else:
             if self.mediaplayer.play() == -1:
-                self.open_file()
                 return
+
+            # On play rewind one second
+            time_msecs = self.mediaplayer.get_time() - 1000
+            if time_msecs < 0:
+                time_msecs = 0
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+
             self.mediaplayer.play()
             self.ui.pushButton_play.setText(_("Pause"))
             self.timer.start()
@@ -953,6 +964,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
         Also use eventFilter for QGraphicsView.
+
+        Options are:
+            ctrl + r to rewind 3 seconds.
+            crl + s OR ctrl + p to start/pause On start rewind 1 second
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -960,6 +975,26 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
+
+        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent
+            return False
+        key = event.key()
+        mods = event.modifiers()
+        #print("KEY ", key, "MODS ", mods)
+        #  ctrl + s or ctrl + p pause/play toggle
+        if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
+            self.play_pause()
+        # Rewind 3 seconds ctrl + r
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
+            time_msecs = self.mediaplayer.get_time() - 3000
+            if time_msecs < 0:
+                time_msecs = 0
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.update_ui()
         return False
 
     def assign_segment_to_code(self, selected):
@@ -2256,11 +2291,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.start()
 
     def eventFilter(self, object, event):
-        """ Add key options to textEdit_transcription to improve manual transcribing.
-        Can only use these options if the transcription is not coded.
+        """ Add key options to improve manual transcribing.
         Options are:
             ctrl + r to rewind 3 seconds.
-            crl + s OR ctrl + p to start/pause
+            crl + s OR ctrl + p to start/pause On start rewind 1 second
+        Can only use these options if the transcription is not coded:
             ctrl + t to insert timestamp in format [hh.mm.ss]
             ctrl + n to enter a new speakers name into shortcuts
             ctrl + 1 .. 8 to insert speaker in format [speaker name]
@@ -2286,7 +2321,6 @@ class DialogViewAV(QtWidgets.QDialog):
             # Update timer display
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-
             self.update_ui()
         #  ctrl t
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
@@ -2528,7 +2562,6 @@ class DialogViewAV(QtWidgets.QDialog):
             self.timer.stop()
         else:
             if self.mediaplayer.play() == -1:
-                self.open_file()
                 return
 
             # On play rewind one second
