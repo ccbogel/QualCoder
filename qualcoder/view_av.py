@@ -2363,7 +2363,7 @@ class DialogViewAV(QtWidgets.QDialog):
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
             ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
-        self.ui.textEdit_transcription.insertPlainText(ts)
+        self.ui.textEdit_transcription.insertPlainText("\n" + ts)
 
     def add_speaker_names_to_label(self):
         """ Add speaker names to label, four on each line. """
