@@ -828,10 +828,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.settings['dialogcodeav_w'] = self.size().width()
         self.app.settings['dialogcodeav_h'] = self.size().height()
         size = self.ddialog.size()
-        if size.width() > 40:
+        if size.width() > 100:
             self.app.settings['video_w'] = size.width()
-        if size.height() > 40:
+        else:
+            self.app.settings['video_w'] = 100
+        if size.height() > 80:
             self.app.settings['video_h'] = size.height()
+        else:
+            self.app.settings['video_h'] = 80
         # Get absolute video dialog position
         self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
@@ -2675,10 +2679,14 @@ class DialogViewAV(QtWidgets.QDialog):
         self.app.settings['dialogviewav_w'] = self.size().width()
         self.app.settings['dialogviewav_h'] = self.size().height()
         size = self.ddialog.size()
-        if size.width() > 40:
+        if size.width() > 100:
             self.app.settings['video_w'] = size.width()
-        if size.height() > 40:
+        else:
+            self.app.settings['video_w'] = 100
+        if size.height() > 80:
             self.app.settings['video_h'] = size.height()
+        else:
+            self.app.settings['video_h'] = 80
         # Get absolute video dialog position
         self.app.settings['viewav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['viewav_video_pos_y'] = self.ddialog.pos().y()
