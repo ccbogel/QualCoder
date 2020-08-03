@@ -729,7 +729,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
 
             # On play rewind one second
-            time_msecs = self.mediaplayer.get_time() - 1000
+            time_msecs = self.mediaplayer.get_time() - 2000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
@@ -995,7 +995,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.play_pause()
         # Rewind 3 seconds ctrl + r
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 3000
+            time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
@@ -2328,7 +2328,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.play_pause()
         # Rewind 3 seconds ctrl + r
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 3000
+            time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
@@ -2412,7 +2412,7 @@ class DialogViewAV(QtWidgets.QDialog):
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
             ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
-        self.ui.textEdit_transcription.insertPlainText("\n" + ts)
+        self.ui.textEdit_transcription.insertPlainText("\n" + ts + " ")
         # Code here makes the current text location visible on the textEdit pane
         textCursor = self.ui.textEdit_transcription.textCursor()
         pos = textCursor.position()
@@ -2580,7 +2580,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 return
 
             # On play rewind one second
-            time_msecs = self.mediaplayer.get_time() - 1000
+            time_msecs = self.mediaplayer.get_time() - 2000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
