@@ -2275,17 +2275,20 @@ class DialogViewAV(QtWidgets.QDialog):
         #print("KEY ", key, "MODS ", mods)  # tmp
         #  ctrl + s or ctrl + p pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
-            print("p")
             self.play_pause()
         # Rewind 3 seconds ctrl + r
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            print("r")
             time_msecs = self.mediaplayer.get_time() - 3000
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.play()
+            #self.mediaplayer.play()
             self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+
+            self.update_ui()
         #  ctrl t
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
@@ -2576,9 +2579,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         media_pos = int(self.mediaplayer.get_position() * 1000)
-
         self.ui.horizontalSlider.setValue(media_pos)
-
         msecs = self.mediaplayer.get_time()
         self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
 
