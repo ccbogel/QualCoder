@@ -22,13 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>60</height>
+       <height>90</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>60</height>
+       <height>90</height>
       </size>
      </property>
      <property name="title">
@@ -86,6 +86,19 @@
       </property>
       <property name="text">
        <string>Export csv file</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_files">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>271</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select files</string>
       </property>
      </widget>
     </widget>
