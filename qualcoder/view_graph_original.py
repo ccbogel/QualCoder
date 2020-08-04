@@ -248,7 +248,7 @@ class ViewGraphOriginal(QDialog):
                 for n in self.scene.items():
                     if isinstance(n, TextGraphicsItem) and m.data['supercatid'] is not None and m.data['supercatid'] == n.data['catid'] and n.data['depth'] < m.data['depth']:
                         #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
-                        item = LinkGraphicsItem(m, n)
+                        item = LinkGraphicsItem(m, n, True)  # corners only = True
                         self.scene.addItem(item)
 
     def circular_graph(self):
@@ -717,12 +717,14 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     line_width = 1.5
     line_type = QtCore.Qt.SolidLine
     line_color = QtCore.Qt.black
+    corners_only = False  # True for list graph
 
-    def __init__(self, from_widget, to_widget):
+    def __init__(self, from_widget, to_widget, corners_only=False):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
+        self.corners_only = corners_only
         #self.setFlag(self.ItemIsSelectable, True)
         self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.calculatePointsAndDraw()
@@ -766,14 +768,15 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        # fix from_x value to middle of from widget if to_widget overlaps in x position
-        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
-            from_x = from_x + self.from_widget.boundingRect().width() / 2
-            x_overlap = True
-        # fix to_x value to middle of to widget if from_widget overlaps in x position
-        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
-            to_x = to_x + self.to_widget.boundingRect().width() / 2
-            x_overlap = True
+        if not self.corners_only:
+            # fix from_x value to middle of from widget if to_widget overlaps in x position
+            if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+                from_x = from_x + self.from_widget.boundingRect().width() / 2
+                x_overlap = True
+            # fix to_x value to middle of to widget if from_widget overlaps in x position
+            if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+                to_x = to_x + self.to_widget.boundingRect().width() / 2
+                x_overlap = True
 
         # fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
         if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
@@ -783,14 +786,15 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        # fix from_y value to middle of from widget if to_widget overlaps in y position
-        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
-            from_y = from_y + self.from_widget.boundingRect().height() / 2
-            y_overlap = True
-        # fix from_y value to middle of to widget if from_widget overlaps in y position
-        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
-            to_y = to_y + self.to_widget.boundingRect().height() / 2
-            y_overlap = True
+        if not self.corners_only:
+            # fix from_y value to middle of from widget if to_widget overlaps in y position
+            if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+                from_y = from_y + self.from_widget.boundingRect().height() / 2
+                y_overlap = True
+            # fix from_y value to middle of to widget if from_widget overlaps in y position
+            if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+                to_y = to_y + self.to_widget.boundingRect().height() / 2
+                y_overlap = True
 
         # fix from_y value if to_widget is above the from_widget
         if not y_overlap and to_y > from_y:
