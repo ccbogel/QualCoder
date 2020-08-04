@@ -246,8 +246,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             return
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
+        if os.path.exists(directory + "/" + filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         filename = directory + "/" + filename
-
         f = open(filename, 'w')
         text = _("Code frequencies") + "\n"
         text += self.app.project_name + "\n"
@@ -296,7 +303,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
         filename = directory + "/" + filename
-
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         data = ""
         header = [_("Code Tree"), "Id"]
         for coder in self.coders:
@@ -527,6 +541,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
         filename = directory + "/" + filename
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         f = open(filename, 'w')
         f.write(self.app.project_name + "\n")
         f.write(_("Date: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
@@ -597,7 +619,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             # determine the same characters coded by both coders, by adding 1 to each coded character
             char_list = [0] * f[1]
             for coded in result0:
-                print(coded[0], coded[1])  # tmp
+                #print(coded[0], coded[1])  # tmp
                 for char in range(coded[0], coded[1]):
                     char_list[char] += 1
                     total['coded0'] += 1
@@ -1004,20 +1026,24 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
+        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
             self.app.last_export_directory)
-        if filename[0] == "":
+        filename = file_tuple[0]
+        if filename == "":
             return
         tmp = filename.split("/")[-1]
         directory = filename[:len(filename) - len(tmp)]
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
-        filename = filename[0] + ".txt"
-        #tw = QtGui.QTextDocumentWriter()
-        #tw.setFileName(filename)
-        #tw.setFormat(b'plaintext')  # byte array needed for Windows 10
-        #tw.setCodec('utf-8-sig') # This line does not work
-        #tw.write(self.ui.textEdit.document())
+        filename = filename + ".txt"
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
         Using a byte order mark so that other software recognised UTF-8
         '''
@@ -1041,16 +1067,24 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
+        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
             self.app.last_export_directory)
-        #    os.path.expanduser('~'))
-        if filename[0] == "":
+        filename = file_tuple[0]
+        if filename == "":
             return
         tmp = filename.split("/")[-1]
         directory = filename[:len(filename) - len(tmp)]
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
-        filename = filename[0] + ".odt"
+        filename = filename + ".odt"
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
@@ -1152,15 +1186,24 @@ class DialogReportCodes(QtWidgets.QDialog):
                     csv_data[row][col] = d
                     row += 1
 
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
+        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
             self.app.last_export_directory)
-        if filename[0] == "":
+        filename = file_tuple[0]
+        if filename == "":
             return
         tmp = filename.split("/")[-1]
         directory = filename[:len(filename) - len(tmp)]
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
-        filename = filename[0] + ".csv"
+        filename = filename + ".csv"
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         with open(filename, 'w', encoding ='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1183,15 +1226,24 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
+        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
             self.app.last_export_directory)
-        if filename[0] == "":
+        filename = file_tuple[0]
+        if filename == "":
             return
         tmp = filename.split("/")[-1]
         directory = filename[:len(filename) - len(tmp)]
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
-        filename = filename[0] + ".html"
+        filename = filename + ".html"
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filename)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10

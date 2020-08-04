@@ -247,6 +247,14 @@ class DialogJournals(QtWidgets.QDialog):
             if directory != self.app.last_export_directory:
                 self.app.last_export_directory = directory
             filename = directory + "/" + filename
+            if os.path.exists(filename):
+                mb = QtWidgets.QMessageBox()
+                mb.setWindowTitle(_("File exists"))
+                mb.setText(_("Overwrite?"))
+                mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                if mb.exec_() == QtWidgets.QMessageBox.No:
+                    return
             data = self.journals[x]['jentry']
             f = open(filename, 'w')
             f.write(data)

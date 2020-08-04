@@ -158,20 +158,27 @@ class DialogSQL(QtWidgets.QDialog):
         file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, "Save text file", tmp_name)
         if file_tuple[0] == "":
             return
-        file_name = file_tuple[0]
-        tmp = file_name.split("/")[-1]
-        directory = file_name[:len(file_name) - len(tmp)]
+        filename = file_tuple[0]
+        tmp = filename.split("/")[-1]
+        directory = filename[:len(filename) - len(tmp)]
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
 
         self.delimiter = str(self.ui.comboBox_delimiter.currentText())
         if self.delimiter == "tab":
             self.delimiter = "\t"
-        #f = open(file_name, 'w')
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
         Using a byte order mark so that other software recognised UTF-8
         '''
-        f = open(file_name, 'w', encoding='utf-8-sig')
+        f = open(filename, 'w', encoding='utf-8-sig')
         # write the header row
         file_line = ""
         for item in col_names:
@@ -189,9 +196,13 @@ class DialogSQL(QtWidgets.QDialog):
             file_line = file_line[:len(file_line) - 1]
             f.write(file_line + "\r\n")
         f.close()
-        self.parent_textEdit.append(_("SQL Results exported to: ") + file_name)
+        self.parent_textEdit.append(_("SQL Results exported to: ") + filename)
         self.parent_textEdit.append(_("Query:") + "\n" + sql)
-        QtWidgets.QMessageBox.information(None, _("Text file export"), file_name)
+        mb = QtWidgets.QMessageBox()
+        mb.setWindowTitle(_("Text file export"))
+        mb.setText(filename)
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.exec_()
 
     def get_item(self):
         """ Get the selected table name or tablename.fieldname and add to the sql text
