@@ -221,7 +221,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         # Disable close button, only close through closing the Ui_Dialog_code_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
-        self.ddialog.resize(1, 1)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
@@ -237,17 +236,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-
-        ''' # Set video dialog position, with a default initial position
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
-        # ddialog is relative to self global position
-        try:
-        x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
-        y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
-        self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
-        except:
-            pass
-        self.ddialog.show()'''
 
         # Create a vlc instance with an empty vlc media player
         self.instance = vlc.Instance()
@@ -517,6 +505,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.closeEvent()
             return
         if self.media_data['mediapath'][0:7] != "/audio/":
+            self.ddialog.show()
             try:
                 w = int(self.app.settings['video_w'])
                 h = int(self.app.settings['video_h'])
@@ -529,7 +518,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
             except:
                 self.ddialog.resize(500, 400)
-        self.ddialog.show()
+        else:
+            self.ddialog.hide()
 
         # clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
@@ -2209,7 +2199,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ddialog.setWindowTitle(self.media_data['mediapath'])
-        self.ddialog.resize(1,1)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
@@ -2265,6 +2254,8 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ddialog.resize(w, h)
             except:
                 self.ddialog.resize(500, 400)
+        else:
+            self.ddialog.hide()
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
         # Parse the metadata of the file
