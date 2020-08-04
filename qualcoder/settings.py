@@ -88,7 +88,7 @@ class DialogSettings(QtWidgets.QDialog):
             if lang[-2:] == self.settings['language']:
                 self.ui.comboBox_language.setCurrentIndex(index)
         timestampformats = ["[mm.ss]", "[mm:ss]", "[hh.mm.ss]", "[hh:mm:ss]",
-                            "{hh.mm.ss}", "#hh:mm:ss.sss#"]
+                            "{hh:mm:ss}", "#hh:mm:ss.sss#"]
         self.ui.comboBox_timestamp.addItems(timestampformats)
         for index, ts in enumerate(timestampformats):
             if ts == self.settings['timestampformat']:
