@@ -73,6 +73,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     categories = []
     codes = []
     coded = []  # to refactor name
+    file_ids = []
 
     def __init__(self, app, parent_textEdit, dialog_list):
 
@@ -93,9 +94,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 self.resize(w, h)
         except:
             pass
-        #TODO
+
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        self.ui.pushButton_select_files.pressed.connect(self.select_files)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -112,6 +114,28 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.app.settings['dialogreportcodefrequencies_w'] = new_size.size().width()
         self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()
 
+    def select_files(self):
+        """ Report code frequencies for all files or selected files. """
+
+        filenames = self.app.get_filenames()
+        ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
+        ok = ui.exec_()
+        tooltip = _("Files selected: ")
+        self.file_ids = []
+        if ok:
+            selected_files = ui.get_selected()  # list of dictionaries
+            files_text = ""
+            for row in selected_files:
+                self.file_ids.append(row['id'])
+                files_text += "| " + row['name']
+            files_text = files_text[2:]
+            tooltip += files_text
+            if len(self.file_ids) > 0:
+                self.ui.pushButton_select_files.setToolTip(tooltip)
+        self.get_data()
+        self.calculate_code_frequencies()
+        self.fill_tree()
+
     def get_data(self):
         """ Called from init. gets coders, code_names and categories.
         Calls calculate_code_frequency - for each code.
@@ -121,7 +145,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         """
 
         cur = self.app.conn.cursor()
-
         self.categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
@@ -144,18 +167,22 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
         self.coded = []
-        cur.execute("select cid, owner from code_text")
-        result = cur.fetchall()
-        for row in result:
-            self.coded.append(row)
-        cur.execute("select cid, owner from code_image")
-        result = cur.fetchall()
-        for row in result:
-            self.coded.append(row)
-        cur.execute("select cid, owner from code_av")
-        result = cur.fetchall()
-        for row in result:
-            self.coded.append(row)
+        if True:
+            cur.execute("select cid, owner, fid from code_text")
+            result = cur.fetchall()
+            for row in result:
+                if row[2] in self.file_ids or self.file_ids == []:
+                    self.coded.append(row)
+            cur.execute("select cid, owner, id from code_image")
+            result = cur.fetchall()
+            for row in result:
+                if row[2] in self.file_ids or self.file_ids == []:
+                    self.coded.append(row)
+            cur.execute("select cid, owner, id from code_av")
+            result = cur.fetchall()
+            for row in result:
+                if row[2] in self.file_ids or self.file_ids == []:
+                    self.coded.append(row)
 
     def calculate_code_frequencies(self):
         """ Calculate the frequency of each code for all coders and the total.
@@ -215,15 +242,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
-        '''
-        #print("HEADER\n", header, "\n")
-        for c in self.codes:
-            print(c)
-
-        print("\n\n")
-        for c in self.categories:
-            print(c)
-        '''
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """
@@ -344,6 +362,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         """
+
+        self.ui.treeWidget.clear()
 
         cats = copy(self.categories)
         codes = copy(self.codes)
