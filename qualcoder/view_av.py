@@ -2414,7 +2414,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if fmt == "[hh:mm:ss]":
             ts += '[' + str(hours) + ':' + remainder_mins + ':' + secs + ']'
         if fmt == "{hh:mm:ss}":
-            ts += '{' + str(hours) + '.' + remainder_mins + '.' + secs + '}'
+            ts += '{' + str(hours) + ':' + remainder_mins + ':' + secs + '}'
         if fmt == "#hh:mm:ss.sss#":
             msecs = "000"
             tms_str = str(time_msecs)
