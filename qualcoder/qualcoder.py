@@ -137,6 +137,7 @@ class App(object):
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
         self.settings = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
+        self.version = qualcoder_version
 
     def read_previous_project_paths(self):
         """ Recent project path is stored in .qualcoder/recent_projects.txt
@@ -757,7 +758,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Compare two or more coders using Cohens Kappa. """
 
         for d in self.dialogList:
-            if type(d).__name__ == "DialogCoderComparison":
+            if type(d).__name__ == "DialogReportCoderComparisons":
+                d.activateWindow()
                 return
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
@@ -768,8 +770,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Show code frequencies overall and by coder. """
 
         for d in self.dialogList:
-            if type(d).__name__ == "DialogCodeFrequencies":
+            if type(d).__name__ == "DialogReportCodeFrequencies":
+                d.activateWindow()
                 return
+
+        '''for d in self.dialogList:
+            # Had to add this code to fix error:
+            # __main__.clean_dialog_refs wrapped C/C++ object of type DialogJournals has been deleted
+            if type(d).__name__ == "DialogJournals":
+                try:
+                    d.show()
+                    d.activateWindow()
+                    return'''
+
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
@@ -777,6 +790,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def report_coding(self):
         """ Report on coding and categories. """
+
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogReportCodes":
+                d.activateWindow()
+                return
 
         ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
@@ -786,6 +804,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "ViewGraphOriginal":
+                d.activateWindow()
+                return
         ui = ViewGraphOriginal(self.app)
         self.dialogList.append(ui)
         ui.show()
@@ -802,6 +824,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
+                d.activateWindow()
                 return
         ui = DialogInformation(self.app, "About", "")
         self.dialogList.append(ui)
@@ -878,6 +901,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCodeText":
+                d.activateWindow()
+                #TODO activate window does NOT bring to front, unline image coding and av coding
+                return
+
         ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -888,6 +917,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCodeImage":
+                d.activateWindow()
+                return
         ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
@@ -898,6 +931,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to segements of the
         audio or video file. Added try block in case VLC bindings do not work. """
 
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogCodeAV":
+                d.activateWindow()
+                return
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
