@@ -459,6 +459,8 @@ class DialogManageFiles(QtWidgets.QDialog):
     def highlight(self, fid, textEdit):
         """ Add coding and annotation highlights. """
 
+        self.text_view_remove_formatting()
+        # Get highlight data
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1 from annotation where fid=? union all select pos0,pos1 from code_text where fid=?"
         cur.execute(sql, [fid, fid])
@@ -466,12 +468,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
         format_.setFontPointSize(self.app.settings['fontsize'])
-
-        # remove formatting
-        cursor = textEdit.textCursor()
-        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(len(textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
-        cursor.setCharFormat(format_)
         # add formatting
         for item in annoted_coded:
             cursor.setPosition(int(item[0]), QtGui.QTextCursor.MoveAnchor)
@@ -483,6 +479,8 @@ class DialogManageFiles(QtWidgets.QDialog):
     def view(self):
         """ View and edit text file contents.
         Alternatively view an image or other media. """
+
+        #TODO make only one dialog open t a time
 
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
@@ -501,15 +499,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         # cannot easily edit file text of there are linked cases, codes or annotations
         self.text_view = DialogMemo(self.app, "",)
         self.text_view.ui.textEdit.setReadOnly(restricted)
+        self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
         if restricted:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_restricted_menu)
         else:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_unrestricted_menu)
-        self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
+            self.text_view.ui.textEdit.currentCharFormatChanged.connect(self.text_view_remove_formatting)
         self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
-
         title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
         if restricted:
             title += "RESTRICTED EDIT"
@@ -525,6 +523,18 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
         self.app.conn.commit()
+
+    def text_view_remove_formatting(self):
+        """ Remove formatting from text edit on changed text.
+         Useful when pasting mime data (rich text or html) from clipboard. """
+
+        format_ = QtGui.QTextCharFormat()
+        format_.setFontFamily(self.app.settings['font'])
+        format_.setFontPointSize(self.app.settings['fontsize'])
+        cursor = self.text_view.ui.textEdit.textCursor()
+        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(len(self.text_view.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(format_)
 
     def textEdit_unrestricted_menu(self, position):
         """ Context menu for select al land copy of text.
