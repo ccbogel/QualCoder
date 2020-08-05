@@ -2342,6 +2342,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # Add new speaker to list  Ctrl n
         if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
+            #TODO on cancel dialog pops up twice
             d = QtWidgets.QInputDialog()
             d.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             d.setWindowFlags(d.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -2349,25 +2350,18 @@ class DialogViewAV(QtWidgets.QDialog):
             d.setLabelText(_("Name:"))
             d.setInputMode(QtWidgets.QInputDialog.TextInput)
             if d.exec() == QtWidgets.QDialog.Accepted:
-                self.add_speakername_to_list(d.textValue())
-            else:
-                return False
+                name = d.textValue()
+                if name == "" or name.find('.') == 0 or name.find(':') == 0 or name.find('[') == 0 or name.find(
+                        ']') == 0 or name.find('{') == 0 or name.find('}') == 0:
+                    return True
+                if len(self.speaker_list) < 8:
+                    self.speaker_list.append(name)
+                if len(self.speaker_list) == 8:
+                    # replace last name in the list, if list at 8
+                    self.speaker_list.pop()
+                    self.speaker_list.append(name)
+                self.add_speaker_names_to_label()
         return True
-
-    def add_speakername_to_list(self, name):
-        """ Perform checks on name before adding.
-         Ignore if blank or markers for timestamps or names are present."""
-
-        if name == "" or name.find('.') == 0 or name.find(':') == 0 or name.find('[') == 0 or name.find(']') == 0 \
-                or name.find('{') == 0 or name.find('}') == 0:
-            return
-        if len(self.speaker_list) < 8:
-            self.speaker_list.append(name)
-        if len(self.speaker_list) == 8:
-            # replace last name in the list, if list over 8
-            self.speaker_list.pop()
-            self.speaker_list.append(name)
-        self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
         """ Insert speaker name using settings format of {} or [] """
@@ -2439,7 +2433,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.label_speakers.setText(text)
 
     def get_speaker_names_from_bracketed_text(self):
-        """ Parse text for [] to find speaker names.
+        """ Parse text for format of [] or {} to find speaker names.
         If needed limit to 8 names. """
 
         if self.transcription is None:
@@ -2447,14 +2441,15 @@ class DialogViewAV(QtWidgets.QDialog):
         text = self.transcription[1]
         start = False
         ts_and_names = ""
+        sn_format = self.app.settings['speakernameformat']
         for c in text:
-            if c == '[':
+            if c == sn_format[0]:
                 start = True
-            if c == ']':
+            if c == sn_format[1]:
                 start = False
             if start:
                 ts_and_names = ts_and_names + c
-        ts_and_names = ts_and_names.split('[')
+        ts_and_names = ts_and_names.split(sn_format[0])
         names = []
         for n in ts_and_names:
             if n.find('.') == -1 and n.find(':') == -1 and n != '':
