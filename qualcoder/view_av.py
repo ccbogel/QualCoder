@@ -2184,8 +2184,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_speakers.setVisible(False)
                 self.ui.label_transcription.setToolTip("")
             else:
-                self.ui.textEdit_transcription.installEventFilter(self)
-                self.ui.label_memo.setText(_("Transcription area: ctrl+r ctrl+s ctrl+t ctrl+n ctrl+1-8"))
+                self.ui.label_memo.setText(_("Transcription area: ctrl+r ctrl+s ctrl+t ctrl+n ctrl+1-8 ctrl+d"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
@@ -2342,26 +2341,50 @@ class DialogViewAV(QtWidgets.QDialog):
         # Add new speaker to list  Ctrl n
         if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
-            #TODO on cancel dialog pops up twice
-            d = QtWidgets.QInputDialog()
-            d.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            d.setWindowFlags(d.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-            d.setWindowTitle(_("Speaker name"))
-            d.setLabelText(_("Name:"))
-            d.setInputMode(QtWidgets.QInputDialog.TextInput)
-            if d.exec() == QtWidgets.QDialog.Accepted:
-                name = d.textValue()
-                if name == "" or name.find('.') == 0 or name.find(':') == 0 or name.find('[') == 0 or name.find(
-                        ']') == 0 or name.find('{') == 0 or name.find('}') == 0:
-                    return True
-                if len(self.speaker_list) < 8:
-                    self.speaker_list.append(name)
-                if len(self.speaker_list) == 8:
-                    # replace last name in the list, if list at 8
-                    self.speaker_list.pop()
-                    self.speaker_list.append(name)
-                self.add_speaker_names_to_label()
+            self.add_speakername()
+        # Delete speaker name from list
+        if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
+            self.pause()
+            self.delete_speakername()
         return True
+
+    def delete_speakername(self):
+        """ Delete speakername from list of shortcut names """
+
+        if self.speaker_list == []:
+            return
+        # convert to list of dictionaries
+        names = []
+        for n in self.speaker_list:
+            names.append({"name": n})
+        ui = DialogSelectItems(self.app, names, _("Select name to delete"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        name = ui.get_selected()
+        if name == []:
+            return
+        self.speaker_list.remove(name['name'])
+        self.add_speaker_names_to_label()
+
+    def add_speakername(self):
+        """ Add speaker name to list of shortcut names. Maximum of 8 entries. """
+
+        if len(self.speaker_list) == 8:
+            return
+        d = QtWidgets.QInputDialog()
+        d.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        d.setWindowFlags(d.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        d.setWindowTitle(_("Speaker name"))
+        d.setLabelText(_("Name:"))
+        d.setInputMode(QtWidgets.QInputDialog.TextInput)
+        if d.exec() == QtWidgets.QDialog.Accepted:
+            name = d.textValue()
+            if name == "" or name.find('.') == 0 or name.find(':') == 0 or name.find('[') == 0 or name.find(
+                    ']') == 0 or name.find('{') == 0 or name.find('}') == 0:
+                return
+            self.speaker_list.append(name)
+            self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
         """ Insert speaker name using settings format of {} or [] """
