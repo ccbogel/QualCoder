@@ -102,7 +102,6 @@ class DialogManageFiles(QtWidgets.QDialog):
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
     parent_textEdit = None
-    dialogList = []
 
     def __init__(self, app, parent_textEdit):
 
@@ -110,7 +109,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app = app
         self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
-        self.dialogList = []
         self.attributes = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
@@ -469,6 +467,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         format_.setFontFamily(self.app.settings['font'])
         format_.setFontPointSize(self.app.settings['fontsize'])
         # add formatting
+        cursor = self.text_view.ui.textEdit.textCursor()
         for item in annoted_coded:
             cursor.setPosition(int(item[0]), QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(int(item[1]), QtGui.QTextCursor.KeepAnchor)
@@ -479,8 +478,6 @@ class DialogManageFiles(QtWidgets.QDialog):
     def view(self):
         """ View and edit text file contents.
         Alternatively view an image or other media. """
-
-        #TODO make only one dialog open t a time
 
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
@@ -780,8 +777,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         try:
             ui = DialogViewAV(self.app, self.source[x])
             #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
-            self.dialogList.append(ui)
-            ui.show()
+            ui.exec_()
             # try and update file data here
             self.load_file_data()
             if self.source[x]['memo'] == "":
