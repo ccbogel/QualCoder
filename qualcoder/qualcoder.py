@@ -905,6 +905,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogCodeText":
                 d.activateWindow()
                 #TODO activate window does NOT bring to front, unline image coding and av coding
+                # Unsure why this occurs
                 return
 
         ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
@@ -1247,7 +1248,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def save_backup(self):
         """ Save a date and hours stamped backup.
         Do not backup if the name already exists.
-        A back up can be generated i nthe subsquent hour."""
+        A back up can be generated in the subsequent hour."""
 
         nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
         backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
@@ -1379,8 +1380,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 backups.append(f)
         backups.sort(reverse=True)  # newest to oldest
         to_remove = []
-        if len(backups) > 6:
-            to_remove = backups[6:]
+        if len(backups) > 5:
+            to_remove = backups[5:]
         if to_remove == []:
             return
         for f in to_remove:
