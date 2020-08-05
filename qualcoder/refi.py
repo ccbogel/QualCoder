@@ -715,7 +715,7 @@ class Refi_import():
         """ Load this text source into sqlite.
          Add the description and the text codings.
          When testing with Windows Nvivo export: import from docx or txt
-         the text needs an additional character.
+         the text may need an additional line-ending character.
          """
 
         name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
@@ -746,13 +746,13 @@ class Refi_import():
 
         # Read the text and enter into sqlite source table
         try:
-            with open(source_path) as f:
+            with open(source_path, encoding='utf-8', errors='replace') as f:
                 fulltext = f.read()
                 #if fulltext[0:6] == "\ufeff":  # associated with notepad files
                 #    fulltext = fulltext[6:]
 
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
-                # Due to 2 charachter line endings
+                # Due to 2 character line endings
                 #TODO TEST if importing Windows endings on Windows OS that it requires the 2 char line-ending replacement
                 if add_ending:
                     fulltext = fulltext.replace('\n', '\n ')

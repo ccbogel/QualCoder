@@ -984,6 +984,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
+        msg = _(
+            "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the QDPX file.")
+        mb = QtWidgets.QMessageBox()
+        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        mb.setWindowTitle(_('RQDA import steps'))
+        mb.setText(msg)
+        mb.exec_()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
@@ -1278,6 +1285,8 @@ class MainWindow(QtWidgets.QMainWindow):
          Display project memo, and code, attribute, journal, files frequencies."""
 
         os_type = platform.system()
+        if self.app.conn is None:
+            return
         cur = self.app.conn.cursor()
         cur.execute("select databaseversion, date, memo, about from project")
         result = cur.fetchall()[-1]
