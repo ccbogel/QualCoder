@@ -38,6 +38,12 @@ import subprocess
 import traceback
 import zipfile
 
+vlc_msg = ""
+try:
+    import vlc
+except Exception as e:
+    vlc_msg = str(e)
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 pdfminer_installed = True
@@ -1288,24 +1294,21 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
 
-    def get_icon(self, name):
+    def get_icon(self, data):
         """ Get icon to put in table. Helper method for fill_table
          parameter:
-            name: a filename
+            data: a dictionary containing the mediapath
          return: QIcon """
 
-        icon_text = QtGui.QIcon("GUI/text.png")
-        icon_play = QtGui.QIcon("GUI/play.png")
-        icon_picture = QtGui.QIcon("GUI/picture.png")
-        icon_sound = QtGui.QIcon("GUI/sound.png")
-        suffix = name[-4:].lower()
-        if suffix in (".png", ".jpg", "jpeg"):
-            return icon_picture
-        if suffix in (".mp4", ".mov", ".avi", ".mkv"):
-            return icon_play
-        if suffix in (".mp3", ".wav", ".ogg"):
-            return icon_sound
-        return icon_text
+        if data['mediapath'] is None:
+            return QtGui.QIcon("GUI/text.png")
+        if data['mediapath'][:8] == "/images/":
+            return QtGui.QIcon("GUI/picture.png")
+        if data['mediapath'][:7] == "/video/":
+            return QtGui.QIcon("GUI/play.png")
+        if data['mediapath'][:7] == "/audio/":
+            return QtGui.QIcon("GUI/sound.png")
+        return QtGui.QIcon("GUI/text.png")
 
     def fill_table(self):
         """ Reload the file data and Fill the table widget with file data. """
@@ -1319,7 +1322,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
-            icon = self.get_icon(data['name'])
+            icon = self.get_icon(data)
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
             # having un-editable file names helps with assigning icons
