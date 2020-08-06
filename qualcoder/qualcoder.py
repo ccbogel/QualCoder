@@ -900,9 +900,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeText":
-                d.activateWindow()
-                #TODO activate window does NOT bring to front, unline image coding and av coding
-                # Unsure why this occurs
+                try:
+                    d.activateWindow()
+                    #TODO activate window does NOT bring to front, unline image coding and av coding
+                    # Unsure why this occurs
+                except RuntimeError as e:
+                    logger.debug(str(e))
+                    self.dialogList.remove(d)
                 return
 
         ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
@@ -999,7 +1003,8 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
         msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
         msg += "External sources over 2GB not imported or linked to."
-        QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", msg)
+        msg += "\n\nPlease, change the coder name in Settings to the current coder name\notherwise coded text and media may appear uncoded."
+        QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", _(msg))
 
     def rqda_project_import(self):
         """ Import an RQDA format project into a new project space. """
