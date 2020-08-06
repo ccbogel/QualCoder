@@ -522,9 +522,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_ui()
         self.show()
 
-        self.whichone = 0
-
-
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -1175,9 +1172,7 @@ class MainWindow(QtWidgets.QMainWindow):
             newproject: yes or no  if yes then do not make an initial backup
         """
 
-        if self.app.project_name != "":
-            self.close_project()
-
+        self.close_project()
         self.setWindowTitle("QualCoder" + _("Open Project"))
         default_directory = self.app.settings['directory']
         if path == "" or path is False:
@@ -1356,6 +1351,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clean_dialog_refs()
         for d in self.dialogList:
             d.destroy()
+            self.dialogList = []
         self.setWindowTitle("QualCoder")
         self.app.write_config_ini(self.app.settings)
 
