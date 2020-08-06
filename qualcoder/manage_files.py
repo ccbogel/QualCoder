@@ -102,6 +102,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
     parent_textEdit = None
+    dialog_list = []
 
     def __init__(self, app, parent_textEdit):
 
@@ -110,6 +111,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
         self.attributes = []
+        self.dialog_list = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
@@ -509,13 +511,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         if restricted:
             title += "RESTRICTED EDIT"
         self.text_view.setWindowTitle(title)
-        ok = self.text_view.exec_()
-        if not ok:
-            return
+        if self.dialog_list != []:
+            self.dialog_list = []
+            self.dialog_list.append(self.text_view)
+        self.text_view.show()
+
         text = self.text_view.ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
             return
-
         self.source[x]['fulltext'] = text
         cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
@@ -777,7 +780,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         try:
             ui = DialogViewAV(self.app, self.source[x])
             #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
-            ui.exec_()
+            if self.dialog_list != []:
+                self.dialog_list = []
+                self.dialog_list.append(ui)
+                ui.show()
             # try and update file data here
             self.load_file_data()
             if self.source[x]['memo'] == "":
@@ -794,7 +800,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ View an image file and edit the image memo. """
 
         ui = DialogViewImage(self.app, self.source[x])
-        ui.exec_()
+        if self.dialog_list != []:
+            self.dialog_list = []
+            self.dialog_list.append(ui)
+            ui.show()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
