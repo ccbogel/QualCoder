@@ -58,6 +58,8 @@ Alternatively move to the qualcoder directory and run the qualcoder.py file in f
 Sometimes there are problems recognising the audio/video VLC library file: libvlc.dll  
 Some solutions are to add the path of the file here: [https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1](https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)
 
+The log file on Windows does not make use of the rotating file handler, so the log file may become large. If so, delete the log file. It will be re-created automatically.
+
 
 ### MacOS
 
