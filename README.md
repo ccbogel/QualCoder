@@ -16,7 +16,7 @@ You can install the latest debian package from https://github.com/ccbogel/QualCo
 
 You may need to add unstable repos as described at https://www.binarytides.com/enable-testing-repo-debian/
 
-On some Linux versions ypu will need to install pip
+On some Linux versions you will need to install pip
 
 `sudo apt install python3-pip`
 
@@ -93,7 +93,7 @@ Required:
 
 * pdfminer.six
 
-* openpxyl   (not yet implemented 10 Jul 2020)
+* openpyxl
 
 
 ## Future plans
