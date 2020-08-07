@@ -32,7 +32,7 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_select_file import Ui_Dialog_selectfile
+from GUI.ui_dialog_select_items import Ui_Dialog_selectitems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class DialogSelectItems(QtWidgets.QDialog):
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
-        self.ui = Ui_Dialog_selectfile()
+        self.ui = Ui_Dialog_selectitems()
         self.ui.setupUi(self)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
@@ -122,7 +122,7 @@ class list_model(QtCore.QAbstractListModel):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSelectFile([{"name":"fff"}, {"name":"jjj"}], "title", "single")
+    ui = DialogSelectItems([{"name":"fff"}, {"name":"jjj"}], "title", "single")
     ui.show()
     sys.exit(app.exec_())
 
