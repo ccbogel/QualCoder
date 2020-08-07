@@ -140,8 +140,11 @@ class App(object):
         self.version = qualcoder_version
 
     def read_previous_project_paths(self):
-        """ Recent project path is stored in .qualcoder/recent_projects.txt
-        Also remove paths that no longer exist. """
+        """ Recent project paths are stored in .qualcoder/recent_projects.txt
+        Remove paths that no longer exist.
+        Moving from only listing the previous project path to: date opened | previous project path.
+        Write a new file in order of most recent opened to older and without duplicate projects.
+        """
 
         previous = []
         try:
@@ -149,32 +152,76 @@ class App(object):
                 for line in f:
                     previous.append(line.strip())
         except:
-            logger.debug('No previous projects found')
+            logger.information('No previous projects found')
 
-        # check and remove paths that no longer exist
-        result = []
+        # Add paths that exist
+        interim_result = []
         for p in previous:
-            if os.path.exists(p):
-                if p not in result:
-                    result.append(p)
-        if previous != result:
-            with open(self.persist_path, 'w') as f:
-                for i, line in enumerate((result)):
-                    f.write(line)
-                    f.write(os.linesep)
-                    if i > 8:
-                        break
+            splt = p.split("|")
+            proj_path = ""
+            if len(splt) == 1:
+                proj_path = splt[0]
+            if len(splt) == 2:
+                proj_path = splt[1]
+            if os.path.exists(proj_path):
+                interim_result.append(p)
+
+        # Remove duplicate project names, keep the most recent
+        interim_result.sort(reverse=True)
+        result = []
+        proj_paths = []
+        for i in interim_result:
+            splt = i.split("|")
+            proj_path = ""
+            if len(splt) == 1:
+                proj_path = splt[0]
+            if len(splt) == 2:
+                proj_path = splt[1]
+            if proj_path not in proj_paths:
+                proj_paths.append(proj_path)
+                result.append(i)
+
+        # Write the latest projects file in order of most recently opened and without duplicate projects
+        with open(self.persist_path, 'w') as f:
+            for i, line in enumerate(result):
+                f.write(line)
+                f.write(os.linesep)
+                if i > 8:
+                    break
         return result
 
     def append_recent_project(self, path):
         """ Add project path as first entry to .qualcoder/recent_projects.txt
         """
 
+        if path == "":
+            return
+        nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         result = self.read_previous_project_paths()
-        if not result or path != result[0]:
-            result.append(path)
+        dated_path = nowdate + "|" + path
+        #print("TEST: PROJ PATH", path)
+        #print("DATED:", dated_path)
+        #print("RESULT:", result)  # tmp
+        if result == []:
+            print("Writing to", self.persist_path)
             with open(self.persist_path, 'w') as f:
-                for i, line in enumerate(reversed(result)):
+                f.write(dated_path)
+                f.write(os.linesep)
+            return
+
+        proj_path = ""
+        splt = result[0].split("|")
+        #print("SPLT:", splt)
+        if len(splt) == 1:
+            proj_path = splt[0]
+        if len(splt) == 2:
+            proj_path = splt[1]
+        #print("PATH:", path, "PPATH:", proj_path)  # tmp
+        if path != proj_path:
+            result.append(dated_path)
+            result.sort()
+            with open(self.persist_path, 'w') as f:
+                for i, line in enumerate(result):
                     f.write(line)
                     f.write(os.linesep)
                     if i > 8:
@@ -606,28 +653,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.menuOpen_Recent_Project.clear()
         #TODO must be a better way to do this
         for i, r in enumerate(self.recent_projects):
+            display_name = r
+            if len(r.split("|")) == 2:
+                display_name = r.split("|")[1]
             if i == 0:
-                action0 = QtWidgets.QAction(r, self)
+                action0 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action0)
                 action0.triggered.connect(self.project0)
             if i == 1:
-                action1 = QtWidgets.QAction(r, self)
+                action1 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action1)
                 action1.triggered.connect(self.project1)
             if i == 2:
-                action2 = QtWidgets.QAction(r, self)
+                action2 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action2)
                 action2.triggered.connect(self.project2)
             if i == 3:
-                action3 = QtWidgets.QAction(r, self)
+                action3 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action3)
                 action3.triggered.connect(self.project3)
             if i == 4:
-                action4 = QtWidgets.QAction(r, self)
+                action4 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action4)
                 action4.triggered.connect(self.project4)
             if i == 5:
-                action5 = QtWidgets.QAction(r, self)
+                action5 = QtWidgets.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action5)
                 action5.triggered.connect(self.project5)
 
@@ -989,7 +1039,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the QDPX file.")
         mb = QtWidgets.QMessageBox()
         mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('RQDA import steps'))
+        mb.setWindowTitle(_('REFI-QDA import steps'))
         mb.setText(msg)
         mb.exec_()
         self.new_project()
@@ -1188,15 +1238,23 @@ class MainWindow(QtWidgets.QMainWindow):
         if path == "" or path is False:
             return
         msg = ""
-        if len(path) > 3 and path[-4:] == ".qda":
+        # New path variable from recent_projects.txt contains time | path
+        # Older variable only listed the project path
+        splt = path.split("|")
+        proj_path = ""
+        if len(splt) == 1:
+            proj_path = splt[0]
+        if len(splt) == 2:
+            proj_path = splt[1]
+        if len(path) > 3 and proj_path[-4:] == ".qda":
             try:
-                self.app.create_connection(path)
+                self.app.create_connection(proj_path)
             except Exception as e:
                 self.app.conn = None
                 msg += " " + str(e)
                 logger.debug(msg)
         if self.app.conn is None:
-            msg += "\n" + path
+            msg += "\n" + proj_path
             QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
                 msg)
             self.app.project_path = ""
@@ -1497,7 +1555,13 @@ def gui():
     getlang.install()
     ex = MainWindow(qual_app)
     if project_path:
-        ex.open_project(path=project_path)
+        splt = project_path.split("|")
+        proj_path = ""
+        if len(splt) == 1:
+            proj_path = splt[0]
+        if len(splt) == 2:
+            proj_path = splt[1]
+        ex.open_project(path=proj_path)
     sys.exit(app.exec_())
 
 
