@@ -2342,13 +2342,13 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             self.add_speakername()
-        # Delete speaker name from list
+        # Delete speaker name(s) from list
         if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
-            self.delete_speakername()
+            self.delete_speakernames()
         return True
 
-    def delete_speakername(self):
+    def delete_speakernames(self):
         """ Delete speakername from list of shortcut names """
 
         if self.speaker_list == []:
@@ -2357,14 +2357,15 @@ class DialogViewAV(QtWidgets.QDialog):
         names = []
         for n in self.speaker_list:
             names.append({"name": n})
-        ui = DialogSelectItems(self.app, names, _("Select name to delete"), "single")
+        ui = DialogSelectItems(self.app, names, _("Select name to delete"), "many")
         ok = ui.exec_()
         if not ok:
             return
-        name = ui.get_selected()
-        if name == []:
+        names = ui.get_selected()
+        if names == []:
             return
-        self.speaker_list.remove(name['name'])
+        for name in names:
+            self.speaker_list.remove(name['name'])
         self.add_speaker_names_to_label()
 
     def add_speakername(self):
