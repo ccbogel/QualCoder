@@ -1227,8 +1227,6 @@ class MainWindow(QtWidgets.QMainWindow):
             newproject: yes or no  if yes then do not make an initial backup
         """
 
-        self.close_project()
-        self.setWindowTitle("QualCoder" + _("Open Project"))
         default_directory = self.app.settings['directory']
         if path == "" or path is False:
             if default_directory == "":
@@ -1237,6 +1235,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 _('Open project directory'), default_directory)
         if path == "" or path is False:
             return
+        self.close_project()
         msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
