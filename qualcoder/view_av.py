@@ -817,7 +817,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeav_w'] = self.size().width()
         self.app.settings['dialogcodeav_h'] = self.size().height()
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.media_data['mediapath'] is not None and  self.media_data['mediapath'][0:7] != "/audio/":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
