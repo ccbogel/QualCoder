@@ -985,10 +985,32 @@ class DialogCodeAV(QtWidgets.QDialog):
         key = event.key()
         mods = event.modifiers()
         #print("KEY ", key, "MODS ", mods)
-        #  ctrl + s or ctrl + p pause/play toggle
+        #  ctrl S or ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 3 seconds ctrl + r
+        # Advance 30 seconds Alt F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
+            time_msecs = self.mediaplayer.get_time() + 30000
+            if time_msecs > self.media.get_duration():
+                time_msecs = self.media.get_duration() - 1
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.update_ui()
+        # Rewind 30 seconds Alt R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+            time_msecs = self.mediaplayer.get_time() - 30000
+            if time_msecs < 0:
+                time_msecs = 0
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.update_ui()
+        # Rewind 3 seconds ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
@@ -2184,7 +2206,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_speakers.setVisible(False)
                 self.ui.label_transcription.setToolTip("")
             else:
-                self.ui.label_memo.setText(_("Transcription area: ctrl+r ctrl+s ctrl+t ctrl+n ctrl+1-8 ctrl+d"))
+                self.ui.label_memo.setText(_("Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
@@ -2318,10 +2340,21 @@ class DialogViewAV(QtWidgets.QDialog):
         key = event.key()
         mods = event.modifiers()
         #print("KEY ", key, "MODS ", mods)
-        #  ctrl s or ctrl p pause/play toggle
+        #  ctrl S or ctrl P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 3 seconds   Ctrl r
+        # Rewind 30 seconds Alt R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+            time_msecs = self.mediaplayer.get_time() - 30000
+            if time_msecs < 0:
+                time_msecs = 0
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.update_ui()
+        # Rewind 3 seconds   Ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
@@ -2332,7 +2365,18 @@ class DialogViewAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        #  Insert  timestamp Ctrl t
+        # Advance 30 seconds Alt F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
+            time_msecs = self.mediaplayer.get_time() + 30000
+            if time_msecs > self.media.get_duration():
+                time_msecs = self.media.get_duration() - 1
+            pos = time_msecs / self.mediaplayer.get_media().get_duration()
+            self.mediaplayer.set_position(pos)
+            # Update timer display
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.update_ui()
+        #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
         # Insert speaker  Ctrl 1 .. 8
