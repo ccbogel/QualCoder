@@ -99,14 +99,14 @@ Required:
 
 
 ## Future plans
-* Improve packaging for easier installation: currently investigating use of pyinstaller - without much success
-* make use of the xlrd python package to import surveys from Microsoft Excel
+* Improve packaging for easier installation: currently investigating use of pyinstaller - without success.
 * Change from pdfminer.six to pdfminer3
-* Import survey from Excel xlxs
+* Look at RQDA Relation function and Profile matrix function.
+* Possibly look at use with R.
 * Reports:
         Word count report maybe
-* Text mining - maybe ?
-    * word cloud, word visualisations
+* Text mining - maybe 
+    * word cloud, word visualisations - maybe
 * General
     * Translations for GUI.
 
