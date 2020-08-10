@@ -2,7 +2,7 @@ SOURCES         = ui_dialog_add_item.py \
 ui_dialog_assign_attribute.py \
 ui_dialog_attribute_type.py \
 ui_dialog_cases.py \
-ui_dialog_case_file_manager.py \
+ui_case_file_manager.py \
 ui_dialog_code_av.py \
 ui_dialog_code_image.py \
 ui_dialog_code_text.py \
@@ -27,10 +27,10 @@ ui_dialog_view_image.py \
 ui_main.py \
 ui_queryDetails.py \
 ui_report_attribute_parameters.py \
-ui_visualise_graph.py \
-ui_visualise_graph.original.py
+ui_visualise_graph_original.py
 TRANSLATIONS    = app_de.ts \
-                  app_fr.ts
+                  app_es.ts \
+                  app_fr.ts 
 CODECFORTR      = ISO-8859-5
 
 
