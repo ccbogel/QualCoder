@@ -152,7 +152,7 @@ class App(object):
                 for line in f:
                     previous.append(line.strip())
         except:
-            logger.information('No previous projects found')
+            logger.info('No previous projects found')
 
         # Add paths that exist
         interim_result = []
