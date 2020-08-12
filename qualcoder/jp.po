@@ -1,0 +1,1783 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-12 14:46+1000\n"
+"PO-Revision-Date: 2020-08-13 08:32+1000\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.3\n"
+
+#: add_attribute.py:46 add_item_name.py:46
+msgid "Uncaught exception"
+msgstr "獲れない例外"
+
+#: add_attribute.py:47 add_item_name.py:47 attributes.py:53
+#: case_file_manager.py:63 cases.py:64 code_text.py:65 codebook.py:47
+#: color_selector.py:49 confirm_delete.py:46 dialog_sql.py:52
+#: import_survey.py:61 information.py:47 journals.py:54 manage_files.py:91
+#: memo.py:47 qualcoder.py:108 report_attributes.py:49 reports.py:62
+#: select_items.py:47 settings.py:48 text_mining.py:55 view_av.py:87
+#: view_graph_original.py:58 view_image.py:63
+msgid "Uncaught Exception"
+msgstr "獲れない例外"
+
+#: add_attribute.py:89 add_item_name.py:89
+msgid "Duplicated"
+msgstr "重複"
+
+#: add_attribute.py:89 add_item_name.py:89
+msgid "This already exists"
+msgstr "これはすでに存在している"
+
+#: attributes.py:52 code_text.py:62
+msgid "Uncaught exception:"
+msgstr "獲れない例外"
+
+#: attributes.py:115 attributes.py:249 qualcoder.py:1384 reports.py:1390
+#: reports.py:2094
+msgid "Attributes: "
+msgstr "属性のこと。"
+
+#: attributes.py:162
+msgid "Attribute added: "
+msgstr "属性追加"
+
+#: attributes.py:162 attributes.py:240
+msgid " to "
+msgstr "にとって"
+
+#: attributes.py:182
+msgid "Attribute deleted: "
+msgstr "属性削除"
+
+#: attributes.py:194
+msgid "Attributes deleted: "
+msgstr "属性削除"
+
+#: attributes.py:204
+msgid "Memo for Attribute "
+msgstr "属性用メモ"
+
+#: attributes.py:216 attributes.py:254 cases.py:463 cases.py:495
+#: code_text.py:250 code_text.py:263 code_text.py:287 code_text.py:304
+#: code_text.py:322 code_text.py:984 code_text.py:1007 manage_files.py:304
+#: manage_files.py:1336 reports.py:913 reports.py:926 reports.py:989
+#: view_av.py:315 view_av.py:387 view_av.py:1265 view_av.py:1289
+#: view_image.py:194 view_image.py:539 view_image.py:549 view_image.py:867
+#: view_image.py:891
+msgid "Memo"
+msgstr "メモ"
+
+#: attributes.py:240
+msgid "Attribute renamed from: "
+msgstr "属性の名前を変更しました。"
+
+#: attributes.py:254 code_text.py:250 manage_files.py:304 reports.py:913
+#: view_av.py:315 view_image.py:194
+msgid "Name"
+msgstr "名前"
+
+#: attributes.py:254
+msgid "Assigned to"
+msgstr "配属先"
+
+#: attributes.py:254
+msgid "Type"
+msgstr "タイプ"
+
+#: attributes.py:266 case_file_manager.py:277
+msgid "Yes"
+msgstr "嗟乎"
+
+#: case_file_manager.py:62 cases.py:61 codebook.py:46 color_selector.py:48
+#: confirm_delete.py:45 dialog_sql.py:51 import_survey.py:58 information.py:46
+#: journals.py:51 manage_files.py:88 memo.py:46 report_attributes.py:46
+#: reports.py:61 select_items.py:46 settings.py:47 text_mining.py:54
+#: view_av.py:84 view_graph_original.py:55 view_image.py:60
+msgid "Uncaught exception: "
+msgstr "獲れない例外 "
+
+#: case_file_manager.py:107 reports.py:1975
+msgid "Case: "
+msgstr "ケース"
+
+#: case_file_manager.py:146
+msgid "Files linked: "
+msgstr "ファイルがリンクしています。"
+
+#: case_file_manager.py:154
+msgid "Add files to case"
+msgstr "ケースにファイルを追加"
+
+#: case_file_manager.py:155
+msgid "Remove files from case"
+msgstr "ケースからファイルを削除"
+
+#: case_file_manager.py:184 case_file_manager.py:588
+msgid "File added to case"
+msgstr "ケースに追加されたファイル"
+
+#: case_file_manager.py:210
+msgid "This file has already been linked to this case "
+msgstr "このファイルはすでにこの事件にリンクされています "
+
+#: case_file_manager.py:217
+msgid " added to case."
+msgstr " をケースに追加しました。"
+
+#: case_file_manager.py:310
+msgid "Displayed file: "
+msgstr "ファイルを表示しています。"
+
+#: case_file_manager.py:362 cases.py:668 dialog_sql.py:350 manage_files.py:553
+#: manage_files.py:578
+msgid "Select all"
+msgstr "すべて選択"
+
+#: case_file_manager.py:364 code_text.py:473 view_av.py:1463
+msgid "Mark"
+msgstr "マーク"
+
+#: case_file_manager.py:366 cases.py:669 dialog_sql.py:351 manage_files.py:554
+#: manage_files.py:579
+msgid "Copy"
+msgstr "コピー"
+
+#: case_file_manager.py:369 code_text.py:467 view_av.py:1457 view_image.py:540
+#: view_image.py:552
+msgid "Unmark"
+msgstr "アンマーク"
+
+#: case_file_manager.py:466
+msgid "Already Linked"
+msgstr "すでにリンクされている"
+
+#: case_file_manager.py:467
+msgid "This segment has already been linked to this case"
+msgstr "このセグメントは、すでに今回のケースとリンクしています。"
+
+#: case_file_manager.py:535 code_text.py:1326 code_text.py:1330
+#: code_text.py:1412 code_text.py:1472 import_survey.py:182 journals.py:319
+#: journals.py:328 manage_files.py:1048 manage_files.py:1070
+#: manage_files.py:1074 manage_files.py:1079 report_attributes.py:160
+#: report_attributes.py:169 report_attributes.py:177 report_attributes.py:190
+#: view_av.py:1661 view_av.py:1669 view_av.py:1746
+msgid "Warning"
+msgstr "警告"
+
+#: case_file_manager.py:535
+msgid "Cannot have blank text marks"
+msgstr "空白のテキストマークを持つことはできません。"
+
+#: case_file_manager.py:537
+msgid "Auto assign text to case: "
+msgstr "テキストを大文字と小文字に自動で割り当てます。"
+
+#: case_file_manager.py:538
+msgid ""
+"\n"
+"Using "
+msgstr ""
+"\n"
+"を使用しています。"
+
+#: case_file_manager.py:538
+msgid " and "
+msgstr " そして "
+
+#: case_file_manager.py:538
+msgid ""
+"\n"
+"In files:\n"
+msgstr ""
+"\n"
+"ファイルの中に\n"
+
+#: case_file_manager.py:561
+msgid "Auto assign. Could not find an end mark: "
+msgstr "自動割り当て。エンドマークが見つかりませんでした。"
+
+#: case_file_manager.py:580
+msgid ""
+"\n"
+"Already assigned."
+msgstr ""
+"\n"
+"すでに割り当てられています。"
+
+#: case_file_manager.py:587
+msgid " sections found."
+msgstr " セクションが見つかりました。"
+
+#: cases.py:157 cases.py:480 qualcoder.py:1372 reports.py:1382
+msgid "Cases: "
+msgstr "ケース。"
+
+#: cases.py:230
+msgid "Attribute added to cases: "
+msgstr "ケースに属性を追加しました。"
+
+#: cases.py:230
+msgid "type: "
+msgstr "のタイプがあります。"
+
+#: cases.py:241
+msgid "Cases have already been created."
+msgstr "ケースはすでに作成済みです。"
+
+#: cases.py:242
+msgid "Select attributes file"
+msgstr "属性ファイルを選択"
+
+#: cases.py:247
+msgid "is not a .csv file. File not imported"
+msgstr "は .csv ファイルではありません。インポートされないファイル"
+
+#: cases.py:260
+msgid "Cannot import from csv, only one row in file"
+msgstr "csv からインポートできません。"
+
+#: cases.py:300
+msgid "attribute:"
+msgstr "属性を使用しています。"
+
+#: cases.py:315
+msgid "Cases and attributes imported from: "
+msgstr "からインポートされたケースと属性。"
+
+#: cases.py:326
+msgid "Case"
+msgstr "ケース。"
+
+#: cases.py:326
+msgid "Enter case name"
+msgstr "ケース名を入力してください。"
+
+#: cases.py:350
+msgid "Case added: "
+msgstr "ケースを追加しました。"
+
+#: cases.py:453
+msgid "Memo for case "
+msgstr "ケースのメモ "
+
+#: cases.py:493 cases.py:496
+msgid "Click to edit memo"
+msgstr "メモを編集するにはクリックしてください。"
+
+#: cases.py:507
+msgid "Click to manage files for this case"
+msgstr "このケースのファイルを管理するにはクリックしてください。"
+
+#: cases.py:534
+msgid "Viewing text of case: "
+msgstr "事件のテキストを見る "
+
+#: cases.py:558 reports.py:1973
+msgid "File: "
+msgstr "ファイルです。"
+
+#: cases.py:558
+msgid " Text: "
+msgstr " テキスト。"
+
+#: cases.py:576 view_image.py:322
+msgid "Image: "
+msgstr "イメージです。"
+
+#: cases.py:594
+msgid "AV media: "
+msgstr "AVメディア。"
+
+#: cases.py:643
+msgid "Open"
+msgstr "開く"
+
+#: code_text.py:196 view_image.py:435
+msgid "NO CODE SELECTED"
+msgstr "選択されたコードなし"
+
+#: code_text.py:250 manage_files.py:304 view_av.py:315 view_image.py:194
+msgid "Id"
+msgstr ""
+
+#: code_text.py:250 reports.py:913 view_av.py:315 view_image.py:194
+msgid "Count"
+msgstr "かぞえ"
+
+#: code_text.py:468 code_text.py:523 view_av.py:1458 view_av.py:1530
+msgid "Change start position"
+msgstr "開始位置の変更"
+
+#: code_text.py:469 code_text.py:530 view_av.py:1459 view_av.py:1537
+msgid "Change end position"
+msgstr "終了位置の変更"
+
+#: code_text.py:474 view_av.py:1464
+msgid "Annotate"
+msgstr "アノテーション"
+
+#: code_text.py:475 view_av.py:1465
+msgid "Copy to clipboard"
+msgstr "クリップボードにコピー"
+
+#: code_text.py:507 code_text.py:1384 view_av.py:1516
+msgid "Select code to unmark"
+msgstr "マークを解除するコードを選択"
+
+#: code_text.py:523 view_av.py:1530
+msgid ""
+"Change start character position.\n"
+"Positive or negative number:"
+msgstr ""
+"開始文字の位置を変更します。\n"
+"正または負の数を指定します。"
+
+#: code_text.py:530 view_av.py:1537
+msgid ""
+"Change end character position.\n"
+"Positive or negative number:"
+msgstr ""
+"終了文字の位置を変更します。\n"
+"正または負の数を指定します。"
+
+#: code_text.py:570 view_av.py:891 view_image.py:469
+msgid "Add a new code"
+msgstr "新しいコードの追加"
+
+#: code_text.py:571 view_av.py:892 view_image.py:470
+msgid "Add a new category"
+msgstr "新しいカテゴリを追加する"
+
+#: code_text.py:572 view_av.py:893 view_image.py:471
+msgid "Rename"
+msgstr "名前の変更"
+
+#: code_text.py:573 view_av.py:894 view_image.py:472
+msgid "View or edit memo"
+msgstr "メモの閲覧・編集"
+
+#: code_text.py:574 dialog_sql.py:353 manage_files.py:187 view_av.py:895
+#: view_image.py:473
+msgid "Delete"
+msgstr "削除"
+
+#: code_text.py:578 view_av.py:897 view_image.py:475
+msgid "Change code color"
+msgstr "コードの色を変更する"
+
+#: code_text.py:579
+msgid "Show coded text and media"
+msgstr "コード化されたテキストとメディアを表示"
+
+#: code_text.py:784 view_av.py:1118 view_image.py:720
+msgid "Merge code: "
+msgstr "コードをマージします。"
+
+#: code_text.py:784
+msgid " into code: "
+msgstr " をコードに変換します。"
+
+#: code_text.py:785 view_av.py:1120 view_image.py:722
+msgid "Merge codes"
+msgstr "マージコード"
+
+#: code_text.py:799
+msgid "Cannot merge codes, unmark overlapping text first. "
+msgstr ""
+"コードをマージすることはできません、最初に重複するテキストのマークを解除しま"
+"す。"
+
+#: code_text.py:800 view_av.py:1136
+msgid "Cannot merge"
+msgstr "マージできない"
+
+#: code_text.py:816 view_av.py:1149 view_image.py:750
+msgid "Add new code"
+msgstr "新しいコードの追加"
+
+#: code_text.py:816 view_image.py:750
+msgid "Code name"
+msgstr "コード名"
+
+#: code_text.py:833 view_image.py:763
+msgid "New code: "
+msgstr "新しいコードだ "
+
+#: code_text.py:884 view_av.py:1170 view_image.py:771
+msgid "Category"
+msgstr "カテゴリー"
+
+#: code_text.py:884 view_av.py:1170 view_image.py:771
+msgid "Category name"
+msgstr "カテゴリ名"
+
+#: code_text.py:898 view_image.py:785
+msgid "New category: "
+msgstr "新しいカテゴリーです。"
+
+#: code_text.py:921 codebook.py:183 reports.py:296 view_av.py:1207
+#: view_image.py:437 view_image.py:810
+msgid "Code: "
+msgstr "コードは？"
+
+#: code_text.py:934 view_av.py:1217 view_image.py:814
+msgid "Code deleted: "
+msgstr "コードを削除しました。"
+
+#: code_text.py:947 codebook.py:177 reports.py:293 view_av.py:1233
+#: view_image.py:836
+msgid "Category: "
+msgstr "カテゴリー。"
+
+#: code_text.py:959 view_av.py:1242 view_image.py:840
+msgid "Category deleted: "
+msgstr "カテゴリーを削除しました。"
+
+#: code_text.py:972
+msgid "Memo for Code: "
+msgstr "コードのメモ。"
+
+#: code_text.py:985
+msgid "Memo for code: "
+msgstr "コードのメモ。"
+
+#: code_text.py:995 view_image.py:884
+msgid "Memo for Category: "
+msgstr "カテゴリーのメモ。"
+
+#: code_text.py:1008
+msgid "Memo for category: "
+msgstr "カテゴリーのメモ。"
+
+#: code_text.py:1016 view_av.py:1304 view_image.py:906
+msgid "Rename code"
+msgstr "コード名の変更"
+
+#: code_text.py:1017 view_av.py:1304 view_image.py:906
+msgid "New code name:"
+msgstr "新しいコード名。"
+
+#: code_text.py:1023 view_av.py:1313 view_image.py:915
+msgid "Name in use"
+msgstr "使用中の名称"
+
+#: code_text.py:1024
+msgid " is already in use, choose another name."
+msgstr " が既に使用されている場合は、別の名前を選択してください。"
+
+#: code_text.py:1039
+msgid "Code renamed from: "
+msgstr "コード名を変更しました。"
+
+#: code_text.py:1039 code_text.py:1069
+msgid " to: "
+msgstr " にとって "
+
+#: code_text.py:1044 view_av.py:1334 view_image.py:940
+msgid "Rename category"
+msgstr "カテゴリ名の変更"
+
+#: code_text.py:1044 view_av.py:1334 view_image.py:940
+msgid "New category name:"
+msgstr "新しいカテゴリ名です。"
+
+#: code_text.py:1051
+msgid "This code name is already in use."
+msgstr "このコード名はすでに使用されています。"
+
+#: code_text.py:1052
+msgid "Duplicate code name"
+msgstr "コード名の重複"
+
+#: code_text.py:1069 view_image.py:969
+msgid "Category renamed from: "
+msgstr "カテゴリーを変更しました。"
+
+#: code_text.py:1125
+msgid "Code text: "
+msgstr "コードテキスト。"
+
+#: code_text.py:1290
+msgid "No overlapping codes"
+msgstr "重複コードなし"
+
+#: code_text.py:1295
+msgid "overlapping codes. Select to highlight."
+msgstr "コードが重複しています。選択してハイライトします。"
+
+#: code_text.py:1326 code_text.py:1412
+msgid "No file was selected"
+msgstr "ファイルが選択されていません"
+
+#: code_text.py:1330 code_text.py:1472 view_av.py:1670
+msgid "No code was selected"
+msgstr "コードが選択されていません"
+
+#: code_text.py:1352 view_av.py:1593 view_av.py:1695 view_av.py:2000
+msgid "Already Coded"
+msgstr "すでにコード化されている"
+
+#: code_text.py:1353 view_av.py:1594 view_av.py:1696
+msgid "This segment has already been coded with this code by "
+msgstr "このセグメントは、すでに "
+
+#: code_text.py:1435 view_av.py:1771
+msgid "Annotation: "
+msgstr "アノテーション。"
+
+#: code_text.py:1450 view_av.py:1786
+msgid "Annotation added at position: "
+msgstr "位置にアノテーションを追加しました。"
+
+#: code_text.py:1451 code_text.py:1462 view_av.py:1787 view_av.py:1797
+msgid " for: "
+msgstr " のために。"
+
+#: code_text.py:1461 view_av.py:1796
+msgid "Annotation removed from position "
+msgstr "アノテーションを位置から削除 "
+
+#: code_text.py:1480
+msgid "Automatic coding"
+msgstr "自動コーディング"
+
+#: code_text.py:1483
+msgid "Use | to code multiple texts"
+msgstr "使用方法 | 複数のテキストをコード化する"
+
+#: code_text.py:1484
+msgid "Autocode files with the current code for this text:"
+msgstr "このテキストの現在のコードを持つオートコードファイル。"
+
+#: code_text.py:1499 view_av.py:440 view_image.py:302
+msgid "Select file to view"
+msgstr "ファイルを選択して表示する"
+
+#: code_text.py:1535
+msgid "Automatic coding in files: "
+msgstr "ファイル内の自動コーディング。"
+
+#: code_text.py:1536
+msgid ". with text: "
+msgstr "テキストで。"
+
+#: codebook.py:158 journals.py:245 manage_files.py:1169 reports.py:262
+#: reports.py:318 reports.py:558
+msgid "Select directory to save file"
+msgstr "ファイルを保存するディレクトリを選択"
+
+#: codebook.py:162
+msgid "Codebook for "
+msgstr "コードブック "
+
+#: codebook.py:189
+msgid ", Owner: "
+msgstr "所有者です。"
+
+#: codebook.py:192 reports.py:1930 view_av.py:1938 view_av.py:2071
+msgid "Memo: "
+msgstr "メモ"
+
+#: codebook.py:203
+msgid "Codebook exported"
+msgstr "コードブックのエクスポート"
+
+#: codebook.py:207
+msgid "Codebook exported to "
+msgstr "にエクスポートされたコードブック "
+
+#: dialog_sql.py:168 journals.py:252 reports.py:269 reports.py:326
+#: reports.py:566 reports.py:1061 reports.py:1102 reports.py:1221
+#: reports.py:1261
+msgid "File exists"
+msgstr "ファイルが存在する"
+
+#: dialog_sql.py:169 journals.py:253 reports.py:270 reports.py:327
+#: reports.py:567 reports.py:1062 reports.py:1103 reports.py:1222
+#: reports.py:1262
+msgid "Overwrite?"
+msgstr "上書き？"
+
+#: dialog_sql.py:199
+msgid "SQL Results exported to: "
+msgstr "SQLの結果をエクスポートしました。"
+
+#: dialog_sql.py:200
+msgid "Query:"
+msgstr "クエリです。"
+
+#: dialog_sql.py:202 reports.py:581
+msgid "Text file export"
+msgstr "テキストファイルのエクスポート"
+
+#: dialog_sql.py:232
+msgid "Running query. Please wait."
+msgstr "クエリを実行中。お待ちください。"
+
+#: dialog_sql.py:247 dialog_sql.py:480
+msgid " rows"
+msgstr "列"
+
+#: dialog_sql.py:250
+msgid "Table created"
+msgstr "作成されたテーブル"
+
+#: dialog_sql.py:253
+msgid "Index created"
+msgstr "作成されたインデックス"
+
+#: dialog_sql.py:257
+msgid " rows deleted"
+msgstr " 削除された行"
+
+#: dialog_sql.py:261
+msgid " rows updated"
+msgstr " 行更新"
+
+#: dialog_sql.py:285
+msgid "Error"
+msgstr "エラー"
+
+#: dialog_sql.py:286
+msgid "SQL Error"
+msgstr "SQLエラー"
+
+#: dialog_sql.py:352
+msgid "Paste"
+msgstr "貼り付け"
+
+#: dialog_sql.py:409 dialog_sql.py:517
+msgid "Clear filter"
+msgstr "クリアフィルター"
+
+#: dialog_sql.py:411 dialog_sql.py:519
+msgid "Filter equals: "
+msgstr "フィルターイコール。"
+
+#: dialog_sql.py:413 dialog_sql.py:521
+msgid "Filter on text like"
+msgstr "のようなテキストにフィルタをかける"
+
+#: dialog_sql.py:415 dialog_sql.py:523
+msgid "Filter on text starts with"
+msgstr "で始まるテキストのフィルタ"
+
+#: dialog_sql.py:417 dialog_sql.py:525
+msgid "Sort ascending"
+msgstr "昇順ソート"
+
+#: dialog_sql.py:419 dialog_sql.py:527
+msgid "Sort descending"
+msgstr "降順ソート"
+
+#: dialog_sql.py:430 dialog_sql.py:436
+msgid " rows ["
+msgstr ""
+
+#: dialog_sql.py:430
+msgid " asc]"
+msgstr " アスク]"
+
+#: dialog_sql.py:436
+msgid " desc]"
+msgstr " 下降]"
+
+#: dialog_sql.py:441 dialog_sql.py:454 dialog_sql.py:544 dialog_sql.py:555
+msgid "Text filter"
+msgstr "テキストフィルタ"
+
+#: dialog_sql.py:441 dialog_sql.py:454 dialog_sql.py:544 dialog_sql.py:555
+msgid "Text contains:"
+msgstr "テキストが含まれています。"
+
+#: dialog_sql.py:447 dialog_sql.py:460 dialog_sql.py:471
+msgid " rows [filtered]"
+msgstr " 行 [フィルタリング済み]"
+
+#: dialog_sql.py:462
+msgid " starts with: "
+msgstr " から始まります。"
+
+#: dialog_sql.py:472
+msgid " equals: "
+msgstr " イコールです。"
+
+#: import_survey.py:133 import_survey.py:238 import_survey.py:243
+msgid "Survey not imported."
+msgstr "調査は輸入されていません。"
+
+#: import_survey.py:143
+msgid ""
+"Please install the openpyxl module.\n"
+"sudo python3 -m pip install openpyxl OR\n"
+"python -m pip install openpyxl"
+msgstr ""
+"openpyxlモジュールをインストールしてください。\n"
+"sudo python3 -m pip install openpyxl ORn\n"
+"python -m pip install openpyxl"
+
+#: import_survey.py:178
+msgid "A column delimiter has not been set."
+msgstr "列の区切り文字が設定されていません。"
+
+#: import_survey.py:201 import_survey.py:202
+msgid "Row error: "
+msgstr "行エラーです。"
+
+#: import_survey.py:218
+msgid "Select survey file"
+msgstr "調査ファイルの選択"
+
+#: import_survey.py:220
+msgid "No file selected"
+msgstr "選択されたファイルはありません"
+
+#: import_survey.py:224
+msgid ""
+"is not a .csv or .xlsx file.\n"
+"File not imported"
+msgstr ""
+"は .csv または .xlsx ファイルではありません。\n"
+"ファイルがインポートされません"
+
+#: import_survey.py:226
+msgid "Survey not imported. Survey not a csv or xlsx file: "
+msgstr ""
+"アンケートがインポートされていません。調査は csv または xlsx ファイルではあり"
+"ません。"
+
+#: import_survey.py:246
+msgid "Importing from: "
+msgstr "からの輸入。"
+
+#: import_survey.py:287
+msgid ""
+"There are duplicated identifiers in the first column.\n"
+"File not imported"
+msgstr ""
+"最初の列に重複した識別子があります。\n"
+"ファイルがインポートされていません"
+
+#: import_survey.py:291
+msgid "Survey file: "
+msgstr "調査ファイル。"
+
+#: import_survey.py:292
+msgid "Fields: "
+msgstr "フィールド。"
+
+#: import_survey.py:293
+msgid "Rows: "
+msgstr "行。"
+
+#: import_survey.py:312
+msgid "Attribute name error"
+msgstr "属性名エラー"
+
+#: import_survey.py:315
+msgid "Survey Not Imported. Attribute duplicate name error: "
+msgstr "調査はインポートされていません。属性の名前が重複しています。"
+
+#: import_survey.py:327
+msgid ""
+"Number of fields does not match header\n"
+"Possible wrong quote format"
+msgstr ""
+"フィールド数がヘッダーと一致しません。\n"
+"間違った引用形式の可能性があります。"
+
+#: import_survey.py:328 import_survey.py:356 import_survey.py:363
+msgid "Survey not loaded: "
+msgstr "アンケートが読み込まれていません。"
+
+#: import_survey.py:332 import_survey.py:360
+msgid "Survey not loaded"
+msgstr "アンケートが読み込まれていません。"
+
+#: import_survey.py:355
+msgid ""
+" - Duplicate case names, either in the file, or duplicates with existing "
+"cases in the project"
+msgstr ""
+" - ファイル内のケース名の重複、またはプロジェクト内の既存のケースとの重複"
+
+#: import_survey.py:437 import_survey.py:442 import_survey.py:443
+msgid "Survey imported"
+msgstr "輸入された調査"
+
+#: import_survey.py:438
+msgid "Survey imported."
+msgstr "輸入された調査"
+
+#: import_survey.py:492
+msgid "Change fieldname"
+msgstr "フィールド名の変更"
+
+#: import_survey.py:495
+msgid "Change to Qualitative"
+msgstr "定性的なものへの変更"
+
+#: import_survey.py:498
+msgid "Change to Character"
+msgstr "キャラクターの変更"
+
+#: import_survey.py:526
+msgid "Change field name"
+msgstr "フィールド名の変更"
+
+#: import_survey.py:526
+msgid "New name:"
+msgstr "新しい名前だ"
+
+#: import_survey.py:532
+msgid ""
+"Name must contain only letters and numbers or '_' and must not start with a "
+"number"
+msgstr "名前は文字と数字、または'_'のみで、数字で始まってはいけません。"
+
+#: import_survey.py:536 import_survey.py:544
+msgid "Field name invalid."
+msgstr "フィールド名が無効です。"
+
+#: import_survey.py:545
+msgid " Already in use"
+msgstr " すでに使用されている"
+
+#: journals.py:107 journals.py:216 journals.py:291 qualcoder.py:1388
+msgid "Journals: "
+msgstr "ジャーナル。"
+
+#: journals.py:174
+msgid "Journal modified: "
+msgstr "ジャーナルが変更されました。"
+
+#: journals.py:183
+msgid "New Journal"
+msgstr "ニュージャーナル"
+
+#: journals.py:183
+msgid "Journal name"
+msgstr "ジャーナル名"
+
+#: journals.py:194 journals.py:338
+msgid "Warning - invalid characters"
+msgstr "警告 - 無効な文字"
+
+#: journals.py:195
+msgid "In the journal name use only: a-z, A-z 0-9 - space"
+msgstr "ジャーナル名では、a-z, A-z 0-9 - スペースのみを使用してください。"
+
+#: journals.py:210
+msgid "Journal created: "
+msgstr "ジャーナルを作成しました。"
+
+#: journals.py:262
+msgid "Journal exported to: "
+msgstr "ジャーナルをエクスポートしました。"
+
+#: journals.py:266
+msgid "Journal export"
+msgstr "ジャーナルのエクスポート"
+
+#: journals.py:290
+msgid "Journal deleted: "
+msgstr "ジャーナルは削除されました。"
+
+#: journals.py:300
+msgid "Journal: "
+msgstr "ジャーナル。"
+
+#: journals.py:303
+msgid "No journal selected"
+msgstr "選択されたジャーナルはありません"
+
+#: journals.py:320
+msgid "No name was entered"
+msgstr "名前の入力はありませんでした。"
+
+#: journals.py:329
+msgid "Journal name in use"
+msgstr "使用中のジャーナル名"
+
+#: journals.py:339
+msgid "In the jornal name use only: a-z, A-z 0-9 - space"
+msgstr "ジャーナル名では、a-z, A-z 0-9 - スペースのみを使用してください。"
+
+#: journals.py:349
+msgid "Journal name changed: "
+msgstr "ジャーナル名を変更しました。"
+
+#: manage_files.py:61 manage_files.py:897
+msgid "pdfminer is not installed."
+msgstr "pdfminerがインストールされていません。"
+
+#: manage_files.py:172
+msgid "View"
+msgstr "ビュー"
+
+#: manage_files.py:180
+msgid "Alphabetic order"
+msgstr "アルファベット順"
+
+#: manage_files.py:181
+msgid "Date order"
+msgstr "日付順"
+
+#: manage_files.py:182
+msgid "File type order"
+msgstr "ファイル型順"
+
+#: manage_files.py:184
+msgid "Show this value"
+msgstr "この値を表示する"
+
+#: manage_files.py:185
+msgid "Order by attribute"
+msgstr "属性順"
+
+#: manage_files.py:186
+msgid "Export"
+msgstr "輸出"
+
+#: manage_files.py:190
+msgid "Show all rows"
+msgstr "すべての行を表示"
+
+#: manage_files.py:304
+msgid "Date"
+msgstr "日付"
+
+#: manage_files.py:354
+msgid "Attribute added to files: "
+msgstr "ファイルに属性を追加しました。"
+
+#: manage_files.py:354
+msgid "type"
+msgstr "タイプ"
+
+#: manage_files.py:376 manage_files.py:384
+msgid "Memo for file "
+msgstr "ファイル用メモ "
+
+#: manage_files.py:516
+msgid "View file: "
+msgstr "ファイルを見る。"
+
+#: manage_files.py:577
+msgid "Edit text maximum 20 characters"
+msgstr "テキストの編集 最大20文字"
+
+#: manage_files.py:616
+msgid ""
+"Please select text that does not have a combination of coded and uncoded "
+"text."
+msgstr ""
+"符号化されたテキストと符号化されていないテキストの組み合わせがないテキストを"
+"選択してください。"
+
+#: manage_files.py:617
+msgid " Nor a combination of annotated and un-annotated text.\n"
+msgstr " また、注釈付きテキストと注釈なしテキストの組み合わせも。\n"
+
+#: manage_files.py:620
+msgid "Selection start: "
+msgstr "セレクション開始。"
+
+#: manage_files.py:620
+msgid " Selection end: "
+msgstr " 選択終了。"
+
+#: manage_files.py:627
+msgid "Code crossover: "
+msgstr "コード・クロスオーバー "
+
+#: manage_files.py:631
+msgid "Codes cross over text"
+msgstr "コードはテキストの上を横切る"
+
+#: manage_files.py:644
+msgid "Annotation crossover: "
+msgstr "アノテーションのクロスオーバー。"
+
+#: manage_files.py:648
+msgid "Annotations cross over text"
+msgstr "アノテーションがテキストにまたがる"
+
+#: manage_files.py:678
+msgid "Can only edit small selections of text, up to 20 characters in length."
+msgstr ""
+"テキストの小さな選択部分のみを編集でき、最大20文字の長さまで編集できます。"
+
+#: manage_files.py:679
+msgid " characters"
+msgstr " 登場人物"
+
+#: manage_files.py:679
+msgid "You selected "
+msgstr "あなたが選択したのは "
+
+#: manage_files.py:683
+msgid "Too much text selected"
+msgstr "選択されたテキストが多すぎる"
+
+#: manage_files.py:693
+msgid "Edit text: start"
+msgstr "テキストの編集：開始"
+
+#: manage_files.py:693
+msgid " end:"
+msgstr " で終了します。"
+
+#: manage_files.py:829
+msgid "New File"
+msgstr " 新規ファイル"
+
+#: manage_files.py:829
+msgid "Enter file name"
+msgstr "ファイル名を入力"
+
+#: manage_files.py:834
+msgid "Creating a new file: "
+msgstr "新規ファイルを作成します。"
+
+#: manage_files.py:859
+msgid "File created: "
+msgstr "ファイルを作成しました。"
+
+#: manage_files.py:875
+msgid "Open file"
+msgstr "ファイルを開く"
+
+#: manage_files.py:910
+msgid "If import error occurs"
+msgstr "インポートエラーが発生した場合"
+
+#: manage_files.py:911
+msgid ""
+"Sometimes pdfs are encrypted, download and decrypt using qpdf before trying "
+"to load the pdf"
+msgstr ""
+"時々pdfが暗号化されていることがありますが、pdfをロードしようとする前にqpdfを"
+"ダウンロードして復号化してください。"
+
+#: manage_files.py:933
+msgid "Unknown file type"
+msgstr "不明なファイルタイプ"
+
+#: manage_files.py:934
+msgid "Unknown file type for import"
+msgstr "インポートのための不明なファイルタイプ"
+
+#: manage_files.py:946 manage_files.py:1086
+msgid "Duplicate file"
+msgstr "重複ファイル"
+
+#: manage_files.py:946 manage_files.py:1087
+msgid ""
+"Duplicate filename.\n"
+"File not imported"
+msgstr ""
+"ファイル名が重複しています。\n"
+"ファイルがインポートされていません"
+
+#: manage_files.py:957 manage_files.py:983 manage_files.py:1110
+msgid " imported."
+msgstr "舶来"
+
+#: manage_files.py:1048 manage_files.py:1075 manage_files.py:1076
+msgid " lines not imported"
+msgstr " 取り込まれない行"
+
+#: manage_files.py:1071 manage_files.py:1080
+msgid "Cannot import "
+msgstr "インポートできない "
+
+#: manage_files.py:1174 manage_files.py:1183
+msgid "Export to "
+msgstr "へのエクスポート "
+
+#: manage_files.py:1177
+msgid "Export files"
+msgstr "ファイルのエクスポート"
+
+#: manage_files.py:1225
+msgid "Files Exported"
+msgstr "エクスポートされたファイル"
+
+#: manage_files.py:1228
+msgid " exported to "
+msgstr " エクスポート "
+
+#: manage_files.py:1257 manage_files.py:1280
+msgid "Deleting file error: "
+msgstr "  ファイルの削除エラー。"
+
+#: manage_files.py:1289
+msgid "Deleted file: "
+msgstr "ファイルを削除しました。"
+
+#: manage_files.py:1316 qualcoder.py:1368 reports.py:1377
+msgid "Files: "
+msgstr "ファイルです。"
+
+#: qualcoder.py:105
+msgid "Uncaught exception : "
+msgstr "捕まえられなかった例外 . "
+
+#: qualcoder.py:771
+msgid "Settings"
+msgstr "設定"
+
+#: qualcoder.py:773
+msgid "Coder"
+msgstr "コーダー"
+
+#: qualcoder.py:774
+msgid "Font"
+msgstr "フォント"
+
+#: qualcoder.py:775
+msgid "Tree font size"
+msgstr "ツリーのフォントサイズ"
+
+#: qualcoder.py:776
+msgid "Working directory"
+msgstr "作業ディレクトリ"
+
+#: qualcoder.py:777
+msgid "Show IDs"
+msgstr "IDを表示"
+
+#: qualcoder.py:778
+msgid "Language"
+msgstr "言語"
+
+#: qualcoder.py:779
+msgid "Timestamp format"
+msgstr "タイムスタンプ形式"
+
+#: qualcoder.py:780
+msgid "Speaker name format"
+msgstr "講演者名のフォーマット"
+
+#: qualcoder.py:781
+msgid "Backup on open"
+msgstr "オープン時のバックアップ"
+
+#: qualcoder.py:782
+msgid "Backup AV files"
+msgstr "AVファイルのバックアップ"
+
+#: qualcoder.py:784 qualcoder.py:1390
+msgid "Directory (folder) paths / represents \\"
+msgstr "ディレクトリ(フォルダ)パス/表す \\"
+
+#: qualcoder.py:1037
+msgid "IMPORTING REFI-QDA PROJECT"
+msgstr "REFI-QDAプロジェクトのインポート"
+
+#: qualcoder.py:1039
+msgid ""
+"Step 1: You will be asked for a new QualCoder project name.\n"
+"Step 2: You will be asked for the QDPX file."
+msgstr ""
+"ステップ1: 新しいQualCoderプロジェクト名の入力を求められます。\n"
+"ステップ2: QDPXファイルを要求されます。"
+
+#: qualcoder.py:1042
+msgid "REFI-QDA import steps"
+msgstr "REFI-QDAインポートステップ"
+
+#: qualcoder.py:1063
+msgid "IMPORTING RQDA PROJECT"
+msgstr "RQDAプロジェクトのインポート"
+
+#: qualcoder.py:1064
+msgid ""
+"Step 1: You will be asked for a new QualCoder project name.\n"
+"Step 2: You will be asked for the RQDA file."
+msgstr ""
+"ステップ1: 新しいQualCoderプロジェクト名の入力を求められます。\n"
+"ステップ2: RQDAファイルの提出を求められます。"
+
+#: qualcoder.py:1067
+msgid "RQDA import steps"
+msgstr "RQDAインポートステップ"
+
+#: qualcoder.py:1075
+msgid "Project creation"
+msgstr "プロジェクトの作成"
+
+#: qualcoder.py:1076
+msgid "Project not successfully created"
+msgstr "プロジェクトが正常に作成されません"
+
+#: qualcoder.py:1091
+msgid "Are you sure you want to quit?"
+msgstr "本当に辞めたいのか？"
+
+#: qualcoder.py:1125
+msgid "Enter project name"
+msgstr "プロジェクト名を入力"
+
+#: qualcoder.py:1127 qualcoder.py:1139
+msgid "Project"
+msgstr "プロジェクト"
+
+#: qualcoder.py:1127
+msgid "No project created."
+msgstr "プロジェクトは作成されていません。"
+
+#: qualcoder.py:1138
+msgid "Project creation error "
+msgstr "プロジェクト作成エラー "
+
+#: qualcoder.py:1139
+msgid "No project created. Exiting. "
+msgstr "プロジェクトが作成されていません。終了します。"
+
+#: qualcoder.py:1162
+msgid "New project: "
+msgstr "新しいプロジェクト。"
+
+#: qualcoder.py:1162
+msgid " created."
+msgstr " を作成しました。"
+
+#: qualcoder.py:1164
+msgid "Opening: "
+msgstr "オープニング。"
+
+#: qualcoder.py:1174
+msgid "New Project Created"
+msgstr "新規プロジェクト作成"
+
+#: qualcoder.py:1175
+msgid "DB Version:"
+msgstr "DBのバージョン。"
+
+#: qualcoder.py:1176 reports.py:279 reports.py:574
+msgid "Date: "
+msgstr "日付。"
+
+#: qualcoder.py:1177
+msgid "About: "
+msgstr "についてです。"
+
+#: qualcoder.py:1178
+msgid "Coder:"
+msgstr "コーダーだ"
+
+#: qualcoder.py:1181
+msgid "Problem creating database "
+msgstr "データベースの作成に問題がある "
+
+#: qualcoder.py:1207
+msgid "Memo for project "
+msgstr "プロジェクトのメモ "
+
+#: qualcoder.py:1214
+msgid "Project memo entered."
+msgstr "プロジェクトメモを入力しました。"
+
+#: qualcoder.py:1235
+msgid "Open project directory"
+msgstr "プロジェクトディレクトリを開く"
+
+#: qualcoder.py:1257
+msgid "Cannot open file"
+msgstr "ファイルを開けない"
+
+#: qualcoder.py:1271
+msgid "Default coder name changed to: "
+msgstr "デフォルトのコーダー名を変更しました。"
+
+#: qualcoder.py:1307
+msgid "Project Opened: "
+msgstr "プロジェクトがオープンしました。"
+
+#: qualcoder.py:1327
+msgid "There is already a backup with this name"
+msgstr "すでにこの名前のバックアップがあります"
+
+#: qualcoder.py:1334
+msgid "WARNING: audio and video files NOT backed up. See settings."
+msgstr ""
+"警告: オーディオおよびビデオファイルはバックアップされていません。設定を参照"
+"してください。"
+
+#: qualcoder.py:1335
+msgid "Project backup created: "
+msgstr "プロジェクトのバックアップが作成されました。"
+
+#: qualcoder.py:1354
+msgid "PROJECT SUMMARY"
+msgstr "プロジェクト概要"
+
+#: qualcoder.py:1356
+msgid "Date time now: "
+msgstr "今の日付の時間。"
+
+#: qualcoder.py:1358
+msgid "Project path: "
+msgstr "プロジェクトパス。"
+
+#: qualcoder.py:1360
+msgid "Project date: "
+msgstr "プロジェクトの日付。"
+
+#: qualcoder.py:1364
+msgid "Project memo: "
+msgstr "プロジェクトメモ。"
+
+#: qualcoder.py:1376
+msgid "Code categories: "
+msgstr "コードカテゴリ。"
+
+#: qualcoder.py:1380 reports.py:1372 reports.py:1453
+msgid "Codes: "
+msgstr "コード。"
+
+#: qualcoder.py:1458
+msgid "Deleting: "
+msgstr "削除します。"
+
+#: qualcoder.py:1511
+msgid "This version: "
+msgstr "このバージョン。"
+
+#: qualcoder.py:1515
+msgid "Newer release available: "
+msgstr "新しいリリースがあります。"
+
+#: qualcoder.py:1520
+msgid "Latest Release: "
+msgstr "最新のリリースです。"
+
+#: report_attributes.py:161
+msgid "No operator was selected"
+msgstr "演算子は選択されていません"
+
+#: report_attributes.py:170
+msgid "Too many values given for this operator"
+msgstr "この演算子に与えられた値が多すぎる"
+
+#: report_attributes.py:178
+msgid "Need 2 values for between"
+msgstr "間に2つの値が必要"
+
+#: report_attributes.py:191
+msgid " is not a number"
+msgstr " は数ではない"
+
+#: reports.py:121 reports.py:2122
+msgid "Select files to view"
+msgstr "表示するファイルを選択"
+
+#: reports.py:123 reports.py:2124
+msgid "Files selected: "
+msgstr "ファイルを選択しました。"
+
+#: reports.py:277
+msgid "Code frequencies"
+msgstr "コード周波数"
+
+#: reports.py:297
+msgid ", Frequency: "
+msgstr ", 周波数. "
+
+#: reports.py:305
+msgid "Text file Export"
+msgstr "テキストファイルのエクスポート"
+
+#: reports.py:306 reports.py:357
+msgid " exported"
+msgstr " ゆしゅつ"
+
+#: reports.py:309
+msgid "Coding frequencies text file exported to: "
+msgstr "符号化頻度のテキストファイルをエクスポートしました。"
+
+#: reports.py:333 reports.py:371 reports.py:713
+msgid "Code Tree"
+msgstr "コードツリー"
+
+#: reports.py:356
+msgid "Csv file Export"
+msgstr " Csvファイルのエクスポート"
+
+#: reports.py:360
+msgid "Coding frequencies csv file exported to: "
+msgstr "符号化頻度のcsvファイルをエクスポートしました。"
+
+#: reports.py:538
+msgid "Coders: None selected"
+msgstr "コーダー。選択されていません"
+
+#: reports.py:577
+msgid "Coder comparisons report exported to "
+msgstr "コーダー比較レポートを "
+
+#: reports.py:582
+msgid "Coder comparison text file exported to: "
+msgstr "コーダー比較テキストファイルをエクスポートしました。"
+
+#: reports.py:591
+msgid "CODER COMPARISON"
+msgstr "コーダ比較"
+
+#: reports.py:591
+msgid "Selected coders: "
+msgstr "選ばれたコーダー。"
+
+#: reports.py:607
+msgid "agreement: "
+msgstr "に同意しています。"
+
+#: reports.py:608
+msgid ", dual coded: "
+msgstr "デュアルコード化されています。"
+
+#: reports.py:609
+msgid ", uncoded: "
+msgstr "は、コード化されていません。"
+
+#: reports.py:610
+msgid ", disagreement: "
+msgstr "意見の相違 "
+
+#: reports.py:702
+msgid "ZeroDivisionError. unique_codings:"
+msgstr "ゼロ除算エラー。"
+
+#: reports.py:1049
+msgid "Save text file"
+msgstr "テキストファイルの保存"
+
+#: reports.py:1075 reports.py:1112
+msgid "Report exported: "
+msgstr "レポートをエクスポートしました。"
+
+#: reports.py:1079 reports.py:1116 reports.py:1236 reports.py:1346
+msgid "Report exported"
+msgstr "エクスポートされたレポート"
+
+#: reports.py:1090
+msgid "Save Open Document Text file"
+msgstr "開いている文書のテキストファイルを保存"
+
+#: reports.py:1209
+msgid "Save CSV file"
+msgstr "CSVファイルの保存"
+
+#: reports.py:1249
+msgid "Save html file"
+msgstr "htmlファイルの保存"
+
+#: reports.py:1286
+msgid "html folder creation error "
+msgstr "htmlフォルダ作成エラー "
+
+#: reports.py:1287
+msgid "Folder creation"
+msgstr "フォルダ作成"
+
+#: reports.py:1287
+msgid " error"
+msgstr " 誤り"
+
+#: reports.py:1294
+msgid "html file reading error:"
+msgstr "htmlファイルの読み込みエラー。"
+
+#: reports.py:1335
+msgid "HTML file creation exception"
+msgstr "ＨＴＭＬファイル作成例外"
+
+#: reports.py:1339
+msgid "Report exported to: "
+msgstr "レポートをエクスポートしました。"
+
+#: reports.py:1341
+msgid "Media folder: "
+msgstr "メディアフォルダ。"
+
+#: reports.py:1427
+msgid "No codes"
+msgstr "コードなし"
+
+#: reports.py:1428
+msgid "No codes have been selected."
+msgstr "コードが選択されていません。"
+
+#: reports.py:1436
+msgid "Nothing selected"
+msgstr "何も選択されていない"
+
+#: reports.py:1437
+msgid "No files, cases or attributes have been selected."
+msgstr "ファイル、ケース、属性が選択されていません。"
+
+#: reports.py:1446
+msgid "Search parameters"
+msgstr "検索パラメータ"
+
+#: reports.py:1448
+msgid "Coding by: All coders"
+msgstr "コーディング方法 すべてのコーダー"
+
+#: reports.py:1450
+msgid "Coding by: "
+msgstr "コーディングをしています。"
+
+#: reports.py:1452
+msgid "Search text: "
+msgstr "テキストを検索します。"
+
+#: reports.py:1835
+msgid "No media name in AV results"
+msgstr "AV結果にメディア名がない"
+
+#: reports.py:2139
+msgid "Files selected: All"
+msgstr "選択されたファイル。すべて"
+
+#: reports.py:2158
+msgid "Select cases to view"
+msgstr "ケースを選択して表示する"
+
+#: reports.py:2160
+msgid "Cases selected: "
+msgstr "選ばれたケース。"
+
+#: reports.py:2175
+msgid "Cases selected: All"
+msgstr "選択されたケース すべて"
+
+#: reports.py:2200
+msgid "Click to view coding in the original file."
+msgstr "クリックすると元のファイルでのコーデが表示されます。"
+
+#: settings.py:142
+msgid "Choose project directory"
+msgstr "プロジェクトディレクトリを選択"
+
+#: view_av.py:48
+msgid "Add DLL Exception"
+msgstr "DLL例外の追加"
+
+#: view_av.py:63
+msgid "Cannot import vlc"
+msgstr "vlc をインポートできない"
+
+#: view_av.py:203
+msgid "Coder: "
+msgstr "コーダーだ "
+
+#: view_av.py:204
+msgid "Media coding"
+msgstr "メディアコーディング"
+
+#: view_av.py:496
+msgid "Media coding: "
+msgstr "メディアコーディング"
+
+#: view_av.py:502 view_av.py:2263
+msgid "Media not found"
+msgstr "見つからないメディア"
+
+#: view_av.py:714 view_av.py:744 view_av.py:2647 view_av.py:2675
+#: view_av.py:2686
+msgid "Play"
+msgstr "プレイ"
+
+#: view_av.py:729 view_av.py:779 view_av.py:1000 view_av.py:1011
+#: view_av.py:1022 view_av.py:2355 view_av.py:2366 view_av.py:2377
+#: view_av.py:2662 view_av.py:2718
+msgid "Time: "
+msgstr "時間だ "
+
+#: view_av.py:732 view_av.py:1568 view_av.py:2061 view_av.py:2665
+msgid "Pause"
+msgstr "一時停止"
+
+#: view_av.py:845 view_av.py:862
+msgid "Clear segment"
+msgstr "クリアセグメント"
+
+#: view_av.py:856
+msgid "End segment"
+msgstr "エンドセグメント"
+
+#: view_av.py:857 view_av.py:872 view_av.py:2071
+msgid "Segment: "
+msgstr "セグメント。"
+
+#: view_av.py:1055
+msgid "Segment:"
+msgstr "セグメント。"
+
+#: view_av.py:1056
+msgid "Start segment"
+msgstr "開始セグメント"
+
+#: view_av.py:1135
+msgid "Cannot merge codes, unmark overlapping text."
+msgstr "コードをマージできない、重複しているテキストのマークを解除する。"
+
+#: view_av.py:1149
+msgid "New code name"
+msgstr "新しいコード名"
+
+#: view_av.py:1161
+msgid "Code added: "
+msgstr "コードを追加しました。"
+
+#: view_av.py:1258 view_image.py:860
+msgid "Memo for Code "
+msgstr "コードのメモ "
+
+#: view_av.py:1282
+msgid "Memo for Category "
+msgstr "カテゴリー別メモ "
+
+#: view_av.py:1314
+msgid " Name already in use, choose another."
+msgstr " すでに使用されている名前は、別のものを選択してください。"
+
+#: view_av.py:1328 view_image.py:934
+msgid "Code renamed: "
+msgstr "コード名を変更しました。"
+
+#: view_av.py:1341 view_image.py:947
+msgid "This category name is already in use"
+msgstr "このカテゴリ名はすでに使用されています"
+
+#: view_av.py:1344 view_image.py:950
+msgid "Duplicate category name"
+msgstr "カテゴリー名の重複"
+
+#: view_av.py:1360
+msgid "Category renamed: "
+msgstr "カテゴリ名を変更しました。"
+
+#: view_av.py:1455
+msgid "Play text"
+msgstr "テキストを再生する"
+
+#: view_av.py:1467
+msgid "Prepare text_link to segment"
+msgstr "セグメントへのテキストリンクの準備"
+
+#: view_av.py:1469
+msgid "Link to segment to text"
+msgstr "セグメントからテキストへのリンク"
+
+#: view_av.py:1474
+msgid "Video position to timestamp"
+msgstr "動画の位置からタイムスタンプまで"
+
+#: view_av.py:1662
+msgid "No transcription"
+msgstr "転写なし"
+
+#: view_av.py:1747
+msgid "No media transcription selected"
+msgstr "メディア転写は選択されていません"
+
+#: view_av.py:1953 view_av.py:2098
+msgid "Memo for segment"
+msgstr "セグメント別メモ"
+
+#: view_av.py:1954
+msgid "Delete segment"
+msgstr "セグメントの削除"
+
+#: view_av.py:1955
+msgid "Play segment"
+msgstr "再生セグメント"
+
+#: view_av.py:1956
+msgid "Edit segment start position"
+msgstr "セグメント開始位置の編集"
+
+#: view_av.py:1957
+msgid "Edit segment end position"
+msgstr "セグメント終了位置の編集"
+
+#: view_av.py:1959
+msgid "Link text to segment"
+msgstr "セグメントへのリンクテキスト"
+
+#: view_av.py:1961
+msgid "Select segment to link to text"
+msgstr "テキストにリンクするセグメントを選択"
+
+#: view_av.py:2001
+msgid "This segment has already been coded with this code."
+msgstr "このセグメントは、すでにこのコードでコード化されています。"
+
+#: view_av.py:2209
+msgid ""
+"Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
+msgstr "転写領域： ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
+
+#: view_av.py:2404
+msgid "Select name to delete"
+msgstr "削除する名前を選択"
+
+#: view_av.py:2423
+msgid "Speaker name"
+msgstr "講演者名"
+
+#: view_av.py:2424
+msgid "Name:"
+msgstr "名前です。"
+
+#: view_image.py:124
+msgid "Image coding"
+msgstr "画像のコーディング"
+
+#: view_image.py:315
+msgid "Image Error"
+msgstr "画像エラー"
+
+#: view_image.py:315 view_image.py:1047
+msgid "Cannot open: "
+msgstr "開くことができません。"
+
+#: view_image.py:451
+msgid "Memo for image "
+msgstr "画像のメモ "
+
+#: view_image.py:575
+msgid "Memo for coded area of "
+msgstr "のコード化領域のメモ "
+
+#: view_image.py:736
+msgid "Cannot merge codes. Unmark overlapping text."
+msgstr "コードをマージできない。重複しているテキストのマークを消す。"
+
+#: view_image.py:916
+msgid " Choose another name"
+msgstr " 別の名前を選ぶ"
+
+#: view_image.py:1039 view_image.py:1046
+msgid "Image error"
+msgstr "画像エラー"
+
+#: view_image.py:1040
+msgid "Image file not found: "
+msgstr "画像ファイルが見つかりません。"
