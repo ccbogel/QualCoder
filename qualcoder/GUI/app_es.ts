@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="es_ES" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="es_ES">
 <context>
     <name>Dialog_Import</name>
     <message>
@@ -165,52 +166,52 @@
     <message>
         <location filename="ui_case_file_manager.py" line="83"/>
         <source>Case file manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Administrador de archivos del caso</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="84"/>
         <source>Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Acciones</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="85"/>
         <source>View file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver archivo</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="86"/>
         <source>Auto assign file text to case</source>
-        <translation type="unfinished"></translation>
+        <translation>Asignar automáticamente el texto del archivo al caso</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="87"/>
         <source>Add selected files to case</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir los archivos seleccionados al caso</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="88"/>
         <source>Remove selected files from case</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar los archivos seleccionados del caso</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="89"/>
         <source>Can assign text in a file to this case. Right click to mark selected text in a file to assign to this case.</source>
-        <translation type="unfinished"></translation>
+        <translation>Puede asignar el texto de un archivo a este caso. Haga clic con el botón derecho del ratón para marcar el texto seleccionado en un archivo para asignarlo a este caso.</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="90"/>
         <source>Case:</source>
-        <translation type="unfinished"></translation>
+        <translation>Caso:</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="91"/>
         <source>File:</source>
-        <translation type="unfinished">Archivo</translation>
+        <translation>Archivo: </translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="92"/>
         <source>Files linked: </source>
-        <translation type="unfinished"></translation>
+        <translation>Archivos vinculados: </translation>
     </message>
 </context>
 <context>
@@ -288,12 +289,12 @@
     <message>
         <location filename="ui_dialog_cases.py" line="87"/>
         <source>Click on a case name to view the case. Double click the name to edit the case name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
-        <translation type="unfinished"></translation>
+        <translation>Haga clic en el nombre de un caso para ver el caso. Haga doble clic en el nombre para editar el nombre del caso. Haga clic en Memo para editar un memo para el caso. Haga clic en Archivos para vincular los archivos y el texto del archivo al caso.</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="88"/>
         <source>Cases: </source>
-        <translation type="unfinished"></translation>
+        <translation>Casos: </translation>
     </message>
 </context>
 <context>
@@ -422,88 +423,88 @@
     <message>
         <location filename="ui_dialog_code_text.py" line="116"/>
         <source>Code Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto del código</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="117"/>
         <source>Select a file to view</source>
-        <translation type="unfinished">Seleccione un archivo para ver</translation>
+        <translation>Seleccione un archivo para ver</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="118"/>
         <source>View File</source>
-        <translation type="unfinished">Ver archivo
+        <translation>Ver archivo
 </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="119"/>
         <source>Auto code</source>
-        <translation type="unfinished">Código automático</translation>
+        <translation>Código automático</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="120"/>
         <source>Coder:</source>
-        <translation type="unfinished">Descifrador:</translation>
+        <translation>Codificador: </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="121"/>
         <source>Right click below to create new codes and categories</source>
-        <translation type="unfinished">Haga clic derecho debajo para crear nuevos códigos y categorías</translation>
+        <translation>Haga clic derecho debajo para crear nuevos códigos y categorías</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="122"/>
         <source>Search for text:</source>
-        <translation type="unfinished">Buscar texto:</translation>
+        <translation>Buscar texto:</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Busca el texto..&lt;/p&gt;&lt;p&gt;marca &lt;span style=&quot; font-weight:600;&quot;&gt;Sensible a las mayúsculas y minúsculas&lt;/span&gt; para la búsqueda de mayúsculas y minúsculas&lt;/p&gt;&lt;p&gt;marca &lt;span style=&quot; font-weight:600;&quot;&gt;Todos los archivos&lt;/span&gt; para buscar en todos los archivos de búsqueda&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="124"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;búsqueda sensible a mayúsculas y minúsculas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;búsqueda sensible a mayúsculas y minúsculas&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="125"/>
         <source>Case sensitive</source>
-        <translation type="unfinished"></translation>
+        <translation>Sensible a las mayúsculas y minúsculas</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;buscar todos los archivos&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;buscar todos los archivos&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="127"/>
         <source>All files</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos los archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="128"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="129"/>
         <source>No overlapping codes</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay códigos superpuestos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="130"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="131"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="132"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -531,12 +532,12 @@
     <message>
         <location filename="ui_dialog_colour_selector.py" line="85"/>
         <source>old</source>
-        <translation type="unfinished"></translation>
+        <translation>viejo</translation>
     </message>
     <message>
         <location filename="ui_dialog_colour_selector.py" line="120"/>
         <source>new</source>
-        <translation type="unfinished"></translation>
+        <translation>nuevo</translation>
     </message>
 </context>
 <context>
@@ -549,7 +550,7 @@
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="36"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -605,7 +606,7 @@
     <message>
         <location filename="ui_dialog_journals.py" line="67"/>
         <source>Journals: </source>
-        <translation type="unfinished"></translation>
+        <translation>Diario: </translation>
     </message>
 </context>
 <context>
@@ -628,7 +629,7 @@
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="42"/>
         <source>Attributes:</source>
-        <translation type="unfinished"></translation>
+        <translation>Attributos: </translation>
     </message>
 </context>
 <context>
@@ -676,12 +677,12 @@
     <message>
         <location filename="ui_dialog_manage_files.py" line="57"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="64"/>
         <source>Files:</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivos: </translation>
     </message>
 </context>
 <context>
@@ -712,12 +713,12 @@
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="60"/>
         <source>Export csv file</source>
-        <translation type="unfinished">Exportar archivo csv</translation>
+        <translation>Exportar archivo csv</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="61"/>
         <source>Select files</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar los archivos</translation>
     </message>
 </context>
 <context>
@@ -785,52 +786,52 @@
     <message>
         <location filename="ui_dialog_report_codings.py" line="117"/>
         <source>Cases</source>
-        <translation type="unfinished">Casos</translation>
+        <translation>Casos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="118"/>
         <source>Files</source>
-        <translation type="unfinished">Archivos</translation>
+        <translation>Archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="119"/>
         <source>Text limiter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limitador de texto: </translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="122"/>
         <source>Attributes</source>
-        <translation type="unfinished">Atributos</translation>
+        <translation>Atributos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="123"/>
         <source>Export:</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportación:</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="124"/>
         <source>html</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="125"/>
         <source>txt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="126"/>
         <source>odt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="127"/>
         <source>csv</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="128"/>
         <source>Counts:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuenta: </translation>
     </message>
 </context>
 <context>
@@ -913,7 +914,7 @@ Los comodines para &apos;me gusta&apos; son% y _</translation>
     <message>
         <location filename="ui_dialog_select_items.py" line="35"/>
         <source>Select Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione los elementos</translation>
     </message>
 </context>
 <context>
@@ -984,12 +985,12 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="129"/>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato de tiempo</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="130"/>
         <source>Speaker format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato del orador</translation>
     </message>
 </context>
 <context>
@@ -1153,17 +1154,17 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_view_av.py" line="102"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To rewind 3 seconds. In the text entry box, press ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;cabeza/&gt;&gt;cuerpo&gt;&lt;p&gt;Rebobinar 5 segundos. En el cuadro de entrada de texto, presione ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="104"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Añade un nombre de orador a los atajos. En el cuadro de entrada de texto presione ctrl + n&lt;/p&gt;&lt;p&gt;Inserte un orador en la transcripción. En el cuadro de entrada de texto presione ctrl + 1 hasta ctrl + 8 para el nombre del orador.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="105"/>
         <source>Speakers:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oradores: </translation>
     </message>
 </context>
 <context>
@@ -1207,22 +1208,22 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_visualise_graph_original.py" line="56"/>
         <source>Graph Visualisation</source>
-        <translation type="unfinished">Visualización de grafos</translation>
+        <translation>Visualización de grafos</translation>
     </message>
     <message>
         <location filename="ui_visualise_graph_original.py" line="57"/>
         <source>Black and white</source>
-        <translation type="unfinished">En blanco y negro</translation>
+        <translation>En blanco y negro</translation>
     </message>
     <message>
         <location filename="ui_visualise_graph_original.py" line="58"/>
         <source>List view</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista de lista</translation>
     </message>
     <message>
         <location filename="ui_visualise_graph_original.py" line="59"/>
         <source>Font size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño de la fuente</translation>
     </message>
 </context>
 <context>
@@ -1450,37 +1451,37 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_main.py" line="190"/>
         <source>Action log</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitácora de acción</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="191"/>
         <source>Temporary notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Notas temporales</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="193"/>
         <source>Open Recent Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir el proyecto reciente</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="194"/>
         <source>Export</source>
-        <translation type="unfinished">Exportar</translation>
+        <translation>Exportar</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="195"/>
         <source>Import</source>
-        <translation type="unfinished">Importar</translation>
+        <translation>Importar</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="238"/>
         <source>Project summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Sumario del proyecto</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="239"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ninguno</translation>
     </message>
 </context>
 </TS>
