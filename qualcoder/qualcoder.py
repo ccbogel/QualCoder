@@ -873,6 +873,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
                 d.activateWindow()
                 return
+        #TODO
         ui = DialogInformation(self.app, "About", "")
         self.dialogList.append(ui)
         ui.show()
@@ -953,7 +954,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     d.activateWindow()
                     #TODO activate window does NOT bring to front, unline image coding and av coding
-                    # Unsure why this occurs
+                    # Unsure why this occurs, so cannot resolve
                 except RuntimeError as e:
                     logger.debug(str(e))
                     self.dialogList.remove(d)
@@ -1420,10 +1421,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
         providing the project was not changed in any way.
-        Delete oldest backups if more that 8 are created.
+        Delete oldest backups if more than 5 are created.
         Backup name format:
         directories/projectname_BKUP_yyyymmdd_hh.qda
-        Keep up to SIX backups only. """
+        Keep up to FIVE backups only. """
 
         if self.app.project_path == "":
             return
@@ -1433,7 +1434,7 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 print(str(e))
 
-        # Delete oldest backups if there are more than 6
+        # Get a list of backup folders for current project
         parts = self.app.project_path.split('/')
         projectname_and_suffix = parts[-1]
         directory = self.app.project_path[0:-len(projectname_and_suffix)]
@@ -1445,7 +1446,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for f in files_folders:
             if f[0:lenname] == projectname_and_bkup and f[-4:] == ".qda":
                 backups.append(f)
-        backups.sort(reverse=True)  # newest to oldest
+        # Sort newest to oldest, and remove any that are more than fifth positon in the list
+        backups.sort(reverse=True)
         to_remove = []
         if len(backups) > 5:
             to_remove = backups[5:]
@@ -1469,7 +1471,6 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             try:
                 #logger.debug(str(d) + ", isVisible:" + str(d.isVisible()) + " Title:" + d.windowTitle())
-                #d.windowTitle()
                 if d.isVisible():
                     tempList.append(d)
             # RuntimeError: wrapped C/C++ object of type DialogSQL has been deleted
@@ -1502,15 +1503,12 @@ class MainWindow(QtWidgets.QMainWindow):
         Dated May 2018
         """
 
-        #try:
-        _json = json.loads(urllib.request.urlopen(urllib.request.Request(
-            'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
-            headers={'Accept': 'application/vnd.github.v3+json'},
-        )).read())
-
         self.ui.textEdit.append(_("This version: ") + qualcoder_version)
-
         try:
+            _json = json.loads(urllib.request.urlopen(urllib.request.Request(
+                'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
+                headers={'Accept': 'application/vnd.github.v3+json'},
+            )).read())
             if _json['name'] != qualcoder_version:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
@@ -1524,7 +1522,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(e)
             logger.debug(str(e))
-
+            self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
 
 def gui():
     qual_app = App()
@@ -1537,7 +1535,7 @@ def gui():
     app.setStyleSheet(stylesheet)
     # Try and load language settings from file stored in home/.qualcoder/
     # translator applies to ui designed GUI widgets only
-    lang = settings.get('language','en')
+    lang = settings.get('language', 'en')
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
     if lang != "en":
         translator = QtCore.QTranslator()
@@ -1550,6 +1548,9 @@ def gui():
         if lang == "es":
             translator.load(path + "/locale/es/app_es.qm")
             getlang = gettext.translation('es', localedir=path + '/locale', languages=['es'])
+        if lang == "jp":
+            translator.load(path + "/locale/jp/app_jp.qm")
+            getlang = gettext.translation('jp', localedir=path + '/locale', languages=['jp'])
         app.installTranslator(translator)
     getlang.install()
     ex = MainWindow(qual_app)
