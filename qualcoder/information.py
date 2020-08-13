@@ -75,7 +75,7 @@ class DialogInformation(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowTitle(title)
         if html == "":
-            self.setHtml(a)
+            self.setHtml(about.replace("QualCoderVersion", app.version))
         else:
             self.setHtml(html)
 
@@ -91,9 +91,9 @@ class DialogInformation(QtWidgets.QDialog):
         self.information = self.ui.textEdit.toPlainText()
         self.ui.Dialog_information.accept()
 
-a = '<h1 class="western">About QualCoder</h1>\
+about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
-<p>QualCoder 1.9 2020 March 11</p>\
+<p>QualCoderVersion</p>\
 <p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
 <p>VLC should also be installed.</p>\
 <p>Tested on: Linux Mint 18.04, Ubuntu 19.04, Lubuntu 18.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\
@@ -111,7 +111,7 @@ images, audio and video. It also contains the sqlite database, named data.qda, t
 <p>QualCoder creates a .qualcoder folder inside your home directory. \
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
-default working directory and selected font.</p>\
+default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python 3 using Qt5 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\

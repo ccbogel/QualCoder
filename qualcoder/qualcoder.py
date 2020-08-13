@@ -115,6 +115,7 @@ class App(object):
     Savable settings does not contain project name, project path or db connection.
     """
 
+    version = qualcoder_version
     conn = None
     project_path = ""
     project_name = ""
