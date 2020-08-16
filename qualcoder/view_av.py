@@ -862,7 +862,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_coding.setText(_("Clear segment"))
 
             # check and reverse start and end times if start is greater than the end
-            if float(self.segment['start']) > float(self.segment['end']):
+            print("start", self.segment['start'], "end", self.segment['end'])
+            if float(self.segment['start'].replace(":", ".")) > float(self.segment['end'].replace(":", ".")):
                 tmp = self.segment['start']
                 tmp_msecs = self.segment['start_msecs']
                 self.segment['start'] = self.segment['end']
