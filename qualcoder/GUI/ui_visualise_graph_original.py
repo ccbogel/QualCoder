@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_visualise_graph_original.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -36,10 +36,10 @@ class Ui_Dialog_visualiseGraph_original(object):
         self.checkBox_listview.setGeometry(QtCore.QRect(20, 30, 141, 22))
         self.checkBox_listview.setObjectName("checkBox_listview")
         self.comboBox_fontsize = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_fontsize.setGeometry(QtCore.QRect(280, 0, 71, 31))
+        self.comboBox_fontsize.setGeometry(QtCore.QRect(310, 0, 71, 31))
         self.comboBox_fontsize.setObjectName("comboBox_fontsize")
         self.label = QtWidgets.QLabel(self.groupBox_2)
-        self.label.setGeometry(QtCore.QRect(190, 6, 81, 17))
+        self.label.setGeometry(QtCore.QRect(205, 4, 101, 17))
         self.label.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.groupBox_2, 1, 0, 1, 1)
