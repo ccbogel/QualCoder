@@ -69,6 +69,18 @@ Install the Python dependencies using `pip`:
 
 `pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
 
+or 
+
+`pip3 install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
+
+and
+
+`brew install qpdf`
+
+or
+
+`sudo port install qpdf`
+
 There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
 
 Another option is shown here [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher.
