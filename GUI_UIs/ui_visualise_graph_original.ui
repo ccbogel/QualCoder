@@ -77,7 +77,7 @@
      <widget class="QComboBox" name="comboBox_fontsize">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>310</x>
         <y>0</y>
         <width>71</width>
         <height>31</height>
@@ -87,9 +87,9 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>6</y>
-        <width>81</width>
+        <x>205</x>
+        <y>4</y>
+        <width>101</width>
         <height>17</height>
        </rect>
       </property>
