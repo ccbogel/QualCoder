@@ -503,7 +503,7 @@ class DialogCodeText(QtWidgets.QWidget):
         code_to_edit = None
         if len(code_list) == 1:
             code_to_edit = code_list[0]
-        # multiple codes to selet from
+        # multiple codes to select from
         if len(code_list) > 1:
             ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
@@ -1100,6 +1100,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """ When view file button is pressed a dialog of filenames is presented to the user.
         The selected file is then displayed for coding. """
 
+        if len(self.filenames) == 0:
+            return
         ui = DialogSelectItems(self.app, self.filenames, "Select file to view", "single")
         ok = ui.exec_()
         if ok:
@@ -1380,7 +1382,7 @@ class DialogCodeText(QtWidgets.QWidget):
         to_unmark = None
         if len(unmarked_list) == 1:
             to_unmark = unmarked_list[0]
-        # multiple codes to selet from
+        # multiple codes to select from
         if len(unmarked_list) > 1:
             ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
@@ -1496,8 +1498,9 @@ class DialogCodeText(QtWidgets.QWidget):
         for t in tmp:
             if t != "":
                 texts.append(t)
-
-        ui = DialogSelectItems(self.app, self.filenames, _("Select file to view"), "many")
+        if len(self.filenames) == 0:
+            return
+        ui = DialogSelectItems(self.app, self.filenames, _("Select files to code"), "many")
         ok = ui.exec_()
         if not ok:
             return
@@ -1522,11 +1525,15 @@ class DialogCodeText(QtWidgets.QWidget):
                     'owner': self.app.settings['codername'], 'memo': "",
                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
                     cur = self.app.conn.cursor()
-                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                        owner,memo,date) values(?,?,?,?,?,?,?,?)"
-                        , (item['cid'], item['fid'], item['seltext'], item['pos0'],
-                        item['pos1'], item['owner'], item['memo'], item['date']))
-                    self.app.conn.commit()
+                    #TODO IntegrityError: UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1, code_text.owner
+                    try:
+                        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                            owner,memo,date) values(?,?,?,?,?,?,?,?)"
+                            , (item['cid'], item['fid'], item['seltext'], item['pos0'],
+                            item['pos1'], item['owner'], item['memo'], item['date']))
+                        self.app.conn.commit()
+                    except Exception as e:
+                        logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
 
                     # If this is the currently open file update the code text list and GUI

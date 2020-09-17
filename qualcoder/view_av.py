@@ -436,7 +436,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         for row in result:
             media_files.append({'name': row[0], 'id': row[1], 'memo': row[2],
                 'owner': row[3], 'date': row[4], 'mediapath': row[5]})
-
+        if media_files == []:
+            return
         ui = DialogSelectItems(self.app, media_files, _("Select file to view"), "single")
         ok = ui.exec_()
         if not ok:
@@ -2402,6 +2403,8 @@ class DialogViewAV(QtWidgets.QDialog):
         names = []
         for n in self.speaker_list:
             names.append({"name": n})
+        if names == []:
+            return
         ui = DialogSelectItems(self.app, names, _("Select name to delete"), "many")
         ok = ui.exec_()
         if not ok:

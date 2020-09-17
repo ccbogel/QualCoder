@@ -76,6 +76,19 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
         self.selection_mode = selectionmode
+        # Check data exists
+        if len(data) == 0:
+            QtWidgets.QMessageBox.critical(None, _('Dictionary is empty'), "No data to select from")
+
+        # Check for 'name' key
+        no_name_key = False
+        for d in data:
+            if not d['name']:
+                no_name_key = True
+        if no_name_key:
+            text = "This data has no name to select from"
+            QtWidgets.QMessageBox.critical(None, _('Dictionary has no "name" key'), text)
+
         self.dict_list = data
         self.model = list_model(self.dict_list)
         self.ui.listView.setModel(self.model)

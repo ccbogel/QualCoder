@@ -299,6 +299,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         """  A dialog of filenames is presented to the user.
         The selected image file is then displayed for coding. """
 
+        if self.files == []:
+            return
         ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
         ok = ui.exec_()
         if ok:

@@ -118,6 +118,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         """ Report code frequencies for all files or selected files. """
 
         filenames = self.app.get_filenames()
+        if len(filenames) == 0:
+            return
         ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
         ok = ui.exec_()
         tooltip = _("Files selected: ")
@@ -2114,6 +2116,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.case_ids = ""
         self.attribute_selection = []
         filenames = self.app.get_filenames()
+        if len(filenames) == 0:
+            return
         self.file_ids = ""
         for row in filenames:
             self.file_ids += "," + str(row['id'])
@@ -2151,6 +2155,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.file_ids = ""
         self.attribute_selection = []
         casenames = self.app.get_casenames()
+        if len(casenames) == 0:
+            return
         self.case_ids = ""
         for row in casenames:
             self.case_ids += "," + str(row['id'])
