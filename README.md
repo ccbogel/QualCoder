@@ -24,7 +24,7 @@ You also need to run this command from the terminal for pdf importing:
 
 `sudo python3 -m pip install pdfminer.six openpyxl`
 
-If not using the debian pacakge:
+If not using the debian package:
 
 Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
 
