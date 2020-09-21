@@ -46,6 +46,8 @@ Install dependencies
 
 QualCoder uses an Ebook library that you can currently install via a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784
 
+Except for install the debian-based installation of dependencies, the `install.sh` should run as expected.
+
 
 ### Linux Use 
 
@@ -53,7 +55,7 @@ QualCoder uses an Ebook library that you can currently install via a work-around
 
 The qualcoder folder should be in the same directory as the install.sh script.
 
-This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
+This will install QualCoder in the /usr/share directory and create a launcher. Alternatively go to the qualcoder directory and run the qualcoder.py file in a terminal: `python3 qualcoder.py`
 
 
 ### Windows: 
