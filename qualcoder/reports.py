@@ -939,13 +939,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree
         to add as child then remove matched categories from the list. '''
         count = 0
-        while len(cats) > 0 or count < 10000:
+        while len(cats) > 0 and count < 10000:
             remove_list = []
             #logger.debug(cats)
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
-                while item:  # while there is an item in the list
+                count2 = 0
+                while item and count2 < 10000:  # while there is an item in the list
                     #logger.debug("While item in list: " + item.text(0) + "|" + item.text(1) + ", c[catid]:" + str(c['catid']) + ", supercatid:" + str(c['supercatid']))
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
@@ -958,6 +959,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         remove_list.append(c)
                     it += 1
                     item = it.value()
+                    count2 += 1
             for item in remove_list:
                 cats.remove(item)
             count += 1
@@ -983,7 +985,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
-            while item:
+            count = 0
+            while item and count < 10000:
                 #logger.debug("add codes as children, item:" + item.text(0) + "|" + item.text(1) + ", c[id]:" + str(c['cid']) + ", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
@@ -997,6 +1000,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
+                count += 1
         self.fill_code_counts_in_tree()
         self.ui.treeWidget.expandAll()
 
@@ -1009,7 +1013,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         sql += "select count(cid) from code_image where cid=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        while item:
+        count = 0
+        while item and count < 10000:
             #print(item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
@@ -1024,6 +1029,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     item.setText(3, "")
             it += 1
             item = it.value()
+            count += 1
 
     def export_option_selected(self):
         """ ComboBox export option selected. """

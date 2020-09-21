@@ -345,7 +345,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
-                while item:  # while there is an item in the list
+                count2 = 0
+                while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
                         if c['memo'] != "":
@@ -356,6 +357,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         remove_list.append(c)
                     it += 1
                     item = it.value()
+                    count2 += 1
             for item in remove_list:
                 cats.remove(item)
             count += 1
