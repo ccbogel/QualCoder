@@ -6,11 +6,14 @@ QualCoder projects are stored in a Sqlite database. Text files can be typed in m
 This project has been tested under Ubuntu 19.04, Linux Mint 18.04 Lubuntu 18.04, Windows 10. It has not been throughly tested on Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the Github Wiki.
 
-## INSTALLATION
+## INSTALLATION 
+
+### Prerequisites
 You will need to have a python3.x version installed.
 You will also need to have a vlc player installed - for audio and video. 
 
 ### Linux
+
 #### Debian-based Linuxes:
 
 You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
@@ -31,6 +34,15 @@ Make the install.sh executable and run the install.sh script from the terminal. 
 
 #### Fedora/CentOS/RHEL Linuxes
 
+Retrieve the current package code from this repository
+
+`git clone https://github.com/ccbogel/QualCoder.git`
+
+Install dependencies 
+
+`sudo dnf install python3-pip python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
+
+QualCoder uses an Ebook library that you can currently install via a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784
 
 
 ### Linux Use 
