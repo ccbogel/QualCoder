@@ -6,11 +6,17 @@ QualCoder projects are stored in a Sqlite database. Text files can be typed in m
 This project has been tested under Ubuntu 19.04, Linux Mint 18.04 Lubuntu 18.04, Windows 10. It has not been throughly tested on Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the Github Wiki.
 
-## INSTALLATION
-You will need to have a python3.x version installed.
-You will also need to have a vlc player installed - for audio and video. 
+## INSTALLATION 
 
-### Linux:
+
+### Linux
+
+### Prerequisites
+You will need to have a `python3.x` version installed.
+You will also need to have a `vlc` player installed - for audio and video. 
+
+
+#### Debian-based Linuxes:
 
 You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
 
@@ -28,13 +34,28 @@ If not using the debian package:
 
 Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
 
-### Use 
+#### Fedora/CentOS/RHEL Linuxes
+
+Retrieve the current package code from this repository
+
+`git clone https://github.com/ccbogel/QualCoder.git`
+
+Install dependencies 
+
+`sudo dnf install python3-pip python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
+
+QualCoder uses an Ebook library that you can currently install via a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784
+
+Except for install the debian-based installation of dependencies, the `install.sh` should run as expected.
+
+
+### Linux Use 
 
 `./install.sh`
 
 The qualcoder folder should be in the same directory as the install.sh script.
 
-This will install QualCoder in the /usr/share directory and create a launcher. Alternatively move to the qualcoder directory and run the qualcoder.py file in a terminal: python3 qualcoder.py
+This will install QualCoder in the /usr/share directory and create a launcher. Alternatively go to the qualcoder directory and run the qualcoder.py file in a terminal: `python3 qualcoder.py`
 
 
 ### Windows: 
