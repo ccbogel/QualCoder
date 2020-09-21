@@ -10,7 +10,8 @@ Instructions and other information are available here: https://qualcoder.wordpre
 You will need to have a python3.x version installed.
 You will also need to have a vlc player installed - for audio and video. 
 
-### Linux:
+### Linux
+#### Debian-based Linuxes:
 
 You can install the latest debian package from https://github.com/ccbogel/QualCoder-Debians
 
@@ -28,7 +29,11 @@ If not using the debian package:
 
 Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
 
-### Use 
+#### Fedora/CentOS/RHEL Linuxes
+
+
+
+### Linux Use 
 
 `./install.sh`
 
