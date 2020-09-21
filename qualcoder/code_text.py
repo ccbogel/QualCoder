@@ -275,7 +275,7 @@ class DialogCodeText(QtWidgets.QWidget):
         ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child, then remove matched categories from the list '''
         count = 0
-        while len(cats) > 0 or count < 10000:
+        while len(cats) > 0 and count < 10000:
             remove_list = []
             #logger.debug("Cats: " + str(cats))
             for c in cats:
@@ -316,7 +316,8 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
-            while item:
+            count = 0
+            while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "" and c['memo'] is not None:
@@ -329,6 +330,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
+                count += 1
         self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
@@ -341,7 +343,8 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        while item:
+        count = 0
+        while item and count < 10000:
             #print(item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
@@ -353,6 +356,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     item.setText(3, "")
             it += 1
             item = it.value()
+            count += 1
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code. """
