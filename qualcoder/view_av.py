@@ -339,7 +339,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree
         to add as child, then remove matched categories from the list. '''
         count = 0
-        while len(cats) > 0 or count < 10000:
+        while len(cats) > 0 and count < 10000:
             remove_list = []
             #logger.debug("cats:" + str(cats))
             for c in cats:
@@ -380,7 +380,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
-            while item:
+            count = 0
+            while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "" and c['memo'] is not None:
@@ -393,6 +394,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
+                count += 1
         self.ui.treeWidget.expandAll()
 
     def fill_code_counts_in_tree(self):
@@ -405,7 +407,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql_txt = "select count(cid) from code_text where cid=? and fid=? and owner=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        while item:
+        count = 0
+        while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 cur.execute(sql, [cid, self.media_data['id'], self.app.settings['codername']])
@@ -423,6 +426,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     item.setText(3, "")
             it += 1
             item = it.value()
+            count += 1
 
     def select_media(self):
         """ Get all the media files. A dialog of filenames is presented to the user.
@@ -818,7 +822,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeav_w'] = self.size().width()
         self.app.settings['dialogcodeav_h'] = self.size().height()
-        if self.media_data['mediapath'] is not None and  self.media_data['mediapath'][0:7] != "/audio/":
+        if self.media_data is not None and self.media_data['mediapath'] is not None and  self.media_data['mediapath'][0:7] != "/audio/":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()

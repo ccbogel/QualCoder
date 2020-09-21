@@ -60,14 +60,13 @@ from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
 from rqda import Rqda_import
-from select_items import DialogSelectItems
 from settings import DialogSettings
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 1.9"
+qualcoder_version = "QualCoder 2.1"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -987,7 +986,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeAV":
-                d.activateWindow()
+                try:
+                    d.activateWindow()
+                except Exception as e:
+                    logger.debug(str(e))
+                    try:
+                        self.dialogList.remove(d)
+                    except:
+                        pass
                 return
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)

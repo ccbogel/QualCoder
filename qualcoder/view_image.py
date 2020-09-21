@@ -224,7 +224,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
-                while item:  # while there is an item in the list
+                count = 0
+                while item and count < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
                         if c['memo'] != "" and c['memo'] is not None:
@@ -235,6 +236,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         remove_list.append(c)
                     it += 1
                     item = it.value()
+                    count += 1
             for item in remove_list:
                 cats.remove(item)
             count += 1
@@ -259,7 +261,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
-            while item:
+            count = 0
+            while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "" and c['memo'] is not None:
@@ -272,6 +275,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
+                count += 1
         self.ui.treeWidget.expandAll()
 
     def fill_code_counts_in_tree(self):
@@ -283,7 +287,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         sql = "select count(cid) from code_image where cid=? and id=? and owner=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        while item:
+        count = 0
+        while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
@@ -294,6 +299,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     item.setText(3, "")
             it += 1
             item = it.value()
+            count += 1
 
     def select_image(self):
         """  A dialog of filenames is presented to the user.
