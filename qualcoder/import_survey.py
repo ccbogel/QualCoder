@@ -477,6 +477,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(len(self.fields))
         for c, field in enumerate(self.fields):
             item = QtWidgets.QTableWidgetItem(field + "\n" + self.fields_type[c] + "\n")
+            msg = "Right click to change column name or to change from character to qualitative"
+            item.setToolTip(_(msg))
             self.ui.tableWidget.setHorizontalHeaderItem(c, item)
         self.ui.tableWidget.setRowCount(len(self.data))
         for row in range(0, len(self.data)):
