@@ -125,6 +125,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.pushButton_memo.pressed.connect(self.image_memo)
+        self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.pushButton_select.customContextMenuRequested.connect(self.select_image_menu)
         self.ui.pushButton_select.pressed.connect(self.select_image)
         self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
@@ -301,6 +303,41 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
+    def select_image_menu(self, position):
+        """ Context menu to select the next image alphabetically, or
+         to select the image that was most recently coded """
+
+        if len(self.files) < 2:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_next = menu.addAction(_("Next file"))
+        action_latest = menu.addAction(_("File with latest coding"))
+        action = menu.exec_(self.ui.pushButton_select.mapToGlobal(position))
+        if action == action_next:
+            if self.file_ is None:
+                self.file_ = self.files[0]
+                self.load_image()
+                return
+            for i in range(0, len(self.files) - 1):
+                if self.file_ == self.files[i]:
+                    found = self.files[i + 1]
+                    self.file_ = found
+                    self.load_image()
+                    return
+        if action == action_latest:
+            sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
+            cur = self.app.conn.cursor()
+            cur.execute(sql, [self.app.settings['codername'],])
+            result = cur.fetchone()
+            if result is None:
+                return
+            for f in self.files:
+                if f['id'] == result[0]:
+                    self.file_ = f
+                    self.load_image()
+                    return
+
     def select_image(self):
         """  A dialog of filenames is presented to the user.
         The selected image file is then displayed for coding. """
@@ -319,7 +356,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         source = self.app.project_path + self.file_['mediapath']
         image = QtGui.QImage(source)
         if image.isNull():
-            #TODO
             QtWidgets.QMessageBox.warning(None, _("Image Error"), _("Cannot open: ") + source)
             self.close()
             logger.warning("Cannot open image: " + source)

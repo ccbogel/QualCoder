@@ -109,7 +109,6 @@ class DialogCodeAV(QtWidgets.QDialog):
     parent_textEdit = None
     filename = None
     files = []
-    file_ = None
     codes = []
     categories = []
     code_text = []
@@ -162,6 +161,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.segment_for_text = None
         self.get_codes_and_categories()
+        self.get_list_of_media()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
@@ -202,6 +202,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
+        self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.pushButton_select.customContextMenuRequested.connect(self.select_media_menu)
         self.ui.pushButton_select.pressed.connect(self.select_media)
         #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
@@ -263,6 +265,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter. """
 
         self.codes, self.categories = self.app.get_data()
+
+    def get_list_of_media(self):
+
+        self.files = []
+        cur = self.app.conn.cursor()
+        cur.execute("select name, id, memo, owner, date, mediapath from source where \
+            substr(mediapath,1,6) in ('/audio','/video') order by name")
+        result = cur.fetchall()
+        for row in result:
+            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2],
+                'owner': row[3], 'date': row[4], 'mediapath': row[5]})
 
     def assign_selected_text_to_code(self):
         """ Assign selected text on left-click on code in tree. """
@@ -430,28 +443,58 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
+    def select_media_menu(self, position):
+        """ Context menu to select the next image alphabetically, or
+         to select the image that was most recently coded """
+
+        if len(self.files) < 2:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_next = menu.addAction(_("Next file"))
+        action_latest = menu.addAction(_("File with latest coding"))
+        action = menu.exec_(self.ui.pushButton_select.mapToGlobal(position))
+        if action == action_next:
+            if self.media_data is None:
+                self.media_data = self.files[0]
+                self.load_media()
+                self.load_segments()
+                self.fill_code_counts_in_tree()
+                return
+            for i in range(0, len(self.files) - 1):
+                if self.media_data == self.files[i]:
+                    found = self.files[i + 1]
+                    self.media_data = found
+                    self.load_media()
+                    self.load_segments()
+                    self.fill_code_counts_in_tree()
+                    return
+        if action == action_latest:
+            sql = "SELECT id FROM code_av where owner=? order by date desc limit 1"
+            cur = self.app.conn.cursor()
+            cur.execute(sql, [self.app.settings['codername'], ])
+            result = cur.fetchone()
+            if result is None:
+                return
+            for f in self.files:
+                if f['id'] == result[0]:
+                    self.media_data = f
+                    self.load_media()
+                    self.load_segments()
+                    self.fill_code_counts_in_tree()
+                    return
+
     def select_media(self):
-        """ Get all the media files. A dialog of filenames is presented to the user.
+        """ A dialog of filenames is presented to the user.
         The selected media file is then displayed for coding. """
 
-        media_files = []
-        cur = self.app.conn.cursor()
-        cur.execute("select name, id, memo, owner, date, mediapath from source where \
-            substr(mediapath,1,6) in ('/audio','/video') order by name")
-        result = cur.fetchall()
-        for row in result:
-            media_files.append({'name': row[0], 'id': row[1], 'memo': row[2],
-                'owner': row[3], 'date': row[4], 'mediapath': row[5]})
-        if media_files == []:
+        if self.files == []:
             return
-        ui = DialogSelectItems(self.app, media_files, _("Select file to view"), "single")
+        ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
         ok = ui.exec_()
         if not ok:
             return
         self.media_data = ui.get_selected()
-        self.ui.pushButton_play.setEnabled(True)
-        self.ui.horizontalSlider.setEnabled(True)
-        self.ui.pushButton_coding.setEnabled(True)
         self.load_media()
         self.load_segments()
         self.fill_code_counts_in_tree()
@@ -499,8 +542,6 @@ class DialogCodeAV(QtWidgets.QDialog):
     def load_media(self):
         """ Add media to media dialog. """
 
-        self.ddialog.setWindowTitle(self.media_data['name'])
-        self.setWindowTitle(_("Media coding: ") + self.media_data['name'])
         try:
             self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
         except Exception as e:
@@ -511,6 +552,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             mb.exec_()
             self.closeEvent()
             return
+
+        self.ddialog.setWindowTitle(self.media_data['name'])
+        self.setWindowTitle(_("Media coding: ") + self.media_data['name'])
+        self.ui.pushButton_play.setEnabled(True)
+        self.ui.horizontalSlider.setEnabled(True)
+        self.ui.pushButton_coding.setEnabled(True)
         if self.media_data['mediapath'][0:7] != "/audio/":
             self.ddialog.show()
             try:

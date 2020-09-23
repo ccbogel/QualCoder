@@ -145,6 +145,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
+        self.ui.pushButton_view_file.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.pushButton_view_file.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
@@ -687,6 +689,7 @@ class DialogCodeText(QtWidgets.QWidget):
             ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
         ui.exec_()
 
+    #TODO is this used?
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
@@ -1101,6 +1104,38 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
+
+    def viewfile_menu(self, position):
+        """ Context menu for view-file to get to the next file and
+        to go to the file with the latest codings by this coder. """
+
+        if len(self.filenames) < 2:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_next = menu.addAction(_("Next file"))
+        action_latest = menu.addAction(_("File with latest coding"))
+        action = menu.exec_(self.ui.pushButton_view_file.mapToGlobal(position))
+        if action == action_next:
+            if self.filename is None:
+                self.load_file(self.filenames[0])
+                return
+            for i in range(0, len(self.filenames) - 1):
+                if self.filename == self.filenames[i]:
+                    found = self.filenames[i + 1]
+                    self.load_file(found)
+                    return
+        if action == action_latest:
+            sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
+            cur = self.app.conn.cursor()
+            cur.execute(sql, [self.app.settings['codername'],])
+            result = cur.fetchone()
+            if result is None:
+                return
+            for f in self.filenames:
+                if f['id'] == result[0]:
+                    self.load_file(f)
+                    return
 
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
