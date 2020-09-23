@@ -156,7 +156,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     else:
                         row.append(item)
                 self.data.append(row)
-        self.fields = self.data[0]
+        # Get field names and replace blacks with a placeholder
+        self.fields = []
+        for i, f in enumerate(self.data[0]):
+            if f != '':
+                self.fields.append(f)
+            else:
+                self.fields.append("Field_" + str(i))
         self.data = self.data[1:]
         # Widgets are not needed
         self.ui.lineEdit_delimiter.hide()
@@ -201,7 +207,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 self.parent_textEdit.append(_("Row error: ") + str(reader.line_num) + "  " + str(e))
                 self.fail_msg(_("Row error: ") + str(e))
                 return False
-        self.fields = self.data[0]
+        # Get field names and replace blacks with a placeholder
+        self.fields = []
+        for i, f in enumerate(self.data[0]):
+            if f != '':
+                self.fields.append(f)
+            else:
+                self.fields.append("Field_" + str(i))
         self.data = self.data[1:]
         return True
 
@@ -242,7 +254,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if not success:
                 self.parent_textEdit.append(_("Survey not imported.") + self.filepath)
                 return False
-
         self.setWindowTitle(_(_("Importing from: ")) + self.filepath.split('/')[-1])
 
         # clean field names
