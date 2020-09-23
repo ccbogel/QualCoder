@@ -352,11 +352,20 @@ class DialogCodeText(QtWidgets.QWidget):
             #print(item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.filename['id'], self.app.settings['codername']])
-                result = cur.fetchone()
-                if result[0] > 0:
-                    item.setText(3, str(result[0]))
-                else:
+                #TODO add try except for TypeError list indices must be integers not str
+                try:
+                    cur.execute(sql, [cid, self.filename['id'], self.app.settings['codername']])
+                    result = cur.fetchone()
+                    if result[0] > 0:
+                        item.setText(3, str(result[0]))
+                    else:
+                        item.setText(3, "")
+                except Exception as e:
+                    msg = "Fill code counts error\n" + str(e) + "\n"
+                    msg += sql + "\n"
+                    msg += "cid " + str(cid) + "\n"
+                    msg += "self.filename['id'] " + str(self.filename['id']) + "\n"
+                    logger.debug(msg)
                     item.setText(3, "")
             it += 1
             item = it.value()
