@@ -360,7 +360,8 @@ class App(object):
         'speakernameformat', 'video_w', 'video_h', 'dialogcodeav_w', 'dialogcodeav_h',
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
-        'codeav_video_pos_x', 'codeav_video_pos_y'
+        'codeav_video_pos_x', 'codeav_video_pos_y',
+        'bookmark_file_id', 'bookmark_pos'
         ]
         for key in keys:
             if key not in data:
@@ -405,6 +406,7 @@ class App(object):
 
     @property
     def default_settings(self):
+        """ bookmark for text files. """
         return {
             'codername': 'default',
             'font': 'Noto Sans',
@@ -472,7 +474,9 @@ class App(object):
             'dialogviewav_w': 0,
             'dialogviewav_h': 0,
             'viewav_abs_pos_x': 0,
-            'viewav_abs_pos_y': 0
+            'viewav_abs_pos_y': 0,
+            'bookmark_file_id': 0,
+            'bookmark_pos': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -1394,6 +1398,10 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(sql)
         res = cur.fetchone()
         msg += _("Journals: ") + str(res[0])
+
+        msg += "\nText Bookmark: " + self.app.settings['bookmark_file_id']
+        msg += ", position: " + self.app.settings['bookmark_pos']
+
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========\n"

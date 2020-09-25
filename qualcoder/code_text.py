@@ -473,6 +473,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
+        if self.ui.textEdit.toPlainText() == "":
+            return
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
@@ -491,6 +493,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_mark = menu.addAction(_("Mark"))
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
+        action_set_bookmark = menu.addAction(_("Set bookmark"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -507,6 +510,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.change_code_pos(cursor.position(), "start")
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
+        if action == action_set_bookmark:
+            self.app.settings['bookmark_file_id'] = str(self.filename['id'])
+            self.app.settings['bookmark_pos'] = str(cursor.position())
 
     def change_code_pos(self, location, start_or_end):
         if self.filename == {}:
@@ -537,14 +543,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if start_or_end == "start":
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
-            print("start", min, max)
+            #print("start", min, max)
             changed_start, ok = int_dialog.getInt(self, _("Change start position"), _("Change start character position.\nPositive or negative number:"), 0,min,max,1)
             if not ok:
                 return
         if start_or_end == "end":
             max = txt_len - code_to_edit['pos1']
             min = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
-            print("end", min, max)
+            #print("end", min, max)
             changed_end, ok = int_dialog.getInt(self, _("Change end position"), _("Change end character position.\nPositive or negative number:"), 0,min,max,1)
             if not ok:
                 return
@@ -1124,6 +1130,8 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
+        action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
+
         action = menu.exec_(self.ui.pushButton_view_file.mapToGlobal(position))
         if action == action_next:
             if self.filename is None:
@@ -1145,6 +1153,16 @@ class DialogCodeText(QtWidgets.QWidget):
                 if f['id'] == result[0]:
                     self.load_file(f)
                     return
+        if action == action_go_to_bookmark:
+            for f in self.filenames:
+                if f['id'] == int(self.app.settings['bookmark_file_id']):
+                    try:
+                        self.load_file(f)
+                        textCursor = self.ui.textEdit.textCursor()
+                        textCursor.setPosition(int(self.app.settings['bookmark_pos']))
+                        self.ui.textEdit.setTextCursor(textCursor)
+                    except Exception as e:
+                        logger.debug(str(e))
 
     def view_file_dialog(self):
         """ When view file button is pressed a dialog of filenames is presented to the user.
