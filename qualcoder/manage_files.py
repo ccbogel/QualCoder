@@ -31,6 +31,8 @@ might need: sudo pip install pdfminer.six
 import logging
 import datetime
 import os
+from PIL import Image
+from PIL.ExifTags import TAGS
 import platform
 import sys
 from shutil import copyfile
@@ -264,6 +266,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         This also fills out the table header lables with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
+        Obtain some file metadata to use in table tooltip.
         param:
             order_by: string ""= name, "date" = date, "filetype" = mediapath, "attribute:attribute name" selected atribute
         """
@@ -298,8 +301,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql)
         result = cur.fetchall()
         for row in result:
+            icon, metadata = self.get_icon_and_metadata(row[0], row[2], row[3])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6], 'metadata': metadata, 'icon': icon})
         # attributes
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id")]
         sql = "select name from attribute_type where caseOrFile='file'"
@@ -317,6 +321,63 @@ class DialogManageFiles(QtWidgets.QDialog):
         for row in result:
             self.attributes.append(row)
         self.fill_table()
+
+    def get_icon_and_metadata(self, name, fulltext, mediapath):
+        """ Get metadata used in table tooltip.
+        param:
+            name: string
+            fulltext: None or string
+            mediapath: None or string
+        """
+
+        metadata = name + "\n"
+        icon = QtGui.QIcon("GUI/text.png")
+        if fulltext is not None and len(fulltext) > 0:
+            metadata += "Characters: " + str(len(fulltext))
+            return icon, metadata
+        if mediapath is None:
+            logger.debug("empty media path error")
+            return icon, metadata
+
+        if mediapath[:8] == "/images/":
+            icon = QtGui.QIcon("GUI/picture.png")
+            image = Image.open(self.app.project_path + mediapath)
+            w, h = image.size
+            metadata += "W: " + str(w) + " x H: " + str(h)
+            '''exif = image._getexif()  # for jpg files
+            if exif is not None:
+                labels = {}
+                for (key, val) in exif.items():
+                    print(TAGS.get(key))
+                    labels[TAGS.get(key)] = val
+                print(labels)'''
+        if mediapath[:7] == "/video/":
+            icon = QtGui.QIcon("GUI/play.png")
+        if mediapath[:7] == "/audio/":
+            icon = QtGui.QIcon("GUI/sound.png")
+        if mediapath[:7] in ( "/audio/", "/video/"):
+            instance = vlc.Instance()
+            mediaplayer = instance.media_player_new()
+            try:
+                media = instance.media_new(self.app.project_path + mediapath)
+                media.parse()
+                msecs = media.get_duration()
+                secs = int(msecs / 1000)
+                mins = int(secs / 60)
+                remainder_secs = str(secs - mins * 60)
+                if len(remainder_secs) == 1:
+                    remainder_secs = "0" + remainder_secs
+                metadata += "Duration: " + str(mins) + ":" + remainder_secs
+            except Exception as e:
+                logger.debug(str(e))
+
+        bytes = os.path.getsize(self.app.project_path + mediapath)
+        metadata += "\nBytes: " + str(bytes)
+        if bytes > 1024 and bytes < 1024 * 1024:
+            metadata += "  " + str(int(bytes / 1024)) + "KB"
+        if bytes > 1024 * 1024:
+            metadata += "  " + str(int(bytes / 1024 / 1024)) + "MB"
+        return icon, metadata
 
     def add_attribute(self):
         """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
@@ -1294,24 +1355,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
 
-    def get_icon(self, data):
-        """ Get icon to put in table. Helper method for fill_table
-         parameter:
-            data: a dictionary containing the mediapath
-         return: QIcon """
-
-        if data['mediapath'] is None:
-            return QtGui.QIcon("GUI/text.png")
-        if data['mediapath'][:8] == "/images/":
-            return QtGui.QIcon("GUI/picture.png")
-        if data['mediapath'][:7] == "/video/":
-            return QtGui.QIcon("GUI/play.png")
-        if data['mediapath'][:7] == "/audio/":
-            return QtGui.QIcon("GUI/sound.png")
-        return QtGui.QIcon("GUI/text.png")
-
     def fill_table(self):
-        """ Reload the file data and Fill the table widget with file data. """
+        """ Fill the table widget with file details. """
 
         self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
@@ -1322,11 +1367,12 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
-            icon = self.get_icon(data)
+            icon = data['icon']
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
             # having un-editable file names helps with assigning icons
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            name_item.setToolTip((data['metadata']))
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
