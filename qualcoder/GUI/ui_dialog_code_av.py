@@ -110,6 +110,7 @@ class Ui_Dialog_code_av(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_av.setWindowTitle(_translate("Dialog_code_av", "Code Audio Video"))
         self.textEdit.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Transcript</p></body></html>"))
+        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Ctrl + R rewind 5 seconds</p><p>Alt + R rewind 30 seconds</p><p>Alt + F forward 30 seconds</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p></body></html>"))
         self.pushButton_play.setText(_translate("Dialog_code_av", "Play"))
         self.label_volume.setText(_translate("Dialog_code_av", "Volume"))
         self.label_time.setText(_translate("Dialog_code_av", "Time:"))
