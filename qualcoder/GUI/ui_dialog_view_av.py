@@ -103,6 +103,7 @@ class Ui_Dialog_view_av(object):
         self.label_transcription.setText(_translate("Dialog_view_av", "Transcription:"))
         self.label_speakers.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Add a speaker name to shortcuts. In the text entry box press ctrl + n</p><p>Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.</p></body></html>"))
         self.label_speakers.setText(_translate("Dialog_view_av", "Speakers:"))
+        self.pushButton_play.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Ctrl + R rewind 5 seconds</p><p>Alt + R rewind 30 seconds</p><p>Alt + F forward 30 seconds</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p></body></html>"))
         self.pushButton_play.setText(_translate("Dialog_view_av", "Play"))
         self.label_volume.setText(_translate("Dialog_view_av", "Volume"))
         self.label_time.setText(_translate("Dialog_view_av", "Time:"))
