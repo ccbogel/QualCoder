@@ -68,6 +68,7 @@ from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
+from helpers import msecs_to_mins_and_secs
 from memo import DialogMemo
 from select_items import DialogSelectItems
 
@@ -87,17 +88,6 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
-
-def msecs_to_mins_and_secs(msecs):
-    """ Convert milliseconds to minutes and seconds.
-    msecs is an integer. Minutes and seconds output is a string."""
-
-    secs = int(msecs / 1000)
-    mins = int(secs / 60)
-    remainder_secs = str(secs - mins * 60)
-    if len(remainder_secs) == 1:
-        remainder_secs = "0" + remainder_secs
-    return str(mins) + ":" + remainder_secs
 
 
 class DialogCodeAV(QtWidgets.QDialog):
@@ -916,7 +906,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_coding.setText(_("Clear segment"))
 
             # check and reverse start and end times if start is greater than the end
-            print("start", self.segment['start'], "end", self.segment['end'])
+            #print("start", self.segment['start'], "end", self.segment['end'])
             if float(self.segment['start'].replace(":", ".")) > float(self.segment['end'].replace(":", ".")):
                 tmp = self.segment['start']
                 tmp_msecs = self.segment['start_msecs']
@@ -952,8 +942,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             ActionItemChangeColor = menu.addAction(_("Change code color"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
-        '''if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionAssignSelectedText:
-            self.mark()'''
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
         if action == ActionItemAddCategory:
@@ -1018,8 +1006,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         Also use eventFilter for QGraphicsView.
 
         Options are:
-            ctrl + r to rewind 3 seconds.
-            crl + s OR ctrl + p to start/pause On start rewind 1 second
+            Ctrl + R to rewind 3 seconds.
+            Alt + R rewind 30 seconds
+            Alt +F forward 30 seconds
+            Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -1065,7 +1055,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        # Rewind 3 seconds ctrl R
+        # Rewind 5 seconds ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
@@ -2375,12 +2365,14 @@ class DialogViewAV(QtWidgets.QDialog):
     def eventFilter(self, object, event):
         """ Add key options to improve manual transcribing.
         Options are:
-            ctrl + r to rewind 3 seconds.
-            crl + s OR ctrl + p to start/pause On start rewind 1 second
+            Ctrl + R to rewind 5 seconds.
+            Alt + R rewind 30 seconds
+            Alt + F forward 30 seconds
+            Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
         Can only use these options if the transcription is not coded:
-            ctrl + t to insert timestamp in format [hh.mm.ss]
-            ctrl + n to enter a new speakers name into shortcuts
-            ctrl + 1 .. 8 to insert speaker in format [speaker name]
+            Ctrl + T to insert timestamp in format [hh.mm.ss]
+            Ctrl + N to enter a new speakers name into shortcuts
+            Ctrl + 1 .. 8 to insert speaker in format [speaker name]
         """
 
         if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
@@ -2409,7 +2401,7 @@ class DialogViewAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        # Rewind 3 seconds   Ctrl R
+        # Rewind 5 seconds   Ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:

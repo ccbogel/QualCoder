@@ -43,10 +43,11 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
+from helpers import msecs_to_mins_and_secs
 from information import DialogInformation
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
-from qtmodels import DictListModel, ListObjectModel
+#from qtmodels import DictListModel, ListObjectModel
 from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -65,19 +66,6 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
-
-
-def msecs_to_mins_and_secs(msecs):
-    """ Convert milliseconds to minutes and seconds.
-    msecs is an integer. Minutes and seconds output is a string.
-    called by: coded_media_dialog   """
-
-    secs = int(msecs / 1000)
-    mins = int(secs / 60)
-    remainder_secs = str(secs - mins * 60)
-    if len(remainder_secs) == 1:
-        remainder_secs = "0" + remainder_secs
-    return str(mins) + "." + remainder_secs
 
 
 class DialogCodeText(QtWidgets.QWidget):
