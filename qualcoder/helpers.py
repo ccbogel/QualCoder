@@ -1,10 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-try:
-    from information import DialogInformation
-except:
-    from .information import DialogInformation
+from information import DialogInformation
 
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
@@ -18,7 +15,8 @@ def msecs_to_mins_and_secs(msecs):
     return str(mins) + "." + remainder_secs
 
 
-class CodedMediaMixin:
+#TODO check if this is used anywhere
+class CodedMediaMixin_OLD:
     def coded_media(self, data):
         """ Display all coded media for this code.
         Coded media comes from ALL files and ALL coders.
