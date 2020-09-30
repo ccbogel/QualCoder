@@ -66,7 +66,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.1"
+qualcoder_version = "QualCoder 2.0"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -83,6 +83,7 @@ try:
     data = f.read()
     f.close()
     if len(data) > 12000:
+        os.remove(logfile)
         f.open(logfile, "w")
         f.write(data[10000:])
         f.close()
