@@ -6,9 +6,10 @@ echo "This installer uses RPM package management."
 echo "QualCoder will be copied to the directory /usr/share/"
 echo "These actions require owner (sudo) permission"
 echo "The installer will also install dependencies"
-sudo dnf install python3-pip python3-pyqt5 python3-lxml python3-pil vlc python3-ebooklib python3-ply python3-six python3-chardet
+sudo dnf install python3-pip python3-pyqt5 python3-lxml python3-pil vlc python3-ply python3-six python3-chardet
+# python3-ebooklib is not available in Fedora, so install using pip
 echo "Please wait ..."
-sudo python3 -m pip install pdfminer.six openpyxl
+sudo python3 -m pip install pdfminer.six openpyxl Ebooklib
 sudo mv ~/.local/lib/python3.8/site-packages/Ebook* /usr/lib/python3.8/site-packages/
 sudo mv ~/.local/lib/python3.8/site-packages/ebook* /usr/lib/python3.8/site-packages/
 sudo cp -r qualcoder /usr/share/qualcoder
