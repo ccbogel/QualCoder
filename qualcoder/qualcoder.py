@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2019 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +25,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 import configparser
 import datetime
@@ -35,7 +35,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import platform
-import re
 import shutil
 import sys
 import sqlite3
@@ -93,6 +92,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(me
      datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+# The rotating file handler does not work on Windows
 handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
 logger.addHandler(handler)
 
@@ -1400,8 +1400,8 @@ class MainWindow(QtWidgets.QMainWindow):
         res = cur.fetchone()
         msg += _("Journals: ") + str(res[0])
 
-        msg += "\nText Bookmark: " + self.app.settings['bookmark_file_id']
-        msg += ", position: " + self.app.settings['bookmark_pos']
+        msg += "\nText Bookmark: " + str(self.app.settings['bookmark_file_id'])
+        msg += ", position: " + str(self.app.settings['bookmark_pos'])
 
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
