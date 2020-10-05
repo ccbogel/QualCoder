@@ -1398,6 +1398,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                         #print("found", a)
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.resizeColumnsToContents()
+        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450:
+            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
+
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':
