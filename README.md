@@ -151,7 +151,7 @@ See [https://github.com/ccbogel/QualCoder-Debians](https://github.com/ccbogel/Qu
 
 ##  Citation APA style
 
-Curtain, C. (2020) QualCoder 1.9 [Computer software]. Retrieved from
+Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/1.9
 
 ## Publications using QualCoder
