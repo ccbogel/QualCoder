@@ -36,16 +36,31 @@ import re
 import sys
 import traceback
 
+path = os.path.abspath(os.path.dirname(__file__))
+logger = logging.getLogger(__name__)
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 # https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
 try:
+    # Older x86 32 bit location
+    os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
+except Exception as e:
+    if sys.platform.startswith("win"):
+        logger.debug(str(e))
+        #Commented below out, as this would be less common location.
+        #Uncomment if desired
+        #QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+try:
     os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC')
 except Exception as e:
     if sys.platform.startswith("win"):
-        QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+        #Commented below out, as this would be less common location.
+        #Uncomment if desired
+        #QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+        logger.debug(str(e))
 vlc_msg = ""
 try:
     import vlc
@@ -72,8 +87,7 @@ from helpers import msecs_to_mins_and_secs
 from memo import DialogMemo
 from select_items import DialogSelectItems
 
-path = os.path.abspath(os.path.dirname(__file__))
-logger = logging.getLogger(__name__)
+
 
 
 def exception_handler(exception_type, value, tb_obj):
