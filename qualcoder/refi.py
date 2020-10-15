@@ -361,7 +361,7 @@ class Refi_import():
             try:
                 cur.execute(
                     "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-                    , (name, now_date, self.app.settings['codername'], memo, caseOrFile, valuetype))
+                    , (name, now_date, self.app.settings['codername'], variable["memo"], caseOrFile, valuetype))
                 self.app.conn.commit()
                 if caseOrFile == "case":
                     casevarcount += 1
