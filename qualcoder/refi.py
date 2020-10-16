@@ -301,6 +301,11 @@ class Refi_import():
             QtWidgets.QApplication.processEvents()
         self.clean_up_case_codes_and_case_text()
         self.parent_textEdit.append(self.file_path + _(" loaded."))
+        # Remove temporary extract folder
+        try:
+            shutil.rmtree(self.folder_name)
+        except OSError as e:
+            logger.debug(str(e) + " " + self.folder_name)
 
         # Change the user name to an owner name from the import
         if len(self.users) > 0:
@@ -313,8 +318,6 @@ class Refi_import():
         <Variable guid="51dc3bcd-5454-47ff-a4d6-ea699144410d" name="Cases:Age group" typeOfVariable="Text">
         <Description />
         </Variable>
-
-        TODO variables assigned to files - to check
 
         typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
 
@@ -517,7 +520,9 @@ class Refi_import():
         return count
 
     def name_creating_user_create_date_source_path_helper(self, element):
-        """ Helper method to obtain name, guid, creating user, create date from each source """
+        """ Helper method to obtain name, guid, creating user, create date from each source.
+         Note: the sources folder can be named: sources or Sources
+         MAXQDA uses sources, NVIVO uses Sources """
 
         name = element.get("name")
         #guid = element.get("guid")
@@ -532,14 +537,23 @@ class Refi_import():
 
         # path starts with internal:// or relative:///
         path = element.get("path")
+
+        # Sources folder name can be capital or lower case, check and get the correct one
+        contents = os.listdir(self.folder_name)
+        sources_name = "/Sources"
+        for i in contents:
+            if i == "sources":
+                sources_name = "/sources"
+        # Determine internal or external path
+        #TODO currently qualcoder does not use external paths with an import
         if path is not None and path.find("internal://") == 0:
             path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + '/Sources' + path
+            source_path = self.folder_name + sources_name + path
         if path is not None and path.find("relative:///") == 0:
             source_path = self.app.project_path + "../" + path.split('relative:///')[1]
         if path is None:
             source_path = element.get("plainTextPath").split('internal:/')[1]
-            source_path = self.folder_name + '/Sources' + source_path
+            source_path = self.folder_name + sources_name + source_path
 
         return name, creating_user, create_date, source_path
 
