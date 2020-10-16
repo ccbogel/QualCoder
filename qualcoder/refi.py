@@ -62,7 +62,6 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class Refi_import():
-
     """
     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
@@ -71,13 +70,14 @@ class Refi_import():
     #TODO parse_sources PDF if e.tag == "{urn:QDA-XML:project:1.0}PDFSource
     #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
+    #TODO check imports from different vendors
 
     file_path = None
     codes = []
     users = []
     cases = []
     sources = []
-    variables = []  # lost of dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    variables = []  # Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     parent_textEdit = None
     app = None
     tree = None
@@ -141,6 +141,10 @@ class Refi_import():
         Determines whether the Code is a Category item or a Code item.
         Uses the parent entered cat_id ot give a Code a category alignment,
         or if a category, gives the category alignment to a super_category.
+        Called from: import_project, import_codebook
+
+        Some software e.g. MAXQDA categories are also codes
+        in this case QualCoder will create a category, and also a code with the same name underneath that category
 
         Recursive, until no more child Codes found.
         Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
@@ -160,7 +164,7 @@ class Refi_import():
                 description = e.text
 
         # Determine if the parent is a code or a category
-        # Has Code element children, so must be a category, insert into code_cat table
+        # if it has Code element children, so must be a category, insert into code_cat table
         is_category = False
         for e in elements:
             if e.tag in ("{urn:QDA-XML:codebook:1:0}Code", "{urn:QDA-XML:project:1.0}Code"):
@@ -180,6 +184,26 @@ class Refi_import():
                     counter += 1
                 except sqlite3.IntegrityError as e:
                     QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
+
+                # This category may ALSO be a code (e.g. MAXQDA has categories as codes also)
+                # So create a code for this codable category
+                isCodable = parent.get("isCodable")
+                if isCodable == "true":
+                    color = parent.get("color")
+                    if color is None:
+                        color = "#999999"
+                    try:
+                        #print(isCodable, name, "inserting into code name")
+                        cur = self.app.conn.cursor()
+                        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
+                            , [name, description, now_date, last_insert_id, color])
+                        self.app.conn.commit()
+                        cur.execute("select last_insert_rowid()")
+                        code_last_insert_id = cur.fetchone()[0]
+                        self.codes.append({'guid': parent.get('guid'), 'cid': code_last_insert_id})
+                        counter += 1
+                    except sqlite3.IntegrityError as e:
+                        QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
 
             for e in elements:
                 if e.tag not in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
@@ -201,7 +225,7 @@ class Refi_import():
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'),'cid': last_insert_id})
+                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
                 QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
@@ -221,15 +245,17 @@ class Refi_import():
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 last_insert_id = cur.fetchone()[0]
-                self.codes.append({'guid': parent.get('guid'),'cid': last_insert_id})
+                self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
                 QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
 
-        #SHOULD NOT GET HERE
+        # SHOULD NOT GET HERE
         print("SHOULD NOT GET HERE")
         print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
+        logger.debug("REFI sub_codes import: SHOULD NOT GET HERE:")
+        logger.debug("tag:" + str(e.tag) + " " + str(e.text) + " name:" + str(e.get("name")) + " color:" + str(e.get("isCodable")))
         QtWidgets.QMessageBox.warning(None, "tag: " + e.tag +"  " + e.text + " " + e.get("name") + " " + e.get("color") +" " + e.get("isCodable"))
         return counter
 
@@ -793,7 +819,7 @@ class Refi_import():
                 self._load_codings_for_text(source, e)
 
     def _load_codings_for_text(self, source, element):
-        ''' These are PlainTextSelection elements.
+        """ These are PlainTextSelection elements.
         These elements contain a Coding element and a Description element.
         The Description element is treated as an Annotation.
 
@@ -812,7 +838,7 @@ class Refi_import():
 
         :param entry - the source text dictionary
         :param element - the PlainTextSelection element
-        '''
+        """
 
         cur = self.app.conn.cursor()
         pos0 = int(element.get("startPosition"))
@@ -835,7 +861,7 @@ class Refi_import():
                 self.app.conn.commit()
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
                 memo = ""
-                #TODO? can coded text be memoed?
+                #TODO can coded text be memoed?
                 # Get the code id from the CodeRef guid
                 cid = None
                 codeRef = e.getchildren()[0]
