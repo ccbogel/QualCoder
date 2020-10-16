@@ -282,6 +282,26 @@ class App(object):
             res.append({'id': row[0], 'name': row[1]})
         return res
 
+    def get_image_filenames(self):
+        """ Get filenames of image files only. """
+        cur = self.conn.cursor()
+        cur.execute("select id, name from source where mediapath like '/images/%' order by lower(name)")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1]})
+        return res
+
+    def get_av_filenames(self):
+        """ Get filenames of audio video files only. """
+        cur = self.conn.cursor()
+        cur.execute("select id, name from source where (mediapath like '/audio/%' or mediapath like '/video/%') order by lower(name)")
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1]})
+        return res
+
     def get_annotations(self):
         """ Get annotations for text files. """
 
@@ -328,7 +348,7 @@ class App(object):
     def _load_config_ini(self):
         config = configparser.ConfigParser()
         config.read(self.configpath)
-        default =  config['DEFAULT']
+        default = config['DEFAULT']
         result = dict(default)
         # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
@@ -341,7 +361,7 @@ class App(object):
         """ Newer features include width and height settings for many dialogs and main window.
         timestamp format
         :param data:  dictionary of most or all settings
-        :return: dictionary of settings
+        :return: dictionary of all settings
         """
 
         dict_len = len(data)
@@ -493,19 +513,14 @@ class App(object):
             )
         else:
             cur.execute("select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
-        res = []
+        keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date'
+        result = []
         for row in cur.fetchall():
-            res.append({
-            'name': row[0],
-            'id': row[1],
-            'fulltext': row[2],
-            'memo': row[3],
-            'owner': row[4],
-            'date': row[5],
-        })
-        return res
+            result.append( dict(zip(keys, row)))
+        return result
 
-    def get_code_texts(self, text):
+    #TODO called by??  defunct function
+    '''def get_code_texts(self, text):
         """ Get all the coded text that contains the text parameter.
         Called by: ???
         param:
@@ -517,7 +532,7 @@ class App(object):
         cur.execute(codingsql, [text],)
         keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
         for res in cur.fetchall():
-            yield dict(zip(keys, res))
+            yield dict(zip(keys, res))'''
 
     def get_coder_names_in_project(self):
         """ Get all coder nmes fro mall tables.
@@ -965,10 +980,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.dialogList.remove(d)
                 return
 
-        ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
-        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.dialogList.append(ui)
-        ui.show()
+        files = self.app.get_text_filenames()
+        if len(files) > 0:
+            ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
+            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            self.dialogList.append(ui)
+            ui.show()
+        else:
+            msg = _("This project contains no text files.")
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('No text files'))
+            mb.setText(msg)
+            mb.exec_()
         self.clean_dialog_refs()
 
     def image_coding(self):
@@ -979,10 +1003,19 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogCodeImage":
                 d.activateWindow()
                 return
-        ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
-        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.dialogList.append(ui)
-        ui.show()
+        files = self.app.get_image_filenames()
+        if len(files) > 0:
+            ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
+            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            self.dialogList.append(ui)
+            ui.show()
+        else:
+            msg = _("This project contains no image files.")
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('No image files'))
+            mb.setText(msg)
+            mb.exec_()
         self.clean_dialog_refs()
 
     def av_coding(self):
@@ -1000,6 +1033,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     except:
                         pass
                 return
+
+        files = self.app.get_av_filenames()
+        if len(files) == 0:
+            msg = _("This project contains no audio/video files.")
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('No a/v files'))
+            mb.setText(msg)
+            mb.exec_()
+            self.clean_dialog_refs()
+            return
+
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
