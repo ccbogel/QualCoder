@@ -34,6 +34,7 @@ import platform
 from random import randint
 import re
 import sys
+import time
 import traceback
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -84,8 +85,6 @@ from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from helpers import msecs_to_mins_and_secs
 from memo import DialogMemo
 from select_items import DialogSelectItems
-
-
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -240,6 +239,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        # add context menu for ddialog
+        self.ddialog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Create a vlc instance with an empty vlc media player
         self.instance = vlc.Instance()
@@ -262,6 +264,31 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+
+    def ddialog_menu(self, position):
+        """ Context menu to export a screenshot, to resize dialog """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        ActionScreenshot = menu.addAction(_("Screenshot"))
+        ActionResize = menu.addAction(_("Resize"))
+
+        action = menu.exec_(self.ddialog.mapToGlobal(position))
+        if action == ActionScreenshot:
+            time.sleep(0.5)
+            screen = QtWidgets.QApplication.primaryScreen()
+            screenshot = screen.grabWindow(self.ddialog.winId())
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().strftime("%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
+        if action == ActionResize:
+            w = self.ddialog.size().width()
+            h = self.ddialog.size().height()
+            res_w = QtWidgets.QInputDialog.getInt(None, _("Width"), _("Width:"), w, 100, 2000, 5)
+            if res_w[1]:
+                w = res_w[0]
+            res_h = QtWidgets.QInputDialog.getInt(None, _("Height"), _("Height:"), h, 80, 2000, 5)
+            if res_h[1]:
+                h = res_h[0]
+            self.ddialog.resize(w, h)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter. """
@@ -2287,6 +2314,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
+        # add context menu for ddialog
+        self.ddialog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Set video dialog position, with a default initial position
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
@@ -2299,7 +2329,7 @@ class DialogViewAV(QtWidgets.QDialog):
             pass
         self.ddialog.show()
 
-        # Create a basic vlc instance
+        # Create a vlc instance
         self.instance = vlc.Instance()
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
@@ -2360,6 +2390,31 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
         #self.play_pause()
+
+    def ddialog_menu(self, position):
+        """ Context menu to export a screenshot, to resize dialog """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        ActionScreenshot = menu.addAction(_("Screenshot"))
+        ActionResize = menu.addAction(_("Resize"))
+
+        action = menu.exec_(self.ddialog.mapToGlobal(position))
+        if action == ActionScreenshot:
+            time.sleep(0.5)
+            screen = QtWidgets.QApplication.primaryScreen()
+            screenshot = screen.grabWindow(self.ddialog.winId())
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().strftime("%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
+        if action == ActionResize:
+            w = self.ddialog.size().width()
+            h = self.ddialog.size().height()
+            res_w = QtWidgets.QInputDialog.getInt(None, _("Width"), _("Width:"), w, 100, 2000, 5)
+            if res_w[1]:
+                w = res_w[0]
+            res_h = QtWidgets.QInputDialog.getInt(None, _("Height"), _("Height:"), h, 80, 2000, 5)
+            if res_h[1]:
+                h = res_h[0]
+            self.ddialog.resize(w, h)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
