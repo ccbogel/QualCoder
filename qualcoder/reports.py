@@ -972,7 +972,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -992,7 +992,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
