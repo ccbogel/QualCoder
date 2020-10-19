@@ -40,11 +40,9 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
-from GUI.ui_dialog_memo import Ui_Dialog_memo  # where used here?
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from memo import DialogMemo
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -1792,13 +1790,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and code_av.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
+            result = []
             if parameters == []:
                 cur.execute(sql)
+                result = cur.fetchall()
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
+                #logger.debug("SQL:" + sql)
+                try:
+                    cur.execute(sql, parameters)
+                    result = cur.fetchall()
+                except Exception as e:
+                    logger.debug(str(e))
+                    logger.debug("SQL:\n" + sql)
+                    logger.debug("Parameters:\n" + str(parameters))
             for row in result:
                 self.av_results.append(row)
 
