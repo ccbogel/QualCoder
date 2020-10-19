@@ -59,6 +59,8 @@ class TestApp(TestCase):
             (1, "textfile one", "a short boring story.", None, 'memo', 'default', dt))
         cur.execute("insert into source (id, name, fulltext, mediapath, memo, owner, date) VALUES (?,?,?,?,?,?,?)",
             (2, "pic one", None, "/images/firstimage.png", 'memo', 'coder2', dt))
+        cur.execute("insert into source (id, name, fulltext, mediapath, memo, owner, date) VALUES (?,?,?,?,?,?,?)",
+            (3, "vid one", None, "/video/firstvideo.mp4", 'memo', 'coder2', dt))
         self.conn.commit()
 
     def tearDown(self):
@@ -88,7 +90,15 @@ class TestApp(TestCase):
 
     def test_get_filenames(self):
         result = App.get_filenames(self)
-        self.assertEqual(2, len(result))
+        self.assertEqual(3, len(result))
+
+    def test_get_av_filenames(self):
+        result = App.get_av_filenames(self)
+        self.assertEqual(1, len(result))
+
+    def test_get_image_filenames(self):
+        result = App.get_image_filenames(self)
+        self.assertEqual(1, len(result))
 
     def test_get_text_filenames(self):
         result = App.get_text_filenames(self)
