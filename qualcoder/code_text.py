@@ -622,6 +622,11 @@ class DialogCodeText(QtWidgets.QWidget):
         http://doc.qt.io/qt-5/qevent.html#Type-enum
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
+
+        Also use it to detect key events in the textedit. These are used to extend ot shrink a text coding.
+        Only works if clicked on a code (text cursor is in the coded text).
+        Shrink start and end code positions using alt arrow left and alt arrow right
+        Extend start and end code positions using shift arrow left, shift arrow right
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -645,9 +650,9 @@ class DialogCodeText(QtWidgets.QWidget):
             #print("KEY ", key)
             if len(codes_here) == 1:
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
-                    self.shrink_left(codes_here[0])
+                    self.shrink_to_left(codes_here[0])
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
-                    self.shrink_right(codes_here[0])
+                    self.shrink_to_right(codes_here[0])
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
                     self.extend_left(codes_here[0])
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
@@ -655,16 +660,60 @@ class DialogCodeText(QtWidgets.QWidget):
         return False
 
     def extend_left(self, code_):
-        print("sh l", code_)
+        """ Shift left arrow """
+
+        if code_['pos0'] < 1:
+            return
+        code_['pos0'] -= 1
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos0'], code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'], self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def extend_right(self, code_):
-        print("sh r", code_)
+        """ Shift right arrow """
 
-    def shrink_left(self, code_):
-        print("alt l", code_)
+        if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
+            return
+        code_['pos1'] += 1
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos1'], code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
-    def shrink_right(self, code_):
-        print("alt r", code_)
+    def shrink_to_left(self, code_):
+        """ Alt left arrow, shrinks code from the right end of the code """
+
+        if code_['pos1'] <= code_['pos0'] + 1:
+            return
+        code_['pos1'] -= 1
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos1'], code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def shrink_to_right(self, code_):
+        """ Alt right arrow shrinks code from the left end of the code """
+
+        if code_['pos0'] >= code_['pos1'] - 1:
+            return
+        code_['pos0'] += 1
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos0'], code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'], self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def coded_media_dialog(self, data):
         """ Display all coded media for this code, in a separate modal dialog.
@@ -846,8 +895,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.conn.commit()
         except Exception as e:
             e = str(e)
-            msg = _("Cannot merge codes, unmark overlapping text first. ") + e
-            QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
+            msg = _("Cannot merge codes, unmark overlapping text first. ") + "\n" + str(e)
+            QtWidgets.QMessageBox.information(None, _("Cannot merge"), msg)
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
