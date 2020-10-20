@@ -1527,7 +1527,6 @@ class DialogCodeText(QtWidgets.QWidget):
             to_unmark = unmarked_list[0]
         # multiple codes to select from
         if len(unmarked_list) > 1:
-            print(unmarked_list)  # tmp
             ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
             if not ok:
