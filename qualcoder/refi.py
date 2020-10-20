@@ -1921,7 +1921,7 @@ class Refi_export(QtWidgets.QDialog):
             xml += '" name="' + c['name']
             xml += '" isCodable="true'
             xml += '" color="' + c['color'] + '"'
-            if c['memo'] != "":
+            if c['memo'] != "" and c['memo'] is not None:
                 xml += '>\n'
                 xml += '<Description>' + c['memo'] + '</Description>\n'
                 xml += '</Code>\n'
