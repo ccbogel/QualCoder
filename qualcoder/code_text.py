@@ -127,7 +127,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
         self.ui.textEdit.setReadOnly(True)
-        #self.ui.textEdit.setStyleSheet(font)
+        self.ui.textEdit.installEventFilter(self)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -589,8 +589,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
+
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
-        if action is not None :
+        if action is not None:
             '''if selected is not None and action == ActionAssignSelectedText:
                 self.mark()'''
             if selected is not None and action == ActionItemChangeColor:
@@ -615,6 +616,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if found:
                     self.coded_media_dialog(found)
 
+
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
@@ -627,7 +629,42 @@ class DialogCodeText(QtWidgets.QWidget):
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
+                return True
+        # change start and end code positions using alt arrow left and alt arrow right
+        # and shift arrow left, shift arrow right
+        # QtGui.QKeyEvent = 7
+        if event.type() == 7 and self.ui.textEdit.hasFocus():
+            key = event.key()
+            mod = event.modifiers()
+            cursor_pos = self.ui.textEdit.textCursor().position()
+            codes_here = []
+            for item in self.code_text:
+                if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings[
+                    'codername']:
+                    codes_here.append(item)
+            #print("KEY ", key)
+            if len(codes_here) == 1:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
+                    self.shrink_left(codes_here[0])
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
+                    self.shrink_right(codes_here[0])
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
+                    self.extend_left(codes_here[0])
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
+                    self.extend_right(codes_here[0])
         return False
+
+    def extend_left(self, code_):
+        print("sh l", code_)
+
+    def extend_right(self, code_):
+        print("sh r", code_)
+
+    def shrink_left(self, code_):
+        print("alt l", code_)
+
+    def shrink_right(self, code_):
+        print("alt r", code_)
 
     def coded_media_dialog(self, data):
         """ Display all coded media for this code, in a separate modal dialog.
@@ -1400,8 +1437,7 @@ class DialogCodeText(QtWidgets.QWidget):
         coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        self.code_text.append(coded)
-        self.highlight()
+
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
@@ -1411,6 +1447,8 @@ class DialogCodeText(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(None, _("Already Coded"),
             _("This segment has already been coded with this code by ") + coded['owner'], QtWidgets.QMessageBox.Ok)
             return
+        self.code_text.append(coded)
+        self.highlight()
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
@@ -1440,6 +1478,7 @@ class DialogCodeText(QtWidgets.QWidget):
             to_unmark = unmarked_list[0]
         # multiple codes to select from
         if len(unmarked_list) > 1:
+            print(unmarked_list)  # tmp
             ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
             if not ok:
