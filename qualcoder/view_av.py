@@ -1766,8 +1766,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        self.code_text.append(coded)
-        self.highlight()
+
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
@@ -1780,6 +1779,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             mb.setText(_("This segment has already been coded with this code by ") + coded['owner'])
             mb.exec_()
             return
+
+        self.code_text.append(coded)
+        self.highlight()
 
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
