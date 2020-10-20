@@ -1536,7 +1536,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     tempList.append(d)
             # RuntimeError: wrapped C/C++ object of type DialogSQL has been deleted
             except RuntimeError as e:
-                logger.error(str(e))
+                #logger.error(str(e))
+                pass
         self.dialogList = tempList
         self.update_dialog_lists_in_modeless_dialogs()
 
