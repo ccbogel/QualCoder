@@ -841,15 +841,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 d.activateWindow()
                 return
 
-        '''for d in self.dialogList:
-            # Had to add this code to fix error:
-            # __main__.clean_dialog_refs wrapped C/C++ object of type DialogJournals has been deleted
-            if type(d).__name__ == "DialogJournals":
-                try:
-                    d.show()
-                    d.activateWindow()
-                    return'''
-
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
@@ -893,7 +884,6 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
                 d.activateWindow()
                 return
-        #TODO
         ui = DialogInformation(self.app, "About", "")
         self.dialogList.append(ui)
         ui.show()
@@ -1249,12 +1239,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Change default settings - the coder name, font, font size. Non-modal.
         Backup options """
 
+        current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
         ui.exec_()
         self.settings_report()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        if current_coder != self.app.settings['codername']:
+            # Close all opened dialogs as coder name needs to change everywhere
+            self.clean_dialog_refs()
+            for d in self.dialogList:
+                d.destroy()
+                self.dialogList = []
 
     def project_memo(self):
         """ Give the entire project a memo. Modal dialog. """
@@ -1345,23 +1342,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
-            '''nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
-            backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
-            if self.app.settings['backup_av_files'] == 'True':
-                try:
-                    shutil.copytree(self.app.project_path, backup)
-                except FileExistsError as e:
-                    msg = _("There is already a backup with this name")
-                    print(str(e) + "\n" + msg)
-                    logger.warning(_(msg) + "\n" + str(e))
-            else:
-                shutil.copytree(self.app.project_path, backup, ignore=shutil.ignore_patterns('*.mp3','*.wav','*.mp4', '*.mov','*.ogg','*.wmv','*.MP3','*.WAV','*.MP4', '*.MOV','*.OGG','*.WMV'))
-                self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
-            self.ui.textEdit.append(_("Project backup created: ") + backup)
-            # delete backup path - delete the backup if no changes occurred in the project during the session
-            self.app.delete_backup_path_name = backup
-            delete_backup = True'''
-
         msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
         self.project_summary_report()
@@ -1393,7 +1373,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(_("Project backup created: ") + backup)
         # delete backup path - delete the backup if no changes occurred in the project during the session
         self.app.delete_backup_path_name = backup
-        #delete_backup = True
 
     def project_summary_report(self):
         """ Add a summary of the project to the tet edit.
@@ -1563,6 +1542,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Get latest github release.
         https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo
         Dated May 2018
+
+        Some issues on some platforms, so all in try except clause
         """
 
         self.ui.textEdit.append(_("This version: ") + qualcoder_version)
