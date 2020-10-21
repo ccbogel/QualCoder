@@ -121,7 +121,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;p&gt;Shift + &amp;gt; increase play rate&lt;/p&gt;&lt;p&gt;Shift + &amp;lt; decrease play rate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Play</string>
