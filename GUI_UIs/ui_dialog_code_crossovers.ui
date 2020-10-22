@@ -38,20 +38,20 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>0</y>
-        <width>651</width>
-        <height>32</height>
+        <y>-4</y>
+        <width>201</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>32</height>
+        <height>26</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>16777213</width>
+        <width>16777215</width>
         <height>26</height>
        </size>
       </property>
@@ -66,7 +66,7 @@
       <property name="geometry">
        <rect>
         <x>360</x>
-        <y>40</y>
+        <y>30</y>
         <width>291</width>
         <height>31</height>
        </rect>
@@ -78,14 +78,27 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>40</y>
+        <x>10</x>
+        <y>30</y>
         <width>171</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>Calculate</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_codes">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>641</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Codes:</string>
       </property>
      </widget>
     </widget>
@@ -97,12 +110,18 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QTreeWidget" name="treeWidget">
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
+       <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QTreeWidget" name="treeWidget">
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QTableWidget" name="tableWidget"/>
        </widget>
       </item>
      </layout>
