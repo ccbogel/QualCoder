@@ -58,6 +58,7 @@ from manage_files import DialogManageFiles
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from report_crossovers import DialogReportCrossovers
 from rqda import Rqda_import
 from settings import DialogSettings
 #from text_mining import DialogTextMining
@@ -382,7 +383,7 @@ class App(object):
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
-        'bookmark_file_id', 'bookmark_pos'
+        'bookmark_file_id', 'bookmark_pos', 'dialogcodecrossovers_w', 'dialogcodecrossovers_h'
         ]
         for key in keys:
             if key not in data:
@@ -497,7 +498,9 @@ class App(object):
             'viewav_abs_pos_x': 0,
             'viewav_abs_pos_y': 0,
             'bookmark_file_id': 0,
-            'bookmark_pos': 0
+            'bookmark_pos': 0,
+            'dialogcodecrossovers_w': 0,
+            'dialogcodecrossovers_h': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -641,6 +644,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
+        self.ui.actionCode_crossovers.triggered.connect(self.report_code_crossovers)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -748,6 +752,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
         self.ui.actionCode_frequencies.setEnabled(False)
+        self.ui.actionCode_crossovers.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
 
@@ -780,6 +785,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
+        self.ui.actionCode_crossovers.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
@@ -842,6 +848,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
 
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
+        self.dialogList.append(ui)
+        ui.show()
+        self.clean_dialog_refs()
+
+    def report_code_crossovers(self):
+        """ Show code crossover relations (overall and by coder.) """
+
+        for d in self.dialogList:
+            if type(d).__name__ == "DialogReportCrossovers":
+                d.activateWindow()
+                return
+
+        ui = DialogReportCrossovers(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
