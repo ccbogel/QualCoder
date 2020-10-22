@@ -86,8 +86,11 @@ class Ui_Dialog_code_av(object):
         self.label.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label.setObjectName("label")
         self.checkBox_scroll_transcript = QtWidgets.QCheckBox(self.groupBox_2)
-        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(10, 90, 591, 22))
+        self.checkBox_scroll_transcript.setGeometry(QtCore.QRect(230, 90, 591, 22))
         self.checkBox_scroll_transcript.setObjectName("checkBox_scroll_transcript")
+        self.label_rate = QtWidgets.QLabel(self.groupBox_2)
+        self.label_rate.setGeometry(QtCore.QRect(10, 90, 161, 17))
+        self.label_rate.setObjectName("label_rate")
         self.gridLayout.addWidget(self.groupBox_2, 1, 0, 1, 1)
         self.horizontalSlider = QtWidgets.QSlider(Dialog_code_av)
         self.horizontalSlider.setMinimumSize(QtCore.QSize(990, 20))
@@ -110,7 +113,7 @@ class Ui_Dialog_code_av(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_av.setWindowTitle(_translate("Dialog_code_av", "Code Audio Video"))
         self.textEdit.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Transcript</p></body></html>"))
-        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Ctrl + R rewind 5 seconds</p><p>Alt + R rewind 30 seconds</p><p>Alt + F forward 30 seconds</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p><p>Shift + &gt; Increase play rate </p><p>Shift + &lt; decrease play rate</p></body></html>"))
+        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Ctrl + R rewind 5 seconds</p><p>Alt + R rewind 30 seconds</p><p>Alt + F forward 30 seconds</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p><p>Ctrl + Shift + &gt; Increase play rate </p><p>Ctrl + Shift + &lt; decrease play rate</p></body></html>"))
         self.pushButton_play.setText(_translate("Dialog_code_av", "Play"))
         self.label_volume.setText(_translate("Dialog_code_av", "Volume"))
         self.label_time.setText(_translate("Dialog_code_av", "Time:"))
@@ -123,6 +126,8 @@ class Ui_Dialog_code_av(object):
         self.pushButton_select.setText(_translate("Dialog_code_av", "Select media"))
         self.label.setText(_translate("Dialog_code_av", "Audio:"))
         self.checkBox_scroll_transcript.setText(_translate("Dialog_code_av", "Scroll transcript while playing. (Transcript cannot be coded)."))
+        self.label_rate.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Ctrl + Shift + &gt;     Increase play rate to maximum 2x </p><p>Ctrl + Shift + &lt;    Decrease play rate to minimum 0.1</p></body></html>"))
+        self.label_rate.setText(_translate("Dialog_code_av", "Rate:"))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
 
 

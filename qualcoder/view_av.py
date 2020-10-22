@@ -1051,8 +1051,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
 
-            Shift + > to increase play rate
-            Shift + < to decrease play rate
+            Ctrl + Shift + > to increase play rate
+            Ctrl + Shift + < to decrease play rate
 
         TODO ADD TEXT CODING KEY EVENTS FOR EXTENDING / SHRINKING CODES - SEE CODE TEXT.py
         """
@@ -1111,11 +1111,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        # Increase play rate  Shift + >
-        if key == QtCore.Qt.Key_Greater:
+        # Increase play rate  Ctrl + Shift + >
+        if key == QtCore.Qt.Key_Greater  and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.increase_play_rate()
-        # Decrease play rate  Shift + <
-        if key == QtCore.Qt.Key_Less:
+        # Decrease play rate  Ctrl + Shift + <
+        if key == QtCore.Qt.Key_Less  and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.decrease_play_rate()
         return False
 
@@ -1123,27 +1123,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Several increased rate options """
 
         rate = self.mediaplayer.get_rate()
-        if rate == 2:
-            self.mediaplayer.set_rate(4)
-        if rate == 1:
-            self.mediaplayer.set_rate(2)
-        if rate == 0.5:
-            self.mediaplayer.set_rate(1)
-        if rate == 0.25:
-            self.mediaplayer.set_rate(0.5)
+        rate += 0.1
+        if rate > 2:
+            rate = 2
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
 
     def decrease_play_rate(self):
         """ Several decreased rate options """
 
         rate = self.mediaplayer.get_rate()
-        if rate == 0.5:
-            self.mediaplayer.set_rate(0.25)
-        if rate == 1:
-            self.mediaplayer.set_rate(0.5)
-        if rate == 2:
-            self.mediaplayer.set_rate(1)
-        if rate == 4:
-            self.mediaplayer.set_rate(2)
+        rate -= 0.1
+        if rate < 0.1:
+            rate = 0.1
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
 
     def assign_segment_to_code(self, selected):
         """ Assign time segment to selected code. Insert an entry into the database.
@@ -2481,8 +2475,8 @@ class DialogViewAV(QtWidgets.QDialog):
             Ctrl + N to enter a new speakers name into shortcuts
             Ctrl + 1 .. 8 to insert speaker in format [speaker name]
 
-            Shift + > to increase play rate
-            Shift + < to decrease play rate
+            Ctrl + Shift + > to increase play rate
+            Ctrl + Shift + < to decrease play rate
         """
 
         if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
@@ -2547,11 +2541,11 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             self.delete_speakernames()
-        # Increase play rate  Shift + >
-        if key == QtCore.Qt.Key_Greater:
+        # Increase play rate  Ctrl + Shift + >
+        if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.increase_play_rate()
-        # Decrease play rate  Shift + <
-        if key == QtCore.Qt.Key_Less:
+        # Decrease play rate  Ctrl + Shift + <
+        if key == QtCore.Qt.Key_Less and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.decrease_play_rate()
         return True
 
@@ -2559,27 +2553,21 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Several increased rate options """
 
         rate = self.mediaplayer.get_rate()
-        if rate == 2:
-            self.mediaplayer.set_rate(4)
-        if rate == 1:
-            self.mediaplayer.set_rate(2)
-        if rate == 0.5:
-            self.mediaplayer.set_rate(1)
-        if rate == 0.25:
-            self.mediaplayer.set_rate(0.5)
+        rate += 0.1
+        if rate > 2:
+            rate = 2
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
 
     def decrease_play_rate(self):
         """ Several decreased rate options """
 
         rate = self.mediaplayer.get_rate()
-        if rate == 0.5:
-            self.mediaplayer.set_rate(0.25)
-        if rate == 1:
-            self.mediaplayer.set_rate(0.5)
-        if rate == 2:
-            self.mediaplayer.set_rate(1)
-        if rate == 4:
-            self.mediaplayer.set_rate(2)
+        rate -= 0.1
+        if rate < 0.1:
+            rate = 0.1
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
 
     def delete_speakernames(self):
         """ Delete speakername from list of shortcut names """
