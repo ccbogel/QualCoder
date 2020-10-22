@@ -116,7 +116,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     ddialog = None
     media_data = None
     instance = None
-    media_player = None
+    mediaplayer = None
     media = None
     metadata = None
     is_paused = False
@@ -244,6 +244,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Create a vlc instance with an empty vlc media player
+        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
         self.instance = vlc.Instance()
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
@@ -1049,6 +1050,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             Alt + R rewind 30 seconds
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
+
+            Shift + > to increase play rate
+            Shift + < to decrease play rate
+
+        TODO ADD TEXT CODING KEY EVENTS FOR EXTENDING / SHRINKING CODES - SEE CODE TEXT.py
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -1064,12 +1070,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             time = msecs_to_mins_and_secs(msecs)
             self.ui.horizontalSlider.setToolTip(time)
 
-        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent
+        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent = 7
             return False
         key = event.key()
         mods = event.modifiers()
         #print("KEY ", key, "MODS ", mods)
-        #  ctrl S or ctrl + P pause/play toggle
+        #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
         # Advance 30 seconds Alt F
@@ -1094,7 +1100,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
-        # Rewind 5 seconds ctrl R
+        # Rewind 5 seconds Ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             time_msecs = self.mediaplayer.get_time() - 5000
             if time_msecs < 0:
@@ -1105,7 +1111,39 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
             self.update_ui()
+        # Increase play rate  Shift + >
+        if key == QtCore.Qt.Key_Greater:
+            self.increase_play_rate()
+        # Decrease play rate  Shift + <
+        if key == QtCore.Qt.Key_Less:
+            self.decrease_play_rate()
         return False
+
+    def increase_play_rate(self):
+        """ Several increased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        if rate == 2:
+            self.mediaplayer.set_rate(4)
+        if rate == 1:
+            self.mediaplayer.set_rate(2)
+        if rate == 0.5:
+            self.mediaplayer.set_rate(1)
+        if rate == 0.25:
+            self.mediaplayer.set_rate(0.5)
+
+    def decrease_play_rate(self):
+        """ Several decreased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        if rate == 0.5:
+            self.mediaplayer.set_rate(0.25)
+        if rate == 1:
+            self.mediaplayer.set_rate(0.5)
+        if rate == 2:
+            self.mediaplayer.set_rate(1)
+        if rate == 4:
+            self.mediaplayer.set_rate(2)
 
     def assign_segment_to_code(self, selected):
         """ Assign time segment to selected code. Insert an entry into the database.
@@ -2442,6 +2480,9 @@ class DialogViewAV(QtWidgets.QDialog):
             Ctrl + T to insert timestamp in format [hh.mm.ss]
             Ctrl + N to enter a new speakers name into shortcuts
             Ctrl + 1 .. 8 to insert speaker in format [speaker name]
+
+            Shift + > to increase play rate
+            Shift + < to decrease play rate
         """
 
         if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
@@ -2506,7 +2547,39 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             self.delete_speakernames()
+        # Increase play rate  Shift + >
+        if key == QtCore.Qt.Key_Greater:
+            self.increase_play_rate()
+        # Decrease play rate  Shift + <
+        if key == QtCore.Qt.Key_Less:
+            self.decrease_play_rate()
         return True
+
+    def increase_play_rate(self):
+        """ Several increased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        if rate == 2:
+            self.mediaplayer.set_rate(4)
+        if rate == 1:
+            self.mediaplayer.set_rate(2)
+        if rate == 0.5:
+            self.mediaplayer.set_rate(1)
+        if rate == 0.25:
+            self.mediaplayer.set_rate(0.5)
+
+    def decrease_play_rate(self):
+        """ Several decreased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        if rate == 0.5:
+            self.mediaplayer.set_rate(0.25)
+        if rate == 1:
+            self.mediaplayer.set_rate(0.5)
+        if rate == 2:
+            self.mediaplayer.set_rate(1)
+        if rate == 4:
+            self.mediaplayer.set_rate(2)
 
     def delete_speakernames(self):
         """ Delete speakername from list of shortcut names """
