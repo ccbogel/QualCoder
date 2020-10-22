@@ -84,27 +84,33 @@ The log file on Windows does not make use of the rotating file handler, so the l
 
 ### MacOS
 
+Install python3 and VLC:
 Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-Install the Python dependencies using `pip`:
+Download Qualcoder-master Zip file and copy it into /Applications
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
+In a Terminal
 
-or 
+`curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 --version`
 
-`pip3 install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
+select 3.9 as an answer
 
-and
+`python3 get-pip.py
+cd /usr/local/bin
+sudo ln -s ../../../Library/Frameworks/Python.framework/Versions/3.9/bin/pip pip
+pip install pyserial
+pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
 
-`brew install qpdf`
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+brew install qpdf`
 
-or
+To run QualCoder
 
-`sudo port install qpdf`
+`cd "/Applications/QualCoder-master/qualcoder"
+python3 qualcoder.py`
 
-There is no desktop icon launch right now for QualCoder. Open a new Terminal window in the directory and launch with `python qualcoder.py`.
-
-Another option is shown here [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher.
+Another option to run Qualcoder is shown here [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher.
  You can make an alias to the file and place it on your desktop.
  
 ## Dependencies
@@ -129,6 +135,8 @@ Required:
 * pdfminer.six
 
 * openpyxl
+
+* qpdf
 
 
 ## Future plans
