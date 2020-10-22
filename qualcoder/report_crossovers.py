@@ -96,6 +96,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
         self.ui.pushButton_calculate.pressed.connect(self.calculate_crossovers)
+        self.ui.label_codes.setText("WORK IN PROGRESS - COME BACK LATER")  # tmp
 
     def get_data(self):
         """ Called from init. gets coders, code_names and categories.
@@ -136,12 +137,36 @@ class DialogReportCrossovers(QtWidgets.QDialog):
     def calculate_crossovers(self):
         """ Calculate the crossovers for selected codes for THIS coder.
         For codings in code_text only.
+
+        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        relation is: inclusion, overlap, exact, proximity
         """
+
+        sel_codes = []
+        items = self.ui.treeWidget.selectedItems()
+        for i in items:
+            if i.text(1)[:3] == "cid":
+                sel_codes.append({"name": i.text(0), "cid": int(i.text(1)[4:])})
+        for i in sel_codes:
+            print(i)
+
+        #TODO testing now - only look at 2 codes in ggg
+        #TODO struggling cid:5, soccer playing cid:4
+
 
         for c in self.coded:
             print(c)
 
         return
+
+    def display_crossovers(self):
+        """ Perhaps as table of:
+        Tooltips with codenames on id1,id2, relation,fid
+        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        relation is: inclusion, overlap, exact, proximity
+        """
+
+        pass
 
 
     def fill_tree(self):
