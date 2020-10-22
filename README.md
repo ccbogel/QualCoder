@@ -101,7 +101,6 @@ cd /usr/local/bin
 sudo ln -s ../../../Library/Frameworks/Python.framework/Versions/3.9/bin/pip pip
 pip install pyserial
 pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
-
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 brew install qpdf`
 
