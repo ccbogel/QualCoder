@@ -183,6 +183,8 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         """ Calculate crossovers for codes in one text file """
 
         CID = 1
+        POS0 = 2
+        POS1 = 3
 
         while len(coded) > 0:
             d = coded.pop()
@@ -200,11 +202,69 @@ class DialogReportCrossovers(QtWidgets.QDialog):
 
     def relation(self, c0, c1):
         """ Relation function as in RQDA
+
+        whichmin is the code with the lowest pos0, or None if equal
+        whichmax is the code with the highest pos1 or None if equal
+        operlapindex is the combined lowest to highest positions. Only used for E, O, P
+        unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
+
+        Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
         """
 
-        result = {}
+        CID = 1
+        POS0 = 2
+        POS1 = 3
+        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None, "whichmax": None,
+            "overlapindex": None, "unionindex": None, "distance": None}
+
+        # whichmin
+        if c0[POS0] < c1[POS0]:
+            result['whichmin'] = c0[CID]
+        if c1[POS0] < c0[POS0]:
+            result['whichmin'] = c1[CID]
+
+        # whichmax
+        if c0[POS1] > c1[POS1]:
+            result['whichmax'] = c0[CID]
+        if c1[POS1] > c0[POS1]:
+            result['whichmax'] = c1[CID]
+
+        # Check for Exact
+        if c0[POS0] == c1[POS0] and c0[POS1] == c1[POS1]:
+            result['relation'] = "E"
+            result['overlapindex'] = [c0[POS0], c0[POS1]]
+            result['unionindex'] = [c0[POS0], c0[POS1]]
+            return result
+
+        # Check for Proximity
+        if c0[POS1] < c1[POS0]:
+            result['relation'] = "P"
+            result['distance'] = c1[POS0] - c0[POS1]
+            return result
+        if c0[POS0] > c1[POS1]:
+            result['relation'] = "P"
+            result['distance'] = c0[POS0] - c1[POS1]
+            return result
+
+        # Check for Inclusion
+
+        
+        # Check for Overlap
+
+        '''
+        if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
+            #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
+            if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                overlaps.append([j['pos0'], j['pos1']])
+            elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                overlaps.append([i['pos0'], i['pos1']])
+            elif j['pos0'] > i['pos0']:
+                overlaps.append([j['pos0'], i['pos1']])
+            else:  # j['pos0'] < i['pos0']:
+                overlaps.append([j['pos1'], i['pos0']])
+        '''
 
         return result
 
