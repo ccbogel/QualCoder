@@ -106,9 +106,6 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         Not using the app.get_data method as this adds extra columns for each end user
         """
 
-        # for testing
-        self.file_ids = [26]  # file 'ggg'
-
         cur = self.app.conn.cursor()
         self.categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
@@ -130,7 +127,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         For codings in code_text only.
 
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is: inclusion, overlap, exact, proximity
+        relation is 1 character: Inclusion, Overlap, Exact, Proximity
         """
 
         sel_codes = []
@@ -150,28 +147,66 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         if len(sel_codes) != 2:
             print("TESTING - ONLY LOOKING AT 2 CODES AT A TIME")
             return
-
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
-        #TODO testing now - only look at 2 codes in ggg
-        #TODO struggling cid:5, soccer playing cid:4
 
         cur = self.app.conn.cursor()
-        self.coded = []
-        sql = "select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
-         code_name.cid=code_text.cid where code_text.owner=? and code_text.cid in (" + code_ids + ") \
-        order by code_text.cid"
+        sql = "select distinct fid from code_text where owner=? and code_text.cid in (" + code_ids + ") \
+            order by fid"
         cur.execute(sql, [self.app.settings['codername'], ])
         result = cur.fetchall()
-        for row in result:
-            if row[0] in self.file_ids or self.file_ids == []:
-                self.coded.append(row)
+        file_ids = []
+        for r in result:
+            file_ids.append(r[0])
 
-        for c in self.coded:
-            print(c)
-        # need to look at each text file separately
-        # need to find the closest Other code to do the relation analysis
+        #TODO testing now - only look at 2 codes in ggg
+        #TODO struggling cid:5, soccer playing cid:4
+        # for testing
+        file_ids = [26]  # file 'ggg'
+        print("fids ", file_ids)
 
+        # Need to look at each text file separately
+        for f in file_ids:
+            sql = "select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
+             code_name.cid=code_text.cid where code_text.owner=? and code_text.cid in (" + code_ids + ") \
+            order by code_text.cid"
+            cur.execute(sql, [self.app.settings['codername'], ])
+            result = cur.fetchall()
+            coded = []
+            for row in result:
+                if row[0] in file_ids or file_ids == []:
+                    coded.append(row)
 
+            # need to find the closest Other code to do the relation analysis
+            self.crossovers_in_file(coded)
+
+    def crossovers_in_file(self, coded):
+        """ Calculate crossovers for codes in one text file """
+
+        CID = 1
+
+        while len(coded) > 0:
+            d = coded.pop()
+            for c in coded:
+                if d[CID] != c[CID]:
+                    print(d, c)
+                    res = self.relation(d, c)
+                    print(res)
+
+        print("DONE")
+
+    def closest_relation(self, c0, c1):
+        #TODO
+        pass
+
+    def relation(self, c0, c1):
+        """ Relation function as in RQDA
+        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        relation is 1 character: Inclusion, Overlap, Exact, Proximity
+        """
+
+        result = {}
+
+        return result
 
     def display_crossovers(self):
         """ Perhaps as table of:
