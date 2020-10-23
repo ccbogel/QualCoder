@@ -125,15 +125,6 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             'cid': row[4], 'catid': row[5], 'color': row[6],
             'display_list': [row[0], 'cid:' + str(row[4])]})
 
-        self.coded = []
-        cur.execute("select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
-         code_name.cid=code_text.cid where code_text.owner=?",
-            [self.app.settings['codername'], ])
-        result = cur.fetchall()
-        for row in result:
-            if row[0] in self.file_ids or self.file_ids == []:
-                self.coded.append(row)
-
     def calculate_crossovers(self):
         """ Calculate the crossovers for selected codes for THIS coder.
         For codings in code_text only.
@@ -143,21 +134,44 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         """
 
         sel_codes = []
+        codes_str = ""
+        code_ids = ""
         items = self.ui.treeWidget.selectedItems()
         for i in items:
             if i.text(1)[:3] == "cid":
                 sel_codes.append({"name": i.text(0), "cid": int(i.text(1)[4:])})
+                codes_str += i.text(0) + "|"
+                code_ids += "," + i.text(1)[4:]
+        if sel_codes == []:
+            return
+        code_ids = code_ids[1:]
         for i in sel_codes:
             print(i)
+        if len(sel_codes) != 2:
+            print("TESTING - ONLY LOOKING AT 2 CODES AT A TIME")
+            return
 
+        self.ui.label_codes.setText(_("Codes: ") + codes_str)
         #TODO testing now - only look at 2 codes in ggg
         #TODO struggling cid:5, soccer playing cid:4
 
+        cur = self.app.conn.cursor()
+        self.coded = []
+        sql = "select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
+         code_name.cid=code_text.cid where code_text.owner=? and code_text.cid in (" + code_ids + ") \
+        order by code_text.cid"
+        cur.execute(sql, [self.app.settings['codername'], ])
+        result = cur.fetchall()
+        for row in result:
+            if row[0] in self.file_ids or self.file_ids == []:
+                self.coded.append(row)
 
         for c in self.coded:
             print(c)
+        # need to look at each text file separately
+        # need to find the closest Other code to do the relation analysis
 
-        return
+
 
     def display_crossovers(self):
         """ Perhaps as table of:
