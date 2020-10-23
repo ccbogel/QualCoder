@@ -194,7 +194,6 @@ class DialogReportCrossovers(QtWidgets.QDialog):
                     res = self.relation(d, c)
                     print(res)
 
-        print("DONE")
 
     def closest_relation(self, c0, c1):
         #TODO
@@ -249,24 +248,37 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             return result
 
         # Check for Inclusion
+        # Note Exact has been resolved already
+        # c0 inside c1
+        if c0[POS0] >= c1[POS0] and c0[POS1] <= c1[POS1]:
+            result['relation'] = "I"
+            result['overlapindex'] = [c0[POS0], c0[POS1]]
+            result['unionindex'] = [c0[POS0], c0[POS1]]
+            return result
+        # c1 inside c0
+        if c1[POS0] >= c0[POS0] and c1[POS1] <= c0[POS1]:
+            result['relation'] = "I"
+            result['overlapindex'] = [c1[POS0], c1[POS1]]
+            result['unionindex'] = [c1[POS0], c1[POS1]]
+            return result
 
-        
         # Check for Overlap
+        # Should be all that is remaining
+        # c0 overlaps from the right, left is not overlapping
+        if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
+            result['relation'] = "O"
+            # Reorder loest to highest
+            result['overlapindex'] = [c0[POS0], c1[POS1]]
+            result['unionindex'] = [c0[POS1], c1[POS0]]
+            return result
 
-        '''
-        if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
-            #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
-            if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
-                overlaps.append([j['pos0'], j['pos1']])
-            elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
-                overlaps.append([i['pos0'], i['pos1']])
-            elif j['pos0'] > i['pos0']:
-                overlaps.append([j['pos0'], i['pos1']])
-            else:  # j['pos0'] < i['pos0']:
-                overlaps.append([j['pos1'], i['pos0']])
-        '''
-
-        return result
+        # c1 overlaps from the right, left is not overlapping
+        if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
+            result['relation'] = "O"
+            # Reorder loest to highest
+            result['overlapindex'] = [c1[POS0], c0[POS1]]
+            result['unionindex'] = [c1[POS1], c0[POS0]]
+            return result
 
     def display_crossovers(self):
         """ Perhaps as table of:
