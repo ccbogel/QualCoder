@@ -45,7 +45,7 @@ Install dependencies
 `sudo dnf install python3-pip python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
 
 QualCoder uses an Ebook library that you can currently install via a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784
-The UNTESTED `install_fedora.sh` should install the aboce dependencies for Fedora.
+The UNTESTED `install_fedora.sh` should install the dependencies fand a desktop start icon for Fedora. The script is for python verrsion 3.8.
 
 
 ### Linux Use 
