@@ -118,7 +118,7 @@
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionView_Graph"/>
-    <addaction name="actionCode_crossovers"/>
+    <addaction name="actionCode_relations"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
    </widget>
@@ -334,9 +334,9 @@
     <string>None</string>
    </property>
   </action>
-  <action name="actionCode_crossovers">
+  <action name="actionCode_relations">
    <property name="text">
-    <string>Code crossovers</string>
+    <string>Code relations</string>
    </property>
   </action>
  </widget>
