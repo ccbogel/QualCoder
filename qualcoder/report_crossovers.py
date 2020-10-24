@@ -61,11 +61,9 @@ class DialogReportCrossovers(QtWidgets.QDialog):
     app = None
     dialog_list = None
     parent_textEdit = None
-    coders = []
     categories = []
     codes = []
-    coded = []  # to refactor name
-    file_ids = []
+    result_relations = []
 
     def __init__(self, app, parent_textEdit, dialog_list):
 
@@ -73,7 +71,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         self.app = app
         self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
-        self.get_data()
+        self.get_code_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeCrossovers()
         self.ui.setupUi(self)
@@ -83,9 +81,12 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             h = int(self.app.settings['dialogcodecrossovers_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
+            s0 = int(self.app.settings['dialogcodecrossovers_splitter0'])
+            s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
         except:
             pass
-
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -95,16 +96,13 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        self.ui.pushButton_exportcsv.setEnabled(False)  # tmp
         self.ui.pushButton_calculate.pressed.connect(self.calculate_crossovers)
-        self.ui.label_codes.setText("WORK IN PROGRESS - COME BACK LATER")  # tmp
 
-    def get_data(self):
-        """ Called from init. gets coders, code_names and categories.
-        Calls calculate_code_frequency - for each code.
-        Adds a list item that is ready to be used by the treeWidget to display multiple
-        columns with the coder frequencies.
-        Not using the app.get_data method as this adds extra columns for each end user
+    def get_code_data(self):
+        """ Called from init. gets code_names and categories.
         """
+        #TODO use App method ?
 
         cur = self.app.conn.cursor()
         self.categories = []
@@ -139,14 +137,17 @@ class DialogReportCrossovers(QtWidgets.QDialog):
                 sel_codes.append({"name": i.text(0), "cid": int(i.text(1)[4:])})
                 codes_str += i.text(0) + "|"
                 code_ids += "," + i.text(1)[4:]
-        if sel_codes == []:
+        if len(sel_codes) < 2:
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Selection warning'))
+            msg = _("Select 2 or more codes\nUse Ctrl or Shift and mouse click")
+            mb.setText(msg)
+            mb.exec_()
             return
+
         code_ids = code_ids[1:]
-        for i in sel_codes:
-            print(i)
-        if len(sel_codes) != 2:
-            print("TESTING - ONLY LOOKING AT 2 CODES AT A TIME")
-            return
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
 
         cur = self.app.conn.cursor()
@@ -155,48 +156,76 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         cur.execute(sql, [self.app.settings['codername'], ])
         result = cur.fetchall()
         file_ids = []
+        file_ids_str = ""
         for r in result:
             file_ids.append(r[0])
+            file_ids_str += "," + str(r[0])
 
-        #TODO testing now - only look at 2 codes in ggg
-        #TODO struggling cid:5, soccer playing cid:4
-        # for testing
-        file_ids = [26]  # file 'ggg'
-        print("fids ", file_ids)
+        if file_ids == []:
+            mb = QtWidgets.QMessageBox()
+            mb.setIcon(QtWidgets.QMessageBox.Warning)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Selection warning'))
+            msg = _("There are no files containing this combination of codes")
+            mb.setText(msg)
+            mb.exec_()
+            return
 
-        # Need to look at each text file separately
-        for f in file_ids:
+        # To add file names to relation result - makes easier for diplaying results
+        file_ids_str = file_ids_str[1:]
+        sql = "select distinct id, name from source where id in (" + file_ids_str + ")"
+        cur.execute(sql)
+        file_id_names = cur.fetchall()
+        #print(file_id_names)
+
+        # Need to look at each text file separately,
+        # only look at current coder
+        self.result_relations = []
+        for fid in file_ids:
+            filename = ""
+            for f in file_id_names:
+                if f[0] == fid:
+                    filename = f[1]
+
             sql = "select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
-             code_name.cid=code_text.cid where code_text.owner=? and code_text.cid in (" + code_ids + ") \
+             code_name.cid=code_text.cid where code_text.owner=? and fid=? \
+             and code_text.cid in (" + code_ids + ") \
             order by code_text.cid"
-            cur.execute(sql, [self.app.settings['codername'], ])
+            cur.execute(sql, [self.app.settings['codername'], fid])
             result = cur.fetchall()
             coded = []
             for row in result:
                 if row[0] in file_ids or file_ids == []:
                     coded.append(row)
 
-            # need to find the closest Other code to do the relation analysis
-            self.crossovers_in_file(coded)
-
-    def crossovers_in_file(self, coded):
-        """ Calculate crossovers for codes in one text file """
-
-        CID = 1
-        POS0 = 2
-        POS1 = 3
-
-        while len(coded) > 0:
-            d = coded.pop()
-            for c in coded:
-                if d[CID] != c[CID]:
-                    print(d, c)
-                    res = self.relation(d, c)
-                    print(res)
-
+            #TODO later, find the closest Other code for relation analysis
+            # Look at each code again other codes, when done remove from list of codes
+            # Sort results in result_relations for display and export
+            CID = 1
+            POS0 = 2
+            POS1 = 3
+            NAME = 4
+            while len(coded) > 0:
+                c0 = coded.pop()
+                for c1 in coded:
+                    if c0[CID] != c1[CID]:
+                        #print(c0, c1)
+                        relation = self.relation(c0, c1)
+                        # Add extra details for output
+                        relation['c0_name'] = c0[NAME]
+                        relation['c1_name'] = c1[NAME]
+                        relation['fid'] = fid
+                        relation['file_name'] = filename
+                        relation['c0_pos0'] = c0[POS0]
+                        relation['c0_pos1'] = c0[POS1]
+                        relation['c1_pos0'] = c1[POS0]
+                        relation['c1_pos1'] = c1[POS1]
+                        self.result_relations.append(relation)
+                        #print(relation)
+        self.display_relations()
 
     def closest_relation(self, c0, c1):
-        #TODO
+        #TODO later
         pass
 
     def relation(self, c0, c1):
@@ -267,28 +296,111 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         # c0 overlaps from the right, left is not overlapping
         if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
             result['relation'] = "O"
-            # Reorder loest to highest
-            result['overlapindex'] = [c0[POS0], c1[POS1]]
-            result['unionindex'] = [c0[POS1], c1[POS0]]
+            # Reorder lowest to highest
+            result['overlapindex'] = [c0[POS0], c1[POS1]].sort()
+            result['unionindex'] = [c0[POS1], c1[POS0]].sort()
             return result
 
         # c1 overlaps from the right, left is not overlapping
         if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
             result['relation'] = "O"
-            # Reorder loest to highest
-            result['overlapindex'] = [c1[POS0], c0[POS1]]
-            result['unionindex'] = [c1[POS1], c0[POS0]]
+            result['overlapindex'] = [c1[POS0], c0[POS1]].sort()
+            result['unionindex'] = [c1[POS1], c0[POS0]].sort()
             return result
 
-    def display_crossovers(self):
+    def display_relations(self):
         """ Perhaps as table of:
         Tooltips with codenames on id1,id2, relation,fid
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is: inclusion, overlap, exact, proximity
         """
 
-        pass
+        FID = 0
+        C0 = 1
+        C1 = 2
+        REL = 3
+        MIN = 4
+        MAX = 5
+        O0 = 6
+        O1 = 7
+        U0 = 8
+        U1 = 9
+        DIST = 10
 
+        col_names = ["FID", "Code0", "Code1", "Rel", "Min", "Max", "Overlap0", "Overlap1", "Union0", "Union1", "Distance"]
+        self.ui.tableWidget.setColumnCount(len(col_names))
+        self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+        for r, i in enumerate(self.result_relations):
+            self.ui.tableWidget.insertRow(r)
+            item = QtWidgets.QTableWidgetItem(str(i['fid']))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setToolTip(i['file_name'])
+            self.ui.tableWidget.setItem(r, FID, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['cid0']))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
+            self.ui.tableWidget.setItem(r, C0, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['cid1']))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
+            self.ui.tableWidget.setItem(r, C1, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['relation']))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            ttip = _("Proximity")
+            if i['relation'] == "O":
+                ttip = _("Overlap")
+            if i['relation'] == "E":
+                ttip = _("Exact")
+            if i['relation'] == "I":
+                ttip = _("Inclusion")
+            item.setToolTip(ttip)
+            self.ui.tableWidget.setItem(r, REL, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['whichmin']).replace("None", ""))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            if i['whichmin'] is not None:
+                ttip = i['c0_name']
+                if i['whichmin'] == i['cid1']:
+                    ttip = i['c1_name']
+                item.setToolTip(ttip)
+            self.ui.tableWidget.setItem(r, MIN, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['whichmax']).replace("None", ""))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            if i['whichmax'] is not None:
+                ttip = i['c0_name']
+                if i['whichmax'] == i['cid1']:
+                    ttip = i['c1_name']
+                item.setToolTip(ttip)
+            self.ui.tableWidget.setItem(r, MAX, item)
+
+            if i['overlapindex'] is not None:
+                item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
+                #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(r,O0, item)
+                item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
+                # item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(r, O1, item)
+
+            if i['unionindex'] is not None:
+                item = QtWidgets.QTableWidgetItem(str(i['unionindex'][0]))
+                # item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(r, U0, item)
+                item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
+                #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(r, U1, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, DIST, item)
+
+        self.ui.tableWidget.resizeColumnsToContents()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
@@ -300,9 +412,6 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
         header = [_("Code Tree"), "Id"]
-        for coder in self.coders:
-            header.append(coder)
-        header.append("Total")
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
         if self.app.settings['showids'] == 'False':
@@ -441,8 +550,11 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
         '''
 
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
+    def closeEvent(self, event):
+        """ Save dialog and splitter dimensions. """
 
-        self.app.settings['dialogcodecrossovers_w'] = new_size.size().width()
-        self.app.settings['dialogcodecrossovers_h'] = new_size.size().height()
+        self.app.settings['dialogcodecrossovers_w'] = self.size().width()
+        self.app.settings['dialogcodecrossovers_h'] = self.size().height()
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodecrossovers_splitter0'] = sizes[0]
+        self.app.settings['dialogcodecrossovers_splitter1'] = sizes[1]
