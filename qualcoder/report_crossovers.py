@@ -61,6 +61,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
     app = None
     dialog_list = None
     parent_textEdit = None
+    coder_names = []
     categories = []
     codes = []
     result_relations = []
@@ -96,39 +97,18 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        self.ui.pushButton_exportcsv.setEnabled(False)  # tmp
-        self.ui.pushButton_calculate.pressed.connect(self.calculate_crossovers)
+        self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
 
     def get_code_data(self):
-        """ Called from init. gets code_names and categories.
+        """ Called from init. gets code_names, categories and owner names.
         """
 
         self.coder_names = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_data()
 
-        '''cur = self.app.conn.cursor()
-        self.categories = []
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
-        result = cur.fetchall()
-        for row in result:
-            self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5],
-            'display_list': [row[0], 'catid:' + str(row[1])]})
-        self.codes = []
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
-        result = cur.fetchall()
-        for row in result:
-            self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6],
-            'display_list': [row[0], 'cid:' + str(row[4])]})'''
-
-    def calculate_crossovers(self):
-        """ Calculate the crossovers for selected codes for THIS coder.
-        For codings in code_text only.
-
-        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is 1 character: Inclusion, Overlap, Exact, Proximity
-        """
+    def coder_code_relations(self):
+        """ Calculate the relations for selected codes for THIS coder or ALL coders.
+        For codings in code_text only. """
 
         sel_codes = []
         codes_str = ""
@@ -148,14 +128,29 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             mb.setText(msg)
             mb.exec_()
             return
-
         code_ids = code_ids[1:]
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
+
+        self.result_relations = []
+        if self.ui.radioButton_this.isChecked():
+            self.calculate_relations_for_coder(self.app.settings['codername'], code_ids)
+        else:
+            for coder_name in self.coder_names:
+                self.calculate_relations_for_coder(coder_name, code_ids)
+        self.display_relations()
+
+    def calculate_relations_for_coder(self, coder_name, code_ids):
+        """ Calculate the crossovers (or relations) for selected codes for THIS coder or ALL coders.
+        For codings in code_text only.
+
+        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        relation is 1 character: Inclusion, Overlap, Exact, Proximity
+        """
 
         cur = self.app.conn.cursor()
         sql = "select distinct fid from code_text where owner=? and code_text.cid in (" + code_ids + ") \
             order by fid"
-        cur.execute(sql, [self.app.settings['codername'], ])
+        cur.execute(sql, [coder_name, ])
         result = cur.fetchall()
         file_ids = []
         file_ids_str = ""
@@ -164,13 +159,13 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             file_ids_str += "," + str(r[0])
 
         if file_ids == []:
-            mb = QtWidgets.QMessageBox()
+            '''mb = QtWidgets.QMessageBox()
             mb.setIcon(QtWidgets.QMessageBox.Warning)
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('Selection warning'))
-            msg = _("There are no files containing this combination of codes")
+            msg = _("There are no files containing this combination of codes for " + coder_name)
             mb.setText(msg)
-            mb.exec_()
+            mb.exec_()'''
             return
 
         # To add file names to relation result - makes easier for diplaying results
@@ -181,8 +176,6 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         #print(file_id_names)
 
         # Need to look at each text file separately,
-        # only look at current coder
-        self.result_relations = []
         for fid in file_ids:
             filename = ""
             for f in file_id_names:
@@ -193,7 +186,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
              code_name.cid=code_text.cid where code_text.owner=? and fid=? \
              and code_text.cid in (" + code_ids + ") \
             order by code_text.cid"
-            cur.execute(sql, [self.app.settings['codername'], fid])
+            cur.execute(sql, [coder_name, fid])
             result = cur.fetchall()
             coded = []
             for row in result:
@@ -201,8 +194,8 @@ class DialogReportCrossovers(QtWidgets.QDialog):
                     coded.append(row)
 
             #TODO later, find the closest Other code for relation analysis
+
             # Look at each code again other codes, when done remove from list of codes
-            # Sort results in result_relations for display and export
             CID = 1
             POS0 = 2
             POS1 = 3
@@ -222,8 +215,8 @@ class DialogReportCrossovers(QtWidgets.QDialog):
                         relation['c0_pos1'] = c0[POS1]
                         relation['c1_pos0'] = c1[POS0]
                         relation['c1_pos1'] = c1[POS1]
+                        relation['owner'] = coder_name
                         self.result_relations.append(relation)
-                        #print(relation)
         self.display_relations()
 
     def closest_relation(self, c0, c1):
@@ -328,8 +321,9 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         U0 = 8
         U1 = 9
         DIST = 10
+        OWNER = 11
 
-        col_names = ["FID", "Code0", "Code1", "Rel", "Min", "Max", "Overlap0", "Overlap1", "Union0", "Union1", "Distance"]
+        col_names = ["FID", "Code0", "Code1", "Rel", "Min", "Max", "Overlap0", "Overlap1", "Union0", "Union1", "Distance", "Owner"]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -401,6 +395,10 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
             #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, DIST, item)
+
+            item = QtWidgets.QTableWidgetItem(str(i['owner']))
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, OWNER, item)
 
         self.ui.tableWidget.resizeColumnsToContents()
 
