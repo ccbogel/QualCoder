@@ -58,7 +58,7 @@ from manage_files import DialogManageFiles
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
-from report_crossovers import DialogReportCrossovers
+from report_relations import DialogReportRelations
 from rqda import Rqda_import
 from settings import DialogSettings
 #from text_mining import DialogTextMining
@@ -628,7 +628,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
-        self.ui.actionCode_crossovers.triggered.connect(self.report_code_crossovers)
+        self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -736,7 +736,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
         self.ui.actionCode_frequencies.setEnabled(False)
-        self.ui.actionCode_crossovers.setEnabled(False)
+        self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
 
@@ -769,7 +769,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
-        self.ui.actionCode_crossovers.setEnabled(True)
+        self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
@@ -836,14 +836,14 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()
         self.clean_dialog_refs()
 
-    def report_code_crossovers(self):
-        """ Show code crossover relations (overall and by coder.) """
+    def report_code_relations(self):
+        """ Show code relations in text files. """
 
         for d in self.dialogList:
-            if type(d).__name__ == "DialogReportCrossovers":
+            if type(d).__name__ == "DialogReportRelations":
                 d.activateWindow()
                 return
-        ui = DialogReportCrossovers(self.app, self.ui.textEdit, self.dialogList)
+        ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
         self.clean_dialog_refs()
