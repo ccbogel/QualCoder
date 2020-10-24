@@ -39,7 +39,7 @@
        <rect>
         <x>10</x>
         <y>-4</y>
-        <width>201</width>
+        <width>651</width>
         <height>26</height>
        </rect>
       </property>
@@ -56,7 +56,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Code crossovers</string>
+       <string>Relations between codes in text files.</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -65,9 +65,9 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>430</x>
         <y>30</y>
-        <width>291</width>
+        <width>231</width>
         <height>31</height>
        </rect>
       </property>
@@ -78,7 +78,7 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>230</x>
         <y>30</y>
         <width>171</width>
         <height>31</height>
@@ -92,13 +92,42 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>80</y>
         <width>641</width>
         <height>28</height>
        </rect>
       </property>
       <property name="text">
        <string>Codes:</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_this">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>151</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>This coder</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_all">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>171</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>All coders</string>
       </property>
      </widget>
     </widget>
