@@ -22,13 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>90</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>90</height>
       </size>
      </property>
      <property name="title">
@@ -88,19 +88,6 @@
        <string>Calculate</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_codes">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>661</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Codes:</string>
-      </property>
-     </widget>
      <widget class="QRadioButton" name="radioButton_this">
       <property name="geometry">
        <rect>
@@ -130,6 +117,25 @@
        <string>All coders</string>
       </property>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_codes">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Codes:</string>
+     </property>
     </widget>
    </item>
    <item>
