@@ -45,6 +45,8 @@ class Ui_Dialog_CodeCrossovers(object):
         self.label_codes = QtWidgets.QLabel(Dialog_CodeCrossovers)
         self.label_codes.setMinimumSize(QtCore.QSize(0, 30))
         self.label_codes.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.label_codes.setScaledContents(True)
+        self.label_codes.setWordWrap(True)
         self.label_codes.setObjectName("label_codes")
         self.verticalLayout.addWidget(self.label_codes)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_CodeCrossovers)
