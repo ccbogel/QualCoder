@@ -139,8 +139,8 @@ class Ui_MainWindow(object):
         self.actionProject_summary.setObjectName("actionProject_summary")
         self.actionNone = QtWidgets.QAction(MainWindow)
         self.actionNone.setObjectName("actionNone")
-        self.actionCode_crossovers = QtWidgets.QAction(MainWindow)
-        self.actionCode_crossovers.setObjectName("actionCode_crossovers")
+        self.actionCode_relations = QtWidgets.QAction(MainWindow)
+        self.actionCode_relations.setObjectName("actionCode_relations")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionCoding_comparison)
         self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionView_Graph)
-        self.menuReports.addAction(self.actionCode_crossovers)
+        self.menuReports.addAction(self.actionCode_relations)
         self.menuReports.addAction(self.actionText_mining)
         self.menuReports.addAction(self.actionSQL_statements)
         self.menuHelp.addAction(self.actionContents)
@@ -240,7 +240,7 @@ class Ui_MainWindow(object):
         self.actionRQDA_Project_import.setText(_translate("MainWindow", "RQDA Project import"))
         self.actionProject_summary.setText(_translate("MainWindow", "Project summary"))
         self.actionNone.setText(_translate("MainWindow", "None"))
-        self.actionCode_crossovers.setText(_translate("MainWindow", "Code crossovers"))
+        self.actionCode_relations.setText(_translate("MainWindow", "Code relations"))
 
 
 if __name__ == "__main__":
