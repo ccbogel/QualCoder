@@ -141,7 +141,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.display_relations()
 
     def calculate_relations_for_coder(self, coder_name, code_ids):
-        """ Calculate the crossovers (or relations) for selected codes for THIS coder or ALL coders.
+        """ Calculate the relations for selected codes for selected coder.
         For codings in code_text only.
 
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
@@ -293,15 +293,15 @@ class DialogReportRelations(QtWidgets.QDialog):
         if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
             result['relation'] = "O"
             # Reorder lowest to highest
-            result['overlapindex'] = [c0[POS0], c1[POS1]].sort()
-            result['unionindex'] = [c0[POS1], c1[POS0]].sort()
+            result['overlapindex'] = sorted([c0[POS0], c1[POS1]])
+            result['unionindex'] = sorted([c0[POS1], c1[POS0]])
             return result
 
         # c1 overlaps from the right, left is not overlapping
         if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
             result['relation'] = "O"
-            result['overlapindex'] = [c1[POS0], c0[POS1]].sort()
-            result['unionindex'] = [c1[POS1], c0[POS0]].sort()
+            result['overlapindex'] = sorted([c1[POS0], c0[POS1]])
+            result['unionindex'] = sorted([c1[POS1], c0[POS0]])
             return result
 
     def display_relations(self):
@@ -380,7 +380,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             if i['overlapindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
                 #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.ui.tableWidget.setItem(r,O0, item)
+                self.ui.tableWidget.setItem(r, O0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
                 # item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, O1, item)
@@ -483,12 +483,13 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_csv_file(self):
-        """ Export data as csv. """
+        """ Export data as csv, called projectname_relations.csv. """
 
-        return
+        if not self.result_relations:
+            return
 
-        '''shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + " code frequencies.csv"
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_relations.csv"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.last_export_directory, options)
@@ -505,24 +506,39 @@ class DialogReportRelations(QtWidgets.QDialog):
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             if mb.exec_() == QtWidgets.QMessageBox.No:
                 return
-        data = ""
-        header = [_("Code Tree"), "Id"]
-        for coder in self.coders:
-            header.append(coder)
-        header.append("Total")
-        data += ",".join(header) + "\n"
 
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        item_total_position = 1 + len(self.coders)
-        while item:
-            line = ""
-            for i in range(0, len(header)):
-                line += "," + item.text(i)
-            data += line[1:] + "\n"
-            #self.depthgauge(item)
-            it += 1
-            item = it.value()
+        col_names = ["Fid", "Filename", "Code0","Code0_name", "Code0_pos0", "Code0_pos1", "Code1", "Code1_name", "Code1_pos0", "Code1_pos1",
+            "Relation", "Minimum", "Maximum", "Overlap0", "Overlap1", "Union0", "Union1", "Distance", "Owner"]
+        data = ""
+        data += ",".join(col_names) + "\n"
+
+        for row in self.result_relations:
+            line = str(row['fid']) + ","
+            line += row['file_name'].replace(',', '_') + ","
+            line += str(row['cid0']) + ","
+            line += row['c0_name'].replace(',', '_') + ","
+            line += str(row['c0_pos0']) + ","
+            line += str(row['c0_pos1']) + ","
+            line += str(row['cid1']) + ","
+            line += row['c1_name'].replace(',', '_') + ","
+            line += str(row['c1_pos0']) + ","
+            line += str(row['c1_pos1']) + ","
+            line += row['relation'] + ","
+            line += str(row['whichmin']).replace('None', '') + ","
+            line += str(row['whichmax']).replace('None', '') + ","
+            if row['overlapindex']:
+                line += str(row['overlapindex'][0]) + ","
+                line += str(row['overlapindex'][1]) + ","
+            else:
+                line += ",,"
+            if row['unionindex']:
+                line += str(row['unionindex'][0]) + ","
+                line += str(row['unionindex'][1]) + ","
+            else:
+                line += ",,"
+            line += str(row['distance']).replace('None', '') + ","
+            line += row['owner'].replace(',', '_')
+            data += line + "\n"
         f = open(filename, 'w')
         f.write(data)
         f.close()
@@ -533,8 +549,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         msg = filename + _(" exported")
         mb.setText(msg)
         mb.exec_()
-        self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
-        '''
+        self.parent_textEdit.append(_("Code relations csv file exported to: ") + filename)
+
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
