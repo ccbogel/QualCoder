@@ -201,9 +201,6 @@ class App(object):
         nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
-        #print("TEST: PROJ PATH", path)
-        #print("DATED:", dated_path)
-        #print("RESULT:", result)  # tmp
         if result == []:
             print("Writing to", self.persist_path)
             with open(self.persist_path, 'w') as f:
@@ -213,7 +210,6 @@ class App(object):
 
         proj_path = ""
         splt = result[0].split("|")
-        #print("SPLT:", splt)
         if len(splt) == 1:
             proj_path = splt[0]
         if len(splt) == 2:
@@ -248,9 +244,9 @@ class App(object):
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         res = []
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
         for row in result:
-            res.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_filenames(self):
@@ -311,30 +307,30 @@ class App(object):
             [self.settings['codername'], ])
         result = cur.fetchall()
         res = []
+        keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
         for row in result:
-            res.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
-            'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_data(self):
         """ Called from init and gets all the codes, categories.
-        Called from code_text, code_av, code_image, reports """
+        Called from code_text, code_av, code_image, reports, report_crossovers """
 
         categories = []
         cur = self.conn.cursor()
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
+        keys = 'name', 'catid', 'owner', 'date', 'memo', 'supercatid'
         for row in result:
-            categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5]})
-        code_names = []
+            categories.append(dict(zip(keys, row)))
+        codes = []
         cur = self.conn.cursor()
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
         for row in result:
-            code_names.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6]})
-        return code_names, categories
+            codes.append(dict(zip(keys, row)))
+        return codes, categories
 
     def write_config_ini(self, settings):
         """ Stores settings for fonts, current coder, directory, and window sizes in .qualcoder folder
@@ -422,7 +418,7 @@ class App(object):
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
         result = self.check_and_add_additional_settings(result)
-        #TEMPORRY delete in a week
+        #TODO TEMPORARY delete in 2021
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         return result
@@ -520,37 +516,24 @@ class App(object):
         keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date'
         result = []
         for row in cur.fetchall():
-            result.append( dict(zip(keys, row)))
+            result.append(dict(zip(keys, row)))
         return result
 
-    #TODO called by??  defunct function
-    '''def get_code_texts(self, text):
-        """ Get all the coded text that contains the text parameter.
-        Called by: ???
-        param:
-            text: a string
-        """
-
-        cur = self.conn.cursor()
-        codingsql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text where seltext like ?"
-        cur.execute(codingsql, [text],)
-        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo'
-        for res in cur.fetchall():
-            yield dict(zip(keys, res))'''
-
     def get_coder_names_in_project(self):
-        """ Get all coder nmes fro mall tables.
-        Useful when opening a project and the settings codername is from another project. """
+        """ Get all coder names from all tables.
+        Useful when opening a project and the settings codername is from another project.
+        Possible design flaw is that codernames are not stored in a specific table in the database.
+        """
 
         cur = self.conn.cursor()
         sql = "select owner from code_image union select owner from code_text union select owner from code_av "
         sql += "union select owner from cases union select owner from source union select owner from code_name"
         cur.execute(sql)
         res = cur.fetchall()
-        names = []
+        coder_names = []
         for r in res:
-            names.append(r[0])
-        return names
+            coder_names.append(r[0])
+        return coder_names
 
 
 class MainWindow(QtWidgets.QMainWindow):
