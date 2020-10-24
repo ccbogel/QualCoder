@@ -102,9 +102,11 @@ class DialogReportCrossovers(QtWidgets.QDialog):
     def get_code_data(self):
         """ Called from init. gets code_names and categories.
         """
-        #TODO use App method ?
 
-        cur = self.app.conn.cursor()
+        self.coder_names = self.app.get_coder_names_in_project()
+        self.codes, self.categories = self.app.get_data()
+
+        '''cur = self.app.conn.cursor()
         self.categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
@@ -118,7 +120,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
             'cid': row[4], 'catid': row[5], 'color': row[6],
-            'display_list': [row[0], 'cid:' + str(row[4])]})
+            'display_list': [row[0], 'cid:' + str(row[4])]})'''
 
     def calculate_crossovers(self):
         """ Calculate the crossovers for selected codes for THIS coder.
@@ -411,23 +413,20 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        header = [_("Code Tree"), "Id"]
+        header = [_("Code Tree"), _("Id")]
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
-        if self.app.settings['showids'] == 'False':
+        '''if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
-            self.ui.treeWidget.setColumnHidden(1, False)
+            self.ui.treeWidget.setColumnHidden(1, False)'''
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                display_list = []
-                for i in c['display_list']:
-                    display_list.append(str(i))
-                top_item = QtWidgets.QTreeWidgetItem(display_list)
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])  # check this
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -441,17 +440,13 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         count = 0
         while len(cats) > 0 or count < 10000:
             remove_list = []
-            #logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
                     #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
-                        display_list = []
-                        for i in c['display_list']:
-                            display_list.append(str(i))
-                        child = QtWidgets.QTreeWidgetItem(display_list)
+                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         item.addChild(child)
                         #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
@@ -465,11 +460,7 @@ class DialogReportCrossovers(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
-                display_list = []
-                for i in c['display_list']:
-                    display_list.append(str(i))
-                top_item = QtWidgets.QTreeWidgetItem(display_list)
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -482,12 +473,8 @@ class DialogReportCrossovers(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                #logger.debug("for c in codes, item:" + item.text(0) +"|" + item.text(1) + ", c[cid]:" + str(c['cid']) +", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
-                    display_list = []
-                    for i in c['display_list']:
-                        display_list.append(str(i))
-                    child = QtWidgets.QTreeWidgetItem(display_list)
+                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
