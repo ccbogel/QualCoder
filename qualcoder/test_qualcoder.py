@@ -196,12 +196,15 @@ class TestMainWindow(TestCase):
         os.remove(os.path.join(self.confighome, "test_qualcoder_test.qda"))
         self.test_dir.close()
 
+    def test_settings_report(self):
+        pass
+
 #TEST_PERSIST_PATH = '/fake/path/'
 CONFIG_INI_TEST = {'codername': 'default', 'font': 'Noto Sans', 'fontsize': 12, 'treefontsize': 10, 'directory': '/home/fake/Desktop',
  'showids': 'False', 'language': 'en', 'backup_on_open': 'True', 'backup_av_files': 'True', 'timestampformat': '[hh.mm.ss]',
  'speakernameformat': '{}', 'mainwindow_w': '602', 'mainwindow_h': '515', 'dialogcodetext_w': '1110',
  'dialogcodetext_h': '611', 'dialogcodetext_splitter0': '361', 'dialogcodetext_splitter1': '723',
- 'dialogcodeimage_w': '0', 'dialogcodeimage_h': '0', 'dalogcodeimage_splitter0': '1', 'dialogcodeimage_splitter1': '1',
+ 'dialogcodeimage_w': '0', 'dialogcodeimage_h': '0', 'dialogcodeimage_splitter0': '1', 'dialogcodeimage_splitter1': '1',
  'dialogviewimage_w': '0', 'dialogviewimage_h': '0', 'dialogreportcodes_w': '0', 'dialogreportcodes_h': '0',
  'dialogreportcodefrequencies_w': '0', 'dialogreportcodefrequencies_h': '0', 'dialogreportcodes_splitter0': '1',
  'dialogreportcodes_splitter1': '1', 'dialogmanagefiles_w': '794', 'dialogmanagefiles_h': '560', 'dialogjournals_w': '0',
@@ -214,5 +217,6 @@ CONFIG_INI_TEST = {'codername': 'default', 'font': 'Noto Sans', 'fontsize': 12, 
  'viewav_video_pos_y': '-10', 'codeav_video_pos_x': '72', 'codeav_video_pos_y': '27', 'dialogcodeav_w': '1032',
  'dialogcodeav_h': '689', 'codeav_abs_pos_x': '652', 'codeav_abs_pos_y': '87', 'dialogviewav_w': '1021',
  'dialogviewav_h': '413', 'viewav_abs_pos_x': '362', 'viewav_abs_pos_y': '250', 'bookmark_file_id': '7',
- 'bookmark_pos': '147', 'dialogmanagesttributes_w': '0'}
+ 'bookmark_pos': '147', 'dialogmanagesttributes_w': '0', 'dialogcodecrossovers_w': 0, 'dialogcodecrossovers_h': 0,
+ 'dialogcodecrossovers_splitter0': 1, 'dialogcodecrossovers_splitter1': 1}
 

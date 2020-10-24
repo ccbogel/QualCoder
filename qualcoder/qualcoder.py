@@ -383,7 +383,8 @@ class App(object):
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
-        'bookmark_file_id', 'bookmark_pos', 'dialogcodecrossovers_w', 'dialogcodecrossovers_h'
+        'bookmark_file_id', 'bookmark_pos', 'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
+        'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1'
         ]
         for key in keys:
             if key not in data:
@@ -481,8 +482,6 @@ class App(object):
             'dialogcasefilemanager_splitter1': 1,
             'dialogmanageattributes_w': 0,
             'dialogmanageattributes_h': 0,
-            'mainwindow_w': 0,
-            'mainwindow_h': 0,
             'video_w': 0,
             'video_h': 0,
             'viewav_video_pos_x': 0,
@@ -500,7 +499,9 @@ class App(object):
             'bookmark_file_id': 0,
             'bookmark_pos': 0,
             'dialogcodecrossovers_w': 0,
-            'dialogcodecrossovers_h': 0
+            'dialogcodecrossovers_h': 0,
+            'dialogcodecrossovers_splitter0': 0,
+            'dialogcodecrossovers_splitter1': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -859,7 +860,6 @@ class MainWindow(QtWidgets.QMainWindow):
             if type(d).__name__ == "DialogReportCrossovers":
                 d.activateWindow()
                 return
-
         ui = DialogReportCrossovers(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
         ui.show()
