@@ -75,6 +75,10 @@ Alternatively move to the qualcoder directory and run the qualcoder.py file in f
 
 `python qualcoder.py`  or `py qualcoder.py`
 
+Run QualCoder and hide the black DOS box:
+
+`C:\Windows\pyw.exe "C:\the location of your Qualcoder folder\QualCoder-master\qualcoder\qualcoder.py"`
+
 Sometimes there are problems recognising the audio/video VLC library file: libvlc.dll  
 Some solutions are to add the path of the file here: [https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1](https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)
 
