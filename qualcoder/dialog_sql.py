@@ -358,8 +358,6 @@ class DialogSQL(QtWidgets.QDialog):
         if action == action_delete:
             text = cursor.selectedText()
             text = str(text)
-            clipboard = QtGui.QApplication.clipboard()
-            clipboard.setText(text)
             start = cursor.position()
             end = cursor.anchor()
             if start > end:
