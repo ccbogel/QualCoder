@@ -43,7 +43,6 @@ from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_cases import Ui_Dialog_cases
 from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 from memo import DialogMemo
-from select_items import DialogSelectItems
 from view_av import DialogViewAV
 from view_image import DialogViewImage
 
@@ -214,7 +213,7 @@ class DialogCases(QtWidgets.QDialog):
         if name == "":
             return
         # update attribute_type list and database
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
             ,(name, now_date, self.app.settings['codername'], "", 'case', value_type))
         self.app.conn.commit()
@@ -259,7 +258,7 @@ class DialogCases(QtWidgets.QDialog):
         if len(values) <= 1:
             logger.info(_("Cannot import from csv, only one row in file"))
             return
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         header = values[0]
         values = values[1:]
         # insert cases
@@ -330,7 +329,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         # update case list and database
         item = {'name': case_name, 'memo': "", 'owner': self.app.settings['codername'],
-                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
         cur = self.app.conn.cursor()
         cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date']))

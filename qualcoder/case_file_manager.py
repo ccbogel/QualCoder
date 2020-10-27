@@ -200,7 +200,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             text_len = len(file_[2])
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
         'pos1': text_len, 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
         # check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
@@ -452,7 +452,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 'fid': self.selected_text_file[ID],
                 'pos0': pos0, 'pos1': pos1,
                 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                 'memo': ""}
         self.case_text.append(item)
         self.highlight()
@@ -565,7 +565,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
                     'pos0': startPos, 'pos1': pos1,
                     'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
                     # check if already assigned to case_text
                     sql = "select id from case_text where caseid=? and fid=? and pos0=? and pos1=?"
                     cur.execute(sql, [item['caseid'], item['fid'], item['pos0'], item['pos1']])

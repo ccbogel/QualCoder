@@ -138,7 +138,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         if ui.radioButton_files.isChecked():
             case_or_file = "file"
         # update attributes list and database
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         item = {'name': name, 'memo': "", 'owner': self.app.settings['codername'],
             'date': now_date, 'valuetype': value_type,
             'caseOrFile': case_or_file}

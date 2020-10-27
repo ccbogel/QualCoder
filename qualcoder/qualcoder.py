@@ -41,6 +41,11 @@ import sqlite3
 import traceback
 import urllib.request
 import webbrowser
+ZoneInfo = None  # Available in python 3.9 and higher
+try:
+    from zoneinfo import ZoneInfo
+except:
+    pass
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -198,7 +203,7 @@ class App(object):
 
         if path == "":
             return
-        nowdate = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
         if result == []:
@@ -719,6 +724,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_import.setEnabled(False)
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
+        self.ui.actionExport_codebook.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -731,7 +737,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
-        self.ui.actionExport_codebook.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -752,6 +757,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_import.setEnabled(True)
         self.ui.actionREFI_QDA_Project_import.setEnabled(False)
         self.ui.actionRQDA_Project_import.setEnabled(False)
+        self.ui.actionExport_codebook.setEnabled(True)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
@@ -764,13 +770,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
-        self.ui.actionExport_codebook.setEnabled(True)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
+
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionText_mining.setVisible(False)
@@ -1205,7 +1211,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
         self.app.conn.commit()
         try:
             # get and display some project details
@@ -1354,7 +1360,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Do not backup if the name already exists.
         A back up can be generated in the subsequent hour."""
 
-        nowdate = datetime.datetime.now().strftime("%Y%m%d_%H")  # -%M-%S")
+        nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%M-%S")
         backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
         # Do not try and create another backup with same date and hour
         result = os.path.exists(backup)
@@ -1392,7 +1398,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #self.project['about'] = result[3]
         msg = "\n" + _("PROJECT SUMMARY")
         msg += "\n========\n"
-        msg += _("Date time now: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\n"
+        msg += _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
         msg += _("Project path: ") + self.app.project_path + "\n"
         #msg += _("Database version: ") + self.project['databaseversion'] + ". "
@@ -1568,6 +1574,7 @@ class MainWindow(QtWidgets.QMainWindow):
             print(e)
             logger.debug(str(e))
             self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
+
 
 def gui():
     qual_app = App()
