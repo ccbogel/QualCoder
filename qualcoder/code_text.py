@@ -327,7 +327,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file. """
+        """ Count instances of each code for current coder and in the selected file.
+        Called by:
+        """
 
         if self.filename is None:
             return
@@ -346,6 +348,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     result = cur.fetchone()
                     if result[0] > 0:
                         item.setText(3, str(result[0]))
+                        item.setToolTip(3, self.app.settings['codername'])
                     else:
                         item.setText(3, "")
                 except Exception as e:
@@ -623,7 +626,7 @@ class DialogCodeText(QtWidgets.QWidget):
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
 
-        Also use it to detect key events in the textedit. These are used to extend ot shrink a text coding.
+        Also use it to detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
@@ -644,10 +647,8 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor_pos = self.ui.textEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
-                if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings[
-                    'codername']:
+                if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
-            #print("KEY ", key)
             if len(codes_here) == 1:
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
                     self.shrink_to_left(codes_here[0])
@@ -919,7 +920,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
         'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
@@ -987,7 +988,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         item = {'name': newCatText, 'cid': None, 'memo': "",
         'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))
@@ -1485,7 +1486,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
 
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
@@ -1577,7 +1578,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if item is None:
             item = {'fid': int(self.filename['id']), 'pos0': pos0, 'pos1': pos1,
             'memo': str(annotation), 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
@@ -1666,7 +1667,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
                     'pos0': startPos, 'pos1': startPos + len(txt),
                     'owner': self.app.settings['codername'], 'memo': "",
-                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                     cur = self.app.conn.cursor()
                     #TODO IntegrityError: UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1, code_text.owner
                     try:

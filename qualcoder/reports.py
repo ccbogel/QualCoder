@@ -276,7 +276,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f = open(filename, 'w')
         text = _("Code frequencies") + "\n"
         text += self.app.project_name + "\n"
-        text += _("Date: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n"
+        text += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
 
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
@@ -567,7 +567,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 return
         f = open(filename, 'w')
         f.write(self.app.project_name + "\n")
-        f.write(_("Date: ") + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
+        f.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
         f.write(self.comparisons)
         f.close()
         logger.info(_("Coder comparisons report exported to ") + filename)

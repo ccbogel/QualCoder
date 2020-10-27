@@ -199,7 +199,7 @@ class DialogJournals(QtWidgets.QDialog):
 
         # update database
         journal = {'name':name, 'jentry': '', 'owner':self.app.settings['codername'],
-            'date':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'jid':None}
+            'date':datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid':None}
         cur = self.app.conn.cursor()
         cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
             (journal['name'], journal['jentry'], journal['owner'], journal['date']))

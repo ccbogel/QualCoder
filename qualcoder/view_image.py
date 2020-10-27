@@ -675,7 +675,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         #print("UNSCALED x", x, "y", y, "w", width, "h", height)
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
         'width': width_unscaled, 'height':height_unscaled, 'owner': self.app.settings['codername'],
-         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'cid': cid,'memo': ''}
+         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'cid': cid,'memo': ''}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner) values(?,?,?,?,?,?,?,?,?)"
             , (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
@@ -798,7 +798,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': new_code_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
@@ -820,7 +820,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # add to database
         item = {'name': newCatText, 'cid': None, 'memo': "",
         'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], None))

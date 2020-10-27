@@ -157,7 +157,7 @@ class Refi_import():
 
         counter = 0
         elements = parent.getchildren()
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         description = ""
         for e in elements:
             if e.tag in("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
@@ -352,7 +352,7 @@ class Refi_import():
         :return count of variables
         """
 
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
         casevarcount = 0
         filevarcount = 0
@@ -429,7 +429,7 @@ class Refi_import():
         :param element - the Cases element:
         """
 
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
         count = 0
         for e in element.getchildren():

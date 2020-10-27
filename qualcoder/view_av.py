@@ -281,7 +281,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             time.sleep(0.5)
             screen = QtWidgets.QApplication.primaryScreen()
             screenshot = screen.grabWindow(self.ddialog.winId())
-            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().strftime(
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().astimezone().strftime(
                 "%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
         if action == ActionResize:
             w = self.ddialog.size().width()
@@ -1240,7 +1240,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cid = int(selected.text(1).split(':')[1])
         values = [self.media_data['id'], self.segment['start_msecs'],
                   self.segment['end_msecs'], cid, self.segment['memo'],
-                  datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                   self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
@@ -1359,7 +1359,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': new_name, 'memo': "", 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None, 'color': code_color}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
                     , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
@@ -1381,7 +1381,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # add to database
         item = {'name': new_name, 'cid': None, 'memo': "",
                 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
                     , (item['name'], item['memo'], item['owner'], item['date'], None))
@@ -1790,7 +1790,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         item['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
         item['owner'] = self.app.settings['codername']
         item['memo'] = ""
-        item['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        item['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         item['avid'] = self.segment_for_text['avid']
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
@@ -1833,7 +1833,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.text_for_segment['pos1'] = pos1
         self.text_for_segment['owner'] = self.app.settings['codername']
         self.text_for_segment['memo'] = ""
-        self.text_for_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.text_for_segment['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         self.text_for_segment['avid'] = None
 
     def set_video_to_timestamp_position(self, position):
@@ -1891,7 +1891,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
 
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
@@ -1980,7 +1980,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if item is None:
             item = {'fid': self.transcription[0], 'pos0': pos0, 'pos1': pos1,
                     'memo': str(annotation), 'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
@@ -2322,7 +2322,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.segment['memo'] = ui.memo
         sql = "update code_av set memo=?, date=? where avid=?"
         values = [self.segment['memo'],
-                  datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
@@ -2540,7 +2540,7 @@ class DialogViewAV(QtWidgets.QDialog):
             time.sleep(0.5)
             screen = QtWidgets.QApplication.primaryScreen()
             screenshot = screen.grabWindow(self.ddialog.winId())
-            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().strftime(
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().astimezone().strftime(
                 "%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
         if action == ActionResize:
             w = self.ddialog.size().width()
