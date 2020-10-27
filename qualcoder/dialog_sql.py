@@ -500,7 +500,6 @@ class NewTableWidget(QtWidgets.QTableWidget):
     def __init__(self, parent=None):
         super(NewTableWidget, self).__init__(parent)
 
-
     def contextMenuEvent(self, event):
 
         menu = QtWidgets.QMenu(self)
@@ -596,13 +595,19 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
             return QtWidgets.QTableWidgetItem.__lt__(self, other)
 
 # Extra queries
-EXTRA_SQL = ["-- Case text\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
+EXTRA_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
-'-- Codes, fileid and coded text\nselect  code_name.name as "codename",  \
+'-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename",  \
 code_text.fid, code_text.pos0, code_text.pos1,  code_text.seltext  from  code_name \
 join  code_text on  code_name.cid = code_text.cid',
-'-- Coded text with each Case\n\nselect code_name.name as codename, cases.name as casename,\
+'-- GET_CODING_TABLE\n-- Implementation of RQDA function\n\
+select code_text.cid, code_text.fid, code_name.name as "codename", \
+source.name as "filename" , code_text.pos1 - code_text.pos0 as "CodingLength",\
+code_text.pos0 as "index1", code_text.pos1 as "index2" \
+from code_text join code_name on code_text.cid = code_name.cid \
+join source on code_text.fid = source.id',
+'-- CODED TEXT WITH EACH CASE\nselect code_name.name as codename, cases.name as casename,\
  code_text.pos0, code_text.pos1, code_text.fid, seltext as "coded text", code_text.owner \
  from code_text join code_name on code_name.cid = code_text.cid \
 join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid \
