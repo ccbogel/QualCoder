@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-11 09:42+1000\n"
-"PO-Revision-Date: 2020-08-12 08:30+1000\n"
+"PO-Revision-Date: 2020-10-29 21:31+1100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1808,7 +1808,7 @@ msgstr "Format des Sprechernamens"
 
 #: qualcoder.py:781
 msgid "Backup on open"
-msgstr ""
+msgstr "Sicherung auf offen"
 
 #: qualcoder.py:782
 msgid "Backup AV files"
