@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtWidgets, QtCore
 import os
@@ -94,9 +94,9 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python 3.x, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
+<p>Depends on python at least 3.7, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
 <p>VLC should also be installed.</p>\
-<p>Tested on: Linux Mint 18.04, Ubuntu 19.04, Lubuntu 18.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\
+<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, partly tested on Mac OS.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
