@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2019 Colin Curtain
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,11 +41,6 @@ import sqlite3
 import traceback
 import urllib.request
 import webbrowser
-ZoneInfo = None  # Available in python 3.9 and higher
-try:
-    from zoneinfo import ZoneInfo
-except:
-    pass
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -71,7 +66,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.0"
+qualcoder_version = "QualCoder 2.1"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -214,7 +209,7 @@ class App(object):
             return
 
         proj_path = ""
-        splt = result[0].split("|")
+        splt = result[0].split("|") #open_menu
         if len(splt) == 1:
             proj_path = splt[0]
         if len(splt) == 2:
