@@ -6,90 +6,133 @@
     <message>
         <location filename="ui_attribute.py" line="42"/>
         <source>Add Attribute</source>
-        <translation type="unfinished">属性の追加</translation>
+        <translation type="obsolete">属性の追加</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="43"/>
         <source>Attribute name:</source>
-        <translation type="unfinished">属性名。</translation>
+        <translation type="obsolete">属性名。</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="44"/>
         <source>Character</source>
-        <translation type="unfinished">キャラクター</translation>
+        <translation type="obsolete">キャラクター</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="45"/>
         <source>Numeric</source>
-        <translation type="unfinished">数値</translation>
+        <translation type="obsolete">数値</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_CodeRelations</name>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="75"/>
+        <source>Code relations</source>
+        <translation>コード関係</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="76"/>
+        <source>Relations between codes in text files.</source>
+        <translation>テキストファイル内のコード間の関係</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="77"/>
+        <source>Export csv file</source>
+        <translation>csvファイルのエクスポート</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="78"/>
+        <source>Calculate</source>
+        <translation>計算</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="79"/>
+        <source>This coder</source>
+        <translation>このコーダー</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="80"/>
+        <source>All coders</source>
+        <translation>すべてのコーダー</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="81"/>
+        <source>Codes:</source>
+        <translation>コード。</translation>
     </message>
 </context>
 <context>
     <name>Dialog_Import</name>
     <message>
-        <location filename="ui_dialog_import.py" line="83"/>
+        <location filename="ui_dialog_import.py" line="85"/>
         <source>Import</source>
         <translation>輸入</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="84"/>
+        <location filename="ui_dialog_import.py" line="86"/>
         <source>.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="85"/>
+        <location filename="ui_dialog_import.py" line="87"/>
         <source>Survey Import Options</source>
         <translation>アンケートのインポートオプション</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="86"/>
+        <location filename="ui_dialog_import.py" line="88"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="87"/>
+        <location filename="ui_dialog_import.py" line="89"/>
         <source>,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="88"/>
+        <location filename="ui_dialog_import.py" line="90"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;デリミタは1文字でなければなりません。&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="89"/>
+        <location filename="ui_dialog_import.py" line="91"/>
         <source>Delimiter:</source>
         <translation>デリミタ:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="90"/>
+        <location filename="ui_dialog_import.py" line="92"/>
         <source>Quote format:</source>
         <translation>引用形式。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="91"/>
+        <location filename="ui_dialog_import.py" line="93"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;なし 123, abc&lt;/p&gt;&lt;p&gt;ミニマル 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;すべて &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="92"/>
+        <location filename="ui_dialog_import.py" line="94"/>
         <source>NONE</source>
         <translation>なし</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="93"/>
+        <location filename="ui_dialog_import.py" line="95"/>
         <source>MINIMAL</source>
         <translation>ミニマル</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="94"/>
+        <location filename="ui_dialog_import.py" line="96"/>
         <source>ALL</source>
         <translation>すべて</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
         <source>Changes made on the top row will override any user changes to field names and field types below.</source>
-        <translation>上の行で行われた変更は、下のフィールド名とフィールドタイプに対するユーザーの変更を上書きします。</translation>
+        <translation type="obsolete">上の行で行われた変更は、下のフィールド名とフィールドタイプに対するユーザーの変更を上書きします。</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_import.py" line="97"/>
+        <source>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (atrtribute) to Qualitative (creates a text file from the text).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -288,79 +331,94 @@
 <context>
     <name>Dialog_code_av</name>
     <message>
-        <location filename="ui_dialog_code_av.py" line="111"/>
+        <location filename="ui_dialog_code_av.py" line="114"/>
         <source>Code Audio Video</source>
         <translation>コード オーディオ ビデオ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="112"/>
+        <location filename="ui_dialog_code_av.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="113"/>
+        <location filename="ui_dialog_code_av.py" line="117"/>
         <source>Play</source>
         <translation>プレイ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="114"/>
+        <location filename="ui_dialog_code_av.py" line="118"/>
         <source>Volume</source>
         <translation>ボリューム</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="115"/>
+        <location filename="ui_dialog_code_av.py" line="119"/>
         <source>Time:</source>
         <translation>時間だ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="116"/>
+        <location filename="ui_dialog_code_av.py" line="120"/>
         <source>Duration: </source>
         <translation>期間です。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="117"/>
+        <location filename="ui_dialog_code_av.py" line="121"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;開始セグメントボタンを押して、オーディオ/ビデオセグメントのコーディングを開始します。End segment ボタンを押して、コード化されたセグメントを終了します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="118"/>
+        <location filename="ui_dialog_code_av.py" line="122"/>
         <source>Start segment</source>
         <translation>開始セグメント</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="119"/>
+        <location filename="ui_dialog_code_av.py" line="123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;オーディオまたはビデオのセグメントが作成されたら、コードツリーからコードを選択し、コードを右クリックしてセグメントをコードに割り当てます。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="120"/>
+        <location filename="ui_dialog_code_av.py" line="124"/>
         <source>Segment:</source>
         <translation>セグメント。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="121"/>
+        <location filename="ui_dialog_code_av.py" line="125"/>
         <source>Coder:</source>
         <translation>コーダーだ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="122"/>
+        <location filename="ui_dialog_code_av.py" line="126"/>
         <source>Select media</source>
         <translation>メディアを選択</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="123"/>
+        <location filename="ui_dialog_code_av.py" line="127"/>
         <source>Audio:</source>
         <translation>オーディオ。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="124"/>
+        <location filename="ui_dialog_code_av.py" line="128"/>
         <source>Scroll transcript while playing. (Transcript cannot be coded).</source>
         <translation>再生中にトランスクリプトをスクロールします。(トランスクリプトはコード化できません)。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="125"/>
+        <location filename="ui_dialog_code_av.py" line="131"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;スライダーボタンを左クリックし、左右にドラッグして動画の位置を変更します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="116"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; Increase play rate &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="129"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="130"/>
+        <source>Rate:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -533,7 +591,7 @@
 <context>
     <name>Dialog_information</name>
     <message>
-        <location filename="ui_dialog_information.py" line="35"/>
+        <location filename="ui_dialog_information.py" line="34"/>
         <source>Information</source>
         <translation>情報のご案内</translation>
     </message>
@@ -1025,74 +1083,89 @@ You must store these files elsewhere.</source>
 <context>
     <name>Dialog_view_av</name>
     <message>
-        <location filename="ui_dialog_view_av.py" line="99"/>
+        <location filename="ui_dialog_view_av.py" line="102"/>
         <source>View Audio Video</source>
         <translation>オーディオビデオを見る</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="100"/>
+        <location filename="ui_dialog_view_av.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;メモ&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="101"/>
+        <location filename="ui_dialog_view_av.py" line="104"/>
         <source>Memo:</source>
         <translation>メモ。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="102"/>
+        <location filename="ui_dialog_view_av.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To rewind 3 seconds. In the text entry box, press ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;5 秒間巻き戻します。テキスト入力ボックスで ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="103"/>
+        <location filename="ui_dialog_view_av.py" line="106"/>
         <source>Transcription:</source>
         <translation>転写です。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="104"/>
+        <location filename="ui_dialog_view_av.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ショートカットにスピーカー名を追加します。テキスト入力ボックスで ctrl + n&lt;/p&gt;&lt;p&gt;テープ起こしに話者を挿入します。テキスト入力ボックスで ctrl + 1 up to ctrl + 8 にスピーカー名を入力してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="105"/>
+        <location filename="ui_dialog_view_av.py" line="108"/>
         <source>Speakers:</source>
         <translation>スピーカー。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="106"/>
+        <location filename="ui_dialog_view_av.py" line="110"/>
         <source>Play</source>
         <translation>プレイ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="107"/>
+        <location filename="ui_dialog_view_av.py" line="111"/>
         <source>Volume</source>
         <translation>ボリューム</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="108"/>
+        <location filename="ui_dialog_view_av.py" line="112"/>
         <source>Time:</source>
         <translation>時間だ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="109"/>
+        <location filename="ui_dialog_view_av.py" line="113"/>
         <source>Duration: </source>
         <translation>期間です。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="110"/>
+        <location filename="ui_dialog_view_av.py" line="114"/>
         <source>Audio:</source>
         <translation>オーディオ。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="111"/>
+        <location filename="ui_dialog_view_av.py" line="115"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
         <translation>再生中にトランスクリプトをスクロールします。(トランスクリプトは読み上げのみ)</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="112"/>
+        <location filename="ui_dialog_view_av.py" line="118"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;スライダーボタンを左クリックし、左右にドラッグして動画の位置を変更します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="109"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="116"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="117"/>
+        <source>Rate:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1134,254 +1207,264 @@ You must store these files elsewhere.</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="ui_main.py" line="189"/>
+        <location filename="ui_main.py" line="194"/>
         <source>QualCoder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="190"/>
+        <location filename="ui_main.py" line="195"/>
         <source>Action log</source>
         <translation>アクションログ</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="191"/>
+        <location filename="ui_main.py" line="196"/>
         <source>Temporary notes</source>
         <translation>一時的な注意事項</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="192"/>
+        <location filename="ui_main.py" line="197"/>
         <source>Project</source>
         <translation>プロジェクト</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="193"/>
+        <location filename="ui_main.py" line="198"/>
         <source>Open Recent Project</source>
         <translation>最近のプロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="194"/>
+        <location filename="ui_main.py" line="199"/>
         <source>Export</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="195"/>
+        <location filename="ui_main.py" line="200"/>
         <source>Import</source>
         <translation>輸入</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="196"/>
+        <location filename="ui_main.py" line="201"/>
         <source>Files and Cases</source>
         <translation>ファイルとケース</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="197"/>
+        <location filename="ui_main.py" line="202"/>
         <source>Coding</source>
         <translation type="unfinished">コーディング</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="198"/>
+        <location filename="ui_main.py" line="203"/>
         <source>Reports</source>
         <translation>報告書</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="199"/>
+        <location filename="ui_main.py" line="204"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="200"/>
+        <location filename="ui_main.py" line="205"/>
         <source>Create New Project</source>
         <translation>新規プロジェクトの作成</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="201"/>
+        <location filename="ui_main.py" line="206"/>
         <source>Open Project</source>
         <translation>オープンプロジェクト</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="202"/>
+        <location filename="ui_main.py" line="207"/>
         <source>Close Project</source>
         <translation>プロジェクトを閉じる</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="203"/>
+        <location filename="ui_main.py" line="208"/>
         <source>Project Memo</source>
         <translation>プロジェクトメモ</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="204"/>
+        <location filename="ui_main.py" line="209"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="205"/>
+        <location filename="ui_main.py" line="210"/>
         <source>Exit</source>
         <translation>出口</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="206"/>
+        <location filename="ui_main.py" line="211"/>
         <source>Manage files</source>
         <translation>ファイルの管理</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="207"/>
+        <location filename="ui_main.py" line="212"/>
         <source>Manage cases</source>
         <translation>ケースの管理</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="208"/>
+        <location filename="ui_main.py" line="213"/>
         <source>File categories</source>
         <translation>ファイルカテゴリ</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="209"/>
+        <location filename="ui_main.py" line="214"/>
         <source>Manage journals</source>
         <translation>ジャーナルの管理</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="210"/>
+        <location filename="ui_main.py" line="215"/>
         <source>Code text</source>
         <translation>コードテキスト</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="211"/>
+        <location filename="ui_main.py" line="216"/>
         <source>Categories</source>
         <translation>カテゴリー</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="212"/>
+        <location filename="ui_main.py" line="217"/>
         <source>Codebook</source>
         <translation>コードブック</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="213"/>
+        <location filename="ui_main.py" line="218"/>
         <source>Assign Attributes</source>
         <translation>属性の割り当て</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="214"/>
+        <location filename="ui_main.py" line="219"/>
         <source>Manage Attributes</source>
         <translation>属性の管理</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="215"/>
+        <location filename="ui_main.py" line="220"/>
         <source>Import Attributes</source>
         <translation>インポート属性</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="216"/>
+        <location filename="ui_main.py" line="221"/>
         <source>Coding reports</source>
         <translation>コーディングレポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="217"/>
+        <location filename="ui_main.py" line="222"/>
         <source>Coding summary</source>
         <translation>コーディングの概要</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="218"/>
+        <location filename="ui_main.py" line="223"/>
         <source>SQL statements</source>
         <translation>エスキューエル文</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="219"/>
+        <location filename="ui_main.py" line="224"/>
         <source>Contents</source>
         <translation>内容</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="220"/>
+        <location filename="ui_main.py" line="225"/>
         <source>About</source>
         <translation>について</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="221"/>
+        <location filename="ui_main.py" line="226"/>
         <source>Import survey</source>
         <translation>輸入調査</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="222"/>
+        <location filename="ui_main.py" line="227"/>
         <source>Manage attributes</source>
         <translation>属性の管理</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="223"/>
+        <location filename="ui_main.py" line="228"/>
         <source>Frequency table</source>
         <translation>周波数表</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="224"/>
+        <location filename="ui_main.py" line="229"/>
         <source>Coding comparison</source>
         <translation>コーディング比較</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="225"/>
+        <location filename="ui_main.py" line="230"/>
         <source>Text mining</source>
         <translation>テキストマイニング</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="226"/>
+        <location filename="ui_main.py" line="231"/>
         <source>View Graph</source>
         <translation>グラフを見る</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="227"/>
+        <location filename="ui_main.py" line="232"/>
         <source>Export codebook</source>
         <translation>コードブックのエクスポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="228"/>
+        <location filename="ui_main.py" line="233"/>
         <source>Code image</source>
         <translation>コード画像</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="229"/>
+        <location filename="ui_main.py" line="234"/>
         <source>Code frequencies</source>
         <translation>コード周波数</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="230"/>
+        <location filename="ui_main.py" line="235"/>
         <source>Coding Matrix</source>
         <translation>コーディングマトリックス</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="231"/>
+        <location filename="ui_main.py" line="236"/>
         <source>Code audio/video</source>
         <translation>コードオーディオ/ビデオ</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="233"/>
+        <location filename="ui_main.py" line="238"/>
         <source>REFI-QDA Project export</source>
         <translation>REFI-QDAプロジェクトエクスポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="234"/>
+        <location filename="ui_main.py" line="239"/>
         <source>REFI-QDA Codebook export</source>
         <translation>REFI-QDAコードブックエクスポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="235"/>
+        <location filename="ui_main.py" line="240"/>
         <source>REFI-QDA Codebook import</source>
         <translation>REFI-QDAコードブックのインポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="236"/>
+        <location filename="ui_main.py" line="241"/>
         <source>REFI-QDA Project import</source>
         <translation>REFI-QDAプロジェクトのインポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="237"/>
+        <location filename="ui_main.py" line="242"/>
         <source>RQDA Project import</source>
         <translation>RQDAプロジェクトのインポート</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="238"/>
+        <location filename="ui_main.py" line="243"/>
         <source>Project summary</source>
         <translation>プロジェクト概要</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="239"/>
+        <location filename="ui_main.py" line="244"/>
         <source>None</source>
         <translation>一人もいない</translation>
+    </message>
+    <message>
+        <location filename="ui_main.py" line="245"/>
+        <source>Code relations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_main.py" line="246"/>
+        <source>Export coded text as html</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

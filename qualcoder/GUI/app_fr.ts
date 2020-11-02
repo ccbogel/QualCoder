@@ -2,71 +2,115 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
+    <name>Dialog_CodeRelations</name>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="75"/>
+        <source>Code relations</source>
+        <translation>Relations de code</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="76"/>
+        <source>Relations between codes in text files.</source>
+        <translation>Relations entre les codes dans les fichiers texte.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="77"/>
+        <source>Export csv file</source>
+        <translatorcomment>Exporter un fichier csv</translatorcomment>
+        <translation>Exporter un fichier csv</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="78"/>
+        <source>Calculate</source>
+        <translation>Calculer</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="79"/>
+        <source>This coder</source>
+        <translation>Ce codeur</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="80"/>
+        <source>All coders</source>
+        <translation>Tous les codeurs</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_relations.py" line="81"/>
+        <source>Codes:</source>
+        <translation>Codes:</translation>
+    </message>
+</context>
+<context>
     <name>Dialog_Import</name>
     <message>
-        <location filename="ui_dialog_import.py" line="83"/>
+        <location filename="ui_dialog_import.py" line="85"/>
         <source>Import</source>
         <translation>Importer </translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="85"/>
+        <location filename="ui_dialog_import.py" line="87"/>
         <source>Survey Import Options</source>
         <translation>Options d&apos;importation d&apos;enquête</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="88"/>
+        <location filename="ui_dialog_import.py" line="90"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;/p&gt;Le délimiteur doit être un seul caractère.&lt;p&gt;tapez &apos;ta&apos; pour &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="89"/>
+        <location filename="ui_dialog_import.py" line="91"/>
         <source>Delimiter:</source>
         <translation>Délimiteur:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="90"/>
+        <location filename="ui_dialog_import.py" line="92"/>
         <source>Quote format:</source>
         <translation>Format de citation:</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
         <source>Changes made on the top row will override any user changes to field names and field types below.</source>
-        <translation>Les modifications apportées sur la ligne supérieure annulent les modifications apportées par l&apos;utilisateur aux noms et types de champs ci-dessous.</translation>
+        <translation type="obsolete">Les modifications apportées sur la ligne supérieure annulent les modifications apportées par l&apos;utilisateur aux noms et types de champs ci-dessous.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="84"/>
+        <location filename="ui_dialog_import.py" line="86"/>
         <source>.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="86"/>
+        <location filename="ui_dialog_import.py" line="88"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="87"/>
+        <location filename="ui_dialog_import.py" line="89"/>
         <source>,</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="91"/>
+        <location filename="ui_dialog_import.py" line="93"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ACUNE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="92"/>
+        <location filename="ui_dialog_import.py" line="94"/>
         <source>NONE</source>
         <translation>AUCUNE</translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="93"/>
+        <location filename="ui_dialog_import.py" line="95"/>
         <source>MINIMAL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_import.py" line="94"/>
+        <location filename="ui_dialog_import.py" line="96"/>
         <source>ALL</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_import.py" line="97"/>
+        <source>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (atrtribute) to Qualitative (creates a text file from the text).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -300,17 +344,17 @@
 <context>
     <name>Dialog_code_av</name>
     <message>
-        <location filename="ui_dialog_code_av.py" line="111"/>
+        <location filename="ui_dialog_code_av.py" line="114"/>
         <source>Code Audio Video</source>
         <translation>Code audio / vidéo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="112"/>
+        <location filename="ui_dialog_code_av.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="113"/>
+        <location filename="ui_dialog_code_av.py" line="117"/>
         <source>Play</source>
         <translation>Démarrer</translation>
     </message>
@@ -320,64 +364,79 @@
         <translation type="obsolete">Stopper</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="114"/>
+        <location filename="ui_dialog_code_av.py" line="118"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="115"/>
+        <location filename="ui_dialog_code_av.py" line="119"/>
         <source>Time:</source>
         <translation>Temps:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="116"/>
+        <location filename="ui_dialog_code_av.py" line="120"/>
         <source>Duration: </source>
         <translation>Durée:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="125"/>
+        <location filename="ui_dialog_code_av.py" line="131"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clic gauche sur le curseur et faites-le glisser vers la gauche ou la droite pour modifier la position de la vidéo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="117"/>
+        <location filename="ui_dialog_code_av.py" line="121"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Appuyez sur le bouton Démarrer segment pour commencer à coder le segment audio / vidéo. Appuyez sur le bouton End segment pour terminer le segment codé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="118"/>
+        <location filename="ui_dialog_code_av.py" line="122"/>
         <source>Start segment</source>
         <translation>Segment de départ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="119"/>
+        <location filename="ui_dialog_code_av.py" line="123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lorsqu&apos;un segment audio ou vidéo est créé, choisissez un code dans l&apos;arborescence des codes, cliquez dessus avec le bouton droit de la souris et assignez le segment au code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="120"/>
+        <location filename="ui_dialog_code_av.py" line="124"/>
         <source>Segment:</source>
         <translation>Segment:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="121"/>
+        <location filename="ui_dialog_code_av.py" line="125"/>
         <source>Coder:</source>
         <translation>Codeur:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="122"/>
+        <location filename="ui_dialog_code_av.py" line="126"/>
         <source>Select media</source>
         <translation>Sélectionnez le média</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="123"/>
+        <location filename="ui_dialog_code_av.py" line="127"/>
         <source>Audio:</source>
         <translation>l&apos;audio:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="124"/>
+        <location filename="ui_dialog_code_av.py" line="128"/>
         <source>Scroll transcript while playing. (Transcript cannot be coded).</source>
         <translation>Faites défiler la transcription pendant la lecture. (La transcription ne peut pas être codée).</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="116"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; Increase play rate &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="129"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="130"/>
+        <source>Rate:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -555,7 +614,7 @@
 <context>
     <name>Dialog_information</name>
     <message>
-        <location filename="ui_dialog_information.py" line="35"/>
+        <location filename="ui_dialog_information.py" line="34"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -985,7 +1044,6 @@ Vous devez stocker ces fichiers ailleurs.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="129"/>
         <source>Time format</source>
-        <translatorcomment>Format de l&apos;orateur</translatorcomment>
         <translation>Format de l&apos;heure</translation>
     </message>
     <message>
@@ -1093,22 +1151,22 @@ Vous devez stocker ces fichiers ailleurs.</translation>
 <context>
     <name>Dialog_view_av</name>
     <message>
-        <location filename="ui_dialog_view_av.py" line="99"/>
+        <location filename="ui_dialog_view_av.py" line="102"/>
         <source>View Audio Video</source>
         <translation>Voir audio / vidéo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="100"/>
+        <location filename="ui_dialog_view_av.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="101"/>
+        <location filename="ui_dialog_view_av.py" line="104"/>
         <source>Memo:</source>
         <translation>Note:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="106"/>
+        <location filename="ui_dialog_view_av.py" line="110"/>
         <source>Play</source>
         <translation>Jouer</translation>
     </message>
@@ -1118,53 +1176,68 @@ Vous devez stocker ces fichiers ailleurs.</translation>
         <translation type="obsolete">Stop</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="107"/>
+        <location filename="ui_dialog_view_av.py" line="111"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="108"/>
+        <location filename="ui_dialog_view_av.py" line="112"/>
         <source>Time:</source>
         <translation>Temps:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="109"/>
+        <location filename="ui_dialog_view_av.py" line="113"/>
         <source>Duration: </source>
         <translation>Durée:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="112"/>
+        <location filename="ui_dialog_view_av.py" line="118"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cliquez avec le bouton gauche sur le curseur et faites-le glisser vers la gauche ou la droite pour modifier la position de la vidéo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="103"/>
+        <location filename="ui_dialog_view_av.py" line="106"/>
         <source>Transcription:</source>
         <translation>Transcription :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="110"/>
+        <location filename="ui_dialog_view_av.py" line="114"/>
         <source>Audio:</source>
         <translation>l&apos;audio:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="111"/>
+        <location filename="ui_dialog_view_av.py" line="115"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
         <translation>Faites défiler la transcription pendant la lecture. (La transcription ne peut pas être codée).</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="102"/>
+        <location filename="ui_dialog_view_av.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To rewind 3 seconds. In the text entry box, press ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="104"/>
+        <location filename="ui_dialog_view_av.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="105"/>
+        <location filename="ui_dialog_view_av.py" line="108"/>
         <source>Speakers:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="109"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="116"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="117"/>
+        <source>Rate:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1230,212 +1303,212 @@ Vous devez stocker ces fichiers ailleurs.</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="ui_main.py" line="192"/>
+        <location filename="ui_main.py" line="197"/>
         <source>Project</source>
         <translation>Projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="196"/>
+        <location filename="ui_main.py" line="201"/>
         <source>Files and Cases</source>
         <translation>Fichiers et cas</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="197"/>
+        <location filename="ui_main.py" line="202"/>
         <source>Coding</source>
         <translation>Codage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="199"/>
+        <location filename="ui_main.py" line="204"/>
         <source>Help</source>
         <translation>Aidez-moi</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="200"/>
+        <location filename="ui_main.py" line="205"/>
         <source>Create New Project</source>
         <translation>Créer nouveau projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="201"/>
+        <location filename="ui_main.py" line="206"/>
         <source>Open Project</source>
         <translation>Ouvrir un projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="202"/>
+        <location filename="ui_main.py" line="207"/>
         <source>Close Project</source>
         <translation>Fermer un projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="203"/>
+        <location filename="ui_main.py" line="208"/>
         <source>Project Memo</source>
         <translation>Notes de projets</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="204"/>
+        <location filename="ui_main.py" line="209"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="205"/>
+        <location filename="ui_main.py" line="210"/>
         <source>Exit</source>
         <translation>Sortir</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="206"/>
+        <location filename="ui_main.py" line="211"/>
         <source>Manage files</source>
         <translation>Gérer les fichiers</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="207"/>
+        <location filename="ui_main.py" line="212"/>
         <source>Manage cases</source>
         <translation>Gérer les cas</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="208"/>
+        <location filename="ui_main.py" line="213"/>
         <source>File categories</source>
         <translation>Catégories de fichier</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="209"/>
+        <location filename="ui_main.py" line="214"/>
         <source>Manage journals</source>
         <translation>Gérer les journaux de bord</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="210"/>
+        <location filename="ui_main.py" line="215"/>
         <source>Code text</source>
         <translation>Code texte</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="211"/>
+        <location filename="ui_main.py" line="216"/>
         <source>Categories</source>
         <translation>Catégories</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="212"/>
+        <location filename="ui_main.py" line="217"/>
         <source>Codebook</source>
         <translation>Livre de code</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="213"/>
+        <location filename="ui_main.py" line="218"/>
         <source>Assign Attributes</source>
         <translation>Attribuer des attributs</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="214"/>
+        <location filename="ui_main.py" line="219"/>
         <source>Manage Attributes</source>
         <translation>Gérer les attributs</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="215"/>
+        <location filename="ui_main.py" line="220"/>
         <source>Import Attributes</source>
         <translation>Attributs d&apos;importation</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="216"/>
+        <location filename="ui_main.py" line="221"/>
         <source>Coding reports</source>
         <translation>Rapports de codage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="217"/>
+        <location filename="ui_main.py" line="222"/>
         <source>Coding summary</source>
         <translation>Résumé de codage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="218"/>
+        <location filename="ui_main.py" line="223"/>
         <source>SQL statements</source>
         <translation>Instructions SQL</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="219"/>
+        <location filename="ui_main.py" line="224"/>
         <source>Contents</source>
         <translation>Contenu</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="220"/>
+        <location filename="ui_main.py" line="225"/>
         <source>About</source>
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="221"/>
+        <location filename="ui_main.py" line="226"/>
         <source>Import survey</source>
         <translation>Enquête d&apos;importation</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="222"/>
+        <location filename="ui_main.py" line="227"/>
         <source>Manage attributes</source>
         <translation>Gérer les attributs</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="223"/>
+        <location filename="ui_main.py" line="228"/>
         <source>Frequency table</source>
         <translation>Table de fréquence</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="224"/>
+        <location filename="ui_main.py" line="229"/>
         <source>Coding comparison</source>
         <translation>Comparaison de codage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="225"/>
+        <location filename="ui_main.py" line="230"/>
         <source>Text mining</source>
         <translation>Fouille de texte</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="226"/>
+        <location filename="ui_main.py" line="231"/>
         <source>View Graph</source>
         <translation>Voir le graphique</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="227"/>
+        <location filename="ui_main.py" line="232"/>
         <source>Export codebook</source>
         <translation>Codebook d&apos;exportation</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="228"/>
+        <location filename="ui_main.py" line="233"/>
         <source>Code image</source>
         <translation>Image de code</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="229"/>
+        <location filename="ui_main.py" line="234"/>
         <source>Code frequencies</source>
         <translation>Fréquence du code</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="230"/>
+        <location filename="ui_main.py" line="235"/>
         <source>Coding Matrix</source>
         <translation>Matrice de codage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="231"/>
+        <location filename="ui_main.py" line="236"/>
         <source>Code audio/video</source>
         <translation>Code audio / vidéo</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="189"/>
+        <location filename="ui_main.py" line="194"/>
         <source>QualCoder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="198"/>
+        <location filename="ui_main.py" line="203"/>
         <source>Reports</source>
         <translation>Reportage</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="233"/>
+        <location filename="ui_main.py" line="238"/>
         <source>REFI-QDA Project export</source>
         <translation>REFI-QDA Exportation de projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="234"/>
+        <location filename="ui_main.py" line="239"/>
         <source>REFI-QDA Codebook export</source>
         <translation>REFI-QDA </translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="235"/>
+        <location filename="ui_main.py" line="240"/>
         <source>REFI-QDA Codebook import</source>
         <translation>REFI-QDA Importation du livre de codes </translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="236"/>
+        <location filename="ui_main.py" line="241"/>
         <source>REFI-QDA Project import</source>
         <translation>REFI-QDA Importation de projet</translation>
     </message>
@@ -1445,44 +1518,54 @@ Vous devez stocker ces fichiers ailleurs.</translation>
         <translation type="obsolete">Voir le graphique 2</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="237"/>
+        <location filename="ui_main.py" line="242"/>
         <source>RQDA Project import</source>
         <translation>RQDA Importation de projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="190"/>
+        <location filename="ui_main.py" line="195"/>
         <source>Action log</source>
         <translation>Journal des actions</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="191"/>
+        <location filename="ui_main.py" line="196"/>
         <source>Temporary notes</source>
         <translation>Notes temporaires</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="193"/>
+        <location filename="ui_main.py" line="198"/>
         <source>Open Recent Project</source>
         <translation>Ouvrir un projet récent</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="194"/>
+        <location filename="ui_main.py" line="199"/>
         <source>Export</source>
         <translation>Exporter</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="195"/>
+        <location filename="ui_main.py" line="200"/>
         <source>Import</source>
         <translation>Importer</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="238"/>
+        <location filename="ui_main.py" line="243"/>
         <source>Project summary</source>
         <translation>Sommaire du projet</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="239"/>
+        <location filename="ui_main.py" line="244"/>
         <source>None</source>
         <translation>Aucune</translation>
+    </message>
+    <message>
+        <location filename="ui_main.py" line="245"/>
+        <source>Code relations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_main.py" line="246"/>
+        <source>Export coded text as html</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
