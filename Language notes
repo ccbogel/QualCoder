@@ -63,6 +63,8 @@ CODECFORTR      = ISO-8859-5
 Double-click to open the .pro file in Qt Creator
 Go to Tools > External > Linguist > update Translations
 
+Open each ts file and after updating translations, replease the .qm file
+
 
 #####################################
 
