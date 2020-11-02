@@ -817,6 +817,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogReportCoderComparisons":
+                d.show()
                 d.activateWindow()
                 return
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
@@ -829,6 +830,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogReportCodeFrequencies":
+                d.show()
                 d.activateWindow()
                 return
 
@@ -842,6 +844,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogReportRelations":
+                d.show()
                 d.activateWindow()
                 return
         ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialogList)
@@ -854,6 +857,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogReportCodes":
+                d.show()
                 d.activateWindow()
                 return
 
@@ -867,6 +871,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "ViewGraphOriginal":
+                d.show()
                 d.activateWindow()
                 return
         ui = ViewGraphOriginal(self.app)
@@ -883,13 +888,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def about(self):
         """ About dialog. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogInformation" and d.windowTitle() == "About":
-                d.activateWindow()
-                return
         ui = DialogInformation(self.app, "About", "")
-        self.dialogList.append(ui)
-        ui.show()
+        ui.exec_()
         self.clean_dialog_refs()
 
     def manage_attributes(self):
@@ -965,9 +965,8 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeText":
                 try:
+                    d.show()
                     d.activateWindow()
-                    #TODO activate window does NOT bring to front, unline image coding and av coding
-                    # Unsure why this occurs, so cannot resolve
                 except RuntimeError as e:
                     logger.debug(str(e))
                     self.dialogList.remove(d)
@@ -994,6 +993,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeImage":
+                d.show()
                 d.activateWindow()
                 return
         files = self.app.get_image_filenames()
@@ -1018,6 +1018,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeAV":
                 try:
+                    d.show()
                     d.activateWindow()
                 except Exception as e:
                     logger.debug(str(e))
@@ -1555,7 +1556,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
             )).read())
-            if _json['name'] != qualcoder_version:
+            if _json['name'] not in qualcoder_version:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
