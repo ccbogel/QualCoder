@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 from copy import deepcopy
 import datetime
@@ -47,7 +47,6 @@ from helpers import msecs_to_mins_and_secs
 from information import DialogInformation
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
-#from qtmodels import DictListModel, ListObjectModel
 from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -98,13 +97,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.dialog_list = dialog_list
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
-        self.codes = []
-        self.categories = []
         self.filenames = self.app.get_text_filenames()
         self.annotations = self.app.get_annotations()
         self.search_indices = []
         self.search_index = 0
-        self.get_codes_and_categories()
+        self.codes, self.categories = self.app.get_data()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         try:
@@ -136,6 +133,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_view_file.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.pushButton_view_file.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
+        self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
@@ -363,10 +362,10 @@ class DialogCodeText(QtWidgets.QWidget):
             count += 1
 
     def get_codes_and_categories(self):
-        """ Called from init, delete category/code. """
+        """ Called from init, delete category/code.
+        Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_data()
-        cur = self.app.conn.cursor()
 
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
@@ -595,8 +594,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
-            '''if selected is not None and action == ActionAssignSelectedText:
-                self.mark()'''
             if selected is not None and action == ActionItemChangeColor:
                 self.change_code_color(selected)
             elif action == ActionItemAddCategory:
@@ -618,7 +615,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
                 if found:
                     self.coded_media_dialog(found)
-
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -719,6 +715,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def coded_media_dialog(self, data):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files and ALL coders.
+        Called from tree_menu
         param:
             data: code dictionary
         """
@@ -779,7 +776,6 @@ class DialogCodeText(QtWidgets.QWidget):
             ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
         ui.exec_()
 
-    #TODO is this used?
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
         A counter is important as each image slice needs a unique name, counter adds
@@ -1555,7 +1551,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Annotation positions are displayed as bold text.
         """
 
-        if self.filename == {}:
+        if self.filename == {} or self.filename is None:
             QtWidgets.QMessageBox.warning(None, _('Warning'), _("No file was selected"))
             return
         pos0 = self.ui.textEdit.textCursor().selectionStart()
@@ -1610,6 +1606,120 @@ class DialogCodeText(QtWidgets.QWidget):
         self.unlight()
         self.highlight()
 
+    def auto_code_menu(self, position):
+        """ Context menu for auto_code button.
+        To allow coding of full sentences based on text fragment and marker indicating end of sentence.
+        Default end marker  is 2 character period and space.
+        Options for This file only or for All text files. """
+
+        item = self.ui.treeWidget.currentItem()
+        if item is None:
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
+                QtWidgets.QMessageBox.Ok)
+            return
+        if item.text(1)[0:3] == 'cat':
+            return
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_code_sentences = None
+        if self.filename is not None:
+            action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
+        action_code_sentences_all = menu.addAction(_("Text fragment to code_sentences. All text files."))
+
+        action = menu.exec_(self.ui.pushButton_auto_code.mapToGlobal(position))
+        if action == action_code_sentences:
+            self.code_sentences(item, "")
+            return
+        if action == action_code_sentences_all:
+            self.code_sentences(item, "all")
+            return
+
+    def code_sentences(self, item, all=""):
+        """ Code full sentence based on text fragment.
+
+        param:
+            item: qtreewidgetitem
+            all = "" :  for this text file only.
+            all = "all" :  for all text files.
+        """
+
+        item = self.ui.treeWidget.currentItem()
+        if item is None:
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
+                QtWidgets.QMessageBox.Ok)
+            return
+        if item.text(1)[0:3] == 'cat':
+            return
+        cid = int(item.text(1).split(':')[1])
+
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Code sentence"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setLabelText(_("Autocode sentence using this text fragment:"))
+        dialog.resize(200, 20)
+        ok = dialog.exec_()
+        if not ok:
+            return
+        text = dialog.textValue()
+        if text == "":
+            return
+        dialog2 = QtWidgets.QInputDialog(None)
+        dialog2.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog2.setWindowTitle(_("Code sentence"))
+        dialog2.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog2.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog2.setToolTip(_("Default is period space. Do not use line endings such as \\n"))
+        dialog2.setLabelText(_("Define sentence ending:"))
+        dialog2.setTextValue(". ")
+        dialog2.resize(200, 20)
+        ok2 = dialog2.exec_()
+        if not ok2:
+            return
+        ending = dialog2.textValue()
+        if ending == "":
+            return
+        files= []
+        if all == "all":
+            files = self.app.get_file_texts()
+        else:
+            files = self.app.get_file_texts([self.filename['id'], ])
+        cur = self.app.conn.cursor()
+        msg = ""
+        for f in files:
+            sentences = f['fulltext'].split(ending)
+            pos0 = 0
+            codes_added = 0
+            for sentence in sentences:
+                if text in sentence:
+                    i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
+                            'pos0': pos0, 'pos1': pos0 + len(sentence),
+                            'owner': self.app.settings['codername'], 'memo': "",
+                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                    #TODO IntegrityError: UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1, code_text.owner
+                    try:
+                        codes_added += 1
+                        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                            owner,memo,date) values(?,?,?,?,?,?,?,?)"
+                            , (i['cid'], i['fid'], i['seltext'], i['pos0'],
+                            i['pos1'], i['owner'], i['memo'], i['date']))
+                        self.app.conn.commit()
+                    except Exception as e:
+                        logger.debug(_("Autocode insert error ") + str(e))
+                pos0 += len(sentence) + len(ending)
+            if codes_added > 0:
+                msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
+        self.parent_textEdit.append(_("Automatic code sentence in files:") \
+            + _("\nCode: ") + item.text(0)
+            + _("\nWith text fragment: ") + text  + _("\nUsing line ending: ") + ending + "\n" + msg)
+        self.app.delete_backup = False
+
+        # Update tooltip filter and code tree code counts
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
         """
@@ -1624,11 +1734,12 @@ class DialogCodeText(QtWidgets.QWidget):
         cid = int(item.text(1).split(':')[1])
         # Input dialog too narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Automatic coding"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
-        dialog.setLabelText(_("Autocode files with the current code for this text:") +"\n" + item.text(0))
+        dialog.setLabelText(_("Autocode files with the current code for this text:") + "\n" + item.text(0))
         dialog.resize(200, 20)
         ok = dialog.exec_()
         if not ok:
@@ -1652,6 +1763,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(files) == 0:
             return
 
+        cur = self.app.conn.cursor()
         for txt in texts:
             filenames = ""
             for f in files:
@@ -1668,7 +1780,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     'pos0': startPos, 'pos1': startPos + len(txt),
                     'owner': self.app.settings['codername'], 'memo': "",
                     'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                    cur = self.app.conn.cursor()
                     #TODO IntegrityError: UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1, code_text.owner
                     try:
                         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
@@ -1679,16 +1790,11 @@ class DialogCodeText(QtWidgets.QWidget):
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
-
-                    # If this is the currently open file update the code text list and GUI
-                    if f['id'] == self.filename['id']:
-                        self.code_text.append(item)
-                self.highlight()
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
                     + _(". with text: ") + txt)
 
         # Update tooltip filter and code tree code counts
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
 
