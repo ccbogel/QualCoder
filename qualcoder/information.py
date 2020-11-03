@@ -49,8 +49,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogInformation(QtWidgets.QDialog):
     """
-    Dialog to display about information from html and text files for PyQDA development,
-    version and license.
+    Dialog to display about information about development, version and license.
     The html is coded below because it avoids potential data file import errors with pyinstaller.
     Called from:
          qualcoder.MainWindow.about
