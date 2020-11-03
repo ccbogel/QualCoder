@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 
-might need: sudo pip install pdfminer.six
-'''
+"""
 
 import logging
 import datetime
@@ -546,7 +545,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def view(self):
         """ View and edit text file contents.
-        Alternatively view an image or other media. """
+        Alternatively view an image, audio or video media. """
 
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
@@ -578,11 +577,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if restricted:
             title += "RESTRICTED EDIT"
         self.text_view.setWindowTitle(title)
-        if self.dialog_list != []:
-            self.dialog_list = []
-            self.dialog_list.append(self.text_view)
-        self.text_view.show()
-
+        self.text_view.exec_()
         text = self.text_view.ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
             return
@@ -604,8 +599,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         cursor.setCharFormat(format_)
 
     def textEdit_unrestricted_menu(self, position):
-        """ Context menu for select al land copy of text.
-         Used inthe 'unrestricted' o.e. no coded text file. """
+        """ Context menu for select all and copy of text.
+         Used in the 'unrestricted' i.e. no coded text file. """
 
         if self.text_view.ui.textEdit.toPlainText() == "":
             return
