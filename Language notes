@@ -1,4 +1,4 @@
-Note for creating language files
+Notes for creating language files
 
 Installs:
 sudo apt install python-setuptools
@@ -64,10 +64,13 @@ CODECFORTR      = ISO-8859-5
 Double-click to open the .pro file in Qt Creator
 Go to Tools > External > Linguist > update Translations
 
+Release as app_name.qm 
+Release is placed in qualcoder/locale/name/name.qm
+
 
 #####################################
 
-Strings in python code need to be translated too
+Strings in python code need to be translated.
 https://docs.python.org/3/library/gettext.html#internationalizing-your-programs-and-modules
 
 
@@ -81,9 +84,8 @@ lang.install()
 # Install poedit
 sudo apt install poedit
 
-Example: xgettext -d es qualcoder.py
 
-In terminal, run these from the qualcoder folder:
+In terminal, run these scripts from the qualcoder folder:
 
 -d is default output name    e.g. fr
 -j option to join existing file
@@ -106,10 +108,9 @@ xgettext -d jp -j jp.po add_attribute.py add_item_name.py attributes.py case_fil
 
 
 
-Use Poedit to fill in translations. Download it from http://poedit.net. Select File > New from POT/PO file... and select your language.po file.
+After translating, save will produce a name.po amd a name.mo file
 
-
-save will produce a .po amd a .mo file
+The .mo file is placed in qualcoder/locale/name/LC_MESSAGES/name.mo
 
 
 
