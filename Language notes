@@ -1,4 +1,8 @@
 Notes for creating language files
+=================================
+List_of_ISO_639-1_codes
+2 letter codes for differnt languages
+jp should be ja but already in place now.
 
 Installs:
 sudo apt install python-setuptools
@@ -54,7 +58,7 @@ ui_dialog_attribute_parameters.py \
 ui_dialog_visualise_graph_original.py
 TRANSLATIONS    = app_de.ts \
                   app_fr.ts \
-                  app_gr.ts \
+                  app_el.ts \
                   app_it.ts \
                   app_es.ts \
                   app_jp.ts
@@ -95,11 +99,11 @@ outputs of below scripts are de.po, es.po, fr.po, gr.po, jp.po
 
 xgettext -d de -j de.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
+xgettext -d el -j el.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
+
 xgettext -d es -j es.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
 xgettext -d fr -j fr.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
-
-xgettext -d gr -j gr.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
 xgettext -d it j it.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
