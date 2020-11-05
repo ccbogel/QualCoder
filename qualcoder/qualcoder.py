@@ -503,7 +503,9 @@ class App(object):
     def get_file_texts(self, fileids=None):
         """ Get the texts of all text files as a list of dictionaries.
         Called by DialogCodeText.search_for_text
-        param: fileids - a list of fileids or None """
+        param:
+            fileids - a list of fileids or None
+        """
 
         cur = self.conn.cursor()
         if fileids is not None:
@@ -1585,20 +1587,11 @@ def gui():
     # translator applies to ui designed GUI widgets only
     lang = settings.get('language', 'en')
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
-    if lang != "en":
+    #if lang != "en":
+    if lang in ["de", "el", "es", "fr", "jp"]:
         translator = QtCore.QTranslator()
-        if lang == "fr":
-            translator.load(path + "/locale/fr/app_fr.qm")
-            getlang = gettext.translation('fr', localedir=path + '/locale', languages=['fr'])
-        if lang == "de":
-            translator.load(path + "/locale/de/app_de.qm")
-            getlang = gettext.translation('de', localedir=path + '/locale', languages=['de'])
-        if lang == "es":
-            translator.load(path + "/locale/es/app_es.qm")
-            getlang = gettext.translation('es', localedir=path + '/locale', languages=['es'])
-        if lang == "jp":
-            translator.load(path + "/locale/jp/app_jp.qm")
-            getlang = gettext.translation('jp', localedir=path + '/locale', languages=['jp'])
+        translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
+        getlang = gettext.translation(lang, localedir=path + '/locale', languages=[lang])
         app.installTranslator(translator)
     getlang.install()
     ex = MainWindow(qual_app)

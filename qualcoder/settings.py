@@ -82,7 +82,7 @@ class DialogSettings(QtWidgets.QDialog):
             for row in results:
                 coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-        languages = ["Deutsch de", "English en", "Español es", "Français fr", "日本 jp"]
+        languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr", "日本 jp"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
