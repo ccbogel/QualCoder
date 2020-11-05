@@ -29,9 +29,9 @@ ui_queryDetails.py \
 ui_report_attribute_parameters.py \
 ui_visualise_graph_original.py
 TRANSLATIONS    = app_de.ts \
+                  app_el.ts \
                   app_es.ts \
                   app_fr.ts \
-                  app_gr.ts \
                   app_it.ts \
                   app_jp.ts
 CODECFORTR      = ISO-8859-5
