@@ -95,7 +95,10 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogManageFiles(QtWidgets.QDialog):
-    """ View, import, export, rename and delete text files. """
+    """ View, import, export, rename and delete text files.
+    Files are normally imported into the qda project folder.
+    Option to link to external A/V files.
+    """
 
     source = []
     app = None
@@ -918,14 +921,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def import_files(self):
-        """ Import files and store into relevant directories (documents, images, ?audio?).
+        """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt, docx and md
         md is text markdown format.
         Note importing from html, odt, docx all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
-        Imports audio as mp3, wav which are stored in an audio directory
-        Imports video as mp4, mov, ogg, wmv which are stored in a video directory
+        Imports audio as mp3, wav which are stored in an audio directory.
+        Imports video as mp4, mov, ogg, wmv which are stored in a video directory.
+
+        Optional: link to audio and video files rather than import into folder.
         """
 
         imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
@@ -1367,6 +1372,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             name_item.setIcon(icon)
             # having un-editable file names helps with assigning icons
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            #TODO if linked add link note to tooltip
             name_item.setToolTip((data['metadata']))
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
@@ -1376,6 +1382,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             if data['memo'] is not None and data['memo'] != "":
                 memo_string = _("Memo")
             memo_item = QtWidgets.QTableWidgetItem(memo_string)
+            if data['memo'] is not None and data['memo'] != "":
+                memo_item.setToolTip(data['memo'])
             memo_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, memo_item)
             fid = data['id']
