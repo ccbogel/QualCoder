@@ -563,7 +563,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.get_latest_github_release()
-        #self.setWindowIcon(QtGui.QIcon("GUI/qualcoder.png"))
         try:
             w = int(self.app.settings['mainwindow_w'])
             h = int(self.app.settings['mainwindow_h'])
@@ -1334,7 +1333,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
         self.setWindowTitle("QualCoder " + self.app.project_name)
-        self.project_summary_report()
 
         # check avid column in code_text table
         # database version < 2
@@ -1596,12 +1594,14 @@ def gui():
     getlang.install()
     ex = MainWindow(qual_app)
     if project_path:
-        splt = project_path.split("|")
+        split_ = project_path.split("|")
         proj_path = ""
-        if len(splt) == 1:
-            proj_path = splt[0]
-        if len(splt) == 2:
-            proj_path = splt[1]
+        # Only the path - older and rarer format - legacy
+        if len(split_) == 1:
+            proj_path = split_[0]
+        # Newer datetime | path
+        if len(split_) == 2:
+            proj_path = split_[1]
         ex.open_project(path=proj_path)
     sys.exit(app.exec_())
 
