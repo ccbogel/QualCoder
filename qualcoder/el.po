@@ -7,13 +7,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-05 08:41+1100\n"
-"PO-Revision-Date: 2020-11-05 13:50+1100\n"
-"Language: el_GR\n"
+"POT-Creation-Date: 2020-11-05 17:25+1100\n"
+"PO-Revision-Date: 2020-11-05 17:33+1100\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "X-Generator: Poedit 2.3\n"
@@ -83,7 +82,9 @@ msgstr "Υπόμνημα για χαρακτηριστικό"
 #: manage_files.py:1377 reports.py:905 reports.py:918 reports.py:984
 #: view_av.py:361 view_av.py:437 view_av.py:1471 view_av.py:1495
 #: view_image.py:196 view_image.py:583 view_image.py:593 view_image.py:911
-#: view_image.py:935
+#: view_image.py:935 code_text.py:1121 code_text.py:1144 view_av.py:1513
+#: view_av.py:1537 view_image.py:625 view_image.py:635 view_image.py:953
+#: view_image.py:977
 msgid "Memo"
 msgstr "Σημείωμα"
 
@@ -154,7 +155,7 @@ msgstr "Εμφανιζόμενο αρχείο:"
 msgid "Select all"
 msgstr "Επιλογή όλων"
 
-#: case_file_manager.py:364 code_text.py:483 view_av.py:1669
+#: case_file_manager.py:364 code_text.py:483 view_av.py:1669 view_av.py:1711
 msgid "Mark"
 msgstr "μαρκάρω"
 
@@ -164,7 +165,7 @@ msgid "Copy"
 msgstr "αντίγραφο"
 
 #: case_file_manager.py:369 code_text.py:477 view_av.py:1663 view_image.py:584
-#: view_image.py:596
+#: view_image.py:596 view_av.py:1705 view_image.py:626 view_image.py:638
 msgid "Unmark"
 msgstr "Αποεπιλογή"
 
@@ -182,6 +183,9 @@ msgstr "Αυτό το τμήμα έχει ήδη συνδεθεί με αυτή�
 #: manage_files.py:1126 manage_files.py:1130 manage_files.py:1135
 #: report_attributes.py:160 report_attributes.py:169 report_attributes.py:177
 #: report_attributes.py:190 view_av.py:1871 view_av.py:1879 view_av.py:1959
+#: code_text.py:1509 code_text.py:1513 code_text.py:1596 code_text.py:1658
+#: code_text.py:1690 code_text.py:1770 view_av.py:1913 view_av.py:1921
+#: view_av.py:2001
 msgid "Warning"
 msgstr "Προειδοποίηση"
 
@@ -293,7 +297,7 @@ msgstr "Κάντε κλικ για να διαχειριστείτε αρχεί�
 msgid "Viewing text of case: "
 msgstr "Προβολή κειμένου της υπόθεσης: "
 
-#: cases.py:557 code_text.py:1713 reports.py:1977
+#: cases.py:557 code_text.py:1713 reports.py:1977 code_text.py:1754
 msgid "File: "
 msgstr "Αρχείο: "
 
@@ -327,18 +331,20 @@ msgid "Count"
 msgstr "μετρώ"
 
 #: code_text.py:478 code_text.py:537 view_av.py:1664 view_av.py:1737
+#: view_av.py:1706 view_av.py:1779
 msgid "Change start position"
 msgstr "Αλλαγή θέσης εκκίνησης"
 
 #: code_text.py:479 code_text.py:544 view_av.py:1665 view_av.py:1745
+#: view_av.py:1707 view_av.py:1787
 msgid "Change end position"
 msgstr "Αλλαγή τελικής θέσης"
 
-#: code_text.py:484 view_av.py:1670
+#: code_text.py:484 view_av.py:1670 view_av.py:1712
 msgid "Annotate"
 msgstr "Σχολιάζω"
 
-#: code_text.py:485 view_av.py:1671
+#: code_text.py:485 view_av.py:1671 view_av.py:1713
 msgid "Copy to clipboard"
 msgstr "Αντιγραφή στο πρόχειρο"
 
@@ -346,11 +352,12 @@ msgstr "Αντιγραφή στο πρόχειρο"
 msgid "Set bookmark"
 msgstr "Ορίστε σελιδοδείκτη"
 
-#: code_text.py:521 code_text.py:1527 view_av.py:1723
+#: code_text.py:521 code_text.py:1527 view_av.py:1723 code_text.py:1568
+#: view_av.py:1765
 msgid "Select code to unmark"
 msgstr "Επιλέξτε κωδικό για κατάργηση της κατάργησης"
 
-#: code_text.py:537 view_av.py:1738
+#: code_text.py:537 view_av.py:1738 view_av.py:1780
 msgid ""
 "Change start character position.\n"
 "Positive or negative number:"
@@ -358,7 +365,7 @@ msgstr ""
 "Αλλαγή θέσης χαρακτήρα έναρξης. \n"
 "Θετικός ή αρνητικός αριθμός:"
 
-#: code_text.py:544 view_av.py:1746
+#: code_text.py:544 view_av.py:1746 view_av.py:1788
 msgid ""
 "Change end character position.\n"
 "Positive or negative number:"
@@ -395,226 +402,243 @@ msgstr "Αλλαγή χρώματος κώδικα"
 msgid "Show coded text and media"
 msgstr "Εμφάνιση κωδικοποιημένου κειμένου και μέσων"
 
-#: code_text.py:880 view_av.py:1324 view_image.py:764
+#: code_text.py:880 view_av.py:1324 view_image.py:764 code_text.py:921
+#: view_av.py:1366 view_image.py:806
 msgid "Merge code: "
 msgstr "Συγχώνευση κωδικού: "
 
-#: code_text.py:880
+#: code_text.py:880 code_text.py:921
 msgid " into code: "
 msgstr " σε κωδικό: "
 
-#: code_text.py:881 view_av.py:1326 view_image.py:766
+#: code_text.py:881 view_av.py:1326 view_image.py:766 code_text.py:922
+#: view_av.py:1368 view_image.py:808
 msgid "Merge codes"
 msgstr "Συγχώνευση κωδικών"
 
-#: code_text.py:895
+#: code_text.py:895 code_text.py:936
 msgid "Cannot merge codes, unmark overlapping text first. "
 msgstr ""
 "Δεν είναι δυνατή η συγχώνευση κωδικών, αποεπιλέξτε πρώτα το επικαλυπτόμενο "
 "κείμενο."
 
-#: code_text.py:896 view_av.py:1342
+#: code_text.py:896 view_av.py:1342 code_text.py:937 view_av.py:1384
 msgid "Cannot merge"
 msgstr "Δεν είναι δυνατή η συγχώνευση"
 
-#: code_text.py:912 view_av.py:1355 view_image.py:794
+#: code_text.py:912 view_av.py:1355 view_image.py:794 code_text.py:953
+#: view_av.py:1397 view_image.py:836
 msgid "Add new code"
 msgstr "Προσθέστε νέο κωδικό"
 
-#: code_text.py:912 view_image.py:794
+#: code_text.py:912 view_image.py:794 code_text.py:953 view_image.py:836
 msgid "Code name"
 msgstr "Κωδικό όνομα"
 
-#: code_text.py:929 view_image.py:807
+#: code_text.py:929 view_image.py:807 code_text.py:970 view_image.py:849
 msgid "New code: "
 msgstr "Νέος κωδικός: "
 
-#: code_text.py:980 view_av.py:1376 view_image.py:815
+#: code_text.py:980 view_av.py:1376 view_image.py:815 code_text.py:1021
+#: view_av.py:1418 view_image.py:857
 msgid "Category"
 msgstr "Κατηγορία"
 
-#: code_text.py:980 view_av.py:1376 view_image.py:815
+#: code_text.py:980 view_av.py:1376 view_image.py:815 code_text.py:1021
+#: view_av.py:1418 view_image.py:857
 msgid "Category name"
 msgstr "Ονομα κατηγορίας"
 
-#: code_text.py:994 view_image.py:829
+#: code_text.py:994 view_image.py:829 code_text.py:1035 view_image.py:871
 msgid "New category: "
 msgstr "Νέα κατηγορία: "
 
 #: code_text.py:1017 codebook.py:183 reports.py:296 view_av.py:1413
-#: view_image.py:481 view_image.py:854
+#: view_image.py:481 view_image.py:854 code_text.py:1058 view_av.py:1455
+#: view_image.py:896
 msgid "Code: "
 msgstr "Κώδικας: "
 
-#: code_text.py:1030 view_av.py:1423 view_image.py:858
+#: code_text.py:1030 view_av.py:1423 view_image.py:858 code_text.py:1071
+#: view_av.py:1465 view_image.py:900
 msgid "Code deleted: "
 msgstr "Ο κωδικός διαγράφηκε: "
 
 #: code_text.py:1043 codebook.py:177 reports.py:293 view_av.py:1439
-#: view_image.py:880
+#: view_image.py:880 code_text.py:1084 view_av.py:1481 view_image.py:922
 msgid "Category: "
 msgstr "Κατηγορία: "
 
-#: code_text.py:1055 view_av.py:1448 view_image.py:884
+#: code_text.py:1055 view_av.py:1448 view_image.py:884 code_text.py:1096
+#: view_av.py:1490 view_image.py:926
 msgid "Category deleted: "
 msgstr "Η κατηγορία διαγράφηκε: "
 
-#: code_text.py:1068
+#: code_text.py:1068 code_text.py:1109
 msgid "Memo for Code: "
 msgstr "Υπόμνημα για κωδικό: "
 
-#: code_text.py:1081
+#: code_text.py:1081 code_text.py:1122
 msgid "Memo for code: "
 msgstr "Υπόμνημα για κωδικό: "
 
-#: code_text.py:1091 view_image.py:928
+#: code_text.py:1091 view_image.py:928 code_text.py:1132 view_image.py:970
 msgid "Memo for Category: "
 msgstr "Υπόμνημα για την κατηγορία: "
 
-#: code_text.py:1104
+#: code_text.py:1104 code_text.py:1145
 msgid "Memo for category: "
 msgstr "Υπόμνημα για την κατηγορία: "
 
-#: code_text.py:1112 view_av.py:1510 view_image.py:950
+#: code_text.py:1112 view_av.py:1510 view_image.py:950 code_text.py:1153
+#: view_av.py:1552 view_image.py:992
 msgid "Rename code"
 msgstr "Μετονομασία κωδικού"
 
-#: code_text.py:1113 view_av.py:1510 view_image.py:950
+#: code_text.py:1113 view_av.py:1510 view_image.py:950 code_text.py:1154
+#: view_av.py:1552 view_image.py:992
 msgid "New code name:"
 msgstr "Νέο όνομα κωδικού:"
 
-#: code_text.py:1119 view_av.py:1519 view_image.py:959
+#: code_text.py:1119 view_av.py:1519 view_image.py:959 code_text.py:1160
+#: view_av.py:1561 view_image.py:1001
 msgid "Name in use"
 msgstr "Όνομα σε χρήση"
 
-#: code_text.py:1120
+#: code_text.py:1120 code_text.py:1161
 msgid " is already in use, choose another name."
 msgstr " χρησιμοποιείται ήδη, επιλέξτε άλλο όνομα."
 
-#: code_text.py:1135
+#: code_text.py:1135 code_text.py:1176
 msgid "Code renamed from: "
 msgstr "Ο κωδικός μετονομάστηκε από: "
 
-#: code_text.py:1135 code_text.py:1165
+#: code_text.py:1135 code_text.py:1165 code_text.py:1176 code_text.py:1206
 msgid " to: "
 msgstr " να: "
 
-#: code_text.py:1140 view_av.py:1540 view_image.py:984
+#: code_text.py:1140 view_av.py:1540 view_image.py:984 code_text.py:1181
+#: view_av.py:1582 view_image.py:1026
 msgid "Rename category"
 msgstr "Μετονομασία κατηγορίας"
 
-#: code_text.py:1140 view_av.py:1540 view_image.py:984
+#: code_text.py:1140 view_av.py:1540 view_image.py:984 code_text.py:1181
+#: view_av.py:1582 view_image.py:1026
 msgid "New category name:"
 msgstr "Όνομα νέας κατηγορίας:"
 
-#: code_text.py:1147
+#: code_text.py:1147 code_text.py:1188
 msgid "This code name is already in use."
 msgstr "Αυτό το όνομα κωδικού χρησιμοποιείται ήδη."
 
-#: code_text.py:1148
+#: code_text.py:1148 code_text.py:1189
 msgid "Duplicate code name"
 msgstr "Διπλότυπο όνομα κωδικού"
 
-#: code_text.py:1165 view_image.py:1013
+#: code_text.py:1165 view_image.py:1013 code_text.py:1206 view_image.py:1055
 msgid "Category renamed from: "
 msgstr "Η κατηγορία μετονομάστηκε από: "
 
-#: code_text.py:1202 view_av.py:489 view_image.py:314
+#: code_text.py:1202 view_av.py:489 view_image.py:314 code_text.py:1243
 msgid "Next file"
 msgstr "Επόμενο αρχείο"
 
-#: code_text.py:1203 view_av.py:490 view_image.py:315
+#: code_text.py:1203 view_av.py:490 view_image.py:315 code_text.py:1244
 msgid "File with latest coding"
 msgstr "Αρχείο με την τελευταία κωδικοποίηση"
 
-#: code_text.py:1204
+#: code_text.py:1204 code_text.py:1245
 msgid "Go to bookmark"
 msgstr "Μεταβείτε στο σελιδοδείκτη"
 
-#: code_text.py:1267
+#: code_text.py:1267 code_text.py:1308
 msgid "Code text: "
 msgstr "Κείμενο κώδικα: "
 
-#: code_text.py:1432
+#: code_text.py:1432 code_text.py:1473
 msgid "No overlapping codes"
 msgstr "Δεν υπάρχουν αλληλεπικαλυπτόμενοι κωδικοί"
 
-#: code_text.py:1437
+#: code_text.py:1437 code_text.py:1478
 msgid "overlapping codes. Select to highlight."
 msgstr "αλληλεπικαλυπτόμενοι κωδικοί. Επιλέξτε για επισήμανση."
 
-#: code_text.py:1468 code_text.py:1555
+#: code_text.py:1468 code_text.py:1555 code_text.py:1509 code_text.py:1596
 msgid "No file was selected"
 msgstr "Δεν επιλέχθηκε αρχείο"
 
 #: code_text.py:1472 code_text.py:1617 code_text.py:1649 code_text.py:1729
-#: view_av.py:1880
+#: view_av.py:1880 code_text.py:1513 code_text.py:1658 code_text.py:1690
+#: code_text.py:1770 view_av.py:1922
 msgid "No code was selected"
 msgstr "Δεν επιλέχθηκε κωδικός"
 
 #: code_text.py:1493 view_av.py:1803 view_av.py:1904 view_av.py:2215
+#: code_text.py:1534 view_av.py:1845 view_av.py:1946 view_av.py:2257
 msgid "Already Coded"
 msgstr "Έχει ήδη κωδικοποιηθεί"
 
-#: code_text.py:1494 view_av.py:1804 view_av.py:1905
+#: code_text.py:1494 view_av.py:1804 view_av.py:1905 code_text.py:1535
+#: view_av.py:1846 view_av.py:1947
 msgid "This segment has already been coded with this code by "
 msgstr "Αυτό το τμήμα έχει ήδη κωδικοποιηθεί με αυτόν τον κωδικό από "
 
-#: code_text.py:1578 view_av.py:1984
+#: code_text.py:1578 view_av.py:1984 code_text.py:1619 view_av.py:2026
 msgid "Annotation: "
 msgstr "Σχόλιο: "
 
-#: code_text.py:1593 view_av.py:1999
+#: code_text.py:1593 view_av.py:1999 code_text.py:1634 view_av.py:2041
 msgid "Annotation added at position: "
 msgstr "Προστέθηκε σχολιασμός στη θέση: "
 
 #: code_text.py:1594 code_text.py:1605 view_av.py:2000 view_av.py:2011
+#: code_text.py:1635 code_text.py:1646 view_av.py:2042 view_av.py:2053
 msgid " for: "
 msgstr "Για: "
 
-#: code_text.py:1604 view_av.py:2010
+#: code_text.py:1604 view_av.py:2010 code_text.py:1645 view_av.py:2052
 msgid "Annotation removed from position "
 msgstr "Ο σχολιασμός καταργήθηκε από τη θέση"
 
-#: code_text.py:1627
+#: code_text.py:1627 code_text.py:1668
 msgid "Text fragment to code_sentences. This file."
 msgstr "Τμήμα κειμένου σε κωδικές προτάσεις. Αυτό το αρχείο."
 
-#: code_text.py:1628
+#: code_text.py:1628 code_text.py:1669
 msgid "Text fragment to code_sentences. All text files."
 msgstr "Τμήμα κειμένου σε κωδικές προτάσεις. Όλα τα αρχεία κειμένου."
 
-#: code_text.py:1658 code_text.py:1671
+#: code_text.py:1658 code_text.py:1671 code_text.py:1699 code_text.py:1712
 msgid "Code sentence"
 msgstr "Κώδικας πρόταση"
 
-#: code_text.py:1661
+#: code_text.py:1661 code_text.py:1702
 msgid "Autocode sentence using this text fragment:"
 msgstr "Πρόταση αυτόματου κωδικού χρησιμοποιώντας αυτό το κείμενο:"
 
-#: code_text.py:1674
+#: code_text.py:1674 code_text.py:1715
 msgid "Default is period space. Do not use line endings such as \\n"
 msgstr ""
 "Η προεπιλογή είναι διάστημα διαστήματος. Μην χρησιμοποιείτε καταλήξεις "
 "γραμμής όπως \\n"
 
-#: code_text.py:1675
+#: code_text.py:1675 code_text.py:1716
 msgid "Define sentence ending:"
 msgstr "Ορίστε την πρόταση που τελειώνει:"
 
-#: code_text.py:1710 code_text.py:1791
+#: code_text.py:1710 code_text.py:1791 code_text.py:1751 code_text.py:1832
 msgid "Autocode insert error "
 msgstr "Σφάλμα εισαγωγής αυτόματου κωδικού"
 
-#: code_text.py:1713
+#: code_text.py:1713 code_text.py:1754
 msgid " added codes"
 msgstr "πρόσθετοι κωδικοί"
 
-#: code_text.py:1714
+#: code_text.py:1714 code_text.py:1755
 msgid "Automatic code sentence in files:"
 msgstr "Αυτόματη πρόταση κώδικα σε αρχεία:"
 
-#: code_text.py:1715
+#: code_text.py:1715 code_text.py:1756
 msgid ""
 "\n"
 "Code: "
@@ -622,7 +646,7 @@ msgstr ""
 "\n"
 "Κώδικας: "
 
-#: code_text.py:1716
+#: code_text.py:1716 code_text.py:1757
 msgid ""
 "\n"
 "With text fragment: "
@@ -630,7 +654,7 @@ msgstr ""
 "\n"
 "Με θραύσμα κειμένου: "
 
-#: code_text.py:1716
+#: code_text.py:1716 code_text.py:1757
 msgid ""
 "\n"
 "Using line ending: "
@@ -638,27 +662,27 @@ msgstr ""
 "\n"
 "Χρήση τελικής γραμμής: "
 
-#: code_text.py:1738
+#: code_text.py:1738 code_text.py:1779
 msgid "Automatic coding"
 msgstr "Αυτόματη κωδικοποίηση"
 
-#: code_text.py:1741
+#: code_text.py:1741 code_text.py:1782
 msgid "Use | to code multiple texts"
 msgstr "Χρήση | για κωδικοποίηση πολλαπλών κειμένων"
 
-#: code_text.py:1742
+#: code_text.py:1742 code_text.py:1783
 msgid "Autocode files with the current code for this text:"
 msgstr "Αρχεία αυτόματου κώδικα με τον τρέχοντα κώδικα για αυτό το κείμενο:"
 
-#: code_text.py:1758
+#: code_text.py:1758 code_text.py:1799
 msgid "Select files to code"
 msgstr "Επιλέξτε αρχεία για κωδικοποίηση"
 
-#: code_text.py:1793
+#: code_text.py:1793 code_text.py:1834
 msgid "Automatic coding in files: "
 msgstr "Αυτόματη κωδικοποίηση σε αρχεία:"
 
-#: code_text.py:1794
+#: code_text.py:1794 code_text.py:1835
 msgid ". with text: "
 msgstr ". με κείμενο: "
 
@@ -676,6 +700,7 @@ msgid ", Owner: "
 msgstr ", Ιδιοκτήτης:"
 
 #: codebook.py:192 reports.py:1934 view_av.py:2152 view_av.py:2290
+#: view_av.py:2194 view_av.py:2332
 msgid "Memo: "
 msgstr "Σημείωμα: "
 
@@ -1715,27 +1740,27 @@ msgstr "Κωδικοποιητής: "
 msgid "Media coding"
 msgstr "Κωδικοποίηση πολυμέσων"
 
-#: view_av.py:276 view_av.py:2535
+#: view_av.py:276 view_av.py:2535 view_av.py:2577
 msgid "Screenshot"
 msgstr "Στιγμιότυπο οθόνης"
 
-#: view_av.py:277 view_av.py:2536
+#: view_av.py:277 view_av.py:2536 view_av.py:2578
 msgid "Resize"
 msgstr "Αλλαγή μεγέθους"
 
-#: view_av.py:289 view_av.py:2548
+#: view_av.py:289 view_av.py:2548 view_av.py:2590
 msgid "Width"
 msgstr "Πλάτος"
 
-#: view_av.py:289 view_av.py:2548
+#: view_av.py:289 view_av.py:2548 view_av.py:2590
 msgid "Width:"
 msgstr "Πλάτος"
 
-#: view_av.py:292 view_av.py:2551
+#: view_av.py:292 view_av.py:2551 view_av.py:2593
 msgid "Height"
 msgstr "Υψος"
 
-#: view_av.py:292 view_av.py:2551
+#: view_av.py:292 view_av.py:2551 view_av.py:2593
 msgid "Height:"
 msgstr "Υψος"
 
@@ -1743,7 +1768,7 @@ msgstr "Υψος"
 msgid "Select file to view"
 msgstr "Επιλέξτε αρχείο για προβολή"
 
-#: view_av.py:585 view_av.py:2486
+#: view_av.py:585 view_av.py:2486 view_av.py:2528
 msgid "Media not found"
 msgstr "Δεν βρέθηκαν μέσα"
 
@@ -1752,17 +1777,20 @@ msgid "Media coding: "
 msgstr "Κωδικοποίηση πολυμέσων:"
 
 #: view_av.py:803 view_av.py:833 view_av.py:2929 view_av.py:2957
-#: view_av.py:2968
+#: view_av.py:2968 view_av.py:2971 view_av.py:2999 view_av.py:3010
 msgid "Play"
 msgstr "Παίζω"
 
 #: view_av.py:818 view_av.py:868 view_av.py:1124 view_av.py:1135
 #: view_av.py:1146 view_av.py:2609 view_av.py:2620 view_av.py:2631
-#: view_av.py:2944 view_av.py:3000
+#: view_av.py:2944 view_av.py:3000 view_av.py:1166 view_av.py:1177
+#: view_av.py:1188 view_av.py:2651 view_av.py:2662 view_av.py:2673
+#: view_av.py:2986 view_av.py:3042
 msgid "Time: "
 msgstr "Χρόνος: "
 
 #: view_av.py:821 view_av.py:1778 view_av.py:2279 view_av.py:2947
+#: view_av.py:1820 view_av.py:2321 view_av.py:2989
 msgid "Pause"
 msgstr "Παύση"
 
@@ -1774,135 +1802,136 @@ msgstr "Εκκαθάριση τμήματος"
 msgid "End segment"
 msgstr "Τελικό τμήμα"
 
-#: view_av.py:947 view_av.py:963 view_av.py:2290
+#: view_av.py:947 view_av.py:963 view_av.py:2290 view_av.py:2332
 msgid "Segment: "
 msgstr "Τμήμα: "
 
 #: view_av.py:1220 view_av.py:1230 view_av.py:2663 view_av.py:2673
+#: view_av.py:1262 view_av.py:1272 view_av.py:2705 view_av.py:2715
 msgid "Rate: "
 msgstr "Τιμή: "
 
-#: view_av.py:1261
+#: view_av.py:1261 view_av.py:1303
 msgid "Segment:"
 msgstr "Τμήμα: "
 
-#: view_av.py:1262
+#: view_av.py:1262 view_av.py:1304
 msgid "Start segment"
 msgstr "Έναρξη τμήματος"
 
-#: view_av.py:1341
+#: view_av.py:1341 view_av.py:1383
 msgid "Cannot merge codes, unmark overlapping text."
 msgstr ""
 "Δεν είναι δυνατή η συγχώνευση κωδικών, αποεπιλέξτε επικαλυπτόμενο κείμενο"
 
-#: view_av.py:1355
+#: view_av.py:1355 view_av.py:1397
 msgid "New code name"
 msgstr "Νέο κωδικό όνομα"
 
-#: view_av.py:1367
+#: view_av.py:1367 view_av.py:1409
 msgid "Code added: "
 msgstr "Προστέθηκε κωδικός:"
 
-#: view_av.py:1464 view_image.py:904
+#: view_av.py:1464 view_image.py:904 view_av.py:1506 view_image.py:946
 msgid "Memo for Code "
 msgstr "Υπόμνημα για κωδικό "
 
-#: view_av.py:1488
+#: view_av.py:1488 view_av.py:1530
 msgid "Memo for Category "
 msgstr "Υπόμνημα για κατηγορία "
 
-#: view_av.py:1520
+#: view_av.py:1520 view_av.py:1562
 msgid " Name already in use, choose another."
 msgstr "Το όνομα χρησιμοποιείται ήδη, επιλέξτε άλλο."
 
-#: view_av.py:1534 view_image.py:978
+#: view_av.py:1534 view_image.py:978 view_av.py:1576 view_image.py:1020
 msgid "Code renamed: "
 msgstr "Ο κωδικός μετονομάστηκε: "
 
-#: view_av.py:1547 view_image.py:991
+#: view_av.py:1547 view_image.py:991 view_av.py:1589 view_image.py:1033
 msgid "This category name is already in use"
 msgstr "Αυτό το όνομα κατηγορίας χρησιμοποιείται ήδη"
 
-#: view_av.py:1550 view_image.py:994
+#: view_av.py:1550 view_image.py:994 view_av.py:1592 view_image.py:1036
 msgid "Duplicate category name"
 msgstr "Διπλότυπο όνομα κατηγορίας"
 
-#: view_av.py:1566
+#: view_av.py:1566 view_av.py:1608
 msgid "Category renamed: "
 msgstr "Η κατηγορία μετονομάστηκε: "
 
-#: view_av.py:1661
+#: view_av.py:1661 view_av.py:1703
 msgid "Play text"
 msgstr "Αναπαραγωγή κειμένου"
 
-#: view_av.py:1673
+#: view_av.py:1673 view_av.py:1715
 msgid "Prepare text_link to segment"
 msgstr "Προετοιμασία κειμένου_σύνδεσης σε τμήμα"
 
-#: view_av.py:1675
+#: view_av.py:1675 view_av.py:1717
 msgid "Link to segment to text"
 msgstr "Σύνδεση με τμήμα σε κείμενο"
 
-#: view_av.py:1680
+#: view_av.py:1680 view_av.py:1722
 msgid "Video position to timestamp"
 msgstr "Θέση βίντεο στη χρονική σήμανση"
 
-#: view_av.py:1872
+#: view_av.py:1872 view_av.py:1914
 msgid "No transcription"
 msgstr "Χωρίς μεταγραφή"
 
-#: view_av.py:1960
+#: view_av.py:1960 view_av.py:2002
 msgid "No media transcription selected"
 msgstr "Δεν επιλέχθηκε μεταγραφή πολυμέσων"
 
-#: view_av.py:2167 view_av.py:2317
+#: view_av.py:2167 view_av.py:2317 view_av.py:2209 view_av.py:2359
 msgid "Memo for segment"
 msgstr "Υπόμνημα για τμήμα"
 
-#: view_av.py:2168
+#: view_av.py:2168 view_av.py:2210
 msgid "Delete segment"
 msgstr "Διαγραφή τμήματος"
 
-#: view_av.py:2169
+#: view_av.py:2169 view_av.py:2211
 msgid "Play segment"
 msgstr "Παίξτε τμήμα"
 
-#: view_av.py:2170
+#: view_av.py:2170 view_av.py:2212
 msgid "Edit segment start position"
 msgstr "Επεξεργασία θέσης έναρξης τμήματος"
 
-#: view_av.py:2171
+#: view_av.py:2171 view_av.py:2213
 msgid "Edit segment end position"
 msgstr "Επεξεργασία τελικής θέσης τμήματος"
 
-#: view_av.py:2173
+#: view_av.py:2173 view_av.py:2215
 msgid "Link text to segment"
 msgstr "Σύνδεση κειμένου με τμήμα"
 
-#: view_av.py:2176
+#: view_av.py:2176 view_av.py:2218
 msgid "Select segment to link to text"
 msgstr "Επιλέξτε τμήμα για σύνδεση με κείμενο"
 
-#: view_av.py:2216
+#: view_av.py:2216 view_av.py:2258
 msgid "This segment has already been coded with this code."
 msgstr "This segment has already been coded with this code."
 
-#: view_av.py:2429
+#: view_av.py:2429 view_av.py:2471
 msgid ""
 "Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
 msgstr ""
 "Περιοχή μεταγραφής:  Ctrl+R Alt+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl"
 "+D"
 
-#: view_av.py:2686
+#: view_av.py:2686 view_av.py:2728
 msgid "Select name to delete"
 msgstr "Επιλέξτε όνομα για διαγραφή"
 
-#: view_av.py:2705
+#: view_av.py:2705 view_av.py:2747
 msgid "Speaker name"
 msgstr "Όνομα ηχείου"
 
-#: view_av.py:2706
+#: view_av.py:2706 view_av.py:2748
 msgid "Name:"
 msgstr "Ονομα:"
 
@@ -1914,7 +1943,7 @@ msgstr "Κωδικοποίηση εικόνας"
 msgid "Image Error"
 msgstr "Σφάλμα εικόνας"
 
-#: view_image.py:359 view_image.py:1091
+#: view_image.py:359 view_image.py:1091 view_image.py:1133
 msgid "Cannot open: "
 msgstr "Δεν μπορεί να ανοίξει:"
 
@@ -1922,24 +1951,24 @@ msgstr "Δεν μπορεί να ανοίξει:"
 msgid "Memo for image "
 msgstr "Υπόμνημα για εικόνα"
 
-#: view_image.py:619
+#: view_image.py:619 view_image.py:661
 msgid "Memo for coded area of "
 msgstr "Υπόμνημα για κωδικοποιημένη περιοχή "
 
-#: view_image.py:780
+#: view_image.py:780 view_image.py:822
 msgid "Cannot merge codes. Unmark overlapping text."
 msgstr ""
 "Δεν είναι δυνατή η συγχώνευση κωδικών. Αποεπιλέξτε το επικαλυπτόμενο κείμενο."
 
-#: view_image.py:960
+#: view_image.py:960 view_image.py:1002
 msgid " Choose another name"
 msgstr "Επιλέξτε άλλο όνομα"
 
-#: view_image.py:1083 view_image.py:1090
+#: view_image.py:1083 view_image.py:1090 view_image.py:1125 view_image.py:1132
 msgid "Image error"
 msgstr "Σφάλμα εικόνας"
 
-#: view_image.py:1084
+#: view_image.py:1084 view_image.py:1126
 msgid "Image file not found: "
 msgstr "Το αρχείο εικόνας δεν βρέθηκε:"
 
@@ -1974,3 +2003,19 @@ msgstr "Συμπερίληψη"
 #: report_relations.py:552
 msgid "Code relations csv file exported to: "
 msgstr "Το αρχείο σχέσεων κώδικα CSS εξήχθη σε:"
+
+#: code_text.py:594 view_av.py:989 view_image.py:520
+msgid "Show codes like"
+msgstr "Εμφάνιση κωδικών όπως"
+
+#: code_text.py:629 view_av.py:1017 view_image.py:546
+msgid "Show codes containing"
+msgstr "Εμφάνιση κωδικών που περιέχουν"
+
+#: code_text.py:632 view_av.py:1020 view_image.py:549
+msgid ""
+"Show codes containing text.\n"
+"(Blank for all)"
+msgstr ""
+"Εμφάνιση κωδικών που περιέχουν κείμενο. \n"
+"(Κενό για όλους)"
