@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-05 17:56+1100\n"
-"PO-Revision-Date: 2020-11-07 09:16+1100\n"
+"PO-Revision-Date: 2020-11-08 07:06+1100\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,11 +21,10 @@ msgstr ""
 msgid "Uncaught exception"
 msgstr "Eccezione non gestita"
 
-#: add_attribute.py:47 add_item_name.py:47 attributes.py:53 case_file_manager.py:63
-#: cases.py:63 code_text.py:65 codebook.py:47 color_selector.py:49 confirm_delete.py:46
-#: dialog_sql.py:52 import_survey.py:61 information.py:47 journals.py:54 manage_files.py:92
-#: memo.py:47 qualcoder.py:109 report_attributes.py:49 reports.py:60 select_items.py:47
-#: settings.py:48 text_mining.py:55 view_av.py:100 view_graph_original.py:58 view_image.py:63
+#: add_attribute.py:47 add_item_name.py:47 attributes.py:53 case_file_manager.py:63 cases.py:63 code_text.py:65
+#: codebook.py:47 color_selector.py:49 confirm_delete.py:46 dialog_sql.py:52 import_survey.py:61 information.py:47
+#: journals.py:54 manage_files.py:92 memo.py:47 qualcoder.py:109 report_attributes.py:49 reports.py:60
+#: select_items.py:47 settings.py:48 text_mining.py:55 view_av.py:100 view_graph_original.py:58 view_image.py:63
 #: report_relations.py:54
 msgid "Uncaught Exception"
 msgstr "Eccezione non gestita"
@@ -50,8 +49,7 @@ msgstr "Questo non esiste"
 msgid "Uncaught exception:"
 msgstr "Eccezione non gestita:"
 
-#: attributes.py:115 attributes.py:249 qualcoder.py:1427 reports.py:1388 reports.py:2098
-#: attributes.py:162
+#: attributes.py:115 attributes.py:249 qualcoder.py:1427 reports.py:1388 reports.py:2098 attributes.py:162
 msgid "Attribute added: "
 msgstr "Attributo aggiungo:"
 
@@ -71,11 +69,10 @@ msgstr "Attributo cancellato:"
 msgid "Memo for Attribute "
 msgstr "Memo per l'Attributo"
 
-#: attributes.py:216 attributes.py:254 cases.py:462 cases.py:494 code_text.py:240
-#: code_text.py:253 code_text.py:278 code_text.py:296 code_text.py:315 code_text.py:1121
-#: code_text.py:1144 manage_files.py:307 manage_files.py:1377 reports.py:905 reports.py:918
-#: reports.py:984 view_av.py:361 view_av.py:437 view_av.py:1513 view_av.py:1537
-#: view_image.py:196 view_image.py:625 view_image.py:635 view_image.py:953 view_image.py:977
+#: attributes.py:216 attributes.py:254 cases.py:462 cases.py:494 code_text.py:240 code_text.py:253
+#: code_text.py:278 code_text.py:296 code_text.py:315 code_text.py:1121 code_text.py:1144 manage_files.py:307
+#: manage_files.py:1377 reports.py:905 reports.py:918 reports.py:984 view_av.py:361 view_av.py:437 view_av.py:1513
+#: view_av.py:1537 view_image.py:196 view_image.py:625 view_image.py:635 view_image.py:953 view_image.py:977
 msgid "Memo"
 msgstr "Memo"
 
@@ -83,8 +80,7 @@ msgstr "Memo"
 msgid "Attribute renamed from: "
 msgstr "Attributo rinominato da:"
 
-#: attributes.py:254 code_text.py:240 manage_files.py:307 reports.py:905 view_av.py:361
-#: view_image.py:196
+#: attributes.py:254 code_text.py:240 manage_files.py:307 reports.py:905 view_av.py:361 view_image.py:196
 msgid "Name"
 msgstr "Nome"
 
@@ -100,11 +96,10 @@ msgstr "Scrivi"
 msgid "Yes"
 msgstr "Si"
 
-#: case_file_manager.py:62 cases.py:60 codebook.py:46 color_selector.py:48
-#: confirm_delete.py:45 dialog_sql.py:51 import_survey.py:58 information.py:46 journals.py:51
-#: manage_files.py:89 memo.py:46 report_attributes.py:46 reports.py:59 select_items.py:46
-#: settings.py:47 text_mining.py:54 view_av.py:97 view_graph_original.py:55 view_image.py:60
-#: report_relations.py:53
+#: case_file_manager.py:62 cases.py:60 codebook.py:46 color_selector.py:48 confirm_delete.py:45 dialog_sql.py:51
+#: import_survey.py:58 information.py:46 journals.py:51 manage_files.py:89 memo.py:46 report_attributes.py:46
+#: reports.py:59 select_items.py:46 settings.py:47 text_mining.py:54 view_av.py:97 view_graph_original.py:55
+#: view_image.py:60 report_relations.py:53
 msgid "Uncaught exception: "
 msgstr "Eccezione non gestita:"
 
@@ -140,8 +135,7 @@ msgstr "aggiungi al caso"
 msgid "Displayed file: "
 msgstr "File mostrato:"
 
-#: case_file_manager.py:362 cases.py:667 dialog_sql.py:350 manage_files.py:609
-#: manage_files.py:634
+#: case_file_manager.py:362 cases.py:667 dialog_sql.py:350 manage_files.py:609 manage_files.py:634
 msgid "Select all"
 msgstr "Seleziona tutto"
 
@@ -149,13 +143,11 @@ msgstr "Seleziona tutto"
 msgid "Mark"
 msgstr "Seleziona"
 
-#: case_file_manager.py:366 cases.py:668 dialog_sql.py:351 manage_files.py:610
-#: manage_files.py:635
+#: case_file_manager.py:366 cases.py:668 dialog_sql.py:351 manage_files.py:610 manage_files.py:635
 msgid "Copy"
 msgstr "Copia"
 
-#: case_file_manager.py:369 code_text.py:477 view_av.py:1705 view_image.py:626
-#: view_image.py:638
+#: case_file_manager.py:369 code_text.py:477 view_av.py:1705 view_image.py:626 view_image.py:638
 msgid "Unmark"
 msgstr "Rimuovi la selezione"
 
@@ -167,11 +159,10 @@ msgstr ""
 msgid "This segment has already been linked to this case"
 msgstr "Questo segmento e' gia stato collegato a questo caso"
 
-#: case_file_manager.py:535 code_text.py:1509 code_text.py:1513 code_text.py:1596
-#: code_text.py:1658 code_text.py:1690 code_text.py:1770 import_survey.py:188 journals.py:319
-#: journals.py:328 manage_files.py:1104 manage_files.py:1126 manage_files.py:1130
-#: manage_files.py:1135 report_attributes.py:160 report_attributes.py:169
-#: report_attributes.py:177 report_attributes.py:190 view_av.py:1913 view_av.py:1921
+#: case_file_manager.py:535 code_text.py:1509 code_text.py:1513 code_text.py:1596 code_text.py:1658
+#: code_text.py:1690 code_text.py:1770 import_survey.py:188 journals.py:319 journals.py:328 manage_files.py:1104
+#: manage_files.py:1126 manage_files.py:1130 manage_files.py:1135 report_attributes.py:160
+#: report_attributes.py:169 report_attributes.py:177 report_attributes.py:190 view_av.py:1913 view_av.py:1921
 #: view_av.py:2001
 msgid "Warning"
 msgstr "Attenzione"
@@ -187,8 +178,10 @@ msgstr "Assegna automaticamente il testo al caso"
 #: case_file_manager.py:538
 msgid ""
 "\n"
-"Usare "
+"Use "
 msgstr ""
+"\n"
+"Usare"
 
 #: case_file_manager.py:538
 msgid " and "
@@ -306,8 +299,7 @@ msgstr "Apri"
 msgid "NO CODE SELECTED"
 msgstr "NON E' STATO SELEZIONATO NESSUN CODICE"
 
-#: code_text.py:240 manage_files.py:307 view_av.py:361 view_image.py:196
-#: report_relations.py:415
+#: code_text.py:240 manage_files.py:307 view_av.py:361 view_image.py:196 report_relations.py:415
 msgid "Id"
 msgstr "Id"
 
@@ -320,8 +312,8 @@ msgid "Change start position"
 msgstr "Cambia la posizione di inzio"
 
 #: code_text.py:479 code_text.py:544 view_av.py:1707 view_av.py:1787
-msgid "Cambia la posizione di fine"
-msgstr ""
+msgid "Change end position"
+msgstr "Cambia la posizione di fine"
 
 #: code_text.py:484 view_av.py:1712
 msgid "Annotate"
@@ -443,8 +435,7 @@ msgstr "Nome della categoria:"
 msgid "New category: "
 msgstr "Nuova categoria:"
 
-#: code_text.py:1058 codebook.py:183 reports.py:296 view_av.py:1455 view_image.py:481
-#: view_image.py:896
+#: code_text.py:1058 codebook.py:183 reports.py:296 view_av.py:1455 view_image.py:481 view_image.py:896
 msgid "Code: "
 msgstr "Codice:"
 
@@ -660,8 +651,8 @@ msgstr "Codifica automatica nei files:"
 msgid ". with text: "
 msgstr ". con testo:"
 
-#: codebook.py:158 journals.py:245 manage_files.py:1225 reports.py:262 reports.py:318
-#: reports.py:554 report_relations.py:495
+#: codebook.py:158 journals.py:245 manage_files.py:1225 reports.py:262 reports.py:318 reports.py:554
+#: report_relations.py:495
 msgid "Select directory to save file"
 msgstr "Selezionare la directory dove salvare il file"
 
@@ -685,13 +676,13 @@ msgstr "Codebook esportato"
 msgid "Codebook exported to "
 msgstr "Codebook esportato in"
 
-#: dialog_sql.py:168 journals.py:252 reports.py:269 reports.py:326 reports.py:562
-#: reports.py:1059 reports.py:1100 reports.py:1219 reports.py:1259 report_relations.py:503
+#: dialog_sql.py:168 journals.py:252 reports.py:269 reports.py:326 reports.py:562 reports.py:1059 reports.py:1100
+#: reports.py:1219 reports.py:1259 report_relations.py:503
 msgid "File exists"
 msgstr "Il file esiste"
 
-#: dialog_sql.py:169 journals.py:253 reports.py:270 reports.py:327 reports.py:563
-#: reports.py:1060 reports.py:1101 reports.py:1220 reports.py:1260 report_relations.py:504
+#: dialog_sql.py:169 journals.py:253 reports.py:270 reports.py:327 reports.py:563 reports.py:1060 reports.py:1101
+#: reports.py:1220 reports.py:1260 report_relations.py:504
 msgid "Overwrite?"
 msgstr "Sovrascrivere?"
 
@@ -881,9 +872,7 @@ msgid "Survey not loaded"
 msgstr "Sondaggio non caricato"
 
 #: import_survey.py:366
-msgid ""
-" - Duplicate case names, either in the file, or duplicates with existing cases in the "
-"project"
+msgid " - Duplicate case names, either in the file, or duplicates with existing cases in the project"
 msgstr ""
 
 #: import_survey.py:448 import_survey.py:453 import_survey.py:454
@@ -1131,8 +1120,7 @@ msgid "If import error occurs"
 msgstr "Se avviene un errore di importazione"
 
 #: manage_files.py:967
-msgid ""
-"Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf"
+msgid "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf"
 msgstr "A volte i file pdf sono crittati, scarica e decritta il file con qpdf prima di provare a importare il pdf"
 
 #: manage_files.py:989
@@ -1717,8 +1705,8 @@ msgstr "Codifica dei media:"
 msgid "Play"
 msgstr "Play"
 
-#: view_av.py:818 view_av.py:868 view_av.py:1166 view_av.py:1177 view_av.py:1188
-#: view_av.py:2651 view_av.py:2662 view_av.py:2673 view_av.py:2986 view_av.py:3042
+#: view_av.py:818 view_av.py:868 view_av.py:1166 view_av.py:1177 view_av.py:1188 view_av.py:2651 view_av.py:2662
+#: view_av.py:2673 view_av.py:2986 view_av.py:3042
 msgid "Time: "
 msgstr "Tempo: "
 
