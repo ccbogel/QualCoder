@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-11-05 17:56+1100\n"
-"PO-Revision-Date: 2020-11-11 08:43+1100\n"
+"PO-Revision-Date: 2020-11-11 09:23+1100\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,7 +37,7 @@ msgstr "Duplicato"
 
 #: add_attribute.py:89 add_item_name.py:89
 msgid "This already exists"
-msgstr "Questo esiste già"
+msgstr "Questo esiste gia'"
 
 #: add_item_name.py:168
 msgid "Not existing"
@@ -169,7 +169,7 @@ msgstr "Già collegato"
 
 #: case_file_manager.py:467
 msgid "This segment has already been linked to this case"
-msgstr "Questo segmento è gia stato collegato a questo caso"
+msgstr "Questo segmento e' gia stato collegato a questo caso"
 
 #: case_file_manager.py:535 code_text.py:1509 code_text.py:1513
 #: code_text.py:1596 code_text.py:1658 code_text.py:1690 code_text.py:1770
@@ -182,7 +182,7 @@ msgstr "Attenzione"
 
 #: case_file_manager.py:535
 msgid "Cannot have blank text marks"
-msgstr "Non può avere segni vuoti"
+msgstr "Non può avere segni di testo vuoto"
 
 #: case_file_manager.py:537
 msgid "Auto assign text to case: "
@@ -210,7 +210,7 @@ msgstr ""
 
 #: case_file_manager.py:561
 msgid "Auto assign. Could not find an end mark: "
-msgstr "Assegnazione automatica. Non è stato possibile trovare una end mark "
+msgstr "Assegnazione automatica. Non e' stato possibile trovare una end mark "
 
 #: case_file_manager.py:580
 msgid ""
@@ -218,7 +218,7 @@ msgid ""
 "Already assigned."
 msgstr ""
 "\n"
-"Già assegnato."
+"Gia' assegnato."
 
 #: case_file_manager.py:587
 msgid " sections found."
@@ -238,7 +238,7 @@ msgstr "scrivi: "
 
 #: cases.py:240
 msgid "Cases have already been created."
-msgstr "I casi sono già stati creati."
+msgstr "I casi sono gia' stati creati."
 
 #: cases.py:241
 msgid "Select attributes file"
@@ -246,11 +246,11 @@ msgstr "Selezionare gli attributi del file"
 
 #: cases.py:246
 msgid "is not a .csv file. File not imported"
-msgstr "non è un file .csv. Il file non è stato importato"
+msgstr "non e' un file .csv. Il file non e' stato importato"
 
 #: cases.py:259
 msgid "Cannot import from csv, only one row in file"
-msgstr "Non e stato possibile importare da csv, il file contiene solo una riga"
+msgstr "Non e' stato possibile importare da csv, il file contiene solo una riga"
 
 #: cases.py:299
 msgid "attribute:"
@@ -286,7 +286,7 @@ msgstr "Clicca per gestire i files di questo caso"
 
 #: cases.py:533
 msgid "Viewing text of case: "
-msgstr "Guard il testo del caso: "
+msgstr "Guard il testo del caso "
 
 #: cases.py:557 code_text.py:1754 reports.py:1977
 msgid "File: "
@@ -302,7 +302,7 @@ msgstr "Immagine: "
 
 #: cases.py:593
 msgid "AV media: "
-msgstr "Media AV: "
+msgstr "Media AV "
 
 #: cases.py:642
 msgid "Open"
@@ -310,7 +310,7 @@ msgstr "Apri"
 
 #: code_text.py:186 view_image.py:479
 msgid "NO CODE SELECTED"
-msgstr "NON È STATO SELEZIONATO NESSUN CODICE"
+msgstr "NON E' STATO SELEZIONATO NESSUN CODICE"
 
 #: code_text.py:240 manage_files.py:307 view_av.py:361 view_image.py:196
 #: report_relations.py:415
@@ -424,7 +424,7 @@ msgstr "Non è stato possibile unire i codici, togliere il contrassegno al testo
 
 #: code_text.py:937 view_av.py:1384
 msgid "Cannot merge"
-msgstr "Non è stato possibile unire"
+msgstr "Non e' stato possibile unire"
 
 #: code_text.py:953 view_av.py:1397 view_image.py:836
 msgid "Add new code"
@@ -478,11 +478,11 @@ msgstr "Memo per il codice: "
 
 #: code_text.py:1132 view_image.py:970
 msgid "Memo for Category: "
-msgstr "Memo per la Categoria "
+msgstr "Memo per la Categoria: "
 
 #: code_text.py:1145
 msgid "Memo for category: "
-msgstr "Memo per la categoria "
+msgstr "Memo per la categoria: "
 
 #: code_text.py:1153 view_av.py:1552 view_image.py:992
 msgid "Rename code"
@@ -498,7 +498,7 @@ msgstr "Nome in uso"
 
 #: code_text.py:1161
 msgid " is already in use, choose another name."
-msgstr "è già usato, scegliere un altro nome."
+msgstr " è già usato, scegliere un altro nome."
 
 #: code_text.py:1176
 msgid "Code renamed from: "
@@ -554,16 +554,16 @@ msgstr "Codici sovrapposti. Selezionare."
 
 #: code_text.py:1509 code_text.py:1596
 msgid "No file was selected"
-msgstr "Nessun file e stato selezionato"
+msgstr "Nessun file e' stato selezionato"
 
 #: code_text.py:1513 code_text.py:1658 code_text.py:1690 code_text.py:1770
 #: view_av.py:1922
 msgid "No code was selected"
-msgstr "Nessun codice è stato selezionato"
+msgstr "Nessun codice e' stato selezionato"
 
 #: code_text.py:1534 view_av.py:1845 view_av.py:1946 view_av.py:2257
 msgid "Already Coded"
-msgstr "Già codificato"
+msgstr "Gia' codificato"
 
 #: code_text.py:1535 view_av.py:1846 view_av.py:1947
 msgid "This segment has already been coded with this code by "
@@ -603,7 +603,7 @@ msgstr "Codifica automaticamente le frasi usando questo frammento di testo:"
 
 #: code_text.py:1715
 msgid "Default is period space. Do not use line endings such as \\n"
-msgstr "L'impostazione predefinita è lo spazio del periodo. Non utilizzare terminazioni di linea come  \\n"
+msgstr "L'impostazione predefinita è lo spazio del periodo. Non utilizzare terminazioni di linea come \\n"
 
 #: code_text.py:1716
 msgid "Define sentence ending:"
@@ -619,7 +619,7 @@ msgstr " codici aggiunti"
 
 #: code_text.py:1755
 msgid "Automatic code sentence in files:"
-msgstr "Frase codificata automaticamente nei files:"
+msgstr "Frase di codice automatica in file:"
 
 #: code_text.py:1756
 msgid ""
@@ -796,7 +796,7 @@ msgstr "Filtro del testo"
 
 #: dialog_sql.py:439 dialog_sql.py:452 dialog_sql.py:541 dialog_sql.py:552
 msgid "Text contains:"
-msgstr "Il testo contiene: "
+msgstr "Il testo contiene:"
 
 #: dialog_sql.py:445 dialog_sql.py:458 dialog_sql.py:469
 msgid " rows [filtered]"
@@ -820,8 +820,8 @@ msgid ""
 "sudo python3 -m pip install openpyxl OR\n"
 "python -m pip install openpyxl"
 msgstr ""
-"Per favore installare il modulo openpyxl.\n"
-"sudo python3 -m pip install openpyx1 OPPURE\n"
+"Si prega di installare il modulo \n"
+"sudo python3 -m pip install openpyxl OR\n"
 "python -m pip install openpyxl"
 
 #: import_survey.py:184
@@ -846,7 +846,7 @@ msgid ""
 "File not imported"
 msgstr ""
 "non è un file .csv o .xlsx.\n"
-"Il file non e' stato importato"
+"File non importato"
 
 #: import_survey.py:238
 msgid "Survey not imported. Survey not a csv or xlsx file: "
@@ -861,8 +861,8 @@ msgid ""
 "There are duplicated identifiers in the first column.\n"
 "File not imported"
 msgstr ""
-"Ci sono identifiers doppi nella prima colonna.\n"
-"Il file non è stato importato"
+"Ci sono identificatori duplicati nella prima colonna.\n"
+"File non importato"
 
 #: import_survey.py:302
 msgid "Survey file: "
@@ -889,8 +889,8 @@ msgid ""
 "Number of fields does not match header\n"
 "Possible wrong quote format"
 msgstr ""
-"Il numero di campi non coincide con l'header\n"
-"Possibile errore nella formattazione"
+"Il numero di campi non corrisponde all'intestazione\n"
+"Possibile formato di preventivo errato"
 
 #: import_survey.py:339 import_survey.py:367 import_survey.py:374
 msgid "Survey not loaded: "
@@ -902,7 +902,7 @@ msgstr "Sondaggio non caricato"
 
 #: import_survey.py:366
 msgid " - Duplicate case names, either in the file, or duplicates with existing cases in the project"
-msgstr " - I nomi dei casi sono già in uso, o nel file, o in altri casi in questo progetto"
+msgstr " - Duplicare i nomi dei casi, sia nel file, sia duplicati con i casi esistenti nel progetto"
 
 #: import_survey.py:448 import_survey.py:453 import_survey.py:454
 msgid "Survey imported"
@@ -918,7 +918,7 @@ msgstr "Cambia il nome"
 
 #: import_survey.py:508
 msgid "Change to Qualitative"
-msgstr "Cambia a Qualitativo"
+msgstr "Camia a Qualitativo"
 
 #: import_survey.py:511
 msgid "Change to Character"
@@ -942,7 +942,7 @@ msgstr "Nome non valido."
 
 #: import_survey.py:558
 msgid " Already in use"
-msgstr " Già in uso"
+msgstr " Gia' in uso"
 
 #: journals.py:107 journals.py:216 journals.py:291 qualcoder.py:1431
 msgid "Journals: "
@@ -994,7 +994,7 @@ msgstr "Nessun giornale selezionato"
 
 #: journals.py:320
 msgid "No name was entered"
-msgstr "Nessun nome e stato inserito"
+msgstr "Nessun nome e' stato inserito"
 
 #: journals.py:329
 msgid "Journal name in use"
@@ -1006,15 +1006,15 @@ msgstr "Nel nome del giornale usa solo: a-z, A-z 0-9 - spazio"
 
 #: journals.py:349
 msgid "Journal name changed: "
-msgstr "Il nome del giornale è stato cambiato: "
+msgstr "Il nome del giornale e' stato cambiato: "
 
 #: manage_files.py:62 manage_files.py:953
 msgid "pdfminer is not installed."
-msgstr "pdfminer non è installato."
+msgstr "pdfminer non e' installato."
 
 #: manage_files.py:173
 msgid "View"
-msgstr "Visualizza"
+msgstr "Guarda"
 
 #: manage_files.py:181
 msgid "Alphabetic order"
@@ -1062,7 +1062,7 @@ msgstr "Memo per il file "
 
 #: manage_files.py:576
 msgid "View file: "
-msgstr "Visualizza il file: "
+msgstr "Guarda il file: "
 
 #: manage_files.py:633
 msgid "Edit text maximum 20 characters"
@@ -1086,23 +1086,23 @@ msgstr " Fine selezione: "
 
 #: manage_files.py:683
 msgid "Code crossover: "
-msgstr "Codice sovrapposto: "
+msgstr "Code crossover: "
 
 #: manage_files.py:687
 msgid "Codes cross over text"
-msgstr "I codici si sovrappongono al testo"
+msgstr "I codici si incrociano sul testo"
 
 #: manage_files.py:700
 msgid "Annotation crossover: "
-msgstr "Errore in un annotazione: "
+msgstr "Crossover di annotazione: "
 
 #: manage_files.py:704
 msgid "Annotations cross over text"
-msgstr "Le annotazioni si sovrappongono al testo"
+msgstr "Le annotazioni si incrociano sul testo"
 
 #: manage_files.py:734
 msgid "Can only edit small selections of text, up to 20 characters in length."
-msgstr "È possibile editare solo brevi porzioni di testo, fino a 20 caratteri."
+msgstr "E' possibile editare solo brevi porzioni di testo, fino a 20 caratteri."
 
 #: manage_files.py:735
 msgid " characters"
@@ -1110,11 +1110,11 @@ msgstr " caratteri"
 
 #: manage_files.py:735
 msgid "You selected "
-msgstr "È  stato selezionato "
+msgstr "E' stato selezionato "
 
 #: manage_files.py:739
 msgid "Too much text selected"
-msgstr "Troppo testo e stato selezionato"
+msgstr "Troppo testo e' stato selezionato"
 
 #: manage_files.py:749
 msgid "Edit text: start"
@@ -1169,8 +1169,8 @@ msgid ""
 "Duplicate filename.\n"
 "File not imported"
 msgstr ""
-"Il nome del file è gia in uso. \n"
-"Il file non è stato importato"
+"Duplicare il nome del file.\n"
+"File non importato"
 
 #: manage_files.py:1013 manage_files.py:1039 manage_files.py:1166
 msgid " imported."
@@ -1178,7 +1178,7 @@ msgstr " Importato."
 
 #: manage_files.py:1104 manage_files.py:1131 manage_files.py:1132
 msgid " lines not imported"
-msgstr " linee non esportate"
+msgstr " Linee non importate"
 
 #: manage_files.py:1127 manage_files.py:1136
 msgid "Cannot import "
@@ -1202,7 +1202,7 @@ msgstr " esportato in "
 
 #: manage_files.py:1313 manage_files.py:1336
 msgid "Deleting file error: "
-msgstr "Errore durante la cancellazione del file: "
+msgstr "Errore durante la cancellazione del file "
 
 #: manage_files.py:1345
 msgid "Deleted file: "
@@ -1214,7 +1214,7 @@ msgstr "Files: "
 
 #: qualcoder.py:106
 msgid "Uncaught exception : "
-msgstr "Eccezione non gestita: "
+msgstr "Eccezione non catturata : "
 
 #: qualcoder.py:784
 msgid "Settings"
@@ -1230,11 +1230,11 @@ msgstr "Font"
 
 #: qualcoder.py:788
 msgid "Tree font size"
-msgstr "Tree font size"
+msgstr "Dimensione del carattere ad albero"
 
 #: qualcoder.py:789
 msgid "Working directory"
-msgstr "Directory di lavoro"
+msgstr "Directory di lavoreo"
 
 #: qualcoder.py:790
 msgid "Show IDs"
@@ -1246,11 +1246,11 @@ msgstr "Lingua"
 
 #: qualcoder.py:792
 msgid "Timestamp format"
-msgstr "Formato data e ora"
+msgstr "Formato timestamp"
 
 #: qualcoder.py:793
 msgid "Speaker name format"
-msgstr "Oratore nome formato"
+msgstr "Formato del nome dell'altoparlante"
 
 #: qualcoder.py:794
 msgid "Backup on open"
@@ -1292,6 +1292,14 @@ msgstr "Nessun file a/v"
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "IMPORTA UN PROGETTO REFI-QDA"
 
+#: qualcoder.py:1093
+msgid ""
+"Step 1: You will be asked for a new QualCoder project name.\n"
+"Step 2: You will be asked for the QDPX file."
+msgstr ""
+"Fase 1: Vi verrà chiesto un nuovo nome per il progetto QualCoder.\n"
+"Passo 2: Vi verrà chiesto il file QDPX."
+
 #: qualcoder.py:1096
 msgid "REFI-QDA import steps"
 msgstr "Passaggi per importare REFI-QDA"
@@ -1305,8 +1313,8 @@ msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
-"Primo passo: Ti verrà richiesto un nuove nome per il progetto Qualcoder.\n"
-"Secondo passo: Ti verrà richiesto il file RQDA."
+"Passo 1: Vi verrà chiesto un nuovo nome per il progetto QualCoder.\n"
+"Passo 2: Vi verrà richiesto il file RQDA."
 
 #: qualcoder.py:1121
 msgid "RQDA import steps"
@@ -1318,7 +1326,7 @@ msgstr "Creazione del progetto"
 
 #: qualcoder.py:1130
 msgid "Project not successfully created"
-msgstr "Il progetto non è stato creato"
+msgstr "Il progetto non e' stato creato"
 
 #: qualcoder.py:1145
 msgid "Are you sure you want to quit?"
@@ -1358,7 +1366,7 @@ msgstr "Apertura: "
 
 #: qualcoder.py:1228
 msgid "New Project Created"
-msgstr "Un nuovo progetto è stato creato"
+msgstr "Un nuovo progetto e' stato creato"
 
 #: qualcoder.py:1229
 msgid "DB Version:"
@@ -1374,7 +1382,7 @@ msgstr "Info: "
 
 #: qualcoder.py:1232
 msgid "Coder:"
-msgstr "Autore:  "
+msgstr "Autore:"
 
 #: qualcoder.py:1235
 msgid "Problem creating database "
@@ -1394,11 +1402,11 @@ msgstr "Aprire la directory del progetto"
 
 #: qualcoder.py:1318
 msgid "Cannot open file"
-msgstr "Non e stato possibile aprire il file"
+msgstr "Non e' stato possibile aprire il file"
 
 #: qualcoder.py:1332
 msgid "Default coder name changed to: "
-msgstr "Il nome dell'autore è stato cambiato in: "
+msgstr "Il nome dell'autore e' stato cambiato in: "
 
 #: qualcoder.py:1351
 msgid "Project Opened: "
@@ -1406,11 +1414,11 @@ msgstr "Progetto Aperto: "
 
 #: qualcoder.py:1371
 msgid "There is already a backup with this name"
-msgstr "C'è già un backup con questo stesso nome"
+msgstr "C'e' gia' un backup con questo stesso nome"
 
 #: qualcoder.py:1378
 msgid "WARNING: audio and video files NOT backed up. See settings."
-msgstr "ATTENZIONE: il backup dei file audio e video NON è stato fatto. Controllare le impostazioni."
+msgstr "ATTENZIONE: il backup dei file audio e video NON e' stato fatto. Controllare le impostazioni."
 
 #: qualcoder.py:1379
 msgid "Project backup created: "
@@ -1438,7 +1446,7 @@ msgstr "Memo del progetto: "
 
 #: qualcoder.py:1419
 msgid "Code categories: "
-msgstr "Categorie di codice: "
+msgstr "Categorie di codice "
 
 #: qualcoder.py:1423 reports.py:1370 reports.py:1451 report_relations.py:133
 msgid "Codes: "
@@ -1454,7 +1462,7 @@ msgstr "Questa versione: "
 
 #: qualcoder.py:1562
 msgid "Newer release available: "
-msgstr "È disponibile una nuova versione"
+msgstr "È disponibile una nuova versione "
 
 #: qualcoder.py:1567
 msgid "Latest Release: "
@@ -1462,11 +1470,11 @@ msgstr "Ultima versione: "
 
 #: qualcoder.py:1574
 msgid "Could not detect latest release from Github\n"
-msgstr "Non è stato possibile individuare l'ultima versiona da Github\n"
+msgstr "Non e' stato possibile individuare l'ultima versiona da Github\n"
 
 #: report_attributes.py:161
 msgid "No operator was selected"
-msgstr "Nessun autore è stato selezionato"
+msgstr "Nessun autore e' stato selezionato"
 
 #: report_attributes.py:170
 msgid "Too many values given for this operator"
@@ -1474,11 +1482,11 @@ msgstr "Troppi valori inseriti per questo autore"
 
 #: report_attributes.py:178
 msgid "Need 2 values for between"
-msgstr "Sono necessari 2 valori"
+msgstr "2 valori sono necessari"
 
 #: report_attributes.py:191
 msgid " is not a number"
-msgstr " non è un numero"
+msgstr " non e' un numero"
 
 #: reports.py:121 reports.py:2128
 msgid "Select files to view"
@@ -1494,7 +1502,7 @@ msgstr "Frequenze dei codici"
 
 #: reports.py:297
 msgid ", Frequency: "
-msgstr ", Frequenza: "
+msgstr ", Frequnza: "
 
 #: reports.py:305
 msgid "Text file Export"
@@ -1542,11 +1550,11 @@ msgstr "Autori selezionati: "
 
 #: reports.py:603
 msgid "agreement: "
-msgstr "accordo "
+msgstr "accordo: "
 
 #: reports.py:604
 msgid ", dual coded: "
-msgstr ", doppia codifica "
+msgstr ", doppio codice: "
 
 #: reports.py:605
 msgid ", uncoded: "
@@ -1562,7 +1570,7 @@ msgstr "Zero DivisionError. unique_codings:"
 
 #: reports.py:1047
 msgid "Save text file"
-msgstr "Salva file di testo"
+msgstr "Saòva file di testo"
 
 #: reports.py:1073 reports.py:1110
 msgid "Report exported: "
@@ -1622,11 +1630,11 @@ msgstr "Nessun codifice selezionato."
 
 #: reports.py:1434
 msgid "Nothing selected"
-msgstr "Niente è stato selezionato"
+msgstr "Niente e' stato selezionato"
 
 #: reports.py:1435
 msgid "No files, cases or attributes have been selected."
-msgstr "Nessun file, caso o attribute è stato selezionato-."
+msgstr "Nessun file, caso o attribute e' stato selezionato-."
 
 #: reports.py:1444
 msgid "Search parameters"
@@ -1654,7 +1662,7 @@ msgstr "File selezionati: Tutti"
 
 #: reports.py:2166
 msgid "Select cases to view"
-msgstr "Seleziona i casi da visualizzare"
+msgstr "Seleziona I casi da guardare"
 
 #: reports.py:2168
 msgid "Cases selected: "
@@ -1666,11 +1674,11 @@ msgstr "Casi selezionati: Tutti"
 
 #: reports.py:2208
 msgid "Click to view coding in the original file."
-msgstr "Clicca per visualizzare la codifica nel file originale."
+msgstr "Clicca per vedere la codifica nel file originale."
 
 #: select_items.py:81
 msgid "Dictionary is empty"
-msgstr "Il dizionario è vuoto"
+msgstr "Il dizionario e' vuoto"
 
 #: select_items.py:90
 msgid "Dictionary has no \"name\" key"
@@ -1682,7 +1690,7 @@ msgstr "Selezionare una directory per il progetto"
 
 #: view_av.py:78
 msgid "Cannot import vlc"
-msgstr "Non è stato possibile importare vlc"
+msgstr "Non e' stato possibile importare vlc"
 
 #: view_av.py:206
 msgid "Coder: "
@@ -1769,7 +1777,7 @@ msgstr "Inizio segmento"
 
 #: view_av.py:1383
 msgid "Cannot merge codes, unmark overlapping text."
-msgstr "Non è stato possibile unire i codici, rimuove la selezione del testo sovrapposto."
+msgstr "Non è possibile unire i codici, non si può contrassegnare il testo che si sovrappone."
 
 #: view_av.py:1397
 msgid "New code name"
@@ -1789,15 +1797,15 @@ msgstr "Memo per la Categoria "
 
 #: view_av.py:1562
 msgid " Name already in use, choose another."
-msgstr "Nome già in uno, sceglierne un'altro."
+msgstr " Nome già in uno, sceglierne un'altro."
 
 #: view_av.py:1576 view_image.py:1020
 msgid "Code renamed: "
-msgstr "Codice rinominato: "
+msgstr "Rinomina codice: "
 
 #: view_av.py:1589 view_image.py:1033
 msgid "This category name is already in use"
-msgstr "Il nome di questa categoria è gia in uso"
+msgstr "Il nome di questa categoria e' gia in uso"
 
 #: view_av.py:1592 view_image.py:1036
 msgid "Duplicate category name"
@@ -1817,11 +1825,11 @@ msgstr "Prepare il text_link per il segmento"
 
 #: view_av.py:1717
 msgid "Link to segment to text"
-msgstr "Aggiungere il segmento al testo"
+msgstr "Aggiungi il segmento al testo"
 
 #: view_av.py:1722
 msgid "Video position to timestamp"
-msgstr "Posizione del video sulla timestamp"
+msgstr "Posizione video al timestamp"
 
 #: view_av.py:1914
 msgid "No transcription"
@@ -1861,11 +1869,11 @@ msgstr "Seleziona il segmento da aggiungere al testo"
 
 #: view_av.py:2258
 msgid "This segment has already been coded with this code."
-msgstr "Questo segmento è gia stato codificato con questo codice."
+msgstr "Questo segmento e' gia stato codificato con questo codice."
 
 #: view_av.py:2471
 msgid "Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
-msgstr "Area di transcrizione: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
+msgstr ""
 
 #: view_av.py:2728
 msgid "Select name to delete"
@@ -1873,11 +1881,11 @@ msgstr "Selezionare nome da eliminare"
 
 #: view_av.py:2747
 msgid "Speaker name"
-msgstr "Nome dell'oratore"
+msgstr "Nome dell'altoparlante"
 
 #: view_av.py:2748
 msgid "Name:"
-msgstr "Nome:"
+msgstr "Nome: "
 
 #: view_image.py:124
 msgid "Image coding"
@@ -1889,7 +1897,7 @@ msgstr "Errore Immagine"
 
 #: view_image.py:359 view_image.py:1133
 msgid "Cannot open: "
-msgstr "Non è stato possibile aprire: "
+msgstr "Non e' stato possibile aprire: "
 
 #: view_image.py:495
 msgid "Memo for image "
@@ -1901,7 +1909,7 @@ msgstr "Memo per l'area codificata in "
 
 #: view_image.py:822
 msgid "Cannot merge codes. Unmark overlapping text."
-msgstr "Non è stato possibile unire i codici. Rimuovere la selezione del testo sovrapposto."
+msgstr "Non può fondere i codici. Annullare il testo che si sovrappone."
 
 #: view_image.py:1002
 msgid " Choose another name"
@@ -1925,11 +1933,11 @@ msgid ""
 "Use Ctrl or Shift and mouse click"
 msgstr ""
 "Selezionare 2 o più codici\n"
-"Usare Ctrl o Shift e il click del mouse"
+"Utilizzare Ctrl o Shift e fare clic con il mouse"
 
 #: report_relations.py:352
 msgid "Proximity"
-msgstr "Prossimità"
+msgstr "Prossimita'"
 
 #: report_relations.py:354
 msgid "Overlap"
@@ -1945,4 +1953,4 @@ msgstr "Inclusione"
 
 #: report_relations.py:552
 msgid "Code relations csv file exported to: "
-msgstr "File csv contenete la relazione del codice esportato in: "
+msgstr "Codice relazioni csv file esportato in: "
