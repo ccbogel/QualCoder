@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +23,8 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
+
 
 from copy import deepcopy
 import datetime
@@ -63,6 +63,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
+
 
 class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
@@ -174,17 +175,25 @@ class DialogCodeImage(QtWidgets.QDialog):
             'cid': row[9]})
 
     def get_image_files(self):
-        """ Load the image file data. """
+        """ Load the image file data. Exclide those image file data where there are bad links."""
+
+        bad_links = self.app.check_bad_file_links()
+        bl_sql = ""
+        for bl in bad_links:
+            bl_sql += "," + str(bl['id'])
+        if len(bl_sql) > 0:
+            bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
         self.files = []
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
-        sql += "substr(mediapath,1,7) = '/images' order by name"
+        sql += "substr(mediapath,1,7) in ('/images', 'images:') " + bl_sql + " order by name"
         cur.execute(sql)
         result = cur.fetchall()
+        self.files = []
+        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
-            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2],
-            'owner': row[3], 'date': row[4], 'mediapath': row[5]})
+            self.files.append(dict(zip(keys, row)))
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -351,14 +360,32 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.load_image()
 
     def load_image(self):
-        """ Add image to scene if it exists. """
+        """ Add image to scene if it exists. If not exists clear the GUI and variables.
+        Called by: select_image_menu, select_image.
+        """
 
         source = self.app.project_path + self.file_['mediapath']
+        if self.file_['mediapath'][0:7] == "images:":
+            source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
-            QtWidgets.QMessageBox.warning(None, _("Image Error"), _("Cannot open: ") + source)
-            self.close()
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_("Image Error"))
+            mb.setText(_("Cannot open: ") + source)
+            mb.exec_()
             logger.warning("Cannot open image: " + source)
+            # Must remove any existing loaded images and clear variables
+            self.file_ = None
+            self.filename = None
+            self.selection = None
+            self.scale = 1.0
+            items = list(self.scene.items())
+            for i in range(items.__len__()):
+                self.scene.removeItem(items[i])
+            self.setWindowTitle(_("Image coding"))
+            self.ui.pushButton_memo.setEnabled(False)
+
             return
         items = list(self.scene.items())
         for i in range(items.__len__()):
@@ -517,6 +544,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         ActionItemDelete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
+        ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
@@ -525,12 +553,53 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.add_category()
         if action == ActionItemAddCode:
             self.add_code()
+        if action == ActionShowCodesLike:
+            self.show_codes_like()
+            return
         if selected is not None and action == ActionItemRename:
             self.rename_category_or_code(selected)
         if selected is not None and action == ActionItemEditMemo:
             self.add_edit_code_memo(selected)
         if selected is not None and action == ActionItemDelete:
             self.delete_category_or_code(selected)
+
+    def show_codes_like(self):
+        """ Show all codes if text is empty.
+         Show selected codes that contain entered text. """
+
+        # Input dialog narrow, so code below
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec_()
+        if not ok:
+            return
+        text = str(dialog.textValue())
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, text)
+
+    def recursive_traverse(self, item, text):
+        """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
+        Recurse through all child categories.
+        Called by: show_codes_like
+        param:
+            item: a QTreeWidgetItem
+            text:  Text string for matching with code names
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            #print(item.child(i).text(0) + "|" + item.child(i).text(1))
+            if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
+                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and text == "":
+                item.child(i).setHidden(False)
+            self.recursive_traverse(item.child(i), text)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identfiy treeWidgetItem drop events.
@@ -1047,6 +1116,8 @@ class DialogViewImage(QtWidgets.QDialog):
     """ View image. View and edit displayed memo.
     Show a scaleable and scrollable image.
     The slider values range from 10 to 99.
+
+    Linked images have 'image:' at start of mediapath
     """
 
     app = None
@@ -1056,6 +1127,7 @@ class DialogViewImage(QtWidgets.QDialog):
 
     def __init__(self, app, image_data, parent=None):
         """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
+        mediapath may be a link as: 'images:path'
         """
 
         sys.excepthook = exception_handler
@@ -1074,21 +1146,19 @@ class DialogViewImage(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.setWindowTitle(self.image_data['mediapath'])
-        try:
-            source = self.app.project_path + self.image_data['mediapath']
-        except Exception as e:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Image error'))
-            mb.setText(_("Image file not found: ") + source + "\n" + str(e))
-            mb.exec_()
-        image = QtGui.QImage(source)
+        abs_path = ""
+        if "images:" in self.image_data['mediapath']:
+            abs_path = self.image_data['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + self.image_data['mediapath']
+        self.setWindowTitle(abs_path)
+
+        image = QtGui.QImage(abs_path)
         if image.isNull():
             mb = QtWidgets.QMessageBox()
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('Image error'))
-            mb.setText(_("Cannot open: ") + source)
+            mb.setText(_("Cannot open: ") + abs_path)
             mb.exec_()
             self.close()
             return

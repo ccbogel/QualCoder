@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from copy import copy
 import csv
@@ -161,7 +161,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             'display_list': [row[0], 'cid:' + str(row[4])]})
 
         self.coders = []
-        cur.execute("select distinct owner from code_text union select distinct owner from code_image")
+        cur.execute("select distinct owner from code_text union select distinct owner from code_image union select distinct owner from code_av")
         result = cur.fetchall()
         self.coders = []
         for row in result:
@@ -1238,8 +1238,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
-        POSSIBLY TODO: an alternative is to have picture data in base64 so there is no
-        need for a separate folder that the html file links to.
+        TODO: Possibly have picture data in base64 so there is no need for a separate folder.
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -1294,35 +1293,66 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         for item in self.html_links:
             if item['imagename'] is not None:
-                # [-3] has a counter, e.g. 1_, 2_ for each image to make it distinct
-                imagename = item['imagename'].split('/')[-3] + item['imagename'].split('/')[-1]
-                #print("IN: ", imagename)
+                #print("===================")
+                #print("IMG PATH ", item['imagename'])
+                # item['imagename'] is in this format: 0-/images/filename.jpg  # where 0- is the counter
+                imagename = item['imagename'].replace('/images/', '')
+                #print("IMG NAME: ", imagename)
                 folder_link = filename[:-5] + "/" + imagename
-                #print("FL:" ,folder_link)
+                #print("FOLDER LINK:", folder_link)
                 item['image'].save(folder_link)
                 html_link = foldername_without_path + "/" + imagename
                 ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
                 this needs to be upper case for the replace method to work:  c:  =>  C:
                 '''
+                #TODO this may fail on Windows now
                 unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
                 html = html.replace(item['imagename'], html_link)
                 if unreplaced_html == html:
                     html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
                 #print("Windows 10 not replacing issue ", item['imagename'], html_link)
                 #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
+
             if item['avname'] is not None:
                 try:
-                    # add audio/video to folder
-                    if not os.path.isfile(foldername + item['avname']):
-                        copyfile(self.app.project_path + item['avname'], foldername + item['avname'])
-                    mediatype = item['avname'][1:6]
+                    # Add audio/video to folder
+                    mediatype = ""
+                    if item['avname'][0:6] in ("/video", "video:"):
+                        mediatype = "video"
+                    if item['avname'][0:6] in ("/audio", "audio:"):
+                        mediatype = "audio"
+                    # Remove link prefix and note if link or not
+                    linked = False
+                    av_path = item['avname']
+                    if av_path[0:6] == "video:":
+                        av_path = av_path[6:]
+                        linked = True
+                    if av_path[0:6] == "audio:":
+                        linked = True
+                        av_path = av_path[6:]
+                    av_filepath_dest = ""
+                    if not linked and not os.path.isfile(foldername + av_path):
+                        copyfile(self.app.project_path + item['avname'], foldername + av_path)
+                        av_filepath_dest = foldername + av_path
+                    # Extra work to check and copy a Linked file
+                    if mediatype == "video" and linked:
+                        av_filepath = av_path.split("/")[-1]
+                        if not os.path.isfile(foldername + "/video/" + av_path.split('/')[-1]):
+                            av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
+                            copyfile(av_path, av_filepath_dest)
+                    if mediatype == "audio" and linked:
+                        av_filename = av_path.split("/")[-1]
+                        if not os.path.isfile(foldername + "/audio/" + av_path.split('/')[-1]):
+                            av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
+                            copyfile(av_path + item['avname'], av_filepath_dest)
+
                     extension = item['avname'][item['avname'].rfind('.') + 1:]
                     extra = "</p><" + mediatype + " controls>"
-                    extra += '<source src="' + foldername + item['avname']
+                    extra += '<source src="' + av_filepath_dest
                     extra += '#t=' + item['av0'] +',' + item['av1'] + '"'
                     extra += ' type="' + mediatype + '/' + extension + '">'
                     extra += '</' + mediatype + '><p>'
-                    #print("EXTRA:", extra)
+                    print("EXTRA:", extra)
                     # hopefully only one location with video/link: [mins.secs - mins.secs]
                     location = html.find(item['avtext'])
                     location = location + len(['avtext'])- 1
@@ -1839,7 +1869,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 QtWidgets.QMessageBox.information(None, _("No media name in AV results"), msg)
                 logger.error("None value for a/v media name in AV results\n" + str(i))
             if i[7] is not None:
-                text = i[7][1:] + ": "
+                text = i[7] + ": "
             secs0 = int(i[3] / 1000)
             mins = int(secs0 / 60)
             remainder_secs = str(secs0 - mins * 60)
@@ -1902,6 +1932,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         path = self.app.project_path + img['mediapath']
+        if img['mediapath'][0:7] == "images:":
+            path = img['mediapath'][7:]
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
@@ -1917,8 +1949,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             scaler = scaler_w
         else:
             scaler = scaler_h
-        # need unique image names or the same image from the same path is reproduced
-        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        # Need unique image names or the same image from the same path is reproduced
+        #print("REPORTS IMG MEDIAPATH", img['mediapath'])
+
+        # Default for an image  stored in the project folder.
+        #imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        imagename = str(counter) + '-' + img['mediapath']
+        # Check and change path for a linked image file
+        if img['mediapath'][0:7] == "images:":
+            #imagename = self.app.project_path + '/images/' + str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
+            imagename = str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
+        # imagename is now:
+        # 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
+
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
         cursor = text_edit.textCursor()

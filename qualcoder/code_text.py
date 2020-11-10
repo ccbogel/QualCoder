@@ -591,9 +591,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
+        ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
+            if action == ActionShowCodesLike:
+                self.show_codes_like()
             if selected is not None and action == ActionItemChangeColor:
                 self.change_code_color(selected)
             elif action == ActionItemAddCategory:
@@ -615,6 +618,44 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
                 if found:
                     self.coded_media_dialog(found)
+
+    def show_codes_like(self):
+        """ Show all codes if text is empty.
+         Show selected codes that contain entered text. """
+
+        # Input dialog narrow, so code below
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec_()
+        if not ok:
+            return
+        text = str(dialog.textValue())
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, text)
+
+    def recursive_traverse(self, item, text):
+        """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
+        Recurse through all child categories.
+        Called by: show_codes_like
+        param:
+            item: a QTreeWidgetItem
+            text:  Text string for matching with code names
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            #print(item.child(i).text(0) + "|" + item.child(i).text(1))
+            if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
+                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and text == "":
+                item.child(i).setHidden(False)
+            self.recursive_traverse(item.child(i), text)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.

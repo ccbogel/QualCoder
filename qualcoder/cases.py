@@ -520,7 +520,7 @@ class DialogCases(QtWidgets.QDialog):
 
     def view(self):
         """ View all of the text associated with this case.
-        Add links to open image files. """
+        Add links to open image and A/V files. """
 
         row = self.ui.tableWidget.currentRow()
         if row == -1:
@@ -568,10 +568,9 @@ class DialogCases(QtWidgets.QDialog):
                 formatB = QtGui.QTextCharFormat()
                 formatB.setFontWeight(QtGui.QFont.Bold)
                 cursor.mergeCharFormat(formatB)
-
                 self.ui.textBrowser.append(c['text'])
 
-            if c['mediapath'][:8] == "/images/":
+            if c['mediapath'][:7] in ("/images", "images:"):
                 header = "\n" + _('Image: ') + c['name']
                 self.ui.textBrowser.append(header)
                 fmt = QtGui.QTextCharFormat()
@@ -583,13 +582,13 @@ class DialogCases(QtWidgets.QDialog):
                 pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
                 cursor.setCharFormat(fmt)
-                # maybe review this approach for copying data over
-                #Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
+                # Maybe review this approach for copying data over
+                # Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
                 self.display_text_links.append(data)
 
-            if c['mediapath'][:7] == "/audio/" or c['mediapath'][:7] == "/video/":
+            if c['mediapath'][:6] in ("/audio", "audio:", "/video", "video:"):
                 header = "\n" + _('AV media: ') + c['name']
                 self.ui.textBrowser.append(header)
                 fmt = QtGui.QTextCharFormat()
@@ -606,32 +605,10 @@ class DialogCases(QtWidgets.QDialog):
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
                 self.display_text_links.append(data)
 
-    ''' # removed images from the case text view, as they were affecting vertical position of previous text - too much white space
-    document = self.ui.textBrowser.document()
-                    image = QtGui.QImageReader(path).read()
-                    document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
-                    cursor = self.ui.textBrowser.textCursor()
-                    image_format = QtGui.QTextImageFormat()
-                    scaler = 1.0
-                    scaler_w = 1.0
-                    scaler_h = 1.0
-                    if image.width() > 300:
-                        scaler_w = 300 / image.width()
-                    if image.height() > 300:
-                        scaler_h = 300 / image.height()
-                    if scaler_w < scaler_h:
-                        scaler = scaler_w
-                    else:
-                        scaler = scaler_h
-                    image_format.setWidth(image.width() * scaler)
-                    image_format.setHeight(image.height() * scaler)
-                    image_format.setName(url.toString())
-                    cursor.insertImage(image_format)
-                    self.ui.textBrowser.append("<br/>")'''
-
     def link_clicked(self, position):
         """ View image or audio/video media in dialog.
-        For A/V, added try block in case VLC bindings do not work.  """
+        For A/V, added try block in case VLC bindings do not work.
+        Also check existence of media, as particularly, linked files may have bad links. """
 
         cursor = self.ui.textBrowser.cursorForPosition(position)
         menu = QtWidgets.QMenu()
@@ -648,11 +625,36 @@ class DialogCases(QtWidgets.QDialog):
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 try:
                     ui = None
+                    abs_path = ""
+                    if item['mediapath'][:6] == "video:":
+                        abs_path = item['mediapath'].split(':')[1]
+                        if not os.path.exists(abs_path):
+                            return
+                        ui = DialogViewAV(self.app, item)
                     if item['mediapath'][:6] == "/video":
+                        abs_path = self.app.project_path + item['mediapath']
+                        if not os.path.exists(abs_path):
+                            return
                         ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][:6] == "/audio":
+                    if item['mediapath'][:6] == "audio:":
+                        abs_path = item['mediapath'].split(':')[1]
+                        if not os.path.exists(abs_path):
+                            return
                         ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][:7] == "/images":
+                    if item['mediapath'][0:6] == "/audio":
+                        abs_path = self.app.project_path + item['mediapath']
+                        if not os.path.exists(abs_path):
+                            return
+                        ui = DialogViewAV(self.app, item)
+                    if item['mediapath'][0:7] == "images:":
+                        abs_path = item['mediapath'].split(':')[1]
+                        if not os.path.exists(abs_path):
+                            return
+                        ui = DialogViewImage(self.app, item)
+                    if item['mediapath'][0:7] == "/images":
+                        abs_path = self.app.project_path + item['mediapath']
+                        if not os.path.exists(abs_path):
+                            return
                         ui = DialogViewImage(self.app, item)
                     ui.exec_()
                 except Exception as e:
