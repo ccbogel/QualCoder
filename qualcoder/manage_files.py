@@ -141,6 +141,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_view.clicked.connect(self.view)
         self.ui.pushButton_delete.clicked.connect(self.delete)
         self.ui.pushButton_import.clicked.connect(self.import_files)
+        self.ui.pushButton_link.clicked.connect(self.link_files)
         self.ui.pushButton_export.clicked.connect(self.export)
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
@@ -189,7 +190,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_order_by_value = menu.addAction(_("Order by attribute"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
-        print("hiden", self.rows_hidden)
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
@@ -248,7 +248,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 res = cur.fetchone()
                 #print("file", s[0],"attr", a[0], " res", res, type(res))
                 if res is None:
-                    print("No attr placeholder found")
+                    #print("No attr placeholder found")
                     placeholders = [a[0], s[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
                     self.app.conn.commit()
@@ -264,7 +264,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
-        No suffix implies the 'file' was imported from a survey question.
+        No suffix implies the 'file' was imported from a survey question or created internally.
         This also fills out the table header lables with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
@@ -341,27 +341,44 @@ class DialogManageFiles(QtWidgets.QDialog):
             logger.debug("empty media path error")
             return icon, metadata
 
-        if mediapath[:8] == "/images/":
+        abs_path = ""
+        if ':' in mediapath:  # Linked
+            abs_path = mediapath.split(':')[1]
+        else:
+            abs_path = self.app.project_path + mediapath
+
+        if mediapath[:8] == "/images/" or mediapath[:7] == "images:":
             icon = QtGui.QIcon("GUI/picture.png")
-            image = Image.open(self.app.project_path + mediapath)
-            w, h = image.size
+            w = 0
+            h = 0
+            try:
+                image = Image.open(abs_path)
+                w, h = image.size
+            except:
+                metadata += _("Cannot locate media. " + abs_path)
+                return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
-            '''exif = image._getexif()  # for jpg files
+            '''# Additional jpg metadata
+            exif = image._getexif()  # for jpg files
             if exif is not None:
                 labels = {}
                 for (key, val) in exif.items():
                     print(TAGS.get(key))
                     labels[TAGS.get(key)] = val
                 print(labels)'''
-        if mediapath[:7] == "/video/":
+        if mediapath[:7] == "/video/" or mediapath[:6] == "video:":
             icon = QtGui.QIcon("GUI/play.png")
-        if mediapath[:7] == "/audio/":
+        if mediapath[:7] == "/audio/" or mediapath[:6] == "audio:":
             icon = QtGui.QIcon("GUI/sound.png")
-        if mediapath[:7] in ( "/audio/", "/video/"):
+        if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
+            if not os.path.exists(abs_path):
+                metadata += _("Cannot locate media. " + abs_path)
+                return icon, metadata
+
             instance = vlc.Instance()
             mediaplayer = instance.media_player_new()
             try:
-                media = instance.media_new(self.app.project_path + mediapath)
+                media = instance.media_new(abs_path)
                 media.parse()
                 msecs = media.get_duration()
                 secs = int(msecs / 1000)
@@ -372,8 +389,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 metadata += "Duration: " + str(mins) + ":" + remainder_secs
             except Exception as e:
                 logger.debug(str(e))
-
-        bytes = os.path.getsize(self.app.project_path + mediapath)
+                metadata += _("Cannot locate media. " + abs_path)
+                return icon, metadata
+        bytes = 0
+        try:
+            bytes = os.path.getsize(abs_path)
+        except:
+            pass
         metadata += "\nBytes: " + str(bytes)
         if bytes > 1024 and bytes < 1024 * 1024:
             metadata += "  " + str(int(bytes / 1024)) + "KB"
@@ -464,7 +486,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         y = self.ui.tableWidget.currentColumn()
         '''if y == self.NAME_COLUMN:
             new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
-
             # check that no other source file has this text and this is is not empty
             update = True
             if new_text == "":
@@ -552,14 +573,14 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
-        if self.source[x]['mediapath'] is not None:
-            if self.source[x]['mediapath'][:8] == "/images/":
+        if self.source[x]['mediapath'] is not None and 'docs:' not in self.source[x]['mediapath']:
+            if self.source[x]['mediapath'][:7] in ("/images", "images:"):
                 self.view_image(x)
                 return
-            if self.source[x]['mediapath'][:7] == "/video/":
+            if self.source[x]['mediapath'][:6] in ("/video", "video:"):
                 self.view_av(x)
                 return
-            if self.source[x]['mediapath'][:7] == "/audio/":
+            if self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
 
@@ -840,7 +861,19 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
         Added try block in case VLC bindings do not work.
         Uses a non-modal dialog.
+
+        param:
+            x  :  row number Integer
         """
+
+        # Check media exists
+        abs_path = ""
+        if "video:" in self.source[x]['mediapath'] or 'audio:' in self.source[x]['mediapath']:
+            abs_path = self.source[x]['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + self.source[x]['mediapath']
+        if not os.path.exists(abs_path):
+            return
 
         try:
             ui = DialogViewAV(self.app, self.source[x])
@@ -862,7 +895,20 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
     def view_image(self, x):
-        """ View an image file and edit the image memo. """
+        """ View an image file and edit the image memo.
+
+        param:
+            x  :  row number Integer
+        """
+
+        # Check image exists
+        abs_path = ""
+        if "images:" in self.source[x]['mediapath']:
+            abs_path = self.source[x]['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + self.source[x]['mediapath']
+        if not os.path.exists(abs_path):
+            return
 
         ui = DialogViewImage(self.app, self.source[x])
         if self.dialog_list != []:
@@ -893,10 +939,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         ui = DialogMemo(self.app, _("Creating a new file: ") + name)
         ui.exec_()
         filetext = ui.memo
-        # update database
+
+        # Create entry details to add to self.source and to database
+        icon, metadata = self.get_icon_and_metadata(name, filetext, None)
         entry = {'name': name, 'id': -1, 'fulltext': filetext, 'memo': "",
         'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'mediapath': None}
+        'mediapath': None, 'icon': icon, 'metadata': metadata}
+
+        # Update database
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
             (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
@@ -920,17 +970,24 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
 
-    def import_files(self):
+    def link_files(self):
+        """ Trigger to link to file location. """
+
+        self.import_files(True)
+
+    def import_files(self, link=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt, docx and md
         md is text markdown format.
         Note importing from html, odt, docx all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
-        Imports audio as mp3, wav which are stored in an audio directory.
+        Imports audio as mp3, wav, m4a which are stored in an audio directory.
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory.
 
-        Optional: link to audio and video files rather than import into folder.
+        param:
+            link:   False - files are imported into project folder,
+                    True- files are linked and not imported
         """
 
         imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
@@ -938,18 +995,28 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not ok or imports == []:
             return
         known_file_type = False
-        nameSplit = imports[0].split("/")
-        temp_filename = nameSplit[-1]
+        name_split = imports[0].split("/")
+        temp_filename = name_split[-1]
         self.default_import_directory = imports[0][0:-len(temp_filename)]
         for f in imports:
-            # Added process events, in case many large files are imported, which leaves the FileDialog open and covering the screen.
+            link_path = ""
+            if link:
+                link_path = f
+            # Check file size, any files over 2Gb are linked and not imported internally
+            fileinfo = os.stat(f)
+            if fileinfo.st_size >= 2147483647:
+                link_path = f
+            # Need process events, if many large files are imported, which leaves the FileDialog open and covering the screen.
             QtWidgets.QApplication.processEvents()
             filename = f.split("/")[-1]
             destination = self.app.project_path
             if f.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub', 'md'):
                 destination += "/documents/" + filename
-                copyfile(f, destination)
-                self.load_file_text(f)
+                if link_path == "":
+                    copyfile(f, destination)
+                    self.load_file_text(f)
+                else:
+                    self.load_file_text(f, "docs:" + link_path)
                 known_file_type = True
             if f.split('.')[-1].lower() in ('pdf'):
                 if pdfminer_installed is False:
@@ -963,32 +1030,53 @@ class DialogManageFiles(QtWidgets.QDialog):
                     process = subprocess.Popen(["qpdf", "--decrypt", f, destination],
                         stdout=subprocess.PIPE)
                     process.wait()
-                    self.load_file_text(destination)
+                    if link_path == "":
+                        self.load_file_text(destination)
+                    else:
+                        self.load_file_text(destination, "docs:" + link_path)
+                        try:
+                            os.remove(destination)
+                        except Exception as e:
+                            logger.debug("Remove decrypted pdf linked file from /documents\n" + destination + "\n" + str(e))
                 else:
-                    #TODO qpdf decrypt not implemented for windows, OSX
+                    # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
                     mb = QtWidgets.QMessageBox()
                     mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
                     mb.setWindowTitle(_('If import error occurs'))
                     msg = _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f
                     mb.setText(msg)
                     mb.exec_()
-                    copyfile(f, destination)
-                    self.load_file_text(destination)
+                    if link_path == "":
+                        copyfile(f, destination)
+                        self.load_file_text(f)
+                    else:
+                        self.load_file_text(f, "docs:" + link_path)
                 known_file_type = True
+
+            # Media files
             if f.split('.')[-1].lower() in ('jpg', 'jpeg', 'png'):
-                destination += "/images/" + filename
-                copyfile(f, destination)
-                self.load_media_reference("/images/" + filename)
+                if link_path == "":
+                    destination += "/images/" + filename
+                    copyfile(f, destination)
+                    self.load_media_reference("/images/" + filename)
+                else:
+                    self.load_media_reference("images:" + link_path)
                 known_file_type = True
-            if f.split('.')[-1].lower() in ('wav', 'mp3'):
-                destination += "/audio/" + filename
-                copyfile(f, destination)
-                self.load_media_reference("/audio/" + filename)
+            if f.split('.')[-1].lower() in ('wav', 'mp3', 'm4a'):
+                if link_path == "":
+                    destination += "/audio/" + filename
+                    copyfile(f, destination)
+                    self.load_media_reference("/audio/" + filename)
+                else:
+                    self.load_media_reference("audio:" + link_path)
                 known_file_type = True
             if f.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
-                destination += "/video/" + filename
-                copyfile(f, destination)
-                self.load_media_reference("/video/" + filename)
+                if link_path == "":
+                    destination += "/video/" + filename
+                    copyfile(f, destination)
+                    self.load_media_reference("/video/" + filename)
+                else:
+                    self.load_media_reference("video:" + link_path)
                 known_file_type = True
             if not known_file_type:
                 QtWidgets.QMessageBox.warning(None, _('Unknown file type'),
@@ -998,7 +1086,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def load_media_reference(self, mediapath):
-        """ Load media reference information for audio video images. """
+        """ Load media reference information for audio, video, images.
+
+        param:
+            mediapath: QualCoder project folder path OR external link path to file
+                       External link path contains prefix 'images:, 'audio:', 'video:'
+        """
 
         # check for duplicated filename and update model, widget and database
         name_split = mediapath.split("/")
@@ -1015,11 +1108,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
-        self.parent_textEdit.append(entry['name'] + _(" imported."))
+        msg = entry['name']
+        if ':' in mediapath:
+            msg += _(" linked")
+        else:
+            msg += _(" imported.")
+        self.parent_textEdit.append(msg)
         self.source.append(entry)
 
         # Create an empty transcription file for audio and video
-        if mediapath[:6] in("/audio", "/video"):
+        if mediapath[:6] in("/audio", "audio:", "/video", "video:"):
             entry = {'name': filename + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
             'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
             cur = self.app.conn.cursor()
@@ -1041,12 +1139,16 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute(insert_sql, placeholders)
                 self.app.conn.commit()
 
-            self.parent_textEdit.append(entry['name'] + _(" imported."))
+            self.parent_textEdit.append(entry['name'] + _(" created."))
             self.source.append(entry)
 
-    def load_file_text(self, import_file):
+    def load_file_text(self, import_file, link_path=""):
         """ Import from file types of odt, docx pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
+
+        param:
+            import_file: filepath of file to be imported, String
+            link_path:  filepath of file to be linked, String
         """
 
         text = ""
@@ -1141,13 +1243,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                 _("Cannot import ") + str(import_file) + "\n" + str(e))
             return
         # Final checks: check for duplicated filename and update model, widget and database
-        nameSplit = import_file.split("/")
-        filename = nameSplit[-1]
+        name_split = import_file.split("/")
+        filename = name_split[-1]
         if any(d['name'] == filename for d in self.source):
             QtWidgets.QMessageBox.warning(None, _('Duplicate file'),
                 _("Duplicate filename.\nFile not imported"))
             return
-        entry = {'name': filename, 'id': -1, 'fulltext': text, 'mediapath': None, 'memo': "",
+
+        mediapath = None
+        if link_path != "":
+            mediapath = link_path
+        entry = {'name': filename, 'id': -1, 'fulltext': text, 'mediapath': mediapath, 'memo': "",
         'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         #logger.debug("type fulltext: " + str(type(entry['fulltext'])))
@@ -1168,7 +1274,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
 
-        self.parent_textEdit.append(entry['name'] + _(" imported."))
+        msg = entry['name']
+        if link_path == "":
+            msg += _(" imported")
+        else:
+            msg += _(" linked")
+        self.parent_textEdit.append(msg)
         self.source.append(entry)
 
     def convert_odt_to_text(self, import_file):
@@ -1216,6 +1327,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Export files to selected directory.
         If an imported file was from a docx, odt, pdf, html, epub then export the original file
         If the file was created within QualCoder (so only in the database), export as plain text.
+
+        Currently can only export ONE file at time, due to tableWidget single selection mode
+
+        Can only export files that were imported into the project folder.
+        Need to check for this condition.
         """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
@@ -1225,6 +1341,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
+        # Currently single selection mode in tableWidget, 1 row only, so rows[0]
+        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath']:
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Cannot Export'))
+            msg = _("This is an external linked file") + "\n"
+            msg += self.source[rows[0]]['mediapath'].split(':')[1]
+            mb.setText(msg)
+            mb.exec_()
+            return
+
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.last_export_directory, options)
@@ -1233,54 +1360,50 @@ class DialogManageFiles(QtWidgets.QDialog):
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
         names = _("Export to ") + directory + "\n"
-        for row in rows:
-            names = names + self.source[row]['name'] + "\n"
+        #for row in rows:
+        # Currently single selection mode in tableWidget
+        names = names + self.source[rows[0]]['name'] + "\n"
         ui = DialogConfirmDelete(self.app, names, _("Export files"))
         ok = ui.exec_()
         if not ok:
             return
-
-        # redo msg as filenames may change for created files and for original file documents
         msg = _("Export to ") + directory + "\n"
-        for row in rows:
-            filename = self.source[row]['name']
-            '''if len(filename) > 5 and (filename[-5:] == ".html" or filename[-5:] == ".docx" or filename[-5:] == ".epub"):
-                filename_txt = filename[0:len(filename) - 5] + ".txt"
-            if len(filename) > 4 and (filename[-4:] == ".htm" or filename[-4:] == ".odt" or filename[-4] == ".txt"):
-                filename_txt = filename[0:len(filename) - 4] + ".txt" '''
-            # export audio, video, picture files
-            if self.source[row]['mediapath'] is not None:
-                file_path = self.app.project_path + self.source[row]['mediapath']
-                destination = directory + "/" + filename
-                try:
-                    copyfile(file_path, destination)
-                    msg += destination + "\n"
-                except FileNotFoundError:
-                    pass
-            # export pdf, docx, odt, epub, html files if located in documents directory
-            original_document_stored = True
-            if self.source[row]['mediapath'] is None:
-                file_path = self.app.project_path + "/documents/" + self.source[row]['name']
-                destination = directory + "/" + self.source[row]['name']
-                try:
-                    copyfile(file_path, destination)
-                    msg += destination + "\n"
-                except FileNotFoundError as e:
-                    print(e)
-                    logger.warning(str(e))
-                    original_document_stored = False
-            # Export transcribed files and for user created text files within QualCoder
-            if self.source[row]['mediapath'] is None and not original_document_stored:
-                filename_txt = filename + ".txt"
-                filename_txt = directory + "/" + filename_txt
-                filedata = self.source[row]['fulltext']
-                f = open(filename_txt, 'w', encoding='utf-8-sig')
-                f.write(filedata)
-                f.close()
-                msg += filename_txt + "\n"
+        # Currently can only export ONE file at time, due to tableWidget single selection mode
+        #for row in rows:
+        row = rows[0]
+        filename = self.source[row]['name']
 
-            #if filename_txt is not None:
-            #    msg += "\n" + directory + "/" + filename_txt
+        # export audio, video, picture files
+        if self.source[row]['mediapath'] is not None:
+            file_path = self.app.project_path + self.source[row]['mediapath']
+            destination = directory + "/" + filename
+            try:
+                copyfile(file_path, destination)
+                msg += destination + "\n"
+            except FileNotFoundError:
+                pass
+        # export pdf, docx, odt, epub, html files if located in documents directory
+        original_document_stored = True
+        if self.source[row]['mediapath'] is None:
+            file_path = self.app.project_path + "/documents/" + self.source[row]['name']
+            destination = directory + "/" + self.source[row]['name']
+            try:
+                copyfile(file_path, destination)
+                msg += destination + "\n"
+            except FileNotFoundError as e:
+                print(e)
+                logger.warning(str(e))
+                original_document_stored = False
+        # Export transcribed files and for user created text files within QualCoder
+        if self.source[row]['mediapath'] is None and not original_document_stored:
+            filename_txt = filename + ".txt"
+            filename_txt = directory + "/" + filename_txt
+            filedata = self.source[row]['fulltext']
+            f = open(filename_txt, 'w', encoding='utf-8-sig')
+            f.write(filedata)
+            f.close()
+            msg += filename_txt + "\n"
+
         mb = QtWidgets.QMessageBox()
         mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         mb.setWindowTitle(_('Files Exported'))
@@ -1290,7 +1413,10 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def delete(self):
         """ Delete files from database and update model and widget.
-        Also, delete files from sub-directories. """
+        Also, delete files from sub-directories, if not externally linked.
+
+        # Currently can only delete ONE file at time, due to tableWidget single selection mode
+        """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = []
@@ -1300,57 +1426,63 @@ class DialogManageFiles(QtWidgets.QDialog):
         if len(rows) == 0:
             return
         names = ""
-        for row in rows:
-            names = names + self.source[row]['name'] + "\n"
+        #for row in rows:
+        # Currently can only delete ONE file at time, due to tableWidget single selection mode
+        names = names + self.source[rows[0]]['name'] + "\n"
         ui = DialogConfirmDelete(self.app, names)
         ok = ui.exec_()
         if not ok:
             return
 
         cur = self.app.conn.cursor()
-        for row in rows:
-            file_id = self.source[row]['id']
-            # delete text source
-            if self.source[row]['mediapath'] is None:
-                try:
+        #for row in rows:
+        # Currently can only delete ONE file at time, due to tableWidget single selection mode
+        row = rows[0]
+        file_id = self.source[row]['id']
+
+        # delete text source
+        if self.source[row]['mediapath'] is None or 'docs:' in self.source[row]['mediapath']:
+            try:
+                if self.source[row]['mediapath'] is None:
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
-                except Exception as e:
-                    logger.warning(_("Deleting file error: ") + str(e))
-                cur.execute("delete from source where id = ?", [file_id])
-                cur.execute("delete from code_text where fid = ?", [file_id])
-                cur.execute("delete from annotation where fid = ?", [file_id])
-                cur.execute("delete from case_text where fid = ?", [file_id])
-                sql = "delete from attribute where attr_type ='file' and id=?"
-                cur.execute(sql, [file_id])
-                self.app.conn.commit()
-            # delete image audio video source
-            if self.source[row]['mediapath'] is not None:
-                # Remove avid links in code_text
-                sql = "select avid from code_av where id=?"
-                cur.execute(sql, (file_id, ))
-                avids = cur.fetchall()
-                sql = "update code_text set avid=null where avid=?"
-                for avid in avids:
-                    cur.execute(sql, (avid[0], ))
-                self.app.conn.commit()
-                # Remove folder file, database stored coded sections and source details
+            except Exception as e:
+                logger.warning(_("Deleting file error: ") + str(e))
+            cur.execute("delete from source where id = ?", [file_id])
+            cur.execute("delete from code_text where fid = ?", [file_id])
+            cur.execute("delete from annotation where fid = ?", [file_id])
+            cur.execute("delete from case_text where fid = ?", [file_id])
+            sql = "delete from attribute where attr_type ='file' and id=?"
+            cur.execute(sql, [file_id])
+            self.app.conn.commit()
+
+        # delete image, audio or video source
+        if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
+            # Remove avid links in code_text
+            sql = "select avid from code_av where id=?"
+            cur.execute(sql, (file_id, ))
+            avids = cur.fetchall()
+            sql = "update code_text set avid=null where avid=?"
+            for avid in avids:
+                cur.execute(sql, (avid[0], ))
+            self.app.conn.commit()
+            # Remove folder file, if internally stored
+            if ':' not in self.source[row]['mediapath']:
                 filepath = self.app.project_path + self.source[row]['mediapath']
                 try:
                     os.remove(filepath)
                 except Exception as e:
                     logger.warning(_("Deleting file error: ") + str(e))
-                cur.execute("delete from source where id = ?", [file_id])
-                cur.execute("delete from code_image where id = ?", [file_id])
-                cur.execute("delete from code_av where id = ?", [file_id])
-                sql = "delete from attribute where attr_type='file' and id=?"
-                cur.execute(sql, [file_id])
-                self.app.conn.commit()
+            # Remove database stored coded sections and source details
+            cur.execute("delete from source where id = ?", [file_id])
+            cur.execute("delete from code_image where id = ?", [file_id])
+            cur.execute("delete from code_av where id = ?", [file_id])
+            sql = "delete from attribute where attr_type='file' and id=?"
+            cur.execute(sql, [file_id])
+            self.app.conn.commit()
 
-            self.check_attribute_placeholders()
-            self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
-        '''for item in self.source:
-            if item['id'] == file_id:
-                self.source.remove(item)'''
+        self.check_attribute_placeholders()
+        self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
+
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
@@ -1372,8 +1504,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             name_item.setIcon(icon)
             # having un-editable file names helps with assigning icons
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            #TODO if linked add link note to tooltip
-            name_item.setToolTip((data['metadata']))
+            # if externally linked add link details to tooltip
+            name_tt = data['metadata']
+            if data['mediapath'] is not None and ':' in data['mediapath']:
+                name_tt += _("\nExternally linked file:\n")
+                name_tt += data['mediapath']
+            name_item.setToolTip((name_tt))
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
             date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
