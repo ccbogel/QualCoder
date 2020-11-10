@@ -272,7 +272,7 @@ class App(object):
     def get_text_filenames(self):
         """ Get filenames of textfiles only. """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where mediapath is Null order by lower(name)")
+        cur.execute("select id, name from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -281,8 +281,9 @@ class App(object):
 
     def get_image_filenames(self):
         """ Get filenames of image files only. """
+
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where mediapath like '/images/%' order by lower(name)")
+        cur.execute("select id, name from source where mediapath like '/images/%' or mediapath like 'images:%' order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -291,8 +292,9 @@ class App(object):
 
     def get_av_filenames(self):
         """ Get filenames of audio video files only. """
+
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where (mediapath like '/audio/%' or mediapath like '/video/%') order by lower(name)")
+        cur.execute("select id, name from source where (mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -331,6 +333,33 @@ class App(object):
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
+
+    def check_bad_file_links(self):
+        """ Check all linked files are present.
+         Called from MainWindow.open_project, view_av.
+         Returns:
+             dicitonary of id,name, mediapath for bad links
+         """
+
+        cur = self.conn.cursor()
+        sql = "select id, name, mediapath from source where \
+            substr(mediapath,1,6) = 'audio:' \
+            or substr(mediapath,1,5) = 'docs:' \
+            or substr(mediapath,1,7) = 'images:' \
+            or substr(mediapath,1,6) = 'video:' order by name"
+        cur.execute(sql)
+        result = cur.fetchall()
+        bad_links = []
+        for r in result:
+            if r[2][0:5] == "docs:" and not os.path.exists(r[2][5:]):
+                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+            if r[2][0:7] == "images:" and not os.path.exists(r[2][7:]):
+                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+            if r[2][0:6] == "video:" and not os.path.exists(r[2][6:]):
+                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+            if r[2][0:6] == "audio:" and not os.path.exists(r[2][6:]):
+                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+        return bad_links
 
     def write_config_ini(self, settings):
         """ Stores settings for fonts, current coder, directory, and window sizes in .qualcoder folder
@@ -969,7 +998,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     d.show()
                     d.activateWindow()
                 except RuntimeError as e:
-                    logger.debug(str(e))
                     self.dialogList.remove(d)
                 return
 
@@ -994,8 +1022,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for d in self.dialogList:
             if type(d).__name__ == "DialogCodeImage":
-                d.show()
-                d.activateWindow()
+                try:
+                    d.show()
+                    d.activateWindow()
+                except:
+                    self.dialogList.remove(d)
                 return
         files = self.app.get_image_filenames()
         if len(files) > 0:
@@ -1022,7 +1053,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     d.show()
                     d.activateWindow()
                 except Exception as e:
-                    logger.debug(str(e))
                     try:
                         self.dialogList.remove(d)
                     except:
@@ -1061,8 +1091,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
          CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
-        VARIABLES ARE NOT SUCCESSFULLY EXPORTED YET.
-        CURRENTLY GIFS ARE EXPORTED UNCHANGED (NEED TO BE PNG OR JPG)"""
+         CURRENTLY WORKING ON AT 2 Gb FILE SIZE LIMITS AND USE OF
+         ABSOLUTE PATHS FOR EXPORT
+        """
 
         Refi_export(self.app, self.ui.textEdit, "project")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
@@ -1084,7 +1115,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
-        Follows the REFI standard. """
+        Follows the REFI standard.
+        CURRENTLY WORKING ON AT 2 Gb FILE SIZE LIMITS AND USE OF
+        RELATIVE AND ABSOLUTE PATHS FOR IMPORT
+         """
 
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
@@ -1241,8 +1275,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.open_project(self.app.project_path, "yes")
 
     def change_settings(self):
-        """ Change default settings - the coder name, font, font size. Non-modal.
-        Backup options """
+        """ Change default settings - the coder name, font, font size.
+        Language, Backup options.
+        As this dialog affects all others if the coder name changes, on exit of the dialog,
+        all other opened dialogs are destroyed."""
 
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
@@ -1348,6 +1384,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.save_backup()
         msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
+        bad_links = self.app.check_bad_file_links()
+        if bad_links:
+            self.ui.textEdit.append('<span style="color:red">' + _("Bad links to files") + "</span>")
+            for l in bad_links:
+                self.ui.textEdit.append('<span style="color:red">' + l['name'] + "   " + l['mediapath'] + '</span>')
         self.project_summary_report()
         self.show_menu_options()
 
@@ -1586,7 +1627,7 @@ def gui():
     lang = settings.get('language', 'en')
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
     #if lang != "en":
-    if lang in ["de", "el", "es", "fr", "jp"]:
+    if lang in ["de", "el", "es", "fr", "it", "jp"]:
         translator = QtCore.QTranslator()
         translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
         getlang = gettext.translation(lang, localedir=path + '/locale', languages=[lang])
