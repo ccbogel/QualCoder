@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 import os
@@ -82,7 +82,8 @@ class DialogSettings(QtWidgets.QDialog):
             for row in results:
                 coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-        languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr", "日本 jp"]
+        languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
+                "Italiano it", "日本 jp"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
