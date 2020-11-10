@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from copy import deepcopy
 import datetime
@@ -132,7 +132,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     annotations = []
     code_text = []
     transcription = None  # A tuple of id, fulltext, name
-    # transcribed timepositions as list of [text_pos0, text_pos1, milliseconds]
+    # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
     def __init__(self, app, parent_textEdit, dialog_list):
@@ -160,8 +160,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end_msecs'] = None
         self.play_segment_end = None
         self.segments = []
-        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None,
-                                 'memo': None, 'date': None, 'avid': None}
+        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
+                'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.segment_for_text = None
         self.get_codes_and_categories()
         self.get_list_of_media()
@@ -269,7 +269,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
 
     def ddialog_menu(self, position):
-        """ Context menu to export a screenshot, to resize dialog """
+        """ Context menu to export a screenshot, to resize dialog. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -300,15 +300,24 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.codes, self.categories = self.app.get_data()
 
     def get_list_of_media(self):
+        """ Get AV media and exclude those with bad links. """
+
+        bad_links = self.app.check_bad_file_links()
+        bl_sql = ""
+        for bl in bad_links:
+            bl_sql += "," + str(bl['id'])
+        if len(bl_sql) > 0:
+            bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
         self.files = []
         cur = self.app.conn.cursor()
         cur.execute("select name, id, memo, owner, date, mediapath from source where \
-            substr(mediapath,1,6) in ('/audio','/video') order by name")
+            substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " order by name")
         result = cur.fetchall()
+        self.files = []
+        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
-            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2],
-                               'owner': row[3], 'date': row[4], 'mediapath': row[5]})
+            self.files.append(dict(zip(keys, row)))
 
     def assign_selected_text_to_code(self):
         """ Assign selected text on left-click on code in tree. """
@@ -531,6 +540,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         self.media_data = ui.get_selected()
         self.load_media()
+        if self.media_data is None:
+            return
         self.load_segments()
         self.fill_code_counts_in_tree()
 
@@ -578,22 +589,28 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Add media to media dialog. """
 
         try:
-            self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            if self.media_data['mediapath'][0:6] in ('/audio', '/video'):
+                self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
+                self.media = self.instance.media_new(self.media_data['mediapath'][6:])
         except Exception as e:
             mb = QtWidgets.QMessageBox()
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('Media not found'))
             mb.setText(str(e) + "\n" + self.app.project_path + self.media_data['mediapath'])
             mb.exec_()
-            self.closeEvent()
+            self.media = None
+            self.media_data = None
+            self.setWindowTitle(_("Media coding"))
             return
 
-        self.ddialog.setWindowTitle(self.media_data['name'])
-        self.setWindowTitle(_("Media coding: ") + self.media_data['name'])
+        title = self.media_data['name'].split('/')[-1]
+        self.ddialog.setWindowTitle(title)
+        self.setWindowTitle(_("Media coding: ") + title)
         self.ui.pushButton_play.setEnabled(True)
         self.ui.horizontalSlider.setEnabled(True)
         self.ui.pushButton_coding.setEnabled(True)
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.media_data['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
             try:
                 w = int(self.app.settings['video_w'])
@@ -986,8 +1003,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         ActionItemDelete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
+        ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if action == ActionShowCodesLike:
+            self.show_codes_like()
+            return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
         if action == ActionItemAddCategory:
@@ -1002,6 +1023,44 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.delete_category_or_code(selected)
         if action == ActionItemAssignSegment:
             self.assign_segment_to_code(selected)
+
+    def show_codes_like(self):
+        """ Show all codes if text is empty.
+         Show selected codes that contain entered text. """
+
+        # Input dialog narrow, so code below
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec_()
+        if not ok:
+            return
+        text = str(dialog.textValue())
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, text)
+
+    def recursive_traverse(self, item, text):
+        """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
+        Recurse through all child categories.
+        Called by: show_codes_like
+        param:
+            item: a QTreeWidgetItem
+            text:  Text string for matching with code names
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            #print(item.child(i).text(0) + "|" + item.child(i).text(1))
+            if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
+                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and text == "":
+                item.child(i).setHidden(False)
+            self.recursive_traverse(item.child(i), text)
 
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
@@ -2355,6 +2414,8 @@ class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
     Mouse events do work with the vlc player in a separate modal dialog.
+
+    Linked a/v have 'audio:' or 'video:' at start of mediapath
     """
 
     app = None
@@ -2381,6 +2442,11 @@ class DialogViewAV(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.media_data = media_data
+        abs_path = ""
+        if "video:" in media_data['mediapath'] or 'audio:' in media_data['mediapath']:
+            abs_path = media_data['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + media_data['mediapath']
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -2406,7 +2472,7 @@ class DialogViewAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.label_speakers.setStyleSheet(font)
-        self.setWindowTitle(self.media_data['mediapath'])
+        self.setWindowTitle(abs_path.split('/')[-1])
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
@@ -2439,7 +2505,8 @@ class DialogViewAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.ddialog.setWindowTitle(self.media_data['mediapath'])
+        title = abs_path.split('/')[-1]
+        self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
@@ -2463,7 +2530,8 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
-        self.ddialog.show()
+        if self.media_data['mediapath'][0:6] not in ("/audio", "audio:"):
+            self.ddialog.show()
 
         # Create a vlc instance
         self.instance = vlc.Instance()
@@ -2479,16 +2547,17 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
         try:
-            self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            #self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            self.media = self.instance.media_new(abs_path)
         except Exception as e:
             mb = QtWidgets.QMessageBox()
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('Media not found'))
-            mb.setText(str(e) + "\n" + self.app.project_path + self.media_data['mediapath'])
+            mb.setText(str(e) + "\n" + abs_path)  # self.app.project_path + self.media_data['mediapath'])
             mb.exec_()
             self.closeEvent()
             return
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.media_data['mediapath'][0:7] not in ("/audio", "audio:"):
             try:
                 w = int(self.app.settings['video_w'])
                 h = int(self.app.settings['video_h'])
@@ -2739,8 +2808,11 @@ class DialogViewAV(QtWidgets.QDialog):
 
         time_msecs = self.mediaplayer.get_time()
         mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
-        mins = int(mins_secs.split(':')[0])
-        secs = mins_secs.split(':')[1]
+        delimiter = ":"
+        if "." in mins_secs:
+            delimiter = "."
+        mins = int(mins_secs.split(delimiter)[0])
+        secs = mins_secs.split(delimiter)[1]
         hours = int(mins / 60)
         remainder_mins = str(mins - hours * 60)
         if len(remainder_mins) == 1:
