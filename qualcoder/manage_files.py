@@ -882,8 +882,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.dialog_list = []
                 self.dialog_list.append(ui)
                 ui.show()
-            # try and update file data here
-            self.load_file_data()
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
