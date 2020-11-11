@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from copy import copy
 import datetime
@@ -67,10 +67,11 @@ class Refi_import():
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
     """
 
-    #TODO parse_sources PDF if e.tag == "{urn:QDA-XML:project:1.0}PDFSource
+    #TODO parse_sources PDF - WORKS BUT FULLY WORKS ?
     #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO check imports from different vendors
+    #TODO reference external sources - relative or absolute paths
 
     file_path = None
     codes = []
@@ -83,6 +84,7 @@ class Refi_import():
     tree = None
     import_type = None
     xml = None
+    base_path = ""
 
     def __init__(self, app, parent_textEdit, import_type):
 
@@ -96,6 +98,7 @@ class Refi_import():
         self.cases = []
         self.sources = []
         self.variables = []
+        self.base_path = ""
         self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
             _('Select REFI_QDA file'), self.app.settings['directory'], "(*." + import_type + ")")
         if not ok or self.file_path == "":
@@ -273,9 +276,24 @@ class Refi_import():
         {urn: QDA - XML: project:1.0}Graphs  not implemented
         {urn: QDA - XML: project:1.0}Notes
         {urn: QDA - XML: project:1.0}Description
+
+        Source files:
+        Internal files are identified in the path attribute of the source element by the
+        URL naming scheme internal:// /Sources folder
+        plainTextPath="internal://8e7fddfe‐db36‐48dc‐b464‐80c3a4decd90.txt"
+        richTextPath="internal://6f35c6f2‐bd8f‐4f08‐ad49‐6d62cb8442a5.docx" >
+
+        path="internal://361bcdb8‐7d11‐4343‐a4cd‐4130693eff76.png"
+
+        External files are identified in the path attribute of the source element by the URL
+        They can be relative to the basePath of the project
+        path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
+        basePath='//PROJECT/Sources'
+
+        Or they can be Absolute paths
+        path="absolute:///hiome/username/Documents/DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
         """
 
-        #print("IMPORT PROJECT" ,self.file_path)
         # Create extract folder
         self.folder_name = self.file_path[:-4] + "_temporary"
         self.parent_textEdit.append(_("Reading from: ") + self.file_path)
@@ -293,12 +311,12 @@ class Refi_import():
 
         tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
         root = tree.getroot()
-        # look for the Codes tag, which contains each Code element
         children = root.getchildren()
         for c in children:
             #print(c.tag)
+            if c.tag == "{urn:QDA-XML:project:1.0}Project":
+                self.parse_project_tag(c)
             if c.tag == "{urn:QDA-XML:project:1.0}Users":
-
                 count = self.parse_users(c)
                 self.parent_textEdit.append(_("Parse users. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}CodeBook":
@@ -524,6 +542,15 @@ class Refi_import():
         Example format:
         <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
+        TODO if during import it detects that the external file is not found, it should
+        TODO check file location and if not found ask user for the new file location.
+        TODO need to look for
+            path='absolute
+            <Project basePath/> +
+                <VideoSource path='relative
+            or
+            <VideoSource currentPath='absolute
+
         :param element:
 
         :return count of sources
@@ -548,7 +575,8 @@ class Refi_import():
     def name_creating_user_create_date_source_path_helper(self, element):
         """ Helper method to obtain name, guid, creating user, create date from each source.
          Note: the sources folder can be named: sources or Sources
-         MAXQDA uses sources, NVIVO uses Sources """
+         MAXQDA uses sources, NVIVO uses Sources
+         """
 
         name = element.get("name")
         #guid = element.get("guid")
@@ -561,7 +589,7 @@ class Refi_import():
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
 
-        # path starts with internal:// or relative:///
+        # path starts with internal:// or relative:// (with<Project basePath or absolute
         path = element.get("path")
 
         # Sources folder name can be capital or lower case, check and get the correct one
@@ -571,24 +599,34 @@ class Refi_import():
             if i == "sources":
                 sources_name = "/sources"
         # Determine internal or external path
-        #TODO currently qualcoder does not use external paths with an import
-        if path is not None and path.find("internal://") == 0:
-            path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + sources_name + path
-        if path is not None and path.find("relative:///") == 0:
-            source_path = self.app.project_path + "../" + path.split('relative:///')[1]
+        source_path = ""
+        path_type = ""
+        #TODO currently qualcoder does not use external paths on import
         if path is None:
             source_path = element.get("plainTextPath").split('internal:/')[1]
             source_path = self.folder_name + sources_name + source_path
+            path_type = "internal"
+        if path is not None and path.find("internal://") == 0:
+            path = element.get("path").split('internal:/')[1]
+            source_path = self.folder_name + sources_name + path
+            path_type = "internal"
+        if path is not None and path.find("relative://") == 0:
+            source_path = self.base_path + path.split('relative://')[1]
+            path_type = "relative"
+        if path is not None and path.find("absolute://") == 0:
+            source_path = path.split('absolute://')[1]
+            path_type = "absolute"
 
-        return name, creating_user, create_date, source_path
+        return name, creating_user, create_date, source_path, path_type
 
     def load_picture_source(self, element):
         """ Load this picture source.
          Load the description and codings into sqlite.
          """
 
-        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+        #TODO absolute and relative
+
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda images folder and rename into original name
         #print(source_path)
@@ -660,7 +698,8 @@ class Refi_import():
         e.g. path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
         """
 
-        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+        #TODO absolute and relative
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda audio folder and rename into original name
         #print(source_path)
@@ -693,7 +732,8 @@ class Refi_import():
         Load the description and codings into sqlite.
         """
 
-        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+        #TODO absolute and relative
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda video folder and rename into original name
         #print(source_path)
@@ -719,7 +759,9 @@ class Refi_import():
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite. """
 
-        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+        #TODO absolute and relative
+
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         # Copy file into .qda documents folder and rename into original name
         #print(source_path)
@@ -758,7 +800,8 @@ class Refi_import():
          the text may need an additional line-ending character.
          """
 
-        name, creating_user, create_date, source_path = self.name_creating_user_create_date_source_path_helper(element)
+        #TODO absolute and relativeg
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         cur = self.app.conn.cursor()
         # find Description to complete memo
@@ -932,6 +975,13 @@ class Refi_import():
         cur.execute("update project set memo = ?", (memo, ))
         self.app.conn.commit()
 
+    def parse_project_tag(self, element):
+        """ Parse the Project tag.
+        Interested in basePath for relative linked sources. """
+
+        self.base_path = element.get("basePath")
+        print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
         There is no user table in QualCoder sqlite.
@@ -978,9 +1028,8 @@ class Refi_import():
 
 
 class Refi_export(QtWidgets.QDialog):
-
-    """
-    Create Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
+    """ Create Rotterdam Exchange Format Initiative (refi) xml documents for
+    codebook.xml and project.xml
     NOTES:
     https://stackoverflow.com/questions/299588/validating-with-an-xml-schema-in-python
     http://infohost.nmt.edu/tcc/help/pubs/pylxml/web/index.html
@@ -1021,18 +1070,13 @@ class Refi_export(QtWidgets.QDialog):
             self.export_project()
 
     def export_project(self):
-        """
-        .qde zipfile
-        Internal files are identified in the path attribute of the source element by the URL naming scheme internal://
-        /Sources folder
-        Audio and video source file size:
-        The maximum size in bytes allowed for an internal file is 2,147,483,647 bytes (2^31−1 bytes, or 2 GiB
-        minus 1 byte). An exporting application must detect file size limit during export and inform the
-        user.
+        """ Create a REFI-QDA project folder project.qdpx zipfile
+        This contains the .qde projedt xml and a Sources folder.
 
         Source types:
-        Plain text, PDF
+        Plain text, PDF,md, odt, docx, md, epub
         Images must be jpeg or png
+        mp3, ogg, mp4, mov, wav
 
         Create an unzipped folder with a /Sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
@@ -1060,9 +1104,9 @@ class Refi_export(QtWidgets.QDialog):
             exit(0)
         txt_errors = ""
         for s in self.sources:
-            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])  # tmp
+            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
             destination = '/Sources/' + s['filename']
-            if s['mediapath'] is not None:
+            if s['mediapath'] is not None and s['external'] is None:
                     try:
                         if s['external'] is None:
                             shutil.copyfile(self.app.project_path + s['mediapath'],
@@ -1074,15 +1118,16 @@ class Refi_export(QtWidgets.QDialog):
                         txt_errors += "Error in media export: " + s['filename'] + "\n" + str(e)
                         print("ERROR in refi.export_project. media export: " + s['filename'])
                         print(e)
-            if s['mediapath'] is None:  # a document
+            if s['mediapath'] is None:  # an internal document
                 try:
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
                         prep_path + destination)
                 except FileNotFoundError as e:
                     with open(prep_path + destination, 'w', encoding="utf-8-sig") as f:
                         f.write(s['fulltext'])
-                # Also need to add the plain text file as a source
-                # plaintext has different guid from richtext
+            # Also need to export a plain text file as a source
+            # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
+            if s['plaintext_filename'] is not None:
                 with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
                     try:
                         f.write(s['fulltext'])
@@ -1090,6 +1135,7 @@ class Refi_export(QtWidgets.QDialog):
                         txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(e)
                         logger.error(str(e) + '\nIn plaintext file export: ' + s['plaintext_filename'])
                         print(e)
+
         for notefile in self.note_files:
             with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
@@ -1154,16 +1200,20 @@ class Refi_export(QtWidgets.QDialog):
 
     def project_xml(self):
         """ Creates the xml for the .qde file.
-        base path for external sources is set to the settings directory.
-        No PDFSources, No sets, No graphs. """
+        External files will be exported using absolute path
+        So base path for external sources is not required.
+        ? PDFSources ?
+        No sets, No graphs.
+        """
 
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<Project '
         self.xml += 'xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
         self.xml += 'name="' + self.app.project_name + '" '
-        self.xml += 'origin="Qualcoder-1.4" '
+        self.xml += 'origin="' + self.app.version + '" '
+        # There is no creating user in QualCoder
         guid = self.create_guid()
-        self.xml += 'creatingUserGUID="' + guid + '" '  # there is no creating user in QualCoder
+        self.xml += 'creatingUserGUID="' + guid + '" '
         cur = self.app.conn.cursor()
         cur.execute("select date from project")
         result = cur.fetchone()
@@ -1413,36 +1463,82 @@ class Refi_export(QtWidgets.QDialog):
     def sources_xml(self):
         """ Create xml for sources: text, pictures, pdf, audio, video.
          Also add selections to each source.
+
+        Audio and video source file size:
+        The maximum size in bytes allowed for an internal file is 2,147,483,647 bytes (2^31−1 bytes, or 2 GiB
+        minus 1 byte). An exporting application must detect file size limit during export and inform the
+        user.
+
+        Internal files are identified in the path attribute of the source element by the
+        URL naming scheme internal:// /Sources folder
+        plainTextPath="internal://8e7fddfe‐db36‐48dc‐b464‐80c3a4decd90.txt"
+        richTextPath="internal://6f35c6f2‐bd8f‐4f08‐ad49‐6d62cb8442a5.docx" >
+
+        path="internal://361bcdb8‐7d11‐4343‐a4cd‐4130693eff76.png"
+
+        currentPath="absolute://E:/Data/David/Video/Transana/Images/ch130214.gif" >
+
+        External files are identified in the path attribute of the source element by the URL
+        They can be relative to the basePath of the project
+        path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
+        basePath='//PROJECT/Sources'
+
+        Or they can be Absolute paths - USE THIS APPROACH AS EASIER TO MANAGE
+        path="absolute:///hiome/username/Documents/DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
+
+        Audio and video source file size:
+        The maximum size in bytes allowed for an internal file is 2,147,483,647 bytes (2^31−1 bytes, or 2 GiB
+        minus 1 byte). An exporting application must detect file size limit during export and inform the
+        user.
+
+        Need to replace xml special characters in filenames
+        e.g. & to &#038;
+
+        Source types:
+        Plain text, PDF
+        Images must be jpeg or png
+
+        Create an unzipped folder with a /Sources folder and project.qde xml document
+        Then create zip wih suffix .qdpx
+
         Called by: project_xml
 
-        :returns xml string
+        :returns xml String
         """
 
         xml = "<Sources>\n"
         for s in self.sources:
             guid = self.create_guid()
-            # text document
-            if s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed'):
+            # Text document
+            if (s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')) or \
+                (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
                 xml += '<TextSource '
-                xml += 'richTextPath="internal://' + s['filename'] + '" '
+                if s['external'] is None:
+                    xml += 'richTextPath="internal://' + s['filename'].replace('&', '&#038;') + '" '
+                else:
+                    xml += 'richTextPath="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'] + '">\n'
+                xml += 'name="' + s['name'].replace('&', '&#038;') + '">\n'
                 if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</TextSource>\n'
-            # pdf document
-            if s['mediapath'] is None and s['name'][-4:].lower() == '.pdf':
+            # PDF document
+            if (s['mediapath'] is None and s['name'][-4:].lower() == '.pdf') or \
+                (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][-4:].lower() == '.pdf') :
                 xml += '<PDFSource '
-                xml += 'path="internal://' + s['filename'] + '" '
+                if s['external'] is None:
+                    xml += 'path="internal://' + s['filename'] + '" '
+                else:
+                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'] + '">\n'
+                xml += 'name="' + s['name'].replace('&', '&#038;') + '">\n'
                 if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += '<Representation guid="' + self.create_guid() + '" '
@@ -1453,44 +1549,50 @@ class Refi_export(QtWidgets.QDialog):
                 xml += '</Representation>'
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PDFSource>\n'
-            if s['mediapath'] is not None and s['mediapath'][0:7] == '/images':
+            # Images
+            if s['mediapath'] is not None and s['mediapath'][0:7] in ('/images', 'images:'):
                 xml += '<PictureSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
-                xml += 'path="internal://' + s['filename'] + '" '
+                if s['external'] is None:
+                    xml += 'path="internal://' + s['filename'] + '" '
+                else:
+                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'] + '" >\n'
+                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
                 if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.picture_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PictureSource>\n'
-            if s['mediapath'] is not None and s['mediapath'][0:6] == '/audio':
+            # Audio
+            if s['mediapath'] is not None and s['mediapath'][0:6] in ('/audio', 'audio:'):
                 xml += '<AudioSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'path="absolute:///'+ self.app.settings['directory'] + '/' + s['filename'] + '" '
+                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'] + '" >\n'
+                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
                 if s['memo'] != '' and s['memo'] is not None:
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Audio')
                 xml += self.source_variables_xml(s['id'])
                 xml += '</AudioSource>\n'
-            if s['mediapath'] is not None and s['mediapath'][0:6] == '/video':
+            # Video
+            if s['mediapath'] is not None and s['mediapath'][0:6] in ('/video', 'video:'):
                 xml += '<VideoSource '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml +='path="absolute:///' + self.app.settings['directory'] + '/'+ s['filename'] + '" '
+                    xml +='path="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'] + '" >\n'
+                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
                 if s['memo'] != '':
                     xml += '<Description>' + s['memo'] + '</Description>\n'
                 xml += self.transcript_xml(s)
@@ -1521,6 +1623,7 @@ class Refi_export(QtWidgets.QDialog):
             xml += '<PlainTextSelection guid="' + self.create_guid() + '" '
             xml += 'startPosition="' + str(r[2]) + '" '
             xml += 'endPosition="' + str(r[3]) + '" '
+            # Semi-colons may cause parsong problems
             xml += 'name="' + str(r[1]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
@@ -1604,6 +1707,7 @@ class Refi_export(QtWidgets.QDialog):
     def transcript_xml(self, source):
         """ Find any transcript of media source.
         Need to add timestamp synchpoints.
+        Replace & xml char with &#038;
 
         Called by: sources_xml
 
@@ -1619,7 +1723,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creatingUser="' + self.user_guid(t['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
                 xml += 'guid="' + self.create_guid() + '" '
-                xml += 'name="' + t['name'] + '" >\n'
+                xml += 'name="' + t['name'].replace('&', '&#038;') + '" >\n'
                 # Get and add xml for syncpoints
                 sync_list = self.get_transcript_syncpoints(t)
                 for s in sync_list:
@@ -1847,7 +1951,7 @@ class Refi_export(QtWidgets.QDialog):
         return time_pos
 
     def convert_timestamp(self, time_in):
-        ''' Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ '''
+        """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ """
 
         time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + 'Z'
         return time_out
@@ -1856,12 +1960,13 @@ class Refi_export(QtWidgets.QDialog):
         """ Add text sources, picture sources, pdf sources, audio sources, video sources.
         Add a .txt suffix to unsuffixed text sources.
 
-        The filename below is also used for the richTextPath for text documents.
+        The filename below is also used for the richTextPath for INTERNAL text documents.
         Each text source also needs a plain text file with a separate unique guid..
         plainTextPath = guid + .txt and consists of fulltext
 
         Files over the 2GiB-1 size must be stored externally, these will be located in the
-        qualcoder settings directory.
+        qualcoder settings directory. They are not imported into QualCoder but must be linked as an external resource.
+        Other files that are linked externally will hav ethe external key replaced with the absolute path.
         """
 
         self.sources = []
@@ -1887,10 +1992,17 @@ class Refi_export(QtWidgets.QDialog):
             'memo': r[4], 'owner': r[5], 'date': r[6], 'guid': guid,
             'filename': filename, 'plaintext_filename': plaintext_filename,
             'external': None}
+            # external is an absolute path
+            # Make it so that no media > 2Gb is able to be imported internally into the project
             if source['mediapath'] is not None:
-                fileinfo = os.stat(self.app.project_path + source['mediapath'])
-                if fileinfo.st_size >= 2147483647:
-                    source['external'] = self.app.settings['directory']
+                #fileinfo = os.stat(self.app.project_path + source['mediapath'])
+                #f fileinfo.st_size >= 2147483647:
+                if source['mediapath'][0:5] == 'docs:':
+                    source['external'] = source['mediapath'][5:]
+                if source['mediapath'][0:7] == 'images:':
+                    source['external'] = source['mediapath'][7:]
+                if source['mediapath'][0:6] in ('audio:', 'video:'):
+                    source['external'] = source['mediapath'][6:]
             self.sources.append(source)
 
     def get_users(self):
@@ -2075,6 +2187,7 @@ class Refi_export(QtWidgets.QDialog):
             return True
         except etree.XMLSyntaxError as err:
             print("PARSING ERROR:{0}".format(err))
+            # May have problems with special characters e.g. &
             return False
 
         except AssertionError as err:
