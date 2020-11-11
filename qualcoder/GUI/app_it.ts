@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0">
+<!DOCTYPE TS>
+<TS version="2.1" language="it" sourcelanguage="en">
 <context>
     <name>Dialog_CodeRelations</name>
     <message>
         <location filename="ui_dialog_code_relations.py" line="75"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation>Codice relazioni</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="76"/>
@@ -35,7 +36,7 @@
     <message>
         <location filename="ui_dialog_code_relations.py" line="81"/>
         <source>Codes:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codici: </translation>
     </message>
 </context>
 <context>
@@ -48,7 +49,7 @@
     <message>
         <location filename="ui_dialog_import.py" line="86"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="87"/>
@@ -63,7 +64,7 @@
     <message>
         <location filename="ui_dialog_import.py" line="89"/>
         <source>,</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="90"/>
@@ -139,12 +140,12 @@
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
         <source>Case:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caso: </translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="67"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="68"/>
@@ -185,7 +186,7 @@
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="44"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>Casi</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="45"/>
@@ -238,7 +239,7 @@
     <message>
         <location filename="ui_case_file_manager.py" line="90"/>
         <source>Case:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caso: </translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="91"/>
@@ -266,7 +267,7 @@
     <message>
         <location filename="ui_dialog_cases.py" line="88"/>
         <source>Cases: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Casi: </translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="89"/>
@@ -427,7 +428,7 @@
     <message>
         <location filename="ui_dialog_code_image.py" line="82"/>
         <source>Code:</source>
-        <translation type="unfinished"></translation>
+        <translation>Codice: </translation>
     </message>
 </context>
 <context>
@@ -495,7 +496,7 @@
     <message>
         <location filename="ui_dialog_code_text.py" line="128"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="129"/>
@@ -505,17 +506,17 @@
     <message>
         <location filename="ui_dialog_code_text.py" line="130"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="131"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="132"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -556,7 +557,7 @@
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="36"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -732,7 +733,7 @@
     <message>
         <location filename="ui_dialog_report_codings.py" line="117"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>Casi</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="118"/>
@@ -767,22 +768,22 @@
     <message>
         <location filename="ui_dialog_report_codings.py" line="124"/>
         <source>html</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="125"/>
         <source>txt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="126"/>
         <source>odt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="127"/>
         <source>csv</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="128"/>
@@ -901,7 +902,7 @@ Wildcards for &apos;like&apos; are % and _</source>
     <message>
         <location filename="ui_dialog_settings.py" line="119"/>
         <source>/</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="120"/>
@@ -961,7 +962,7 @@ You must store these files elsewhere.</source>
     <message>
         <location filename="ui_dialog_SQL.py" line="66"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="67"/>
@@ -981,17 +982,17 @@ You must store these files elsewhere.</source>
     <message>
         <location filename="ui_dialog_SQL.py" line="70"/>
         <source>,</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="71"/>
         <source>;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="72"/>
         <source>|</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1024,7 +1025,7 @@ You must store these files elsewhere.</source>
     <message>
         <location filename="ui_dialog_text_mining.py" line="96"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>Casi</translation>
     </message>
     <message>
         <location filename="ui_dialog_text_mining.py" line="97"/>
