@@ -720,12 +720,11 @@ class Refi_import():
 
         #TODO load transcript
         #TODO transcript contains SynchPoints AKA timestamps
-        #TODO load codings
-        '''
-        <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1" firstX="783" firstY="1238" secondX="1172" secondY="1788" name="a stylised faced on the lecture slide.
-        " creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" creationDateTime="2019-03-09T23:19:07Z">
-        <Coding guid="7a7e80ca-ed8c-4006-86b3-731e36baca19" creatingUser="70daf61c-b6f0-4b5e-8c2f-548fde3ad3d4" ><CodeRef targetGUID="1b594544-2954-4b67-86ff-fb552f090ba8"/>
-        </Coding></PictureSelection>'''
+
+        # Parse AudioSelection elements and load these codings
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
+                self._load_codings_for_audio_video(id_, e)
 
     def load_video_source(self, element):
         """ Load this video source into .
@@ -754,7 +753,48 @@ class Refi_import():
 
         #TODO load transcript
         #TODO transcript contains SynchPoints AKA timestamps
-        #TODO load codings
+
+        # Parse VideoSelection elements and load these codings
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
+                self._load_codings_for_audio_video(id_, e)
+
+    def _load_codings_for_audio_video(self, id_, element):
+        """ Load coded segments for audio and video
+        Example format:
+        <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100" guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
+        creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z" name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
+        <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z">
+        <CodeRef targetGUID="86392BC1-A364-4904-A406-87A7E025EBF7"/>
+        </Coding>
+        </VideoSelection>
+        """
+
+        seg_start = int(element.get("begin"))
+        seg_end = int(element.get("end"))
+        memo = element.get("name")
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+
+        cur = self.app.conn.cursor()
+        for e in element:
+            if e.tag == "{urn:QDA-XML:project:1.0}Coding":
+                # Get the code id from the CodeRef guid
+                cid = None
+                codeRef = e.getchildren()[0]
+                for c in self.codes:
+                    if c['guid'] == codeRef.get("targetGUID"):
+                        cid = c['cid']
+                cur.execute("insert into code_av (id,pos0,pos1,cid,memo,\
+                    date, owner) values(?,?,?,?,?,?,?)", (id_, seg_start, seg_end,
+                    cid, memo, create_date, creating_user))
+                self.app.conn.commit()
 
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite. """
