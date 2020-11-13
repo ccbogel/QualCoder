@@ -552,14 +552,8 @@ class Refi_import():
 
         TODO if during import it detects that the external file is not found, it should
         TODO check file location and if not found ask user for the new file location.
-        TODO need to look for
-            path='absolute
-            <Project basePath/> +
-                <VideoSource path='relative
-            or
-            <VideoSource currentPath='absolute
 
-        :param element:
+        :param element: Sources element object
 
         :return count of sources
         """
@@ -581,13 +575,12 @@ class Refi_import():
         return count
 
     def name_creating_user_create_date_source_path_helper(self, element):
-        """ Helper method to obtain name, guid, creating user, create date from each source.
-         Note: the sources folder can be named: sources or Sources
+        """ Helper method to obtain name, guid, creating user, create date, path type from each source.
+         The sources folder can be named: sources or Sources
          MAXQDA uses sources, NVIVO uses Sources
          """
 
         name = element.get("name")
-        #guid = element.get("guid")
         creating_user_guid = element.get("creatingUser")
         creating_user = "default"
         for u in self.users:
@@ -596,10 +589,8 @@ class Refi_import():
         create_date = element.get("creationDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
-
         # path starts with internal:// or relative:// (with<Project basePath or absolute
         path = element.get("path")
-
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
         sources_name = "/Sources"
@@ -609,7 +600,6 @@ class Refi_import():
         # Determine internal or external path
         source_path = ""
         path_type = ""
-        #TODO currently qualcoder does not use external paths on import
         if path is None:
             source_path = element.get("plainTextPath").split('internal:/')[1]
             source_path = self.folder_name + sources_name + source_path
@@ -624,30 +614,40 @@ class Refi_import():
         if path is not None and path.find("absolute://") == 0:
             source_path = path.split('absolute://')[1]
             path_type = "absolute"
-
         return name, creating_user, create_date, source_path, path_type
 
     def load_picture_source(self, element):
         """ Load this picture source.
          Load the description and codings into sqlite.
+         Can manage internal and absolute source paths.
+         TODO relative import path
+
+        Params:
+            element: PictureSource element object
          """
 
-        #TODO absolute and relative
-
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
-
-        # Copy file into .qda images folder and rename into original name
-        #print(source_path)
-        destination = self.app.project_path + "/images/" + name
-        media_path = "/images/" + name
-        #print(destination)
-        try:
-            shutil.copyfile(source_path, destination)
-        except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "internal":
+            # Copy file into .qda images folder and rename into original name
+            destination = self.app.project_path + "/images/" + name
+            media_path = "/images/" + name
+            try:
+                shutil.copyfile(source_path, destination)
+            except Exception as e:
+                self.parent_textEdit.append(_('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "absolute":
+            media_path = "images:" + source_path
+        if path_type == "relative":
+            #TODO check this works
+            media_path = "images:" + self.base_path + source_path
+            print(source_path, media_path)
+        memo = ""
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, '', creating_user, create_date, media_path, None))
+            (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
@@ -700,82 +700,136 @@ class Refi_import():
                     width, height, cid, memo, create_date, creating_user))
                 self.app.conn.commit()
 
-
-
     def load_audio_source(self, element):
         """ Load audio source into .
         Load the description and codings into sqlite.
+        Can manage internal and absolute source paths.
+        TODO relative path
 
-        path to file can be internal or relative.
-        e.g. path="relative:///DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
+        Params:
+            element: AudioSource element object
         """
 
-        #TODO absolute and relative
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
+        if path_type == "internal":
+            # Copy file into .qda audio folder and rename into original name
+            destination = self.app.project_path + "/audio/" + name
+            media_path = "/audio/" + name
+            try:
+                shutil.copyfile(source_path, destination)
+            except Exception as e:
+                self.parent_textEdit.append(_('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "absolute":
+            media_path = "audio:" + source_path
+        if path_type == "relative":
+            #TODO check relative import works
+            media_path = "audio:" + self.base_path + source_path
+            #print(source_path, media_path)
 
-        # Copy file into .qda audio folder and rename into original name
-        #print(source_path)
-        destination = self.app.project_path + "/audio/" + name
-        media_path = "/audio/" + name
-        #print(destination)
-        try:
-            shutil.copyfile(source_path, destination)
-        except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
-
+        memo = ""
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, '', creating_user, create_date, media_path, None))
+            (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
 
-        #TODO load transcript
-        #TODO transcript contains SynchPoints AKA timestamps
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                self.load_transcript_with_codings_and_syncpoints(id_, creating_user, e)
 
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
-                self._load_codings_for_audio_video(id_, e)
+                self.load_codings_for_audio_video(id_, e)
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, id_, creating_user)
 
     def load_video_source(self, element):
         """ Load this video source into .
         Load the description and codings into sqlite.
+        Can manage internal and absolute source paths.
+        TODO relative
+
+        Params:
+            element: VideoSource element object
         """
 
-        #TODO absolute and relative
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
-
-        # Copy file into .qda video folder and rename into original name
-        #print(source_path)
-        destination = self.app.project_path + "/video/" + name
-        media_path = "/video/" + name
-        #print(destination)
-        try:
-            shutil.copyfile(source_path, destination)
-        except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
-
+        if path_type == "internal":
+            # Copy file into .qda video folder and rename into original name
+            destination = self.app.project_path + "/video/" + name
+            media_path = "/video/" + name
+            try:
+                shutil.copyfile(source_path, destination)
+            except Exception as e:
+                self.parent_textEdit.append(_('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "absolute":
+            media_path = "video:" + source_path
+        if path_type == "relative":
+            #TODO check relative import works
+            media_path = "video:" + self.base_path + source_path
+            #print(source_path, media_path)
+        memo = ""
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, '', creating_user, create_date, media_path, None))
+            (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
 
-        #TODO load transcript
-        #TODO transcript contains SynchPoints AKA timestamps
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                self.load_transcript_with_codings_and_syncpoints(id_, creating_user, e)
 
         # Parse VideoSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
-                self._load_codings_for_audio_video(id_, e)
+                self.load_codings_for_audio_video(id_, e)
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, id_, creating_user)
 
-    def _load_codings_for_audio_video(self, id_, element):
+    def load_transcript_with_codings_and_syncpoints(self, id_, creating_user, element):
+        """ Load the transcript text. Load the synchpoints.
+         Load the transcript codings.
+         Called by: load_audio_source, load_video_source
+
+         Param:
+            id_     : source id in sqlite, Integer
+            creating_uer    : user who created source, String
+            element     : the Transcript element object
+         """
+
+        #TODO
+        print("Transcript", element.tag)
+
+        # Syncpoints
+        """
+        <SyncPoint guid="58716919-f62e-4f2a-b386-6ceb1ebbd859" position="3044" timeStamp="155000" />
+        """
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}SyncPoint":
+                print("SyncPoint")
+
+        # Transcript selections
+        """
+        <TranscriptSelection guid="fea90668-ed71-4cd9-a47e-23d588f4207e" name="Brighton_Storm.mp4.transcribed" fromSyncPoint="28b27114-5284-4481-837d-dc0d98a5a9a8" toSyncPoint="a687db0f-d12d-401d-b9e3-405dcb2b7879">
+        <Coding guid="7f0fa382-05fe-4c93-b0f7-182a4c2eb7b1" >
+        <CodeRef targetGUID="a3825924-8bf7-47c1-a51b-be9196147a56" />
+        </Coding></TranscriptSelection>
+        """
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}TranscriptSelection":
+                print(e.tag)
+
+
+    def load_codings_for_audio_video(self, id_, element):
         """ Load coded segments for audio and video
         Example format:
         <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100" guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
@@ -790,8 +844,14 @@ class Refi_import():
         seg_end = int(element.get("end"))
         memo = element.get("name")
         create_date = element.get("creationDateTime")
-        create_date = create_date.replace('T', ' ')
-        create_date = create_date.replace('Z', '')
+        try:
+            create_date = create_date.replace('T', ' ')
+            create_date = create_date.replace('Z', '')
+        except AttributeError as e:
+            # None type object ??
+            print(e)
+            create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
+
         creating_user_guid = element.get("creatingUser")
         creating_user = "default"
         for u in self.users:
@@ -813,21 +873,30 @@ class Refi_import():
                 self.app.conn.commit()
 
     def load_pdf_source(self, element):
-        """ Load the pdf and text representation into sqlite. """
+        """ Load the pdf and text representation into sqlite.
+        Can manage internal and absolute source paths.
 
-        #TODO absolute and relative
+        Params:
+            element: PDFSource element object
+        """
+
+        #TODO relative
 
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
-
-        # Copy file into .qda documents folder and rename into original name
-        #print(source_path)
-        destination = self.app.project_path + "/documents/" + name
-        #print(destination)
-        try:
-            shutil.copyfile(source_path, destination)
-            print("PDF IMPORT", source_path, destination)
-        except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "internal":
+            # Copy file into .qda documents folder and rename into original name
+            destination = self.app.project_path + "/documents/" + name
+            try:
+                shutil.copyfile(source_path, destination)
+                print("PDF IMPORT", source_path, destination)
+            except Exception as e:
+                self.parent_textEdit.append(_('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+        if path_type == "absolute":
+            media_path = "docs:" + source_path
+        if path_type == "relative":
+            #TODO check this works
+            media_path = "docs:" + self.base_path + source_path
+            #print(source_path, media_path)
 
         """ The PDF source contains a text representation:
         <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
@@ -853,7 +922,11 @@ class Refi_import():
         """ Load this text source into sqlite.
          Add the description and the text codings.
          When testing with Windows Nvivo export: import from docx or txt
-         the text may need an additional line-ending character.
+         The text may need an additional line-ending character.
+        Can manage internal and absolute source paths.
+
+        Params:
+            element: TextSource element object
          """
 
         #TODO absolute and relative
@@ -887,9 +960,6 @@ class Refi_import():
         try:
             with open(source_path, encoding='utf-8', errors='replace') as f:
                 fulltext = f.read()
-                #if fulltext[0:6] == "\ufeff":  # associated with notepad files
-                #    fulltext = fulltext[6:]
-
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
                 # Due to 2 character line endings
                 #TODO TEST if importing Windows endings on Windows OS that it requires the 2 char line-ending replacement
@@ -906,12 +976,14 @@ class Refi_import():
                 self.sources.append(source)
         except Exception as e:
             self.parent_textEdit.append(_("Cannot read from TextSource: ") + source_path + "\n" + str(e))
-        destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
-        try:
-            shutil.copyfile(source_path, destination)
-            #print("TEXT IMPORT", source_path, destination)
-        except Exception as e:
-            self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        if path_type == "internal":
+            # Copy file into .qda documents folder and rename into original name
+            destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
+            try:
+                shutil.copyfile(source_path, destination)
+            except Exception as e:
+                self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
 
         # Parse forPlainTextSelection elements for Coding elements and VariableValues
         for e in element.getchildren():
