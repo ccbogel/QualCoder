@@ -330,12 +330,6 @@ class Refi_import():
                 count = self.parse_variables(c)
                 self.parent_textEdit.append(_("Parse file variables. Loaded: ") + str(count[0]))
                 self.parent_textEdit.append(_("Parse case variables. Loaded: ") + str(count[1]))
-            if c.tag == "{urn:QDA-XML:project:1.0}Cases":
-                count = self.parse_cases(c)
-                self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
-            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
-                count = self.parse_sources(c)
-                self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
                 count = self.parse_notes(c)
                 self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
@@ -343,8 +337,22 @@ class Refi_import():
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
             QtWidgets.QApplication.processEvents()
+
+        # Parse cases and sources after the variables components parsed
+        # Need to fill placeholders and values for variables for sources and cases
+        #TODO
+        children = root.getchildren()
+        for c in children:
+            # print(c.tag)
+            if c.tag == "{urn:QDA-XML:project:1.0}Cases":
+                count = self.parse_cases(c)
+                self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
+            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
+                count = self.parse_sources(c)
+                self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
         self.clean_up_case_codes_and_case_text()
         self.parent_textEdit.append(self.file_path + _(" loaded."))
+
         # Remove temporary extract folder
         try:
             shutil.rmtree(self.folder_name)
@@ -644,10 +652,12 @@ class Refi_import():
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
 
-        # Parse PictureSelection elements for Coding elements and load these
+        # Parse PictureSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
                 self._load_codings_for_picture(id_, e)
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
 
     def _load_codings_for_picture(self, id_, element):
         """ Load coded rectangles for pictures
@@ -690,6 +700,8 @@ class Refi_import():
                     width, height, cid, memo, create_date, creating_user))
                 self.app.conn.commit()
 
+
+
     def load_audio_source(self, element):
         """ Load audio source into .
         Load the description and codings into sqlite.
@@ -721,10 +733,12 @@ class Refi_import():
         #TODO load transcript
         #TODO transcript contains SynchPoints AKA timestamps
 
-        # Parse AudioSelection elements and load these codings
+        # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
                 self._load_codings_for_audio_video(id_, e)
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
 
     def load_video_source(self, element):
         """ Load this video source into .
@@ -754,10 +768,12 @@ class Refi_import():
         #TODO load transcript
         #TODO transcript contains SynchPoints AKA timestamps
 
-        # Parse VideoSelection elements and load these codings
+        # Parse VideoSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
                 self._load_codings_for_audio_video(id_, e)
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
 
     def _load_codings_for_audio_video(self, id_, element):
         """ Load coded segments for audio and video
@@ -840,7 +856,7 @@ class Refi_import():
          the text may need an additional line-ending character.
          """
 
-        #TODO absolute and relativeg
+        #TODO absolute and relative
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
 
         cur = self.app.conn.cursor()
@@ -896,10 +912,50 @@ class Refi_import():
             #print("TEXT IMPORT", source_path, destination)
         except Exception as e:
             self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
-        # Parse PlainTextSelection elements for Coding elements and load these
+
+        # Parse forPlainTextSelection elements for Coding elements and VariableValues
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
                 self._load_codings_for_text(source, e)
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
+
+    def parse_variable_value(self, element, id_, creating_user):
+        """ Parse VariableValue element.
+        Needs two parses - one to get the variable name and one to get the value.
+        Enter details into attributes table.
+        Called from load_picture_source, load_text_source, load_audio_source, load_video_source
+
+        Params:
+            element : VariableValue xml element object
+            id_ : File id of source, Integer
+            creating_user : The user who created this source, String
+        """
+
+        value_types = ["{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}TextValue",
+                "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                "{urn:QDA-XML:project:1.0}DateTimeValue", "{urn:QDA-XML:project:1.0}BooleanValue"]
+
+        var_name = ""
+        value = ""
+        for var_el in element.getchildren():
+            if var_el.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                guid = var_el.get("targetGUID")
+                for v in self.variables:
+                    if v['guid'] == guid:
+                        var_name = v['name']
+                        break
+        # Need to parse the element children twice, otherwise may miss the needed element
+        for var_el in element.getchildren():
+            if var_el.tag in value_types and var_el.text is not None:
+                value = var_el.text
+                value = value.strip()
+        # print("varname:", var_name, " value:",value)
+        cur = self.app.conn.cursor()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
+        placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
+        cur.execute(insert_sql, placeholders)
+        self.app.conn.commit()
 
     def _load_codings_for_text(self, source, element):
         """ These are PlainTextSelection elements.
