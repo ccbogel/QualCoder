@@ -739,7 +739,7 @@ class Refi_import():
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
-                self.load_transcript_with_codings_and_syncpoints(id_, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(id_, creating_user, e)
 
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
@@ -786,7 +786,7 @@ class Refi_import():
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
-                self.load_transcript_with_codings_and_syncpoints(id_, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(id_, creating_user, e)
 
         # Parse VideoSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
@@ -795,7 +795,7 @@ class Refi_import():
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, id_, creating_user)
 
-    def load_transcript_with_codings_and_syncpoints(self, id_, creating_user, element):
+    def parse_transcript_with_codings_and_syncpoints(self, id_, creating_user, element):
         """ Load the transcript text. Load the synchpoints.
          Load the transcript codings.
          Called by: load_audio_source, load_video_source
@@ -806,9 +806,9 @@ class Refi_import():
             element     : the Transcript element object
          """
 
-        #TODO
-        print("Transcript", element.tag)
-
+        #TODO WORK IN PROGRESS
+        print("Transcript", element.tag, "WORK IN PROGRESS")
+        '''
         # Syncpoints
         """
         <SyncPoint guid="58716919-f62e-4f2a-b386-6ceb1ebbd859" position="3044" timeStamp="155000" />
@@ -827,6 +827,7 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}TranscriptSelection":
                 print(e.tag)
+        '''
 
 
     def load_codings_for_audio_video(self, id_, element):
