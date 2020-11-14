@@ -1116,8 +1116,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard.
-        CURRENTLY WORKING ON AT 2 Gb FILE SIZE LIMITS AND USE OF
-        RELATIVE AND ABSOLUTE PATHS FOR IMPORT
+        TODO test relative paths on import
+        TODO transcript import - needs work
          """
 
         self.close_project()
@@ -1137,9 +1137,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
         msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
-        msg += "Audio, video, transcripts, transcript codings and synchpoints not tested.\n"
+        msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
         msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "External sources over 2GB not imported or linked to."
+        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. "
+        msg += "All variables are stored as text, but cast as text or float during operations.\n"
+        msg += "Relative paths untested."
         msg += "\n\nPlease, change the coder name in Settings to the current coder name\notherwise coded text and media may appear uncoded."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", _(msg))
 
