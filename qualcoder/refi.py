@@ -1792,8 +1792,8 @@ class Refi_export(QtWidgets.QDialog):
             xml += '<PlainTextSelection guid="' + self.create_guid() + '" '
             xml += 'startPosition="' + str(r[2]) + '" '
             xml += 'endPosition="' + str(r[3]) + '" '
-            # Semi-colons may cause parsong problems
-            xml += 'name="' + str(r[1]) + '" '
+            # Ampersands may cause parsing problems
+            xml += 'name="' + str(r[1]).replace('&', '&#038;') + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
