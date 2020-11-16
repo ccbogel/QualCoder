@@ -94,7 +94,7 @@ class Ui_Dialog_Import(object):
         self.comboBox_quote.setItemText(0, _translate("Dialog_Import", "NONE"))
         self.comboBox_quote.setItemText(1, _translate("Dialog_Import", "MINIMAL"))
         self.comboBox_quote.setItemText(2, _translate("Dialog_Import", "ALL"))
-        self.label_information.setText(_translate("Dialog_Import", "Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (atrtribute) to Qualitative (creates a text file from the text)."))
+        self.label_information.setText(_translate("Dialog_Import", "Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text)."))
 
 
 if __name__ == "__main__":
