@@ -55,6 +55,7 @@ from import_survey import DialogImportSurvey
 from information import DialogInformation
 from journals import DialogJournals
 from manage_files import DialogManageFiles
+from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
@@ -409,7 +410,8 @@ class App(object):
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
         'bookmark_file_id', 'bookmark_pos', 'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
-        'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1'
+        'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
+        'dialogmanagelinks_w', 'dialogmanagelinks_h'
         ]
         for key in keys:
             if key not in data:
@@ -526,7 +528,9 @@ class App(object):
             'dialogcodecrossovers_w': 0,
             'dialogcodecrossovers_h': 0,
             'dialogcodecrossovers_splitter0': 0,
-            'dialogcodecrossovers_splitter1': 0
+            'dialogcodecrossovers_splitter1': 0,
+            'dialogmanagelinks_w': 0,
+            'dialogmanagelinks_h': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -641,6 +645,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setShortcut('Alt+A')
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
         self.ui.actionImport_survey.setShortcut('Alt+I')
+        self.ui.actionManage_bad_links_to_files.triggered.connect(self.fix_bad_file_links)
 
         # codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
@@ -739,7 +744,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def hide_menu_options(self):
         """ No project opened, hide most menu options.
-         Enable project import options."""
+         Enable project import options.
+         Called by init and by close_project. """
 
         # project menu
         self.ui.actionClose_Project.setEnabled(False)
@@ -756,6 +762,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_cases.setEnabled(False)
         self.ui.actionManage_attributes.setEnabled(False)
         self.ui.actionImport_survey.setEnabled(False)
+        self.ui.actionManage_bad_links_to_files.setEnabled(False)
         # codes menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
@@ -968,6 +975,16 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()
         self.clean_dialog_refs()
 
+    def fix_bad_file_links(self):
+        """ Fix any bad links to files. """
+
+        ui = DialogManageLinks(self.app, self.ui.textEdit)
+        ui.exec_()
+        self.clean_dialog_refs()
+        bad_links = self.app.check_bad_file_links()
+        if bad_links == []:
+            self.ui.actionManage_bad_links_to_files.setEnabled(False)
+
     def journals(self):
         """ Create and edit journals. """
 
@@ -1117,7 +1134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard.
         TODO test relative paths on import
-        TODO transcript import - needs work
+        TODO transcript import - needs work and testing
          """
 
         self.close_project()
@@ -1139,11 +1156,12 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
         msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
         msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. "
+        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. \n"
         msg += "All variables are stored as text, but cast as text or float during operations.\n"
-        msg += "Relative paths untested."
+        msg += "Relative paths untested.\n"
         msg += "\n\nPlease, change the coder name in Settings to the current coder name\notherwise coded text and media may appear uncoded."
         QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", _(msg))
+        self.project_summary_report()
 
     def rqda_project_import(self):
         """ Import an RQDA format project into a new project space. """
@@ -1386,11 +1404,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.save_backup()
         msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
-        bad_links = self.app.check_bad_file_links()
-        if bad_links:
-            self.ui.textEdit.append('<span style="color:red">' + _("Bad links to files") + "</span>")
-            for l in bad_links:
-                self.ui.textEdit.append('<span style="color:red">' + l['name'] + "   " + l['mediapath'] + '</span>')
         self.project_summary_report()
         self.show_menu_options()
 
@@ -1422,8 +1435,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.delete_backup_path_name = backup
 
     def project_summary_report(self):
-        """ Add a summary of the project to the tet edit.
-         Display project memo, and code, attribute, journal, files frequencies."""
+        """ Add a summary of the project to the text edit.
+         Display project memo, and code, attribute, journal, files frequencies.
+         Also detect and display bad links to linked files. """
 
         os_type = platform.system()
         if self.app.conn is None:
@@ -1476,8 +1490,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
-        msg += "\n========\n"
         self.ui.textEdit.append(msg)
+
+        bad_links = self.app.check_bad_file_links()
+        if bad_links:
+            self.ui.textEdit.append('<span style="color:red">' + _("Bad links to files") + "</span>")
+            for l in bad_links:
+                self.ui.textEdit.append('<span style="color:red">' + l['name'] + "   " + l['mediapath'] + '</span>')
+            self.ui.actionManage_bad_links_to_files.setEnabled(True)
+        else:
+            self.ui.actionManage_bad_links_to_files.setEnabled(False)
+        self.ui.textEdit.append("\n========\n")
 
     def close_project(self):
         """ Close an open project. """
