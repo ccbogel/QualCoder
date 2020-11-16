@@ -231,7 +231,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
          Need to add placeholder attribute values for these, if missing.
-         Similarly,if a file is delete, check and reomve any isolated attribute values. """
+         Also,if a file is deleted, check and remove any isolated attribute values. """
 
         cur = self.app.conn.cursor()
         sql = "select id from source "
@@ -1340,7 +1340,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if len(rows) == 0:
             return
         # Currently single selection mode in tableWidget, 1 row only, so rows[0]
-        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath']:
+        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
+                and (self.source[rows[0]]['fulltext'] is None or self.source[rows[0]]['fulltext'] == ""):
             mb = QtWidgets.QMessageBox()
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('Cannot Export'))
@@ -1349,6 +1350,18 @@ class DialogManageFiles(QtWidgets.QDialog):
             mb.setText(msg)
             mb.exec_()
             return
+        # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
+        text_rep = False
+        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
+                and self.source[rows[0]]['fulltext'] != "":
+            mb = QtWidgets.QMessageBox()
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            mb.setWindowTitle(_('Can Export text'))
+            msg = _("This is a linked file. Will export text representation.") + "\n"
+            msg += self.source[rows[0]]['mediapath'].split(':')[1]
+            mb.setText(msg)
+            mb.exec_()
+            text_rep = True
 
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -1372,7 +1385,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         filename = self.source[row]['name']
 
         # export audio, video, picture files
-        if self.source[row]['mediapath'] is not None:
+        if self.source[row]['mediapath'] is not None and text_rep is False:
             file_path = self.app.project_path + self.source[row]['mediapath']
             destination = directory + "/" + filename
             try:
@@ -1380,20 +1393,20 @@ class DialogManageFiles(QtWidgets.QDialog):
                 msg += destination + "\n"
             except FileNotFoundError:
                 pass
+
         # export pdf, docx, odt, epub, html files if located in documents directory
-        original_document_stored = True
-        if self.source[row]['mediapath'] is None:
-            file_path = self.app.project_path + "/documents/" + self.source[row]['name']
+        document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
+        if document_stored and self.source[row]['mediapath'] is None:
             destination = directory + "/" + self.source[row]['name']
             try:
-                copyfile(file_path, destination)
+                copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
                 msg += destination + "\n"
             except FileNotFoundError as e:
-                print(e)
                 logger.warning(str(e))
-                original_document_stored = False
-        # Export transcribed files and for user created text files within QualCoder
-        if self.source[row]['mediapath'] is None and not original_document_stored:
+                document_stored = False
+
+        # Export transcribed files, user created text files, text representations of linked files
+        if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:') and not document_stored:
             filename_txt = filename + ".txt"
             filename_txt = directory + "/" + filename_txt
             filedata = self.source[row]['fulltext']
