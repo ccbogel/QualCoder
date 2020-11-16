@@ -37,7 +37,7 @@ class Ui_Dialog_manage_links(object):
     def retranslateUi(self, Dialog_manage_links):
         _translate = QtCore.QCoreApplication.translate
         Dialog_manage_links.setWindowTitle(_translate("Dialog_manage_links", "Manage file links"))
-        self.label_1.setText(_translate("Dialog_manage_links", "Click on the file name to browse to the file. Or double-click to type in the new path."))
+        self.label_1.setText(_translate("Dialog_manage_links", "Click on the file name to browse to the correct file location."))
 
 
 if __name__ == "__main__":
