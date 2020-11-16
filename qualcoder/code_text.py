@@ -89,6 +89,7 @@ class DialogCodeText(QtWidgets.QWidget):
     search_indices = []
     search_index = 0
     eventFilter = None
+    autocode_history = [] # A list of dictionaryies {title, list of dictionary of sql commands}
 
     def __init__(self, app, parent_textEdit, dialog_list):
 
@@ -1545,8 +1546,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.delete_backup = False
         except Exception as e:
             logger.debug(str(e))
-        # Update filter for tooltip
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
+
+        # Update filter for tooltip and update code colours
+        self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
     def unmark(self, location):
@@ -1583,7 +1585,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.code_text.remove(to_unmark)
 
         # Update filter for tooltip and update code colours
-        #self.eventFilterTT.setCodes(self.code_text, self.codes)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
@@ -1664,6 +1665,9 @@ class DialogCodeText(QtWidgets.QWidget):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_code_sentences = None
+        action_autocode_undo = None
+        if self.autocode_history != []:
+            action_autocode_undo = menu.addAction(_("Undo autocoding"))
         if self.filename is not None:
             action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
         action_code_sentences_all = menu.addAction(_("Text fragment to code_sentences. All text files."))
@@ -1675,6 +1679,32 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_code_sentences_all:
             self.code_sentences(item, "all")
             return
+        if action == action_autocode_undo:
+            self.undo_autocoding()
+            return
+
+    def undo_autocoding(self):
+        """ Present a list of choices for the undo operation.
+         Use selects and undoes the chosen autocoding operation.
+         The autocode_history is a list of dictionaries with 'name' and 'sql_list' """
+
+        ui = DialogSelectItems(self.app, self.autocode_history, _("Select auto-codings to undo"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        undo = ui.get_selected()
+        self.autocode_history.remove(undo)
+
+        # Run all sqls
+        cur = self.app.conn.cursor()
+        for i in undo['sql_list']:
+            cur.execute(i['sql'], [i['cid'], i['fid'], i['pos0'], i['pos1'], i['owner']])
+        self.app.conn.commit()
+        self.ui.textEdit.append(_("Undo autocoding: " + undo['name'] + "\n"))
+
+        # Update filter for tooltip and update code colours
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
 
     def code_sentences(self, item, all=""):
         """ Code full sentence based on text fragment.
@@ -1685,14 +1715,14 @@ class DialogCodeText(QtWidgets.QWidget):
             all = "all" :  for all text files.
         """
 
-        item = self.ui.treeWidget.currentItem()
+        code_item = self.ui.treeWidget.currentItem()
         if item is None:
             QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
                 QtWidgets.QMessageBox.Ok)
             return
-        if item.text(1)[0:3] == 'cat':
+        if code_item.text(1)[0:3] == 'cat':
             return
-        cid = int(item.text(1).split(':')[1])
+        cid = int(code_item.text(1).split(':')[1])
 
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -1729,6 +1759,7 @@ class DialogCodeText(QtWidgets.QWidget):
             files = self.app.get_file_texts([self.filename['id'], ])
         cur = self.app.conn.cursor()
         msg = ""
+        undo_list = []
         for f in files:
             sentences = f['fulltext'].split(ending)
             pos0 = 0
@@ -1747,11 +1778,21 @@ class DialogCodeText(QtWidgets.QWidget):
                             , (i['cid'], i['fid'], i['seltext'], i['pos0'],
                             i['pos1'], i['owner'], i['memo'], i['date']))
                         self.app.conn.commit()
+                        # Record a list of undo sql
+                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                            "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'], "owner": i['owner']
+                            }
+                        undo_list.append(undo)
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                 pos0 += len(sentence) + len(ending)
             if codes_added > 0:
                 msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
+        if len(undo_list) > 0:
+            name = _("Sentence coding: ") + _("\nCode: ") + code_item.text(0)
+            name += _("\nWith: ") + text + _("\nUsing line ending: ") + ending
+            undo_dict = {"name": name, "sql_list": undo_list}
+            self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:") \
             + _("\nCode: ") + item.text(0)
             + _("\nWith text fragment: ") + text  + _("\nUsing line ending: ") + ending + "\n" + msg)
@@ -1765,14 +1806,14 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Autocode text in one file or all files with currently selected code.
         """
 
-        item = self.ui.treeWidget.currentItem()
-        if item is None:
+        code_item = self.ui.treeWidget.currentItem()
+        if code_item is None:
             QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
                 QtWidgets.QMessageBox.Ok)
             return
-        if item.text(1)[0:3] == 'cat':
+        if code_item.text(1)[0:3] == 'cat':
             return
-        cid = int(item.text(1).split(':')[1])
+        cid = int(code_item.text(1).split(':')[1])
         # Input dialog too narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -1780,7 +1821,7 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
-        dialog.setLabelText(_("Autocode files with the current code for this text:") + "\n" + item.text(0))
+        dialog.setLabelText(_("Autocode files with the current code for this text:") + "\n" + code_item.text(0))
         dialog.resize(200, 20)
         ok = dialog.exec_()
         if not ok:
@@ -1804,6 +1845,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(files) == 0:
             return
 
+        undo_list = []
         cur = self.app.conn.cursor()
         for txt in texts:
             filenames = ""
@@ -1828,12 +1870,21 @@ class DialogCodeText(QtWidgets.QWidget):
                             , (item['cid'], item['fid'], item['seltext'], item['pos0'],
                             item['pos1'], item['owner'], item['memo'], item['date']))
                         self.app.conn.commit()
+                        # Record a list of undo sql
+                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                            "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'], "owner": item['owner']
+                            }
+                        undo_list.append(undo)
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
                     + _(". with text: ") + txt)
-
+        if len(undo_list) > 0:
+            name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
+            name += _("\nWith: ") + find_text
+            undo_dict = {"name": name, "sql_list": undo_list}
+            self.autocode_history.insert(0, undo_dict)
         # Update tooltip filter and code tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
