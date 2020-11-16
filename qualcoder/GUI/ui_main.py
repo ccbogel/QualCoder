@@ -141,6 +141,11 @@ class Ui_MainWindow(object):
         self.actionNone.setObjectName("actionNone")
         self.actionCode_relations = QtWidgets.QAction(MainWindow)
         self.actionCode_relations.setObjectName("actionCode_relations")
+        self.actionExport_coded_text_as_html = QtWidgets.QAction(MainWindow)
+        self.actionExport_coded_text_as_html.setObjectName("actionExport_coded_text_as_html")
+        self.actionManage_bad_links_to_files = QtWidgets.QAction(MainWindow)
+        self.actionManage_bad_links_to_files.setEnabled(False)
+        self.actionManage_bad_links_to_files.setObjectName("actionManage_bad_links_to_files")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -165,6 +170,7 @@ class Ui_MainWindow(object):
         self.menuFiles_and_Cases.addAction(self.actionManage_cases)
         self.menuFiles_and_Cases.addAction(self.actionManage_journals)
         self.menuFiles_and_Cases.addAction(self.actionManage_attributes)
+        self.menuFiles_and_Cases.addAction(self.actionManage_bad_links_to_files)
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
@@ -241,6 +247,8 @@ class Ui_MainWindow(object):
         self.actionProject_summary.setText(_translate("MainWindow", "Project summary"))
         self.actionNone.setText(_translate("MainWindow", "None"))
         self.actionCode_relations.setText(_translate("MainWindow", "Code relations"))
+        self.actionExport_coded_text_as_html.setText(_translate("MainWindow", "Export coded text as html"))
+        self.actionManage_bad_links_to_files.setText(_translate("MainWindow", "Manage bad links to files"))
 
 
 if __name__ == "__main__":
