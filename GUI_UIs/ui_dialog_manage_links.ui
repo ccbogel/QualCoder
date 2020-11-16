@@ -39,7 +39,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_1">
      <property name="text">
-      <string>Click on the file name to browse to the file. Or double-click to type in the new path.</string>
+      <string>Click on the file name to browse to the correct file location.</string>
      </property>
     </widget>
    </item>
