@@ -89,7 +89,7 @@ class DialogCodeText(QtWidgets.QWidget):
     search_indices = []
     search_index = 0
     eventFilter = None
-    autocode_history = [] # A list of dictionaryies {title, list of dictionary of sql commands}
+    autocode_history = [] # A list of dictionaries {title, list of dictionary of sql commands}
 
     def __init__(self, app, parent_textEdit, dialog_list):
 
@@ -1667,7 +1667,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_code_sentences = None
         action_autocode_undo = None
         if self.autocode_history != []:
-            action_autocode_undo = menu.addAction(_("Undo autocoding"))
+            action_autocode_undo = menu.addAction(_("Undo auto coding"))
         if self.filename is not None:
             action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
         action_code_sentences_all = menu.addAction(_("Text fragment to code_sentences. All text files."))
@@ -1729,7 +1729,7 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog.setWindowTitle(_("Code sentence"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
-        dialog.setLabelText(_("Autocode sentence using this text fragment:"))
+        dialog.setLabelText(_("Auto code sentence using this text fragment:"))
         dialog.resize(200, 20)
         ok = dialog.exec_()
         if not ok:
@@ -1821,7 +1821,7 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
-        dialog.setLabelText(_("Autocode files with the current code for this text:") + "\n" + code_item.text(0))
+        dialog.setLabelText(_("Auto code files with the current code for this text:") + "\n" + code_item.text(0))
         dialog.resize(200, 20)
         ok = dialog.exec_()
         if not ok:
