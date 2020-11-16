@@ -101,6 +101,7 @@
     <addaction name="actionManage_cases"/>
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
+    <addaction name="actionManage_bad_links_to_files"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -337,6 +338,19 @@
   <action name="actionCode_relations">
    <property name="text">
     <string>Code relations</string>
+   </property>
+  </action>
+  <action name="actionExport_coded_text_as_html">
+   <property name="text">
+    <string>Export coded text as html</string>
+   </property>
+  </action>
+  <action name="actionManage_bad_links_to_files">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Manage bad links to files</string>
    </property>
   </action>
  </widget>
