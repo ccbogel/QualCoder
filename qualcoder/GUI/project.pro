@@ -13,6 +13,7 @@ ui_dialog_information.py \
 ui_dialog_journals.py \
 ui_dialog_manage_attributes.py \
 ui_dialog_manage_files.py \
+ui_dialog_manage_links.py \
 ui_dialog_memo.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_codings.py \
