@@ -32,7 +32,7 @@ On some Linux versions you will need to install pip
 
 You also need to run this command from the terminal for pdf importing:
 
-`sudo python3 -m pip install pdfminer.six openpyxl`
+`sudo python3 -m pip install pdfminer.six openpyxl ebooklib`
 
 If not using the debian package:
 
