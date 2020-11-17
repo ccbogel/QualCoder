@@ -502,8 +502,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
         if action == action_set_bookmark:
-            self.app.settings['bookmark_file_id'] = str(self.filename['id'])
-            self.app.settings['bookmark_pos'] = str(cursor.position())
+            cur = self.app.conn.cursor()
+            cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.filename['id'], cursor.position()])
+            self.app.conn.commit()
 
     def change_code_pos(self, location, start_or_end):
         if self.filename == {}:
@@ -1268,12 +1269,15 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.load_file(f)
                     return
         if action == action_go_to_bookmark:
+            cur = self.app.conn.cursor()
+            cur.execute("select bookmarkfile, bookmarkpos from project")
+            result = cur.fetchone()
             for f in self.filenames:
-                if f['id'] == int(self.app.settings['bookmark_file_id']):
+                if f['id'] == result[0]:
                     try:
                         self.load_file(f)
                         textCursor = self.ui.textEdit.textCursor()
-                        textCursor.setPosition(int(self.app.settings['bookmark_pos']))
+                        textCursor.setPosition(result[1])
                         self.ui.textEdit.setTextCursor(textCursor)
                     except Exception as e:
                         logger.debug(str(e))

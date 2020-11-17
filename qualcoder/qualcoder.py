@@ -339,7 +339,7 @@ class App(object):
         """ Check all linked files are present.
          Called from MainWindow.open_project, view_av.
          Returns:
-             dicitonary of id,name, mediapath for bad links
+             dictionary of id,name, mediapath for bad links
          """
 
         cur = self.conn.cursor()
@@ -409,9 +409,9 @@ class App(object):
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
-        'bookmark_file_id', 'bookmark_pos', 'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
+        'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
-        'dialogmanagelinks_w', 'dialogmanagelinks_h'
+        'dialogmanagelinks_w', 'dialogmanagelinks_h',
         ]
         for key in keys:
             if key not in data:
@@ -523,14 +523,12 @@ class App(object):
             'dialogviewav_h': 0,
             'viewav_abs_pos_x': 0,
             'viewav_abs_pos_y': 0,
-            'bookmark_file_id': 0,
-            'bookmark_pos': 0,
             'dialogcodecrossovers_w': 0,
             'dialogcodecrossovers_h': 0,
             'dialogcodecrossovers_splitter0': 0,
             'dialogcodecrossovers_splitter1': 0,
             'dialogmanagelinks_w': 0,
-            'dialogmanagelinks_h': 0
+            'dialogmanagelinks_h': 0,
         }
 
     def get_file_texts(self, fileids=None):
@@ -1249,7 +1247,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
         self.app.create_connection(self.app.project_path)
         cur = self.app.conn.cursor()
-        cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text);")
+        cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
         cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text);")
@@ -1397,6 +1395,13 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select avid from code_text")
         except:
             cur.execute("ALTER TABLE code_text ADD avid integer;")
+            self.app.conn.commit()
+        try:
+            cur.execute("select bookmarkfile from project")
+        except:
+            cur.execute("ALTER TABLE project ADD bookmarkfile integer;")
+            self.app.conn.commit()
+            cur.execute("ALTER TABLE project ADD bookmarkpos integer;")
             self.app.conn.commit()
 
         # Save a date and 24hour stamped backup
