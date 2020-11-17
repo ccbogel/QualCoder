@@ -2,6 +2,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 from information import DialogInformation
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
@@ -15,8 +17,25 @@ def msecs_to_mins_and_secs(msecs):
     return str(mins) + "." + remainder_secs
 
 
+class Message(QtWidgets.QMessageBox):
+    """ This is called a lot , but is styled to font size """
+    def __init__(self, app, title, text, icon=None):
+        QtWidgets.QMessageBox.__init__(self)
+        
+        self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
+        self.setWindowTitle(title)
+        self.setText(text)
+        if icon == "warning":
+            self.setIcon(QtWidgets.QMessageBox.Warning)
+        if icon == "Information":
+            self.setIcon(QtWidgets.QMessageBox.Information)
+        if icon == "critical":
+            self.setIcon(QtWidgets.QMessageBox.Critical)
+
+
 #TODO check if this is used anywhere
-class CodedMediaMixin_OLD:
+# Delete otherwise
+'''class CodedMediaMixin_OLD:
     def coded_media(self, data):
         """ Display all coded media for this code.
         Coded media comes from ALL files and ALL coders.
@@ -82,4 +101,4 @@ class CodedMediaMixin_OLD:
             end = msecs_to_mins_and_secs(row[4])
             ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] Coder: ' + row[6])
             ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
-        ui.exec_()
+        ui.exec_()'''

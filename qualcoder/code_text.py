@@ -43,7 +43,7 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
-from helpers import msecs_to_mins_and_secs
+from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
@@ -629,7 +629,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Input dialog narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
         dialog.setLabelText(_("Show codes containing the text. (Blank for all)"))
@@ -1665,22 +1665,19 @@ class DialogCodeText(QtWidgets.QWidget):
 
         item = self.ui.treeWidget.currentItem()
         if item is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
-                QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
         if item.text(1)[0:3] == 'cat':
             return
-
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_code_sentences = None
-        action_autocode_undo = None
-        if self.autocode_history != []:
-            action_autocode_undo = menu.addAction(_("Undo auto coding"))
-        if self.filename is not None:
-            action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
+        action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
+        if self.filename is None:
+            action_code_sentences.setEnabled(False)
         action_code_sentences_all = menu.addAction(_("Text fragment to code_sentences. All text files."))
-
+        action_autocode_undo = menu.addAction(_("Undo auto coding"))
+        if self.autocode_history == []:
+            action_autocode_undo.setEnabled(False)
         action = menu.exec_(self.ui.pushButton_auto_code.mapToGlobal(position))
         if action == action_code_sentences:
             self.code_sentences(item, "")
@@ -1726,13 +1723,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
         code_item = self.ui.treeWidget.currentItem()
         if item is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
-                QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
         if code_item.text(1)[0:3] == 'cat':
             return
         cid = int(code_item.text(1).split(':')[1])
-
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Code sentence"))
@@ -1751,8 +1746,8 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog2.setWindowTitle(_("Code sentence"))
         dialog2.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog2.setInputMode(QtWidgets.QInputDialog.TextInput)
-        dialog2.setToolTip(_("Default is period space. Do not use line endings such as \\n"))
-        dialog2.setLabelText(_("Define sentence ending:"))
+        dialog2.setToolTip(_("Do not use line endings such as \\n"))
+        dialog2.setLabelText(_("Define sentence ending (Default is period space. ):"))
         dialog2.setTextValue(". ")
         dialog2.resize(200, 20)
         ok2 = dialog2.exec_()
