@@ -1448,7 +1448,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.conn is None:
             return
         cur = self.app.conn.cursor()
-        cur.execute("select databaseversion, date, memo, about from project")
+        cur.execute("select databaseversion, date, memo, about, bookmarkfile,bookmarkpos from project")
         result = cur.fetchall()[-1]
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
@@ -1489,9 +1489,11 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(sql)
         res = cur.fetchone()
         msg += _("Journals: ") + str(res[0])
-
-        msg += "\nText Bookmark: " + str(self.app.settings['bookmark_file_id'])
-        msg += ", position: " + str(self.app.settings['bookmark_pos'])
+        cur.execute("select name from source where id=?", [result[4],])
+        bookmark_filename = cur.fetchone()
+        if bookmark_filename is not None and result[5] is not None:
+            msg += "\nText Bookmark: " + str(bookmark_filename[0])
+            msg += ", position: " + str(result[5])
 
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
