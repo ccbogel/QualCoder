@@ -22,6 +22,10 @@ You can install the latest debian package from https://github.com/ccbogel/QualCo
 
 You may need to add unstable repos as described at https://www.binarytides.com/enable-testing-repo-debian/
 
+Install these modules fro mthe command line
+
+`sudo apt install python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
+
 On some Linux versions you will need to install pip
 
 `sudo apt install python3-pip`
