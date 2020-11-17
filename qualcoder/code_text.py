@@ -1296,8 +1296,6 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.filename == []:
                 return
             self.load_file(self.filename)
-        else:
-            self.ui.textEdit.clear()
 
     def load_file(self, filedata):
         """ Load and display file text for this file.
