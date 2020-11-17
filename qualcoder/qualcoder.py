@@ -51,6 +51,7 @@ from code_text import DialogCodeText
 from copy import copy
 from dialog_sql import DialogSQL
 from GUI.ui_main import Ui_MainWindow
+from helpers import Message
 from import_survey import DialogImportSurvey
 from information import DialogInformation
 from journals import DialogJournals
@@ -1024,11 +1025,12 @@ class MainWindow(QtWidgets.QMainWindow):
             ui.show()
         else:
             msg = _("This project contains no text files.")
-            mb = QtWidgets.QMessageBox()
+            Message(self.app, _('No text files'), msg).exec_()
+            '''mb = QtWidgets.QMessageBox()
             mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             mb.setWindowTitle(_('No text files'))
             mb.setText(msg)
-            mb.exec_()
+            mb.exec_()'''
         self.clean_dialog_refs()
 
     def image_coding(self):
@@ -1051,11 +1053,7 @@ class MainWindow(QtWidgets.QMainWindow):
             ui.show()
         else:
             msg = _("This project contains no image files.")
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No image files'))
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('No image files'), msg).exec_()
         self.clean_dialog_refs()
 
     def av_coding(self):
@@ -1077,14 +1075,9 @@ class MainWindow(QtWidgets.QMainWindow):
         files = self.app.get_av_filenames()
         if len(files) == 0:
             msg = _("This project contains no audio/video files.")
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No a/v files'))
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('No a/v files'), msg).exec_()
             self.clean_dialog_refs()
             return
-
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -1112,7 +1105,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Refi_export(self.app, self.ui.textEdit, "project")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
-        QtWidgets.QMessageBox.warning(None, "REFI QDA Project export", msg)
+        Message(self.app, _("REFI QDA Project export"), msg, "warning").exec_()
 
     def REFI_codebook_export(self):
         """ Export the codebook as .qdc
@@ -1139,15 +1132,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
         msg = _(
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the QDPX file.")
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('REFI-QDA import steps'))
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('REFI-QDA import steps'), msg).exec_()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            QtWidgets.QMessageBox.warning(None, "Project creation", "Project not successfully created")
+            Message(self.app, _("Project creation"), _("Project not successfully created"), "warning").exec_()
             return
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
@@ -1158,7 +1147,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "All variables are stored as text, but cast as text or float during operations.\n"
         msg += "Relative paths untested.\n"
         msg += "\n\nPlease, change the coder name in Settings to the current coder name\notherwise coded text and media may appear uncoded."
-        QtWidgets.QMessageBox.warning(None, "REFI QDA Project import", _(msg))
+        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -1167,19 +1156,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
         msg = _("Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('RQDA import steps'))
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('RDDA import steps'), msg).exec_()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Project creation'))
-            mb.setText(_("Project not successfully created"))
-            mb.exec_()
+            Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec_()
             return
         Rqda_import(self.app, self.ui.textEdit)
         self.project_summary_report()
@@ -1229,7 +1210,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.project_path = QtWidgets.QFileDialog.getSaveFileName(self,
             _("Enter project name"), self.app.settings['directory'], ".qda")[0]
         if self.app.project_path == "":
-            QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created."))
+            Message(self.app, _("Project"), _("No project created."), "critical").exec_()
             return
         if self.app.project_path.find(".qda") == -1:
             self.app.project_path = self.app.project_path + ".qda"
@@ -1241,8 +1222,9 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.app.project_path + "/documents")
         except Exception as e:
             logger.critical(_("Project creation error ") + str(e))
-            QtWidgets.QMessageBox.warning(None, _("Project"), _("No project created. Exiting. ") + str(e))
-            exit(0)
+            Message(self.app, _("Project"), _("Project not successfully created"), "critical").exec_()
+            self.app = App()
+            return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
         self.app.create_connection(self.app.project_path)
@@ -1368,8 +1350,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug(msg)
         if self.app.conn is None:
             msg += "\n" + proj_path
-            QtWidgets.QMessageBox.warning(None, _("Cannot open file"),
-                msg)
+            Message(self.app, _("Cannot open file"), msg, "critical").exec_()
             self.app.project_path = ""
             self.app.project_name = ""
             return
