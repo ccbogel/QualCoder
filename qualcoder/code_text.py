@@ -1276,9 +1276,15 @@ class DialogCodeText(QtWidgets.QWidget):
                 if f['id'] == result[0]:
                     try:
                         self.load_file(f)
+                        # set text cursor position and also highlight one character, to show location.
                         textCursor = self.ui.textEdit.textCursor()
                         textCursor.setPosition(result[1])
+                        endpos = result[1] - 1
+                        if endpos < 0:
+                            endpos = 0
+                        textCursor.setPosition(endpos, QtGui.QTextCursor.KeepAnchor)
                         self.ui.textEdit.setTextCursor(textCursor)
+
                     except Exception as e:
                         logger.debug(str(e))
 
