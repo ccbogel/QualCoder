@@ -33,6 +33,7 @@ import logging
 import traceback
 
 from GUI.ui_dialog_select_items import Ui_Dialog_selectitems
+from helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -63,8 +64,13 @@ class DialogSelectItems(QtWidgets.QDialog):
     title = None
 
     def __init__(self, app, data, title, selectionmode):
-        """ present list of name to user for selection.
-        data is a list of dictionaries containing the key 'name' """
+        """ present list of names to user for selection.
+
+        params:
+            data: list of dictionaries containing the key 'name'
+            title: Dialog title, String
+            selectionmode: 'single' or anything else for 'multiple', String
+        """
 
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
@@ -78,16 +84,16 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.selection_mode = selectionmode
         # Check data exists
         if len(data) == 0:
-            QtWidgets.QMessageBox.critical(None, _('Dictionary is empty'), "No data to select from")
-
+            Message(app, _('Dictionary is empty'), _("No data to select from"), "warning")
         # Check for 'name' key
         no_name_key = False
+
         for d in data:
             if not d['name']:
                 no_name_key = True
         if no_name_key:
-            text = "This data has no name to select from"
-            QtWidgets.QMessageBox.critical(None, _('Dictionary has no "name" key'), text)
+            text = _("This data does not contain names to select from")
+            Message(app, _('Dictionary has no "name" key'), text, "warning")
 
         self.dict_list = data
         self.model = list_model(self.dict_list)
@@ -95,7 +101,7 @@ class DialogSelectItems(QtWidgets.QDialog):
         if self.selection_mode == "single":
             self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         else:
-            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.ui.listView.doubleClicked.connect(self.accept)
 
     def get_selected(self):
