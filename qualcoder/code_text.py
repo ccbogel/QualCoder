@@ -507,6 +507,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.conn.commit()
 
     def change_code_pos(self, location, start_or_end):
+        """  Called via textedit_menu. """
         if self.filename == {}:
             return
         code_list = []
@@ -532,7 +533,9 @@ class DialogCodeText(QtWidgets.QWidget):
         changed_end = 0
         int_dialog = QtWidgets.QInputDialog()
         int_dialog.setMinimumSize(60, 150)
-        int_dialog.setWindowFlags(int_dialog.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
+        int_dialog.setWindowFlags(int_dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        msg = _("Key shortcuts\nShift left Arrow\nShift Right Arrow\nAlt Left Arrow\nAlt Right Arrow")
+        int_dialog.setWhatsThis(msg)
         if start_or_end == "start":
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
