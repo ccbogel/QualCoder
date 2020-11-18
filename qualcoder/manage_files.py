@@ -170,7 +170,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 text = None
         except:
             pass
-        #print(self.row, self.col, self.cellValue)
         # action cannot be None otherwise may default to one of the actions below depending on column clicked
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -334,11 +333,15 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         metadata = name + "\n"
         icon = QtGui.QIcon("GUI/text.png")
-        if fulltext is not None and len(fulltext) > 0:
+        if fulltext is not None and len(fulltext) > 0 and mediapath is None:
             metadata += "Characters: " + str(len(fulltext))
             return icon, metadata
         if mediapath is None:
             logger.debug("empty media path error")
+            return icon, metadata
+        if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
+            metadata += "Characters: " + str(len(fulltext))
+            icon = QtGui.QIcon("GUI/text_link.png")
             return icon, metadata
 
         abs_path = ""
@@ -347,7 +350,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + mediapath
 
-        if mediapath[:8] == "/images/" or mediapath[:7] == "images:":
+        if mediapath[:8] == "/images/":
             icon = QtGui.QIcon("GUI/picture.png")
             w = 0
             h = 0
@@ -358,18 +361,25 @@ class DialogManageFiles(QtWidgets.QDialog):
                 metadata += _("Cannot locate media. " + abs_path)
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
-            '''# Additional jpg metadata
-            exif = image._getexif()  # for jpg files
-            if exif is not None:
-                labels = {}
-                for (key, val) in exif.items():
-                    print(TAGS.get(key))
-                    labels[TAGS.get(key)] = val
-                print(labels)'''
-        if mediapath[:7] == "/video/" or mediapath[:6] == "video:":
+        if mediapath[:7] == "images:":
+            icon = QtGui.QIcon("GUI/picture_link.png")
+            w = 0
+            h = 0
+            try:
+                image = Image.open(abs_path)
+                w, h = image.size
+            except:
+                metadata += _("Cannot locate media. " + abs_path)
+                return icon, metadata
+            metadata += "W: " + str(w) + " x H: " + str(h)
+        if mediapath[:7] == "/video/":
             icon = QtGui.QIcon("GUI/play.png")
-        if mediapath[:7] == "/audio/" or mediapath[:6] == "audio:":
+        if mediapath[:6] == "video:":
+            icon = QtGui.QIcon("GUI/play_link.png")
+        if mediapath[:7] == "/audio/":
             icon = QtGui.QIcon("GUI/sound.png")
+        if mediapath[:6] == "audio:":
+            icon = QtGui.QIcon("GUI/sound_link.png")
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. " + abs_path)
