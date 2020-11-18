@@ -533,9 +533,11 @@ class DialogCodeText(QtWidgets.QWidget):
         changed_end = 0
         int_dialog = QtWidgets.QInputDialog()
         int_dialog.setMinimumSize(60, 150)
+        # Remove context flag does not work here
         int_dialog.setWindowFlags(int_dialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         msg = _("Key shortcuts\nShift left Arrow\nShift Right Arrow\nAlt Left Arrow\nAlt Right Arrow")
         int_dialog.setWhatsThis(msg)
+        int_dialog.setToolTip(msg)
         if start_or_end == "start":
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
