@@ -24,7 +24,6 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-
 """
 
 import logging
@@ -72,6 +71,7 @@ from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from html_parser import *
 from memo import DialogMemo
+from select_items import DialogSelectItems
 from view_image import DialogViewImage
 from view_av import DialogViewAV
 
@@ -139,7 +139,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.pushButton_create.clicked.connect(self.create)
         self.ui.pushButton_view.clicked.connect(self.view)
-        self.ui.pushButton_delete.clicked.connect(self.delete)
+        self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
         self.ui.pushButton_import.clicked.connect(self.import_files)
         self.ui.pushButton_link.clicked.connect(self.link_files)
         self.ui.pushButton_export.clicked.connect(self.export)
@@ -556,7 +556,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return True
         return False
 
-    def highlight(self, fid, textEdit):
+    def highlight(self, fid):
         """ Add coding and annotation highlights. """
 
         self.text_view_remove_formatting()
@@ -606,7 +606,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_unrestricted_menu)
             self.text_view.ui.textEdit.currentCharFormatChanged.connect(self.text_view_remove_formatting)
-        self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
+        self.highlight(self.source[x]['id'])
         title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
         if restricted:
             title += "RESTRICTED EDIT"
@@ -684,7 +684,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.restricted_edit_text(x, text_cursor)
             # reload text
             self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
-            self.highlight(self.source[x]['id'], self.text_view.ui.textEdit)
+            self.highlight(self.source[x]['id'])
         if action == action_copy:
             selected_text = self.text_view.ui.textEdit.textCursor().selectedText()
             cb = QtWidgets.QApplication.clipboard()
@@ -883,6 +883,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
         if not os.path.exists(abs_path):
+            #TODO update bad links
             return
 
         try:
@@ -916,6 +917,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
         if not os.path.exists(abs_path):
+            #TODO update bad links
             return
 
         ui = DialogViewImage(self.app, self.source[x])
@@ -1432,11 +1434,80 @@ class DialogManageFiles(QtWidgets.QDialog):
         mb.exec_()
         self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
-    def delete(self):
+    def delete_button_multiple_files(self):
         """ Delete files from database and update model and widget.
         Also, delete files from sub-directories, if not externally linked.
 
-        # Currently can only delete ONE file at time, due to tableWidget single selection mode
+        Called by: delete button.
+        """
+
+        ui = DialogSelectItems(self.app, self.source, _("Delete files"), "multi")
+        ok = ui.exec_()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if selection == []:
+            return
+        names = ""
+        for s in selection:
+            names = names + s['name'] + "\n"
+        ui = DialogConfirmDelete(self.app, names)
+        ok = ui.exec_()
+        if not ok:
+            return
+
+        msg = ""
+        cur = self.app.conn.cursor()
+        for s in selection:
+            msg += _("Deleted file: ") + s['name'] + "\n"
+            # Delete text source
+            if s['mediapath'] is None or 'docs:' in s['mediapath']:
+                try:
+                    if s['mediapath'] is None:
+                        os.remove(self.app.project_path + "/documents/" + s['name'])
+                except Exception as e:
+                    logger.warning(_("Deleting file error: ") + str(e))
+                # Delete stored coded sections and source details
+                cur.execute("delete from source where id = ?", [s['id']])
+                cur.execute("delete from code_text where fid = ?", [s['id']])
+                cur.execute("delete from annotation where fid = ?", [s['id']])
+                cur.execute("delete from case_text where fid = ?", [s['id']])
+                cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
+                self.app.conn.commit()
+            # Delete image, audio or video source
+            if s['mediapath'] is not None and 'docs:' not in s['mediapath']:
+                # Remove avid links in code_text
+                sql = "select avid from code_av where id=?"
+                cur.execute(sql, [s['id']])
+                avids = cur.fetchall()
+                sql = "update code_text set avid=null where avid=?"
+                for avid in avids:
+                    cur.execute(sql, [avid[0]])
+                self.app.conn.commit()
+                # Remove project folder file, if internally stored
+                if ':' not in s['mediapath']:
+                    filepath = self.app.project_path + s['mediapath']
+                    try:
+                        os.remove(filepath)
+                    except Exception as e:
+                        logger.warning(_("Deleting file error: ") + str(e))
+                # Delete stored coded sections and source details
+                cur.execute("delete from source where id = ?", [s['id']])
+                cur.execute("delete from code_image where id = ?", [s['id']])
+                cur.execute("delete from code_av where id = ?", [s['id']])
+                cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
+                self.app.conn.commit()
+        self.check_attribute_placeholders()
+        self.parent_textEdit.append(msg)
+        self.load_file_data()
+        self.fill_table()
+        self.app.delete_backup = False
+
+    def delete(self):
+        """ Delete one file from database and update model and widget.
+        Deletes only one file due to table single selection mode
+        Also, delete the file from sub-directories, if not externally linked.
+        Called by: right-click table context menu.
         """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
@@ -1447,8 +1518,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if len(rows) == 0:
             return
         names = ""
-        #for row in rows:
-        # Currently can only delete ONE file at time, due to tableWidget single selection mode
         names = names + self.source[rows[0]]['name'] + "\n"
         ui = DialogConfirmDelete(self.app, names)
         ok = ui.exec_()
@@ -1456,35 +1525,31 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
         cur = self.app.conn.cursor()
-        #for row in rows:
-        # Currently can only delete ONE file at time, due to tableWidget single selection mode
         row = rows[0]
         file_id = self.source[row]['id']
-
-        # delete text source
+        # Delete text source
         if self.source[row]['mediapath'] is None or 'docs:' in self.source[row]['mediapath']:
             try:
                 if self.source[row]['mediapath'] is None:
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
             except Exception as e:
                 logger.warning(_("Deleting file error: ") + str(e))
+            # Delete stored coded sections and source details
             cur.execute("delete from source where id = ?", [file_id])
             cur.execute("delete from code_text where fid = ?", [file_id])
             cur.execute("delete from annotation where fid = ?", [file_id])
             cur.execute("delete from case_text where fid = ?", [file_id])
-            sql = "delete from attribute where attr_type ='file' and id=?"
-            cur.execute(sql, [file_id])
+            cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
-
-        # delete image, audio or video source
+        # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Remove avid links in code_text
             sql = "select avid from code_av where id=?"
-            cur.execute(sql, (file_id, ))
+            cur.execute(sql, [file_id])
             avids = cur.fetchall()
             sql = "update code_text set avid=null where avid=?"
             for avid in avids:
-                cur.execute(sql, (avid[0], ))
+                cur.execute(sql, [avid[0]])
             self.app.conn.commit()
             # Remove folder file, if internally stored
             if ':' not in self.source[row]['mediapath']:
@@ -1493,17 +1558,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                     os.remove(filepath)
                 except Exception as e:
                     logger.warning(_("Deleting file error: ") + str(e))
-            # Remove database stored coded sections and source details
+            # Delete stored coded sections and source details
             cur.execute("delete from source where id = ?", [file_id])
             cur.execute("delete from code_image where id = ?", [file_id])
             cur.execute("delete from code_av where id = ?", [file_id])
-            sql = "delete from attribute where attr_type='file' and id=?"
-            cur.execute(sql, [file_id])
+            cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
-
         self.check_attribute_placeholders()
         self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
-
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
