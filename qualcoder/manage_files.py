@@ -162,6 +162,14 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
+        # Use these next few lines to determine if hte file is linked or not
+        id_ = None
+        mediapath = None
+        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        for s in self.source:
+            if s['id'] == id_:
+                mediapath = s['mediapath']
+
         text = None
         try:
             text = str(self.ui.tableWidget.item(row, col).text())
@@ -180,6 +188,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_equals_value = None
         action_order_by_value = None
         action_show_all = None
+        action_import_linked = None
         if col < 4:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
@@ -191,10 +200,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows"))
+        if mediapath is not None and ':' in mediapath:
+            action_import_linked = menu.addAction(_("Import linked file"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
-
+        if action == action_import_linked:
+            self.import_linked_file(id_, mediapath)
         if action == action_view:
             self.view()
         if action == action_export:
@@ -226,6 +238,30 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def import_linked_file(self, id_, mediapath):
+        """ Import linked file and change mediapath details. """
+
+        name_split1 = mediapath.split(":")[1]
+        filename = name_split1.split('/')[-1]
+        if mediapath[0:6] == "audio:":
+            copyfile(mediapath[6:], self.app.project_path + "/audio/" + filename)
+            mediapath = '/audio/' + filename
+        if mediapath[0:6] == "video:":
+            copyfile(mediapath[6:], self.app.project_path + "/video/" + filename)
+            mediapath = '/video/' + filename
+        if mediapath[0:7] == "images:":
+            copyfile(mediapath[7:], self.app.project_path + "/images/" + filename)
+            mediapath = '/images/' + filename
+        # This must be the last if statement as mediapath can be None
+        if mediapath[0:5] == "docs:":
+            copyfile(mediapath[5:], self.app.project_path + "/documents/" + filename)
+            mediapath = None
+        cur = self.app.conn.cursor()
+        cur.execute("update source set mediapath=? where id=?", [mediapath, id_])
+        self.app.conn.commit()
+        # Reload data and refill the table
+        self.load_file_data()
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -1100,7 +1136,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         param:
             mediapath: QualCoder project folder path OR external link path to file
-                       External link path contains prefix 'images:, 'audio:', 'video:'
+                       External link path contains prefix 'docs:', 'images:, 'audio:', 'video:'
         """
 
         # check for duplicated filename and update model, widget and database
