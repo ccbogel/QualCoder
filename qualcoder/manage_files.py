@@ -33,7 +33,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 import platform
 import sys
-from shutil import copyfile
+from shutil import copyfile, move
 import subprocess
 import traceback
 import zipfile
@@ -69,6 +69,7 @@ from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
+from helpers import Message
 from html_parser import *
 from memo import DialogMemo
 from select_items import DialogSelectItems
@@ -162,7 +163,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-        # Use these next few lines to determine if hte file is linked or not
+        # Use these next few lines to use for mvoing a linked file into or an internal file out of the project folder
         id_ = None
         mediapath = None
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
@@ -189,6 +190,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_order_by_value = None
         action_show_all = None
         action_import_linked = None
+        action_export_to_linked = None
         if col < 4:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
@@ -202,11 +204,15 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_show_all = menu.addAction(_("Show all rows"))
         if mediapath is not None and ':' in mediapath:
             action_import_linked = menu.addAction(_("Import linked file"))
+        else:
+            action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
         if action == action_import_linked:
             self.import_linked_file(id_, mediapath)
+        if action == action_export_to_linked:
+            self.export_file_as_linked_file(id_, mediapath)
         if action == action_view:
             self.view()
         if action == action_export:
@@ -238,6 +244,41 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def export_file_as_linked_file(self, id_, mediapath):
+        """ Move an internal project file into an external location as a linked file. """
+
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        file_directory = mediapath.split('/')[1]  # as [0] will be blank
+        destination = directory + "/" + mediapath.split('/')[-1]
+        msg = _("Export to ") + destination + "\n"
+        try:
+            move(self.app.project_path + mediapath, destination)
+        except Exception as e:
+            logger.debug(str(e))
+            Message(self.app, _("Cannot export"), _("Cannot export as linked file\n") + str(e), "warning").exec_()
+            return
+        new_mediapath = ""
+        if file_directory == "documents":
+            new_mediapath = "docs:" + destination
+        if file_directory == "images":
+            new_mediapath = "images:" + destination
+        if file_directory == "audio":
+            new_mediapath = "audio:" + destination
+        if file_directory == "video":
+            new_mediapath = "video:" + destination
+        cur = self.app.conn.cursor()
+        cur.execute("update source set mediapath=? where id=?", [new_mediapath, id_])
+        self.parent_textEdit.append(msg)
+        self.app.conn.commit()
+        # Reload data and refill the table
+        self.load_file_data()
 
     def import_linked_file(self, id_, mediapath):
         """ Import linked file and change mediapath details. """
@@ -489,7 +530,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-
         if y == self.NAME_COLUMN:
             self.view()
 
@@ -500,7 +540,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-
         if y == self.MEMO_COLUMN:
             name =self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
@@ -704,15 +743,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_select_all = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
         action = menu.exec_(self.text_view.ui.textEdit.mapToGlobal(position))
-        '''if text_cursor.position() == 0 and text_cursor.selectionEnd() == 0:
-            msg = _("Select a section of text, maximum 20 characters.\nThe selection must be either all underlined or all not-underlined.")
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No text selected'))
-            mb.setText(msg)
-            mb.exec_()
-            return'''
         if action == action_item_edit and len(selected_text) > 0 and len(selected_text) < 21:
             result = self.crossover_check(x, text_cursor)
             if result['crossover']:
@@ -751,12 +781,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         code_crossover = cur.fetchall()
         if code_crossover != []:
             msg += _("Code crossover: ") + str(code_crossover)
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Codes cross over text'))
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Codes cross over text'), msg, "warning").exec_()
             return response
         # find if the selected text is coded
         sql = "select pos0,pos1 from code_text where fid=? and ?>=pos0 and ?<=pos1"
@@ -768,12 +793,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         annote_crossover = cur.fetchall()
         if annote_crossover != []:
             msg += _("Annotation crossover: ") + str(annote_crossover)
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Annotations cross over text'))
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Annotations cross over text'), msg, "warning").exec_()
             return response
         # find if the selected text is annotated
         sql = "select pos0,pos1 from annotation where fid=? and ?>=pos0 and ?<=pos1"
@@ -803,12 +823,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if len(txt) > 20:
             msg = _("Can only edit small selections of text, up to 20 characters in length.") + "\n"
             msg += _("You selected " + str(len(txt)) + _(" characters"))
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setWindowTitle(_('Too much text selected'))
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Too much text selected'), msg, "warning").exec_()
             return
 
         #TODO maybe use DialogMemo again
@@ -936,7 +951,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         except Exception as e:
             logger.debug(e)
             print(e)
-            QtWidgets.QMessageBox.warning(None, 'view av error', str(e), QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('view averror'), str(e), "warning").exec_()
             return
 
     def view_image(self, x):
@@ -1068,7 +1083,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if pdfminer_installed is False:
                     text = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
                     text += "For Windows run the following in the command prompt: pip install pdfminer.six"
-                    QtWidgets.QMessageBox.critical(None, _('pdfminer is not installed.'), _(text))
+                    Message(self.app, _("pdf miner is not installed"), _(text) + str(e),"critical").exec_()
                     return
                 destination += "/documents/" + filename
                 # remove encryption from pdf if possible, for Linux
@@ -1086,12 +1101,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                             logger.debug("Remove decrypted pdf linked file from /documents\n" + destination + "\n" + str(e))
                 else:
                     # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
-                    mb = QtWidgets.QMessageBox()
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_('If import error occurs'))
                     msg = _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f
-                    mb.setText(msg)
-                    mb.exec_()
+                    Message(self.app, _('If import error occurs'), msg, "warning").exec_()
                     if link_path == "":
                         copyfile(f, destination)
                         self.load_file_text(f)
@@ -1276,17 +1287,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if text[0:6] == "\ufeff":  # associated with notepad files
                         text = text[6:]
             except Exception as e:
-                QtWidgets.QMessageBox.warning(None, _('Warning'),
-                    _("Cannot import ") + str(import_file) + "\n" + str(e))
+                Message(self.app, _("Warning"), _("Cannot import") + str(import_file) + "\n" + str(e), "warning").exec_()
                 return
             if import_errors > 0:
-                QtWidgets.QMessageBox.warning(None, _('Warning'),
-                    str(import_errors) + _(" lines not imported"))
+                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec_()
                 logger.warning(import_file + ": " + str(import_errors) + _(" lines not imported"))
         # import of text file did not work
         if text == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'),
-                _("Cannot import ") + str(import_file) + "\n" + str(e))
+            Message(self.app, _("Warning"), _("Cannot import ") + str(import_file) + "\n" + str(e), "warning").exec_()
             return
         # Final checks: check for duplicated filename and update model, widget and database
         name_split = import_file.split("/")
@@ -1390,25 +1398,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Currently single selection mode in tableWidget, 1 row only, so rows[0]
         if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
                 and (self.source[rows[0]]['fulltext'] is None or self.source[rows[0]]['fulltext'] == ""):
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Cannot Export'))
             msg = _("This is an external linked file") + "\n"
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Cannot export'), msg, "warning").exec_()
             return
         # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
         text_rep = False
         if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
                 and self.source[rows[0]]['fulltext'] != "":
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Can Export text'))
             msg = _("This is a linked file. Will export text representation.") + "\n"
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _("Can export text"), msg, "warning").exec_()
             text_rep = True
 
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
@@ -1462,12 +1462,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             f.write(filedata)
             f.close()
             msg += filename_txt + "\n"
-
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Files Exported'))
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _("Files exported"), msg).exec_()
         self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
     def delete_button_multiple_files(self):
@@ -1668,7 +1663,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ui = Ui_dialog_manage_files()
+    ui = Ui_Dialog_manage_files()
     ui.show()
     sys.exit(app.exec_())
 
