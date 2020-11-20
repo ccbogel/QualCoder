@@ -181,3 +181,5 @@ Barriers to Health: Understanding the Barriers Faced by Community Intervention P
 
 Framing food geographies. S Ramsay, Masters Thesis, Stockholms Universitet 2020
 
+Seeking research software. A qualitative study of humanities scholars' information practices. Ronny Gey, Masters Thesis, Humboldt University of Berlin 2020
+
