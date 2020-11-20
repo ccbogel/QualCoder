@@ -1242,7 +1242,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder'))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder', 0, 0))
         self.app.conn.commit()
         try:
             # get and display some project details
