@@ -1156,7 +1156,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
         msg = _("Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
-        Message(self.app, _('RDDA import steps'), msg).exec_()
+        Message(self.app, _('RQDA import steps'), msg).exec_()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
