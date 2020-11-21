@@ -378,6 +378,8 @@ class App(object):
         config.read(self.configpath)
         default = config['DEFAULT']
         result = dict(default)
+        if result['codername'] == "":
+            result['codername'] = "default"
         # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
@@ -457,7 +459,7 @@ class App(object):
 
     @property
     def default_settings(self):
-        """ bookmark for text files. """
+        """ Standard Settings for config.ini file. """
         return {
             'codername': 'default',
             'font': 'Noto Sans',
@@ -530,6 +532,8 @@ class App(object):
             'dialogcodecrossovers_splitter1': 0,
             'dialogmanagelinks_w': 0,
             'dialogmanagelinks_h': 0,
+            'bookmark_file_id': 0,
+            'bookmark_pos': 0
         }
 
     def get_file_texts(self, fileids=None):
@@ -554,8 +558,7 @@ class App(object):
         return result
 
     def get_coder_names_in_project(self):
-        """ Get all coder names from all tables.
-        Useful when opening a project and the settings codername is from another project.
+        """ Get all coder names from all tables and from the config.ini file
         Possible design flaw is that codernames are not stored in a specific table in the database.
         """
 
@@ -564,9 +567,11 @@ class App(object):
         sql += "union select owner from cases union select owner from source union select owner from code_name"
         cur.execute(sql)
         res = cur.fetchall()
-        coder_names = []
+        # The coder name may be stored in the config.ini file, so need to add it here as it may not be obtained from the sql
+        coder_names = [self.settings['codername']]
         for r in res:
-            coder_names.append(r[0])
+            if r[0] not in coder_names:
+                coder_names.append(r[0])
         return coder_names
 
 
@@ -1140,14 +1145,6 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         Refi_import(self.app, self.ui.textEdit, "qdpx")
-        msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
-        msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
-        msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. \n"
-        msg += "All variables are stored as text, but cast as text or float during operations.\n"
-        msg += "Relative paths untested.\n"
-        msg += "\n\nPlease, change the coder name in Settings to the current coder name\notherwise coded text and media may appear uncoded."
-        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
         self.project_summary_report()
 
     def rqda_project_import(self):

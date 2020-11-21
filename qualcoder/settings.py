@@ -67,6 +67,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
+        self.ui.lineEdit_coderName.setText(self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # get coder names from all tables
         # Note: does not appear to require a distinct clause
@@ -80,7 +81,8 @@ class DialogSettings(QtWidgets.QDialog):
             cur.execute(sql)
             results = cur.fetchall()
             for row in results:
-                coders.append(row[0])
+                if row[0] != "":
+                    coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
         languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
                 "Italiano it", "日本 jp"]
