@@ -204,14 +204,13 @@ class DialogCases(QtWidgets.QDialog):
         for a in result:
             attribute_names.append({'name': a[0]})
         check_names = attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'caseid'}, {'name':'date'}]
-        ui = DialogAddAttribute(self.app, check_names)
-        ok = ui.exec_()
-        if not ok:
+        add_ui = DialogAddAttribute(self.app, check_names)
+        ok = add_ui.exec_()
+        if not ok or add_ui.new_name == "":
             return
-        name = ui.new_name
-        value_type = ui.value_type
-        if name == "":
-            return
+        name = add_ui.new_name
+        value_type = add_ui.value_type
+
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
