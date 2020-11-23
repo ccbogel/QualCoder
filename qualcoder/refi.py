@@ -47,6 +47,8 @@ import zipfile
 
 from PyQt5 import QtWidgets
 
+from helpers import Message
+
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -62,8 +64,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class Refi_import():
-    """
-    Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml and project.xml
+    """     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml
+    and project.xml
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
     """
 
@@ -134,10 +136,10 @@ class Refi_import():
                 for c in code_elements:
                     # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
-                QtWidgets.QMessageBox.information(None, _("Codebook imported"),
-                    str(counter) + _(" categories and codes imported from ") + self.file_path)
+                Message(self.app, _("Codebook imported"),
+                    str(counter) + _(" categories and codes imported from ") + self.file_path).exec_()
                 return
-        QtWidgets.QMessageBox.warning(None, _("Codebook importation"), self.file_path + _(" NOT imported"))
+        Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec_()
 
     def sub_codes(self, parent, cat_id):
         """ Get subcode elements, if any.
@@ -340,7 +342,6 @@ class Refi_import():
 
         # Parse cases and sources after the variables components parsed
         # Need to fill placeholders and values for variables for sources and cases
-        #TODO
         children = root.getchildren()
         for c in children:
             # print(c.tag)
@@ -363,6 +364,15 @@ class Refi_import():
         if len(self.users) > 0:
             self.app.settings['codername'] = self.users[0]['name']
             self.app.write_config_ini(self.app.settings)
+
+        msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
+        msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
+        msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
+        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. \n"
+        msg += "All variables are stored as text, but cast as text or float during operations.\n"
+        msg += "Relative paths to external files are untested.\n"
+        msg += "\n\nSelect a coder name in Settings dropbox, otherwise coded text and media may appear uncoded."
+        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
 
     def parse_variables(self, element):
         """ Parse the Variables element.
@@ -550,8 +560,9 @@ class Refi_import():
         Example format:
         <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
-        TODO if during import it detects that the external file is not found, it should
-        TODO check file location and if not found ask user for the new file location.
+        If during import it detects that the external file is not found, it should
+        check file location and if not found ask user for the new file location.
+        This check occurs in qualcoder.py
 
         :param element: Sources element object
 
@@ -739,7 +750,7 @@ class Refi_import():
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
-                self.parse_transcript_with_codings_and_syncpoints(id_, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(name, id_, creating_user, e)
 
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
@@ -752,7 +763,7 @@ class Refi_import():
         """ Load this video source into .
         Load the description and codings into sqlite.
         Can manage internal and absolute source paths.
-        TODO relative
+        TODO relative paths to be tested
 
         Params:
             element: VideoSource element object
@@ -782,53 +793,179 @@ class Refi_import():
             (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
-        id_ = cur.fetchone()[0]
+        av_id = cur.fetchone()[0]
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
-                self.parse_transcript_with_codings_and_syncpoints(id_, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(name, av_id, creating_user, e)
 
         # Parse VideoSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
-                self.load_codings_for_audio_video(id_, e)
+                self.load_codings_for_audio_video(av_id, e)
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)
+                self.parse_variable_value(e, av_id, creating_user)
 
-    def parse_transcript_with_codings_and_syncpoints(self, id_, creating_user, element):
-        """ Load the transcript text. Load the synchpoints.
-         Load the transcript codings.
-         Called by: load_audio_source, load_video_source
+    def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, creating_user, element):
+        """ Load the transcript plain text file into source table.
+        For now - this file MUST be internal to the project.
+        Change transcript filename to match the audio/video name, unless .srt
+        Add ".transcribed" suffix so QualCoder can interpret as a transcription for this a/v file.
+
+        Transcription file is stored in documents folder or if an .srt then it is stored in audio or video folder.
+
+        Load the transcript codings.
+
+        Called by: load_audio_source, load_video_source
 
          Param:
-            id_     : source id in sqlite, Integer
-            creating_uer    : user who created source, String
+            av_id     : source id in sqlite, Integer
+            creating_user    : user who created source, String
             element     : the Transcript element object
          """
 
-        #TODO WORK IN PROGRESS
-        print("Transcript", element.tag, "WORK IN PROGRESS")
-        '''
+        # Change transcript filename to match the audio/video name, unless .srt
+        # Add ".transcribed" suffix so qualcoder can interpret as a transcription for this a/v file.
+        creating_user_guid = element.get("creatingUser")
+        creating_user = "default"
+        for u in self.users:
+            if u['guid'] == creating_user_guid:
+                creating_user = u['name']
+        create_date = element.get("creationDateTime")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
+        guid = element.get("guid")
+        #print("guid", element.get("guid"))
+
+        # Load the plain text transcript file into project.
+        # Presumes the plain text file is internal
+        #TODO rich text path import - UNSURE - IMPORT OR NOT?
+        #rich_text_path = element.get("richTextPath")
+        #print("rtpath", element.get("richTextPath"))
+        plain_text_path = element.get("plainTextPath")
+        path_type = "internal"
+        if plain_text_path[0:11] == "internal://":
+            plain_text_path = plain_text_path[11:]
+        else:
+            logger.debug("Cannot import plain text transcription file - not internal")
+            return
+
+        # Copy plain text file into documents folder, or if .srt into audio or video folder.
+        name = element.get("name")
+        destination = self.app.project_path + "/documents/" + name
+        if name[-4:] == ".srt" and av_name[-4] in ("mp4", "ogg", "mov"):
+            destination = self.app.project_path + "/video/" + name
+        elif name[-4:] == ".srt" and av_name[-4] in ("mp3", "m4a", "wav"):
+            destination = self.app.project_path + "/audio/" + name
+        else:
+            destination = self.app.project_path + "/documents/" + name
+        # Sources folder name can be capital or lower case, check and get the correct one
+        contents = os.listdir(self.folder_name)
+        sources_name = "/Sources/"
+        for i in contents:
+            if i == "sources":
+                sources_name = "/sources/"
+        source_path = self.folder_name + sources_name + plain_text_path
+        #print("Source path: ", source_path)
+        #print("Destination: ", destination)
+        try:
+            shutil.copyfile(source_path, destination)
+        except Exception as e:
+            self.parent_textEdit.append(
+                _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+
+        # Load transcription text into database with filename matching and suffixed with .transcribed
+        text = ""
+        try:
+            # can get UnicodeDecode Error on Windows so using error handler
+            with open(destination, "r", encoding="utf-8", errors="backslashreplace") as sourcefile:
+                while 1:
+                    line = sourcefile.readline()
+                    if not line:
+                        break
+                    try:
+                        text += line
+                    except Exception as e:
+                        # logger.debug("Importing plain text file, line ignored: " + str(e))
+                        pass
+                if text[0:6] == "\ufeff":  # associated with notepad files
+                    text = text[6:]
+        except Exception as e:
+            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec_()
+
+        memo = ""
+        if name is not None:
+            memo = "Name: " + name + "\n"
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                if(e.text) is not None:
+                    memo += e.text
+        if av_name[-12:] != '.transcribed':
+            av_filename = av_name + ".transcribed"
+
+        cur = self.app.conn.cursor()
+        sql = "insert into source (name, fulltext, mediapath, memo, owner, date) values (?,?,?,?,?,?)"
+        cur.execute(sql, [av_filename, text, None, memo, creating_user, create_date])
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        fid = cur.fetchone()[0]
+
         # Syncpoints
-        """
+        #TODO syncpoints are not stored in QualCoder - unsure how to make use of the timestamps
+        # Perhaps add syncpoint timestamps from and to into the code_text table ?
+        syncpoints = []
+        """ Format:
         <SyncPoint guid="58716919-f62e-4f2a-b386-6ceb1ebbd859" position="3044" timeStamp="155000" />
         """
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}SyncPoint":
-                print("SyncPoint")
+                syncpoints.append({"guid": e.get("guid"), "pos": e.get("position"), "timestamp": e.get("timeStamp")})
 
-        # Transcript selections
         """
-        <TranscriptSelection guid="fea90668-ed71-4cd9-a47e-23d588f4207e" name="Brighton_Storm.mp4.transcribed" fromSyncPoint="28b27114-5284-4481-837d-dc0d98a5a9a8" toSyncPoint="a687db0f-d12d-401d-b9e3-405dcb2b7879">
+        Transcript selections.
+        Get a lot of details, av_id, fid (from text into source above), cid, memo, pos0,pos1, seltext, owner, date
+        
+        <TranscriptSelection guid="fea90668-ed71-4cd9-a47e-23d588f4207e" name="Brighton_Storm.mp4.transcribed" 
+        fromSyncPoint="28b27114-5284-4481-837d-dc0d98a5a9a8" 
+        toSyncPoint="a687db0f-d12d-401d-b9e3-405dcb2b7879">
+        <Description>a note</Description>
         <Coding guid="7f0fa382-05fe-4c93-b0f7-182a4c2eb7b1" >
         <CodeRef targetGUID="a3825924-8bf7-47c1-a51b-be9196147a56" />
-        </Coding></TranscriptSelection>
+        </Coding>
+        </TranscriptSelection>
         """
+
+        value_list = []
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}TranscriptSelection":
-                print(e.tag)
-        '''
-
+                pos0 = 0
+                pos1 = 0
+                guid_pos0 = e.get("fromSyncPoint")
+                guid_pos1 = e.get("toSyncPoint")
+                for s in syncpoints:
+                    if guid_pos0 == s['guid']:
+                        #TODO test pos0 and 1 are correct, added 1 for python as String starts from 0
+                        pos0 = int(s['pos']) + 1
+                    if guid_pos1 == s['guid']:
+                        pos1 = int(s['pos']) + 1
+                memo = ""
+                for ee in e.getchildren():
+                    if ee.tag == "{urn:QDA-XML:project:1.0}Description":
+                        memo = str(ee.text)
+                for ee in e.getchildren():
+                    if ee.tag == "{urn:QDA-XML:project:1.0}Coding":
+                        cid = None
+                        code_ref = ee.getchildren()[0]
+                        for c in self.codes:
+                            if c['guid'] == code_ref.get("targetGUID"):
+                                cid = c['cid']  # String ?
+                                value_list.append([cid, fid, text[pos0:pos1], pos0 , pos1, creating_user, create_date, memo, av_id])
+        sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo, avid) "
+        sql += " values (?,?,?,?,?,?,?,?,?)"
+        cur = self.app.conn.cursor()
+        for v in value_list:
+            cur.execute(sql, v)
+        self.app.conn.commit()
 
     def load_codings_for_audio_video(self, id_, element):
         """ Load coded segments for audio and video
@@ -850,7 +987,7 @@ class Refi_import():
             create_date = create_date.replace('Z', '')
         except AttributeError as e:
             # None type object ??
-            print(e)
+            print("load_codings_for_audio_video", e)
             create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
 
         creating_user_guid = element.get("creatingUser")
@@ -923,7 +1060,7 @@ class Refi_import():
         """ Load this text source into sqlite.
          Add the description and the text codings.
          When testing with Windows Nvivo export: import from docx or txt
-         The text may need an additional line-ending character.
+         The text may need an additional line-ending character for Windows \r\n
         Can manage internal and absolute source paths.
 
         Params:
@@ -964,7 +1101,7 @@ class Refi_import():
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
                 # Due to 2 character line endings
                 #TODO TEST if importing Windows endings on Windows OS that it requires the 2 char line-ending replacement
-                if add_ending:
+                if fulltext is not None and add_ending:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
                 # logger.debug("type fulltext: " + str(type(entry['fulltext'])))
@@ -1240,7 +1377,7 @@ class Refi_export(QtWidgets.QDialog):
 
     def export_project(self):
         """ Create a REFI-QDA project folder project.qdpx zipfile
-        This contains the .qde projedt xml and a Sources folder.
+        This contains the .qde project xml and a Sources folder.
 
         Source types:
         Plain text, PDF,md, odt, docx, md, epub
@@ -1262,15 +1399,15 @@ class Refi_export(QtWidgets.QDialog):
             os.mkdir(prep_path + "/Sources")
         except Exception as e:
             logger.error(_("Project export error ") + str(e))
-            QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
-            exit(0)
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            return
         try:
             with open(prep_path +'/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, _("Project"), _("Project not exported. Exiting. ") + str(e))
-            print(e)
-            exit(0)
+            Message(self.app,_("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            logger.debug(str(e))
+            return
         txt_errors = ""
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
@@ -1319,15 +1456,12 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError as e:
             logger.debug(str(e))
         msg = export_path + ".qpdx\n"
-        msg += "Coding for a/v transcripts is also exported as a <TextSource>.\n"
-        msg += "Transcript syncronisation with a/v is approximated from textual timepoints in the transcript. "
-        msg += "Large > 2GBfiles are not stored externally."
-        msg += "This project exchange is not compliant with the exchange standard.\n"
+        msg += "This project exchange is not guaranteed compliant with the exchange standard.\n"
         msg += "REFI-QDA EXPERIMENTAL FUNCTION."
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
-        QtWidgets.QMessageBox.information(None, _("Project exported"), _(msg))
+        Message(self.app, _("Project exported"), _(msg)).exec_()
         self.parent_textEdit.append(_("Project exported") + "\n" + _(msg))
 
     def export_codebook(self):
@@ -1346,11 +1480,11 @@ class Refi_export(QtWidgets.QDialog):
             f.close()
             msg = "Codebook has been exported to "
             msg += filename
-            QtWidgets.QMessageBox.information(None, _("Codebook exported"), _(msg))
+            Message(self.app, _("Codebook exported"), _(msg)).exec_()
             self.parent_textEdit.append(_("Codebook exported") +"\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
-            QtWidgets.QMessageBox.information(None, _("Codebook NOT exported"), str(e))
+            Message(self.app, _("Codebook NOT exported"), str(e)).exec_()
             self.parent_textEdit.append(_("Codebook NOTexported") + "\n" + _(msg))
 
     def user_guid(self, username):
@@ -1679,7 +1813,7 @@ class Refi_export(QtWidgets.QDialog):
         for s in self.sources:
             guid = self.create_guid()
             # Text document
-            if (s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')) or \
+            if (s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
                 (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
                 xml += '<TextSource '
                 if s['external'] is None:
