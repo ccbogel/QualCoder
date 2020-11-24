@@ -56,8 +56,8 @@
      <widget class="QPushButton" name="pushButton_memo">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>40</y>
+        <x>380</x>
+        <y>7</y>
         <width>141</width>
         <height>32</height>
        </rect>
@@ -66,23 +66,10 @@
        <string>Memo</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_select">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>201</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Select image</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>10</x>
         <y>10</y>
         <width>301</width>
         <height>21</height>
@@ -129,17 +116,12 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <property name="spacing">
-       <number>0</number>
-      </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Vertical</enum>
         </property>
+        <widget class="QListWidget" name="listWidget"/>
         <widget class="QTreeWidget" name="treeWidget">
          <column>
           <property name="text">
@@ -147,20 +129,27 @@
           </property>
          </column>
         </widget>
-        <widget class="QScrollArea" name="scrollArea">
-         <property name="widgetResizable">
-          <bool>true</bool>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>715</width>
+           <height>539</height>
+          </rect>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>76</width>
-            <height>562</height>
-           </rect>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QGraphicsView" name="graphicsView"/>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
