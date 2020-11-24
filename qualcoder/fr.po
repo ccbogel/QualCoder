@@ -2453,7 +2453,7 @@ msgstr "Hauteur:"
 #: view_av.py:1262 view_av.py:1272 view_av.py:2705 view_av.py:2715
 #: view_av.py:1279 view_av.py:1289 view_av.py:2732 view_av.py:2742
 msgid "Rate: "
-msgstr "Taux: "
+msgstr "Vitesse : "
 
 #: report_relations.py:127
 msgid "Selection warning"
