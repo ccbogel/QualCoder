@@ -112,6 +112,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.resize(w, h)
         except:
             pass
+
+        
+        #TODO https://stackoverflow.com/questions/1905402/python-qpushbutton-seticon-put-icon-on-button
+
+
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -131,9 +136,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
-        self.ui.pushButton_view_file.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.pushButton_view_file.customContextMenuRequested.connect(self.viewfile_menu)
-        self.ui.pushButton_view_file.clicked.connect(self.view_file_dialog)
+        self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        for f in self.filenames:
+            self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(f['name']))
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
@@ -1241,7 +1248,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories()
 
     def viewfile_menu(self, position):
-        """ Context menu for view-file to get to the next file and
+        """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder. """
 
         if len(self.filenames) < 2:
@@ -1252,7 +1259,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_latest = menu.addAction(_("File with latest coding"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
 
-        action = menu.exec_(self.ui.pushButton_view_file.mapToGlobal(position))
+        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
             if self.filename is None:
                 self.load_file(self.filenames[0])
@@ -1293,24 +1300,26 @@ class DialogCodeText(QtWidgets.QWidget):
                     except Exception as e:
                         logger.debug(str(e))
 
-    def view_file_dialog(self):
-        """ When view file button is pressed a dialog of filenames is presented to the user.
+    def listwidgetitem_view_file(self):
+        """ When listwidget item is pressed load the file.
         The selected file is then displayed for coding. """
 
         if len(self.filenames) == 0:
             return
-        ui = DialogSelectItems(self.app, self.filenames, "Select file to view", "single")
-        ok = ui.exec_()
-        if ok:
-            # filename is dictionary with id and name
-            self.filename = ui.get_selected()
-            if self.filename == []:
-                return
-            self.load_file(self.filename)
+        itemname = self.ui.listWidget.currentItem().text()
+        self.filename = None
+        for f in self.filenames:
+            if f['name'] == itemname:
+                self.filename = f
+                self.load_file(self.filename)
+                break
 
     def load_file(self, filedata):
         """ Load and display file text for this file.
-        Get and display coding highlights. """
+        Get and display coding highlights.
+        Called from:
+            view_file_dialog, context_menu: ,
+        """
 
         self.filename = filedata
         sql_values = []
