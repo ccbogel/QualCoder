@@ -118,17 +118,22 @@ class DialogCodeImage(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.ui.treeWidget.setStyleSheet(font)
+        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.pushButton_memo.pressed.connect(self.image_memo)
-        self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.pushButton_select.customContextMenuRequested.connect(self.select_image_menu)
-        self.ui.pushButton_select.pressed.connect(self.select_image)
+        self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        self.ui.listWidget.setStyleSheet(tree_font)
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -142,6 +147,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
+            h0 = int(self.app.settings['dialogcodeimage_splitter_h0'])
+            h1 = int(self.app.settings['dialogcodeimage_splitter_h1'])
+            if h0 > 10 and h1 > 10:
+                self.ui.splitter_2.setSizes([h0, h1])
         except:
             pass
         self.fill_tree()
@@ -154,6 +163,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
         self.app.settings['dialogcodeimage_splitter1'] = sizes[1]
+        sizes = self.ui.splitter_2.sizes()
+        self.app.settings['dialogcodeimage_splitter_h0'] = sizes[0]
+        self.app.settings['dialogcodeimage_splitter_h1'] = sizes[1]
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
@@ -312,7 +324,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
-    def select_image_menu(self, position):
+    def viewfile_menu(self, position):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
 
@@ -322,17 +334,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
-        action = menu.exec_(self.ui.pushButton_select.mapToGlobal(position))
+        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
             if self.file_ is None:
                 self.file_ = self.files[0]
-                self.load_image()
+                self.load_file()
                 return
             for i in range(0, len(self.files) - 1):
                 if self.file_ == self.files[i]:
                     found = self.files[i + 1]
                     self.file_ = found
-                    self.load_image()
+                    self.load_file()
                     return
         if action == action_latest:
             sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
@@ -344,24 +356,24 @@ class DialogCodeImage(QtWidgets.QDialog):
             for f in self.files:
                 if f['id'] == result[0]:
                     self.file_ = f
-                    self.load_image()
+                    self.load_file()
                     return
 
-    def select_image(self):
-        """  A dialog of filenames is presented to the user.
-        The selected image file is then displayed for coding. """
+    def listwidgetitem_view_file(self):
+        """ Item selcted so fill current file variable and load. """
 
-        if self.files == []:
+        if len(self.files) == 0:
             return
-        ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
-        ok = ui.exec_()
-        if ok:
-            self.file_ = ui.get_selected()
-            self.load_image()
+        itemname = self.ui.listWidget.currentItem().text()
+        for f in self.files:
+            if f['name'] == itemname:
+                self.file_ = f
+                self.load_file()
+                break
 
-    def load_image(self):
+    def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
-        Called by: select_image_menu, select_image.
+        Called by: select_image_menu, listwisgetitem_view_file
         """
 
         source = self.app.project_path + self.file_['mediapath']
