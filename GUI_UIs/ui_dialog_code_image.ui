@@ -14,28 +14,6 @@
    <string>View Image</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0">
-    <widget class="QSlider" name="horizontalSlider">
-     <property name="minimum">
-      <number>9</number>
-     </property>
-     <property name="singleStep">
-      <number>3</number>
-     </property>
-     <property name="value">
-      <number>99</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TicksBelow</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="minimumSize">
@@ -98,9 +76,9 @@
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>10</x>
         <y>40</y>
-        <width>521</width>
+        <width>511</width>
         <height>26</height>
        </rect>
       </property>
@@ -110,6 +88,28 @@
      </widget>
     </widget>
    </item>
+   <item row="4" column="0">
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="minimum">
+      <number>9</number>
+     </property>
+     <property name="singleStep">
+      <number>3</number>
+     </property>
+     <property name="value">
+      <number>99</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -117,39 +117,42 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QSplitter" name="splitter">
+       <widget class="QSplitter" name="splitter_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QListWidget" name="listWidget"/>
-        <widget class="QTreeWidget" name="treeWidget">
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QScrollArea" name="scrollArea">
-        <property name="widgetResizable">
-         <bool>true</bool>
-        </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>715</width>
-           <height>539</height>
-          </rect>
+        <widget class="QSplitter" name="splitter">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QGraphicsView" name="graphicsView"/>
-          </item>
-         </layout>
+         <widget class="QListWidget" name="listWidget"/>
+         <widget class="QTreeWidget" name="treeWidget">
+          <column>
+           <property name="text">
+            <string notr="true">1</string>
+           </property>
+          </column>
+         </widget>
+        </widget>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>504</width>
+            <height>539</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QGraphicsView" name="graphicsView"/>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </widget>
       </item>
