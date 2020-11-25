@@ -121,9 +121,9 @@ class DialogCodeText(QtWidgets.QWidget):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.ui.treeWidget.setStyleSheet(font)
+        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
@@ -138,8 +138,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        self.ui.listWidget.setStyleSheet(tree_font)
         for f in self.filenames:
-            self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(f['name']))
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.auto_code_menu)

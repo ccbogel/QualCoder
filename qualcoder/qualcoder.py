@@ -274,33 +274,33 @@ class App(object):
     def get_text_filenames(self):
         """ Get filenames of textfiles only. """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
+        cur.execute("select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_image_filenames(self):
         """ Get filenames of image files only. """
 
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where mediapath like '/images/%' or mediapath like 'images:%' order by lower(name)")
+        cur.execute("select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%' order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_av_filenames(self):
         """ Get filenames of audio video files only. """
 
         cur = self.conn.cursor()
-        cur.execute("select id, name from source where (mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') order by lower(name)")
+        cur.execute("select id, name, memo from source where (mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_annotations(self):
