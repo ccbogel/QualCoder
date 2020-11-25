@@ -137,7 +137,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def __init__(self, app, parent_textEdit, dialog_list):
         """ Show list of audio and video files.
-        Can create a transcribe file from the audio / video.
+        Can code a transcribed text file for the audio / video.
         """
 
         super(DialogCodeAV, self).__init__()
@@ -200,15 +200,22 @@ class DialogCodeAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.ui.treeWidget.setStyleSheet(font)
+        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
-        self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.pushButton_select.customContextMenuRequested.connect(self.select_media_menu)
-        self.ui.pushButton_select.pressed.connect(self.select_media)
-        # self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
+        #self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
+        #self.ui.pushButton_select.customContextMenuRequested.connect(self.select_media_menu)
+        #self.ui.pushButton_select.pressed.connect(self.select_media)
+        self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
+        self.ui.listWidget.setStyleSheet(tree_font)
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -497,7 +504,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
-        action = menu.exec_(self.ui.pushButton_select.mapToGlobal(position))
+        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
             if self.media_data is None:
                 self.media_data = self.files[0]
@@ -527,23 +534,21 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.load_segments()
                     self.fill_code_counts_in_tree()
                     return
+                
 
-    def select_media(self):
-        """ A dialog of filenames is presented to the user.
-        The selected media file is then displayed for coding. """
+    def listwidgetitem_view_file(self):
+        """ Item selcted so fill current file variable and load. """
 
-        if self.files == []:
+        if len(self.files) == 0:
             return
-        ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
-        ok = ui.exec_()
-        if not ok:
-            return
-        self.media_data = ui.get_selected()
-        self.load_media()
-        if self.media_data is None:
-            return
-        self.load_segments()
-        self.fill_code_counts_in_tree()
+        itemname = self.ui.listWidget.currentItem().text()
+        for f in self.files:
+            if f['name'] == itemname:
+                self.media_data = f
+                self.load_media()
+                self.load_segments()
+                self.fill_code_counts_in_tree()
+                break
 
     def load_segments(self):
         """ Get coded segments for this file and for this coder.
