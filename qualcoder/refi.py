@@ -1481,14 +1481,15 @@ class Refi_export(QtWidgets.QDialog):
             msg = "Codebook has been exported to "
             msg += filename
             Message(self.app, _("Codebook exported"), _(msg)).exec_()
-            self.parent_textEdit.append(_("Codebook exported") +"\n" + _(msg))
+            self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
             Message(self.app, _("Codebook NOT exported"), str(e)).exec_()
-            self.parent_textEdit.append(_("Codebook NOTexported") + "\n" + _(msg))
+            self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(e)))
 
     def user_guid(self, username):
         """ Requires a username. returns matching guid """
+
         for u in self.users:
             if u['name'] == username:
                 return u['guid']
@@ -1496,6 +1497,7 @@ class Refi_export(QtWidgets.QDialog):
 
     def code_guid(self, code_id):
         """ Requires a code id. returns matching guid """
+
         for c in self.codes:
             if c['cid'] == code_id:
                 return c['guid']
@@ -1575,7 +1577,7 @@ class Refi_export(QtWidgets.QDialog):
         return xml
 
     def project_description_xml(self):
-        """
+        """ Create overall project description memo xml.
         :returns xml string of project description
         """
 
@@ -1588,7 +1590,7 @@ class Refi_export(QtWidgets.QDialog):
         xml = '<Description>' + memo + '</Description>\n'
         return xml
 
-    def create_note_xml(self, journal):  #guid, text, user, datetime, name=""):
+    def create_note_xml(self, journal):
         """ Create a Note xml for journal entries
         Appends xml in notes list.
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
@@ -1709,9 +1711,9 @@ class Refi_export(QtWidgets.QDialog):
         """ Find sources linked to this case, pos0 and pos1 must equal zero.
         Called by: cases_xml
 
-        :param caseid integer
+        :param caseid Integer
 
-        :returns xml string
+        :returns xml String
         """
 
         xml = ''
@@ -1737,9 +1739,9 @@ class Refi_export(QtWidgets.QDialog):
         <TextValue>20-29</TextValue>
         </VariableValue>
 
-        :param caseid integer
+        :param caseid Integer
 
-        :returns xml string for case variables
+        :returns xml String for case variables
         """
 
         xml = ""
@@ -1982,9 +1984,9 @@ class Refi_export(QtWidgets.QDialog):
         </Coding>
         </VideoSelection>
 
-        :param id_ is the source id
+        :param id_ is the source id Integer
 
-        :returns xml string
+        :returns xml String
         """
 
         xml = ""
@@ -2016,7 +2018,7 @@ class Refi_export(QtWidgets.QDialog):
 
         :param source  is this media source dictionary.
 
-        :returns xml string
+        :returns xml String
         """
 
         xml = ""
@@ -2154,7 +2156,7 @@ class Refi_export(QtWidgets.QDialog):
         <SyncPoint guid="c32d0ae1‐7f16‐4bbe‐93a1‐537e2dc0fb66"
         position="94" timeStamp="45000" />
 
-        :param text string
+        :param text String
 
         :return list of time points as [character position, milliseconds]
         """
@@ -2177,7 +2179,6 @@ class Refi_export(QtWidgets.QDialog):
             s = stamp.split(':')
             try:
                 msecs = (int(s[0]) * 60 + int(s[1])) * 1000
-
                 time_pos.append([match.span()[0], msecs])
             except:
                 pass
@@ -2347,7 +2348,8 @@ class Refi_export(QtWidgets.QDialog):
 
     def get_categories(self):
         """ get categories and assign guid.
-        examine is set to true and then to false when creating the xml """
+        examine is set to true and then to false when creating the xml through recursion.
+        """
 
         self.categories = []
         cur = self.app.conn.cursor()
@@ -2356,7 +2358,7 @@ class Refi_export(QtWidgets.QDialog):
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
             'date': row[3].replace(' ', 'T'), 'memo': row[4], 'supercatid': row[5],
-            'guid': self.create_guid(),'examine': True})
+            'guid': self.create_guid(), 'examine': True})
 
     def codebook_xml(self):
         """ Top level items are main categories and unlinked codes
@@ -2380,7 +2382,7 @@ class Refi_export(QtWidgets.QDialog):
                 c['examine'] = False
                 xml += '<Code guid="' + c['guid']
                 xml += '" name="' + c['name']
-                xml += '" isCodable="true'
+                xml += '" isCodable="false'
                 xml += '">\n'
                 if c['memo'] != "":
                     xml += '<Description>' + c['memo'] + '</Description>\n'
@@ -2413,7 +2415,7 @@ class Refi_export(QtWidgets.QDialog):
                     c['examine'] = False
                     xml += '<Code guid="' + c['guid']
                     xml += '" name="' + c['name']
-                    xml += '" isCodable="true'
+                    xml += '" isCodable="false'
                     xml += '">\n'
                     if c['memo'] != "":
                         xml += '<Description>' + c['memo'] + '</Description>\n'
