@@ -658,14 +658,14 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
-        if self.source[x]['mediapath'] is not None and 'docs:' not in self.source[x]['mediapath']:
-            if self.source[x]['mediapath'][:7] in ("/images", "images:"):
+        if self.source[x]['mediapath'] is not None and 'docs:' != self.source[x]['mediapath'][0:5]:
+            if len(self.source[x]['mediapath']) > 6 and self.source[x]['mediapath'][:7] in ("/images", "images:"):
                 self.view_image(x)
                 return
-            if self.source[x]['mediapath'][:6] in ("/video", "video:"):
+            if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/video", "video:"):
                 self.view_av(x)
                 return
-            if self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
+            if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
 
