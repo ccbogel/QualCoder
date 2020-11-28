@@ -481,11 +481,13 @@ class DialogCodeText(QtWidgets.QWidget):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
+        action_code_memo = None
         action_start_pos = None
         action_end_pos = None
         for item in self.code_text:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
+                action_code_memo = menu.addAction(_("Memo coded text"))
                 action_start_pos = menu.addAction(_("Change start position"))
                 action_end_pos = menu.addAction(_("Change end position"))
                 break
@@ -507,6 +509,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.annotate(cursor.position())
         if action == action_unmark:
             self.unmark(cursor.position())
+        if action == action_code_memo:
+            self.coded_text_memo(cursor.position())
         if action == action_start_pos:
             self.change_code_pos(cursor.position(), "start")
         if action == action_end_pos:
@@ -515,6 +519,47 @@ class DialogCodeText(QtWidgets.QWidget):
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.filename['id'], cursor.position()])
             self.app.conn.commit()
+
+    def coded_text_memo(self, position):
+        """ Add or edit a memo for this coded text. """
+
+        if self.filename == {}:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if position >= item['pos0'] and position <= item['pos1'] and item['owner'] == self.app.settings[
+                'codername']:
+                coded_text_list.append(item)
+        if coded_text_list == []:
+            return
+        text_item = None
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to unmark"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if text_item is None:
+            return
+
+        # dictionary with cid fid seltext owner date name color memo
+        ui = DialogMemo(self.app, _("Memo for Coded text: ") + _("Memo for coded text"), text_item['memo'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == text_item['memo']:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
+        self.app.conn.commit()
+        for item in self.code_text:
+            if position >= item['pos0'] and position <= item['pos1'] and item['owner'] == self.app.settings[
+                'codername']:
+                item['memo'] = memo
+        self.app.delete_backup = False
 
     def change_code_pos(self, location, start_or_end):
         """  Called via textedit_menu. """
@@ -1113,6 +1158,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
+    #TODO more detailed method name
     def add_edit_memo(self, selected):
         """ View and edit a memo for a category or code. """
 
@@ -1921,6 +1967,13 @@ class ToolTip_EventFilter(QtCore.QObject):
     code_text = None
 
     def setCodes(self, code_text, codes):
+        """ Code_text contains the coded text to be displayed in a tooptip.
+
+        param:
+            code_text: List of dictionaries of the coded text contains: pos0, pos1, seltext, cid, memo
+            codes: List of dictionaries contains id, name, color
+        """
+
         self.code_text = code_text
         self.codes = codes
         for item in self.code_text:
@@ -1937,7 +1990,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             cursor = receiver.cursorForPosition(helpEvent.pos())
             pos = cursor.position()
             receiver.setToolTip("")
-            displayText = ""
+            display_text = ""
             # Occasional None type error
             if self.code_text is None:
                 #Call Base Class Method to Continue Normal Event Processing
@@ -1961,22 +2014,28 @@ class ToolTip_EventFilter(QtCore.QObject):
                         except:
                             pass
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
-                    if displayText == "":
+                    if display_text == "":
                         try:
-                            displayText = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
+                            display_text = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            if item['memo'] is not None and item['memo'] != "":
+                                display_text += "<br />Memo: " + item['memo']
+                            display_text += "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
                             msg += str(item)
                             logger.error(msg)
                     else:  # Can have multiple codes on same selected area
                         try:
-                            displayText += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext + "</p>"
+                            display_text += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            if item['memo'] is not None and item['memo'] != "":
+                                display_text += "<br />Memo: " + item['memo']
+                            display_text += "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
                             msg += str(item)
                             logger.error(msg)
-            if displayText != "":
-                receiver.setToolTip(displayText)
+            if display_text != "":
+                receiver.setToolTip(display_text)
 
         #Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
