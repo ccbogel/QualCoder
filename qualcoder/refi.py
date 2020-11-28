@@ -188,7 +188,8 @@ class Refi_import():
                     last_insert_id = cur.fetchone()[0]
                     counter += 1
                 except sqlite3.IntegrityError as e:
-                    QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
+                    pass
+                    #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
 
                 # This category may ALSO be a code (e.g. MAXQDA has categories as codes also)
                 # So create a code for this codable category
@@ -208,7 +209,8 @@ class Refi_import():
                         self.codes.append({'guid': parent.get('guid'), 'cid': code_last_insert_id})
                         counter += 1
                     except sqlite3.IntegrityError as e:
-                        QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+                        pass
+                        #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
 
             for e in elements:
                 if e.tag not in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
@@ -233,7 +235,8 @@ class Refi_import():
                 self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
-                QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+                pass
+                #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
 
         # One child, a description so, insert this code into code_name table
@@ -253,7 +256,8 @@ class Refi_import():
                 self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError as e:
-                QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+                pass
+                #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
 
         # SHOULD NOT GET HERE
