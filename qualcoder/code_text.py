@@ -997,7 +997,7 @@ class DialogCodeText(QtWidgets.QWidget):
         except Exception as e:
             e = str(e)
             msg = _("Cannot merge codes, unmark overlapping text first. ") + "\n" + str(e)
-            QtWidgets.QMessageBox.information(None, _("Cannot merge"), msg)
+            Message(self.app, _("Cannot merge"), msg, "warning").exec_()
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
@@ -1221,8 +1221,8 @@ class DialogCodeText(QtWidgets.QWidget):
             # Check that no other code has this name
             for c in self.codes:
                 if c['name'] == new_name:
-                    QtWidgets.QMessageBox.warning(None, _("Name in use"),
-                    new_name + _(" is already in use, choose another name."), QtWidgets.QMessageBox.Ok)
+                    Message(self.app, _("Name in use"),
+                    new_name + _(" is already in use, choose another name."), "warning").exec_()
                     return
             # Find the code in the list
             found = -1
@@ -1250,7 +1250,7 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This code name is already in use.")
-                    QtWidgets.QMessageBox.warning(None, _("Duplicate code name"), msg, QtWidgets.QMessageBox.Ok)
+                    Message(self.app, _("Duplicate code name"), msg, "warning").exec_()
                     return
             # Find the category in the list
             found = -1
@@ -1579,11 +1579,11 @@ class DialogCodeText(QtWidgets.QWidget):
        """
 
         if self.filename == {}:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No file was selected"), QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('Warning'), _("No file was selected"), "warning").exec_()
             return
         item = self.ui.treeWidget.currentItem()
         if item is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"), QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
@@ -1604,8 +1604,8 @@ class DialogCodeText(QtWidgets.QWidget):
             (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Coded"),
-            _("This segment has already been coded with this code by ") + coded['owner'], QtWidgets.QMessageBox.Ok)
+            Message(self.app, _("Already Coded"),
+            _("This segment has already been coded with this code by ") + coded['owner'], "warning").exec_()
             return
         self.code_text.append(coded)
         self.highlight()
@@ -1666,7 +1666,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         if self.filename == {} or self.filename is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No file was selected"))
+            Message.warning(self.app, _('Warning'), _("No file was selected"), "warning").exec_()
             return
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
