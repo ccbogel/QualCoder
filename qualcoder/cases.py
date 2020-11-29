@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 import csv
 import datetime
@@ -41,7 +41,8 @@ from add_item_name import DialogAddItemName
 from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_cases import Ui_Dialog_cases
-from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+from helpers import Message
+
 from memo import DialogMemo
 from view_av import DialogViewAV
 from view_image import DialogViewImage
@@ -243,7 +244,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         if filename[-4:].lower() != ".csv":
             msg = filename + "\n" + _("is not a .csv file. File not imported")
-            QtWidgets.QMessageBox.warning(None, "Warning", msg)
+            Message(self.app, _("Warning"), msg, "warning").exec_()
             self.parent_textEdit.append(msg)
             return
         values = []
@@ -409,10 +410,33 @@ class DialogCases(QtWidgets.QDialog):
         if y > 2:  # update attribute value
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
+            print(attribute_name)
             cur = self.app.conn.cursor()
+
+            # Check numeric for numeric attributes, clear "" if cannot be cast
+            cur.execute("select valuetype from attribute_type where caseOrFile='case' and name=?", (attribute_name, ))
+            result = cur.fetchone()
+            if result is None:
+                return
+            if result[0] == "numeric":
+                try:
+                    float(value)
+                except Exception as e:
+                    self.ui.tableWidget.item(x, y).setText("")
+                    value = ""
+                    msg = _("This attribute is numeric")
+                    Message(self.app, _("Warning"), msg, "warning").exec_()
+
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
             (value, self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
+            # Reload attributes
+            sql = "select attribute.name, value, id from attribute where attr_type='case'"
+            cur.execute(sql)
+            result = cur.fetchall()
+            self.attributes = []
+            for row in result:
+                self.attributes.append(row)
         self.app.delete_backup = False
 
     def cell_selected(self):
@@ -659,7 +683,7 @@ class DialogCases(QtWidgets.QDialog):
                 except Exception as e:
                     logger.debug(str(e))
                     print(e)
-                    QtWidgets.QMessageBox.warning(None, 'view av/images error', str(e), QtWidgets.QMessageBox.Ok)
+                    Message(self.app, 'view av/images error', str(e), "warning").exec_()
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Select all, Copy. """
@@ -677,9 +701,4 @@ class DialogCases(QtWidgets.QDialog):
             cb.setText(selected_text, mode=cb.Clipboard)
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogGetStartAndEndMarks("case one", ["file 1","file 2"])
-    ui.show()
-    sys.exit(app.exec_())
 
