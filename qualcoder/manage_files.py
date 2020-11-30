@@ -246,7 +246,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.rows_hidden = False
 
     def export_file_as_linked_file(self, id_, mediapath):
-        """ Move an internal project file into an external location as a linked file. """
+        """ Move an internal project file into an external location as a linked file.
+
+        params:
+            id_ : the file id, Integer
+            mediapath: stored path to media, will be None for text files, or String
+        """
 
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -255,8 +260,18 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
-        file_directory = mediapath.split('/')[1]  # as [0] will be blank
-        destination = directory + "/" + mediapath.split('/')[-1]
+        file_directory = ""
+        if mediapath is not None:
+            file_directory = mediapath.split('/')[1]  # as [0] will be blank
+            destination = directory + "/" + mediapath.split('/')[-1]
+        else:
+            # Text files have None as mediapath
+            cur = self.app.conn.cursor()
+            cur.execute("select name from source where id=?", [id_, ])
+            name = cur.fetchone()[0]
+            file_directory = "documents"
+            mediapath = "/documents/" + name
+            destination = directory + "/" + name
         msg = _("Export to ") + destination + "\n"
         try:
             move(self.app.project_path + mediapath, destination)
