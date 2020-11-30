@@ -1625,7 +1625,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-
         for row, data in enumerate(self.source):
             self.ui.tableWidget.insertRow(row)
             icon = data['icon']
@@ -1666,9 +1665,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                         #print("found", a)
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.resizeColumnsToContents()
-        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450:
+        table_w = 0
+        for i in range(self.ui.tableWidget.columnCount()):
+            table_w += self.ui.tableWidget.columnWidth(i)
+        #print("t", table_w)
+        #print("d", self.size().width() - 20)  # 20 for L and R margins
+        dialog_w = self.size().width() - 20
+        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
             self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
-
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':
