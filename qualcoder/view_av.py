@@ -268,8 +268,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.video_set_key_input(False)
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
-        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
+        self.ui.horizontalSlider.sliderReleased.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
@@ -544,7 +544,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     return
 
     def listwidgetitem_view_file(self):
-        """ Item selcted so fill current file variable and load. """
+        """ Item selected so fill current file variable and load. """
 
         if len(self.files) == 0:
             return
@@ -664,6 +664,22 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
+        # Need this for helping set the slider on user sliding before play begins
+        # Also need to determine how many tracks available
+        self.mediaplayer.play()
+        time.sleep(0.2)
+        # print( self.mediaplayer.audio_get_track_count()) # > 0
+        tracks = self.mediaplayer.audio_get_track_description()
+        good_tracks = []  # note where track [0] == -1 is a disabled track
+        for track in tracks:
+            if track[0] >= 0:
+                good_tracks.append(track)
+            # print(track[0], track[1])  # track number and track name
+        if len(good_tracks) < 2:
+            self.ui.label.setEnabled(False)
+            self.ui.comboBox_tracks.setEnabled(False)
+        self.mediaplayer.pause()
+
         # Get the transcribed text and fill textedit
         cur = self.app.conn.cursor()
         cur.execute("select id, fulltext, name from source where name = ?", [self.media_data['name'] + ".transcribed"])
@@ -808,8 +824,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         self.timer.stop()
+        self.mediaplayer.pause()
         pos = self.ui.horizontalSlider.value()
         self.mediaplayer.set_position(pos / 1000.0)
+        self.mediaplayer.play()
         self.timer.start()
 
     def audio_track_changed(self):
@@ -1147,13 +1165,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
 
-        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove and self.media is not None:
-            maxx = self.ui.horizontalSlider.size().width()
-            proportion = event.pos().x() / maxx
-            msecs = self.media.get_duration() * proportion
-            time = msecs_to_mins_and_secs(msecs)
-            self.ui.horizontalSlider.setToolTip(time)
-
         if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent = 7
             return False
         key = event.key()
@@ -1399,7 +1410,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         # TODO font size in message box
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
-                                               msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+                msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return
         cur = self.app.conn.cursor()
@@ -2560,8 +2571,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
-        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
+        self.ui.horizontalSlider.sliderReleased.connect(self.set_position)
 
         try:
             self.media = self.instance.media_new(abs_path)
@@ -2592,7 +2603,6 @@ class DialogViewAV(QtWidgets.QDialog):
         # specific, so we must give the ID of the QFrame (or similar object) to
         # vlc. Different platforms have different functions for this
         if platform.system() == "Linux":  # for Linux using the X Server
-            # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
             self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
         elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
@@ -2606,6 +2616,22 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
+        # Need this for helping set the slider on user sliding before play begins
+        # Detect number of audio tracks in media
+        self.mediaplayer.play()
+        time.sleep(0.2)
+        #print( self.mediaplayer.audio_get_track_count()) # > 0
+        tracks = self.mediaplayer.audio_get_track_description()
+        good_tracks = []  # note where track [0] == -1 is a disabled track
+        for track in tracks:
+            if track[0] >= 0:
+                good_tracks.append(track)
+            #print(track[0], track[1])  # track number and track name
+        if len(good_tracks) < 2:
+            self.ui.label.setEnabled(False)
+            self.ui.comboBox_tracks.setEnabled(False)
+        self.mediaplayer.stop()
+
         # self.play_pause()
 
     def ddialog_menu(self, position):
@@ -2635,16 +2661,17 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ddialog.resize(w, h)
 
     def set_position(self):
-        """ Set the movie position according to the position slider.
+        """ Set the a/v position according to the slider position.
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
         integer variables, so you need a factor; the higher the factor, the
         more precise are the results (1000 should suffice).
         """
 
-        # Set the media position to where the slider was dragged
         self.timer.stop()
+        self.mediaplayer.pause()
         pos = self.ui.horizontalSlider.value()
         self.mediaplayer.set_position(pos / 1000.0)
+        self.mediaplayer.play()
         self.timer.start()
 
     def eventFilter(self, object, event):
@@ -2662,13 +2689,6 @@ class DialogViewAV(QtWidgets.QDialog):
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
         """
-
-        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
-            maxx = self.ui.horizontalSlider.size().width()
-            proportion = event.pos().x() / maxx
-            msecs = self.media.get_duration() * proportion
-            time = msecs_to_mins_and_secs(msecs)
-            self.ui.horizontalSlider.setToolTip(time)
 
         if event.type() != 7:  # QtGui.QKeyEvent
             return False
