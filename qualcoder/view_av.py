@@ -168,6 +168,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         try:
             w = int(self.app.settings['dialogcodeav_w'])
             h = int(self.app.settings['dialogcodeav_h'])
@@ -178,8 +179,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.ui.splitter.setSizes([100, 200])
+        try:
+            s0 = int(self.app.settings['dialogcodeav_splitter0'])
+            s1 = int(self.app.settings['dialogcodeav_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, s1])
+            h0 = int(self.app.settings['dialogcodeav_splitter_h0'])
+            h1 = int(self.app.settings['dialogcodeav_splitter_h1'])
+            if h0 > 10 and h1 > 10:
+                self.ui.splitter_2.setSizes([h0, h1])
+        except:
+            pass
+
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
@@ -205,9 +216,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
-        #self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
-        #self.ui.pushButton_select.customContextMenuRequested.connect(self.select_media_menu)
-        #self.ui.pushButton_select.pressed.connect(self.select_media)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -534,7 +542,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.load_segments()
                     self.fill_code_counts_in_tree()
                     return
-                
 
     def listwidgetitem_view_file(self):
         """ Item selcted so fill current file variable and load. """
@@ -944,6 +951,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
         self.app.settings['codeav_abs_pos_y'] = self.pos().y()
+        self.app.settings['dialogcodeav_splitter0'] = self.ui.splitter.sizes()[0]
+        self.app.settings['dialogcodeav_splitter1'] = self.ui.splitter.sizes()[1]
+        self.app.settings['dialogcodeav_splitter_h0'] = self.ui.splitter_2.sizes()[0]
+        self.app.settings['dialogcodeav_splitter_h1'] = self.ui.splitter_2.sizes()[1]
         self.ddialog.close()
         self.stop()
 
@@ -2448,10 +2459,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.app = app
         self.media_data = media_data
         abs_path = ""
-        if "video:" in media_data['mediapath'] or 'audio:' in media_data['mediapath']:
-            abs_path = media_data['mediapath'].split(':')[1]
-        else:
-            abs_path = self.app.project_path + media_data['mediapath']
+        if self.media_data['mediapath'][0:6] in ('/audio', '/video'):
+            abs_path = self.app.project_path + self.media_data['mediapath']
+        if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.media_data['mediapath'][6:]
+
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -2551,6 +2563,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
+
         try:
             #self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
             self.media = self.instance.media_new(abs_path)
