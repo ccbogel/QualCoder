@@ -61,7 +61,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_view.setText(_translate("Dialog_manage_files", "Open"))
         self.pushButton_create.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Create a text file</p></body></html>"))
         self.pushButton_create.setText(_translate("Dialog_manage_files", "Create"))
-        self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p><br/></p></body></html>"))
+        self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export selected file</p></body></html>"))
         self.pushButton_export.setText(_translate("Dialog_manage_files", "Export"))
         self.pushButton_delete.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Select files for deletion</p></body></html>"))
         self.pushButton_delete.setText(_translate("Dialog_manage_files", "Delete files"))
