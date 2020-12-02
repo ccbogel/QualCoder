@@ -437,11 +437,15 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
 
         abs_path = ""
-        if ':' in mediapath:  # Linked
-            abs_path = mediapath.split(':')[1]
+        if 'audio:' == mediapath[0:6]:
+            abs_path = mediapath[6:]
+        elif 'video:' == mediapath[0:6]:
+            abs_path = mediapath[6:]
+        elif 'images:' == mediapath[0:7]:
+            abs_path = mediapath[7:]
         else:
             abs_path = self.app.project_path + mediapath
-
+            
         if mediapath[:8] == "/images/":
             icon = QtGui.QIcon("GUI/picture.png")
             w = 0
