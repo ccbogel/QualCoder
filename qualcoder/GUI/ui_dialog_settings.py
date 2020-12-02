@@ -13,9 +13,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_settings(object):
     def setupUi(self, Dialog_settings):
         Dialog_settings.setObjectName("Dialog_settings")
-        Dialog_settings.resize(780, 542)
+        Dialog_settings.resize(627, 544)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_settings)
-        self.buttonBox.setGeometry(QtCore.QRect(440, 500, 261, 32))
+        self.buttonBox.setGeometry(QtCore.QRect(270, 500, 261, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
@@ -72,11 +72,11 @@ class Ui_Dialog_settings(object):
         self.comboBox_language.setGeometry(QtCore.QRect(200, 110, 241, 32))
         self.comboBox_language.setObjectName("comboBox_language")
         self.checkBox_auto_backup = QtWidgets.QCheckBox(Dialog_settings)
-        self.checkBox_auto_backup.setGeometry(QtCore.QRect(30, 307, 721, 23))
+        self.checkBox_auto_backup.setGeometry(QtCore.QRect(30, 307, 900, 23))
         self.checkBox_auto_backup.setChecked(True)
         self.checkBox_auto_backup.setObjectName("checkBox_auto_backup")
         self.checkBox_backup_AV_files = QtWidgets.QCheckBox(Dialog_settings)
-        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(30, 340, 721, 81))
+        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(30, 340, 601, 81))
         self.checkBox_backup_AV_files.setChecked(True)
         self.checkBox_backup_AV_files.setObjectName("checkBox_backup_AV_files")
         self.label_5 = QtWidgets.QLabel(Dialog_settings)
@@ -115,6 +115,7 @@ class Ui_Dialog_settings(object):
         Dialog_settings.setWindowTitle(_translate("Dialog_settings", "Settings"))
         self.label_coderName.setText(_translate("Dialog_settings", "This Coder Name"))
         self.label.setText(_translate("Dialog_settings", "General font and size"))
+        self.checkBox.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Show the identifying numbers for files, cases, codes, et cetera.</p></body></html>"))
         self.checkBox.setText(_translate("Dialog_settings", "Show IDs"))
         self.label_directory.setText(_translate("Dialog_settings", "/"))
         self.pushButton_choose_directory.setText(_translate("Dialog_settings", "Default project directory"))
@@ -126,7 +127,9 @@ class Ui_Dialog_settings(object):
         self.checkBox_backup_AV_files.setText(_translate("Dialog_settings", "Backup video and audio files. Uncheck to speed up backups.\n"
 "Not recommended unless you have many large files slowing the backup.\n"
 "You must store these files elsewhere."))
+        self.label_5.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Used when entering time position in transcription</p></body></html>"))
         self.label_5.setText(_translate("Dialog_settings", "Time format"))
+        self.label_6.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Used when entering speaker name in transcription</p></body></html>"))
         self.label_6.setText(_translate("Dialog_settings", "Speaker format"))
 
 
