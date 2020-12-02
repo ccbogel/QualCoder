@@ -944,10 +944,10 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Check media exists
         abs_path = ""
-        if "video:" in self.source[x]['mediapath'] or 'audio:' in self.source[x]['mediapath']:
-            abs_path = self.source[x]['mediapath'].split(':')[1]
-        else:
+        if self.source[x]['mediapath'][0:6] in ('/audio', '/video'):
             abs_path = self.app.project_path + self.source[x]['mediapath']
+        if self.source[x]['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.source[x]['mediapath'][6:]
         if not os.path.exists(abs_path):
             #TODO update bad links
             return

@@ -2463,7 +2463,6 @@ class DialogViewAV(QtWidgets.QDialog):
             abs_path = self.app.project_path + self.media_data['mediapath']
         if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
             abs_path = self.media_data['mediapath'][6:]
-        print(abs_path)  # tmp
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
