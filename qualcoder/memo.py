@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtWidgets, QtCore
 import os
@@ -74,6 +74,11 @@ class DialogMemo(QtWidgets.QDialog):
         self.setWindowTitle(title)
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
+        self.ui.pushButton_clear.pressed.connect(self.clear_contents)
+
+    def clear_contents(self):
+        """ Clear all text """
+        self.ui.textEdit.setPlainText("")
 
     def accept(self):
         """ Accepted button overridden method. """
