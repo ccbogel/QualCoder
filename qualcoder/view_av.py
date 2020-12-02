@@ -83,7 +83,7 @@ from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from helpers import msecs_to_mins_and_secs
+from helpers import msecs_to_mins_and_secs, Message
 from memo import DialogMemo
 from select_items import DialogSelectItems
 
@@ -2463,7 +2463,7 @@ class DialogViewAV(QtWidgets.QDialog):
             abs_path = self.app.project_path + self.media_data['mediapath']
         if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
             abs_path = self.media_data['mediapath'][6:]
-
+        print(abs_path)  # tmp
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -2565,14 +2565,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
 
         try:
-            #self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
             self.media = self.instance.media_new(abs_path)
         except Exception as e:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Media not found'))
-            mb.setText(str(e) + "\n" + abs_path)  # self.app.project_path + self.media_data['mediapath'])
-            mb.exec_()
+            Message(self.app, _('Media not found'), str(e) + "\n" + abs_path).exec_()
             self.closeEvent()
             return
         if self.media_data['mediapath'][0:7] not in ("/audio", "audio:"):
