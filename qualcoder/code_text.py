@@ -174,6 +174,10 @@ class DialogCodeText(QtWidgets.QWidget):
             s1 = int(self.app.settings['dialogcodetext_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
+            v0 = int(self.app.settings['dialogcodetext_splitter_v0'])
+            v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
+            if v0 > 5 and v1 > 5:
+                self.ui.leftsplitter.setSizes([v0, v1])
         except:
             pass
         self.fill_tree()
@@ -187,6 +191,9 @@ class DialogCodeText(QtWidgets.QWidget):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodetext_splitter0'] = sizes[0]
         self.app.settings['dialogcodetext_splitter1'] = sizes[1]
+        v_sizes = self.ui.leftsplitter.sizes()
+        self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
+        self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name and colour.

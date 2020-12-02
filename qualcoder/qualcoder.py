@@ -273,6 +273,7 @@ class App(object):
 
     def get_text_filenames(self):
         """ Get filenames of textfiles only. """
+
         cur = self.conn.cursor()
         cur.execute("select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
         result = cur.fetchall()
@@ -401,8 +402,10 @@ class App(object):
         'dialogjournals_w', 'dialogjournals_h', 'dialogsql_w', 'dialogsql_h',
         'dialogcases_w', 'dialogcases_h', 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
         'dialogmanagesttributes_w', 'dialogmanageattributes_h',
-        'dialogcodetext_splitter0', 'dialogcodetext_splitter1', 'dialogcodeimage_splitter0',
-        'dialogcodeimage_splitter1', 'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
+        'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
+        'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
+        'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
+        'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
         'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
         'dialogjournals_splitter0', 'dialogjournals_splitter1', 'dialogsql_splitter_h0',
         'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
@@ -413,6 +416,8 @@ class App(object):
         'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
         'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
+        'dialogcodeav_splitter_0','dialogcodeav_splitter_1',
+        'dialogcodeav_splitter_h0','dialogcodeav_splitter_h1',
         'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
@@ -479,6 +484,8 @@ class App(object):
             'dialogcodetext_h': 0,
             'dialogcodetext_splitter0': 1,
             'dialogcodetext_splitter1': 1,
+            'dialogcodetext_splitter_v0': 1,
+            'dialogcodetext_splitter_v1': 1,
             'dialogcodeimage_w': 0,
             'dialogcodeimage_h': 0,
             'dialogcodeimage_splitter0': 1,
@@ -525,6 +532,10 @@ class App(object):
             'dialogcodeav_h': 0,
             'codeav_abs_pos_x': 0,
             'codeav_abs_pos_y': 0,
+            'dialogcodeav_splitter_0': 0,
+            'dialogcodeav_splitter_1': 0,
+            'dialogcodeav_splitter_h0': 0,
+            'dialogcodeav_splitter_h1': 0,
             'dialogviewav_w': 0,
             'dialogviewav_h': 0,
             'viewav_abs_pos_x': 0,
