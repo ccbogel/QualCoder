@@ -95,16 +95,20 @@ class Rqda_import():
         return: standard format date
         """
 
-        yyyy = r_date[-4:] # remove day string
+        yyyy = r_date[-4:]
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         mm = str(months.index(r_date[4:7]) + 1)
         if len(mm) == 1:
             mm = "0" + mm
         # TODO check if day is ALWAYS 2 digits
         dd = r_date[8:10]
-        hh_mm_ss = r_date[11:19]
-        if hh_mm_ss[0] == " ":
-            hh_mm_ss = "0" + hh_mm_ss[1:]
+        # TODO check if hours is ALWAYS 2 digits
+        # Different way to get hh ,mm ss as slice was not working
+        s = r_date.split(" ")
+        hh_mm_ss = s[-2]
+        #hh_mm_ss = r_date[11:19]
+        #if hh_mm_ss[0] == " ":
+        #    hh_mm_ss = "0" + hh_mm_ss[1:]
         return yyyy + "-" + mm + "-" + dd + " " + hh_mm_ss
 
     def import_data(self):
