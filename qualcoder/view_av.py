@@ -269,7 +269,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.horizontalSlider.sliderReleased.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
@@ -823,12 +822,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         more precise are the results (1000 should suffice).
         """
 
-        self.timer.stop()
-        self.mediaplayer.pause()
-        pos = self.ui.horizontalSlider.value()
-        self.mediaplayer.set_position(pos / 1000.0)
-        self.mediaplayer.play()
-        self.timer.start()
+        if self.mediaplayer.is_playing():
+            self.mediaplayer.pause()
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
+            self.mediaplayer.play()
+            self.timer.start()
+        else:
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
 
     def audio_track_changed(self):
         """ Audio track changed.
@@ -2572,7 +2574,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.horizontalSlider.sliderReleased.connect(self.set_position)
 
         try:
             self.media = self.instance.media_new(abs_path)
@@ -2631,7 +2632,6 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.label.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.stop()
-
         # self.play_pause()
 
     def ddialog_menu(self, position):
@@ -2667,12 +2667,15 @@ class DialogViewAV(QtWidgets.QDialog):
         more precise are the results (1000 should suffice).
         """
 
-        self.timer.stop()
-        self.mediaplayer.pause()
-        pos = self.ui.horizontalSlider.value()
-        self.mediaplayer.set_position(pos / 1000.0)
-        self.mediaplayer.play()
-        self.timer.start()
+        if self.mediaplayer.is_playing():
+            self.mediaplayer.pause()
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
+            self.mediaplayer.play()
+            self.timer.start()
+        else:
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
 
     def eventFilter(self, object, event):
         """ Add key options to improve manual transcribing.
