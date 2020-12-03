@@ -663,9 +663,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
+        
         # Need this for helping set the slider on user sliding before play begins
         # Also need to determine how many tracks available
         self.mediaplayer.play()
+        self.mediaplayer.audio_set_volume(0)
         time.sleep(0.2)
         # print( self.mediaplayer.audio_get_track_count()) # > 0
         tracks = self.mediaplayer.audio_get_track_description()
@@ -678,6 +680,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.label.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.pause()
+        self.mediaplayer.audio_set_volume(100)
 
         # Get the transcribed text and fill textedit
         cur = self.app.conn.cursor()
@@ -2620,6 +2623,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # Need this for helping set the slider on user sliding before play begins
         # Detect number of audio tracks in media
         self.mediaplayer.play()
+        self.mediaplayer.audio_set_volume(0)
         time.sleep(0.2)
         #print( self.mediaplayer.audio_get_track_count()) # > 0
         tracks = self.mediaplayer.audio_get_track_description()
@@ -2632,6 +2636,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.label.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.stop()
+        self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
 
     def ddialog_menu(self, position):
@@ -3080,7 +3085,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.comboBox_tracks.setCurrentIndex(0)
 
     def set_volume(self, volume):
-        """ Set the volume. """
+        """ Set the volume. The slider ranges from 0 to 100."""
 
         self.mediaplayer.audio_set_volume(volume)
 
