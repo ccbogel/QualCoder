@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from copy import copy
 import datetime
@@ -88,19 +88,23 @@ class Rqda_import():
     def convert_date(self, r_date):
         """ Convert RQDA date format from:
         Mon Oct 28 08:11:36 2019 to: yyyy-mm-dd hh:mm:ss
+        Leading zeros on hour may be missing
+        Mon Oct 28 8:11:36 2019 to: yyyy-mm-dd hh:mm:ss
 
         param: rqda formatted date
         return: standard format date
         """
 
-        yyyy = r_date[-4:]
+        yyyy = r_date[-4:] # remove day string
         months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         mm = str(months.index(r_date[4:7]) + 1)
         if len(mm) == 1:
             mm = "0" + mm
         # TODO check if day is ALWAYS 2 digits
         dd = r_date[8:10]
-        hh_mm_ss = r_date[12:19]
+        hh_mm_ss = r_date[11:19]
+        if hh_mm_ss[0] == " ":
+            hh_mm_ss = "0" + hh_mm_ss[1:]
         return yyyy + "-" + mm + "-" + dd + " " + hh_mm_ss
 
     def import_data(self):
