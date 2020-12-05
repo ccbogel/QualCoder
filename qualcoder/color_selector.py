@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 import logging
 import os
@@ -54,18 +54,21 @@ colors = ["#F8E0E0","#F6CECE","#F5A9A9","#F78181","#FA5858","#F8E6E0","#F6D8CE",
     "#E0F8E0","#CEF6CE","#A9F5A9","#81F781","#58FA58","#CEF6E3","#A9F5D0","#81F7BE","#58FAAC","#2EFE9A",
     "#CEF6F5","#A9F5F2","#81F7F3","#58FAF4","#2EFEF7","#CEE3F6","#A9D0F5","#81BEF7","#3498DB","#5882FA",
     "#ECE0F8","#E3CEF6","#D0A9F5","#BE81F7","#AC58FA","#F8E0F7","#F6CEF5","#F5A9F2","#F781F3","#FA58F4",
-    "#F8E0E6","#F6CED8","#F5A9BC","#F7819F","#FA5882","#F0F0F0","#EAEAEA","#E6E6E6","#D8D8D8","#BDBDBD"]
+    "#F8E0E6","#F6CED8","#F5A9BC","#F7819F","#FA5882","#F0F0F0","#EAEAEA","#E6E6E6","#D8D8D8","#BDBDBD",
+    "#0D47A1","#311B92","#4A148C","#880E4F","#B71C1C","#BF360C","#E65100","#FF6F00","#33691E","#1B5E20"]
+
+COLS = 10
+ROWS = 8
 
 
 class DialogColorSelect(QtWidgets.QDialog):
-    """ Dialog to select colour for code.
-    There are 10 columns and 6 rows of colours. """
+    """ Dialog to select colour for code. """
 
     selected_color = None
 
     def __init__(self, prev_color, parent=None):
 
-        super(DialogColorSelect, self).__init__(parent)  # overrride accept method
+        super(DialogColorSelect, self).__init__(parent)
         sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_colour_selector()
@@ -78,19 +81,19 @@ class DialogColorSelect(QtWidgets.QDialog):
         c = QtGui.QColor(self.selected_color)
         palette.setColor(QtGui.QPalette.Window, c)
         self.ui.label_colour_old.setPalette(palette)
-        self.ui.label_colour_old.setAutoFillBackground(True)  # important
+        self.ui.label_colour_old.setAutoFillBackground(True)
 
     def color_selected(self):
         """ Get colour selection from table widget. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        self.selected_color = colors[x * 10 + y]
+        self.selected_color = colors[x * COLS + y]
         palette = self.ui.label_colour_new.palette()
         c = QtGui.QColor(self.selected_color)
         palette.setColor(QtGui.QPalette.Window, c)
         self.ui.label_colour_new.setPalette(palette)
-        self.ui.label_colour_new.setAutoFillBackground(True)  # important
+        self.ui.label_colour_new.setAutoFillBackground(True)
 
     def get_color(self):
         """ Get the selected color from selected table widget cell. """
@@ -98,20 +101,22 @@ class DialogColorSelect(QtWidgets.QDialog):
         return self.selected_color
 
     def accept(self):
-        """ Overrriden accept button. """
+        """ Overrride accept button. """
 
         super(DialogColorSelect, self).accept()
 
     def setupUi(self):
-        """ seven rows of 10 columns of colours. """
+        """ Eight rows of ten columns of colours. """
 
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        for row in range(0, 7):
+        self.ui.tableWidget.setColumnCount(COLS)
+        self.ui.tableWidget.setRowCount(ROWS)
+        for row in range(0, ROWS):
             self.ui.tableWidget.setRowHeight(row, 31)
-            for col in range(0, 10):
+            for col in range(0, COLS):
                 self.ui.tableWidget.setColumnWidth(col, 52)
                 item = QtWidgets.QTableWidgetItem()
-                codeColor = colors[row * 10 + col]
+                codeColor = colors[row * COLS + col]
                 item.setBackground(QtGui.QBrush(QtGui.QColor(codeColor)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
