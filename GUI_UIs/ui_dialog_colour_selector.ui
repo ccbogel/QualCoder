@@ -54,7 +54,7 @@
      <x>10</x>
      <y>100</y>
      <width>521</width>
-     <height>221</height>
+     <height>252</height>
     </rect>
    </property>
    <property name="verticalScrollBarPolicy">
@@ -69,6 +69,11 @@
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>
+   <row>
+    <property name="text">
+     <string>New Row</string>
+    </property>
+   </row>
    <row>
     <property name="text">
      <string>New Row</string>
