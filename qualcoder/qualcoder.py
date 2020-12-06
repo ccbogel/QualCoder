@@ -379,8 +379,6 @@ class App(object):
         config.read(self.configpath)
         default = config['DEFAULT']
         result = dict(default)
-        if result['codername'] == "":
-            result['codername'] = "default"
         # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
@@ -457,6 +455,8 @@ class App(object):
             self.write_config_ini(self.default_settings)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
+        if result['codername'] == "":
+            result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
         #TODO TEMPORARY delete in 2021
         if result['speakernameformat'] == 0:
@@ -576,16 +576,20 @@ class App(object):
         Possible design flaw is that codernames are not stored in a specific table in the database.
         """
 
-        cur = self.conn.cursor()
-        sql = "select owner from code_image union select owner from code_text union select owner from code_av "
-        sql += "union select owner from cases union select owner from source union select owner from code_name"
-        cur.execute(sql)
-        res = cur.fetchall()
         # The coder name may be stored in the config.ini file, so need to add it here as it may not be obtained from the sql
         coder_names = [self.settings['codername']]
-        for r in res:
-            if r[0] not in coder_names:
-                coder_names.append(r[0])
+        # Try except, as there may not be an open project
+        try:
+            cur = self.conn.cursor()
+            sql = "select owner from code_image union select owner from code_text union select owner from code_av "
+            sql += "union select owner from cases union select owner from source union select owner from code_name"
+            cur.execute(sql)
+            res = cur.fetchall()
+            for r in res:
+                if r[0] not in coder_names:
+                    coder_names.append(r[0])
+        except:
+            pass
         return coder_names
 
 
