@@ -1964,6 +1964,8 @@ class DialogCodeText(QtWidgets.QWidget):
          Use selects and undoes the chosen autocoding operation.
          The autocode_history is a list of dictionaries with 'name' and 'sql_list' """
 
+        if self.autocode_history == []:
+            return
         ui = DialogSelectItems(self.app, self.autocode_history, _("Select auto-codings to undo"), "single")
         ok = ui.exec_()
         if not ok:
