@@ -191,6 +191,22 @@ class DialogCodeAV(QtWidgets.QDialog):
         except:
             pass
 
+        # Labels need to be 32x32 pixels for 32x32 icons
+        self.ui.label_time_3.setStyleSheet("background-image : url(GUI/clock_icon.png);")
+        self.ui.label_volume.setStyleSheet("background-image : url(GUI/sound_high_icon.png);")
+        # Buttons need to be 36x36 pixels for 32x32 icons
+        self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
+        self.ui.pushButton_rewind_30.setStyleSheet("background-image : url(GUI/rewind_30_icon.png);")
+        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
+        self.ui.pushButton_rewind_5.setStyleSheet("background-image : url(GUI/rewind_5_icon.png);")
+        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
+        self.ui.pushButton_forward_30.setStyleSheet("background-image : url(GUI/forward_30_icon.png);")
+        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
+        self.ui.pushButton_rate_down.setStyleSheet("background-image : url(GUI/rate_down_icon.png);")
+        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
+        self.ui.pushButton_rate_up.setStyleSheet("background-image : url(GUI/rate_up_icon.png);")
+        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
@@ -658,12 +674,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.media_duration_text = "Duration: " + msecs_to_mins_and_secs(msecs)
-        self.ui.label_time_2.setText(self.media_duration_text)
+        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.ui.label_time.setText("0.00" + self.media_duration_text)
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
-        
+
         # Need this for helping set the slider on user sliding before play begins
         # Also need to determine how many tracks available
         self.mediaplayer.play()
@@ -852,7 +868,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
             self.is_paused = True
             self.timer.stop()
         else:
@@ -867,10 +883,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-
+            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText(_("Pause"))
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/playback_pause_icon.png);")
             self.timer.start()
             self.is_paused = False
             self.play_segment_end = None
@@ -882,7 +897,7 @@ class DialogCodeAV(QtWidgets.QDialog):
          Programatically setting the audio track to other values does not work."""
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText(_("Play"))
+        self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
         self.timer.stop()
         self.ui.horizontalSlider.setProperty("value", 0)
         self.play_segment_end = None
@@ -917,7 +932,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # update label_time
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
 
         # Check if segments need to be reloaded
         # This only updates if the media is playing, not ideal, but works
@@ -940,6 +955,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
@@ -993,7 +1009,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.fill_code_counts_in_tree()
             return
         time = self.ui.label_time.text()
-        time = time[6:]
+        time = time.split(" / ")[0]
         time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
@@ -1205,37 +1221,13 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.play_pause()
         # Advance 30 seconds Alt F
         if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() + 30000
-            if time_msecs > self.media.get_duration():
-                time_msecs = self.media.get_duration() - 1
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.forward_30_seconds()
         # Rewind 30 seconds Alt R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() - 30000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_30_seconds()
         # Rewind 5 seconds Ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 5000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_5_seconds()
         # Increase play rate  Ctrl + Shift + >
         if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.increase_play_rate()
@@ -1243,6 +1235,51 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_Less and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.decrease_play_rate()
         return False
+
+    def rewind_30_seconds(self):
+        """ Rewind AV by 30 seconds. """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() - 30000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def rewind_5_seconds(self):
+        """ Rewind AV by 30 seconds. """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() - 5000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def forward_30_seconds(self):
+        """ Forward AV 30 seconds. """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
 
     def extend_left(self, code_):
         """ Shift left arrow """
@@ -1308,7 +1345,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if rate > 2:
             rate = 2
         self.mediaplayer.set_rate(rate)
-        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def decrease_play_rate(self):
         """ Several decreased rate options """
@@ -1318,7 +1355,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if rate < 0.1:
             rate = 0.1
         self.mediaplayer.set_rate(rate)
-        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def assign_segment_to_code(self, selected):
         """ Assign time segment to selected code. Insert an entry into the database.
@@ -1809,7 +1846,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         code_to_edit = None
         if len(code_list) == 1:
             code_to_edit = code_list[0]
-        # multiple codes to selet from
+        # multiple codes to select from
         if len(code_list) > 1:
             ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
@@ -1866,7 +1903,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        self.ui.pushButton_play.setText(_("Pause"))
+        self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/playback_pause_icon.png);")
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
@@ -2217,7 +2254,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Draws coded segment line. The media duration determines the scaler for the line length and position.
     y values are pre-calculated and stored in the segment data.
-    Refernces Dialog_code_av for variables and methods.
+    References Dialog_code_av for variables and methods.
     """
 
     app = None
@@ -2367,7 +2404,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.mediaplayer.play()
         self.code_av_dialog.mediaplayer.set_position(pos)
         self.code_av_dialog.is_paused = False
-        self.code_av_dialog.ui.pushButton_play.setText(_("Pause"))
+        self.code_av_dialog.ui.pushButton_play.setStyleSheet("background-image : url(GUI/playback_pause_icon.png);")
         self.code_av_dialog.play_segment_end = self.segment['pos1']
         self.code_av_dialog.timer.start()
 
@@ -2530,6 +2567,22 @@ class DialogViewAV(QtWidgets.QDialog):
             self.get_speaker_names_from_bracketed_text()
             self.add_speaker_names_to_label()
 
+        # Labels need to be 32x32 pixels for 32x32 icons
+        self.ui.label_time_3.setStyleSheet("background-image : url(GUI/clock_icon.png);")
+        self.ui.label_volume.setStyleSheet("background-image : url(GUI/sound_high_icon.png);")
+        # Buttons need to be 36x36 pixels for 32x32 icons
+        self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
+        self.ui.pushButton_rewind_30.setStyleSheet("background-image : url(GUI/rewind_30_icon.png);")
+        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
+        self.ui.pushButton_rewind_5.setStyleSheet("background-image : url(GUI/rewind_5_icon.png);")
+        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
+        self.ui.pushButton_forward_30.setStyleSheet("background-image : url(GUI/forward_30_icon.png);")
+        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
+        self.ui.pushButton_rate_down.setStyleSheet("background-image : url(GUI/rate_down_icon.png);")
+        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
+        self.ui.pushButton_rate_up.setStyleSheet("background-image : url(GUI/rate_up_icon.png);")
+        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
         # enable custom window hint - must be set to enable customizing window controls
@@ -2613,7 +2666,8 @@ class DialogViewAV(QtWidgets.QDialog):
         elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.ui.label_time_2.setText("Duration: " + msecs_to_mins_and_secs(msecs))
+        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.ui.label_time.setText("0.00" + self.media_duration_text)
         self.ui.textEdit.setText(self.media_data['memo'])
         self.ui.textEdit.ensureCursorVisible()
         self.timer = QtCore.QTimer(self)
@@ -2633,7 +2687,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 good_tracks.append(track)
             #print(track[0], track[1])  # track number and track name
         if len(good_tracks) < 2:
-            self.ui.label.setEnabled(False)
+            self.ui.label_audio.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
@@ -2708,37 +2762,13 @@ class DialogViewAV(QtWidgets.QDialog):
             self.play_pause()
         # Rewind 30 seconds Alt R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() - 30000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_30_seconds()
         # Rewind 5 seconds   Ctrl R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 5000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_5_seconds()
         # Advance 30 seconds Alt F
         if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() + 30000
-            if time_msecs > self.media.get_duration():
-                time_msecs = self.media.get_duration() - 1
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
@@ -2761,6 +2791,45 @@ class DialogViewAV(QtWidgets.QDialog):
             self.decrease_play_rate()
         return True
 
+    def rewind_30_seconds(self):
+        """ Rewind AV 30 seconds """
+
+        time_msecs = self.mediaplayer.get_time() - 30000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
+    def rewind_5_seconds(self):
+        """ Rewind AV 5 seconds """
+
+        time_msecs = self.mediaplayer.get_time() - 5000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
+    def forward_30_seconds(self):
+        """ Forward AV 30 seconds """
+
+        time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
     def increase_play_rate(self):
         """ Several increased rate options """
 
@@ -2769,7 +2838,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if rate > 2:
             rate = 2
         self.mediaplayer.set_rate(rate)
-        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def decrease_play_rate(self):
         """ Several decreased rate options """
@@ -2779,7 +2848,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if rate < 0.1:
             rate = 0.1
         self.mediaplayer.set_rate(rate)
-        self.ui.label_rate.setText(_("Rate: ") + str(round(rate, 1)))
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def delete_speakernames(self):
         """ Delete speakername from list of shortcut names """
@@ -3034,11 +3103,9 @@ class DialogViewAV(QtWidgets.QDialog):
     def play_pause(self):
         """ Toggle play or pause status. """
 
-        # check that QDialog containinv vlc is visible (i.e. has not been closed)
-
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
             self.is_paused = True
             self.timer.stop()
         else:
@@ -3053,10 +3120,10 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
 
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText(_("Pause"))
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/playback_pause_icon.png);")
             self.timer.start()
             self.is_paused = False
 
@@ -3066,7 +3133,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
             self.is_paused = True
             self.timer.stop()
 
@@ -3077,9 +3144,8 @@ class DialogViewAV(QtWidgets.QDialog):
          Programatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText(_("Play"))
+        self.ui.pushButton_play.setStyleSheet("background-image : url(GUI/play_icon.png);")
         self.ui.horizontalSlider.setProperty("value", 0)
-
         # set combobox display of audio track to the first one, or leave it blank if it contains no items
         if self.ui.comboBox_tracks.count() > 0:
             self.ui.comboBox_tracks.setCurrentIndex(0)
@@ -3109,11 +3175,11 @@ class DialogViewAV(QtWidgets.QDialog):
         media_pos = int(self.mediaplayer.get_position() * 1000)
         self.ui.horizontalSlider.setValue(media_pos)
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
 
         """ For long transcripts, update the relevant text position in the textEdit to match the
         video's current position.
-        time_postion list itme: [text_pos0, text_pos1, milliseconds]
+        time_position list itme: [text_pos0, text_pos1, milliseconds]
         """
         if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit_transcription.toPlainText() != "":
             for i in range(1, len(self.time_positions)):

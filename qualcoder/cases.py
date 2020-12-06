@@ -65,10 +65,11 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(text)
     mb.exec_()
 
+
 class DialogCases(QtWidgets.QDialog):
-    ''' Create, edit and delete cases.
+    """ Create, edit and delete cases.
     Assign entire text files or portions of files to cases.
-    Assign attributes to cases. '''
+    Assign attributes to cases. """
 
     NAME_COLUMN = 0  # also primary key
     MEMO_COLUMN = 1
@@ -106,11 +107,15 @@ class DialogCases(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.load_cases_and_attributes()
+        self.ui.pushButton_add.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
         self.ui.pushButton_add.clicked.connect(self.add_case)
+        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url(GUI/plus_icon.png);")
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
+        self.ui.pushButton_import_cases.setStyleSheet("background-image : url(GUI/doc_import_icon.png);")
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)

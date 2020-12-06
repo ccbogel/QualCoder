@@ -49,15 +49,14 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogMemo(QtWidgets.QDialog):
 
-    """
-    Dialog to view and edit memo text.
+    """ Dialog to view and edit memo text.
     """
 
     app = None
     title = ""
     memo = ""
 
-    def __init__(self, app, title="", memo=""):
+    def __init__(self, app, title="", memo="", clear_button="show"):
         """  """
 
         super(DialogMemo, self).__init__(parent=None)  # overrride accept method
@@ -74,6 +73,8 @@ class DialogMemo(QtWidgets.QDialog):
         self.setWindowTitle(title)
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
+        if clear_button == "hide":
+            self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
 
     def clear_contents(self):

@@ -99,6 +99,8 @@ class DialogManageFiles(QtWidgets.QDialog):
     """ View, import, export, rename and delete text files.
     Files are normally imported into the qda project folder.
     Option to link to external A/V files.
+    Notes regards icons in buttons:
+    The buttons are 36x36 pixels and the icons are 32x32 pixels.
     """
 
     source = []
@@ -138,12 +140,23 @@ class DialogManageFiles(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
+        self.ui.pushButton_create.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
         self.ui.pushButton_create.clicked.connect(self.create)
+        self.ui.pushButton_view.setStyleSheet("background-image : url(GUI/eye_icon.png);")
         self.ui.pushButton_view.clicked.connect(self.view)
+        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/doc_delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
+        self.ui.pushButton_import.setStyleSheet("background-image : url(GUI/doc_import_icon.png);")
         self.ui.pushButton_import.clicked.connect(self.import_files)
+        self.ui.pushButton_link.setStyleSheet("background-image : url(GUI/link_icon.png);")
         self.ui.pushButton_link.clicked.connect(self.link_files)
+        self.ui.pushButton_import_from_linked.setStyleSheet("background-image : url(GUI/linked_import_icon2.png);")
+        self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
+        self.ui.pushButton_export_to_linked.setStyleSheet("background-image : url(GUI/to_link.png);")
+        self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
+        self.ui.pushButton_export.setStyleSheet("background-image : url(GUI/doc_export_icon.png);")
         self.ui.pushButton_export.clicked.connect(self.export)
+        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url(GUI/plus_icon.png);")
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
@@ -202,10 +215,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows"))
-        if mediapath is not None and ':' in mediapath:
-            action_import_linked = menu.addAction(_("Import linked file"))
-        else:
+        if mediapath is None or (mediapath is not None and mediapath[0] == "/"):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
+        else:
+            action_import_linked = menu.addAction(_("Import linked file"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -244,6 +257,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def button_export_file_as_linked_file(self):
+        """ User presses button to export current row's file.
+         Only to work with an exportable file. """
+
+        row = self.ui.tableWidget.currentRow()
+        id_ = None
+        mediapath = None
+        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        for s in self.source:
+            if s['id'] == id_:
+                mediapath = s['mediapath']
+        if id_ is None or mediapath is None:
+            return
+        if mediapath is None or (mediapath is not None and mediapath[0] == "/"):
+            self.export_file_as_linked_file(id_, mediapath)
 
     def export_file_as_linked_file(self, id_, mediapath):
         """ Move an internal project file into an external location as a linked file.
@@ -294,6 +323,22 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         # Reload data and refill the table
         self.load_file_data()
+
+    def button_import_linked_file(self):
+        """ User presses button to import linked file.
+        Only to work with an importable file. """
+
+        row = self.ui.tableWidget.currentRow()
+        id_ = None
+        mediapath = None
+        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        for s in self.source:
+            if s['id'] == id_:
+                mediapath = s['mediapath']
+        if id_ is None or mediapath is None:
+            return
+        if mediapath is not None and mediapath[0] != "/":
+            self.import_linked_file(id_, mediapath)
 
     def import_linked_file(self, id_, mediapath):
         """ Import linked file and change mediapath details. """
@@ -445,7 +490,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = mediapath[7:]
         else:
             abs_path = self.app.project_path + mediapath
-            
+
         if mediapath[:8] == "/images/":
             icon = QtGui.QIcon("GUI/picture.png")
             w = 0
@@ -689,10 +734,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return
 
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
+        title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
+        if restricted:
+            title += "RESTRICTED EDIT"
         # cannot easily edit file text of there are linked cases, codes or annotations
-        self.text_view = DialogMemo(self.app, "",)
+        self.text_view = DialogMemo(self.app, title, self.source[x]['fulltext'], "hide")
         self.text_view.ui.textEdit.setReadOnly(restricted)
-        self.text_view.ui.textEdit.setPlainText(self.source[x]['fulltext'])
         if restricted:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_restricted_menu)
@@ -701,10 +748,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_unrestricted_menu)
             self.text_view.ui.textEdit.currentCharFormatChanged.connect(self.text_view_remove_formatting)
         self.highlight(self.source[x]['id'])
-        title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
-        if restricted:
-            title += "RESTRICTED EDIT"
-        self.text_view.setWindowTitle(title)
         self.text_view.exec_()
         text = self.text_view.ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
@@ -1155,8 +1198,22 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.load_media_reference("video:" + link_path)
                 known_file_type = True
             if not known_file_type:
-                QtWidgets.QMessageBox.warning(None, _('Unknown file type'),
-                    _("Unknown file type for import") + ":\n" + f)
+                Message(self.app, _('Unknown file type'),
+                    _("Trying to import as text") + ":\n" + f
+                    , "warning")
+                destination += "/documents/" + filename
+                if link_path == "":
+                    try:
+                        self.load_file_text(f)
+                        copyfile(f, destination)
+                    except Exception as e:
+                        Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
+                else:
+                    try:
+                        self.load_file_text(f, "docs:" + link_path)
+                    except Exception as e:
+                        Message(self.app, _('Unknown file type'),  _("Cannot import file") + ":\n" + f, "warning")
+
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
