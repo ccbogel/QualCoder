@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1085</width>
-    <height>760</height>
+    <width>900</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,44 +36,53 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>111</width>
-        <height>27</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Create</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>70</x>
         <y>10</y>
-        <width>111</width>
-        <height>27</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>130</x>
         <y>10</y>
-        <width>111</width>
-        <height>27</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Delete</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_jname">
       <property name="geometry">
        <rect>
-        <x>485</x>
+        <x>200</x>
         <y>18</y>
         <width>571</width>
         <height>21</height>

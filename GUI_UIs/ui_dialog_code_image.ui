@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1021</width>
-    <height>715</height>
+    <width>950</width>
+    <height>630</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,20 +34,23 @@
      <widget class="QPushButton" name="pushButton_memo">
       <property name="geometry">
        <rect>
-        <x>380</x>
+        <x>20</x>
         <y>7</y>
-        <width>141</width>
-        <height>32</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Memo</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>80</x>
         <y>10</y>
         <width>301</width>
         <height>21</height>
@@ -58,10 +61,13 @@
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_show_coders">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
-        <x>690</x>
-        <y>10</y>
+        <x>700</x>
+        <y>0</y>
         <width>221</width>
         <height>22</height>
        </rect>
@@ -76,9 +82,9 @@
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>511</width>
+        <x>20</x>
+        <y>50</y>
+        <width>441</width>
         <height>26</height>
        </rect>
       </property>
@@ -143,8 +149,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>504</width>
-            <height>539</height>
+            <width>467</width>
+            <height>454</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">

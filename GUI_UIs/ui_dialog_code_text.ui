@@ -34,14 +34,17 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>40</y>
-        <width>191</width>
-        <height>32</height>
+        <x>870</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Auto code</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_coder">
@@ -61,9 +64,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>73</y>
-        <width>401</width>
-        <height>41</height>
+        <y>83</y>
+        <width>461</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
@@ -73,29 +76,10 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_search">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>0</y>
-        <width>181</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Search for text:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>350</x>
         <y>0</y>
         <width>191</width>
         <height>32</height>
@@ -108,40 +92,40 @@
      <widget class="QCheckBox" name="checkBox_search_case">
       <property name="geometry">
        <rect>
-        <x>720</x>
+        <x>550</x>
         <y>0</y>
-        <width>171</width>
-        <height>22</height>
+        <width>21</width>
+        <height>36</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Case sensitive</string>
+       <string/>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_search_all_files">
       <property name="geometry">
        <rect>
-        <x>900</x>
+        <x>610</x>
         <y>0</y>
-        <width>141</width>
-        <height>22</height>
+        <width>21</width>
+        <height>36</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>All files</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>588</x>
-        <y>0</y>
+        <x>770</x>
+        <y>2</y>
         <width>81</width>
         <height>22</height>
        </rect>
@@ -221,27 +205,297 @@
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>680</x>
         <y>0</y>
-        <width>21</width>
-        <height>25</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>&lt;</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>720</x>
         <y>0</y>
-        <width>21</width>
-        <height>25</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>&gt;</string>
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_all_files">
+      <property name="geometry">
+       <rect>
+        <x>638</x>
+        <y>0</y>
+        <width>34</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_case_sensitive">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>0</y>
+        <width>34</width>
+        <height>34</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
+      <property name="geometry">
+       <rect>
+        <x>910</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
+      <property name="geometry">
+       <rect>
+        <x>950</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_undo">
+      <property name="geometry">
+       <rect>
+        <x>990</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next_file">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_latest">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_bookmark_go">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_delete_all_codes">
+      <property name="geometry">
+       <rect>
+        <x>1050</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_codings_next">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_codings_prev">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_all_codings">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_document_memo">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_annotate">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>80</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_coding_memo">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>80</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
