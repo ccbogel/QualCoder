@@ -1257,7 +1257,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'','QualCoder', 0, 0))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'', qualcoder_version, 0, 0))
         self.app.conn.commit()
         try:
             # get and display some project details
@@ -1369,6 +1369,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.project_path = ""
             self.app.project_name = ""
             return
+        # Check that the connection is to a valid QualCoder database
+        cur = self.app.conn.cursor()
+        try:
+            cur.execute("select databaseversion, date, memo, about from project")
+            res = cur.fetchone()
+            print(res[3])  # tmp
+            if "QualCoder" not in res[3]:
+                logger.debug("This is not a QualCoder database")
+                self.close_project()
+                return
+        except Exception as e:
+            logger.debug("This in not a QualCoder database " + str(e))
+            self.close_project()
+            return
 
         #TODO Potential design flaw to have the current coders name in the config.ini file
         #TODO as is would change when opening different projects
@@ -1390,15 +1404,21 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             cur.execute("select avid from code_text")
         except:
-            cur.execute("ALTER TABLE code_text ADD avid integer;")
-            self.app.conn.commit()
+            try:
+                cur.execute("ALTER TABLE code_text ADD avid integer;")
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
         try:
             cur.execute("select bookmarkfile from project")
         except:
-            cur.execute("ALTER TABLE project ADD bookmarkfile integer;")
-            self.app.conn.commit()
-            cur.execute("ALTER TABLE project ADD bookmarkpos integer;")
-            self.app.conn.commit()
+            try:
+                cur.execute("ALTER TABLE project ADD bookmarkfile integer;")
+                self.app.conn.commit()
+                cur.execute("ALTER TABLE project ADD bookmarkpos integer;")
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
 
         # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
