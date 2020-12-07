@@ -12,7 +12,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ### Linux
 
 ### Prerequisites
-You will need to have a `python3.x` version installed.
+You will need to have a `python3.6` or newer version installed.
 You will also need to have a `vlc` player installed - for audio and video. 
 
 
