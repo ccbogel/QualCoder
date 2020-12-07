@@ -140,16 +140,21 @@ class DialogCodeText(QtWidgets.QWidget):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
+        # Icons marked icon_24 icons are 24x24 px but need a button of 28
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
-        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon.png);")
+        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon_24.png);")
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon.png);")
+        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon_24.png);")
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon.png);")
+        self.ui.pushButton_bookmark_go.setStyleSheet("background-image : url(GUI/bookmark_icon_24.png);")
+        self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
+        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon_24.png);")
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.pushButton_annotate.setStyleSheet("background-image : url(GUI/notepad_pencil_icon.png);")
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
@@ -165,8 +170,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
         self.ui.pushButton_auto_code_undo.setStyleSheet("background-image : url(GUI/undo_icon.png);")
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
-        self.ui.pushButton_bookmark_go.setStyleSheet("background-image : url(GUI/bookmark_icon.png);")
-        self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
+
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -182,8 +186,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         self.ui.pushButton_delete_all_codes.setStyleSheet("background-image : url(GUI/delete_icon.png);")
-        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon.png);")
-        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
         self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
@@ -205,7 +207,8 @@ class DialogCodeText(QtWidgets.QWidget):
             v0 = int(self.app.settings['dialogcodetext_splitter_v0'])
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
             if v0 > 5 and v1 > 5:
-                self.ui.leftsplitter.setSizes([v0, v1])
+                # 30s are for the button boxes
+                self.ui.leftsplitter.setSizes([v1, 30, v0, 30])
         except:
             pass
         self.fill_tree()
@@ -925,17 +928,28 @@ class DialogCodeText(QtWidgets.QWidget):
         for index in indexes:
             if index['pos0'] > cur_pos:
                 cur_pos = index['pos0']
-                #end_pos = index['pos1']
+                end_pos = index['pos1']
                 found_larger = True
                 break
         if not found_larger:
             return
-        cursor.setPosition(cur_pos)
-        #cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+
         self.unlight()
         self.highlight(cid)
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon.png);")
+
+        color = ""
+        for c in self.codes:
+            if c['cid'] == cid:
+                color = c['color']
+        cursor.setPosition(cur_pos)
+        self.ui.textEdit.setTextCursor(cursor)
+        '''cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
+        brush = QtGui.QBrush(QtGui.QColor(color))
+        fmt.setBackground(brush)'''
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
@@ -970,13 +984,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         self.unlight()
         self.highlight(cid)
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon.png);")
+        color = ""
+        for c in self.codes:
+            if c['cid'] == cid:
+                color = c['color']
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
 
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
         self.unlight()
         self.highlight()
 
