@@ -132,7 +132,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
-        self.ui.textEdit.cursorPositionChanged.connect(self.coded_in_text)
+        self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -925,13 +925,13 @@ class DialogCodeText(QtWidgets.QWidget):
         for index in indexes:
             if index['pos0'] > cur_pos:
                 cur_pos = index['pos0']
-                end_pos = index['pos1']
+                #end_pos = index['pos1']
                 found_larger = True
                 break
         if not found_larger:
             return
         cursor.setPosition(cur_pos)
-        cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
+        #cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.unlight()
         self.highlight(cid)
@@ -960,13 +960,13 @@ class DialogCodeText(QtWidgets.QWidget):
         for index in indexes:
             if index['pos0'] < cur_pos - 1:
                 cur_pos = index['pos0']
-                end_pos = index['pos1']
+                #end_pos = index['pos1']
                 found_smaller = True
                 break
         if not found_smaller:
             return
-        cursor.setPosition(end_pos)
-        cursor.setPosition(cur_pos, QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(cur_pos)
+        #cursor.setPosition(cur_pos, QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.unlight()
         self.highlight(cid)
@@ -1638,7 +1638,8 @@ class DialogCodeText(QtWidgets.QWidget):
                         formatB = QtGui.QTextCharFormat()
                         formatB.setFontWeight(QtGui.QFont.Bold)
                         cursor.mergeCharFormat(formatB)
-        self.apply_overline_to_overlaps()
+        if id_ == -1:
+            self.apply_overline_to_overlaps()
 
     def apply_overline_to_overlaps(self):
         """ Apply overline format to coded text sections which are overlapping. """
@@ -1703,7 +1704,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.select_tree_item_by_code_name(current_text)
         self.apply_overline_to_overlaps()
 
-    def coded_in_text(self):
+    def overlapping_codes_in_text(self):
         """ When coded text is clicked on, the code names at this location are
         displayed in the combobox above the text edit widget.
         Only enabled if two or more codes are here. """
