@@ -943,10 +943,15 @@ class DialogCodeText(QtWidgets.QWidget):
                 color = c['color']
         cursor.setPosition(cur_pos)
         self.ui.textEdit.setTextCursor(cursor)
-        '''cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
         brush = QtGui.QBrush(QtGui.QColor(color))
-        fmt.setBackground(brush)'''
+        fmt = QtGui.QTextCharFormat()
+        fmt.setBackground(brush)
+        fmt.setFontOverline(True)
+        fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
+        cursor.mergeCharFormat(fmt)
+
         self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
@@ -974,20 +979,29 @@ class DialogCodeText(QtWidgets.QWidget):
         for index in indexes:
             if index['pos0'] < cur_pos - 1:
                 cur_pos = index['pos0']
-                #end_pos = index['pos1']
+                end_pos = index['pos1']
                 found_smaller = True
                 break
         if not found_smaller:
             return
-        cursor.setPosition(cur_pos)
-        #cursor.setPosition(cur_pos, QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+
         self.unlight()
         self.highlight(cid)
+
         color = ""
         for c in self.codes:
             if c['cid'] == cid:
                 color = c['color']
+        cursor.setPosition(cur_pos)
+        self.ui.textEdit.setTextCursor(cursor)
+        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
+        brush = QtGui.QBrush(QtGui.QColor(color))
+        fmt = QtGui.QTextCharFormat()
+        fmt.setBackground(brush)
+        fmt.setFontOverline(True)
+        fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
+        cursor.mergeCharFormat(fmt)
         self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
