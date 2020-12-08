@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_memo(object):
     def setupUi(self, Dialog_memo):
         Dialog_memo.setObjectName("Dialog_memo")
-        Dialog_memo.resize(740, 533)
+        Dialog_memo.resize(541, 396)
         self.gridLayout = QtWidgets.QGridLayout(Dialog_memo)
         self.gridLayout.setObjectName("gridLayout")
         self.textEdit = QtWidgets.QTextEdit(Dialog_memo)
@@ -25,12 +25,12 @@ class Ui_Dialog_memo(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.buttonBox = QtWidgets.QDialogButtonBox(self.groupBox)
-        self.buttonBox.setGeometry(QtCore.QRect(490, 0, 221, 25))
+        self.buttonBox.setGeometry(QtCore.QRect(170, 0, 221, 25))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.pushButton_clear = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_clear.setGeometry(QtCore.QRect(380, 0, 89, 25))
+        self.pushButton_clear.setGeometry(QtCore.QRect(10, 0, 89, 25))
         self.pushButton_clear.setObjectName("pushButton_clear")
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 1)
 
