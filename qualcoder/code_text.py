@@ -197,7 +197,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
         self.ui.splitter.setSizes([150, 400])
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
@@ -226,9 +226,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
 
-    def fill_code_label(self):
+    def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
-         Also, if text is highlighted, assign the text to this code. """
+         Also, if text is highlighted, assign the text to this code.
+
+         Called by: treewidgetitem_clicked, select_tree_item_by_code_name """
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
@@ -251,6 +253,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(selected_text) > 0:
             self.mark()
         self.underline_text_of_this_code(code_for_underlining)
+        # When a code is selected undo the show selected code features
+        self.highlight()
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
 
     def underline_text_of_this_code(self, code_for_underlining):
         """ User interface, highlight coded text selections for the currently selected code.
@@ -624,7 +631,7 @@ class DialogCodeText(QtWidgets.QWidget):
         text_item = None
         if len(coded_text_list) == 1:
             text_item = coded_text_list[0]
-        # multiple codes at this position to select from
+        # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
             ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
             ok = ui.exec_()
@@ -634,7 +641,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if text_item is None:
             return
         # Dictionary with cid fid seltext owner date name color memo
-        ui = DialogMemo(self.app, _("Memo for Coded text: ") + _("Memo for coded text"), text_item['memo'])
+        #TODO maybe highlight section to be memoed
+        msg = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
+        ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
         ui.exec_()
         memo = ui.memo
         if memo == text_item['memo']:
@@ -644,10 +653,11 @@ class DialogCodeText(QtWidgets.QWidget):
             (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
         self.app.conn.commit()
         for i in self.code_text:
-            print(i)
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
                 and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
-                    i['memo'] = memo
+                i['memo'] = memo
+                print(i)
+
         self.app.delete_backup = False
 
     def change_code_pos(self, location, start_or_end):
@@ -1793,7 +1803,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item)
             it += 1
             item = it.value()
-        self.fill_code_label()
+        self.fill_code_label_undo_show_selected_code()
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -2264,7 +2274,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                         try:
                             display_text = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
-                                display_text += "<br />Memo: " + item['memo']
+                                display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
                             display_text += "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
@@ -2274,7 +2284,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                         try:
                             display_text += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
-                                display_text += "<br />Memo: " + item['memo']
+                                display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
                             display_text += "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
