@@ -56,7 +56,7 @@ class DialogMemo(QtWidgets.QDialog):
     title = ""
     memo = ""
 
-    def __init__(self, app, title="", memo="", clear_button="show"):
+    def __init__(self, app, title="", memo="", clear_button="show", tooltip=""):
         """  """
 
         super(DialogMemo, self).__init__(parent=None)  # overrride accept method
@@ -73,6 +73,8 @@ class DialogMemo(QtWidgets.QDialog):
         self.setWindowTitle(title)
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
+        if tooltip != "":
+            self.ui.textEdit.setToolTip(tooltip)
         if clear_button == "hide":
             self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
