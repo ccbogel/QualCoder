@@ -74,6 +74,10 @@ class Ui_Dialog_cases(object):
         self.label_filename.setMaximumSize(QtCore.QSize(16777215, 30))
         self.label_filename.setWordWrap(True)
         self.label_filename.setObjectName("label_filename")
+        self.pushButton_file_manager = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_file_manager.setGeometry(QtCore.QRect(180, 0, 36, 36))
+        self.pushButton_file_manager.setText("")
+        self.pushButton_file_manager.setObjectName("pushButton_file_manager")
         self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBox_2, 1, 1, 1, 1)
 
@@ -95,6 +99,7 @@ class Ui_Dialog_cases(object):
         self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a <span style=\" font-weight:600;\">comma delimited</span> csv file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add attribute</p></body></html>"))
         self.label_filename.setText(_translate("Dialog_cases", "."))
+        self.pushButton_file_manager.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Case file manager</p></body></html>"))
 
 
 if __name__ == "__main__":
