@@ -1533,10 +1533,12 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.filename is None:
             self.load_file(self.filenames[0])
+            self.ui.listWidget.setCurrentRow(0)
             return
         for i in range(0, len(self.filenames) - 1):
             if self.filename == self.filenames[i]:
                 found = self.filenames[i + 1]
+                self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_file(found)
                 return
 
@@ -1549,10 +1551,11 @@ class DialogCodeText(QtWidgets.QWidget):
         result = cur.fetchone()
         if result is None:
             return
-        for f in self.filenames:
+        for i, f in enumerate(self.filenames):
             if f['id'] == result[0]:
+                self.ui.listWidget.setCurrentRow(i)
                 self.load_file(f)
-                return
+                break
 
     def go_to_bookmark(self):
         """ Find bookmark, open the file and highlight the bookmarked character. """
@@ -1560,9 +1563,10 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute("select bookmarkfile, bookmarkpos from project")
         result = cur.fetchone()
-        for f in self.filenames:
+        for i, f in enumerate(self.filenames):
             if f['id'] == result[0]:
                 try:
+                    self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
                     # set text cursor position and also highlight one character, to show location.
                     textCursor = self.ui.textEdit.textCursor()
@@ -1574,6 +1578,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.textEdit.setTextCursor(textCursor)
                 except Exception as e:
                     logger.debug(str(e))
+                break
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.
