@@ -107,6 +107,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
+        self.ui.checkBox_show_coders.hide()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
         self.scene = QtWidgets.QGraphicsScene()
@@ -121,11 +122,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
+        self.ui.label_code.setStyleSheet(tree_font)  # usually smaller font
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+        # Icon images are 32x32 pixels within 36x36 pixel button
+        self.ui.pushButton_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon.png);")
+        self.ui.pushButton_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_memo.setEnabled(False)
-        self.ui.pushButton_memo.pressed.connect(self.image_memo)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -142,11 +146,19 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        # The buttons in the splitter are smaller 24x24 pixels
+        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon_24.png);")
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon_24.png);")
+        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon_24.png);")
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        self.ui.label_coded_area_icon.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
-            if s0 > 10 and s1 > 10:
-                self.ui.splitter.setSizes([s0, s1])
+            # 30 is for the button box
+            self.ui.splitter.setSizes([s0, 30, s1])
             h0 = int(self.app.settings['dialogcodeimage_splitter_h0'])
             h1 = int(self.app.settings['dialogcodeimage_splitter_h1'])
             if h0 > 10 and h1 > 10:
@@ -162,7 +174,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.settings['dialogcodeimage_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
-        self.app.settings['dialogcodeimage_splitter1'] = sizes[1]
+        self.app.settings['dialogcodeimage_splitter1'] = sizes[2]
         sizes = self.ui.splitter_2.sizes()
         self.app.settings['dialogcodeimage_splitter_h0'] = sizes[0]
         self.app.settings['dialogcodeimage_splitter_h1'] = sizes[1]
@@ -324,6 +336,57 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
+    def file_memo(self):
+        """ Open file memo to view or edit. """
+
+        if self.file_ is None:
+            return
+        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == self.file_['memo']:
+            return
+        self.file_['memo'] = memo
+        cur = self.app.conn.cursor()
+        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
+        self.app.conn.commit()
+        self.get_image_files()
+        self.ui.listWidget.clear()
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
+        self.app.delete_backup = False
+
+    def go_to_latest_coded_file(self):
+        """ Vertical spliter button activates this """
+
+        sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [self.app.settings['codername'], ])
+        result = cur.fetchone()
+        if result is None:
+            return
+        for f in self.files:
+            if f['id'] == result[0]:
+                self.file_ = f
+                self.load_file()
+                break
+
+    def go_to_next_file(self):
+        """ Vertical splitter button activates this """
+
+        if self.file_ is None:
+            self.file_ = self.files[0]
+            self.load_file()
+            return
+        for i in range(0, len(self.files) - 1):
+            if self.file_ == self.files[i]:
+                found = self.files[i + 1]
+                self.file_ = found
+                self.load_file()
+                return
+
     def viewfile_menu(self, position):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
@@ -336,31 +399,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_latest = menu.addAction(_("File with latest coding"))
         action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
-            if self.file_ is None:
-                self.file_ = self.files[0]
-                self.load_file()
-                return
-            for i in range(0, len(self.files) - 1):
-                if self.file_ == self.files[i]:
-                    found = self.files[i + 1]
-                    self.file_ = found
-                    self.load_file()
-                    return
+            self.go_to_next_file()
+            return
         if action == action_latest:
-            sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
-            cur = self.app.conn.cursor()
-            cur.execute(sql, [self.app.settings['codername'],])
-            result = cur.fetchone()
-            if result is None:
-                return
-            for f in self.files:
-                if f['id'] == result[0]:
-                    self.file_ = f
-                    self.load_file()
-                    return
+            self.go_to_latest_coded_file()
+            return
 
     def listwidgetitem_view_file(self):
-        """ Item selcted so fill current file variable and load. """
+        """ Item selected so fill current file variable and load. """
 
         if len(self.files) == 0:
             return
@@ -373,9 +419,11 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
-        Called by: select_image_menu, listwisgetitem_view_file
+        Called by: select_image_menu, listwidgetitem_view_file
         """
 
+        self.ui.label_coded_area.setText("Coded area")
+        self.ui.label_coded_area.setToolTip("")
         source = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:7] == "images:":
             source = self.file_['mediapath'][7:]
@@ -397,7 +445,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.scene.removeItem(items[i])
             self.setWindowTitle(_("Image coding"))
             self.ui.pushButton_memo.setEnabled(False)
-
             return
         items = list(self.scene.items())
         for i in range(items.__len__()):
@@ -470,6 +517,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
+        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
 
     def show_or_hide_coders(self):
         """ When checked call on draw_coded_areas to either show all coders codings,
@@ -527,18 +575,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
                 break
-
-    def image_memo(self):
-        """ Create a memo for the image file. """
-
-        ui = DialogMemo(self.app, _("Memo for image ") + self.file_['name'],
-            self.file_['memo'])
-        ui.exec_()
-        cur = self.app.conn.cursor()
-        cur.execute('update source set memo=? where id=?', (ui.memo, self.file_['id']))
-        self.app.conn.commit()
-        self.file_['memo'] = ui.memo
-        self.app.delete_backup = False
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -614,7 +650,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.recursive_traverse(item.child(i), text)
 
     def eventFilter(self, object, event):
-        """ Using this event filter to identfiy treeWidgetItem drop events.
+        """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
         QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
@@ -631,6 +667,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         if object is self.scene:
             #logger.debug(event.type(), type(event))
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
+                #
+                pos = event.buttonDownScenePos(1)
+                self.fill_coded_area_label(self.find_coded_areas_for_pos(pos))
                 #logger.debug(event.type(), type(event))
                 if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
                     p0 = event.buttonDownScenePos(1)  # left mouse button
@@ -668,6 +707,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # no coded area item in this mouse position
         if item is None:
             return
+        self.fill_coded_area_label(item)
         action = menu.exec_(global_pos)
         if action is None:
             return
@@ -693,6 +733,29 @@ class DialogCodeImage(QtWidgets.QDialog):
                     #print(pos, item['x1'] * self.scale, item['y1'] * self.scale, item['width'] * self.scale, item['height'] * self.scale)
                     return item
         return None
+
+    def fill_coded_area_label(self, item):
+        """ Fill details of label about the currently clicked on coded area.
+        Called by: right click scene menu, """
+
+        if item is None:
+            return
+        #TODO if multiple items ?
+        code_name = ""
+        for c in self.codes:
+            if c['cid'] == item['cid']:
+                codename = c['name']
+                break
+        msg = codename
+        msg += "\nx:" +str(int(item['x1'])) + " y:" + str(int(item['y1']))
+        msg += " w:" + str(int(item['width'])) + " h:" + str(int(item['height']))
+        area = item['width'] * item['height']
+        pic_area = self.pixmap.width() * self.pixmap.height()
+        percent_area = round(area / pic_area * 100, 2)
+        msg += " area: " + str(percent_area) + "%"
+        #print(item)
+        self.ui.label_coded_area.setText(msg)
+        self.ui.label_coded_area.setToolTip(item['memo'])
 
     def coded_area_memo(self, item):
         """ Add memo to this coded area. """
