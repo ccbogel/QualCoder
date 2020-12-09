@@ -600,7 +600,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
-        If a new memo also show in table widget by displaying YES in the memo column. """
+        If a new memo, also show in table widget by displaying MEMO in the memo column. """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -1001,19 +1001,26 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         try:
             ui = DialogViewAV(self.app, self.source[x])
-            #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
-            if self.dialog_list != []:
+            ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+            '''if self.dialog_list != []:
                 self.dialog_list = []
                 self.dialog_list.append(ui)
-                ui.show()
+                ui.exec_()'''
+            memo = ui.ui.textEdit.toPlainText()
+            if self.source[x]['memo'] != memo:
+                self.source[x]['memo'] = memo
+                cur = self.app.conn.cursor()
+                cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
+                    self.source[x]['id']))
+                self.app.conn.commit()
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
-                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+                self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
         except Exception as e:
             logger.debug(e)
             print(e)
-            Message(self.app, _('view averror'), str(e), "warning").exec_()
+            Message(self.app, _('view AV error'), str(e), "warning").exec_()
             return
 
     def view_image(self, x):
@@ -1037,7 +1044,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.dialog_list != []:
             self.dialog_list = []
             self.dialog_list.append(ui)
-            ui.show()
+            ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
@@ -1048,7 +1055,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.source[x]['memo'] == "":
             self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
         else:
-            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem("Yes"))
+            self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
 
     def create(self):
         """ Create a new text file by entering text into the dialog.
