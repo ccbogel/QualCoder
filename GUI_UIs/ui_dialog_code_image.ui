@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>950</width>
-    <height>630</height>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>7</y>
+        <y>3</y>
         <width>36</width>
         <height>36</height>
        </rect>
@@ -66,8 +66,8 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>700</x>
-        <y>0</y>
+        <x>410</x>
+        <y>60</y>
         <width>221</width>
         <height>22</height>
        </rect>
@@ -83,13 +83,67 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>50</y>
-        <width>441</width>
-        <height>26</height>
+        <y>45</y>
+        <width>381</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>Code:</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coded_area">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>0</y>
+        <width>451</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Coded area:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>0</y>
+        <width>3</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coded_area_icon">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>4</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
      </widget>
     </widget>
@@ -132,6 +186,71 @@
           <enum>Qt::Vertical</enum>
          </property>
          <widget class="QListWidget" name="listWidget"/>
+         <widget class="QGroupBox" name="groupBox_file_buttons">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <widget class="QPushButton" name="pushButton_latest">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_next_file">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_document_memo">
+           <property name="geometry">
+            <rect>
+             <x>80</x>
+             <y>0</y>
+             <width>28</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </widget>
          <widget class="QTreeWidget" name="treeWidget">
           <column>
            <property name="text">
@@ -150,7 +269,7 @@
             <x>0</x>
             <y>0</y>
             <width>467</width>
-            <height>454</height>
+            <height>420</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
