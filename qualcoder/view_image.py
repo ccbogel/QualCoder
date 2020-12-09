@@ -367,23 +367,28 @@ class DialogCodeImage(QtWidgets.QDialog):
         result = cur.fetchone()
         if result is None:
             return
-        for f in self.files:
+        for i, f in enumerate(self.files):
             if f['id'] == result[0]:
                 self.file_ = f
+                self.ui.listWidget.setCurrentRow(i)
                 self.load_file()
                 break
 
     def go_to_next_file(self):
-        """ Vertical splitter button activates this """
+        """ Vertical splitter button activates this.
+         Assumes one or more items in the list widget.
+         As the coding dialog will not open with no AV files. """
 
         if self.file_ is None:
             self.file_ = self.files[0]
+            self.ui.listWidget.setCurrentRow(0)
             self.load_file()
             return
         for i in range(0, len(self.files) - 1):
             if self.file_ == self.files[i]:
                 found = self.files[i + 1]
                 self.file_ = found
+                self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_file()
                 return
 

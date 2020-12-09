@@ -183,7 +183,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             s0 = int(self.app.settings['dialogcodeav_splitter0'])
             s1 = int(self.app.settings['dialogcodeav_splitter1'])
             if s0 > 10 and s1 > 10:
-                self.ui.splitter.setSizes([s0, s1])
+                self.ui.splitter.setSizes([s0, 30, s1])
             h0 = int(self.app.settings['dialogcodeav_splitter_h0'])
             h1 = int(self.app.settings['dialogcodeav_splitter_h1'])
             if h0 > 10 and h1 > 10:
@@ -206,6 +206,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
         self.ui.pushButton_rate_up.setStyleSheet("background-image : url(GUI/rate_up_icon.png);")
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+
+        # The buttons in the splitter are smaller 24x24 pixels
+        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon_24.png);")
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon_24.png);")
+        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon_24.png);")
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
 
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
@@ -239,7 +247,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
-        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_load_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -558,7 +566,63 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.fill_code_counts_in_tree()
                     return
 
-    def listwidgetitem_view_file(self):
+    def file_memo(self):
+        """ Open file memo to view or edit. """
+
+        if self.media_data is None:
+            return
+        ui = DialogMemo(self.app, _("Memo for file: ") + self.media_data['name'], self.media_data['memo'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == self.media_data['memo']:
+            return
+        self.media_data['memo'] = memo
+        cur = self.app.conn.cursor()
+        cur.execute("update source set memo=? where id=?", (memo, self.media_data['id']))
+        self.app.conn.commit()
+        self.get_list_of_media()
+        self.ui.listWidget.clear()
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
+        self.app.delete_backup = False
+
+    def go_to_latest_coded_file(self):
+        """ Vertical splitter button activates this """
+
+        sql = "SELECT id FROM code_av where owner=? order by date desc limit 1"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [self.app.settings['codername'], ])
+        result = cur.fetchone()
+        if result is None:
+            return
+        for i, f in enumerate(self.files):
+            if f['id'] == result[0]:
+                self.media_data = f
+                self.ui.listWidget.setCurrentRow(i)
+                self.load_media()
+                break
+
+    def go_to_next_file(self):
+        """ Vertical splitter button activates this.
+         Assumes one or more items in the list widget.
+         As the coding dialog will not open with no AV files. """
+
+        if self.media_data is None:
+            self.media_data = self.files[0]
+            self.load_media()
+            self.ui.listWidget.setCurrentRow(0)
+            return
+        for i in range(0, len(self.files) - 1):
+            if self.media_data == self.files[i]:
+                found = self.files[i + 1]
+                self.media_data = found
+                self.ui.listWidget.setCurrentRow(i + 1)
+                self.load_media()
+                return
+
+    def listwidgetitem_load_file(self):
         """ Item selected so fill current file variable and load. """
 
         if len(self.files) == 0:
@@ -991,7 +1055,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
         self.app.settings['codeav_abs_pos_y'] = self.pos().y()
         self.app.settings['dialogcodeav_splitter0'] = self.ui.splitter.sizes()[0]
-        self.app.settings['dialogcodeav_splitter1'] = self.ui.splitter.sizes()[1]
+        self.app.settings['dialogcodeav_splitter1'] = self.ui.splitter.sizes()[2]
         self.app.settings['dialogcodeav_splitter_h0'] = self.ui.splitter_2.sizes()[0]
         self.app.settings['dialogcodeav_splitter_h1'] = self.ui.splitter_2.sizes()[1]
         self.ddialog.close()
