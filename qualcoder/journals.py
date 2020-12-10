@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtCore, QtWidgets
 import datetime
 import os
+import platform
 import re
 import sys
 import logging
@@ -43,6 +44,8 @@ logger = logging.getLogger(__name__)
 
 PTH = os.path.realpath(__file__)
 PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):

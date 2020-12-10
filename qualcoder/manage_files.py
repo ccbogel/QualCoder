@@ -82,6 +82,8 @@ logger = logging.getLogger(__name__)
 # Need absolute path to images - for Debian in particular
 PTH = os.path.realpath(__file__)
 PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):

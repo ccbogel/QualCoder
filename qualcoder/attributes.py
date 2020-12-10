@@ -27,6 +27,7 @@ https://github.com/ccbogel/QualCoder
 
 import datetime
 import os
+import platform
 import sys
 import logging
 import traceback
@@ -45,6 +46,8 @@ logger = logging.getLogger(__name__)
 
 PTH = os.path.realpath(__file__)
 PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.

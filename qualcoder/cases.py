@@ -29,8 +29,8 @@ import csv
 import datetime
 import logging
 import os
+import platform
 import sys
-import re
 import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -53,6 +53,8 @@ logger = logging.getLogger(__name__)
 
 PTH = os.path.realpath(__file__)
 PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
