@@ -30,6 +30,7 @@ import datetime
 import logging
 from operator import itemgetter
 import os
+import platform
 from random import randint
 import re
 import sys
