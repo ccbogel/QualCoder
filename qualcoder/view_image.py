@@ -30,6 +30,7 @@ from copy import deepcopy
 import datetime
 import logging
 import os
+import platform
 from random import randint
 import sys
 import traceback
@@ -49,6 +50,11 @@ from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -127,7 +133,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         # Icon images are 32x32 pixels within 36x36 pixel button
-        self.ui.pushButton_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon.png);")
+        self.ui.pushButton_memo.setStyleSheet("background-image : url("+PTH+"GUI/notepad_2_icon.png);")
         self.ui.pushButton_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -147,13 +153,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
-        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon_24.png);")
+        self.ui.pushButton_latest.setStyleSheet("background-image : url("+PTH+"GUI/playback_next_icon_24.png);")
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon_24.png);")
+        self.ui.pushButton_next_file.setStyleSheet("background-image : url("+PTH+"GUI/playback_play_icon_24.png);")
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon_24.png);")
+        self.ui.pushButton_document_memo.setStyleSheet("background-image : url("+PTH+"GUI/notepad_2_icon_24.png);")
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        self.ui.label_coded_area_icon.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
+        self.ui.label_coded_area_icon.setStyleSheet("background-image : url("+PTH+"GUI/2x2_color_grid_icon_24.png);")
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])

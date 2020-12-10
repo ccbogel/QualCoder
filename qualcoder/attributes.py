@@ -27,6 +27,7 @@ https://github.com/ccbogel/QualCoder
 
 import datetime
 import os
+import platform
 import sys
 import logging
 import traceback
@@ -42,6 +43,11 @@ from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -93,9 +99,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.fill_tableWidget()
-        self.ui.pushButton_add.setStyleSheet("background-image : url(GUI/plus_icon.png);")
+        self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
+        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
