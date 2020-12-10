@@ -68,7 +68,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.1"
+qualcoder_version = "QualCoder 2.2"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -204,7 +204,7 @@ class App(object):
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
         if result == []:
-            print("Writing to", self.persist_path)
+            #print("Writing to", self.persist_path)
             with open(self.persist_path, 'w') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
@@ -1374,7 +1374,6 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             cur.execute("select databaseversion, date, memo, about from project")
             res = cur.fetchone()
-            print(res[3])  # tmp
             if "QualCoder" not in res[3]:
                 logger.debug("This is not a QualCoder database")
                 self.close_project()

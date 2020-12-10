@@ -121,8 +121,11 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
         self.ui.textEdit.textChanged.connect(self.text_changed)
+        self.ui.pushButton_create.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
         self.ui.pushButton_create.clicked.connect(self.create)
+        self.ui.pushButton_export.setStyleSheet("background-image : url(GUI/doc_export_icon.png);")
         self.ui.pushButton_export.clicked.connect(self.export)
+        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete)
 
     def view(self):

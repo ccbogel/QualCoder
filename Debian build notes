@@ -1,0 +1,62 @@
+Processes taken from
+====================
+Ubuntu PythonRecipies/DebianPackage
+https://help.ubuntu.com/community/PythonRecipes/DebianPackage
+
+version# refers to the version number,  e.g. 2.2
+
+Debian directory setup
+======================
+qualcoder-version#
+--DEBIAN
+----control
+--usr
+----bin
+------qualcoder   # executable bash with python3 /usr/share/qualcoder/qualcoder.py
+----share
+------man
+--------man1
+----------qualcoder.1.gz  # compress with gzip -9
+------qualcoder     # source
+------applications
+--------qualcoder.desktop
+------doc
+--------qualcoder
+----------changelog.gz   # compress with gzip -9
+----------copyright
+----------README.md
+------pixmaps
+--------qualcoder.png
+
+
+Build package
+==============
+# Remove pycaches:
+sudo rm -R qualcoder-version#/usr/share/qualcoder/__pycache__
+sudo rm -R qualcoder-version#/usr/share/qualcoder/GUI/__pycache__
+sudo rm -R qualcoder-version#/usr/share/qualcoder/.idea
+
+# Change file permissions:
+sudo chmod -R 755 qualcoder-version#
+
+# update gzip the change log and Deb manual page
+gzip -9 qualcoder-version#/usr/share/doc/qualcoder/changelog
+gzip -9 qualcoder-version#/usr/share/man/man1/qualcoder.1
+
+
+# Debian creation
+=================
+Use the following command in the folder above qualcoder-version#: 
+sudo fakeroot dpkg --build qualcoder-version#/ qualcoder-version#.deb
+
+# Lintian error check
+lintian qualcoder-version#.deb
+
+# To install
+sudo dpkg -i qualcoder-version#.deb
+
+# To remove
+sudo dpkg -r qualcoder-version#.deb
+
+
+
