@@ -79,6 +79,9 @@ from view_av import DialogViewAV
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+# Need absolute path to images - for Debian in particular
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -140,23 +143,23 @@ class DialogManageFiles(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
-        self.ui.pushButton_create.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
+        self.ui.pushButton_create.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
         self.ui.pushButton_create.clicked.connect(self.create)
-        self.ui.pushButton_view.setStyleSheet("background-image : url(GUI/eye_icon.png);")
+        self.ui.pushButton_view.setStyleSheet("background-image : url("+PTH+"GUI/eye_icon.png);")
         self.ui.pushButton_view.clicked.connect(self.view)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/doc_delete_icon.png);")
+        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/doc_delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
-        self.ui.pushButton_import.setStyleSheet("background-image : url(GUI/doc_import_icon.png);")
+        self.ui.pushButton_import.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        self.ui.pushButton_link.setStyleSheet("background-image : url(GUI/link_icon.png);")
+        self.ui.pushButton_link.setStyleSheet("background-image : url("+PTH+"GUI/link_icon.png);")
         self.ui.pushButton_link.clicked.connect(self.link_files)
-        self.ui.pushButton_import_from_linked.setStyleSheet("background-image : url(GUI/linked_import_icon2.png);")
+        self.ui.pushButton_import_from_linked.setStyleSheet("background-image : url("+PTH+"GUI/linked_import_icon2.png);")
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
-        self.ui.pushButton_export_to_linked.setStyleSheet("background-image : url(GUI/to_link.png);")
+        self.ui.pushButton_export_to_linked.setStyleSheet("background-image : url("+PTH+"GUI/to_link.png);")
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
-        self.ui.pushButton_export.setStyleSheet("background-image : url(GUI/doc_export_icon.png);")
+        self.ui.pushButton_export.setStyleSheet("background-image : url("+PTH+"GUI/doc_export_icon.png);")
         self.ui.pushButton_export.clicked.connect(self.export)
-        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url(GUI/plus_icon.png);")
+        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
@@ -478,7 +481,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
         if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
             metadata += "Characters: " + str(len(fulltext))
-            icon = QtGui.QIcon("GUI/text_link.png")
+            icon = QtGui.QIcon(PTH + "GUI/text_link.png")
             return icon, metadata
 
         abs_path = ""
@@ -492,7 +495,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + mediapath
 
         if mediapath[:8] == "/images/":
-            icon = QtGui.QIcon("GUI/picture.png")
+            icon = QtGui.QIcon(PTH + "GUI/picture.png")
             w = 0
             h = 0
             try:
@@ -503,7 +506,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "images:":
-            icon = QtGui.QIcon("GUI/picture_link.png")
+            icon = QtGui.QIcon(PTH + "GUI/picture_link.png")
             w = 0
             h = 0
             try:
@@ -514,13 +517,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "/video/":
-            icon = QtGui.QIcon("GUI/play.png")
+            icon = QtGui.QIcon(PTH + "GUI/play.png")
         if mediapath[:6] == "video:":
-            icon = QtGui.QIcon("GUI/play_link.png")
+            icon = QtGui.QIcon(PTH + "GUI/play_link.png")
         if mediapath[:7] == "/audio/":
-            icon = QtGui.QIcon("GUI/sound.png")
+            icon = QtGui.QIcon(PTH + "GUI/sound.png")
         if mediapath[:6] == "audio:":
-            icon = QtGui.QIcon("GUI/sound_link.png")
+            icon = QtGui.QIcon(PTH + "GUI/sound_link.png")
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. " + abs_path)

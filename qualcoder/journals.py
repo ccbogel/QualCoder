@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtCore, QtWidgets
 import datetime
@@ -40,6 +40,9 @@ from GUI.ui_dialog_journals import Ui_Dialog_journals
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -121,11 +124,11 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
         self.ui.textEdit.textChanged.connect(self.text_changed)
-        self.ui.pushButton_create.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
+        self.ui.pushButton_create.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
         self.ui.pushButton_create.clicked.connect(self.create)
-        self.ui.pushButton_export.setStyleSheet("background-image : url(GUI/doc_export_icon.png);")
+        self.ui.pushButton_export.setStyleSheet("background-image : url("+PTH+"GUI/doc_export_icon.png);")
         self.ui.pushButton_export.clicked.connect(self.export)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
+        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete)
 
     def view(self):

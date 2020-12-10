@@ -51,6 +51,9 @@ from view_image import DialogViewImage
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -107,17 +110,17 @@ class DialogCases(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.load_cases_and_attributes()
-        self.ui.pushButton_add.setStyleSheet("background-image : url(GUI/pencil_icon.png);")
+        self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
         self.ui.pushButton_add.clicked.connect(self.add_case)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
+        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
-        self.ui.pushButton_file_manager.setStyleSheet("background-image : url(GUI/clipboard_copy_icon.png);")
+        self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
         self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url(GUI/plus_icon.png);")
+        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        self.ui.pushButton_import_cases.setStyleSheet("background-image : url(GUI/doc_import_icon.png);")
+        self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
