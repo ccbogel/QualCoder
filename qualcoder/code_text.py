@@ -53,6 +53,11 @@ from select_items import DialogSelectItems
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+PTH = os.path.realpath(__file__)
+PTH = os.path.dirname(PTH) + "/"
+if platform.system() == "Windows":
+    PTH = ""
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -142,33 +147,33 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.listWidget.addItem(item)
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
-        self.ui.pushButton_latest.setStyleSheet("background-image : url(GUI/playback_next_icon_24.png);")
+        self.ui.pushButton_latest.setStyleSheet("background-image : url("+PTH+"GUI/playback_next_icon_24.png);")
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setStyleSheet("background-image : url(GUI/playback_play_icon_24.png);")
+        self.ui.pushButton_next_file.setStyleSheet("background-image : url("+PTH+"GUI/playback_play_icon_24.png);")
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        self.ui.pushButton_bookmark_go.setStyleSheet("background-image : url(GUI/bookmark_icon_24.png);")
+        self.ui.pushButton_bookmark_go.setStyleSheet("background-image : url("+PTH+"GUI/bookmark_icon_24.png);")
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
-        self.ui.pushButton_document_memo.setStyleSheet("background-image : url(GUI/notepad_2_icon_24.png);")
+        self.ui.pushButton_document_memo.setStyleSheet("background-image : url("+PTH+"GUI/notepad_2_icon_24.png);")
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_right_icon_24.png);")
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_left_icon_24.png);")
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url("+PTH+"GUI/2x2_grid_icon_24.png);")
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
-        self.ui.pushButton_annotate.setStyleSheet("background-image : url(GUI/notepad_pencil_icon.png);")
+        self.ui.pushButton_annotate.setStyleSheet("background-image : url("+PTH+"GUI/notepad_pencil_icon.png);")
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
-        self.ui.pushButton_coding_memo.setStyleSheet("background-image : url(GUI/notepad_pencil_red_icon.png);")
+        self.ui.pushButton_coding_memo.setStyleSheet("background-image : url("+PTH+"GUI/notepad_pencil_red_icon.png);")
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
         self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.auto_code_menu)
-        self.ui.pushButton_auto_code.setStyleSheet("background-image : url(GUI/magic_wand_icon.png);")
+        self.ui.pushButton_auto_code.setStyleSheet("background-image : url("+PTH+"GUI/magic_wand_icon.png);")
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        self.ui.pushButton_auto_code_frag_this_file.setStyleSheet("background-image : url(GUI/wand_one_file_icon.png);")
+        self.ui.pushButton_auto_code_frag_this_file.setStyleSheet("background-image : url("+PTH+"GUI/wand_one_file_icon.png);")
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        self.ui.pushButton_auto_code_frag_all_files.setStyleSheet("background-image : url(GUI/wand_all_files_icon.png);")
+        self.ui.pushButton_auto_code_frag_all_files.setStyleSheet("background-image : url("+PTH+"GUI/wand_all_files_icon.png);")
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
-        self.ui.pushButton_auto_code_undo.setStyleSheet("background-image : url(GUI/undo_icon.png);")
+        self.ui.pushButton_auto_code_undo.setStyleSheet("background-image : url("+PTH+"GUI/undo_icon.png);")
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
 
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
@@ -177,15 +182,15 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
-        self.ui.label_search_case_sensitive.setStyleSheet("background-image : url(GUI/text_letter_t_icon.png);")
-        self.ui.label_search_all_files.setStyleSheet("background-image : url(GUI/clipboard_copy_icon.png);")
-        self.ui.pushButton_previous.setStyleSheet("background-image : url(GUI/playback_back_icon.png);")
+        self.ui.label_search_case_sensitive.setStyleSheet("background-image : url("+PTH+"GUI/text_letter_t_icon.png);")
+        self.ui.label_search_all_files.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
+        self.ui.pushButton_previous.setStyleSheet("background-image : url("+PTH+"GUI/playback_back_icon.png);")
         self.ui.pushButton_previous.setEnabled(False)
-        self.ui.pushButton_next.setStyleSheet("background-image : url(GUI/playback_play_icon.png);")
+        self.ui.pushButton_next.setStyleSheet("background-image : url("+PTH+"GUI/playback_play_icon.png);")
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        self.ui.pushButton_delete_all_codes.setStyleSheet("background-image : url(GUI/delete_icon.png);")
+        self.ui.pushButton_delete_all_codes.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
         self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
@@ -255,9 +260,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.underline_text_of_this_code(code_for_underlining)
         # When a code is selected undo the show selected code features
         self.highlight()
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url("+PTH+"GUI/2x2_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_right_icon_24.png);")
 
     def underline_text_of_this_code(self, code_for_underlining):
         """ User interface, highlight coded text selections for the currently selected code.
@@ -962,9 +967,9 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
 
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url("+PTH+"GUI/2x2_color_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url("+PTH+"GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url("+PTH+"GUI/round_arrow_right_icon_24.png);")
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
@@ -1012,17 +1017,17 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_color_grid_icon_24.png);")
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url(GUI/round_arrow_left_icon_24.png);")
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url(GUI/round_arrow_right_icon_24.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url("+PTH+"GUI/2x2_color_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + "; background-image : url("+PTH+"GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";background-image : url("+PTH+"GUI/round_arrow_right_icon_24.png);")
 
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
-        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url(GUI/2x2_grid_icon_24.png);")
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url(GUI/round_arrow_left_icon_24.png);")
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url(GUI/round_arrow_right_icon_24.png);")
+        self.ui.pushButton_show_all_codings.setStyleSheet("background-image : url("+PTH+"GUI/2x2_grid_icon_24.png);")
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_left_icon_24.png);")
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-image : url("+PTH+"GUI/round_arrow_right_icon_24.png);")
         self.unlight()
         self.highlight()
 
