@@ -111,6 +111,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_add.clicked.connect(self.add_case)
         self.ui.pushButton_delete.setStyleSheet("background-image : url(GUI/delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
+        self.ui.pushButton_file_manager.setStyleSheet("background-image : url(GUI/clipboard_copy_icon.png);")
+        self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.pushButton_add_attribute.setStyleSheet("background-image : url(GUI/plus_icon.png);")
@@ -491,15 +493,24 @@ class DialogCases(QtWidgets.QDialog):
             self.app.delete_backup = False
 
         if y == self.FILES_COLUMN:
-            ui = DialogCaseFileManager(self.app, self.parent_textEdit, self.cases[x])
-            ui.exec_()
-            # reload files count
-            cur = self.app.conn.cursor()
-            sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
-            cur.execute(sql, [self.cases[x]['caseid'], ])
-            files = cur.fetchall()
-            self.cases[x]['files'] = files
-            self.fill_tableWidget()
+            self.open_case_file_manager()
+
+    def open_case_file_manager(self):
+        """ Link files to cases.
+         Called by click in files column in table or by button. """
+
+        x = self.ui.tableWidget.currentRow()
+        if x == -1:
+            return
+        ui = DialogCaseFileManager(self.app, self.parent_textEdit, self.cases[x])
+        ui.exec_()
+        # reload files count
+        cur = self.app.conn.cursor()
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+        cur.execute(sql, [self.cases[x]['caseid'], ])
+        files = cur.fetchall()
+        self.cases[x]['files'] = files
+        self.fill_tableWidget()
 
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
