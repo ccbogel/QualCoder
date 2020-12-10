@@ -68,7 +68,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.1"
+qualcoder_version = "QualCoder 2.2"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
