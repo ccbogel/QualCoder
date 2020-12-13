@@ -185,9 +185,6 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="handleWidth">
-          <number>7</number>
-         </property>
          <widget class="QListWidget" name="listWidget"/>
          <widget class="QGroupBox" name="groupBox_file_buttons">
           <property name="minimumSize">

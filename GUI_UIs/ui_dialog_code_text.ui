@@ -394,32 +394,10 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QSplitter" name="leftsplitter">
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="midLineWidth">
-       <number>1</number>
-      </property>
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <property name="handleWidth">
-       <number>7</number>
-      </property>
-      <property name="childrenCollapsible">
-       <bool>true</bool>
-      </property>
-      <widget class="QListWidget" name="listWidget">
-       <property name="midLineWidth">
-        <number>0</number>
-       </property>
-       <property name="gridSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="QListWidget" name="listWidget"/>
       <widget class="QGroupBox" name="groupBox_file_buttons">
        <property name="minimumSize">
         <size>
@@ -529,8 +507,8 @@
          <rect>
           <x>90</x>
           <y>0</y>
-          <width>29</width>
-          <height>29</height>
+          <width>28</width>
+          <height>28</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -545,8 +523,8 @@
          <rect>
           <x>10</x>
           <y>0</y>
-          <width>29</width>
-          <height>29</height>
+          <width>28</width>
+          <height>28</height>
          </rect>
         </property>
         <property name="toolTip">
@@ -561,8 +539,8 @@
          <rect>
           <x>50</x>
           <y>0</y>
-          <width>29</width>
-          <height>29</height>
+          <width>28</width>
+          <height>28</height>
          </rect>
         </property>
         <property name="toolTip">
