@@ -71,7 +71,6 @@ class Ui_Dialog_code_image(object):
         self.splitter_2.setObjectName("splitter_2")
         self.splitter = QtWidgets.QSplitter(self.splitter_2)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
-        self.splitter.setHandleWidth(7)
         self.splitter.setObjectName("splitter")
         self.listWidget = QtWidgets.QListWidget(self.splitter)
         self.listWidget.setObjectName("listWidget")
