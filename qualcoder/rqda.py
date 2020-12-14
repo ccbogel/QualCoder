@@ -89,8 +89,10 @@ class Rqda_import():
     def convert_date(self, r_date):
         """ Convert RQDA date format from:
         Mon Oct 28 08:11:36 2019 to: yyyy-mm-dd hh:mm:ss
-        Leading zeros on hour may be missing
         Mon Oct 28 8:11:36 2019 to: yyyy-mm-dd hh:mm:ss
+        RQDA does have a leading space for single digit days.
+        RQDA does had 2 digit dates e.g. '12' '09'
+        Fri Dec  6 09:26:07 2019
 
         param: rqda formatted date
         return: standard format date
@@ -101,15 +103,15 @@ class Rqda_import():
         mm = str(months.index(r_date[4:7]) + 1)
         if len(mm) == 1:
             mm = "0" + mm
-        # TODO check if day is ALWAYS 2 digits
+        # Day can have a leading space, so '12' or ' 9'
         dd = r_date[8:10]
-        # TODO check if hours is ALWAYS 2 digits
+        if dd[0] == " ":
+            dd[0] == "0"
+        # Hours is always 2 digits
         # Different way to get hh ,mm ss as slice was not working
         s = r_date.split(" ")
+        # The first minus space is between time and year, the second minus space between date and time
         hh_mm_ss = s[-2]
-        #hh_mm_ss = r_date[11:19]
-        #if hh_mm_ss[0] == " ":
-        #    hh_mm_ss = "0" + hh_mm_ss[1:]
         return yyyy + "-" + mm + "-" + dd + " " + hh_mm_ss
 
     def import_data(self):
