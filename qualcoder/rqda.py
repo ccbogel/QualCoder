@@ -78,12 +78,13 @@ class Rqda_import():
         if not ok or self.file_path == "":
             return
         self.conn = sqlite3.connect(self.file_path)
+        self.parent_textEdit.append(_("Beginning import from RQDA"))
         try:
             self.import_data()
             self.parent_textEdit.append(_("Data imported from ") + self.file_path)
             self.parent_textEdit.append(_("File categories are not imported from RQDA"))
-        except:
-            self.parent_textEdit.append(_("Data import unsuccessful from ") + self.file_path)
+        except Exception as e:
+            self.parent_textEdit.append(_("Data import unsuccessful from ") + self.file_path + "\n" + str(e))
 
     def convert_date(self, r_date):
         """ Convert RQDA date format from:
@@ -113,95 +114,168 @@ class Rqda_import():
 
     def import_data(self):
         """ Code colours are randomly created.
-         The codername in qlaucoder settings is set to the first owner found in RQDA """
+         The codername in qualcoder settings is set to the first owner found in RQDA.
+
+         Note sqlite3.Integrity error can occur if he same text is coded by the same code and same owner.
+         So adding a check for this. """
 
         r_cur = self.conn.cursor()
         q_cur = self.app.conn.cursor()
-
         r_cur.execute("select memo from project")
         res = r_cur.fetchone()
         q_cur.execute("update project set memo=?", (res[0], ))
+        if res[0] is not None:
+            self.parent_textEdit.append(_("Project memo imported"))
         r_cur.execute("select id,name, file, memo, owner, date from source")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
             q_cur.execute("insert into source (id, name, fulltext,memo, owner, date, mediapath) values (?,?,?,?,?,?,?)",
                 [r[0], r[1], r[2], r[3], r[4], self.convert_date(r[5]), None])
+            i += 1
+        self.parent_textEdit.append(str(i) + _(" files imported"))
         r_cur.execute("select fid,position,annotation, owner, date from annotation")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
             if r[3] != "" and r[3] is not None:
                 q_cur.execute("insert into annotation (fid, pos0, pos1, memo, owner, date) values (?,?,?,?,?,?)",
                     [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
+                i += 1
+        self.parent_textEdit.append(str(i) + _(" annotations imported"))
         r_cur.execute("select name,journal, owner, date from journal")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
             q_cur.execute("insert into journal (name, jentry, owner, date) values (?,?,?,?)",
                 [r[0], r[1], r[2], self.convert_date(r[3])])
+            i += 1
+        self.parent_textEdit.append(str(i) + _(" journals imported"))
         r_cur.execute("select id, name, memo, owner, date from cases")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
-            q_cur.execute("insert into cases (caseid, name, memo, owner, date) values (?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], self.convert_date(r[4])])
+            try:
+                q_cur.execute("insert into cases (caseid, name, memo, owner, date) values (?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], self.convert_date(r[4])])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" cases imported"))
         r_cur.execute("select catid, name, memo, owner, date from codecat")
         res = r_cur.fetchall()
+        i = 0  # do not use enumerate as res could be None
         for r in res:
             # there are no supercatids in rqda
-            q_cur.execute("insert into code_cat (catid,name, memo, owner, date,supercatid) values (?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], self.convert_date(r[4]), None])
+            try:
+                q_cur.execute("insert into code_cat (catid,name, memo, owner, date,supercatid) values (?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), None])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" code categories imported"))
         # get catids for each code cid
         r_cur.execute("select cid, catid from treecode")
         treecodes = r_cur.fetchall()
         r_cur.execute("select id, name, memo,color, owner, date from freecode")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
             code_color = colors[randint(0, len(colors) - 1)]
             treecode = None
             for t in treecodes:
                 if t[0] == r[0]:
                     treecode = t[1]  # the corresponding catid
-            q_cur.execute("insert into code_name (cid, catid,name, memo,color, owner, date) values (?,?,?,?,?,?,?)",
-                [r[0],treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
+            try:
+                q_cur.execute("insert into code_name (cid, catid,name, memo,color, owner, date) values (?,?,?,?,?,?,?)",
+                    [r[0],treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + " codes imported")
         r_cur.execute("select cid, fid, seltext,selfirst,selend,memo, owner, date from coding")
         res = r_cur.fetchall()
+        i = 0
+        dup = 0
         for r in res:
             if r[2] != "" and r[2] is not None:
-                q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                try:
+                    q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
                     [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
+                    i += 1
+                except sqlite3.IntegrityError as e:
+                    dup += 1
+        self.parent_textEdit.append(str(i) + _(" codings imported"))
+        if dup > 0:
+            self.parent_textEdit.append(str(dup) + _(" duplicated codings found and ignored"))
         r_cur.execute("select cid, fid, seltext,selfirst,selend,memo, owner, date from coding2")
         res = r_cur.fetchall()
+        i = 0
+        dup = 0
         for r in res:
             if r[2] != "" and r[2] is not None:
-                q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                try:
+                    q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
                     [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
-
+                    i += 1
+                except sqlite3.IntegrityError as e:
+                    dup += 1
+        self.parent_textEdit.append(str(i) + _(" codings imported from coding2 table"))
+        if dup > 0:
+            self.parent_textEdit.append(str(dup) + _(" duplicated codings found and ignored from coding2 table"))
         # attribute class = character or numeric
         r_cur.execute("select distinct variable from caseAttr")
         case_attr = r_cur.fetchall()
         r_cur.execute("select name,class,memo, owner, date from attributes")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
             # default to a file attribute unless it is a case attribute
             caseOrFile = "file"
             for c in case_attr:
                 if c[0] == r[0]:
                     caseOrFile = "case"
-            q_cur.execute("insert into attribute_type (name, valuetype,caseOrFile,memo, owner, date) values (?,?,?,?,?,?)",
-                [r[0], r[1], caseOrFile, r[2], r[3], self.convert_date(r[4])])
+            try:
+                q_cur.execute("insert into attribute_type (name, valuetype,caseOrFile,memo, owner, date) values (?,?,?,?,?,?)",
+                    [r[0], r[1], caseOrFile, r[2], r[3], self.convert_date(r[4])])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" attribute types imported"))
         r_cur.execute("select variable, value, caseID, owner, date from caseAttr")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
-            q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "case"])
+            try:
+                q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "case"])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" case attribute values imported"))
         r_cur.execute("select variable, value, fileID, owner, date from fileAttr")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
-            q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "file"])
+            try:
+                q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "file"])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" file attribute values imported"))
         r_cur.execute("select caseid,fid,selfirst,selend, owner, memo,date from caselinkage")
         res = r_cur.fetchall()
+        i = 0
         for r in res:
-            q_cur.execute("insert into case_text (caseid,fid,pos0,pos1,owner,memo, date) values(?,?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
+            try:
+                q_cur.execute("insert into case_text (caseid,fid,pos0,pos1,owner,memo, date) values(?,?,?,?,?,?,?)",
+                    [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
+                i += 1
+            except sqlite3.IntegrityError as e:
+                pass
+        self.parent_textEdit.append(str(i) + _(" case linked texts imported"))
+
         self.app.conn.commit()
 
         # Keep a copy of the text sources in the QualCoder documents folder
