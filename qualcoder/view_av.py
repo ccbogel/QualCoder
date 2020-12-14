@@ -87,10 +87,6 @@ from helpers import msecs_to_mins_and_secs, Message
 from memo import DialogMemo
 from select_items import DialogSelectItems
 
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
