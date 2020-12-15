@@ -1667,9 +1667,9 @@ class Refi_export(QtWidgets.QDialog):
         for r in result:
             xml += '<Case guid="' + self.create_guid() + '" '
             xml += 'name="' + r[1] + '">\n'
-            if r[2] != "":
+            if r[2] is not None and r[2] != "":
                 xml += '<Description>' + r[2] + '</Description>\n'
-            if r[2] == "":
+            if r[2] is None or r[2] == "":
                 xml += '<Description />\n'
             xml += self.case_variables_xml(r[0])
             xml += self.case_source_ref_xml(r[0])
@@ -1934,6 +1934,7 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'endPosition="' + str(r[3]) + '" '
             # Ampersands may cause parsing problems
             xml += 'name="' + str(r[1]).replace('&', '&#038;') + '" '
+            #TODO escapte quote marks in the text
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
@@ -2388,7 +2389,7 @@ class Refi_export(QtWidgets.QDialog):
                 xml += '" name="' + c['name']
                 xml += '" isCodable="false'
                 xml += '">\n'
-                if c['memo'] != "":
+                if c['memo'] is not None and c['memo'] != "":
                     xml += '<Description>' + c['memo'] + '</Description>\n'
                 # add codes in this category
                 for co in self.codes:
