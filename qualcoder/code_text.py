@@ -137,10 +137,25 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
+        # Fill additional details about each file in the memo
+        cur = self.app.conn.cursor()
+        sql = "select length(fulltext) from source where id=?"
+        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
         for f in self.filenames:
+            cur.execute(sql, [f['id'],])
+            res = cur.fetchone()
+            if res is None:  # safety catch
+                res = [0]
+            tt = "Characters: " + str(res[0])
+            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
+            res = cur.fetchone()
+            tt += "\nCodings: " + str(res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
+            if f['memo'] is not None and f['memo'] != "":
+                tt += "\nMemo: " + f['memo']
+            item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
+
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
@@ -223,7 +238,7 @@ class DialogCodeText(QtWidgets.QWidget):
             v0 = int(self.app.settings['dialogcodetext_splitter_v0'])
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
             if v0 > 5 and v1 > 5:
-                # 30s are for the button boxes
+                # 30s are for the groupboxes containing buttons
                 self.ui.leftsplitter.setSizes([v1, 30, v0, 30])
         except:
             pass
@@ -1982,7 +1997,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.unlight()
         self.highlight()
 
-    def auto_code_menu(self, position):
+    '''def auto_code_menu(self, position):
         """ Context menu for auto_code button.
         To allow coding of full sentences based on text fragment and marker indicating end of sentence.
         Default end marker  is 2 character period and space.
@@ -2012,7 +2027,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_autocode_undo:
             self.undo_autocoding()
-            return
+            return'''
 
     def button_autocode_sentences_this_file(self):
         item = self.ui.treeWidget.currentItem()
