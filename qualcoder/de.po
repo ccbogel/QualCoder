@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-16 16:22+1100\n"
-"PO-Revision-Date: 2020-12-16 16:39+1100\n"
+"POT-Creation-Date: 2020-12-16 16:45+1100\n"
+"PO-Revision-Date: 2020-12-16 17:17+1100\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -102,6 +102,7 @@ msgstr "Memo"
 #: view_graph_original.py:55 view_image.py:60 cases.py:60 manage_files.py:90
 #: reports.py:59 view_av.py:97 report_relations.py:53 manage_files.py:89
 #: case_file_manager.py:63 select_items.py:47 cases.py:66 journals.py:57
+#: refi.py:62 rqda.py:58
 msgid "Uncaught exception: "
 msgstr "Nicht erfasste Ausnahme: "
 
@@ -193,7 +194,7 @@ msgstr "Memo für Fall "
 #: code_text.py:1943 code_text.py:2035 code_text.py:2044 code_text.py:2086
 #: code_text.py:2175 journals.py:337 manage_files.py:1360 manage_files.py:1382
 #: manage_files.py:1385 manage_files.py:1389 view_av.py:2077 view_av.py:2085
-#: view_av.py:2165
+#: view_av.py:2165 refi.py:898
 msgid "Warning"
 msgstr "Warnung"
 
@@ -642,7 +643,7 @@ msgstr ". mit text: "
 #: journals.py:245 manage_files.py:1169 reports.py:262 reports.py:318
 #: reports.py:558 manage_files.py:1230 reports.py:554 report_relations.py:495
 #: manage_files.py:1225 manage_files.py:1380 journals.py:254
-#: manage_files.py:296 manage_files.py:1508
+#: manage_files.py:296 manage_files.py:1508 refi.py:1477
 msgid "Select directory to save file"
 msgstr "Wählen das Verzeichnis zum Speichern der Datei"
 
@@ -662,7 +663,7 @@ msgstr "Besitzer: "
 msgid "Memo: "
 msgstr "Memo: "
 
-#: codebook.py:198 codebook.py:203
+#: codebook.py:198 codebook.py:203 refi.py:1487 refi.py:1488
 msgid "Codebook exported"
 msgstr "Codebuch exportiert"
 
@@ -1223,6 +1224,7 @@ msgstr "Geben Sie den Projektnamen ein"
 #: qualcoder.py:438 qualcoder.py:450 qualcoder.py:1127 qualcoder.py:1139
 #: qualcoder.py:1183 qualcoder.py:1195 qualcoder.py:1181 qualcoder.py:1193
 #: qualcoder.py:1213 qualcoder.py:1225 qualcoder.py:1228 qualcoder.py:1240
+#: refi.py:1406 refi.py:1412
 msgid "Project"
 msgstr "Projekt"
 
@@ -1551,7 +1553,7 @@ msgstr "Medienkodierung"
 
 #: view_av.py:362 view_av.py:502 view_av.py:2263 view_av.py:585 view_av.py:2486
 #: view_av.py:2528 view_av.py:599 view_av.py:2555 view_av.py:699
-#: view_av.py:2722
+#: view_av.py:2722 refi.py:2254
 msgid "Media not found"
 msgstr "Medien nicht gefunden"
 
@@ -2817,7 +2819,7 @@ msgstr ""
 msgid "REFI QDA Project export"
 msgstr "REFI-QDA-Projekt exportieren"
 
-#: qualcoder.py:1150
+#: qualcoder.py:1150 refi.py:379
 msgid "REFI-QDA Project import"
 msgstr "REFI-QDA-Projekt importieren"
 
@@ -2901,7 +2903,7 @@ msgstr "Versucht, als Text zu importieren"
 msgid "Cannot import file"
 msgstr "Datei kann nicht importiert werden"
 
-#: manage_files.py:1382
+#: manage_files.py:1382 refi.py:898
 msgid "Cannot import"
 msgstr "Kann nicht importieren"
 
@@ -2916,3 +2918,203 @@ msgstr "Exportierte Dateien"
 #: view_image.py:530
 msgid "Scale: "
 msgstr "Maßstab: "
+
+#: refi.py:105
+msgid "Select REFI_QDA file"
+msgstr "REFI_QDA-Datei auswählen"
+
+#: refi.py:139
+msgid "Codebook imported"
+msgstr "Codebuch importiert"
+
+#: refi.py:140
+msgid " categories and codes imported from "
+msgstr " Kategorien und Codes, die aus importierte "
+
+#: refi.py:142
+msgid "Codebook importation"
+msgstr "Codebuch-Import"
+
+#: refi.py:142
+msgid " NOT imported"
+msgstr " NICHT importiert"
+
+#: refi.py:305
+msgid "Reading from: "
+msgstr "Lesen von: "
+
+#: refi.py:306
+msgid "Creating temporary directory: "
+msgstr "Temporäres Verzeichnis erstellen: "
+
+#: refi.py:327
+msgid "Parse users. Loaded: "
+msgstr "Benutzer parsen. Geladen: "
+
+#: refi.py:334
+msgid "Parse codes and categories. Loaded: "
+msgstr "Codes und Kategorien parsen. Geladen: "
+
+#: refi.py:337
+msgid "Parse file variables. Loaded: "
+msgstr "Datei-Variablen parsen. Geladen: "
+
+#: refi.py:338
+msgid "Parse case variables. Loaded: "
+msgstr "Fallvariablen parsen. Geladen: "
+
+#: refi.py:341
+msgid "Parsing journal notes. Loaded: "
+msgstr "Parsen von Journalnotizen. Geladen: "
+
+#: refi.py:343
+msgid "Parsing and loading project memo"
+msgstr "Parsen und Laden des Projektmemos"
+
+#: refi.py:354
+msgid "Parsing cases. Loaded: "
+msgstr "Parsen von Fällen. Geladen: "
+
+#: refi.py:357
+msgid "Parsing sources. Loaded: "
+msgstr "Dateien parsen. Geladen: "
+
+#: refi.py:359
+msgid " loaded."
+msgstr " geladen."
+
+#: refi.py:441
+msgid "Variable import error"
+msgstr "Fehler beim Variablenimport"
+
+#: refi.py:441
+msgid "Variable name already exists: "
+msgstr "Variablenname existiert bereits: "
+
+#: refi.py:498
+msgid "Error entering Case into database"
+msgstr "Fehler bei der Eingabe des Falls in die Datenbank"
+
+#: refi.py:652
+msgid "Cannot copy Image file from: "
+msgstr "Kann Bilddatei nicht kopieren von: "
+
+#: refi.py:736
+msgid "Cannot copy Audio file from: "
+msgstr "Audio-Datei kann nicht kopiert werden von: "
+
+#: refi.py:784
+msgid "Cannot copy Video file from: "
+msgstr "Kann Videodatei nicht kopieren von: "
+
+#: refi.py:879
+msgid "Cannot copy transcript file from: "
+msgstr "Kann die Transkriptdatei nicht kopieren von: "
+
+#: refi.py:1035
+msgid "Cannot copy PDF file from: "
+msgstr "PDF-Datei kann nicht kopiert werden von: "
+
+#: refi.py:1120
+msgid "Cannot read from TextSource: "
+msgstr "Kann nicht aus Textquelle lesen: "
+
+#: refi.py:1128
+msgid "Cannot copy TextSource file from: "
+msgstr "Kann die Datei Text Source nicht kopieren von: "
+
+#: refi.py:1264
+msgid "Trying to read Note element: "
+msgstr "Versucht, das Notelement zu lesen: "
+
+#: refi.py:1405
+msgid "Project export error "
+msgstr "Fehler beim Projektexport "
+
+#: refi.py:1406 refi.py:1412
+msgid "Project not exported. Exiting. "
+msgstr "Projekt nicht exportiert. Beenden. "
+
+#: refi.py:1468 refi.py:1469
+msgid "Project exported"
+msgstr "Projekt exportiert"
+
+#: refi.py:1491 refi.py:1492
+msgid "Codebook NOT exported"
+msgstr "Codebuch NICHT exportiert"
+
+#: rqda.py:77
+msgid "Select RQDA file"
+msgstr "RQDA-Datei auswählen"
+
+#: rqda.py:81
+msgid "Beginning import from RQDA"
+msgstr "Beginn des Imports aus RQDA"
+
+#: rqda.py:84
+msgid "Data imported from "
+msgstr "Daten importiert von "
+
+#: rqda.py:85
+msgid "File categories are not imported from RQDA"
+msgstr "Dateikategorien werden nicht aus RQDA importiert"
+
+#: rqda.py:87
+msgid "Data import unsuccessful from "
+msgstr "Datenimport fehlgeschlagen von "
+
+#: rqda.py:130
+msgid "Project memo imported"
+msgstr "Projektnotiz importiert"
+
+#: rqda.py:138
+msgid " files imported"
+msgstr " importierte Dateien"
+
+#: rqda.py:147
+msgid " annotations imported"
+msgstr " importierte Anmerkungen"
+
+#: rqda.py:155
+msgid " journals imported"
+msgstr " importierte Journale"
+
+#: rqda.py:166
+msgid " cases imported"
+msgstr " Importierte Fälle"
+
+#: rqda.py:178
+msgid " code categories imported"
+msgstr " importierte Code-Kategorien"
+
+#: rqda.py:210
+msgid " codings imported"
+msgstr " importierte Kodierungen"
+
+#: rqda.py:212
+msgid " duplicated codings found and ignored"
+msgstr " doppelte Codierungen gefunden und ignoriert"
+
+#: rqda.py:225
+msgid " codings imported from coding2 table"
+msgstr " Codierungen aus Tabelle coding2 importiert"
+
+#: rqda.py:227
+msgid " duplicated codings found and ignored from coding2 table"
+msgstr " doppelte Codierungen gefunden und aus der Tabelle coding2 ignoriert"
+
+#: rqda.py:246
+msgid " attribute types imported"
+msgstr " importierte Attributtypen"
+
+#: rqda.py:257
+msgid " case attribute values imported"
+msgstr " Fall-Attributwerte importiert"
+
+#: rqda.py:268
+msgid " file attribute values imported"
+msgstr " Dateiattributwerte importiert"
+
+#: rqda.py:279
+msgid " case linked texts imported"
+msgstr " fallverknüpfte Texte importiert"
