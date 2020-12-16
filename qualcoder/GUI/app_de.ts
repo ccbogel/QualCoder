@@ -109,7 +109,7 @@
     <message>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text).</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen, die in der obersten Zeile vorgenommen werden, setzen alle Benutzeränderungen an Feldnamen und Feldtypen darunter außer Kraft. Klicken Sie mit der rechten Maustaste auf eine Spaltenüberschrift unten, um den Spaltennamen zu ändern oder um von &quot;Zeichen&quot; (Attribut) zu &quot;Qualitativ&quot; (erstellt eine Textdatei aus dem Text) zu wechseln.</translation>
     </message>
 </context>
 <context>
@@ -1822,7 +1822,7 @@ Sie müssen diese Dateien an einem anderen Ort speichern.</translation>
     <message>
         <location filename="ui_main.py" line="250"/>
         <source>Export coded text as html</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codierten Text als html exportieren</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="251"/>
