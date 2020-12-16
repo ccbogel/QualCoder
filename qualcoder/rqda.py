@@ -94,6 +94,10 @@ class Rqda_import():
         RQDA does had 2 digit dates e.g. '12' '09'
         Fri Dec  6 09:26:07 2019
 
+        TODO some dates are like this after rqda conversion: 2019-03- 1 17:51:21
+        TODO original RQDA date:  Fri Mar  1 17:51:21 2019
+
+
         param: rqda formatted date
         return: standard format date
         """
@@ -106,7 +110,7 @@ class Rqda_import():
         # Day can have a leading space, so '12' or ' 9'
         dd = r_date[8:10]
         if dd[0] == " ":
-            dd[0] == "0"
+            dd = "0" + dd[1]
         # Hours is always 2 digits
         # Different way to get hh ,mm ss as slice was not working
         s = r_date.split(" ")
