@@ -1507,6 +1507,23 @@ class Refi_export(QtWidgets.QDialog):
                 return c['guid']
         return ""
 
+    def convert_xml_predefined_entities(self, text):
+        """ Helper function to convert predefiend xml entnties " ' < > &
+        into numeric equivalents #nnn;
+        Also convert None type into ""
+        param: text : String - usually a memo, description, code or category
+        """
+
+        if text is None:
+            return ""
+
+        text = text.replace('&', '&#038;')  # &#x26; &amp;
+        text = text.replace('"', '&#034;')  # &#x22; &quot;
+        text = text.replace("'", '&#039;')  # &#x27; &apos;
+        text = text.replace('<', '&#060;')  # &#x3C; &lt;
+        text = text.replace('>', '&#062;')  # &#x3E; &gt;
+        return text
+
     def project_xml(self):
         """ Creates the xml for the .qde file.
         External files will be exported using absolute path
@@ -1562,7 +1579,7 @@ class Refi_export(QtWidgets.QDialog):
         for r in results:
             guid = self.create_guid()
             xml += '<Variable guid="' + guid + '" '
-            xml += 'name="' + r[0] + '" '
+            xml += 'name="' + self.convert_xml_predefined_entities(r[0]) + '" '
             xml += 'typeOfVariable="'
             # Only two variable options in QualCoder
             if r[3] == 'numeric':
@@ -1574,7 +1591,7 @@ class Refi_export(QtWidgets.QDialog):
             if r[1] == "" or r[1] is None:
                 xml += '<Description />\n'
             else:
-                xml += '<Description>' + r[1] + '</Description>\n'
+                xml += '<Description>' + self.convert_xml_predefined_entities(r[1]) + '</Description>\n'
             xml += '</Variable>\n'
             self.variables.append({'guid': guid, 'name': r[0], 'caseOrFile': r[2], 'type': r[3]})
         xml += '</Variables>\n'
@@ -1591,15 +1608,7 @@ class Refi_export(QtWidgets.QDialog):
         if results == []:  # this should not happen
             return '<Description />\n'
         memo = str(results[0][0])
-        if memo is None:
-            memo = ""
-        # Replace predefined xml entities
-        memo = memo.replace('&', '&#038;')
-        memo = memo.replace('"', '&#034;')
-        memo = memo.replace("'", '#039;')
-        memo = memo.replace('<', '#060;')
-        memo = memo.replace('>', '#062;')
-        xml = '<Description>' + memo + '</Description>\n'
+        xml = '<Description>' + self.convert_xml_predefined_entities(memo) + '</Description>\n'
         return xml
 
     def create_note_xml(self, journal):
@@ -1625,7 +1634,7 @@ class Refi_export(QtWidgets.QDialog):
         xml = '<Note guid="' + guid + '" '
         xml += 'creatingUser="' + self.user_guid(journal[3]) + '" '
         xml += 'creationDateTime="' + self.convert_timestamp(journal[2]) + '" '
-        xml += 'name="' + journal[0] + '" '
+        xml += 'name="' + self.convert_xml_predefined_entities(journal[0]) + '" '
         xml += ' plainTextPath="internal://' + guid + '.txt" '
         xml += '>\n'
         #xml += '<PlainTextContent>' + text + '</PlainTextContent>\n'
@@ -1674,16 +1683,11 @@ class Refi_export(QtWidgets.QDialog):
         xml = '<Cases>\n'
         for r in result:
             xml += '<Case guid="' + self.create_guid() + '" '
-            xml += 'name="' + r[1] + '">\n'
-            if r[2] is not None and r[2] != "":
-                # replace predefined xml entities
-                tmp = r[2].replace('&', '&#038;')
-                tmp = tmp.replace('"', '&#034;')
-                tmp = tmp.replace("'", '#039;')
-                tmp = tmp.replace('<', '#060;')
-                tmp = tmp.replace('>', '#062;')
-                xml += '<Description>' + tmp + '</Description>\n'
-            if r[2] is None or r[2] == "":
+            xml += 'name="' + self.convert_xml_predefined_entities(r[1]) + '">\n'
+            description = self.convert_xml_predefined_entities(r[2])
+            if description != "":
+                xml += '<Description>' + description + '</Description>\n'
+            if description == "":
                 xml += '<Description />\n'
             xml += self.case_variables_xml(r[0])
             xml += self.case_source_ref_xml(r[0])
@@ -1721,8 +1725,7 @@ class Refi_export(QtWidgets.QDialog):
             if var_type == 'numeric':
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
             if var_type == 'character':
-                #TODO unsure, replace with predefined xml entities?
-                xml += '<TextValue>' + a[1] + '</TextValue>\n'
+                xml += '<TextValue>' + self.convert_xml_predefined_entities(a[1]) + '</TextValue>\n'
             xml += '</VariableValue>\n'
         return xml
 
@@ -1780,8 +1783,7 @@ class Refi_export(QtWidgets.QDialog):
             if var_type == 'numeric':
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
             if var_type == 'character':
-                #TODO unsure, replace with predefined xml entities
-                xml += '<TextValue>' + a[1] + '</TextValue>\n'
+                xml += '<TextValue>' + self.convert_xml_predefined_entities(a[1]) + '</TextValue>\n'
             xml += '</VariableValue>\n'
         return xml
 
@@ -1839,16 +1841,19 @@ class Refi_export(QtWidgets.QDialog):
                 (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
                 xml += '<TextSource '
                 if s['external'] is None:
-                    xml += 'richTextPath="internal://' + s['filename'].replace('&', '&#038;') + '" '
+                    # Internal filename is a guid identifier
+                    xml += 'richTextPath="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'richTextPath="absolute://' + s['external'].replace('&', '&#038;') + '" '
+                    xml += 'richTextPath="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
+                # Internal filename is a guid identifier
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'].replace('&', '&#038;') + '">\n'
-                if s['memo'] != '' and s['memo'] is not None:
-                    xml += '<Description>' + s['memo'] + '</Description>\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '">\n'
+                memo = self.convert_xml_predefined_entities(s['memo'])
+                if memo != "":
+                    xml += '<Description>' + memo + '</Description>\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</TextSource>\n'
@@ -1857,25 +1862,22 @@ class Refi_export(QtWidgets.QDialog):
                 (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][-4:].lower() == '.pdf') :
                 xml += '<PDFSource '
                 if s['external'] is None:
+                    # Internal filename is a guid identifier
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
+                    xml += 'path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'].replace('&', '&#038;') + '">\n'
-                if s['memo'] != '' and s['memo'] is not None:
-                    # replace xml predefined entities
-                    tmp = s['memo'].replace('&', '&#038;')
-                    tmp = tmp.replace('"', '&#034;')
-                    tmp = tmp.replace("'", '#039;')
-                    tmp = tmp.replace('<', '#060;')
-                    tmp = tmp.replace('>', '#062;')
-                    xml += '<Description>' + tmp + '</Description>\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '">\n'
+                memo = self.convert_xml_predefined_entities(s['memo'])
+                if s['memo'] != "":
+                    xml += '<Description>' + memo + '</Description>\n'
                 xml += '<Representation guid="' + self.create_guid() + '" '
+                # Internal filename is a guid identifier
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
-                xml += 'name="' + s['name'] + '">\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '">\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += '</Representation>'
                 xml += self.source_variables_xml(s['id'])
@@ -1886,19 +1888,15 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
+                    # Internal filename is a guid identifier
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
                     xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
-                if s['memo'] != '' and s['memo'] is not None:
-                    # replace xml predefined entities
-                    tmp = s['memo'].replace('&', '&#038;')
-                    tmp = tmp.replace('"', '&#034;')
-                    tmp = tmp.replace("'", '#039;')
-                    tmp = tmp.replace('<', '#060;')
-                    tmp = tmp.replace('>', '#062;')
-                    xml += '<Description>' + tmp + '</Description>\n'
+                memo = self.convert_xml_predefined_entities(s['memo'])
+                if memo != '':
+                    xml += '<Description>' + memo + '</Description>\n'
                 xml += self.picture_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PictureSource>\n'
@@ -1908,19 +1906,15 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
+                    # Internal filename is a guid identifier
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
+                    xml += 'path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
-                if s['memo'] != '' and s['memo'] is not None:
-                    # replace xml predefined entities
-                    tmp = s['memo'].replace('&', '&#038;')
-                    tmp = tmp.replace('"', '&#034;')
-                    tmp = tmp.replace("'", '#039;')
-                    tmp = tmp.replace('<', '#060;')
-                    tmp = tmp.replace('>', '#062;')
-                    xml += '<Description>' + tmp + '</Description>\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '" >\n'
+                memo = self.convert_xml_predefined_entities(s['memo'])
+                if memo != '':
+                    xml += '<Description>' + memo + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Audio')
                 xml += self.source_variables_xml(s['id'])
@@ -1931,19 +1925,16 @@ class Refi_export(QtWidgets.QDialog):
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
-                    xml += 'path="internal://' + s['filename'] + '" '
+                    # Internal - may not need to convert xml entities
+                    print("plaintext internal", s['plaintext_filename'])
+                    xml += 'path="internal://' + self.convert_xml_predefined_entities(s['filename']) + '" '
                 else:
-                    xml +='path="absolute://' + s['external'].replace('&', '&#038;') + '" '
+                    xml +='path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
-                if s['memo'] is not None and s['memo'] != '':
-                    # replace xml predefined entities
-                    tmp = s['memo'].replace('&', '&#038;')
-                    tmp = tmp.replace('"', '&#034;')
-                    tmp = tmp.replace("'", '#039;')
-                    tmp = tmp.replace('<', '#060;')
-                    tmp = tmp.replace('>', '#062;')
-                    xml += '<Description>' + tmp + '</Description>\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '" >\n'
+                memo = self.code_guid(s['memo'])
+                if memo != '':
+                    xml += '<Description>' + memo + '</Description>\n'
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Video')
                 xml += self.source_variables_xml(s['id'])
@@ -1974,12 +1965,8 @@ class Refi_export(QtWidgets.QDialog):
             xml += 'endPosition="' + str(r[3]) + '" '
             xml += 'name="'
             # Replace predefined entities in XML
-            tmp = str(r[1]).replace('&', '&#038;')
-            tmp = tmp.replace('"', '&#034;')
-            tmp = tmp.replace("'", '#039;')
-            tmp = tmp.replace('<', '#060;')
-            tmp = tmp.replace('>', '#062;')
-            xml += tmp + '" '
+            name = self.convert_xml_predefined_entities(r[1])
+            xml += name + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
@@ -2074,11 +2061,12 @@ class Refi_export(QtWidgets.QDialog):
         xml = ""
         for t in self.sources:
             if t['name'] == source['name'] + '.transcribed':
+                # Internal filename is a guid identfier
                 xml = '<Transcript plainTextPath="internal://' + t['plaintext_filename'] + '" '
                 xml += 'creatingUser="' + self.user_guid(t['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
                 xml += 'guid="' + self.create_guid() + '" '
-                xml += 'name="' + t['name'].replace('&', '&#038;') + '" >\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(t['name']) + '" >\n'
                 # Get and add xml for syncpoints
                 sync_list = self.get_transcript_syncpoints(t)
                 for s in sync_list:
@@ -2384,19 +2372,13 @@ class Refi_export(QtWidgets.QDialog):
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
                 'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
             xml = '<Code guid="' + c['guid']
-            xml += '" name="' + c['name']
+            xml += '" name="' + self.convert_xml_predefined_entities(c['name'])
             xml += '" isCodable="true'
             xml += '" color="' + c['color'] + '"'
-            if c['memo'] != "" and c['memo'] is not None:
+            memo = self.convert_xml_predefined_entities(c['memo'])
+            if memo != "":
                 xml += '>\n'
-                xml += '<Description>'
-                # replace xml predefined entities
-                tmp = c['memo'].replace('&', '&#038;')
-                tmp = tmp.replace('"', '&#034;')
-                tmp = tmp.replace("'", '#039;')
-                tmp = tmp.replace('<', '#060;')
-                tmp = tmp.replace('>', '#062;')
-                xml += tmp + '</Description>\n'
+                xml += '<Description>' + memo + '</Description>\n'
                 xml += '</Code>\n'
             else:  # no description element, so wrap up code as <code />
                 xml += ' />\n'
@@ -2438,18 +2420,12 @@ class Refi_export(QtWidgets.QDialog):
             if c['supercatid'] is None and c['examine']:
                 c['examine'] = False
                 xml += '<Code guid="' + c['guid']
-                xml += '" name="' + c['name']
+                xml += '" name="' + self.convert_xml_predefined_entities(c['name'])
                 xml += '" isCodable="false'
                 xml += '">\n'
-                if c['memo'] is not None and c['memo'] != "":
-                    xml += '<Description>'
-                    # replace xml predefined entities
-                    tmp = c['memo'].replace('&', '&#038;')
-                    tmp = tmp.replace('"', '&#034;')
-                    tmp = tmp.replace("'", '#039;')
-                    tmp = tmp.replace('<', '#060;')
-                    tmp = tmp.replace('>', '#062;')
-                    xml += tmp + '</Description>\n'
+                memo = self.convert_xml_predefined_entities(c['memo'])
+                if memo != "":
+                    xml += '<Description>' + memo + '</Description>\n'
                 # add codes in this category
                 for co in self.codes:
                     if co['catid'] == c['catid']:
@@ -2478,18 +2454,12 @@ class Refi_export(QtWidgets.QDialog):
                 if c['examine'] and cid == c['supercatid']:
                     c['examine'] = False
                     xml += '<Code guid="' + c['guid']
-                    xml += '" name="' + c['name']
+                    xml += '" name="' + self.convert_xml_predefined_entities(c['name'])
                     xml += '" isCodable="false'
                     xml += '">\n'
-                    if c['memo'] is not None and c['memo'] != "":
-                        xml += '<Description>'
-                        # replace xml predefined entities
-                        tmp = c['memo'].replace('&', '&#038;')
-                        tmp = tmp.replace('"', '&#034;')
-                        tmp = tmp.replace("'", '#039;')
-                        tmp = tmp.replace('<', '#060;')
-                        tmp = tmp.replace('>', '#062;')
-                        xml += tmp + '</Description>\n'
+                    memo = self.convert_xml_predefined_entities(c['memo'])
+                    if memo != "":
+                        xml += '<Description>' + memo + '</Description>\n'
                     xml += self.add_sub_categories(c['catid'], cats)
                     # add codes
                     for co in self.codes:
