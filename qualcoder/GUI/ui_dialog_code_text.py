@@ -29,7 +29,7 @@ class Ui_Dialog_code_text(object):
         self.label_coder.setGeometry(QtCore.QRect(10, 0, 281, 28))
         self.label_coder.setObjectName("label_coder")
         self.label_code = QtWidgets.QLabel(self.groupBox)
-        self.label_code.setGeometry(QtCore.QRect(10, 83, 461, 31))
+        self.label_code.setGeometry(QtCore.QRect(10, 80, 461, 38))
         self.label_code.setWordWrap(True)
         self.label_code.setObjectName("label_code")
         self.lineEdit_search = QtWidgets.QLineEdit(self.groupBox)
