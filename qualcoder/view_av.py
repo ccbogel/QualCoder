@@ -502,9 +502,11 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
+        self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file. """
+        """ Count instances of each code for current coder and in the selected file.
+        Called by fill_tree """
 
         if self.media_data is None:
             return
@@ -1125,7 +1127,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         '''ActionAssignSelectedText = None
         if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
             ActionAssignSelectedText = menu.addAction("Assign selected text")'''
+        ActionItemChangeColor = None
         ActionItemAssignSegment = None
+        ActionMoveCode = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
         ActionItemAddCode = menu.addAction(_("Add a new code"))
@@ -1135,6 +1139,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         ActionItemDelete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
+            ActionMoveCode = menu.addAction(_("Move code to"))
+
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
@@ -1143,6 +1149,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
+        if selected is not None and action == ActionMoveCode:
+            self.move_code(selected)
         if action == ActionItemAddCategory:
             self.add_category()
         if action == ActionItemAddCode:
@@ -1155,6 +1163,28 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.delete_category_or_code(selected)
         if action == ActionItemAssignSegment:
             self.assign_segment_to_code(selected)
+
+    def move_code(self, selected):
+        """ Move code to another category or to no category.
+        Uses a list selection.
+        param:
+            selected : QTreeWidgetItem
+         """
+
+        cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        cur.execute("select name, catid from code_cat order by name")
+        res = cur.fetchall()
+        category_list = [{'name':"", 'catid': None}]
+        for r in res:
+            category_list.append({'name':r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
+        self.update_dialog_codes_and_categories()
 
     def show_codes_like(self):
         """ Show all codes if text is empty.

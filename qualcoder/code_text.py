@@ -417,7 +417,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code for current coder and in the selected file.
-        Called by:
+        Called by: fill_tree
         """
 
         if self.filename is None:
@@ -784,9 +784,11 @@ class DialogCodeText(QtWidgets.QWidget):
         ActionItemDelete = menu.addAction(_("Delete"))
         ActionItemChangeColor = None
         ActionShowCodedMedia = None
+        ActionMoveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
+            ActionMoveCode = menu.addAction(_("Move code to"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
@@ -799,6 +801,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.add_category()
             elif action == ActionItemAddCode:
                 self.add_code()
+            elif selected is not None and action == ActionMoveCode:
+                self.move_code(selected)
             elif selected is not None and action == ActionItemRename:
                 self.rename_category_or_code(selected)
             elif selected is not None and action == ActionItemEditMemo:
@@ -814,6 +818,28 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
                 if found:
                     self.coded_media_dialog(found)
+
+    def move_code(self, selected):
+        """ Move code to another category or to no category.
+        Uses a list selection.
+        param:
+            selected : QTreeWidgetItem
+         """
+
+        cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        cur.execute("select name, catid from code_cat order by name")
+        res = cur.fetchall()
+        category_list = [{'name':"", 'catid': None}]
+        for r in res:
+            category_list.append({'name':r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
+        self.update_dialog_codes_and_categories()
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
@@ -1455,7 +1481,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
-        Check that the code or category name is not currently in use. """
+        Check that the code or category name is not currently in use.
+        param:
+            selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
@@ -1514,7 +1542,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.parent_textEdit.append(_("Category renamed from: ") + old_name + _(" to: ") + new_name)
 
     def change_code_color(self, selected):
-        """ Change the colour of the currently selected code. """
+        """ Change the colour of the currently selected code.
+        param:
+            selected : QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
         found = -1
@@ -1542,7 +1572,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def viewfile_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
-        to go to the file with the latest codings by this coder. """
+        to go to the file with the latest codings by this coder.
+        param:
+            position : """
 
         if len(self.filenames) < 2:
             return

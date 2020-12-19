@@ -317,9 +317,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
+        self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file. """
+        """ Count instances of each code for current coder and in the selected file.
+        Called by: fill_tree """
 
         if self.file_ is None:
             return
@@ -600,13 +602,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         ActionItemRename = menu.addAction(_("Rename"))
         ActionItemEditMemo = menu.addAction(_("View or edit memo"))
         ActionItemDelete = menu.addAction(_("Delete"))
+        ActionItemChangeColor = None
+        ActionMoveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
+            ActionMoveCode = menu.addAction(_("Move code to"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
+        if selected is not None and action == ActionMoveCode:
+            self.move_code(selected)
         if action == ActionItemAddCategory:
             self.add_category()
         if action == ActionItemAddCode:
@@ -620,6 +627,28 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.add_edit_code_memo(selected)
         if selected is not None and action == ActionItemDelete:
             self.delete_category_or_code(selected)
+
+    def move_code(self, selected):
+        """ Move code to another category or to no category.
+        Uses a list selection.
+        param:
+            selected : QTreeWidgetItem
+         """
+
+        cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        cur.execute("select name, catid from code_cat order by name")
+        res = cur.fetchall()
+        category_list = [{'name':"", 'catid': None}]
+        for r in res:
+            category_list.append({'name':r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
+        self.update_dialog_codes_and_categories()
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
@@ -768,7 +797,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.label_coded_area.setToolTip(item['memo'])
 
     def coded_area_memo(self, item):
-        """ Add memo to this coded area. """
+        """ Add memo to this coded area.
+        param:
+            item : dictionary of coded area """
 
         ui = DialogMemo(self.app, _("Memo for coded area of ") + self.file_['name'],
             item['memo'])
@@ -783,7 +814,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.draw_coded_areas()
 
     def unmark(self, item):
-        """ Remove coded area. """
+        """ Remove coded area.
+        param:
+            item : dictionary of coded area """
 
         cur = self.app.conn.cursor()
         cur.execute("delete from code_image where imid=?", [item['imid'], ])
@@ -794,8 +827,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def code_area(self, p1):
         """ Create coded area coordinates from mouse release.
-        The point and width and height mush be based on the original image size,
-        so add in scale factor. """
+        The point and width and height must be based on the original image size,
+        so add in scale factor.
+        param:
+            p1 : QPoint of mouse release """
 
         code_ = self.ui.treeWidget.currentItem()
         if code_ is None:
@@ -857,7 +892,10 @@ class DialogCodeImage(QtWidgets.QDialog):
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
-        Also merge codes if one code is dropped on another code. """
+        Also merge codes if one code is dropped on another code.
+        param:
+            item : QTreeWidgetItem
+            parent : QTreeWidgetItem """
 
         # find the category in the list
         if item.text(1)[0:3] == 'cat':
@@ -913,7 +951,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
-        Called by item_moved_update_data when a code is moved onto another code. """
+        Called by item_moved_update_data when a code is moved onto another code.
+        param:
+            item : QTreeWidgetItem
+            parent : QTreeWidgetItem """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         #TODO might need to add font size
@@ -985,7 +1026,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
-        If category deleted, sub-level items are retained. """
+        If category deleted, sub-level items are retained.
+        param:
+            selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
@@ -995,7 +1038,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code_name data and fill
-        treeWidget. """
+        treeWidget.
+        param:
+            selected : QTreeWidgetItem """
 
         # find the code_in the list, check to delete
         found = -1
@@ -1022,7 +1067,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. Sub-level items are retained. """
+        and fill treeWidget. Sub-level items are retained.
+        param:
+            selected : QTreeWidgetItem """
 
         found = -1
         for i in range(0, len(self.categories)):
@@ -1046,7 +1093,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
-        """ View and edit a memo. """
+        """ View and edit a memo.
+        param:
+            selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
             found = -1
@@ -1098,7 +1147,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category. Checks that the proposed code or category name is
-        not currently in use. """
+        not currently in use.
+        param:
+            selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
@@ -1170,7 +1221,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.app.delete_backup = False
 
     def change_code_color(self, selected):
-        """ Change the color of the currently selected code. """
+        """ Change the color of the currently selected code.
+        param:
+            selected : QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
         found = -1
