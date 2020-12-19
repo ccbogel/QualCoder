@@ -1523,7 +1523,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 found = i
         if found == -1:
             return
-        ui = DialogColorSelect(self.codes[found]['color'])
+        ui = DialogColorSelect(self.app, self.codes[found]['color'])
         ok = ui.exec_()
         if not ok:
             return
