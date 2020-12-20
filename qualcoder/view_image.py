@@ -45,6 +45,8 @@ from color_selector import DialogColorSelect
 from color_selector import colors
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
+from helpers import msecs_to_mins_and_secs, Message
+from information import DialogInformation
 from memo import DialogMemo
 from select_items import DialogSelectItems
 
@@ -204,7 +206,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             'cid': row[9]})
 
     def get_image_files(self):
-        """ Load the image file data. Exclide those image file data where there are bad links."""
+        """ Load the image file data. Exclude those image file data where there are bad links."""
 
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
@@ -366,7 +368,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def go_to_latest_coded_file(self):
-        """ Vertical spliter button activates this """
+        """ Vertical splitter button activates this """
 
         sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
         cur = self.app.conn.cursor()
@@ -441,11 +443,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_("Image Error"))
-            mb.setText(_("Cannot open: ") + source)
-            mb.exec_()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
             logger.warning("Cannot open image: " + source)
             # Must remove any existing loaded images and clear variables
             self.file_ = None
@@ -603,10 +601,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         ActionItemEditMemo = menu.addAction(_("View or edit memo"))
         ActionItemDelete = menu.addAction(_("Delete"))
         ActionItemChangeColor = None
+        ActionShowCodedMedia = None
         ActionMoveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
             ActionMoveCode = menu.addAction(_("Move code to"))
+            ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
@@ -627,6 +627,118 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.add_edit_code_memo(selected)
         if selected is not None and action == ActionItemDelete:
             self.delete_category_or_code(selected)
+        if selected is not None and action == ActionShowCodedMedia:
+            found = None
+            tofind = int(selected.text(1)[4:])
+            for code in self.codes:
+                if code['cid'] == tofind:
+                    found = code
+                    break
+            if found:
+                self.coded_media_dialog(found)
+
+    def coded_media_dialog(self, data):
+        """ Display all coded media for this code, in a separate modal dialog.
+        Coded media comes from ALL files for this coder.
+        Called from tree_menu
+        param:
+            data: code dictionary
+        """
+        ui = DialogInformation(self.app, "Coded text and media: " + data['name'], " ")
+        cur = self.app.conn.cursor()
+        COLOR = 1
+        SOURCE_NAME = 2
+        POS0 = 3
+        POS1 = 4
+        SELTEXT = 5
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext from "
+        sql += "code_text "
+        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
+        sql += " where code_name.cid=? and code_text.owner=?"
+        sql += " order by source.name, pos0"
+        cur.execute(sql, [data['cid'], self.app.settings['codername']])
+        results = cur.fetchall()
+        # Text
+        for row in results:
+            title = '<span style=\"background-color:' + row[COLOR] + '\">'
+            title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
+            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
+            ui.ui.textEdit.insertHtml(title)
+            ui.ui.textEdit.append(row[SELTEXT] + "\n\n")
+
+        # Images
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+        sql += " source.mediapath, source.id, code_image.memo "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+        sql += "where code_name.cid =? and code_image.owner=? "
+        sql += " order by source.name"
+        cur.execute(sql, [data['cid'], self.app.settings['codername']])
+        results = cur.fetchall()
+        for counter, row in enumerate(results):
+            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[7] + '</span>')
+            img = {'mediapath': row[7], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
+            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
+            ui.ui.textEdit.append("\nMemo: " + row[9] + "\n\n")
+
+        # Media
+        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
+        sql += "source.mediapath, source.id from code_av join code_name "
+        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+        sql += "where code_name.cid = " + str(data['cid']) + " "
+        sql += " order by source.name"
+        cur.execute(sql)
+        results = cur.fetchall()
+        for row in results:
+            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[6] + '</span>')
+            start = msecs_to_mins_and_secs(row[3])
+            end = msecs_to_mins_and_secs(row[4])
+            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] ')
+            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
+        ui.exec_()
+
+    def put_image_into_textedit(self, img, counter, text_edit):
+        """ Scale image, add resource to document, insert image.
+        A counter is important as each image slice needs a unique name, counter adds
+        the uniqueness to the name.
+        Called by: coded_media_dialog
+        param:
+            img: image data dictionary with file location and width, height, position data
+            counter: a changing counter is needed to make discrete different images
+            text_edit:  the widget that shows the data
+        """
+
+        path = self.app.project_path
+        if img['mediapath'][0] == "/":
+            path = path + img['mediapath']
+        else:
+            path = img['mediapath'][7:]
+        document = text_edit.document()
+        image = QtGui.QImageReader(path).read()
+        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        # scale to max 300 wide or high. perhaps add option to change maximum limit?
+        scaler = 1.0
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 300:
+            scaler_w = 300 / image.width()
+        if image.height() > 300:
+            scaler_h = 300 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        # need unique image names or the same image from the same path is reproduced
+        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        url = QtCore.QUrl(imagename)
+        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        cursor = text_edit.textCursor()
+        image_format = QtGui.QTextImageFormat()
+        image_format.setWidth(image.width() * scaler)
+        image_format.setHeight(image.height() * scaler)
+        image_format.setName(url.toString())
+        cursor.insertImage(image_format)
+        text_edit.insertHtml("<br />")
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
@@ -1159,11 +1271,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    mb = QtWidgets.QMessageBox()
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_("Name in use"))
-                    mb.setText(new_name + _(" Choose another name"))
-                    mb.exec_()
+                    Message(self.app, _("Name in use"), new_name + _(" Choose another name"), "warning").exec_()
                     return
             # Find the code in the list
             found = -1
@@ -1194,11 +1302,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
-                    mb = QtWidgets.QMessageBox()
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_("Duplicate category name"))
-                    mb.setText(msg)
-                    mb.exec_()
+                    Message(self.app, _("Duplicate category name"), msg, "warning").exec_()
                     return
             # find the category in the list
             found = -1
@@ -1290,14 +1394,9 @@ class DialogViewImage(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.image_data['mediapath']
         self.setWindowTitle(abs_path)
-
         image = QtGui.QImage(abs_path)
         if image.isNull():
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Image error'))
-            mb.setText(_("Cannot open: ") + abs_path)
-            mb.exec_()
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
             self.close()
             return
         self.pixmap = QtGui.QPixmap.fromImage(image)
