@@ -54,12 +54,15 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>121</width>
+        <width>281</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>old</string>
+       <string/>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_colour_new">
@@ -67,12 +70,15 @@
        <rect>
         <x>10</x>
         <y>50</y>
-        <width>121</width>
+        <width>281</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>new</string>
+       <string/>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QDialogButtonBox" name="buttonBox">
@@ -94,14 +100,20 @@
      <widget class="QLabel" name="label_used">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>310</x>
         <y>10</y>
-        <width>151</width>
-        <height>21</height>
+        <width>101</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
        <string>* Used</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
