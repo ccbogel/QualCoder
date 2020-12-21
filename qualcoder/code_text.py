@@ -1095,7 +1095,7 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             data: code dictionary
         """
-        ui = DialogInformation(self.app, "Coded text : " + data['name'], " ")
+        ui = DialogInformation(self.app, "Coded text and media: " + data['name'], " ")
         cur = self.app.conn.cursor()
         COLOR = 1
         SOURCE_NAME = 2
@@ -1553,7 +1553,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 found = i
         if found == -1:
             return
-        ui = DialogColorSelect(self.app, self.codes[found]['color'])
+        ui = DialogColorSelect(self.app, self.codes[found])  #['color'])
         ok = ui.exec_()
         if not ok:
             return

@@ -75,7 +75,7 @@ class DialogColorSelect(QtWidgets.QDialog):
     selected_color = None
     used_colors = []
 
-    def __init__(self, app, prev_color, parent=None):
+    def __init__(self, app, code_, parent=None):
 
         super(DialogColorSelect, self).__init__(parent)
         sys.excepthook = exception_handler
@@ -90,13 +90,16 @@ class DialogColorSelect(QtWidgets.QDialog):
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.selected_color = prev_color
+        self.selected_color = code_['color']
         # preset with the current colour
         palette = self.ui.label_colour_old.palette()
         c = QtGui.QColor(self.selected_color)
         palette.setColor(QtGui.QPalette.Window, c)
         self.ui.label_colour_old.setPalette(palette)
         self.ui.label_colour_old.setAutoFillBackground(True)
+        self.ui.label_colour_old.setText(code_['name'])
+        self.ui.label_colour_new.setText(code_['name'])
+
 
     def color_selected(self):
         """ Get colour selection from table widget. """
