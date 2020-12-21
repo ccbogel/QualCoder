@@ -29,10 +29,14 @@ class Ui_Dialog_colour_selector(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.label_colour_old = QtWidgets.QLabel(self.groupBox)
-        self.label_colour_old.setGeometry(QtCore.QRect(10, 10, 121, 31))
+        self.label_colour_old.setGeometry(QtCore.QRect(10, 10, 281, 31))
+        self.label_colour_old.setText("")
+        self.label_colour_old.setWordWrap(True)
         self.label_colour_old.setObjectName("label_colour_old")
         self.label_colour_new = QtWidgets.QLabel(self.groupBox)
-        self.label_colour_new.setGeometry(QtCore.QRect(10, 50, 121, 31))
+        self.label_colour_new.setGeometry(QtCore.QRect(10, 50, 281, 31))
+        self.label_colour_new.setText("")
+        self.label_colour_new.setWordWrap(True)
         self.label_colour_new.setObjectName("label_colour_new")
         self.buttonBox = QtWidgets.QDialogButtonBox(self.groupBox)
         self.buttonBox.setGeometry(QtCore.QRect(430, 10, 81, 71))
@@ -40,7 +44,9 @@ class Ui_Dialog_colour_selector(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.label_used = QtWidgets.QLabel(self.groupBox)
-        self.label_used.setGeometry(QtCore.QRect(220, 10, 151, 21))
+        self.label_used.setGeometry(QtCore.QRect(310, 10, 101, 41))
+        self.label_used.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.label_used.setWordWrap(True)
         self.label_used.setObjectName("label_used")
         self.gridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
         self.tableWidget = QtWidgets.QTableWidget(Dialog_colour_selector)
@@ -57,8 +63,6 @@ class Ui_Dialog_colour_selector(object):
     def retranslateUi(self, Dialog_colour_selector):
         _translate = QtCore.QCoreApplication.translate
         Dialog_colour_selector.setWindowTitle(_translate("Dialog_colour_selector", "Colour selector"))
-        self.label_colour_old.setText(_translate("Dialog_colour_selector", "old"))
-        self.label_colour_new.setText(_translate("Dialog_colour_selector", "new"))
         self.label_used.setText(_translate("Dialog_colour_selector", "* Used"))
 
 
