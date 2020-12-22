@@ -1426,6 +1426,9 @@ class DialogViewImage(QtWidgets.QDialog):
         self.label.setFixedWidth(scale * self.pixmap.width())
         self.label.setFixedHeight(scale * self.pixmap.height())
         self.ui.scrollArea.setWidget(new_label)
+        w_h = _("Width: ") + str(self.label.pixmap().size().width()) + _(" Height: ") + str(self.label.pixmap().size().height())
+        msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
+        self.ui.horizontalSlider.setToolTip(msg)
 
 
 
