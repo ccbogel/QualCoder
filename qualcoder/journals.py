@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 import datetime
 import os
 import platform
@@ -41,11 +41,6 @@ from GUI.ui_dialog_journals import Ui_Dialog_journals
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -127,11 +122,14 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
         self.ui.textEdit.textChanged.connect(self.text_changed)
-        self.ui.pushButton_create.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
+        self.ui.pushButton_create.setIcon(icon)
         self.ui.pushButton_create.clicked.connect(self.create)
-        self.ui.pushButton_export.setStyleSheet("background-image : url("+PTH+"GUI/doc_export_icon.png);")
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        self.ui.pushButton_export.setIcon(icon)
         self.ui.pushButton_export.clicked.connect(self.export)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
+        self.ui.pushButton_delete.setIcon(icon)
         self.ui.pushButton_delete.clicked.connect(self.delete)
 
     def view(self):
@@ -345,7 +343,7 @@ class DialogJournals(QtWidgets.QDialog):
                 mb.setIcon(QtWidgets.QMessageBox.Warning)
                 mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
                 mb.setWindowTitle(_('Warning - invalid characters'))
-                mb.setText(_("In the jornal name use only: a-z, A-z 0-9 - space"))
+                mb.setText(_("In the journal name use only: a-z, A-z 0-9 - space"))
                 mb.exec_()
                 update = False
             if update:
@@ -354,8 +352,9 @@ class DialogJournals(QtWidgets.QDialog):
                 cur.execute("update journal set name=? where name=?",
                     (new_name, self.journals[x]['name']))
                 self.app.conn.commit()
+                self.parent_textEdit.append(_("Journal name changed from: ") + self.journals[x]['name'] + " to: " + new_name)
                 self.journals[x]['name'] = new_name
-                self.parent_textEdit.append(_("Journal name changed: ") + new_name)
+                self.ui.label_jname.setText(_("Journal: ") + self.journals[x]['name'])
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.journals[x]['name'])
 
