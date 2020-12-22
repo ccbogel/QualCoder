@@ -79,11 +79,6 @@ from view_av import DialogViewAV
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-# Need absolute path to images - for Debian in particular
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -147,39 +142,30 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
         self.ui.pushButton_create.setIcon(icon)
-        #self.ui.pushButton_create.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
         self.ui.pushButton_create.clicked.connect(self.create)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
         self.ui.pushButton_view.setIcon(icon)
-        #self.ui.pushButton_view.setStyleSheet("background-image : url("+PTH+"GUI/eye_icon.png);")
         self.ui.pushButton_view.clicked.connect(self.view)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
         self.ui.pushButton_delete.setIcon(icon)
-        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/doc_delete_icon.png);")
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
         self.ui.pushButton_import.setIcon(icon)
-        #self.ui.pushButton_import.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
         self.ui.pushButton_import.clicked.connect(self.import_files)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
         self.ui.pushButton_link.setIcon(icon)
-        #self.ui.pushButton_link.setStyleSheet("background-image : url("+PTH+"GUI/link_icon.png);")
         self.ui.pushButton_link.clicked.connect(self.link_files)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
         self.ui.pushButton_import_from_linked.setIcon(icon)
-        #self.ui.pushButton_import_from_linked.setStyleSheet("background-image : url("+PTH+"GUI/linked_import_icon.png);")
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
         self.ui.pushButton_export_to_linked.setIcon(icon)
-        #self.ui.pushButton_export_to_linked.setStyleSheet("background-image : url("+PTH+"GUI/to_link_icon.png);")
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
         self.ui.pushButton_export.setIcon(icon)
-        #self.ui.pushButton_export.setStyleSheet("background-image : url("+PTH+"GUI/doc_export_icon.png);")
         self.ui.pushButton_export.clicked.connect(self.export)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
         self.ui.pushButton_add_attribute.setIcon(icon)
-        #self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
@@ -485,6 +471,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def get_icon_and_metadata(self, name, fulltext, mediapath):
         """ Get metadata used in table tooltip.
+        Called by: create, load_file_data
         param:
             name: string
             fulltext: None or string
@@ -501,7 +488,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
         if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
             metadata += "Characters: " + str(len(fulltext))
-            icon = QtGui.QIcon(PTH + "GUI/text_link.png")
+            icon = QtGui.QIcon("GUI/text_link.png")
             return icon, metadata
 
         abs_path = ""
@@ -515,7 +502,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + mediapath
 
         if mediapath[:8] == "/images/":
-            icon = QtGui.QIcon(PTH + "GUI/picture.png")
+            icon = QtGui.QIcon("GUI/picture.png")
             w = 0
             h = 0
             try:
@@ -526,7 +513,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "images:":
-            icon = QtGui.QIcon(PTH + "GUI/picture_link.png")
+            icon = QtGui.QIcon("GUI/picture_link.png")
             w = 0
             h = 0
             try:
@@ -537,13 +524,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "/video/":
-            icon = QtGui.QIcon(PTH + "GUI/play.png")
+            icon = QtGui.QIcon("GUI/play.png")
         if mediapath[:6] == "video:":
-            icon = QtGui.QIcon(PTH + "GUI/play_link.png")
+            icon = QtGui.QIcon("GUI/play_link.png")
         if mediapath[:7] == "/audio/":
-            icon = QtGui.QIcon(PTH + "GUI/sound.png")
+            icon = QtGui.QIcon("GUI/sound.png")
         if mediapath[:6] == "audio:":
-            icon = QtGui.QIcon(PTH + "GUI/sound_link.png")
+            icon = QtGui.QIcon("GUI/sound_link.png")
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. " + abs_path)
@@ -1020,15 +1007,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.source[x]['mediapath'][6:]
         if not os.path.exists(abs_path):
             #TODO update bad links
+            self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
 
         try:
             ui = DialogViewAV(self.app, self.source[x])
             ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
-            '''if self.dialog_list != []:
-                self.dialog_list = []
-                self.dialog_list.append(ui)
-                ui.exec_()'''
             memo = ui.ui.textEdit.toPlainText()
             if self.source[x]['memo'] != memo:
                 self.source[x]['memo'] = memo
@@ -1061,13 +1045,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + self.source[x]['mediapath']
         if not os.path.exists(abs_path):
             #TODO update bad links
+            self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
 
         ui = DialogViewImage(self.app, self.source[x])
-        if self.dialog_list != []:
-            self.dialog_list = []
-            self.dialog_list.append(ui)
-            ui.exec_()
+        self.dialog_list.append(ui)
+        ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
