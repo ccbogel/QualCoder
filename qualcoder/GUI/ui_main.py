@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_main.ui'
+# Form implementation generated from reading ui file 'ui_main2.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
@@ -13,33 +13,34 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(602, 515)
+        MainWindow.resize(1024, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.tab)
+        self.tab_coding = QtWidgets.QWidget()
+        self.tab_coding.setObjectName("tab_coding")
+        self.tabWidget.addTab(self.tab_coding, "")
+        self.tab_reports = QtWidgets.QWidget()
+        self.tab_reports.setObjectName("tab_reports")
+        self.tabWidget.addTab(self.tab_reports, "")
+        self.tab_manage = QtWidgets.QWidget()
+        self.tab_manage.setObjectName("tab_manage")
+        self.tabWidget.addTab(self.tab_manage, "")
+        self.tab_action_log = QtWidgets.QWidget()
+        self.tab_action_log.setObjectName("tab_action_log")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.tab_action_log)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.textEdit = QtWidgets.QTextEdit(self.tab)
+        self.textEdit = QtWidgets.QTextEdit(self.tab_action_log)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout_2.addWidget(self.textEdit, 0, 0, 1, 1)
-        self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.gridLayout_3 = QtWidgets.QGridLayout(self.tab_2)
-        self.gridLayout_3.setObjectName("gridLayout_3")
-        self.textEdit_notes = QtWidgets.QTextEdit(self.tab_2)
-        self.textEdit_notes.setObjectName("textEdit_notes")
-        self.gridLayout_3.addWidget(self.textEdit_notes, 0, 0, 1, 1)
-        self.tabWidget.addTab(self.tab_2, "")
+        self.tabWidget.addTab(self.tab_action_log, "")
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 602, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1024, 22))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -190,14 +191,16 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "QualCoder"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Action log"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Temporary notes"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_manage), _translate("MainWindow", "Manage"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_action_log), _translate("MainWindow", "Action Log"))
         self.menuProject.setTitle(_translate("MainWindow", "Project"))
         self.menuOpen_Recent_Project.setTitle(_translate("MainWindow", "Open Recent Project"))
         self.menuExport.setTitle(_translate("MainWindow", "Export"))
