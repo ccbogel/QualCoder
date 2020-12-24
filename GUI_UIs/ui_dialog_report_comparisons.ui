@@ -22,13 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>110</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>110</height>
       </size>
      </property>
      <property name="title">
@@ -40,7 +40,7 @@
         <x>370</x>
         <y>70</y>
         <width>231</width>
-        <height>41</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="text">
@@ -51,9 +51,9 @@
       <property name="geometry">
        <rect>
         <x>370</x>
-        <y>20</y>
+        <y>27</y>
         <width>231</width>
-        <height>41</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="text">
@@ -77,9 +77,9 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>20</y>
+        <y>27</y>
         <width>221</width>
-        <height>41</height>
+        <height>36</height>
        </rect>
       </property>
      </widget>
@@ -89,11 +89,24 @@
         <x>90</x>
         <y>70</y>
         <width>221</width>
-        <height>41</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="text">
        <string>Clear selection</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_title">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>301</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Coder comparisons</string>
       </property>
      </widget>
     </widget>
@@ -103,13 +116,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>50</height>
+       <height>36</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777213</width>
-       <height>50</height>
+       <height>36</height>
       </size>
      </property>
      <property name="text">
