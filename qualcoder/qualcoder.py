@@ -860,7 +860,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_reports.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     """def text_mining(self):
@@ -881,7 +895,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
-        ui.show()
+
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_reports.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def report_code_frequencies(self):
@@ -892,10 +921,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 d.show()
                 d.activateWindow()
                 return
-
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_reports.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def report_code_relations(self):
@@ -908,7 +950,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
         ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
-        ui.show()
+
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_reports.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def report_coding(self):
@@ -922,7 +979,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_reports.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def view_graph_original(self):
@@ -955,7 +1026,21 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create, edit, delete, rename attributes. """
 
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
-        ui.exec_()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_manage.setLayout(layout)
+        #ui.exec_()
         self.clean_dialog_refs()
 
     def import_survey(self):
@@ -979,7 +1064,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
         ui = DialogCases(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_manage.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def manage_files(self):
@@ -994,7 +1093,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
         ui = DialogManageFiles(self.app, self.ui.textEdit)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_manage.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def fix_bad_file_links(self):
@@ -1024,7 +1137,21 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.dialogList.append(ui)
-        ui.show()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_manage.setLayout(layout)
+        #ui.show()
         self.clean_dialog_refs()
 
     def text_coding(self):
@@ -1045,15 +1172,25 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.dialogList.append(ui)
-            ui.show()
+
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
+            # Check the tab has a layout and widgets
+            contents = self.ui.tab_coding.layout()
+            if contents:
+                # Remove widgets from layout
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+                contents.addWidget(ui)
+            else:
+                # Tab has no layout so add one with widget
+                layout = QtWidgets.QVBoxLayout()
+                layout.addWidget(ui)
+                self.ui.tab_coding.setLayout(layout)
+            #ui.show()
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec_()
-            '''mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No text files'))
-            mb.setText(msg)
-            mb.exec_()'''
         self.clean_dialog_refs()
 
     def image_coding(self):
@@ -1073,14 +1210,29 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.dialogList.append(ui)
-            ui.show()
+
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
+            # Check the tab has a layout and widgets
+            contents = self.ui.tab_coding.layout()
+            if contents:
+                # Remove widgets from layout
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+                contents.addWidget(ui)
+            else:
+                # Tab has no layout so add one with widget
+                layout = QtWidgets.QVBoxLayout()
+                layout.addWidget(ui)
+                self.ui.tab_coding.setLayout(layout)
+            #ui.show()
         else:
             msg = _("This project contains no image files.")
             Message(self.app, _('No image files'), msg).exec_()
         self.clean_dialog_refs()
 
     def av_coding(self):
-        """ Create edit and delete codes. Apply and remove codes to segements of the
+        """ Create edit and delete codes. Apply and remove codes to segments of the
         audio or video file. Added try block in case VLC bindings do not work. """
 
         for d in self.dialogList:
@@ -1105,7 +1257,22 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.dialogList.append(ui)
-            ui.show()
+
+            self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
+            # Check the tab has a layout and widgets
+            contents = self.ui.tab_coding.layout()
+            if contents:
+                # Remove widgets from layout
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+                contents.addWidget(ui)
+            else:
+                # Tab has no layout so add one with widget
+                layout = QtWidgets.QVBoxLayout()
+                layout.addWidget(ui)
+                self.ui.tab_coding.setLayout(layout)
+            #ui.show()
         except Exception as e:
             logger.debug(str(e))
             print(e)
@@ -1122,8 +1289,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
          CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
-         CURRENTLY WORKING ON AT 2 Gb FILE SIZE LIMITS AND USE OF
-         ABSOLUTE PATHS FOR EXPORT
+         NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
         """
 
         Refi_export(self.app, self.ui.textEdit, "project")
@@ -1147,8 +1313,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard.
-        TODO test relative paths on import
-        TODO transcript import - needs work and testing
+        CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
+         NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
          """
 
         self.close_project()

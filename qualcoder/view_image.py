@@ -104,7 +104,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.log = ""
         self.scale = 1.0
         self.selection = None
-        self.get_image_files()
+        self.get_files()
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -142,7 +142,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
-        self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -168,10 +167,12 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.splitter.setSizes([s0, 30, s1])
             h0 = int(self.app.settings['dialogcodeimage_splitter_h0'])
             h1 = int(self.app.settings['dialogcodeimage_splitter_h1'])
-            if h0 > 10 and h1 > 10:
+            if h0 > 1 and h1 > 1:
                 self.ui.splitter_2.setSizes([h0, h1])
         except:
             pass
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
 
     def closeEvent(self, event):
@@ -179,6 +180,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeimage_w'] = self.size().width()
         self.app.settings['dialogcodeimage_h'] = self.size().height()
+
+    def update_sizes(self):
+        """ Called by changed splitter sizes """
+
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
         self.app.settings['dialogcodeimage_splitter1'] = sizes[2]
@@ -205,7 +210,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             'width': row[4], 'height': row[5], 'memo': row[6], 'date': row[7], 'owner': row[8],
             'cid': row[9]})
 
-    def get_image_files(self):
+    def get_files(self):
         """ Load the image file data. Exclude those image file data where there are bad links."""
 
         bad_links = self.app.check_bad_file_links()
@@ -359,7 +364,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
         self.app.conn.commit()
-        self.get_image_files()
+        self.get_files()
         self.ui.listWidget.clear()
         for f in self.files:
             item = QtWidgets.QListWidgetItem(f['name'])
@@ -467,6 +472,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
         self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 100  # slider and groupbox approx heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 100:
+            scale = (self.height() - 30 - 100) / self.pixmap.height()
+            slider_value = int(scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
+
         self.draw_coded_areas()
         self.fill_code_counts_in_tree()
 
@@ -528,15 +545,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
         self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
-
-    def show_or_hide_coders(self):
-        """ When checked call on draw_coded_areas to either show all coders codings,
-        otherwise only show current coder.
-        Change scale is called becuase all items need to be removed and then added to the
-        scene. pixmap being the first item added then the codings.
-        """
-
-        self.change_scale()
 
     def draw_coded_areas(self):
         """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
@@ -1407,8 +1415,20 @@ class DialogViewImage(QtWidgets.QDialog):
         self.label.setScaledContents(True)
         self.label.setPixmap(self.pixmap)
         self.ui.scrollArea.setWidget(self.label)
+        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.textEdit.setText(self.image_data['memo'])
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 80  # slider and textedit heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 80:
+            scale = (self.height() - 30 - 80) / self.pixmap.height()
+            slider_value = int(scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
@@ -1417,9 +1437,7 @@ class DialogViewImage(QtWidgets.QDialog):
         self.app.settings['dialogviewimage_h'] = self.size().height()
 
     def change_scale(self):
-        """ Resize image. Idea from:
-        https://github.com/baoboa/pyqt5/blob/master/examples/widgets/imageviewer.py
-        """
+        """ Resize image based on slider position. """
 
         scale = (self.ui.horizontalSlider.value() + 1) / 100
         new_label = self.label.resize(scale * self.label.pixmap().size())

@@ -127,7 +127,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             files_text = ""
             for row in selected_files:
                 self.file_ids.append(row['id'])
-                files_text += "| " + row['name']
+                files_text += "\n" + row['name']
             files_text = files_text[2:]
             tooltip += files_text
             if len(self.file_ids) > 0:

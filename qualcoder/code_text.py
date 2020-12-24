@@ -233,7 +233,7 @@ class DialogCodeText(QtWidgets.QWidget):
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
             s1 = int(self.app.settings['dialogcodetext_splitter1'])
-            if s0 > 10 and s1 > 10:
+            if s0 > 5 and s1 > 5:
                 self.ui.splitter.setSizes([s0, s1])
             v0 = int(self.app.settings['dialogcodetext_splitter_v0'])
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
@@ -242,6 +242,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.leftsplitter.setSizes([v1, 30, v0, 30])
         except:
             pass
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
@@ -250,6 +252,10 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.app.settings['dialogcodetext_w'] = self.size().width()
         self.app.settings['dialogcodetext_h'] = self.size().height()
+
+    def update_sizes(self):
+        """ Called by changed splitter size """
+
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodetext_splitter0'] = sizes[0]
         self.app.settings['dialogcodetext_splitter1'] = sizes[1]

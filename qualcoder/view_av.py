@@ -191,6 +191,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.ui.splitter_2.setSizes([h0, h1])
         except:
             pass
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
 
         # Labels need to be 32x32 pixels for 32x32 icons
         self.ui.label_time_3.setPixmap(QtGui.QPixmap('GUI/clock_icon.png'))
@@ -790,6 +792,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                                      'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         self.get_coded_text_update_eventfilter_tooltips()
 
+    def haha(self):
+        print("haha")
+
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
         Segment_Graphics_Item.link_text_to_segment.
@@ -938,6 +943,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     def play_pause(self):
         """ Toggle play or pause status. """
 
+        # user might update window positions and sizes, need to detect it
+        self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
             icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
@@ -1048,10 +1055,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop the vlc player on close.
         Capture the video window size. """
 
+        self.update_sizes()
+        self.ddialog.close()
+        self.stop()
+
+    def update_sizes(self):
+        """ Called by splitter resizes and play/pause """
+
         self.app.settings['dialogcodeav_w'] = self.size().width()
         self.app.settings['dialogcodeav_h'] = self.size().height()
-        if self.media_data is not None and self.media_data['mediapath'] is not None and self.media_data['mediapath'][
-                                                                                        0:7] != "/audio/":
+        if self.media_data is not None and self.media_data['mediapath'] is not None \
+                and self.media_data['mediapath'][0:7] != "/audio/" \
+                and self.media_data['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
@@ -1064,14 +1079,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Get absolute video dialog position
         self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
+        #To change below ?
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
         self.app.settings['codeav_abs_pos_y'] = self.pos().y()
-        self.app.settings['dialogcodeav_splitter0'] = self.ui.splitter.sizes()[0]
-        self.app.settings['dialogcodeav_splitter1'] = self.ui.splitter.sizes()[2]
-        self.app.settings['dialogcodeav_splitter_h0'] = self.ui.splitter_2.sizes()[0]
-        self.app.settings['dialogcodeav_splitter_h1'] = self.ui.splitter_2.sizes()[1]
-        self.ddialog.close()
-        self.stop()
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
@@ -3296,6 +3306,8 @@ class DialogViewAV(QtWidgets.QDialog):
     def play_pause(self):
         """ Toggle play or pause status. """
 
+        # user might update window positions and sizes, need to detect it
+        self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
             icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
@@ -3400,9 +3412,26 @@ class DialogViewAV(QtWidgets.QDialog):
         Record the dialog and video dialog0 size and positions.
         Update the memo. """
 
+        self.update_sizes()
+        self.ddialog.close()
+        self.stop()
+        memo = self.ui.textEdit.toPlainText()
+        cur = self.app.conn.cursor()
+        cur.execute('update source set memo=? where id=?', (memo, self.media_data['id']))
+        self.app.conn.commit()
+        if self.transcription is not None:
+            text = self.ui.textEdit_transcription.toPlainText()
+            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
+            self.app.conn.commit()
+        # following will occur even if memo is not changed
+        self.app.delete_backup = False
+
+    def update_sizes(self):
+        """ Called by play/pause and close event """
+
         self.app.settings['dialogviewav_w'] = self.size().width()
         self.app.settings['dialogviewav_h'] = self.size().height()
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.media_data['mediapath'][0:7] != "/audio/" and self.media_data['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
@@ -3415,17 +3444,5 @@ class DialogViewAV(QtWidgets.QDialog):
         # Get absolute video dialog position
         self.app.settings['viewav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['viewav_video_pos_y'] = self.ddialog.pos().y()
-        self.ddialog.close()
         self.app.settings['viewav_abs_pos_x'] = self.pos().x()
         self.app.settings['viewav_abs_pos_y'] = self.pos().y()
-        self.stop()
-        memo = self.ui.textEdit.toPlainText()
-        cur = self.app.conn.cursor()
-        cur.execute('update source set memo=? where id=?', (memo, self.media_data['id']))
-        self.app.conn.commit()
-        if self.transcription is not None:
-            text = self.ui.textEdit_transcription.toPlainText()
-            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
-            self.app.conn.commit()
-        # following will occur even if memo is not changed
-        self.app.delete_backup = False
