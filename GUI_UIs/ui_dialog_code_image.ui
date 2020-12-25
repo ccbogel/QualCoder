@@ -60,25 +60,6 @@
        <string>Coder:</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_show_coders">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>410</x>
-        <y>60</y>
-        <width>221</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Mark this to show all coded text by all other coders.</string>
-      </property>
-      <property name="text">
-       <string>Show other coders</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_code">
       <property name="geometry">
        <rect>
