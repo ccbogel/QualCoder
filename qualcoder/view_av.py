@@ -110,13 +110,12 @@ class DialogCodeAV(QtWidgets.QDialog):
     app = None
     dialog_list = None
     parent_textEdit = None
-    filename = None
     files = []
+    file_ = None
     codes = []
     categories = []
     code_text = []
     ddialog = None
-    media_data = None
     instance = None
     mediaplayer = None
     media = None
@@ -154,7 +153,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.code_text = []
         self.time_positions = []
         self.transcription = None
-        self.media_data = None
+        self.file_ = None
         self.segment['start'] = None
         self.segment['end'] = None
         self.segment['start_msecs'] = None
@@ -165,7 +164,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.segment_for_text = None
         self.get_codes_and_categories()
-        self.get_list_of_media()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
@@ -255,10 +253,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
-        for f in self.files:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
+
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_load_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -268,6 +263,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
         self.fill_tree()
+        self.get_files()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         # A display-dialog named ddialog
@@ -349,8 +345,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_data()
 
-    def get_list_of_media(self):
-        """ Get AV media and exclude those with bad links. """
+    def get_files(self):
+        """ Get AV files and exclude those with bad links.
+        Fill list widget with file names. """
 
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
@@ -368,6 +365,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
             self.files.append(dict(zip(keys, row)))
+
+        self.ui.listWidget.clear()
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
 
     def assign_selected_text_to_code(self):
         """ Assign selected text on left-click on code in tree. """
@@ -511,7 +514,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Count instances of each code for current coder and in the selected file.
         Called by fill_tree """
 
-        if self.media_data is None:
+        if self.file_ is None:
             return
         cur = self.app.conn.cursor()
         sql = "select count(cid) from code_av where cid=? and id=? and owner=?"
@@ -522,7 +525,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.media_data['id'], self.app.settings['codername']])
+                cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
                 result_av = cur.fetchone()
                 result_txt = [0]
                 try:  # may not have a text file
@@ -551,16 +554,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_latest = menu.addAction(_("File with latest coding"))
         action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
-            if self.media_data is None:
-                self.media_data = self.files[0]
+            if self.file_ is None:
+                self.file_ = self.files[0]
                 self.load_media()
                 self.load_segments()
                 self.fill_code_counts_in_tree()
                 return
             for i in range(0, len(self.files) - 1):
-                if self.media_data == self.files[i]:
+                if self.file_ == self.files[i]:
                     found = self.files[i + 1]
-                    self.media_data = found
+                    self.file_ = found
                     self.load_media()
                     self.load_segments()
                     self.fill_code_counts_in_tree()
@@ -574,7 +577,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
             for f in self.files:
                 if f['id'] == result[0]:
-                    self.media_data = f
+                    self.file_ = f
                     self.load_media()
                     self.load_segments()
                     self.fill_code_counts_in_tree()
@@ -583,23 +586,18 @@ class DialogCodeAV(QtWidgets.QDialog):
     def file_memo(self):
         """ Open file memo to view or edit. """
 
-        if self.media_data is None:
+        if self.file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.media_data['name'], self.media_data['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
         ui.exec_()
         memo = ui.memo
-        if memo == self.media_data['memo']:
+        if memo == self.file_['memo']:
             return
-        self.media_data['memo'] = memo
+        self.file_['memo'] = memo
         cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.media_data['id']))
+        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
         self.app.conn.commit()
-        self.get_list_of_media()
-        self.ui.listWidget.clear()
-        for f in self.files:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
+        self.get_files()
         self.app.delete_backup = False
 
     def go_to_latest_coded_file(self):
@@ -613,7 +611,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         for i, f in enumerate(self.files):
             if f['id'] == result[0]:
-                self.media_data = f
+                self.file_ = f
                 self.ui.listWidget.setCurrentRow(i)
                 self.load_media()
                 break
@@ -623,15 +621,15 @@ class DialogCodeAV(QtWidgets.QDialog):
          Assumes one or more items in the list widget.
          As the coding dialog will not open with no AV files. """
 
-        if self.media_data is None:
-            self.media_data = self.files[0]
+        if self.file_ is None:
+            self.file_ = self.files[0]
             self.load_media()
             self.ui.listWidget.setCurrentRow(0)
             return
         for i in range(0, len(self.files) - 1):
-            if self.media_data == self.files[i]:
+            if self.file_ == self.files[i]:
                 found = self.files[i + 1]
-                self.media_data = found
+                self.file_ = found
                 self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_media()
                 return
@@ -644,7 +642,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         itemname = self.ui.listWidget.currentItem().text()
         for f in self.files:
             if f['name'] == itemname:
-                self.media_data = f
+                self.file_ = f
                 self.load_media()
                 self.load_segments()
                 self.fill_code_counts_in_tree()
@@ -654,7 +652,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Get coded segments for this file and for this coder.
         Called from select_media. """
 
-        if self.media_data is None:
+        if self.file_ is None:
             return
         self.segments = []
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
@@ -662,7 +660,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
         sql += " and code_av.owner=? "
-        values = [self.media_data['id']]
+        values = [self.file_['id']]
         values.append(self.app.settings['codername'])
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
@@ -690,28 +688,41 @@ class DialogCodeAV(QtWidgets.QDialog):
         for s in self.segments:
             self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self.text_for_segment, self))
 
+    def clear_file(self):
+        """ When AV file removed clear all details.
+        Called by null file with load_media, and from ManageFiles.delete. """
+
+        self.stop()
+        self.media = None
+        self.file_ = None
+        self.setWindowTitle(_("Media coding"))
+        self.ui.pushButton_play.setEnabled(False)
+        self.ui.horizontalSlider.setEnabled(False)
+        self.ui.pushButton_coding.setEnabled(False)
+        self.ui.textEdit.clear()
+        self.transcription = None
+        self.ddialog.hide()
+
     def load_media(self):
         """ Add media to media dialog. """
 
         try:
-            if self.media_data['mediapath'][0:6] in ('/audio', '/video'):
-                self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
-            if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
-                self.media = self.instance.media_new(self.media_data['mediapath'][6:])
+            if self.file_['mediapath'][0:6] in ('/audio', '/video'):
+                self.media = self.instance.media_new(self.app.project_path + self.file_['mediapath'])
+            if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
+                self.media = self.instance.media_new(self.file_['mediapath'][6:])
         except Exception as e:
-            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.media_data['mediapath'], "warning").exec_()
-            self.media = None
-            self.media_data = None
-            self.setWindowTitle(_("Media coding"))
+            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.file_['mediapath'], "warning").exec_()
+            self.clear_file()
             return
 
-        title = self.media_data['name'].split('/')[-1]
+        title = self.file_['name'].split('/')[-1]
         self.ddialog.setWindowTitle(title)
         self.setWindowTitle(_("Media coding: ") + title)
         self.ui.pushButton_play.setEnabled(True)
         self.ui.horizontalSlider.setEnabled(True)
         self.ui.pushButton_coding.setEnabled(True)
-        if self.media_data['mediapath'][0:6] not in ("/audio", "audio:"):
+        if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
             try:
                 w = int(self.app.settings['video_w'])
@@ -774,7 +785,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Get the transcribed text and fill textedit
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext, name from source where name = ?", [self.media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext, name from source where name = ?", [self.file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is None:
             return
@@ -791,9 +802,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
                                      'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         self.get_coded_text_update_eventfilter_tooltips()
-
-    def haha(self):
-        print("haha")
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
@@ -1064,9 +1072,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeav_w'] = self.size().width()
         self.app.settings['dialogcodeav_h'] = self.size().height()
-        if self.media_data is not None and self.media_data['mediapath'] is not None \
-                and self.media_data['mediapath'][0:7] != "/audio/" \
-                and self.media_data['mediapath'][0:6] != "audio:":
+        if self.file_ is not None and self.file_['mediapath'] is not None \
+                and self.file_['mediapath'][0:7] != "/audio/" \
+                and self.file_['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
@@ -1588,12 +1596,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Assign time segment to selected code. Insert an entry into the database.
         Then clear the segment for re-use."""
 
-        if self.media_data is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
+        if self.file_ is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
             self.clear_segment()
             return
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
         cid = int(selected.text(1).split(':')[1])
-        values = [self.media_data['id'], self.segment['start_msecs'],
+        values = [self.file_['id'], self.segment['start_msecs'],
                   self.segment['end_msecs'], cid, self.segment['memo'],
                   datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                   self.app.settings['codername']]
@@ -2054,7 +2062,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.change_text_code_pos(cursor.position(), "end")
 
     def change_text_code_pos(self, location, start_or_end):
-        if self.filename == {}:
+        if self.file_ is None:
             return
         code_list = []
         for item in self.code_text:
@@ -2686,7 +2694,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
     app = None
     label = None
-    media_data = None
+    file_ = None
     is_paused = False
     media_duration_text = ""
     displayframe = None
@@ -2699,20 +2707,20 @@ class DialogViewAV(QtWidgets.QDialog):
     speaker_list = []
     can_transcribe = True
 
-    def __init__(self, app, media_data, parent=None):
+    def __init__(self, app, file_, parent=None):
 
-        """ Media_data contains: {name, mediapath, owner, id, date, memo, fulltext}
+        """ file_ contains: {name, mediapath, owner, id, date, memo, fulltext}
         A separate modal dialog is created to display the video.
         """
 
         sys.excepthook = exception_handler
         self.app = app
-        self.media_data = media_data
+        self.file_ = file_
         abs_path = ""
-        if self.media_data['mediapath'][0:6] in ('/audio', '/video'):
-            abs_path = self.app.project_path + self.media_data['mediapath']
-        if self.media_data['mediapath'][0:6] in ('audio:', 'video:'):
-            abs_path = self.media_data['mediapath'][6:]
+        if self.file_['mediapath'][0:6] in ('/audio', '/video'):
+            abs_path = self.app.project_path + self.file_['mediapath']
+        if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -2742,7 +2750,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext from source where name=?", [media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit_transcription.installEventFilter(self)
@@ -2818,7 +2826,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
-        if self.media_data['mediapath'][0:6] not in ("/audio", "audio:"):
+        if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
 
         # Create a vlc instance
@@ -2840,7 +2848,7 @@ class DialogViewAV(QtWidgets.QDialog):
             Message(self.app, _('Media not found'), str(e) + "\n" + abs_path).exec_()
             self.closeEvent()
             return
-        if self.media_data['mediapath'][0:7] not in ("/audio", "audio:"):
+        if self.file_['mediapath'][0:7] not in ("/audio", "audio:"):
             try:
                 w = int(self.app.settings['video_w'])
                 h = int(self.app.settings['video_h'])
@@ -2871,7 +2879,7 @@ class DialogViewAV(QtWidgets.QDialog):
         msecs = self.media.get_duration()
         self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
         self.ui.label_time.setText("0.00" + self.media_duration_text)
-        self.ui.textEdit.setText(self.media_data['memo'])
+        self.ui.textEdit.setText(self.file_['memo'])
         self.ui.textEdit.ensureCursorVisible()
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
@@ -3417,7 +3425,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.stop()
         memo = self.ui.textEdit.toPlainText()
         cur = self.app.conn.cursor()
-        cur.execute('update source set memo=? where id=?', (memo, self.media_data['id']))
+        cur.execute('update source set memo=? where id=?', (memo, self.file_['id']))
         self.app.conn.commit()
         if self.transcription is not None:
             text = self.ui.textEdit_transcription.toPlainText()
@@ -3431,7 +3439,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.app.settings['dialogviewav_w'] = self.size().width()
         self.app.settings['dialogviewav_h'] = self.size().height()
-        if self.media_data['mediapath'][0:7] != "/audio/" and self.media_data['mediapath'][0:6] != "audio:":
+        if self.file_['mediapath'][0:7] != "/audio/" and self.file_['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()

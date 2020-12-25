@@ -74,11 +74,10 @@ class DialogCodeImage(QtWidgets.QDialog):
     app = None
     dialog_list = None
     parent_textEdit = None
-    filename = None
     pixmap = None
     scene = None
     files = []
-    file_ = None
+    file_ = None  # Dictionary with name, memo, id, mediapath?
     codes = []
     categories = []
     selection = None  # Initial code rectangle point
@@ -104,7 +103,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.log = ""
         self.scale = 1.0
         self.selection = None
-        self.get_files()
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -136,10 +134,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
-        for f in self.files:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
+        self.get_files()
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -210,7 +205,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             'cid': row[9]})
 
     def get_files(self):
-        """ Load the image file data. Exclude those image file data where there are bad links."""
+        """ Load the image file data. Exclude those image file data where there are bad links.
+        Fill List widget with the files."""
 
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
@@ -219,6 +215,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if len(bl_sql) > 0:
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
+        self.ui.listWidget.clear()
         self.files = []
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
@@ -229,6 +226,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
             self.files.append(dict(zip(keys, row)))
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -435,6 +436,19 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.load_file()
                 break
 
+    def clear_file(self):
+        """ When image removed clear all details.
+        Called by null file in load_file, and from ManageFiles.delete. """
+
+        self.file_ = None
+        self.selection = None
+        self.scale = 1.0
+        items = list(self.scene.items())
+        for i in range(items.__len__()):
+            self.scene.removeItem(items[i])
+        self.setWindowTitle(_("Image coding"))
+        self.ui.pushButton_memo.setEnabled(False)
+
     def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
         Called by: select_image_menu, listwidgetitem_view_file
@@ -447,18 +461,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
+            self.clear_file()
             Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
             logger.warning("Cannot open image: " + source)
-            # Must remove any existing loaded images and clear variables
-            self.file_ = None
-            self.filename = None
-            self.selection = None
-            self.scale = 1.0
-            items = list(self.scene.items())
-            for i in range(items.__len__()):
-                self.scene.removeItem(items[i])
-            self.setWindowTitle(_("Image coding"))
-            self.ui.pushButton_memo.setEnabled(False)
             return
         items = list(self.scene.items())
         for i in range(items.__len__()):

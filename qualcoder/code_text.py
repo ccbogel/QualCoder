@@ -84,7 +84,7 @@ class DialogCodeText(QtWidgets.QWidget):
     codes = []
     categories = []
     filenames = []
-    filename = None  # contains filename and file id returned from SelectItems
+    file_ = None  # contains filename and file id returned from SelectItems
     sourceText = None
     code_text = []
     annotations = []
@@ -101,7 +101,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.dialog_list = dialog_list
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
-        self.filenames = self.app.get_text_filenames()
         self.annotations = self.app.get_annotations()
         self.search_indices = []
         self.search_index = 0
@@ -137,24 +136,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
-        # Fill additional details about each file in the memo
-        cur = self.app.conn.cursor()
-        sql = "select length(fulltext) from source where id=?"
-        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
-        for f in self.filenames:
-            cur.execute(sql, [f['id'],])
-            res = cur.fetchone()
-            if res is None:  # safety catch
-                res = [0]
-            tt = "Characters: " + str(res[0])
-            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
-            res = cur.fetchone()
-            tt += "\nCodings: " + str(res[0])
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] is not None and f['memo'] != "":
-                tt += "\nMemo: " + f['memo']
-            item.setToolTip(tt)
-            self.ui.listWidget.addItem(item)
+        self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
@@ -246,6 +228,30 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
+
+    def get_files(self):
+        """ Get files with additional details and fill list widget """
+
+        self.ui.listWidget.clear()
+        self.filenames = self.app.get_text_filenames()
+        # Fill additional details about each file in the memo
+        cur = self.app.conn.cursor()
+        sql = "select length(fulltext) from source where id=?"
+        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
+        for f in self.filenames:
+            cur.execute(sql, [f['id'], ])
+            res = cur.fetchone()
+            if res is None:  # safety catch
+                res = [0]
+            tt = "Characters: " + str(res[0])
+            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
+            res = cur.fetchone()
+            tt += "\nCodings: " + str(res[0])
+            item = QtWidgets.QListWidgetItem(f['name'])
+            if f['memo'] is not None and f['memo'] != "":
+                tt += "\nMemo: " + f['memo']
+            item.setToolTip(tt)
+            self.ui.listWidget.addItem(item)
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
@@ -426,7 +432,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: fill_tree
         """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         cur = self.app.conn.cursor()
         sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
@@ -438,7 +444,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 try:
-                    cur.execute(sql, [cid, self.filename['id'], self.app.settings['codername']])
+                    cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
                     result = cur.fetchone()
                     if result[0] > 0:
                         item.setText(3, str(result[0]))
@@ -449,7 +455,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     msg = "Fill code counts error\n" + str(e) + "\n"
                     msg += sql + "\n"
                     msg += "cid " + str(cid) + "\n"
-                    msg += "self.filename['id'] " + str(self.filename['id']) + "\n"
+                    msg += "self.file_['id'] " + str(self.file_['id']) + "\n"
                     logger.debug(msg)
                     item.setText(3, "")
             it += 1
@@ -465,7 +471,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def delete_all_codes_from_file(self):
         """ Delete all codes from this file by this coder. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         msg = _("Delete all codings in this file made by ") + self.app.settings['codername']
         ui = DialogConfirmDelete(self.app, msg)
@@ -474,11 +480,11 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cur = self.app.conn.cursor()
         sql = "delete from code_text where fid=? and owner=?"
-        cur.execute(sql, (self.filename['id'], self.app.settings['codername']))
+        cur.execute(sql, (self.file_['id'], self.app.settings['codername']))
         self.app.conn.commit()
         self.get_coded_text_update_eventfilter_tooltips()
         self.app.delete_backup = False
-        msg = _("All codes by ") + self.app.settings['codername'] + _(" deleted from ") + self.filename['name']
+        msg = _("All codes by ") + self.app.settings['codername'] + _(" deleted from ") + self.file_['name']
         self.parent_textEdit.append(msg)
 
     def search_for_text(self):
@@ -490,7 +496,7 @@ class DialogCodeText(QtWidgets.QWidget):
         If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         if len(self.search_indices) == 0:
             self.ui.pushButton_next.setEnabled(False)
@@ -533,7 +539,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         if self.sourceText:
                             for match in pattern.finditer(self.sourceText):
                                 # Get result as first dictionary item
-                                filedata = self.app.get_file_texts([self.filename['id'], ])[0]
+                                filedata = self.app.get_file_texts([self.file_['id'], ])[0]
                                 self.search_indices.append((filedata,match.start(), len(match.group(0))))
                     except:
                         logger.exception('Failed searching current file for %s',search_term)
@@ -545,7 +551,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         self.search_index -= 1
         if self.search_index == -1:
@@ -553,7 +559,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
         # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
-        if self.filename is None or self.filename['id'] != prev_result[0]['id']:
+        if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
             self.load_file(prev_result[0])
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
@@ -563,7 +569,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
 
         self.search_index += 1
@@ -572,7 +578,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
         # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
-        if self.filename is None or self.filename['id'] != next_result[0]['id']:
+        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
             self.load_file(next_result[0])
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
@@ -628,22 +634,22 @@ class DialogCodeText(QtWidgets.QWidget):
             self.change_code_pos(cursor.position(), "end")
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
-            cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.filename['id'], cursor.position()])
+            cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], cursor.position()])
             self.app.conn.commit()
 
     def file_memo(self):
         """ Open file memo to view or edit. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.filename['name'], self.filename['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
         ui.exec_()
         memo = ui.memo
-        if memo == self.filename['memo']:
+        if memo == self.file_['memo']:
             return
-        self.filename['memo'] = memo
+        self.file_['memo'] = memo
         cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.filename['id']))
+        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
         self.app.conn.commit()
         self.filenames = self.app.get_text_filenames()
         self.ui.listWidget.clear()
@@ -659,7 +665,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if position is None:
             # Called via button
             position = self.ui.textEdit.textCursor().position()
-        if self.filename is None:
+        if self.file_ is None:
             return
         coded_text_list = []
         for item in self.code_text:
@@ -702,7 +708,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def change_code_pos(self, location, start_or_end):
         """  Called via textedit_menu. """
-        if self.filename == {}:
+        if self.file_ is None:
             return
         code_list = []
         for item in self.code_text:
@@ -985,7 +991,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Highlight only the selected code in the text. Move to next instance in text
         from the current textEdit cursor position. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
@@ -1036,7 +1042,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Highlight only the selected code in the text. Move to previous instance in text from
         the current textEdit cursor position. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
@@ -1601,12 +1607,12 @@ class DialogCodeText(QtWidgets.QWidget):
     def go_to_next_file(self):
         """ Go to next file in list. """
 
-        if self.filename is None:
+        if self.file_ is None:
             self.load_file(self.filenames[0])
             self.ui.listWidget.setCurrentRow(0)
             return
         for i in range(0, len(self.filenames) - 1):
-            if self.filename == self.filenames[i]:
+            if self.file_ == self.filenames[i]:
                 found = self.filenames[i + 1]
                 self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_file(found)
@@ -1660,26 +1666,26 @@ class DialogCodeText(QtWidgets.QWidget):
         self.filename = None
         for f in self.filenames:
             if f['name'] == itemname:
-                self.filename = f
-                self.load_file(self.filename)
+                self.file_ = f
+                self.load_file(self.file_)
                 break
 
-    def load_file(self, filedata):
+    def load_file(self, file_):
         """ Load and display file text for this file.
         Get and display coding highlights.
         Called from:
             view_file_dialog, context_menu: ,
         """
 
-        self.filename = filedata
+        self.file_ = file_
         sql_values = []
-        file_result = self.app.get_file_texts([filedata['id']])[0]
+        file_result = self.app.get_file_texts([file_['id']])[0]
         sql_values.append(int(file_result['id']))
         self.sourceText = file_result['fulltext']
         self.ui.textEdit.setPlainText(self.sourceText)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-        self.setWindowTitle(_("Code text: ") + self.filename['name'])
+        self.setWindowTitle(_("Code text: ") + self.file_['name'])
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
@@ -1689,9 +1695,9 @@ class DialogCodeText(QtWidgets.QWidget):
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update. """
 
-        if self.filename is None:
+        if self.file_ is None:
             return
-        sql_values = [int(self.filename['id']), self.app.settings['codername']]
+        sql_values = [int(self.file_['id']), self.app.settings['codername']]
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
@@ -1752,8 +1758,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
             # Add annotation marks - these are in bold
             for note in self.annotations:
-                if len(self.filename.keys()) > 0:  # will be zero if using autocode and no file is loaded
-                    if note['fid'] == self.filename['id']:
+                if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
+                    if note['fid'] == self.file_['id']:
                         cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
                         cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
                         formatB = QtGui.QTextCharFormat()
@@ -1885,7 +1891,7 @@ class DialogCodeText(QtWidgets.QWidget):
        Need to check for multiple same codes at same pos0 and pos1.
        """
 
-        if self.filename == {}:
+        if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec_()
             return
         item = self.ui.treeWidget.currentItem()
@@ -1901,7 +1907,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if pos0 == pos1:
             return
         # Add the coded section to code text, add to database and update GUI
-        coded = {'cid': cid, 'fid': int(self.filename['id']), 'seltext': selectedText,
+        coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
 
@@ -1933,7 +1939,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
 
-        if self.filename == {}:
+        if self.file_ is None:
             return
         unmarked_list = []
         for item in self.code_text:
@@ -1973,7 +1979,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called via context menu, button
         """
 
-        if self.filename is None:
+        if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec_()
             return
         pos0 = self.ui.textEdit.textCursor().selectionStart()
@@ -1986,10 +1992,10 @@ class DialogCodeText(QtWidgets.QWidget):
         annotation = ""
         # Find annotation at this position for this file
         for note in self.annotations:
-            #if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.filename['id']:
+            #if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.file_['id']:
             if ((pos0 >= note['pos0'] and pos0 <= note['pos1']) or \
                     (pos1 >= note['pos0'] and pos1 <= note['pos1'])) \
-                    and note['fid'] == self.filename['id']:
+                    and note['fid'] == self.file_['id']:
                 item = note  # use existing annotation
                 details = item['owner'] + " " + item['date']
         # Exit this method if no text selected and there is no annotation at this position
@@ -1997,7 +2003,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Add new item to annotations, add to database and update GUI
         if item is None:
-            item = {'fid': int(self.filename['id']), 'pos0': pos0, 'pos1': pos1,
+            item = {'fid': int(self.file_['id']), 'pos0': pos0, 'pos1': pos1,
             'memo': str(annotation), 'owner': self.app.settings['codername'],
             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
@@ -2016,7 +2022,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.annotations.append(item)
             self.highlight()
             self.parent_textEdit.append(_("Annotation added at position: ") \
-                + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.filename['name'])
+                + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_['name'])
         # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
@@ -2027,7 +2033,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
                     self.annotations.remove(note)
             self.parent_textEdit.append(_("Annotation removed from position ") \
-                + str(item['pos0']) + _(" for: ") + self.filename['name'])
+                + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.unlight()
         self.highlight()
 
@@ -2154,7 +2160,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if all == "all":
             files = self.app.get_file_texts()
         else:
-            files = self.app.get_file_texts([self.filename['id'], ])
+            files = self.app.get_file_texts([self.file_['id'], ])
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []

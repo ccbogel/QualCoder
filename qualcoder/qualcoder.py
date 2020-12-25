@@ -606,7 +606,7 @@ class MainWindow(QtWidgets.QMainWindow):
     """
 
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
-    dialogList = []  # keeps active and track of non-modal windows
+    dialog_list = []  # keeps active and track of non-modal windows
     recent_projects = []  # a list of recent projects for the qmenu
 
     def __init__(self, app, force_quit=False):
@@ -860,7 +860,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Run SQL statements on database. """
 
         ui = DialogSQL(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_reports.layout()
@@ -889,13 +889,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogReportCoderComparisons":
                 d.show()
                 d.activateWindow()
                 return
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
 
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
         # Check the tab has a layout and widgets
@@ -917,13 +917,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogReportCodeFrequencies":
                 d.show()
                 d.activateWindow()
                 return
-        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
+        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialog_list)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_reports.layout()
@@ -944,13 +944,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_code_relations(self):
         """ Show code relations in text files. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogReportRelations":
                 d.show()
                 d.activateWindow()
                 return
-        ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
+        ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialog_list)
+        self.dialog_list.append(ui)
 
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
         # Check the tab has a layout and widgets
@@ -972,14 +972,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding(self):
         """ Report on coding and categories. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogReportCodes":
                 d.show()
                 d.activateWindow()
                 return
 
-        ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
+        ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialog_list)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_reports)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_reports.layout()
@@ -1000,13 +1000,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "ViewGraphOriginal":
                 d.show()
                 d.activateWindow()
                 return
         ui = ViewGraphOriginal(self.app)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
         ui.show()
         self.clean_dialog_refs()
 
@@ -1059,13 +1059,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogCases":
                 d.show()
                 d.activateWindow()
                 return
         ui = DialogCases(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_manage.layout()
@@ -1088,13 +1088,13 @@ class MainWindow(QtWidgets.QMainWindow):
         plain text. Rename, delete and add memos to files.
         """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogManageFiles":
                 d.show()
                 d.activateWindow()
                 return
-        ui = DialogManageFiles(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
+        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_manage.layout()
@@ -1125,7 +1125,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def journals(self):
         """ Create and edit journals. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             # Had to add this code to fix error:
             # __main__.clean_dialog_refs wrapped C/C++ object of type DialogJournals has been deleted
             if type(d).__name__ == "DialogJournals":
@@ -1138,7 +1138,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
         # Check the tab has a layout and widgets
         contents = self.ui.tab_manage.layout()
@@ -1160,21 +1160,21 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
-        for d in self.dialogList:
+        # WIth the new tabbed approach the dialog list is cleared
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogCodeText":
                 try:
                     d.show()
                     d.activateWindow()
                 except RuntimeError as e:
-                    self.dialogList.remove(d)
+                    self.dialog_list.remove(d)
                 return
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
-            ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeText(self.app, self.ui.textEdit, self.dialog_list)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
-
+            self.dialog_list.append(ui)
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
             # Check the tab has a layout and widgets
             contents = self.ui.tab_coding.layout()
@@ -1199,19 +1199,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogCodeImage":
                 try:
                     d.show()
                     d.activateWindow()
                 except:
-                    self.dialogList.remove(d)
+                    self.dialog_list.remove(d)
                 return
         files = self.app.get_image_filenames()
         if len(files) > 0:
-            ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialog_list)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
+            self.dialog_list.append(ui)
 
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
             # Check the tab has a layout and widgets
@@ -1237,14 +1237,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes to segments of the
         audio or video file. Added try block in case VLC bindings do not work. """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if type(d).__name__ == "DialogCodeAV":
                 try:
                     d.show()
                     d.activateWindow()
                 except Exception as e:
                     try:
-                        self.dialogList.remove(d)
+                        self.dialog_list.remove(d)
                     except:
                         pass
                 return
@@ -1256,9 +1256,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.clean_dialog_refs()
             return
         try:
-            ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialog_list)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
+            self.dialog_list.append(ui)
 
             self.ui.tabWidget.setCurrentWidget(self.ui.tab_coding)
             # Check the tab has a layout and widgets
@@ -1363,7 +1363,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if reply == QtWidgets.QMessageBox.Yes:
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
-                self.dialogList = None
+                self.dialog_list = None
 
                 if self.app.conn is not None:
                     try:
@@ -1492,9 +1492,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     contents.itemAt(i).widget().setParent(None)
             # Close all opened dialogs as coder name needs to change everywhere
             self.clean_dialog_refs()
-            for d in self.dialogList:
+            for d in self.dialog_list:
                 d.destroy()
-                self.dialogList = []
+                self.dialog_list = []
 
     def project_memo(self):
         """ Give the entire project a memo. Modal dialog. """
@@ -1504,7 +1504,7 @@ class MainWindow(QtWidgets.QMainWindow):
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
             memo)
-        self.dialogList.append(ui)
+        self.dialog_list.append(ui)
         ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
@@ -1734,9 +1734,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
         self.clean_dialog_refs()
-        for d in self.dialogList:
+        for d in self.dialog_list:
             d.destroy()
-            self.dialogList = []
+            self.dialog_list = []
 
         self.ui.textEdit.append("Closing project: " + self.app.project_name + "\n========\n")
         try:
@@ -1808,7 +1808,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Non-modal example - having a journal open and a coding dialog. """
 
         tempList = []
-        for d in self.dialogList:
+        for d in self.dialog_list:
             try:
                 #logger.debug(str(d) + ", isVisible:" + str(d.isVisible()) + " Title:" + d.windowTitle())
                 if d.isVisible():
@@ -1817,26 +1817,26 @@ class MainWindow(QtWidgets.QMainWindow):
             except RuntimeError as e:
                 #logger.error(str(e))
                 pass
-        self.dialogList = tempList
+        self.dialog_list = tempList
         self.update_dialog_lists_in_modeless_dialogs()
 
     def update_dialog_lists_in_modeless_dialogs(self):
         """ This is to assist: Update code and category tree in DialogCodeImage,
         DialogCodeAV, DialogCodeText, DialogReportCodes """
 
-        for d in self.dialogList:
+        for d in self.dialog_list:
             if isinstance(d, DialogCodeText):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
             if isinstance(d, DialogCodeAV):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
             if isinstance(d, DialogCodeImage):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
             if isinstance(d, DialogReportCodes):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
             if isinstance(d, DialogCases):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
             if isinstance(d, DialogManageFiles):
-                d.dialog_list = self.dialogList
+                d.dialog_list = self.dialog_list
 
     def get_latest_github_release(self):
         """ Get latest github release.

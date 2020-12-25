@@ -65,6 +65,7 @@ from ebooklib import epub
 
 from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
+from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
@@ -73,8 +74,8 @@ from helpers import Message
 from html_parser import *
 from memo import DialogMemo
 from select_items import DialogSelectItems
-from view_image import DialogViewImage
-from view_av import DialogViewAV
+from view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
+from view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -115,14 +116,16 @@ class DialogManageFiles(QtWidgets.QDialog):
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
     parent_textEdit = None
-    dialog_list = []
+    dialog_list = []  # Used for opened image , text and AV dialogs
+    tab_coding = None  # Tab widget coding tab
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, tab_coding):
 
         sys.excepthook = exception_handler
         self.app = app
         self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
+        self.tab_coding = tab_coding
         self.attributes = []
         self.dialog_list = []
         QtWidgets.QDialog.__init__(self)
@@ -1617,6 +1620,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_av where id = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 self.app.conn.commit()
+
+        # Remove file from file list in any opened coding dialog
+        print("delete multiple files")
+
+        for d in self.parent_tabs_list:
+            print(d, type(d))
+
         self.check_attribute_placeholders()
         self.parent_textEdit.append(msg)
         self.load_file_data()
@@ -1660,6 +1670,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from annotation where fid = ?", [file_id])
             cur.execute("delete from case_text where fid = ?", [file_id])
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
+            #TODO delete transcription ??
             self.app.conn.commit()
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
@@ -1684,6 +1695,27 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_av where id = ?", [file_id])
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
+
+        # Remove file from file list in any opened coding dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                    if c.file_ is not None and c.file_['id'] == file_id:
+                        c.clear_file()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                    if c.file_ is not None and c.file_['id'] == file_id:
+                        c.clear_file()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
+                    if c.file_ is not None and c.file_['id'] == file_id:
+                        c.file_ = None
+                        c.ui.textEdit.clear()
+
         self.check_attribute_placeholders()
         self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
         self.load_file_data()
