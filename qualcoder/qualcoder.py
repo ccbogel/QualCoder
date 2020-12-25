@@ -854,6 +854,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
         self.ui.textEdit.append(msg)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):
         """ Run SQL statements on database. """
@@ -1052,6 +1053,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         ui.exec_()
         self.clean_dialog_refs()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
@@ -1454,6 +1456,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         # new project, so tell open project NOT to backup, as there will be nothing in there to backup
         self.open_project(self.app.project_path, "yes")
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def change_settings(self):
         """ Change default settings - the coder name, font, font size.
@@ -1469,6 +1472,24 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         if current_coder != self.app.settings['codername']:
+            self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
+            # Close all opened dialogs as coder name needs to change everywhere
+            # Remove widgets from each tab
+            contents = self.ui.tab_reports.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+            contents = self.ui.tab_coding.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+            contents = self.ui.tab_manage.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
             # Close all opened dialogs as coder name needs to change everywhere
             self.clean_dialog_refs()
             for d in self.dialogList:
@@ -1689,9 +1710,33 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def close_project(self):
-        """ Close an open project. """
+        """ Close an open project.
+        Remove widgets from tabs, clear dialog list. Close app connection.
+        Delete old backups. Hide menu options. """
+
+        # Remove widgets from each tab
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        self.clean_dialog_refs()
+        for d in self.dialogList:
+            d.destroy()
+            self.dialogList = []
 
         self.ui.textEdit.append("Closing project: " + self.app.project_name + "\n========\n")
         try:
@@ -1709,12 +1754,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.delete_backup = True
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
-        self.clean_dialog_refs()
-        for d in self.dialogList:
-            d.destroy()
-            self.dialogList = []
         self.setWindowTitle("QualCoder")
         self.app.write_config_ini(self.app.settings)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
