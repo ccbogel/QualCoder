@@ -110,7 +110,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
-        self.ui.checkBox_show_coders.hide()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
         self.scene = QtWidgets.QGraphicsScene()
@@ -571,9 +570,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
                 if item['owner'] == self.app.settings['codername']:
-                    self.scene.addItem(rect_item)
-                if self.ui.checkBox_show_coders.isChecked() and item['owner'] != self.app.settings['codername']:
-                    rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DotLine))
                     self.scene.addItem(rect_item)
 
     def fill_code_label(self):
