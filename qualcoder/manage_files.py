@@ -1233,6 +1233,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
+        # Add file to file list in any opened coding dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
 
     def load_media_reference(self, mediapath):
         """ Load media reference information for audio, video, images.
@@ -1621,11 +1632,38 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 self.app.conn.commit()
 
-        # Remove file from file list in any opened coding dialog
-        print("delete multiple files")
+                # Delete the .transcribed text file
+                transcribed = s['name'] + ".transcribed"
+                print("transcribed ", transcribed)
+                cur.execute("select id from source where name=?", [transcribed])
+                res = cur.fetchone()
+                if res is not None:
+                    cur.execute("delete from source where id = ?", [res[0]])
+                    cur.execute("delete from code_text where fid = ?", [res[0]])
+                    cur.execute("delete from annotation where fid = ?", [res[0]])
+                    cur.execute("delete from case_text where fid = ?", [res[0]])
+                    cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                    self.app.conn.commit()
 
-        for d in self.parent_tabs_list:
-            print(d, type(d))
+            # Remove file from file list in any opened coding dialog
+            contents = self.tab_coding.layout()
+            if contents:
+                # Examine widgets in layout
+                for i in reversed(range(contents.count())):
+                    c = contents.itemAt(i).widget()
+                    if isinstance(c, DialogCodeImage):
+                        c.get_files()
+                        if c.file_ is not None and c.file_['id'] == s['id']:
+                            c.clear_file()
+                    if isinstance(c, DialogCodeAV):
+                        c.get_files()
+                        if c.file_ is not None and c.file_['id'] == s['id']:
+                            c.clear_file()
+                    if isinstance(c, DialogCodeText):
+                        c.get_files()
+                        if c.file_ is not None and c.file_['id'] == s['id']:
+                            c.file_ = None
+                            c.ui.textEdit.clear()
 
         self.check_attribute_placeholders()
         self.parent_textEdit.append(msg)
@@ -1670,8 +1708,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from annotation where fid = ?", [file_id])
             cur.execute("delete from case_text where fid = ?", [file_id])
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
-            #TODO delete transcription ??
             self.app.conn.commit()
+
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Remove avid links in code_text
@@ -1696,10 +1734,23 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
 
+            # Delete the .transcribed text file
+            transcribed = self.source[row]['name'] + ".transcribed"
+            print("transcribed ", transcribed)
+            cur.execute("select id from source where name=?", [transcribed])
+            res = cur.fetchone()
+            if res is not None:
+                cur.execute("delete from source where id = ?", [res[0]])
+                cur.execute("delete from code_text where fid = ?", [res[0]])
+                cur.execute("delete from annotation where fid = ?", [res[0]])
+                cur.execute("delete from case_text where fid = ?", [res[0]])
+                cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                self.app.conn.commit()
+
         # Remove file from file list in any opened coding dialog
         contents = self.tab_coding.layout()
         if contents:
-            # Remove widgets from layout
+            # Examine widgets in layout
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
                 if isinstance(c, DialogCodeImage):
