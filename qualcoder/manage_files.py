@@ -333,11 +333,25 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set mediapath=? where id=?", [new_mediapath, id_])
         self.parent_textEdit.append(msg)
         self.app.conn.commit()
+        
+        # Add file to file list in any opened coding dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
+
         # Reload data and refill the table
         self.load_file_data()
+        self.app.delete_backup = False
 
     def button_import_linked_file(self):
-        """ User presses button to import linked file.
+        """ User presses button to import a linked file into the project folder.
         Only to work with an importable file. """
 
         row = self.ui.tableWidget.currentRow()
@@ -353,7 +367,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.import_linked_file(id_, mediapath)
 
     def import_linked_file(self, id_, mediapath):
-        """ Import linked file and change mediapath details. """
+        """ Import a linked file into the project folder, and change mediapath details. """
 
         name_split1 = mediapath.split(":")[1]
         filename = name_split1.split('/')[-1]
@@ -373,8 +387,22 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set mediapath=? where id=?", [mediapath, id_])
         self.app.conn.commit()
+
+        # Add file to file list in any opened coding dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
+
         # Reload data and refill the table
         self.load_file_data()
+        self.app.delete_backup = False
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -646,36 +674,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        '''if y == self.NAME_COLUMN:
-            new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
-            # check that no other source file has this text and this is is not empty
-            update = True
-            if new_text == "":
-                update = False
-            for c in self.source:
-                if c['name'] == new_text:
-                    update = False
-            # .transcribed suffix is not to be used on a media file
-            if new_text[-12:] == ".transcribed" and self.source[x]['mediapath'] is not None:
-                update = False
-            # Need to preserve names of a/v files and their
-            # dependent transcribed files: filename.type.transcribed
-            if update:
-                if self.source[x]['mediapath'] is not None and self.source[x]['mediapath'][:2] in ('/a', '/v'):
-                    msg = _("If there is an associated '.transcribed' file please rename ")
-                    msg += _("it to match the media file plus '.transcribed'")
-                    QtWidgets.QMessageBox.warning(None, "Media name", msg)
-                if self.source[x]['name'][-12:] == ".transcribed":
-                    msg = _("If there is an associated media file please rename ")
-                    msg += _("it to match the media file before the '.transcribed' suffix")
-                    QtWidgets.QMessageBox.warning(None, _("Media name"), msg)
-                # update source list and database
-                self.source[x]['name'] = new_text
-                cur = self.app.conn.cursor()
-                cur.execute("update source set name=? where id=?", (new_text, self.source[x]['id']))
-                self.app.conn.commit()
-            else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])'''
+
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
@@ -1103,6 +1102,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
+
+        # Add file to file list in opened coding text dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
 
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
