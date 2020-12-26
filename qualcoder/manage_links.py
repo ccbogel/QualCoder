@@ -140,15 +140,13 @@ class DialogManageLinks(QtWidgets.QDialog):
             mb.setText(msg)
             mb.exec_()
             return
-
-        # All seems good so update link and database
+        # All ok so update link and database
         self.links[x]['mediapath'] = self.links[x]['mediapath'].split(':')[0] + ':' + file_path
         cur = self.app.conn.cursor()
         sql = "update source set mediapath=? where id=?"
         cur.execute(sql, [self.links[x]['mediapath'], self.links[x]['id']])
         self.app.conn.commit()
         self.fill_table()
-
         # Add file to file list in any opened coding dialog
         contents = self.tab_coding.layout()
         if contents:
@@ -160,6 +158,7 @@ class DialogManageLinks(QtWidgets.QDialog):
                     c.get_files()
                 if isinstance(c, DialogCodeText):
                     c.get_files()
+        self.parent_textEdit.append(_("Bad link fixed for file: ") + new_file_name + _(" Path: ") + file_path)
         self.app.delete_backup = False
 
     def cell_selected(self):
