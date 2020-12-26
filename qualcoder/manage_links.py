@@ -34,8 +34,11 @@ import traceback
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 
+from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
+from view_image import DialogCodeImage  # DialogCodeImage for isinstance()
+from view_av import DialogCodeAV  # DialogCodeAV for isinstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -61,12 +64,14 @@ class DialogManageLinks(QtWidgets.QDialog):
     """
 
     parent_textEdit = None
+    tab_coding = None  # Tab widget coding tab
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, tab_coding):
 
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textEdit
+        self.tab_coding = tab_coding
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_links()
@@ -115,6 +120,7 @@ class DialogManageLinks(QtWidgets.QDialog):
     def file_selection(self, x):
         """ Select a file to replace the bad link.
         Called by: table_menu, filename cell clicked.
+        The path can be different but the file name must match.
         """
 
         file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None, _('Select file'),
@@ -143,29 +149,24 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.app.conn.commit()
         self.fill_table()
 
+        # Add file to file list in any opened coding dialog
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
+        self.app.delete_backup = False
+
     def cell_selected(self):
         """ When the table widget cell is selected open file select dialog.
         """
 
         self.file_selection(self.ui.tableWidget.currentRow())
-
-    # Decided against typing in the link, instead use file select dialog
-    '''def cell_double_clicked(self):
-        """  """
-
-        x = self.ui.tableWidget.currentRow()
-        y = self.ui.tableWidget.currentColumn()
-
-        if y == 0:  # name column
-            self.file_selected(x)
-        if y == 1:  # filepath column
-            pass'''
-
-    '''def cell_modified(self):
-        """ File paths can be changed. """
-
-        x = self.ui.tableWidget.currentRow()
-        y = self.ui.tableWidget.currentColumn()'''
 
     def fill_table(self):
         """ Fill the table widget with file details. """

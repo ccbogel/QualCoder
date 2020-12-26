@@ -667,7 +667,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setShortcut('Alt+A')
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
         self.ui.actionImport_survey.setShortcut('Alt+I')
-        self.ui.actionManage_bad_links_to_files.triggered.connect(self.fix_bad_file_links)
+        self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
 
         # codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
@@ -1112,11 +1112,26 @@ class MainWindow(QtWidgets.QMainWindow):
         #ui.show()
         self.clean_dialog_refs()
 
-    def fix_bad_file_links(self):
-        """ Fix any bad links to files. """
+    def manage_bad_file_links(self):
+        """ Fix any bad links to files.
+        File names must match but paths can be different. """
 
-        ui = DialogManageLinks(self.app, self.ui.textEdit)
-        ui.exec_()
+        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_manage)
+        # Check the tab has a layout and widgets
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            self.ui.tab_manage.setLayout(layout)
+        #ui.exec_()
         self.clean_dialog_refs()
         bad_links = self.app.check_bad_file_links()
         if bad_links == []:
