@@ -49,7 +49,10 @@ from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
-from select_items import DialogSelectItems
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from select_items import DialogSelectItems  # for isinstance()
+from view_av import DialogCodeAV  # for isinstance()
+from view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1334,7 +1337,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     d.get_coded_text_update_eventfilter_tooltips()
                 except RuntimeError as e:
                     pass
-            if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
+            if isinstance(DialogCodeAV):
                 try:
                     d.get_codes_and_categories()
                     d.fill_tree()
@@ -1344,7 +1347,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     d.get_coded_text_update_eventfilter_tooltips()
                 except RuntimeError as e:
                     pass
-            if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
+            if isinstance(DialogCodeImage):
                 try:
                     d.get_codes_and_categories()
                     d.fill_tree()
@@ -1352,7 +1355,19 @@ class DialogCodeText(QtWidgets.QWidget):
                     d.draw_coded_areas()
                 except RuntimeError as e:
                     pass
-            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
+            if isinstance(DialogReportCodes):
+                try:
+                    d.get_data()
+                    d.fill_tree()
+                except RuntimeError as e:
+                    pass
+            if isinstance(DialogReportCoderComparisons):
+                try:
+                    d.get_data()
+                    d.fill_tree()
+                except RuntimeError as e:
+                    pass
+            if isinstance(DialogReportCodeFrequencies):
                 try:
                     d.get_data()
                     d.fill_tree()

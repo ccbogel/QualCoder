@@ -262,17 +262,17 @@ class App(object):
         return res
 
     def get_casenames(self):
-        """ Get all casenames. As id, name """
+        """ Get all case names. As id, name, memo. """
         cur = self.conn.cursor()
-        cur.execute("select caseid, name from cases order by lower(name)")
+        cur.execute("select caseid, name, memo from cases order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_text_filenames(self):
-        """ Get filenames of textfiles only. """
+        """ Get filenames of text files. """
 
         cur = self.conn.cursor()
         cur.execute("select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")

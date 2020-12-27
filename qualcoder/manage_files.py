@@ -76,6 +76,7 @@ from memo import DialogMemo
 from select_items import DialogSelectItems
 from view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
 from view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
+from reports import DialogReportCodes  # for isInstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -333,20 +334,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set mediapath=? where id=?", [new_mediapath, id_])
         self.parent_textEdit.append(msg)
         self.app.conn.commit()
-        
-        # Add file to file list in any opened coding dialog
-        contents = self.tab_coding.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogCodeImage):
-                    c.get_files()
-                if isinstance(c, DialogCodeAV):
-                    c.get_files()
-                if isinstance(c, DialogCodeText):
-                    c.get_files()
-
-        # Reload data and refill the table
+        self.update_files_in_dialogs()
         self.load_file_data()
         self.app.delete_backup = False
 
@@ -387,20 +375,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set mediapath=? where id=?", [mediapath, id_])
         self.app.conn.commit()
-
-        # Add file to file list in any opened coding dialog
-        contents = self.tab_coding.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogCodeImage):
-                    c.get_files()
-                if isinstance(c, DialogCodeAV):
-                    c.get_files()
-                if isinstance(c, DialogCodeText):
-                    c.get_files()
-
-        # Reload data and refill the table
+        self.update_files_in_dialogs()
         self.load_file_data()
         self.app.delete_backup = False
 
@@ -1102,15 +1077,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
-
-        # Add file to file list in opened coding text dialog
-        contents = self.tab_coding.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogCodeText):
-                    c.get_files()
-
+        self.update_files_in_dialogs()
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
@@ -1236,11 +1203,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                         self.load_file_text(f, "docs:" + link_path)
                     except Exception as e:
                         Message(self.app, _('Unknown file type'),  _("Cannot import file") + ":\n" + f, "warning")
-
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
-        # Add file to file list in any opened coding dialog
+        self.update_files_in_dialogs()
+
+    def update_files_in_dialogs(self):
+        """ Update files list in any opened dialogs:
+         DialogReportCodes, DialogCodeText, DialogCodeAV, DialogCodeImage """
+
         contents = self.tab_coding.layout()
         if contents:
             for i in reversed(range(contents.count())):
@@ -1251,6 +1222,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                     c.get_files()
                 if isinstance(c, DialogCodeText):
                     c.get_files()
+        contents = self.tab_reports.layout()
+        if contents:
+            # Examine widgets in layout
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    c.get_files_and_cases()
 
     def load_media_reference(self, mediapath):
         """ Load media reference information for audio, video, images.
@@ -1652,26 +1630,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                     self.app.conn.commit()
 
-            # Remove file from file list in any opened coding dialog
-            contents = self.tab_coding.layout()
-            if contents:
-                # Examine widgets in layout
-                for i in reversed(range(contents.count())):
-                    c = contents.itemAt(i).widget()
-                    if isinstance(c, DialogCodeImage):
-                        c.get_files()
-                        if c.file_ is not None and c.file_['id'] == s['id']:
-                            c.clear_file()
-                    if isinstance(c, DialogCodeAV):
-                        c.get_files()
-                        if c.file_ is not None and c.file_['id'] == s['id']:
-                            c.clear_file()
-                    if isinstance(c, DialogCodeText):
-                        c.get_files()
-                        if c.file_ is not None and c.file_['id'] == s['id']:
-                            c.file_ = None
-                            c.ui.textEdit.clear()
-
+        self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_textEdit.append(msg)
         self.load_file_data()
@@ -1754,26 +1713,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                 self.app.conn.commit()
 
-        # Remove file from file list in any opened coding dialog
-        contents = self.tab_coding.layout()
-        if contents:
-            # Examine widgets in layout
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogCodeImage):
-                    c.get_files()
-                    if c.file_ is not None and c.file_['id'] == file_id:
-                        c.clear_file()
-                if isinstance(c, DialogCodeAV):
-                    c.get_files()
-                    if c.file_ is not None and c.file_['id'] == file_id:
-                        c.clear_file()
-                if isinstance(c, DialogCodeText):
-                    c.get_files()
-                    if c.file_ is not None and c.file_['id'] == file_id:
-                        c.file_ = None
-                        c.ui.textEdit.clear()
-
+        self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
         self.load_file_data()
