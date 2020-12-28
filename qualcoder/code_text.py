@@ -51,8 +51,6 @@ from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from select_items import DialogSelectItems  # for isinstance()
-from view_av import DialogCodeAV  # for isinstance()
-from view_image import DialogCodeImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -82,8 +80,8 @@ class DialogCodeText(QtWidgets.QWidget):
     ID_COLUMN = 1
     MEMO_COLUMN = 2
     app = None
-    dialog_list = None
     parent_textEdit = None
+    tab_reports = None  # Tab widget reports, used for updates to codes
     codes = []
     categories = []
     filenames = []
@@ -97,11 +95,11 @@ class DialogCodeText(QtWidgets.QWidget):
     eventFilter = None
     autocode_history = [] # A list of dictionaries {title, list of dictionary of sql commands}
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit, tab_reports):
 
         super(DialogCodeText, self).__init__()
         self.app = app
-        self.dialog_list = dialog_list
+        self.tab_reports = tab_reports
         sys.excepthook = exception_handler
         self.parent_textEdit = parent_textEdit
         self.annotations = self.app.get_annotations()
@@ -1321,58 +1319,37 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def update_dialog_codes_and_categories(self):
-        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
-        DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes as could not import the classes to test
-        against. There was an import error.
+        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
         Using try except blocks for each instance, as instance may have been deleted. """
 
-        for d in self.dialog_list:
-            if isinstance(d, DialogCodeText):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(DialogCodeAV):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.load_segments()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(DialogCodeImage):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.get_coded_areas()
-                    d.draw_coded_areas()
-                except RuntimeError as e:
-                    pass
-            if isinstance(DialogReportCodes):
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
-            if isinstance(DialogReportCoderComparisons):
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
-            if isinstance(DialogReportCodeFrequencies):
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.unlight()
+        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    #try:
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCoderComparisons):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCodeFrequencies):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
 
     def add_category(self):
         """ When button pressed, add a new category.

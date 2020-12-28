@@ -40,14 +40,15 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
 from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
 from color_selector import DialogColorSelect
 from color_selector import colors
+from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
 from memo import DialogMemo
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -72,8 +73,8 @@ class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
+    tab_reports = None  # Tab widget reports, used for updates to codes
     pixmap = None
     scene = None
     files = []
@@ -84,7 +85,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     scale = 1.0
     code_areas = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
@@ -94,7 +95,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         super(DialogCodeImage,self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
+        self.tab_reports = tab_reports
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
@@ -492,47 +493,36 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.fill_code_counts_in_tree()
 
     def update_dialog_codes_and_categories(self):
-        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
-        DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes as could not import the classes to test
-        against. There was an import error.
-        Using try except blocks for each instance, as instance may have been deleted.
-        """
+        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
+        Using try except blocks for each instance, as instance may have been deleted. """
 
-        for d in self.dialog_list:
-            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.load_segments()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(d, DialogCodeImage):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.get_coded_areas()
-                    d.draw_coded_areas()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.get_coded_areas()
+        self.draw_coded_areas()
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    #try:
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCoderComparisons):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCodeFrequencies):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
 
     def change_scale(self):
         """ Resize image. Triggered by user change in slider.

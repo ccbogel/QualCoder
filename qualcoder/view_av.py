@@ -86,6 +86,7 @@ from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
 from memo import DialogMemo
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from select_items import DialogSelectItems
 
 
@@ -108,8 +109,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     Create codes and categories.  """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
+    tab_reports = None  # Tab widget reports, used for updates to codes
     files = []
     file_ = None
     codes = []
@@ -135,7 +136,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of audio and video files.
         Can code a transcribed text file for the audio / video.
         """
@@ -143,7 +144,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         super(DialogCodeAV, self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
+        self.tab_reports = tab_reports
         self.parent_textEdit = parent_textEdit
         if vlc_msg != "":
             self.parent_textEdit.append(vlc_msg)
@@ -1355,43 +1356,39 @@ class DialogCodeAV(QtWidgets.QDialog):
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
         DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes, as could not import. There was an import error.
+        Not using isinstance for other classes as could not import the classes to test
+        against. There was an import error.
         Using try except blocks for each instance, as instance may have been deleted. """
 
-        for d in self.dialog_list:
-            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(d, DialogCodeAV):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.load_segments()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.get_coded_areas()
-                    d.draw_coded_areas()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.load_segments()
+        self.unlight()
+        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    #try:
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCoderComparisons):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCodeFrequencies):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.

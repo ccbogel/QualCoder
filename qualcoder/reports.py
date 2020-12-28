@@ -65,7 +65,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     This is for text, image and av coding. """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
     coders = []
     categories = []
@@ -73,11 +72,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     coded = []  # to refactor name
     file_ids = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.get_data()
         self.calculate_code_frequencies()
@@ -507,8 +505,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
-
-        cur.execute("select id, length(fulltext) from source where mediapath is Null")
+        cur.execute('select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
         self.file_summaries = cur.fetchall()
 
     def coder_selected(self):
@@ -789,7 +786,6 @@ class DialogReportCodes(QtWidgets.QDialog):
     """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
     code_names = []
     coders = [""]
@@ -805,11 +801,10 @@ class DialogReportCodes(QtWidgets.QDialog):
     case_ids = ""
     attribute_selection = ""
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit):
         super(DialogReportCodes, self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
