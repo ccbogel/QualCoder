@@ -166,9 +166,6 @@ Required:
 ## License
 QualCoder is distributed under the MIT LICENSE.
 
-## Debian packages
-See [https://github.com/ccbogel/QualCoder-Debians](https://github.com/ccbogel/QualCoder-Debians)
-
 ##  Citation APA style
 
 Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
