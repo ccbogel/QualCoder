@@ -1454,7 +1454,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     tmp = html[:location] + extra + html[location:]
                     html = tmp
                 except Exception as e:
-                    print(e)
+                    logger.debug(str(e))
                     QtWidgets.QMessageBox.warning(None, _("HTML file creation exception"), str(e))
 
         with open(filename, 'w') as f:
@@ -1610,7 +1610,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 sql += " and seltext like ? "
                 parameters.append("%" + str(search_text) + "%")
             if parameters == []:
-                print(sql)  # tmp)
                 cur.execute(sql)
             else:
                 #logger.info("SQL:" + sql)
