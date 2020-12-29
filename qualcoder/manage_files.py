@@ -107,6 +107,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     source = []
     app = None
+    parent_textEdit = None
+    tab_coding = None  # Tab widget coding tab for updates
+    tab_reports = None  # Tab widget reports for updates
     text_view = None
     header_labels = []
     NAME_COLUMN = 0
@@ -116,17 +119,16 @@ class DialogManageFiles(QtWidgets.QDialog):
     rows_hidden = False
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
-    parent_textEdit = None
     dialog_list = []  # Used for opened image , text and AV dialogs
-    tab_coding = None  # Tab widget coding tab
 
-    def __init__(self, app, parent_textEdit, tab_coding):
+    def __init__(self, app, parent_textEdit, tab_coding, tab_reports):
 
         sys.excepthook = exception_handler
         self.app = app
         self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
         self.tab_coding = tab_coding
+        self.tab_reports = tab_reports
         self.attributes = []
         self.dialog_list = []
         QtWidgets.QDialog.__init__(self)

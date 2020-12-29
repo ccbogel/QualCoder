@@ -893,7 +893,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         self.ui.listWidget_files.clear()
-        self.files = self.app.get_text_filenames()
+        self.files = self.app.get_filenames()
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext) from source where id=?"

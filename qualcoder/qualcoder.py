@@ -251,13 +251,13 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames. As id, name """
+        """ Get all filenames. As id, name, memo """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source order by lower(name)")
+        cur.execute("select id, name, memo from source order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_casenames(self):
@@ -943,14 +943,14 @@ class MainWindow(QtWidgets.QMainWindow):
         plain text. Rename, delete and add memos to files.
         """
 
-        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding)
+        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_bad_file_links(self):
         """ Fix any bad links to files.
         File names must match but paths can be different. """
 
-        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding)
+        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
         if bad_links == []:

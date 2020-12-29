@@ -37,8 +37,9 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
-from view_image import DialogCodeImage  # DialogCodeImage for isinstance()
-from view_av import DialogCodeAV  # DialogCodeAV for isinstance()
+from reports import DialogReportCodes  # for isinstance()
+from view_image import DialogCodeImage  # for isinstance()
+from view_av import DialogCodeAV  # for isinstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -64,7 +65,7 @@ class DialogManageLinks(QtWidgets.QDialog):
     """
 
     parent_textEdit = None
-    tab_coding = None  # Tab widget coding tab
+    tab_coding = None  # Tab widget coding tab for updates
 
     def __init__(self, app, parent_textEdit, tab_coding):
 
@@ -157,6 +158,12 @@ class DialogManageLinks(QtWidgets.QDialog):
                 if isinstance(c, DialogCodeAV):
                     c.get_files()
                 if isinstance(c, DialogCodeText):
+                    c.get_files()
+        contents_reports = self.tab_reports.layout()
+        if contents_reports:
+            for i in reversed(range(contents_reports.count())):
+                c = contents2.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
                     c.get_files()
         self.parent_textEdit.append(_("Bad link fixed for file: ") + new_file_name + _(" Path: ") + file_path)
         self.app.delete_backup = False
