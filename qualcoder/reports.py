@@ -864,10 +864,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
-        #self.ui.listWidget_files.itemClicked.connect()
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
-        #self.ui.listWidget_cases.itemClicked.connect()
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -978,17 +976,75 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         self.display_counts()
 
-    def listwidget_files_menu(self):
+    def listwidget_files_menu(self, position):
         """ Context menu for file selection. """
 
-        #TODO
-        pass
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_all_files = menu.addAction(_("Select all files"))
+        action_files_like = menu.addAction(_("Select files like"))
+        action_files_none = menu.addAction(_("Select none"))
+        action = menu.exec_(self.ui.listWidget_files.mapToGlobal(position))
+        if action == action_all_files:
+            self.ui.listWidget_files.selectAll()
+            self.ui.listWidget_files.item(0).setSelected(False)
+        if action == action_files_none:
+            for i in range(self.ui.listWidget_files.count()):
+                self.ui.listWidget_files.item(i).setSelected(False)
+        if action == action_files_like:
+            # Input dialog narrow, so code below
+            dialog = QtWidgets.QInputDialog(None)
+            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setWindowTitle(_("Select some files"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+            dialog.setLabelText(_("Show files containing text"))
+            dialog.resize(200, 20)
+            ok = dialog.exec_()
+            if not ok:
+                return
+            text = str(dialog.textValue())
+            for i in range(self.ui.listWidget_files.count()):
+                item_name = self.ui.listWidget_files.item(i).text()
+                if text in item_name:
+                    self.ui.listWidget_files.item(i).setSelected(True)
+                else:
+                    self.ui.listWidget_files.item(i).setSelected(False)
 
-    def listwidget_cases_menu(self):
+    def listwidget_cases_menu(self, position):
         """ Context menu for case selection. """
 
-        #TODO
-        pass
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_all_cases = menu.addAction(_("Select all cases"))
+        action_cases_like = menu.addAction(_("Select cases like"))
+        action_cases_none = menu.addAction(_("Select none"))
+        action = menu.exec_(self.ui.listWidget_cases.mapToGlobal(position))
+        if action == action_all_cases:
+            self.ui.listWidget_cases.selectAll()
+            self.ui.listWidget_cases.item(0).setSelected(False)
+        if action == action_cases_none:
+            for i in range(self.ui.listWidget_cases.count()):
+                self.ui.listWidget_cases.item(i).setSelected(False)
+        if action == action_cases_like:
+            # Input dialog narrow, so code below
+            dialog = QtWidgets.QInputDialog(None)
+            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setWindowTitle(_("Select some cases"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+            dialog.setLabelText(_("Select cases containing text"))
+            dialog.resize(200, 20)
+            ok = dialog.exec_()
+            if not ok:
+                return
+            text = str(dialog.textValue())
+            for i in range(self.ui.listWidget_cases.count()):
+                item_name = self.ui.listWidget_cases.item(i).text()
+                if text in item_name:
+                    self.ui.listWidget_cases.item(i).setSelected(True)
+                else:
+                    self.ui.listWidget_cases.item(i).setSelected(False)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -1016,10 +1072,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug("item:" + str(item) + ", e:" + str(e))
 
         ''' Add child categories. Look at each unmatched category, iterate through tree
         to add as child then remove matched categories from the list. '''
@@ -1517,34 +1570,25 @@ class DialogReportCodes(QtWidgets.QDialog):
     def search(self):
         """ Search for selected codings.
         There are three main search pathways.
-        The default is based on file selection and can be restricted using the file
-        selection dialog.
-        The second pathway is based on case selection and can be restricted using the
-        case selection dialog. If cases are selected this overrides file selections that
-        the user has entered.
-        The third pathway is based on attribute selection, which may include files or cases.
+        1:  file selection only.
+        2: case selection combined with files selection. (No files selected presumes ALL files)
+        3: attribute selection, which may include files or cases.
         """
 
-        # self.ui.textEdit.blockSignals(True) - does not work when filling textedit
+        # Get variables for search: search text, coders, codes, files,cases, attributes
         try:
+            # self.ui.textEdit.blockSignals(True) - does not work when filling textedit
             self.ui.textEdit.cursorPositionChanged.disconnect(self.show_context_of_clicked_heading)
         except:
             pass
-
         coder = self.ui.comboBox_coders.currentText()
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
-
-        rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
-            self.ui.tableWidget.removeRow(0)
-
         self.get_selected_files_and_cases()
 
         # Select all code items under selected categories
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
-
         if len(items) == 0:
             mb = QtWidgets.QMessageBox()
             mb.setIcon(QtWidgets.QMessageBox.Warning)
@@ -1564,6 +1608,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             mb.exec_()
             return
 
+        # Prepare results table
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+
         # Add search terms to textEdit
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
@@ -1581,7 +1630,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.insertPlainText(codes_string)
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # Get selected codes from selected items
+        # Get selected codes
         code_ids = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
@@ -1594,10 +1643,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.av_results = []
         cur = self.app.conn.cursor()
 
-        # get coded text/images/av via selected files
+        # FILES ONLY SEARCH
         parameters = []
-        if self.file_ids != "":
-            # coded text
+        if self.file_ids != "" and self.case_ids == "":
+            # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
             sql += "code_text.owner, fid from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
@@ -1619,7 +1668,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.text_results.append(row)
 
-            # coded images
+            # Coded images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
             sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
@@ -1643,7 +1692,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.image_results.append(row)
 
-            # coded audio and video, also looks for search_text in coded segment memo
+            # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
             sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
@@ -1666,9 +1715,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.av_results.append(row)
 
-        # get coded text/images/av via selected cases
+        # CASES SEARCH
+        # Default to all files if none are selected, otherwise limit to the selected files
         if self.case_ids != "":
-            # coded text
+            # Coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
             sql += "code_text join code_name on code_name.cid = code_text.cid "
@@ -1676,6 +1726,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += "code_text.fid = case_text.fid "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
+            if self.file_ids != "":
+                sql += " and code_text.fid in (" + self.file_ids + ")"
             sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
             if coder != "":
                 sql += " and code_text.owner=? "
@@ -1683,7 +1735,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and seltext like ? "
                 parameters.append("%" + str(search_text) + "%")
-
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1692,7 +1743,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.text_results.append(row)
 
-            # coded images
+            # Coded images
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
@@ -1703,6 +1754,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += " join source on case_text.fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
+            if self.file_ids != "":
+                sql += " and source.id in (" + self.file_ids + ")"
             if coder != "":
                 sql += " and code_image.owner=? "
                 parameters.append(coder)
@@ -1719,7 +1772,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.image_results.append(row)
 
-            # coded audio and video
+            # Coded audio and video
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,source.mediapath, "
@@ -1730,6 +1783,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += " join source on case_text.fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
+            if self.file_ids != "":
+                sql += " and source.id in (" + self.file_ids + ")"
             if coder != "":
                 sql += " and code_av.owner=? "
                 parameters.append(coder)
@@ -1746,6 +1801,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.av_results.append(row)
 
+        # ATTRIBUTES ONLY SEARCH
         # get coded text and images from attribute selection
         if self.attribute_selection != []:
             logger.debug("attributes:" + str(self.attribute_selection))
@@ -1926,6 +1982,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.av_results.append(row)
 
         self.fill_text_edit_with_search_results()
+
+
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
