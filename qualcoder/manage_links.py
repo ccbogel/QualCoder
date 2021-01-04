@@ -40,6 +40,7 @@ from GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
 from reports import DialogReportCodes  # for isinstance()
 from view_image import DialogCodeImage  # for isinstance()
 from view_av import DialogCodeAV  # for isinstance()
+from view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -165,6 +166,7 @@ class DialogManageLinks(QtWidgets.QDialog):
                 c = contents2.itemAt(i).widget()
                 if isinstance(c, DialogReportCodes):
                     c.get_files()
+
         self.parent_textEdit.append(_("Bad link fixed for file: ") + new_file_name + _(" Path: ") + file_path)
         self.app.delete_backup = False
 
