@@ -59,18 +59,16 @@ class DialogReportRelations(QtWidgets.QDialog):
     This is for text only. """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
     coder_names = []
     categories = []
     codes = []
     result_relations = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
         self.parent_textEdit = parent_textEdit
         self.get_code_data()
         QtWidgets.QDialog.__init__(self)
