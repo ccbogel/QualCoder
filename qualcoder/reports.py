@@ -518,8 +518,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.selected_coders.append(coder)
         if len(self.selected_coders) == 1 and self.selected_coders[0] != coder:
             self.selected_coders.append(coder)
-
-        self.ui.label_selections.setText("Coders: " + str(self.selected_coders))
         if len(self.selected_coders) == 2:
             self.ui.pushButton_run.setEnabled(True)
 
@@ -528,7 +526,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         self.selected_coders = []
         self.ui.pushButton_run.setEnabled(False)
-        self.ui.label_selections.setText(_("Coders: None selected"))
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:  # while there is an item in the list
@@ -799,7 +796,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     # variables for search restrictions
     file_ids = ""
     case_ids = ""
-    attribute_selection = ""
+    attribute_selection = []
 
     def __init__(self, app, parent_textEdit):
         super(DialogReportCodes, self).__init__()
@@ -824,7 +821,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(treefont)
-        self.ui.label_selections.setStyleSheet(treefont)
         self.ui.label_counts.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -944,8 +940,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         Clear attribute selection.
          Called by: search """
 
-        self.attribute_selection = []
-
         selected_files = []
         self.file_ids = ""
         for item in self.ui.listWidget_files.selectedItems():
@@ -955,11 +949,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     self.file_ids += "," + str(f['id'])
         if len(self.file_ids) > 0:
             self.file_ids = self.file_ids[1:]
-        files_text = "|".join(selected_files)
-        if files_text != "":
-            self.ui.label_selections.setText(files_text)
-            # self.ui.label_selections.setText(_("Files selected: All"))
-
         selected_cases = []
         self.case_ids = ""
         for item in self.ui.listWidget_cases.selectedItems():
@@ -969,11 +958,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     self.case_ids += "," + str(c['id'])
         if len(self.case_ids) > 0:
             self.case_ids = self.case_ids[1:]
-        cases_text = "|".join(selected_cases)
-        if cases_text != "":
-            self.ui.label_selections.setText(cases_text)
-            #self.ui.label_selections.setText(_("Files selected: All"))
-
         self.display_counts()
 
     def listwidget_files_menu(self, position):
@@ -1616,18 +1600,48 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Add search terms to textEdit
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
-        parameters = self.ui.label_selections.text()
-        self.ui.textEdit.insertPlainText(_("Search parameters") + ":\n" + parameters + "\n")
+        self.ui.textEdit.insertPlainText(_("Search parameters") + "\n==========\n")
         if coder == "":
             self.ui.textEdit.insertPlainText(_("Coding by: All coders") + "\n")
         else:
             self.ui.textEdit.insertPlainText(_("Coding by: ") + coder + "\n")
-        if search_text != "":
-            self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
-        codes_string = "\n" + _("Codes: ") + "\n"
+        codes_string = _("Codes: ") + "\n"
         for i in items:
             codes_string += i.text(0) + ". "
         self.ui.textEdit.insertPlainText(codes_string)
+
+        cur = self.app.conn.cursor()
+        parameters = ""
+        if self.attribute_selection != []:
+            self.file_ids = ""
+            for i in range(self.ui.listWidget_files.count()):
+                self.ui.listWidget_files.item(i).setSelected(False)
+            self.case_ids = ""
+            for i in range(self.ui.listWidget_cases.count()):
+                self.ui.listWidget_cases.item(i).setSelected(False)
+            self.display_counts()
+            parameters += _("\nAttributes:\n")
+            for a in self.attribute_selection:
+                parameters += a[0] + " " + a[3] + " "
+                for b in a[4]:  # a[4] is a list
+                    parameters += b + ","
+                parameters += "\n"
+        if self.file_ids != "" and self.attribute_selection == []:
+            parameters += _("\nFiles:\n")
+            cur.execute("select name from source where id in (" + self.file_ids + ") order by name")
+            res = cur.fetchall()
+            for r in res:
+                parameters += r[0] + ", "
+        if self.case_ids != "":
+            parameters += _("\nCases:\n")
+            cur.execute("select name from cases where caseid in (" + self.case_ids + ") order by name")
+            res = cur.fetchall()
+            for r in res:
+                parameters += r[0] + ", "
+
+        self.ui.textEdit.insertPlainText(parameters + "\n")
+        if search_text != "":
+            self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
         self.ui.textEdit.insertPlainText("\n==========\n")
 
         # Get selected codes
@@ -1641,7 +1655,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.text_results = []
         self.image_results = []
         self.av_results = []
-        cur = self.app.conn.cursor()
 
         # FILES ONLY SEARCH
         parameters = []
@@ -1715,7 +1728,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.av_results.append(row)
 
-        # CASES SEARCH
+        # CASES AND FILES SEARCH
         # Default to all files if none are selected, otherwise limit to the selected files
         if self.case_ids != "":
             # Coded text
@@ -1982,8 +1995,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.av_results.append(row)
 
         self.fill_text_edit_with_search_results()
-
-
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
@@ -2286,7 +2297,12 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
+        for i in range(self.ui.listWidget_files.count()):
+            self.ui.listWidget_files.item(i).setSelected(False)
         self.case_ids = ""
+        for i in range(self.ui.listWidget_cases.count()):
+            self.ui.listWidget_cases.item(i).setSelected(False)
+        self.display_counts()
         ui = DialogSelectAttributeParameters(self.app)
         ok = ui.exec_()
         if not ok:
@@ -2299,7 +2315,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             label += att[0] + " " + att[3] + " "
             label += ','.join(att[4])
             label += "| "
-        self.ui.label_selections.setText(label)
         self.display_counts()
 
 
