@@ -66,18 +66,6 @@ class Ui_Dialog_reportCodings(object):
         self.label_counts.setWordWrap(True)
         self.label_counts.setObjectName("label_counts")
         self.verticalLayout.addWidget(self.groupBox)
-        self.label_selections = QtWidgets.QLabel(Dialog_reportCodings)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_selections.sizePolicy().hasHeightForWidth())
-        self.label_selections.setSizePolicy(sizePolicy)
-        self.label_selections.setMinimumSize(QtCore.QSize(0, 30))
-        self.label_selections.setMaximumSize(QtCore.QSize(16777213, 100))
-        self.label_selections.setScaledContents(True)
-        self.label_selections.setWordWrap(True)
-        self.label_selections.setObjectName("label_selections")
-        self.verticalLayout.addWidget(self.label_selections)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodings)
         self.groupBox_2.setTitle("")
         self.groupBox_2.setObjectName("groupBox_2")
@@ -126,7 +114,6 @@ class Ui_Dialog_reportCodings(object):
         self.comboBox_export.setItemText(3, _translate("Dialog_reportCodings", "odt"))
         self.comboBox_export.setItemText(4, _translate("Dialog_reportCodings", "csv"))
         self.label_counts.setText(_translate("Dialog_reportCodings", "Counts:"))
-        self.label_selections.setText(_translate("Dialog_reportCodings", "Search selections:"))
 
 
 if __name__ == "__main__":
