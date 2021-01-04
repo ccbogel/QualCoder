@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_SQL.ui'
 #
-# Created: Sun Feb 11 09:50:03 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_sql(object):
     def setupUi(self, Dialog_sql):
@@ -63,7 +64,7 @@ class Ui_Dialog_sql(object):
     def retranslateUi(self, Dialog_sql):
         _translate = QtCore.QCoreApplication.translate
         Dialog_sql.setWindowTitle(_translate("Dialog_sql", "SQL_statements"))
-        self.label.setText(_translate("Dialog_sql", "."))
+        self.label.setText(_translate("Dialog_sql", "SQL reports"))
         self.pushButton_runSQL.setText(_translate("Dialog_sql", "Run"))
         self.pushButton_export.setText(_translate("Dialog_sql", "Export to file"))
         self.comboBox_delimiter.setItemText(0, _translate("Dialog_sql", "tab"))
@@ -80,4 +81,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_sql)
     Dialog_sql.show()
     sys.exit(app.exec_())
-
