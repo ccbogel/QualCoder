@@ -83,13 +83,13 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        try:
+        '''try:
             w = int(self.app.settings['dialogreportcodefrequencies_w'])
             h = int(self.app.settings['dialogreportcodefrequencies_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
         except:
-            pass
+            pass'''
 
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
@@ -104,11 +104,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
 
-    def resizeEvent(self, new_size):
+    '''def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
         self.app.settings['dialogreportcodefrequencies_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()
+        self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()'''
 
     def select_files(self):
         """ Report code frequencies for all files or selected files. """
@@ -807,13 +807,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
-        try:
+        '''try:
             w = int(self.app.settings['dialogreportcodes_w'])
             h = int(self.app.settings['dialogreportcodes_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
         except:
-            pass
+            pass'''
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -863,11 +863,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
 
-    def resizeEvent(self, new_size):
+    '''def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
         self.app.settings['dialogreportcodes_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodes_h'] = new_size.size().height()
+        self.app.settings['dialogreportcodes_h'] = new_size.size().height()'''
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -890,8 +890,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.files = self.app.get_filenames()
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
-        sql = "select length(fulltext) from source where id=?"
-        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
+        sql = "select length(fulltext), mediapath from source where id=?"
+        sql_text_codings = "select count(cid) from code_text where fid=?"
+        sql_av_codings = "select count(cid) from code_av where id=?"
+        sql_image_codings = "select count(cid) from code_image where id=?"
         item = QtWidgets.QListWidgetItem("")
         item.setToolTip(_("No file selection"))
         self.ui.listWidget_files.addItem(item)
@@ -900,10 +902,29 @@ class DialogReportCodes(QtWidgets.QDialog):
             res = cur.fetchone()
             if res is None:  # safety catch
                 res = [0]
-            tt = "Characters: " + str(res[0])
-            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
-            res = cur.fetchone()
-            tt += "\nCodings: " + str(res[0])
+            tt = ""
+            if res[1] is None or res[1][0:5] == "docs:":
+                tt += _("Text file\n")
+                tt += _("Characters: ") + str(res[0])
+            if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
+                tt += _("Image")
+            if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
+                tt += _("Audio")
+            if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
+                tt += _("Video")
+            cur.execute(sql_text_codings, [f['id']])
+            txt_res = cur.fetchone()
+            cur.execute(sql_av_codings, [f['id']])
+            av_res = cur.fetchone()
+            cur.execute(sql_image_codings, [f['id']])
+            img_res = cur.fetchone()
+            tt += _("\nCodings: ")
+            if txt_res[0] > 0:
+                tt += str(txt_res[0])
+            if av_res[0] > 0:
+                tt += str(av_res[0])
+            if img_res[0] > 0:
+                tt += str(img_res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
             if f['memo'] is not None and f['memo'] != "":
                 tt += _("\nMemo: ") + f['memo']
@@ -1038,6 +1059,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo"), _("Count")])
+        self.ui.treeWidget.header().setToolTip(_("Codes and categories"))
         if self.app.settings['showids'] == 'False':
             self.ui.treeWidget.setColumnHidden(1, True)
         else:

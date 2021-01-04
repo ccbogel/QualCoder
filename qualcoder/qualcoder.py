@@ -501,9 +501,9 @@ class App(object):
             'dialogreportcodefrequencies_h': 0,
             'dialogreportcodes_splitter0': 1,
             'dialogreportcodes_splitter1': 1,
-            'dialogreportcodes_splitter_v0': 1,
-            'dialogreportcodes_splitter_v1': 1,
-            'dialogreportcodes_splitter_v2': 1,
+            'dialogreportcodes_splitter_v0': 30,
+            'dialogreportcodes_splitter_v1': 30,
+            'dialogreportcodes_splitter_v2': 30,
             'dialogmanagefiles_w': 0,
             'dialogmanagefiles_h': 0,
             'dialogjournals_w': 0,
@@ -858,6 +858,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
         self.ui.textEdit.append(msg)
+        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):
@@ -1449,6 +1450,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
+        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def close_project(self):
