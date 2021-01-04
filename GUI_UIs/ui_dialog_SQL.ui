@@ -42,7 +42,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>.</string>
+          <string>SQL reports</string>
          </property>
         </widget>
        </item>
