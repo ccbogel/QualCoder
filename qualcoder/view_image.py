@@ -40,14 +40,15 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
 from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
 from color_selector import DialogColorSelect
 from color_selector import colors
+from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
 from memo import DialogMemo
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -72,20 +73,19 @@ class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
-    filename = None
+    tab_reports = None  # Tab widget reports, used for updates to codes
     pixmap = None
     scene = None
     files = []
-    file_ = None
+    file_ = None  # Dictionary with name, memo, id, mediapath?
     codes = []
     categories = []
     selection = None  # Initial code rectangle point
     scale = 1.0
     code_areas = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of image files.
         On select, Show a scaleable and scrollable image.
         Can add a memo to image
@@ -95,7 +95,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         super(DialogCodeImage,self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
+        self.tab_reports = tab_reports
         self.parent_textEdit = parent_textEdit
         self.codes = []
         self.categories = []
@@ -104,13 +104,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.log = ""
         self.scale = 1.0
         self.selection = None
-        self.get_image_files()
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
-        self.ui.checkBox_show_coders.hide()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
         self.scene = QtWidgets.QGraphicsScene()
@@ -137,12 +135,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
-        for f in self.files:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
+        self.get_files()
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
-        self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -168,10 +162,12 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.splitter.setSizes([s0, 30, s1])
             h0 = int(self.app.settings['dialogcodeimage_splitter_h0'])
             h1 = int(self.app.settings['dialogcodeimage_splitter_h1'])
-            if h0 > 10 and h1 > 10:
+            if h0 > 1 and h1 > 1:
                 self.ui.splitter_2.setSizes([h0, h1])
         except:
             pass
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
 
     def closeEvent(self, event):
@@ -179,6 +175,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.app.settings['dialogcodeimage_w'] = self.size().width()
         self.app.settings['dialogcodeimage_h'] = self.size().height()
+
+    def update_sizes(self):
+        """ Called by changed splitter sizes """
+
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodeimage_splitter0'] = sizes[0]
         self.app.settings['dialogcodeimage_splitter1'] = sizes[2]
@@ -205,8 +205,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             'width': row[4], 'height': row[5], 'memo': row[6], 'date': row[7], 'owner': row[8],
             'cid': row[9]})
 
-    def get_image_files(self):
-        """ Load the image file data. Exclude those image file data where there are bad links."""
+    def get_files(self):
+        """ Load the image file data. Exclude those image file data where there are bad links.
+        Fill List widget with the files."""
 
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
@@ -215,6 +216,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if len(bl_sql) > 0:
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
+        self.ui.listWidget.clear()
         self.files = []
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
@@ -225,6 +227,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
             self.files.append(dict(zip(keys, row)))
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -359,7 +365,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
         self.app.conn.commit()
-        self.get_image_files()
+        self.get_files()
         self.ui.listWidget.clear()
         for f in self.files:
             item = QtWidgets.QListWidgetItem(f['name'])
@@ -431,6 +437,19 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.load_file()
                 break
 
+    def clear_file(self):
+        """ When image removed clear all details.
+        Called by null file in load_file, and from ManageFiles.delete. """
+
+        self.file_ = None
+        self.selection = None
+        self.scale = 1.0
+        items = list(self.scene.items())
+        for i in range(items.__len__()):
+            self.scene.removeItem(items[i])
+        self.setWindowTitle(_("Image coding"))
+        self.ui.pushButton_memo.setEnabled(False)
+
     def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
         Called by: select_image_menu, listwidgetitem_view_file
@@ -443,18 +462,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
+            self.clear_file()
             Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
             logger.warning("Cannot open image: " + source)
-            # Must remove any existing loaded images and clear variables
-            self.file_ = None
-            self.filename = None
-            self.selection = None
-            self.scale = 1.0
-            items = list(self.scene.items())
-            for i in range(items.__len__()):
-                self.scene.removeItem(items[i])
-            self.setWindowTitle(_("Image coding"))
-            self.ui.pushButton_memo.setEnabled(False)
             return
         items = list(self.scene.items())
         for i in range(items.__len__()):
@@ -467,51 +477,52 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
         self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 100  # slider and groupbox approx heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 100:
+            scale = (self.height() - 30 - 100) / self.pixmap.height()
+            slider_value = int(scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
+
         self.draw_coded_areas()
         self.fill_code_counts_in_tree()
 
     def update_dialog_codes_and_categories(self):
-        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
-        DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes as could not import the classes to test
-        against. There was an import error.
-        Using try except blocks for each instance, as instance may have been deleted.
-        """
+        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
+        Using try except blocks for each instance, as instance may have been deleted. """
 
-        for d in self.dialog_list:
-            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'view_av.DialogCodeAV'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.load_segments()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(d, DialogCodeImage):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.get_coded_areas()
-                    d.draw_coded_areas()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.get_coded_areas()
+        self.draw_coded_areas()
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    #try:
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCoderComparisons):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCodeFrequencies):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
 
     def change_scale(self):
         """ Resize image. Triggered by user change in slider.
@@ -528,15 +539,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
         self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
-
-    def show_or_hide_coders(self):
-        """ When checked call on draw_coded_areas to either show all coders codings,
-        otherwise only show current coder.
-        Change scale is called becuase all items need to be removed and then added to the
-        scene. pixmap being the first item added then the codings.
-        """
-
-        self.change_scale()
 
     def draw_coded_areas(self):
         """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
@@ -563,9 +565,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
                 if item['owner'] == self.app.settings['codername']:
-                    self.scene.addItem(rect_item)
-                if self.ui.checkBox_show_coders.isChecked() and item['owner'] != self.app.settings['codername']:
-                    rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DotLine))
                     self.scene.addItem(rect_item)
 
     def fill_code_label(self):
@@ -1407,8 +1406,20 @@ class DialogViewImage(QtWidgets.QDialog):
         self.label.setScaledContents(True)
         self.label.setPixmap(self.pixmap)
         self.ui.scrollArea.setWidget(self.label)
+        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         self.ui.textEdit.setText(self.image_data['memo'])
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 80  # slider and textedit heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 80:
+            scale = (self.height() - 30 - 80) / self.pixmap.height()
+            slider_value = int(scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
@@ -1417,9 +1428,7 @@ class DialogViewImage(QtWidgets.QDialog):
         self.app.settings['dialogviewimage_h'] = self.size().height()
 
     def change_scale(self):
-        """ Resize image. Idea from:
-        https://github.com/baoboa/pyqt5/blob/master/examples/widgets/imageviewer.py
-        """
+        """ Resize image based on slider position. """
 
         scale = (self.ui.horizontalSlider.value() + 1) / 100
         new_label = self.label.resize(scale * self.label.pixmap().size())

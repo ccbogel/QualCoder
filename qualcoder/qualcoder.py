@@ -204,7 +204,6 @@ class App(object):
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
         if result == []:
-            #print("Writing to", self.persist_path)
             with open(self.persist_path, 'w') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
@@ -252,27 +251,27 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames. As id, name """
+        """ Get all filenames. As id, name, memo """
         cur = self.conn.cursor()
-        cur.execute("select id, name from source order by lower(name)")
+        cur.execute("select id, name, memo from source order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_casenames(self):
-        """ Get all casenames. As id, name """
+        """ Get all case names. As id, name, memo. """
         cur = self.conn.cursor()
-        cur.execute("select caseid, name from cases order by lower(name)")
+        cur.execute("select caseid, name, memo from cases order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
     def get_text_filenames(self):
-        """ Get filenames of textfiles only. """
+        """ Get filenames of text files. """
 
         cur = self.conn.cursor()
         cur.execute("select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
@@ -405,6 +404,8 @@ class App(object):
         'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
         'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
         'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
+        'dialogreportcodes_splitter_v0', 'dialogreportcodes_splitter_v1',
+        'dialogreportcodes_splitter_v2',
         'dialogjournals_splitter0', 'dialogjournals_splitter1', 'dialogsql_splitter_h0',
         'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
         'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
@@ -500,6 +501,9 @@ class App(object):
             'dialogreportcodefrequencies_h': 0,
             'dialogreportcodes_splitter0': 1,
             'dialogreportcodes_splitter1': 1,
+            'dialogreportcodes_splitter_v0': 1,
+            'dialogreportcodes_splitter_v1': 1,
+            'dialogreportcodes_splitter_v2': 1,
             'dialogmanagefiles_w': 0,
             'dialogmanagefiles_h': 0,
             'dialogjournals_w': 0,
@@ -606,7 +610,7 @@ class MainWindow(QtWidgets.QMainWindow):
     """
 
     project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
-    dialogList = []  # keeps active and track of non-modal windows
+    #dialog_list = []  # keeps active and track of non-modal windows
     recent_projects = []  # a list of recent projects for the qmenu
 
     def __init__(self, app, force_quit=False):
@@ -667,7 +671,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setShortcut('Alt+A')
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
         self.ui.actionImport_survey.setShortcut('Alt+I')
-        self.ui.actionManage_bad_links_to_files.triggered.connect(self.fix_bad_file_links)
+        self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
 
         # codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
@@ -854,14 +858,13 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
         self.ui.textEdit.append(msg)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):
         """ Run SQL statements on database. """
 
         ui = DialogSQL(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     """def text_mining(self):
         ''' text analysis of files / cases / codings.
@@ -874,89 +877,49 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogReportCoderComparisons":
-                d.show()
-                d.activateWindow()
-                return
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogReportCodeFrequencies":
-                d.show()
-                d.activateWindow()
-                return
-
-        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_relations(self):
         """ Show code relations in text files. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogReportRelations":
-                d.show()
-                d.activateWindow()
-                return
-        ui = DialogReportRelations(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        ui = DialogReportRelations(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
         """ Report on coding and categories. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogReportCodes":
-                d.show()
-                d.activateWindow()
-                return
-
-        ui = DialogReportCodes(self.app, self.ui.textEdit, self.dialogList)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        ui = DialogReportCodes(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
         """ Show acyclic graph of codes and categories. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "ViewGraphOriginal":
-                d.show()
-                d.activateWindow()
-                return
         ui = ViewGraphOriginal(self.app)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        ui.exec_()
 
     def help(self):
         """ Display manual in browser. """
 
         webbrowser.open(path + "/GUI/QualCoder_Manual.pdf")
-        self.clean_dialog_refs()
 
     def about(self):
         """ About dialog. """
 
         ui = DialogInformation(self.app, "About", "")
         ui.exec_()
-        self.clean_dialog_refs()
 
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
-        ui.exec_()
-        self.clean_dialog_refs()
+        self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
@@ -966,43 +929,29 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         ui.exec_()
-        self.clean_dialog_refs()
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogCases":
-                d.show()
-                d.activateWindow()
-                return
         ui = DialogCases(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_files(self):
         """ Create text files or import files from odt, docx, html and
         plain text. Rename, delete and add memos to files.
         """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogManageFiles":
-                d.show()
-                d.activateWindow()
-                return
-        ui = DialogManageFiles(self.app, self.ui.textEdit)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
+        self.tab_layout_helper(self.ui.tab_manage, ui)
 
-    def fix_bad_file_links(self):
-        """ Fix any bad links to files. """
+    def manage_bad_file_links(self):
+        """ Fix any bad links to files.
+        File names must match but paths can be different. """
 
-        ui = DialogManageLinks(self.app, self.ui.textEdit)
-        ui.exec_()
-        self.clean_dialog_refs()
+        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
+        self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
         if bad_links == []:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
@@ -1010,107 +959,73 @@ class MainWindow(QtWidgets.QMainWindow):
     def journals(self):
         """ Create and edit journals. """
 
-        for d in self.dialogList:
-            # Had to add this code to fix error:
-            # __main__.clean_dialog_refs wrapped C/C++ object of type DialogJournals has been deleted
-            if type(d).__name__ == "DialogJournals":
-                try:
-                    d.show()
-                    d.activateWindow()
-                    return
-                except Exception as e:
-                    logger.debug(str(e))
-
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.dialogList.append(ui)
-        ui.show()
-        self.clean_dialog_refs()
+        self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def text_coding(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
         text in imported text files. """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogCodeText":
-                try:
-                    d.show()
-                    d.activateWindow()
-                except RuntimeError as e:
-                    self.dialogList.remove(d)
-                return
-
         files = self.app.get_text_filenames()
         if len(files) > 0:
-            ui = DialogCodeText(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
-            ui.show()
+            self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec_()
-            '''mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No text files'))
-            mb.setText(msg)
-            mb.exec_()'''
-        self.clean_dialog_refs()
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogCodeImage":
-                try:
-                    d.show()
-                    d.activateWindow()
-                except:
-                    self.dialogList.remove(d)
-                return
         files = self.app.get_image_filenames()
         if len(files) > 0:
-            ui = DialogCodeImage(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
-            ui.show()
+            self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no image files.")
             Message(self.app, _('No image files'), msg).exec_()
-        self.clean_dialog_refs()
 
     def av_coding(self):
-        """ Create edit and delete codes. Apply and remove codes to segements of the
+        """ Create edit and delete codes. Apply and remove codes to segments of the
         audio or video file. Added try block in case VLC bindings do not work. """
-
-        for d in self.dialogList:
-            if type(d).__name__ == "DialogCodeAV":
-                try:
-                    d.show()
-                    d.activateWindow()
-                except Exception as e:
-                    try:
-                        self.dialogList.remove(d)
-                    except:
-                        pass
-                return
 
         files = self.app.get_av_filenames()
         if len(files) == 0:
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec_()
-            self.clean_dialog_refs()
             return
         try:
-            ui = DialogCodeAV(self.app, self.ui.textEdit, self.dialogList)
+            ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-            self.dialogList.append(ui)
-            ui.show()
+            self.tab_layout_helper(self.ui.tab_coding, ui)
         except Exception as e:
             logger.debug(str(e))
             print(e)
             QtWidgets.QMessageBox.warning(None, "A/V Coding", str(e), QtWidgets.QMessageBox.Ok)
-        self.clean_dialog_refs()
+
+    def tab_layout_helper(self, tab_widget, ui):
+        """ Used when loading a coding, report or manage dialog  in to a tab widget.
+         Add widget if no layout.
+         If there is a layout, then remove all widgets from it and add the new widget. """
+
+        self.ui.tabWidget.setCurrentWidget(tab_widget)
+        # Check the tab has a layout and widgets
+        contents = tab_widget.layout()
+        if contents:
+            # Remove widgets from layout
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+            contents.addWidget(ui)
+        else:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            tab_widget.setLayout(layout)
 
     def codebook(self):
         """ Export a text file code book of categories and codes.
@@ -1122,8 +1037,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
          CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
-         CURRENTLY WORKING ON AT 2 Gb FILE SIZE LIMITS AND USE OF
-         ABSOLUTE PATHS FOR EXPORT
+         NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
         """
 
         Refi_export(self.app, self.ui.textEdit, "project")
@@ -1147,8 +1061,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard.
-        TODO test relative paths on import
-        TODO transcript import - needs work and testing
+        CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
+         NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
          """
 
         self.close_project()
@@ -1195,8 +1109,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if reply == QtWidgets.QMessageBox.Yes:
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
-                self.dialogList = None
-
+                #self.dialog_list = None
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -1288,6 +1201,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         # new project, so tell open project NOT to backup, as there will be nothing in there to backup
         self.open_project(self.app.project_path, "yes")
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def change_settings(self):
         """ Change default settings - the coder name, font, font size.
@@ -1303,21 +1217,33 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         if current_coder != self.app.settings['codername']:
+            self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
             # Close all opened dialogs as coder name needs to change everywhere
-            self.clean_dialog_refs()
-            for d in self.dialogList:
-                d.destroy()
-                self.dialogList = []
+            # Remove widgets from each tab
+            contents = self.ui.tab_reports.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+            contents = self.ui.tab_coding.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+            contents = self.ui.tab_manage.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
 
     def project_memo(self):
-        """ Give the entire project a memo. Modal dialog. """
+        """ Give the entire project a memo. """
 
         cur = self.app.conn.cursor()
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
             memo)
-        self.dialogList.append(ui)
         ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
@@ -1422,7 +1348,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
-        msg = "\n========\n" + _("Project Opened: ") + self.app.project_name
+        msg = "\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
@@ -1523,11 +1449,33 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def close_project(self):
-        """ Close an open project. """
+        """ Close an open project.
+        Remove widgets from tabs, clear dialog list. Close app connection.
+        Delete old backups. Hide menu options. """
 
-        self.ui.textEdit.append("Closing project: " + self.app.project_name + "\n========\n")
+        # Remove widgets from each tab
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        # Added if statement for the first opening of QualCoder. Otherwise looks odd.
+        if self.app.project_name != "":
+            self.ui.textEdit.append("Closing project: " + self.app.project_name)
+            self.ui.textEdit.append("========\n")
         try:
             self.app.conn.commit()
             self.app.conn.close()
@@ -1543,12 +1491,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.delete_backup = True
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
-        self.clean_dialog_refs()
-        for d in self.dialogList:
-            d.destroy()
-            self.dialogList = []
         self.setWindowTitle("QualCoder")
         self.app.write_config_ini(self.app.settings)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
@@ -1592,43 +1537,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.textEdit.append(_("Deleting: " + f))
             except Exception as e:
                 print(str(e))
-
-    def clean_dialog_refs(self):
-        """ Test the list of dialog refs to see if they have been cleared
-        and create a new list of current dialogs.
-        Also need to keep these dialog references to keep non-modal dialogs open.
-        Non-modal example - having a journal open and a coding dialog. """
-
-        tempList = []
-        for d in self.dialogList:
-            try:
-                #logger.debug(str(d) + ", isVisible:" + str(d.isVisible()) + " Title:" + d.windowTitle())
-                if d.isVisible():
-                    tempList.append(d)
-            # RuntimeError: wrapped C/C++ object of type DialogSQL has been deleted
-            except RuntimeError as e:
-                #logger.error(str(e))
-                pass
-        self.dialogList = tempList
-        self.update_dialog_lists_in_modeless_dialogs()
-
-    def update_dialog_lists_in_modeless_dialogs(self):
-        """ This is to assist: Update code and category tree in DialogCodeImage,
-        DialogCodeAV, DialogCodeText, DialogReportCodes """
-
-        for d in self.dialogList:
-            if isinstance(d, DialogCodeText):
-                d.dialog_list = self.dialogList
-            if isinstance(d, DialogCodeAV):
-                d.dialog_list = self.dialogList
-            if isinstance(d, DialogCodeImage):
-                d.dialog_list = self.dialogList
-            if isinstance(d, DialogReportCodes):
-                d.dialog_list = self.dialogList
-            if isinstance(d, DialogCases):
-                d.dialog_list = self.dialogList
-            if isinstance(d, DialogManageFiles):
-                d.dialog_list = self.dialogList
 
     def get_latest_github_release(self):
         """ Get latest github release.

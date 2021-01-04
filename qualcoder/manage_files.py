@@ -65,6 +65,7 @@ from ebooklib import epub
 
 from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
+from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
@@ -73,8 +74,9 @@ from helpers import Message
 from html_parser import *
 from memo import DialogMemo
 from select_items import DialogSelectItems
-from view_image import DialogViewImage
-from view_av import DialogViewAV
+from view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
+from view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
+from reports import DialogReportCodes  # for isInstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -105,6 +107,9 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     source = []
     app = None
+    parent_textEdit = None
+    tab_coding = None  # Tab widget coding tab for updates
+    tab_reports = None  # Tab widget reports for updates
     text_view = None
     header_labels = []
     NAME_COLUMN = 0
@@ -114,15 +119,16 @@ class DialogManageFiles(QtWidgets.QDialog):
     rows_hidden = False
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
-    parent_textEdit = None
-    dialog_list = []
+    dialog_list = []  # Used for opened image , text and AV dialogs
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textEdit, tab_coding, tab_reports):
 
         sys.excepthook = exception_handler
         self.app = app
         self.default_import_directory = self.app.settings['directory']
         self.parent_textEdit = parent_textEdit
+        self.tab_coding = tab_coding
+        self.tab_reports = tab_reports
         self.attributes = []
         self.dialog_list = []
         QtWidgets.QDialog.__init__(self)
@@ -330,11 +336,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set mediapath=? where id=?", [new_mediapath, id_])
         self.parent_textEdit.append(msg)
         self.app.conn.commit()
-        # Reload data and refill the table
+        self.update_files_in_dialogs()
         self.load_file_data()
+        self.app.delete_backup = False
 
     def button_import_linked_file(self):
-        """ User presses button to import linked file.
+        """ User presses button to import a linked file into the project folder.
         Only to work with an importable file. """
 
         row = self.ui.tableWidget.currentRow()
@@ -350,7 +357,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.import_linked_file(id_, mediapath)
 
     def import_linked_file(self, id_, mediapath):
-        """ Import linked file and change mediapath details. """
+        """ Import a linked file into the project folder, and change mediapath details. """
 
         name_split1 = mediapath.split(":")[1]
         filename = name_split1.split('/')[-1]
@@ -370,8 +377,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set mediapath=? where id=?", [mediapath, id_])
         self.app.conn.commit()
-        # Reload data and refill the table
+        self.update_files_in_dialogs()
         self.load_file_data()
+        self.app.delete_backup = False
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.
@@ -643,36 +651,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        '''if y == self.NAME_COLUMN:
-            new_text = str(self.ui.tableWidget.item(x, y).text()).strip()
-            # check that no other source file has this text and this is is not empty
-            update = True
-            if new_text == "":
-                update = False
-            for c in self.source:
-                if c['name'] == new_text:
-                    update = False
-            # .transcribed suffix is not to be used on a media file
-            if new_text[-12:] == ".transcribed" and self.source[x]['mediapath'] is not None:
-                update = False
-            # Need to preserve names of a/v files and their
-            # dependent transcribed files: filename.type.transcribed
-            if update:
-                if self.source[x]['mediapath'] is not None and self.source[x]['mediapath'][:2] in ('/a', '/v'):
-                    msg = _("If there is an associated '.transcribed' file please rename ")
-                    msg += _("it to match the media file plus '.transcribed'")
-                    QtWidgets.QMessageBox.warning(None, "Media name", msg)
-                if self.source[x]['name'][-12:] == ".transcribed":
-                    msg = _("If there is an associated media file please rename ")
-                    msg += _("it to match the media file before the '.transcribed' suffix")
-                    QtWidgets.QMessageBox.warning(None, _("Media name"), msg)
-                # update source list and database
-                self.source[x]['name'] = new_text
-                cur = self.app.conn.cursor()
-                cur.execute("update source set name=? where id=?", (new_text, self.source[x]['id']))
-                self.app.conn.commit()
-            else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.source[x]['name'])'''
+
         # update attribute value
         if y > self.ID_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
@@ -1100,7 +1079,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
-
+        self.update_files_in_dialogs()
         self.parent_textEdit.append(_("File created: ") + entry['name'])
         self.source.append(entry)
         self.fill_table()
@@ -1226,10 +1205,32 @@ class DialogManageFiles(QtWidgets.QDialog):
                         self.load_file_text(f, "docs:" + link_path)
                     except Exception as e:
                         Message(self.app, _('Unknown file type'),  _("Cannot import file") + ":\n" + f, "warning")
-
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
+        self.update_files_in_dialogs()
+
+    def update_files_in_dialogs(self):
+        """ Update files list in any opened dialogs:
+         DialogReportCodes, DialogCodeText, DialogCodeAV, DialogCodeImage """
+
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeImage):
+                    c.get_files()
+                if isinstance(c, DialogCodeAV):
+                    c.get_files()
+                if isinstance(c, DialogCodeText):
+                    c.get_files()
+        contents = self.tab_reports.layout()
+        if contents:
+            # Examine widgets in layout
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    c.get_files_and_cases()
 
     def load_media_reference(self, mediapath):
         """ Load media reference information for audio, video, images.
@@ -1617,6 +1618,21 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_av where id = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
                 self.app.conn.commit()
+
+                # Delete the .transcribed text file
+                transcribed = s['name'] + ".transcribed"
+                print("transcribed ", transcribed)
+                cur.execute("select id from source where name=?", [transcribed])
+                res = cur.fetchone()
+                if res is not None:
+                    cur.execute("delete from source where id = ?", [res[0]])
+                    cur.execute("delete from code_text where fid = ?", [res[0]])
+                    cur.execute("delete from annotation where fid = ?", [res[0]])
+                    cur.execute("delete from case_text where fid = ?", [res[0]])
+                    cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                    self.app.conn.commit()
+
+        self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_textEdit.append(msg)
         self.load_file_data()
@@ -1661,6 +1677,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from case_text where fid = ?", [file_id])
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
+
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Remove avid links in code_text
@@ -1684,6 +1701,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_av where id = ?", [file_id])
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
+
+            # Delete the .transcribed text file
+            transcribed = self.source[row]['name'] + ".transcribed"
+            print("transcribed ", transcribed)
+            cur.execute("select id from source where name=?", [transcribed])
+            res = cur.fetchone()
+            if res is not None:
+                cur.execute("delete from source where id = ?", [res[0]])
+                cur.execute("delete from code_text where fid = ?", [res[0]])
+                cur.execute("delete from annotation where fid = ?", [res[0]])
+                cur.execute("delete from case_text where fid = ?", [res[0]])
+                cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                self.app.conn.commit()
+
+        self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_textEdit.append(_("Deleted file: ") + self.source[row]['name'])
         self.load_file_data()

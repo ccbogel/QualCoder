@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
@@ -36,6 +36,7 @@ import logging
 import traceback
 
 from GUI.ui_dialog_SQL import Ui_Dialog_sql
+from helpers import Message
 from highlighter import Highlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -68,6 +69,7 @@ class DialogSQL(QtWidgets.QDialog):
     results = None  # SQL results
     queryTime = ""  # for label tooltip
     queryFilters = ""  # for label tooltip
+    cell_value = ""
 
     def __init__(self, app, parent_textEdit):
 
@@ -124,12 +126,18 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.splitter_2.setSizes([s0, s1])
         except:
             pass
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
 
         self.app.settings['dialogsql_w'] = self.size().width()
         self.app.settings['dialogsql_h'] = self.size().height()
+
+    def update_sizes(self):
+        """ Called by splitter resized """
+
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogsql_splitter_h0'] = sizes[0]
         self.app.settings['dialogsql_splitter_h1'] = sizes[1]
@@ -146,7 +154,7 @@ class DialogSQL(QtWidgets.QDialog):
         try:
             cur.execute(sql)
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, 'SQL error', str(e))
+            Message(self.app, _("SQL error"), str(e), "warning").exec_()
             return
 
         results = cur.fetchall()
@@ -198,26 +206,23 @@ class DialogSQL(QtWidgets.QDialog):
         f.close()
         self.parent_textEdit.append(_("SQL Results exported to: ") + filename)
         self.parent_textEdit.append(_("Query:") + "\n" + sql)
-        mb = QtWidgets.QMessageBox()
-        mb.setWindowTitle(_("Text file export"))
-        mb.setText(filename)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.exec_()
+        Message(self.app, _("Text file export"), filename, "information").exec_()
 
     def get_item(self):
         """ Get the selected table name or tablename.fieldname and add to the sql text
-        at the current cursor position. """
+        at the current cursor position.
+        Also get a prepared query and replace sql text in the text edit. """
 
         item_text = self.ui.treeWidget.currentItem().text(0)
         index = self.ui.treeWidget.currentIndex()
-        #logger.debug("item index:" + index.row(), index.parent().row())
         if index.parent().row() != -1:  # there is a parent if not -1
             item_parent = self.ui.treeWidget.itemFromIndex(index.parent())
             item_parent_text = item_parent.text(0)
-            if item_parent_text != "-- Joins --":
+            if item_parent_text != "-- Query --":
                 item_text = item_parent_text + "." + item_text
+            if item_parent_text == "-- Query --":
+                self.ui.textEdit_sql.clear()
         cursor = self.ui.textEdit_sql.textCursor()
-        #logger.debug("Cursor position:" + cursor.position())
         cursor.insertText(" " + item_text + " ")
 
     def run_SQL(self):
@@ -282,7 +287,7 @@ class DialogSQL(QtWidgets.QDialog):
             if sqlString.find("CREATE ") == 0 or sqlString.find("DROP ") == 0 or sqlString.find("ALTER ") == 0:
                 self.get_schema_update_treeWidget()
         except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
-            QtWidgets.QMessageBox.critical(None, _('Error'), str(e), QtWidgets.QMessageBox.Ok)
+            Message(self.app, _("Error"), str(e), "warning").exec_()
             self.ui.label.setText(_("SQL Error"))
             self.ui.label.setToolTip(str(e))
         self.results = None
@@ -293,57 +298,56 @@ class DialogSQL(QtWidgets.QDialog):
         The schema needs to be updated when drop table or create queries are run. """
 
         self.schema = []
-        tableDict = {}
+        table_dict = {}
         cur = self.app.conn.cursor()
         cur.execute("SELECT sql, type, name FROM sqlite_master WHERE type IN ('table', 'view') ")
         result = cur.fetchall()
         for row in result:
-            tableName = row[2]
+            table_name = row[2]
             fields = []
-            fieldResults = cur.execute("PRAGMA table_info(" + tableName + ")")
+            field_results = cur.execute("PRAGMA table_info(" + table_name + ")")
             # each field is a tuple of cid, name, type (integer, text, ), notNull (1=notNull),
             # defaultValue(None usually), primaryKey(as integers 1 up, or 0)
-            for field in fieldResults:
+            for field in field_results:
                 fields.append(field)
-            tableDict[tableName] = fields
-        self.schema = tableDict
+            table_dict[table_name] = fields
+        self.schema = table_dict
 
-        # update tables and views in tree widget
-        tablesAndViews = []
+        # Fill tree widget with tables and views
+        tables_and_views = []
         for k in self.schema.keys():
-            tablesAndViews.append(k)
-        tablesAndViews.sort()
+            tables_and_views.append(k)
+        tables_and_views.sort()
         self.ui.treeWidget.clear()
-        for tableName in tablesAndViews:
-            topItem = QtWidgets.QTreeWidgetItem()
-            topItem.setText(0, tableName)
-            result = cur.execute("SELECT type FROM sqlite_master WHERE name='" + tableName + "' ")
-            tableOrView = result.fetchone()[0]
-            if tableOrView == "view":
-                topItem.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
-            self.ui.treeWidget.addTopLevelItem(topItem)
-            for field in self.schema[tableName]:
-                fieldItem = QtWidgets.QTreeWidgetItem()
-                if tableOrView == "view":
-                    fieldItem.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
+        for table_name in tables_and_views:
+            top_item = QtWidgets.QTreeWidgetItem()
+            top_item.setText(0, table_name)
+            result = cur.execute("SELECT type FROM sqlite_master WHERE name='" + table_name + "' ")
+            table_or_view = result.fetchone()[0]
+            if table_or_view == "view":
+                top_item.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
+            self.ui.treeWidget.addTopLevelItem(top_item)
+            for field in self.schema[table_name]:
+                field_item = QtWidgets.QTreeWidgetItem()
+                if table_or_view == "view":
+                    field_item.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
                 if field[5] > 0:
-                    fieldItem.setForeground(0, QtGui.QBrush(Qt.red))
-                fieldItem.setText(0, field[1])
-                topItem.addChild(fieldItem)
+                    field_item.setForeground(0, QtGui.QBrush(Qt.red))
+                field_item.setText(0, field[1])
+                top_item.addChild(field_item)
 
-        # add join syntax
-        joinItem = QtWidgets.QTreeWidgetItem()
-        joinItem.setText(0, "-- Joins --")
-        self.ui.treeWidget.addTopLevelItem(joinItem)
-        for join in EXTRA_SQL:
-            jItem = QtWidgets.QTreeWidgetItem()
-            jItem.setText(0, join)
-            joinItem.addChild(jItem)
+        # Add prepared query sqls
+        query_item = QtWidgets.QTreeWidgetItem()
+        query_item.setText(0, "-- Query --")
+        self.ui.treeWidget.addTopLevelItem(query_item)
+        for query in EXTRA_SQL:
+            item = QtWidgets.QTreeWidgetItem()
+            item.setText(0, query)
+            query_item.addChild(item)
 
-    # sql text edit widget context menu
     def sql_menu(self, position):
-        """ add context menu to textedit_sql
-         includes:cut ctrlX copy ctrlC paste ctrlV delete select_all ctrlA. """
+        """ Context menu to textedit_sql
+         Cut Ctrl + X, Copy Ctrl + C, Paste Ctrl + V, Delete, Ctrl + A selectall. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -351,7 +355,7 @@ class DialogSQL(QtWidgets.QDialog):
         action_copy = menu.addAction(_("Copy"))
         action_paste = menu.addAction(_("Paste"))
         action_delete = menu.addAction(_("Delete"))
-        action_SQL_SelectAllFrom = menu.addAction("SELECT * FROM ")
+        action_SelectAllFrom = menu.addAction("SELECT * FROM ")
         action = menu.exec_(self.ui.textEdit_sql.mapToGlobal(position))
         cursor = self.ui.textEdit_sql.textCursor()
 
@@ -367,26 +371,22 @@ class DialogSQL(QtWidgets.QDialog):
             beginText = self.ui.textEdit_sql.toPlainText()[0:start]
             endText = self.ui.textEdit_sql.toPlainText()[end:len(self.ui.textEdit_sql.toPlainText())]
             self.ui.textEdit_sql.setText(beginText + endText)
-
         if action == action_paste:
             clipboard = QtWidgets.QApplication.clipboard()
             text = clipboard.text()
             cursor.insertText(text)
-
         if action == action_copy:
             text = cursor.selectedText()
             text = str(text)
             clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(text)
-
         if action == action_SelectAll:
             clipboard = QtWidgets.QApplication.clipboard()
             cursor.setPosition(0)
             cursor.setPosition(len(self.ui.textEdit_sql.toPlainText()),
                 QtGui.QTextCursor.KeepAnchor)
             self.ui.textEdit_sql.setTextCursor(cursor)
-
-        if action == action_SQL_SelectAllFrom:
+        if action == action_SelectAllFrom:
             cursor.insertText("SELECT * FROM ")
 
     # start table results context menu section
@@ -398,15 +398,14 @@ class DialogSQL(QtWidgets.QDialog):
         try:
             self.row = self.ui.tableWidget_results.currentRow()
             self.col = self.ui.tableWidget_results.currentColumn()
-            #print(self.row, self.col)
-            self.cellValue = str(self.ui.tableWidget_results.item(self.row, self.col).text())
+            self.cell_value = str(self.ui.tableWidget_results.item(self.row, self.col).text())
         except AttributeError as e:
             logger.warning("No table for table menu: " + str(e))
             return
 
         ActionShowAllRows = menu.addAction(_("Clear filter"))
         ActionShowAllRows.triggered.connect(self.show_all_rows)
-        ActionFilterOnCellValue = menu.addAction(_("Filter equals: ") + str(self.cellValue))
+        ActionFilterOnCellValue = menu.addAction(_("Filter equals: ") + str(self.cell_value))
         ActionFilterOnCellValue.triggered.connect(self.filter_cell_value)
         ActionFilterOnTextLike = menu.addAction(_("Filter on text like"))
         ActionFilterOnTextLike.triggered.connect(self.filter_text_like)
@@ -437,7 +436,7 @@ class DialogSQL(QtWidgets.QDialog):
         """ Hide rows where cells in the column do not contain the text fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cellValue))
+        QtWidgets.QLineEdit.Normal, str(self.cell_value))
         if ok and text != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().find(text) == -1:
@@ -450,7 +449,7 @@ class DialogSQL(QtWidgets.QDialog):
         """ Hide rows where cells in the column do not contain the text start fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cellValue))
+        QtWidgets.QLineEdit.Normal, str(self.cell_value))
         if ok and text != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().startswith(text) is False:
@@ -464,10 +463,10 @@ class DialogSQL(QtWidgets.QDialog):
         """ Hide rows that do not have the selected cell value. """
 
         for r in range(0, self.ui.tableWidget_results.rowCount()):
-            if self.ui.tableWidget_results.item(r, self.col).text() != self.cellValue:
+            if self.ui.tableWidget_results.item(r, self.col).text() != self.cell_value:
                 self.ui.tableWidget_results.setRowHidden(r, True)
         self.ui.label.setText(str(len(self.file_data) - 1) + _(" rows [filtered]"))
-        self.queryFilters += "\n" + str(self.ui.tableWidget_results.horizontalHeaderItem(self.col).text()) + _(" equals: ") + str(self.cellValue)
+        self.queryFilters += "\n" + str(self.ui.tableWidget_results.horizontalHeaderItem(self.col).text()) + _(" equals: ") + str(self.cell_value)
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
 
     def show_all_rows(self):
@@ -491,11 +490,11 @@ if __name__ == "__main__":
 
 
 class NewTableWidget(QtWidgets.QTableWidget):
-    ''' This extends the table widget by adding a context menu and associated actions. '''
+    """ This extends the table widget by adding a context menu and associated actions. """
 
     row = None
     col = None
-    cellValue = None
+    cell_value = None
 
     def __init__(self, parent=None):
         super(NewTableWidget, self).__init__(parent)
@@ -506,14 +505,14 @@ class NewTableWidget(QtWidgets.QTableWidget):
         try:
             self.row = self.currentRow()
             self.col = self.currentColumn()
-            self.cellValue = str(self.item(self.row, self.col).text())
+            self.cell_value = str(self.item(self.row, self.col).text())
         except AttributeError as e:
             logger.warning("No table for menu: " + str(e))
             return
 
         ActionShowAllRows = menu.addAction(_("Clear filter"))
         ActionShowAllRows.triggered.connect(self.show_all_rows)
-        ActionFilterOnCellValue = menu.addAction(_("Filter equals: ") + str(self.cellValue))
+        ActionFilterOnCellValue = menu.addAction(_("Filter equals: ") + str(self.cell_value))
         ActionFilterOnCellValue.triggered.connect(self.filter_cell_value)
         ActionFilterOnTextLike = menu.addAction(_("Filter on text like"))
         ActionFilterOnTextLike.triggered.connect(self.filter_text_like)
@@ -526,20 +525,20 @@ class NewTableWidget(QtWidgets.QTableWidget):
         menu.exec_(event.globalPos())
 
     def sort_ascending(self):
-        ''' Sort rows on selected column in ascending order. '''
+        """ Sort rows on selected column in ascending order. """
 
         self.sortItems(self.col, QtCore.Qt.AscendingOrder)
 
     def sort_descending(self):
-        ''' Sort rows on selected column in descending order. '''
+        """ Sort rows on selected column in descending order. """
 
         self.sortItems(self.col, QtCore.Qt.DescendingOrder)
 
     def filter_text_like(self):
-        ''' Hide rows where cells in the column do not contain the text fragment. '''
+        """ Hide rows where cells in the column do not contain the text fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cellValue))
+        QtWidgets.QLineEdit.Normal, str(self.cell_value))
         if ok and text != '':
             #logger.debug(text)
             for r in range(0, self.rowCount()):
@@ -547,10 +546,10 @@ class NewTableWidget(QtWidgets.QTableWidget):
                     self.setRowHidden(r, True)
 
     def filter_text_starts_with(self):
-        ''' Hide rows where cells in the column do not contain the text start fragment. '''
+        """ Hide rows where cells in the column do not contain the text start fragment. """
 
         text, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cellValue))
+        QtWidgets.QLineEdit.Normal, str(self.cell_value))
         if ok and text != '':
             #logger.debug(text)
             for r in range(0, self.rowCount()):
@@ -558,29 +557,29 @@ class NewTableWidget(QtWidgets.QTableWidget):
                     self.setRowHidden(r, True)
 
     def filter_cell_value(self):
-        ''' Hide rows that do not have the selected cell value. '''
+        """ Hide rows that do not have the selected cell value. """
 
         for r in range(0, self.rowCount()):
-            if str(self.item(r, self.col).text()) != self.cellValue:
+            if str(self.item(r, self.col).text()) != self.cell_value:
                 self.setRowHidden(r, True)
 
     def show_all_rows(self):
-        ''' Remove all hidden rows. '''
+        """ Remove all hidden rows. """
 
         for r in range(0, self.rowCount()):
                 self.setRowHidden(r, False)
 
 
 class TableWidgetItem(QtWidgets.QTableWidgetItem):
-    ''' A sorting method that works. From:
+    """ A sorting method that works. From:
         http://www.tagwith.com/question_868979_sort-string-column-in-pyqtqtablewidget-based-on-non-string-value
-        With some modification for unicode and numerics '''
+        With some modification for unicode and numerics """
 
     def __init__(self, value):
         super(TableWidgetItem, self).__init__(value)
 
     def __lt__(self, other):
-        ''' not sure about the if statement ?'''
+        """ Not sure about the if isinstance statement. """
 
         if (isinstance(other, TableWidgetItem)):
             try:

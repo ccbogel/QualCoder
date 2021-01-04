@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
-    <height>515</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,25 +18,30 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_coding">
        <attribute name="title">
-        <string>Action log</string>
+        <string>Coding</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_reports">
+       <attribute name="title">
+        <string>Reports</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_manage">
+       <attribute name="title">
+        <string>Manage</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_action_log">
+       <attribute name="title">
+        <string>Action Log</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QTextEdit" name="textEdit"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Temporary notes</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="textEdit_notes"/>
         </item>
        </layout>
       </widget>
@@ -49,7 +54,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>602</width>
+     <width>1024</width>
      <height>22</height>
     </rect>
    </property>
