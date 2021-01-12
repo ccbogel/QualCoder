@@ -1,5 +1,5 @@
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 and pyqt5.
+QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt5.
 
 QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
@@ -63,7 +63,7 @@ This will install QualCoder in the /usr/share directory and create a launcher. A
 
 ### Windows: 
 
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3.
+Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3. Minumum version python 3.6.
 
 Install dependencies in the command prompt:
 
@@ -136,7 +136,7 @@ Required:
 
 * Pillow
 
-* six
+* six  (Mac OS)
 
 * ebooklib
 
@@ -148,13 +148,12 @@ Required:
 
 * openpyxl
 
-* qpdf
+* qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 
 ## Future plans
-* Improve packaging for easier installation: currently investigating use of pyinstaller - without success.
+* Improve packaging for easier installation: currently investigating use of pyinstaller - without success so far.
 * Change from pdfminer.six to pdfminer3
-* Look at RQDA Relation function and Profile matrix function.
 * Possibly look at use with R.
 * Reports:
         Word count report maybe
