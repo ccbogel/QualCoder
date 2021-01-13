@@ -254,11 +254,11 @@ class DialogCodeText(QtWidgets.QWidget):
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
 
-    def closeEvent(self, event):
+    '''def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
 
         self.app.settings['dialogcodetext_w'] = self.size().width()
-        self.app.settings['dialogcodetext_h'] = self.size().height()
+        self.app.settings['dialogcodetext_h'] = self.size().height()'''
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -800,7 +800,7 @@ class DialogCodeText(QtWidgets.QWidget):
         ActionMoveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             ActionItemChangeColor = menu.addAction(_("Change code color"))
-            ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
+            ActionShowCodedMedia = menu.addAction(_("Show coded files"))
             ActionMoveCode = menu.addAction(_("Move code to"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
@@ -1014,9 +1014,17 @@ class DialogCodeText(QtWidgets.QWidget):
                 end_pos = index['pos1']
                 found_larger = True
                 break
-        if not found_larger:
+        if not found_larger and indexes == []:
             return
-
+        # loop around to highest index
+        if not found_larger and indexes != []:
+            cur_pos = indexes[0]['pos0']
+            end_pos = indexes[0]['pos1']
+        if not found_larger:
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(0)
+            self.ui.textEdit.setTextCursor(cursor)
+            return
         self.unlight()
         self.highlight(cid)
 
@@ -1065,9 +1073,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 end_pos = index['pos1']
                 found_smaller = True
                 break
-        if not found_smaller:
+        if not found_smaller and indexes == []:
             return
-
+        # loop around to highest index
+        if not found_smaller and indexes != []:
+            cur_pos = indexes[0]['pos0']
+            end_pos = indexes[0]['pos1']
         self.unlight()
         self.highlight(cid)
 
@@ -1094,6 +1105,9 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(0)
+        self.ui.textEdit.setTextCursor(cursor)
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
         self.ui.pushButton_show_all_codings.setIcon(icon)
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
@@ -1108,7 +1122,7 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             data: code dictionary
         """
-        ui = DialogInformation(self.app, "Coded text and media: " + data['name'], " ")
+        ui = DialogInformation(self.app, "Coded files: " + data['name'], " ")
         cur = self.app.conn.cursor()
         COLOR = 1
         SOURCE_NAME = 2
