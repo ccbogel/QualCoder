@@ -900,10 +900,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
-        """ Show acyclic graph of codes and categories. """
+        """ Show list or acyclic graph of codes and categories. """
 
         ui = ViewGraphOriginal(self.app)
-        ui.exec_()
+        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def help(self):
         """ Display manual in browser. """
