@@ -101,14 +101,17 @@ class Refi_import():
         self.sources = []
         self.variables = []
         self.base_path = ""
-        self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-            _('Select REFI_QDA file'), self.app.settings['directory'], "(*." + import_type + ")")
-        if not ok or self.file_path == "":
-            return
-
         if import_type == "qdc":
+            self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdc *.QDC)")
+            if not ok or self.file_path == "":
+                return
             self.import_codebook()
         else:
+            self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdpx *.QDPX)")
+            if not ok or self.file_path == "":
+                return
             self.import_project()
 
     def import_codebook(self):
@@ -597,11 +600,15 @@ class Refi_import():
 
         name = element.get("name")
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
                 creating_user = u['name']
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         # path starts with internal:// or relative:// (with<Project basePath or absolute
@@ -694,9 +701,14 @@ class Refi_import():
         height = secondY - firstY
         memo = element.get("name")
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
+        creating_user_guid = e.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = e.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -831,11 +843,15 @@ class Refi_import():
         # Change transcript filename to match the audio/video name, unless .srt
         # Add ".transcribed" suffix so qualcoder can interpret as a transcription for this a/v file.
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
                 creating_user = u['name']
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         guid = element.get("guid")
@@ -986,6 +1002,8 @@ class Refi_import():
         seg_end = int(element.get("end"))
         memo = element.get("name")
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         try:
             create_date = create_date.replace('T', ' ')
             create_date = create_date.replace('Z', '')
@@ -993,8 +1011,10 @@ class Refi_import():
             # None type object ??
             print("load_codings_for_audio_video", e)
             create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
-
         creating_user_guid = element.get("creatingUser")
+        creating_user_guid = e.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = e.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1197,9 +1217,13 @@ class Refi_import():
         pos0 = int(element.get("startPosition"))
         pos1 = int(element.get("endPosition"))
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1245,26 +1269,34 @@ class Refi_import():
             #print(e.tag, e.get("name"), e.get("plainTextPath"))
             name = e.get("name")
             create_date = e.get("creationDateTime")
+            if create_date is None:
+                create_date = e.get("modifiedDateTime")
             create_date = create_date.replace('T', ' ')
             create_date = create_date.replace('Z', '')
             creating_user_guid = e.get("creatingUser")
+            if creating_user_guid is None:
+                creating_user_guid = e.get("modifyingUser")
             creating_user = "default"
             for u in self.users:
                 if u['guid'] == creating_user_guid:
                     creating_user = u['name']
-            # paths starts with internal://
-            path = e.get("plainTextPath").split('internal:/')[1]
-            path = self.folder_name + '/Sources' + path
-            #print(path)
-            jentry = ""
-            try:
-                with open(path) as f:
-                    jentry = f.read()
-            except Exception as e:
-                self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
-            cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-            (name, jentry, creating_user, create_date))
-            self.app.conn.commit()
+            # journal paths starts with internal://
+            if e.get("plainTextPath") is not None:
+                path = e.get("plainTextPath").split('internal:/')[1]
+                path = self.folder_name + '/Sources' + path
+                #print(path)
+                jentry = ""
+                try:
+                    with open(path) as f:
+                        jentry = f.read()
+                except Exception as e:
+                    self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
+                cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
+                (name, jentry, creating_user, create_date))
+                self.app.conn.commit()
+            else:
+                #TODO
+                print(_("Note element is not a journal."))
             count += 1
         return count
 
