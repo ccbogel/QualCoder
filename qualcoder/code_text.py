@@ -933,57 +933,69 @@ class DialogCodeText(QtWidgets.QWidget):
         return False
 
     def extend_left(self, code_):
-        """ Shift left arrow """
+        """ Shift left arrow. """
 
         if code_['pos0'] < 1:
             return
         code_['pos0'] -= 1
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos0'], code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'], self.app.settings['codername']))
+            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
     def extend_right(self, code_):
-        """ Shift right arrow """
+        """ Shift right arrow. """
 
         if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
             return
         code_['pos1'] += 1
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos1'], code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1, self.app.settings['codername']))
+            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1, self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_left(self, code_):
-        """ Alt left arrow, shrinks code from the right end of the code """
+        """ Alt left arrow, shrinks code from the right end of the code. """
 
         if code_['pos1'] <= code_['pos0'] + 1:
             return
         code_['pos1'] -= 1
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos1'], code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1, self.app.settings['codername']))
+            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1, self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_right(self, code_):
-        """ Alt right arrow shrinks code from the left end of the code """
+        """ Alt right arrow shrinks code from the left end of the code. """
 
         if code_['pos0'] >= code_['pos1'] - 1:
             return
         code_['pos0'] += 1
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos0'], code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'], self.app.settings['codername']))
+            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
