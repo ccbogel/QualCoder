@@ -116,7 +116,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Change text code start positions ALL codes ALL files.</string>
+    <string>Change text code start positions ALL codes ALL files for current owner.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
@@ -129,7 +132,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Change text code end positions ALL codes ALL files.</string>
+    <string>Change text code end positions ALL codes ALL files for current owner.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
