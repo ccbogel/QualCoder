@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_main2.ui'
+# Form implementation generated from reading ui file 'ui_main.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
@@ -147,6 +147,8 @@ class Ui_MainWindow(object):
         self.actionManage_bad_links_to_files = QtWidgets.QAction(MainWindow)
         self.actionManage_bad_links_to_files.setEnabled(False)
         self.actionManage_bad_links_to_files.setObjectName("actionManage_bad_links_to_files")
+        self.actionSpecial_functions = QtWidgets.QAction(MainWindow)
+        self.actionSpecial_functions.setObjectName("actionSpecial_functions")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -184,6 +186,7 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionSQL_statements)
         self.menuHelp.addAction(self.actionContents)
         self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionSpecial_functions)
         self.menubar.addAction(self.menuProject.menuAction())
         self.menubar.addAction(self.menuFiles_and_Cases.menuAction())
         self.menubar.addAction(self.menuCoding.menuAction())
@@ -252,6 +255,7 @@ class Ui_MainWindow(object):
         self.actionCode_relations.setText(_translate("MainWindow", "Code relations"))
         self.actionExport_coded_text_as_html.setText(_translate("MainWindow", "Export coded text as html"))
         self.actionManage_bad_links_to_files.setText(_translate("MainWindow", "Manage bad links to files"))
+        self.actionSpecial_functions.setText(_translate("MainWindow", "Special functions"))
 
 
 if __name__ == "__main__":
