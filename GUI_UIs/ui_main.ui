@@ -134,6 +134,7 @@
     </property>
     <addaction name="actionContents"/>
     <addaction name="actionAbout"/>
+    <addaction name="actionSpecial_functions"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuFiles_and_Cases"/>
@@ -356,6 +357,11 @@
    </property>
    <property name="text">
     <string>Manage bad links to files</string>
+   </property>
+  </action>
+  <action name="actionSpecial_functions">
+   <property name="text">
+    <string>Special functions</string>
    </property>
   </action>
  </widget>
