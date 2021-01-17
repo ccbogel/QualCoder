@@ -32,6 +32,7 @@ import traceback
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 
+from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_special_functions import Ui_Dialog_special_functions
 
@@ -56,8 +57,9 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
     app = None
     parent_textEdit = None
+    tab_coding = None  # Tab widget coding tab for updates
 
-    def __init__(self, app, parent_textEdit, parent=None):
+    def __init__(self, app, parent_textEdit, tab_coding, parent=None):
 
         super(DialogSpecialFunctions, self).__init__(parent)
         sys.excepthook = exception_handler
@@ -66,6 +68,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.app = app
         self.parent_textEdit = parent_textEdit
+        self.tab_coding = tab_coding
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
@@ -114,6 +117,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
         self.app.conn.commit()
         self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
+        self.update_tab_coding_dialog()
 
     def change_text_code_end_positions(self):
         """ Extend or shrink text coding start positions in all codings and all files for owner. """
@@ -156,6 +160,19 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
         self.app.conn.commit()
         self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
+        self.update_tab_coding_dialog()
+
+    def update_tab_coding_dialog(self):
+        """ DialogCodeText """
+
+        contents = self.tab_coding.layout()
+        if contents:
+            # Remove code text widgets from layout
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogCodeText):
+                    c.get_coded_text_update_eventfilter_tooltips()
+                    break
 
     def accept(self):
         """ Overrride accept button. """

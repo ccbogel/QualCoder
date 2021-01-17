@@ -926,7 +926,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def special_functions(self):
         """ User requested special functions dialog. """
 
-        ui = DialogSpecialFunctions(self.app, self.ui.textEdit)
+        ui = DialogSpecialFunctions(self.app, self.ui.textEdit, self.ui.tab_coding)
         ui.exec_()
 
     def manage_attributes(self):
