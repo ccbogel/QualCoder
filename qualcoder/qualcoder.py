@@ -1017,17 +1017,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setCurrentWidget(tab_widget)
         # Check the tab has a layout and widgets
         contents = tab_widget.layout()
-        if contents:
+        if contents is None:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            tab_widget.setLayout(layout)
+        else:
             # Remove widgets from layout
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
             contents.addWidget(ui)
-        else:
-            # Tab has no layout so add one with widget
-            layout = QtWidgets.QVBoxLayout()
-            layout.addWidget(ui)
-            tab_widget.setLayout(layout)
 
     def codebook(self):
         """ Export a text file code book of categories and codes.
