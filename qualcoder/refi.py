@@ -321,11 +321,13 @@ class Refi_import():
         self.parent_textEdit.append("Project XML parsing successful: " + str(result))
         tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
         root = tree.getroot()
+        # Must parse Project tag first to get software_name
+        # This is used when importing - especially from ATLAS.ti
+        self.parse_project_tag(root)
+
         children = root.getchildren()
         for c in children:
             #print(c.tag)
-            if c.tag == "{urn:QDA-XML:project:1.0}Project":
-                self.parse_project_tag(c)
             if c.tag == "{urn:QDA-XML:project:1.0}Users":
                 count = self.parse_users(c)
                 self.parent_textEdit.append(_("Parse users. Loaded: " + str(count)))
@@ -1127,7 +1129,6 @@ class Refi_import():
         as though it is \n  - one character
         But the source.txt stores \r\n and in ATLAS is treated at one character 
         To test for docx also """
-
         if "ATLAS" in self.software_name:
             add_ending = False
 
@@ -1334,10 +1335,12 @@ class Refi_import():
         """ Parse the Project tag.
         Interested in basePath for relative linked sources.
          software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
-
+        print("Project tag")
+        print(element)
         self.base_path = element.get("basePath")
         print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
         self.software_name = element.get("origin")
+        print("SOFTWARE NAME: ", self.software_name)
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
