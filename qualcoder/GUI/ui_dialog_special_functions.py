@@ -40,9 +40,11 @@ class Ui_Dialog_special_functions(object):
         self.pushButton_text_ends.setObjectName("pushButton_text_ends")
         self.label_2 = QtWidgets.QLabel(Dialog_special_functions)
         self.label_2.setGeometry(QtCore.QRect(140, 40, 611, 30))
+        self.label_2.setWordWrap(True)
         self.label_2.setObjectName("label_2")
         self.label_3 = QtWidgets.QLabel(Dialog_special_functions)
         self.label_3.setGeometry(QtCore.QRect(140, 90, 611, 30))
+        self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
 
         self.retranslateUi(Dialog_special_functions)
@@ -58,8 +60,8 @@ class Ui_Dialog_special_functions(object):
         self.spinBox_text_ends.setToolTip(_translate("Dialog_special_functions", "<html><head/><body><p>Numer of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>"))
         self.pushButton_text_starts.setText(_translate("Dialog_special_functions", "Go"))
         self.pushButton_text_ends.setText(_translate("Dialog_special_functions", "Go"))
-        self.label_2.setText(_translate("Dialog_special_functions", "Change text code start positions ALL codes ALL files."))
-        self.label_3.setText(_translate("Dialog_special_functions", "Change text code end positions ALL codes ALL files."))
+        self.label_2.setText(_translate("Dialog_special_functions", "Change text code start positions ALL codes ALL files for current owner."))
+        self.label_3.setText(_translate("Dialog_special_functions", "Change text code end positions ALL codes ALL files for current owner."))
 
 
 if __name__ == "__main__":
