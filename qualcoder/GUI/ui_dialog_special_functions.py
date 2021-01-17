@@ -55,9 +55,9 @@ class Ui_Dialog_special_functions(object):
     def retranslateUi(self, Dialog_special_functions):
         _translate = QtCore.QCoreApplication.translate
         Dialog_special_functions.setWindowTitle(_translate("Dialog_special_functions", "Special Functions"))
-        self.spinBox_text_starts.setToolTip(_translate("Dialog_special_functions", "<html><head/><body><p>Numer of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>"))
+        self.spinBox_text_starts.setToolTip(_translate("Dialog_special_functions", "<html><head/><body><p>Number of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>"))
         self.label.setText(_translate("Dialog_special_functions", "Special user function requests"))
-        self.spinBox_text_ends.setToolTip(_translate("Dialog_special_functions", "<html><head/><body><p>Numer of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>"))
+        self.spinBox_text_ends.setToolTip(_translate("Dialog_special_functions", "<html><head/><body><p>Number of characters to extend (positive numbers)</p><p>or reduce (negative numbers)</p></body></html>"))
         self.pushButton_text_starts.setText(_translate("Dialog_special_functions", "Go"))
         self.pushButton_text_ends.setText(_translate("Dialog_special_functions", "Go"))
         self.label_2.setText(_translate("Dialog_special_functions", "Change text code start positions ALL codes ALL files for current owner."))
