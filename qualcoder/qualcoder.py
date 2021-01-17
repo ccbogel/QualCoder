@@ -63,6 +63,7 @@ from reports import DialogReportCodes, DialogReportCoderComparisons, DialogRepor
 from report_relations import DialogReportRelations
 from rqda import Rqda_import
 from settings import DialogSettings
+from special_functions import DialogSpecialFunctions
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
@@ -697,6 +698,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionContents.setShortcut('Ctrl+H')
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -802,6 +804,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
+        # help menu
+        self.ui.actionSpecial_functions.setEnabled(False)
 
     def show_menu_options(self):
         """ Project opened, show most menu options.
@@ -834,6 +838,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
+        # help menu
+        self.ui.actionSpecial_functions.setEnabled(True)
 
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
@@ -915,6 +921,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ About dialog. """
 
         ui = DialogInformation(self.app, "About", "")
+        ui.exec_()
+
+    def special_functions(self):
+        """ User requested special functions dialog. """
+
+        ui = DialogSpecialFunctions(self.app, self.ui.textEdit)
         ui.exec_()
 
     def manage_attributes(self):
