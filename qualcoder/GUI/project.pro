@@ -21,6 +21,7 @@ ui_dialog_report_comparisons.py \
 ui_dialog_select_items.py \
 ui_dialog_settings.py \
 ui_dialog_SQL.py \
+ui_dialog_special_functions.py \
 ui_dialog_start_and_end_marks.py \
 ui_dialog_text_mining.py \
 ui_dialog_view_av.py \
