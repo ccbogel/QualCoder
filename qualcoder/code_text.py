@@ -1827,14 +1827,14 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
         if current_code is None:
             return
-        #print(current_code)
+        #print("Current code", current_code)  # tmp
         pos = self.ui.textEdit.textCursor().position()
         codes_here = []
         for item in self.code_text:
             if item['pos0'] <= pos and item['pos1'] >= pos and item['cid'] == current_code['cid']:
                 current_coded_text = item
                 break
-        #print(current_coded_text)
+        #print("current coded text", current_coded_text)  # tmp
         # remove formatting
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
@@ -1845,8 +1845,7 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QtGui.QBrush(QtGui.QColor(current_code['color']))
         fmt.setBackground(brush)
         cursor.setCharFormat(fmt)
-
-        self.select_tree_item_by_code_name(current_text)
+        #self.select_tree_item_by_code_name(current_text)
         self.apply_overline_to_overlaps()
 
     def overlapping_codes_in_text(self):
