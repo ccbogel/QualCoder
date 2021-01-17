@@ -87,6 +87,7 @@ class Refi_import():
     import_type = None
     xml = None
     base_path = ""
+    sofware_name = ""
 
     def __init__(self, app, parent_textEdit, import_type):
 
@@ -101,6 +102,7 @@ class Refi_import():
         self.sources = []
         self.variables = []
         self.base_path = ""
+        self.software_name = ""
         if import_type == "qdc":
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                 _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdc *.QDC)")
@@ -317,7 +319,6 @@ class Refi_import():
             self.xml = xml_file.read()
         result = self.xml_validation("project")
         self.parent_textEdit.append("Project XML parsing successful: " + str(result))
-
         tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
         root = tree.getroot()
         children = root.getchildren()
@@ -372,13 +373,13 @@ class Refi_import():
             self.app.settings['codername'] = self.users[0]['name']
             self.app.write_config_ini(self.app.settings)
 
-        msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
-        msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
-        msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. \n"
-        msg += "All variables are stored as text, but cast as text or float during operations.\n"
-        msg += "Relative paths to external files are untested.\n"
-        msg += "\n\nSelect a coder name in Settings dropbox, otherwise coded text and media may appear uncoded."
+        msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
+        msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")
+        msg += _("Sets and Graphs not imported as QualCoder does not have this functionality.\n")
+        msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
+        msg += _("All variables are stored as text, but cast as text or float during operations.\n")
+        msg += _("Relative paths to external files are untested.\n")
+        msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
 
     def parse_variables(self, element):
@@ -454,6 +455,8 @@ class Refi_import():
         Enter empty values for Variables for each Case.
         Second parse: read variable values and update in attributes table.
 
+        Quirkos - Cases have no name attribute , so use the case count  as a name
+
         Note: some Codes in CodeBook are Cases - they use the same guid
 
         Example xml format:
@@ -476,17 +479,18 @@ class Refi_import():
         cur = self.app.conn.cursor()
         count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"), e.get("guid"))
-
+            #print("CASE TAG", e.tag, "CASE NAME", e.get("name"), "GUID", e.get("guid"))  # tmp
             item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.app.settings['codername'], "memo": "", "caseid": None}
+            # Quirkos: Cases have no name attribute
+            if item['name'] is None:
+                item['name'] = str(count)
             # Get the description text
             d_elements = e.getchildren()
+            item['memo'] = ""
             for d in d_elements:
-                memo = ""
                 #print("Memo ", d.tag)
                 if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
-                    memo = d.text
-                item["memo"] = memo
+                    item['memo'] = d.text
 
             # Enter Case into sqlite and keep a copy in  a list
             try:
@@ -504,6 +508,7 @@ class Refi_import():
             # Create an empty attribute entry for each Case and variable in the attributes table
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             for v in self.variables:
+                print(v)  # tmp
                 if v['caseOrFile'] == 'case':
                     cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.app.settings['codername']))
                     self.app.conn.commit()
@@ -520,7 +525,7 @@ class Refi_import():
                         "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
                         "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
                             value = v_element.text
-                    #print(guid, value)
+                    print(item, guid, value)  # tmp
                     # Get attribute name by linking guids
                     attr_name = ""
                     for attr in self.variables:
@@ -535,7 +540,7 @@ class Refi_import():
 
     def clean_up_case_codes_and_case_text(self):
         """ Some Code guids match the Case guids. So remove these Codes.
-        For text selectino:
+        For text selection:
         Some Coding selections match the Case guid. So re-align to Case selections.
         """
 
@@ -1118,6 +1123,14 @@ class Refi_import():
                     pass
             #print('n')
 
+        """Atlas stored correct positions in the project.qde xml
+        as though it is \n  - one character
+        But the source.txt stores \r\n and in ATLAS is treated at one character 
+        To test for docx also """
+
+        if "ATLAS" in self.software_name:
+            add_ending = False
+
         # Read the text and enter into sqlite source table
         try:
             with open(source_path, encoding='utf-8', errors='replace') as f:
@@ -1184,7 +1197,7 @@ class Refi_import():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        # print("varname:", var_name, " value:",value)
+        print("varname:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
@@ -1319,10 +1332,12 @@ class Refi_import():
 
     def parse_project_tag(self, element):
         """ Parse the Project tag.
-        Interested in basePath for relative linked sources. """
+        Interested in basePath for relative linked sources.
+         software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
 
         self.base_path = element.get("basePath")
         print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        self.software_name = element.get("origin")
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
@@ -1492,8 +1507,9 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError as e:
             logger.debug(str(e))
         msg = export_path + ".qpdx\n"
-        msg += "This project exchange is not guaranteed compliant with the exchange standard.\n"
-        msg += "REFI-QDA EXPERIMENTAL FUNCTION."
+        msg += _("REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n")
+        msg += _("This project exchange is not guaranteed compliant with the exchange standard.\n")
+        msg += _()
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
@@ -1514,7 +1530,7 @@ class Refi_export(QtWidgets.QDialog):
             f = open(filename, 'w')
             f.write(self.xml)
             f.close()
-            msg = "Codebook has been exported to "
+            msg = _("Codebook has been exported to ")
             msg += filename
             Message(self.app, _("Codebook exported"), _(msg)).exec_()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
