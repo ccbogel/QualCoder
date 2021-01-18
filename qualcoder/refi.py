@@ -1463,9 +1463,9 @@ class Refi_export(QtWidgets.QDialog):
         title = _("Additional line-ending support")
         msg = _("Plain text code positions may be affected by incorrect recognition of line endings.")
         msg += "\n"
-        msg += _("If import of a QualCoder qdpx file into MAXQDA or ATLAS.ti  shifts codes to the left, click OK.")
+        msg += _("Usually, click Cancel.")
         msg += "\n"
-        msg += _("Otherwise, click Cancel.")
+        msg += _("If import of a QualCoder qdpx file into MAXQDA or ATLAS.ti  shifts codes to the left, click OK.")
         ui = DialogConfirmDelete(self.app, msg, title)
         ok = ui.exec_()
         add_plain_text_line_ending = False
@@ -2356,9 +2356,12 @@ class Refi_export(QtWidgets.QDialog):
         return time_pos
 
     def convert_timestamp(self, time_in):
-        """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ """
+        """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ
+        I have found one instance of an underscore where the space should be. """
 
-        time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + 'Z'
+        time_out = time_in[0:10] + "T" + time_in[11:] + "Z"
+        '''if " " in time_in:
+            time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + "Z"'''
         return time_out
 
     def get_sources(self):
