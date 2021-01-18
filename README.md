@@ -179,3 +179,5 @@ Framing food geographies. S Ramsay, Masters Thesis, Stockholms Universitet 2020
 
 Seeking research software. A qualitative study of humanities scholars' information practices. Ronny Gey, Masters Thesis, Humboldt University of Berlin 2020
 
+Traditional and biomedical care pathways for mental well‐being in rural Nepal. T Pham, R Koirala, B Kohrt, International Journal of Mental Health Systems volume 15 2021
+
