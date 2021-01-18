@@ -65,14 +65,17 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>280</x>
         <y>30</y>
-        <width>231</width>
-        <height>31</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export csv file</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_calculate">
@@ -80,12 +83,15 @@
        <rect>
         <x>230</x>
         <y>30</y>
-        <width>171</width>
-        <height>31</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Calculate</string>
+       <string/>
       </property>
      </widget>
      <widget class="QRadioButton" name="radioButton_this">
