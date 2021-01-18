@@ -1515,7 +1515,8 @@ class Refi_export(QtWidgets.QDialog):
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
                         elif add_line_ending_for_atlas:
-                            f.write(s['fulltext'].replace("\n", "\n\r\n"))
+                            #TODO Testing
+                            f.write(s['fulltext'].replace("\r\n", "\r"))
                         else:
                             f.write(s['fulltext'])
                     except Exception as e:
