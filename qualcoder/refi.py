@@ -47,6 +47,7 @@ import zipfile
 
 from PyQt5 import QtWidgets
 
+from confirm_delete import DialogConfirmDelete  # REFI export questin about line endings
 from helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -713,9 +714,8 @@ class Refi_import():
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
-        creating_user_guid = e.get("creatingUser")
         if creating_user_guid is None:
-            creating_user_guid = e.get("modifyingUser")
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1019,9 +1019,8 @@ class Refi_import():
             print("load_codings_for_audio_video", e)
             create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
         creating_user_guid = element.get("creatingUser")
-        creating_user_guid = e.get("creatingUser")
         if creating_user_guid is None:
-            creating_user_guid = e.get("modifyingUser")
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1335,12 +1334,10 @@ class Refi_import():
         """ Parse the Project tag.
         Interested in basePath for relative linked sources.
          software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
-        print("Project tag")
-        print(element)
         self.base_path = element.get("basePath")
-        print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        #print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
         self.software_name = element.get("origin")
-        print("SOFTWARE NAME: ", self.software_name)
+        #print("SOFTWARE NAME: ", self.software_name)
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
@@ -1462,6 +1459,19 @@ class Refi_export(QtWidgets.QDialog):
             Message(self.app,_("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
             logger.debug(str(e))
             return
+
+        title = _("Additional line-ending support")
+        msg = _("Plain text code positions may be affected by incorrect recognition of line endings.")
+        msg += "\n"
+        msg += _("If import of a QualCoder qdpx file into MAXQDA or ATLAS.ti  shifts codes to the left, click OK.")
+        msg += "\n"
+        msg += _("Otherwise, click Cancel.")
+        ui = DialogConfirmDelete(self.app, msg, title)
+        ok = ui.exec_()
+        add_plain_text_line_ending = False
+        if ok:
+            add_plain_text_line_ending = True
+
         txt_errors = ""
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
@@ -1490,7 +1500,10 @@ class Refi_export(QtWidgets.QDialog):
             if s['plaintext_filename'] is not None:
                 with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
                     try:
-                        f.write(s['fulltext'])
+                        if add_plain_text_line_ending:
+                            f.write(s['fulltext'].replace("\n", "\r\n"))
+                        else:
+                            f.write(s['fulltext'])
                     except Exception as e:
                         txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(e)
                         logger.error(str(e) + '\nIn plaintext file export: ' + s['plaintext_filename'])
