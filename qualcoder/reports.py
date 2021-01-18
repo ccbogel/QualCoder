@@ -480,8 +480,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        self.ui.pushButton_run.setIcon(icon)
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/clear_icon.png'))
+        self.ui.pushButton_clear.setIcon(icon)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        self.ui.pushButton_exporttext.setIcon(icon)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
