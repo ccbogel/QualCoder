@@ -45,10 +45,12 @@ except:
 from xsd import codebook, project
 import zipfile
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from confirm_delete import DialogConfirmDelete  # REFI export questin about line endings
+from GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from helpers import Message
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1384,6 +1386,19 @@ class Refi_import():
             return False
 
 
+class Refi_line_endings(QtWidgets.QDialog):
+    """Refi line endings dialog."""
+
+    def __init__(self, app, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_Dialog_refi_export_line_endings()
+        self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
+        font += '"' + app.settings['font'] + '";'
+        self.setStyleSheet(font)
+
+
 class Refi_export(QtWidgets.QDialog):
     """ Create Rotterdam Exchange Format Initiative (refi) xml documents for
     codebook.xml and project.xml
@@ -1460,17 +1475,14 @@ class Refi_export(QtWidgets.QDialog):
             logger.debug(str(e))
             return
 
-        title = _("Additional line-ending support")
-        msg = _("Plain text code positions may be affected by incorrect recognition of line endings.")
-        msg += "\n"
-        msg += _("Usually, click Cancel.")
-        msg += "\n"
-        msg += _("If import of a QualCoder qdpx file into MAXQDA or ATLAS.ti  shifts codes to the left, click OK.")
-        ui = DialogConfirmDelete(self.app, msg, title)
-        ok = ui.exec_()
-        add_plain_text_line_ending = False
-        if ok:
-            add_plain_text_line_ending = True
+        add_line_ending_for_maxqda = False
+        add_line_ending_for_atlas = False
+        ui = Refi_line_endings(self.app)
+        ui.exec_()
+        if ui.ui.radioButton_maxqda.isChecked():
+            add_line_ending_for_maxqda = True
+        if ui.ui.radioButton_atlas.isChecked():
+            add_line_ending_for_atlas = True
 
         txt_errors = ""
         for s in self.sources:
@@ -1500,8 +1512,10 @@ class Refi_export(QtWidgets.QDialog):
             if s['plaintext_filename'] is not None:
                 with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
                     try:
-                        if add_plain_text_line_ending:
+                        if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
+                        elif add_line_ending_for_atlas:
+                            f.write(s['fulltext'].replace("\n", "\n\r\n"))
                         else:
                             f.write(s['fulltext'])
                     except Exception as e:
