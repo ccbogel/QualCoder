@@ -83,16 +83,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        '''try:
-            w = int(self.app.settings['dialogreportcodefrequencies_w'])
-            h = int(self.app.settings['dialogreportcodefrequencies_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass'''
-
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        self.ui.pushButton_exporttext.setIcon(icon)
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        self.ui.pushButton_exportcsv.setIcon(icon)
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
