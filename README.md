@@ -3,7 +3,7 @@ QualCoder is a qualitative data analysis application written in python3 (python 
 
 QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu 20.04, Linux Mint 18.04 Lubuntu 18.04, Windows 10. It has not been throughly tested on Mac OS.
+This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on Linux Mint 18.04 Lubuntu 18.04, Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the Github Wiki.
 
 ## INSTALLATION 
@@ -22,7 +22,7 @@ You can install the latest debian package from https://github.com/ccbogel/QualCo
 
 You may need to add unstable repos as described at https://www.binarytides.com/enable-testing-repo-debian/
 
-Install these modules fro mthe command line
+Install these modules from the command line
 
 `sudo apt install python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
 
