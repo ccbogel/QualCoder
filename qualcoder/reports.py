@@ -809,13 +809,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
-        '''try:
-            w = int(self.app.settings['dialogreportcodes_w'])
-            h = int(self.app.settings['dialogreportcodes_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass'''
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -832,6 +825,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        self.ui.pushButton_search.setIcon(icon)
+        self.ui.label_exports.setPixmap(QtGui.QPixmap('GUI/doc_export_icon.png'))
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
@@ -864,12 +860,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
-
-    '''def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogreportcodes_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodes_h'] = new_size.size().height()'''
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
