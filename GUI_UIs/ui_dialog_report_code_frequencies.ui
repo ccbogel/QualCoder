@@ -40,19 +40,19 @@
         <x>10</x>
         <y>0</y>
         <width>481</width>
-        <height>26</height>
+        <height>22</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>26</height>
+        <height>22</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777213</width>
-        <height>26</height>
+        <height>22</height>
        </size>
       </property>
       <property name="text">
@@ -65,36 +65,66 @@
      <widget class="QPushButton" name="pushButton_exporttext">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>300</x>
         <y>30</y>
-        <width>351</width>
-        <height>25</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export text file</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>368</x>
+        <x>350</x>
         <y>30</y>
-        <width>291</width>
-        <height>25</height>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>36</width>
+        <height>36</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export csv file</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>30</y>
         <width>271</width>
-        <height>25</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="text">
