@@ -96,7 +96,11 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        self.ui.pushButton_exportcsv.setIcon(icon)
         self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        self.ui.pushButton_calculate.setIcon(icon)
 
     def get_code_data(self):
         """ Called from init. gets code_names, categories and owner names.
