@@ -1512,7 +1512,6 @@ class Refi_export(QtWidgets.QDialog):
         msg = export_path + ".qpdx\n"
         msg += _("REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n")
         msg += _("This project exchange is not guaranteed compliant with the exchange standard.\n")
-        msg += _()
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
