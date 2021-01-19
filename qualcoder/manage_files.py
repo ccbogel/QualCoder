@@ -134,13 +134,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogmanagefiles_w'])
-            h = int(self.app.settings['dialogmanagefiles_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -179,12 +172,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
-
-    def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogmanagefiles_w'] = self.size().width()
-        self.app.settings['dialogmanagefiles_h'] = self.size().height()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -657,6 +644,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
+
+            # Check numeric for numeric attributes, clear "" if cannot be cast
+            cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?", (attribute_name, ))
+            result = cur.fetchone()
+            if result is None:
+                return
+            if result[0] == "numeric":
+                try:
+                    float(value)
+                except Exception as e:
+                    self.ui.tableWidget.item(x, y).setText("")
+                    value = ""
+                    msg = _("This attribute is numeric")
+                    Message(self.app, _("Warning"), msg, "warning").exec_()
+
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
@@ -1215,7 +1217,7 @@ class DialogManageFiles(QtWidgets.QDialog):
          DialogReportCodes, DialogCodeText, DialogCodeAV, DialogCodeImage """
 
         contents = self.tab_coding.layout()
-        if contents:
+        if contents is not None:
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
                 if isinstance(c, DialogCodeImage):
@@ -1225,7 +1227,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if isinstance(c, DialogCodeText):
                     c.get_files()
         contents = self.tab_reports.layout()
-        if contents:
+        if contents is not None:
             # Examine widgets in layout
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
