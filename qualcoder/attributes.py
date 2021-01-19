@@ -76,28 +76,14 @@ class DialogManageAttributes(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textEdit
-        self.attributes = []
-        cur = self.app.conn.cursor()
-        cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
-        result = cur.fetchall()
-        for row in result:
-            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
-            'memo': row[3], 'caseOrFile': row[4],'valuetype': row[5]})
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogmanageattributes_w'])
-            h = int(self.app.settings['dialogmanageattributes_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.get_attributes()
         self.fill_tableWidget()
         self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
@@ -106,12 +92,17 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogmanageattributes_w'] = new_size.size().width()
-        self.app.settings['dialogmanageattributes_h'] = new_size.size().height()
+    def get_attributes(self):
+        self.attributes = []
+        cur = self.app.conn.cursor()
+        cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
+        result = cur.fetchall()
+        for row in result:
+            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
+                'memo': row[3], 'caseOrFile': row[4], 'valuetype': row[5]})
 
     def count_selected_items(self):
         """ Update label with the count of selected items """
@@ -223,6 +214,28 @@ class DialogManageAttributes(QtWidgets.QDialog):
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             self.attributes[x]['memo'] = str(memo)
+
+    def table_menu(self, position):
+        """ Context menu for displaying table rows in differing order """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        text = str(self.ui.tableWidget.item(row, col).text())
+        if col == 2 and text == _("numeric"):
+            action_to_character = menu.addAction(_("Change to character"))
+        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_to_character:
+            attr_name = str(self.ui.tableWidget.item(row, 0).text())
+            cur = self.app.conn.cursor()
+            print(attr_name)
+            cur.execute('update attribute_type set valuetype="character" where name=?',[attr_name, ])
+            self.app.conn.commit()
+            self.get_attributes()
+            self.fill_tableWidget()
 
     def cell_modified(self):
         """ If the attribute name has been changed in the table widget and update the database. """
