@@ -1481,9 +1481,6 @@ class Refi_export(QtWidgets.QDialog):
         ui.exec_()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
-        if ui.ui.radioButton_atlas.isChecked():
-            add_line_ending_for_atlas = True
-
         txt_errors = ""
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
@@ -1514,9 +1511,6 @@ class Refi_export(QtWidgets.QDialog):
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
-                        elif add_line_ending_for_atlas:
-                            #TODO Testing
-                            f.write(s['fulltext'].replace("\r\n", " \r"))
                         else:
                             f.write(s['fulltext'])
                     except Exception as e:
