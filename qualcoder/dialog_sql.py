@@ -84,13 +84,6 @@ class DialogSQL(QtWidgets.QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogsql_w'])
-            h = int(self.app.settings['dialogsql_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -109,7 +102,11 @@ class DialogSQL(QtWidgets.QDialog):
         self.get_schema_update_treeWidget()
         self.ui.treeWidget.itemClicked.connect(self.get_item)
         self.ui.pushButton_runSQL.clicked.connect(self.run_SQL)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        self.ui.pushButton_runSQL.setIcon(icon)
         self.ui.pushButton_export.clicked.connect(self.export_file)
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        self.ui.pushButton_export.setIcon(icon)
         self.ui.splitter.setSizes([20, 180])
         try:
             s0 = int(self.app.settings['dialogsql_splitter_h0'])
@@ -129,11 +126,6 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
 
-    def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogsql_w'] = self.size().width()
-        self.app.settings['dialogsql_h'] = self.size().height()
 
     def update_sizes(self):
         """ Called by splitter resized """
