@@ -518,8 +518,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             return
         if len(self.selected_coders) == 0:
             self.selected_coders.append(coder)
+            self.ui.label_selections.setText(coder)
         if len(self.selected_coders) == 1 and self.selected_coders[0] != coder:
             self.selected_coders.append(coder)
+            coder1 = self.ui.label_selections.text()
+            self.ui.label_selections.setText(coder1 + " , " + coder)
         if len(self.selected_coders) == 2:
             self.ui.pushButton_run.setEnabled(True)
 
@@ -539,6 +542,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 item.setText(6, "")
             it += 1
             item = it.value()
+        self.ui.label_selections.setText(_("No coders selected"))
 
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
