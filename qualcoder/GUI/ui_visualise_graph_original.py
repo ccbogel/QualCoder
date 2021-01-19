@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_visualiseGraph_original(object):
     def setupUi(self, Dialog_visualiseGraph_original):
         Dialog_visualiseGraph_original.setObjectName("Dialog_visualiseGraph_original")
-        Dialog_visualiseGraph_original.resize(1098, 647)
+        Dialog_visualiseGraph_original.resize(1024, 600)
         self.gridLayout = QtWidgets.QGridLayout(Dialog_visualiseGraph_original)
         self.gridLayout.setObjectName("gridLayout")
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_visualiseGraph_original)
@@ -24,7 +24,7 @@ class Ui_Dialog_visualiseGraph_original(object):
         self.checkBox_blackandwhite.setGeometry(QtCore.QRect(20, 0, 191, 22))
         self.checkBox_blackandwhite.setObjectName("checkBox_blackandwhite")
         self.comboBox = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox.setGeometry(QtCore.QRect(650, 0, 421, 30))
+        self.comboBox.setGeometry(QtCore.QRect(420, 0, 421, 30))
         self.comboBox.setObjectName("comboBox")
         self.checkBox_listview = QtWidgets.QCheckBox(self.groupBox_2)
         self.checkBox_listview.setGeometry(QtCore.QRect(20, 30, 141, 22))
@@ -38,7 +38,7 @@ class Ui_Dialog_visualiseGraph_original(object):
         self.label.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.label.setObjectName("label")
         self.graphicsView = QtWidgets.QGraphicsView(self.groupBox_2)
-        self.graphicsView.setGeometry(QtCore.QRect(0, 60, 1080, 560))
+        self.graphicsView.setGeometry(QtCore.QRect(0, 60, 1000, 520))
         self.graphicsView.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.graphicsView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.graphicsView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
