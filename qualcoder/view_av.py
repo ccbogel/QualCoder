@@ -1149,6 +1149,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         ActionMoveCode = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
             ActionItemAssignSegment = menu.addAction("Assign segment to code")
+        ActionAddCodeToCategory = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            ActionAddCodeToCategory = menu.addAction(_("Add new code to category"))
         ActionItemAddCode = menu.addAction(_("Add a new code"))
         ActionItemAddCategory = menu.addAction(_("Add a new category"))
         ActionItemRename = menu.addAction(_("Rename"))
@@ -1161,6 +1164,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if action is None:
+            return
         if action == ActionShowCodesLike:
             self.show_codes_like()
             return
@@ -1172,6 +1177,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.add_category()
         if action == ActionItemAddCode:
             self.add_code()
+        if action == ActionAddCodeToCategory:
+            catid = int(selected.text(1).split(":")[1])
+            self.add_code(catid)
         if selected is not None and action == ActionItemRename:
             self.rename_category_or_code(selected)
         if selected is not None and action == ActionItemEditMemo:
@@ -1719,10 +1727,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
         self.load_segments()
 
-    def add_code(self):
-        """ Use add_item dialog to get new code text.
-        Add_code_name dialog checks for duplicate code name.
-        New code is added to data and database. """
+    def add_code(self, catid=None):
+        """  Use add_item dialog to get new code text. Add_code_name dialog checks for
+        duplicate code name. A random color is selected for the code.
+        New code is added to data and database.
+        param:
+            catid : None to add to without category, catid to add to to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("New code name"))
         ui.exec_()
@@ -1731,7 +1741,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': new_name, 'memo': "", 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None, 'color': code_color}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
                     , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))

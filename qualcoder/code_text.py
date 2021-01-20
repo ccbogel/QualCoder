@@ -108,13 +108,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.codes, self.categories = self.app.get_data()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogcodetext_w'])
-            h = int(self.app.settings['dialogcodetext_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -253,12 +246,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 tt += "\nMemo: " + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
-
-    '''def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogcodetext_w'] = self.size().width()
-        self.app.settings['dialogcodetext_h'] = self.size().height()'''
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -790,6 +777,9 @@ class DialogCodeText(QtWidgets.QWidget):
         '''ActionAssignSelectedText = None
         if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
             ActionAssignSelectedText = menu.addAction("Assign selected text")'''
+        ActionAddCodeToCategory = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            ActionAddCodeToCategory = menu.addAction(_("Add new code to category"))
         ActionItemAddCode = menu.addAction(_("Add a new code"))
         ActionItemAddCategory = menu.addAction(_("Add a new category"))
         ActionItemRename = menu.addAction(_("Rename"))
@@ -814,6 +804,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.add_category()
             elif action == ActionItemAddCode:
                 self.add_code()
+            elif action == ActionAddCodeToCategory:
+                catid = int(selected.text(1).split(":")[1])
+                self.add_code(catid)
             elif selected is not None and action == ActionMoveCode:
                 self.move_code(selected)
             elif selected is not None and action == ActionItemRename:
@@ -1318,10 +1311,12 @@ class DialogCodeText(QtWidgets.QWidget):
         # update filter for tooltip
         self.eventFilterTT.setCodes(self.code_text, self.codes)
 
-    def add_code(self):
+    def add_code(self, catid=None):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
-        New code is added to data and database. """
+        New code is added to data and database.
+        param:
+            catid : None to add to without category, catid to add to to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec_()
@@ -1330,7 +1325,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': None,
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': catid,
         'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"

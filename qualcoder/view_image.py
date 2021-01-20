@@ -594,6 +594,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         #print(selected.parent())
         #index = self.ui.treeWidget.currentIndex()
+        ActionAddCodeToCategory = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            ActionAddCodeToCategory = menu.addAction(_("Add new code to category"))
         ActionItemAddCode = menu.addAction(_("Add a new code"))
         ActionItemAddCategory = menu.addAction(_("Add a new category"))
         ActionItemRename = menu.addAction(_("Rename"))
@@ -607,8 +610,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             ActionMoveCode = menu.addAction(_("Move code to"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
-
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if action is None:
+            return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
             self.change_code_color(selected)
         if selected is not None and action == ActionMoveCode:
@@ -617,6 +621,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.add_category()
         if action == ActionItemAddCode:
             self.add_code()
+        if action == ActionAddCodeToCategory:
+            catid = int(selected.text(1).split(":")[1])
+            self.add_code(catid)
         if action == ActionShowCodesLike:
             self.show_codes_like()
             return
@@ -1092,10 +1099,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
 
-    def add_code(self):
-        """ Use add_item dialog to get new code text.
-        Add_code_name dialog checks for duplicate code name.
-        New code is added to data and database. """
+    def add_code(self, catid=None):
+        """  Use add_item dialog to get new code text. Add_code_name dialog checks for
+        duplicate code name. A random color is selected for the code.
+        New code is added to data and database.
+        param:
+            catid : None to add to without category, catid to add to to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec_()
@@ -1104,7 +1113,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': new_code_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'catid': catid, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
             , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
