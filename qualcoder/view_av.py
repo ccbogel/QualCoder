@@ -1409,9 +1409,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             Alt + R rewind 30 seconds
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
-
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
+
+            TextEdit:
+            A annotate
+            Q Quick Mark with code
 
         Also detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
@@ -1455,8 +1458,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Mark selected
-            if key == QtCore.Qt.Key_M and selected_text != "":
+            # Quick Mark selected
+            if key == QtCore.Qt.Key_Q and selected_text != "":
                 self.mark()
                 return True
             # Annotate selected

@@ -899,10 +899,15 @@ class DialogCodeText(QtWidgets.QWidget):
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
 
-        Also use it to detect key events in the textedit. These are used to extend or shrink a text coding.
+        Also use it to detect key events in the textedit.
+        These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
+        A annotate
+        Q Quick Mark with code
+        B Create bookmark
+        S search text
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -933,8 +938,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.extend_right(codes_here[0])
                 return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Mark selected
-            if key == QtCore.Qt.Key_M and selected_text != "":
+            # Quick Mark selected
+            if key == QtCore.Qt.Key_Q and selected_text != "":
                 self.mark()
                 return True
             # Annotate selected
