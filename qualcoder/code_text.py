@@ -83,6 +83,7 @@ class DialogCodeText(QtWidgets.QWidget):
     parent_textEdit = None
     tab_reports = None  # Tab widget reports, used for updates to codes
     codes = []
+    recent_codes = []  # list of recent codes (up to 5) for textedit context menu
     categories = []
     filenames = []
     file_ = None  # contains filename and file id returned from SelectItems
@@ -106,6 +107,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.codes, self.categories = self.app.get_data()
+        self.recent_codes = []
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -596,6 +598,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark"))
+
+            #TODO make use of recent_codes, max 5
+            '''submenu = menu.addMenu(_("Mark with recent code"))
+            submenu.addAction("A")
+            submenu.addAction("B")'''
+
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_set_bookmark = menu.addAction(_("Set bookmark"))
@@ -923,6 +931,32 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.extend_left(codes_here[0])
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
+                return True
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            # Mark selected
+            if key == QtCore.Qt.Key_M and selected_text != "":
+                self.mark()
+                return True
+            # Annotate selected
+            if key == QtCore.Qt.Key_A and selected_text != "":
+                self.annotate()
+                return True
+            # Set Bookmark
+            if key == QtCore.Qt.Key_B and self.file_ is not None:
+                text_cursor_pos = self.ui.textEdit.textCursor().position()
+                cur = self.app.conn.cursor()
+                cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_cursor_pos])
+                self.app.conn.commit()
+                return True
+            # Search, with or without selected
+            if key == QtCore.Qt.Key_S and self.file_ is not None:
+                if selected_text == "":
+                    self.ui.lineEdit_search.setFocus()
+                else:
+                    self.ui.lineEdit_search.setText(selected_text)
+                    self.search_for_text()
+                    self.ui.pushButton_next.setFocus()
+                return True
         return False
 
     def extend_left(self, code_):

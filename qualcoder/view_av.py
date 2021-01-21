@@ -1162,7 +1162,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             ActionMoveCode = menu.addAction(_("Move code to"))
             ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
         ActionShowCodesLike = menu.addAction(_("Show codes like"))
-
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -1445,17 +1444,25 @@ class DialogCodeAV(QtWidgets.QDialog):
             if len(codes_here) == 1:
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
                     self.shrink_to_left(codes_here[0])
-                    return False
+                    return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
                     self.shrink_to_right(codes_here[0])
-                    return False
+                    return True
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
                     self.extend_left(codes_here[0])
-                    return False
+                    return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
-                    return False
-
+                    return True
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            # Mark selected
+            if key == QtCore.Qt.Key_M and selected_text != "":
+                self.mark()
+                return True
+            # Annotate selected
+            if key == QtCore.Qt.Key_A and selected_text != "":
+                self.annotate(self.ui.textEdit.textCursor().position())
+                return True
         #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
@@ -2020,7 +2027,6 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.ui.checkBox_scroll_transcript.isChecked():
             return
-
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
@@ -2310,6 +2316,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     def annotate(self, location):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
+        params:
+            location : textCursor currept position
         """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
