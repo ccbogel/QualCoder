@@ -1466,14 +1466,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
+        # Advance 30 seconds Shift F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
             self.forward_30_seconds()
         # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
             self.rewind_30_seconds()
-        # Rewind 5 seconds Ctrl R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
+        # Rewind 5 seconds Shift R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
             self.rewind_5_seconds()
         # Increase play rate  Ctrl + Shift + >
         if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
@@ -1484,7 +1484,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         return False
 
     def rewind_30_seconds(self):
-        """ Rewind AV by 30 seconds. """
+        """ Rewind AV by 30 seconds. Shift + R """
 
         if self.mediaplayer.get_media() is None:
             return
@@ -1499,7 +1499,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_ui()
 
     def rewind_5_seconds(self):
-        """ Rewind AV by 30 seconds. """
+        """ Rewind AV by 30 seconds. Alt + R """
 
         if self.mediaplayer.get_media() is None:
             return
@@ -2977,9 +2977,9 @@ class DialogViewAV(QtWidgets.QDialog):
     def eventFilter(self, object, event):
         """ Add key options to improve manual transcribing.
         Options are:
-            Ctrl + R to rewind 5 seconds.
-            Alt + R rewind 30 seconds
-            Alt + F forward 30 seconds
+            Alt + R to rewind 5 seconds.
+            Shift + R rewind 30 seconds
+            Shift + F forward 30 seconds
             Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
         Can only use these options if the transcription is not coded:
             Ctrl + T to insert timestamp in format [hh.mm.ss]
@@ -2998,14 +2998,14 @@ class DialogViewAV(QtWidgets.QDialog):
         #  ctrl S or ctrl P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+        # Rewind 30 seconds Shift R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
             self.rewind_30_seconds()
-        # Rewind 5 seconds   Ctrl R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
+        # Rewind 5 seconds   Alt R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
             self.rewind_5_seconds()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
+        # Advance 30 seconds Shift F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
             self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
@@ -3030,7 +3030,7 @@ class DialogViewAV(QtWidgets.QDialog):
         return True
 
     def rewind_30_seconds(self):
-        """ Rewind AV 30 seconds """
+        """ Rewind AV 30 seconds. Shift + R """
 
         time_msecs = self.mediaplayer.get_time() - 30000
         if time_msecs < 0:
@@ -3043,7 +3043,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_ui()
 
     def rewind_5_seconds(self):
-        """ Rewind AV 5 seconds """
+        """ Rewind AV 5 seconds. Alt + R """
 
         time_msecs = self.mediaplayer.get_time() - 5000
         if time_msecs < 0:
@@ -3056,7 +3056,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_ui()
 
     def forward_30_seconds(self):
-        """ Forward AV 30 seconds """
+        """ Forward AV 30 seconds. Shift + F """
 
         time_msecs = self.mediaplayer.get_time() + 30000
         if time_msecs > self.media.get_duration():
