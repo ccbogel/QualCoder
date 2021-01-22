@@ -604,18 +604,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_rename = menu.addAction(_("Rename"))
         action_editMemo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
-        action_changeColor = None
+        action_color = None
         action_showCodedMedia = None
         action_moveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_changeColor = menu.addAction(_("Change code color"))
+            action_color = menu.addAction(_("Change code color"))
             action_moveCode = menu.addAction(_("Move code to"))
             action_showCodedMedia = menu.addAction(_("Show coded text and media"))
         action_showCodesLike = menu.addAction(_("Show codes like"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_changeColor:
+        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
         if selected is not None and action == action_moveCode:
             self.move_code(selected)
