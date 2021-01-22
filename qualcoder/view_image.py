@@ -594,46 +594,51 @@ class DialogCodeImage(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         #print(selected.parent())
         #index = self.ui.treeWidget.currentIndex()
-        ActionAddCodeToCategory = None
+        action_addCodeToCategory = None
+        action_addCategoryToCategory = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            ActionAddCodeToCategory = menu.addAction(_("Add new code to category"))
-        ActionItemAddCode = menu.addAction(_("Add a new code"))
-        ActionItemAddCategory = menu.addAction(_("Add a new category"))
-        ActionItemRename = menu.addAction(_("Rename"))
-        ActionItemEditMemo = menu.addAction(_("View or edit memo"))
-        ActionItemDelete = menu.addAction(_("Delete"))
-        ActionItemChangeColor = None
-        ActionShowCodedMedia = None
-        ActionMoveCode = None
+            action_addCodeToCategory = menu.addAction(_("Add new code to category"))
+            action_addCategoryToCategory = menu.addAction(_("Add a new category to category"))
+        action_addCode = menu.addAction(_("Add a new code"))
+        action_addCategory = menu.addAction(_("Add a new category"))
+        action_rename = menu.addAction(_("Rename"))
+        action_editMemo = menu.addAction(_("View or edit memo"))
+        action_delete = menu.addAction(_("Delete"))
+        action_changeColor = None
+        action_showCodedMedia = None
+        action_moveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionItemChangeColor = menu.addAction(_("Change code color"))
-            ActionMoveCode = menu.addAction(_("Move code to"))
-            ActionShowCodedMedia = menu.addAction(_("Show coded text and media"))
-        ActionShowCodesLike = menu.addAction(_("Show codes like"))
+            action_changeColor = menu.addAction(_("Change code color"))
+            action_moveCode = menu.addAction(_("Move code to"))
+            action_showCodedMedia = menu.addAction(_("Show coded text and media"))
+        action_showCodesLike = menu.addAction(_("Show codes like"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
+        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_changeColor:
             self.change_code_color(selected)
-        if selected is not None and action == ActionMoveCode:
+        if selected is not None and action == action_moveCode:
             self.move_code(selected)
-        if action == ActionItemAddCategory:
+        if action == action_addCategory:
             self.add_category()
-        if action == ActionItemAddCode:
+        if action == action_addCategoryToCategory:
+            catid = int(selected.text(1).split(":")[1])
+            self.add_category(catid)
+        if action == action_addCode:
             self.add_code()
-        if action == ActionAddCodeToCategory:
+        if action == action_addCodeToCategory:
             catid = int(selected.text(1).split(":")[1])
             self.add_code(catid)
-        if action == ActionShowCodesLike:
+        if action == action_showCodesLike:
             self.show_codes_like()
             return
-        if selected is not None and action == ActionItemRename:
+        if selected is not None and action == action_rename:
             self.rename_category_or_code(selected)
-        if selected is not None and action == ActionItemEditMemo:
+        if selected is not None and action == action_editMemo:
             self.add_edit_code_memo(selected)
-        if selected is not None and action == ActionItemDelete:
+        if selected is not None and action == action_delete:
             self.delete_category_or_code(selected)
-        if selected is not None and action == ActionShowCodedMedia:
+        if selected is not None and action == action_showCodedMedia:
             found = None
             tofind = int(selected.text(1)[4:])
             for code in self.codes:
@@ -1122,10 +1127,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.parent_textEdit.append(_("New code: ") + item['name'])
         self.app.delete_backup = False
 
-    def add_category(self):
+    def add_category(self, supercatid=None):
         """ Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
-        Add the new category as a top level item. """
+        param:
+            suoercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
@@ -1138,7 +1144,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date'], None))
+            , (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("New category: ") + item['name'])
