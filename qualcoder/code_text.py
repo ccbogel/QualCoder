@@ -575,6 +575,28 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
+    def textEdit_recent_codes_menu(self, position):
+        """ Alternative context menu.
+        Shows a list of recent codes to select from.
+        Called by R key press in the text edit pane, only if there is some selected text. """
+
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        if selected_text == "":
+            return
+        if len(self.recent_codes) == 0:
+            return
+        menu = QtWidgets.QMenu()
+        for item in self.recent_codes:
+            menu.addAction(item['name'])
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
@@ -598,7 +620,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark"))
-            # Use up to 5 recent codes
+            # Use up to 10 recent codes
             if len(self.recent_codes) > 0:
                 submenu = menu.addMenu(_("Mark with recent code"))
                 for item in self.recent_codes:
@@ -932,6 +954,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Q Quick Mark with code
         B Create bookmark
         S search text
+        R opens a context menu for recently used codes for sleection from for marking text
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -985,6 +1008,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.lineEdit_search.setText(selected_text)
                     self.search_for_text()
                     self.ui.pushButton_next.setFocus()
+                return True
+            if key== QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
+                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
                 return True
         return False
 
