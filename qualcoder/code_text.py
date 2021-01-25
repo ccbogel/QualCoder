@@ -598,12 +598,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark"))
-
-            #TODO make use of recent_codes, max 5
-            '''submenu = menu.addMenu(_("Mark with recent code"))
-            submenu.addAction("A")
-            submenu.addAction("B")'''
-
+            # Use up to 5 recent codes
+            if len(self.recent_codes) > 0:
+                submenu = menu.addMenu(_("Mark with recent code"))
+                for item in self.recent_codes:
+                    submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_set_bookmark = menu.addAction(_("Set bookmark"))
@@ -612,9 +611,10 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
+            return
         if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
-        #cursor = self.ui.textEdit.cursorForPosition(position)
+            return
         if selectedText != "" and action == action_annotate:
             self.annotate()
             return
@@ -626,12 +626,34 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_start_pos:
             self.change_code_pos(cursor.position(), "start")
+            return
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
+            return
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], cursor.position()])
             self.app.conn.commit()
+            return
+
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def recursive_set_current_item(self, item, text):
+        """ Set matching item to be the current selected item.
+        Recurse through any child categories.
+        Tried to use QTreeWidget.finditems - but this did not find matching item text
+        Called by: textEdit menu option
+        Required for: mark()
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
+                self.ui.treeWidget.setCurrentItem(item.child(i))
+            self.recursive_set_current_item(item.child(i), text)
 
     def file_memo(self):
         """ Open file memo to view or edit. """
@@ -792,11 +814,11 @@ class DialogCodeText(QtWidgets.QWidget):
         action_rename = menu.addAction(_("Rename"))
         action_editMemo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
-        action_changeColor = None
+        action_color = None
         action_showCodedMedia = None
         action_moveCode = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_changeColor = menu.addAction(_("Change code color"))
+            action_color = menu.addAction(_("Change code color"))
             action_showCodedMedia = menu.addAction(_("Show coded files"))
             action_moveCode = menu.addAction(_("Move code to"))
         action_showCodesLike = menu.addAction(_("Show codes like"))
@@ -805,7 +827,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if action is not None:
             if action == action_showCodesLike:
                 self.show_codes_like()
-            if selected is not None and action == action_changeColor:
+            if selected is not None and action == action_color:
                 self.change_code_color(selected)
             if action == action_addCategory:
                 self.add_category()
@@ -1471,6 +1493,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
 
+        # Remove from recent codes
+        for item in self.recent_codes:
+            if item['name'] == code_['name']:
+                self.recent_codes.remove(item)
+                break
+
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
         and fill treeWidget. """
@@ -1570,6 +1598,11 @@ class DialogCodeText(QtWidgets.QWidget):
                     found = i
             if found == -1:
                 return
+            # Rename in recent codes
+            for item in self.recent_codes:
+                if item['name'] == self.codes[found]['name']:
+                    item['name'] = new_name
+                    break
             # Update codes list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
@@ -1943,6 +1976,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def mark(self):
         """ Mark selected text in file with currently selected code.
        Need to check for multiple same codes at same pos0 and pos1.
+       Update recent_codes list.
        """
 
         if self.file_ is None:
@@ -1989,6 +2023,22 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+
+        # update recent_codes
+        tmp_code = None
+        for c in self.codes:
+            if c['cid'] == cid:
+                tmp_code = c
+        if tmp_code is None:
+            return
+        # Need to remove as may not be in first position
+        for item in self.recent_codes:
+            if item == tmp_code:
+                self.recent_codes.remove(item)
+                break
+        self.recent_codes.insert(0, tmp_code)
+        if len(self.recent_codes) > 10:
+            self.recent_codes = self.recent_codes[:10]
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
@@ -2090,38 +2140,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.unlight()
         self.highlight()
-
-    '''def auto_code_menu(self, position):
-        """ Context menu for auto_code button.
-        To allow coding of full sentences based on text fragment and marker indicating end of sentence.
-        Default end marker  is 2 character period and space.
-        Options for This file only or for All text files. """
-
-        item = self.ui.treeWidget.currentItem()
-        if item is None:
-            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
-            return
-        if item.text(1)[0:3] == 'cat':
-            return
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_code_sentences = menu.addAction(_("Text fragment to code_sentences. This file."))
-        if self.filename is None:
-            action_code_sentences.setEnabled(False)
-        action_code_sentences_all = menu.addAction(_("Text fragment to code_sentences. All text files."))
-        action_autocode_undo = menu.addAction(_("Undo auto coding"))
-        if self.autocode_history == []:
-            action_autocode_undo.setEnabled(False)
-        action = menu.exec_(self.ui.pushButton_auto_code.mapToGlobal(position))
-        if action == action_code_sentences:
-            self.code_sentences(item, "")
-            return
-        if action == action_code_sentences_all:
-            self.code_sentences(item, "all")
-            return
-        if action == action_autocode_undo:
-            self.undo_autocoding()
-            return'''
 
     def button_autocode_sentences_this_file(self):
         item = self.ui.treeWidget.currentItem()
