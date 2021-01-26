@@ -35,6 +35,7 @@ from datetime import datetime
 import logging
 import traceback
 
+from GUI.base64_helper import *
 from GUI.ui_dialog_SQL import Ui_Dialog_sql
 from helpers import Message
 from highlighter import Highlighter
@@ -102,11 +103,15 @@ class DialogSQL(QtWidgets.QDialog):
         self.get_schema_update_treeWidget()
         self.ui.treeWidget.itemClicked.connect(self.get_item)
         self.ui.pushButton_runSQL.clicked.connect(self.run_SQL)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
-        self.ui.pushButton_runSQL.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_runSQL.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
-        self.ui.pushButton_export.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.splitter.setSizes([20, 180])
         try:
             s0 = int(self.app.settings['dialogsql_splitter_h0'])
