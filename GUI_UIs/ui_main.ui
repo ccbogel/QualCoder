@@ -24,12 +24,12 @@
        <attribute name="title">
         <string>Coding</string>
        </attribute>
-       <widget class="QLabel" name="label_manage_2">
+       <widget class="QLabel" name="label_coding">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>511</width>
+          <x>9</x>
+          <y>9</y>
+          <width>581</width>
           <height>17</height>
          </rect>
         </property>
