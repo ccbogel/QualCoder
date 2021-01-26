@@ -114,8 +114,9 @@ class DialogCodeAV(QtWidgets.QDialog):
     files = []
     file_ = None
     codes = []
+    recent_codes = []  # list of recent codes (up to 5) for textedit context menu
     categories = []
-    code_text = []
+    code_text = []  #
     ddialog = None
     instance = None
     mediaplayer = None
@@ -149,6 +150,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if vlc_msg != "":
             self.parent_textEdit.append(vlc_msg)
         self.codes = []
+        self.recent_codes = []
         self.categories = []
         self.annotations = []
         self.code_text = []
@@ -170,10 +172,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         try:
-            w = int(self.app.settings['dialogcodeav_w'])
-            h = int(self.app.settings['dialogcodeav_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
             x = int(self.app.settings['codeav_abs_pos_x'])
             y = int(self.app.settings['codeav_abs_pos_y'])
             self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
@@ -192,7 +190,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
-
         # Labels need to be 32x32 pixels for 32x32 icons
         self.ui.label_time_3.setPixmap(QtGui.QPixmap('GUI/clock_icon.png'))
         self.ui.label_volume.setPixmap(QtGui.QPixmap("GUI/sound_high_icon.png"))
@@ -636,7 +633,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
 
     def listwidgetitem_load_file(self):
-        """ Item selected so fill current file variable and load. """
+        """ Listwidget file name selected so fill current file variable and load. """
 
         if len(self.files) == 0:
             return
@@ -807,7 +804,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
         Segment_Graphics_Item.link_text_to_segment.
-        link_segment_to_text"""
+        link_segment_to_text """
 
         if self.transcription is None:
             return
@@ -984,7 +981,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop vlc player. Set position slider to the start.
          If multiple audio tracks are shown in the combobox, set the audio track to the first index.
          This is because when beginning play again, the audio track reverts to the first track.
-         Programatically setting the audio track to other values does not work."""
+         Programming setting the audio track to other values does not work."""
 
         self.mediaplayer.stop()
         icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
@@ -1071,8 +1068,6 @@ class DialogCodeAV(QtWidgets.QDialog):
     def update_sizes(self):
         """ Called by splitter resizes and play/pause """
 
-        self.app.settings['dialogcodeav_w'] = self.size().width()
-        self.app.settings['dialogcodeav_h'] = self.size().height()
         if self.file_ is not None and self.file_['mediapath'] is not None \
                 and self.file_['mediapath'][0:7] != "/audio/" \
                 and self.file_['mediapath'][0:6] != "audio:":
@@ -1140,7 +1135,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected = self.ui.treeWidget.currentItem()
         # logger.debug("selected paremt: " + str(selected.parent()))
         # logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
-        action_changeColor = None
+        action_color = None
         action_assignSegment = None
         action_showCodedMedia = None
         action_moveCode = None
@@ -1157,7 +1152,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_editMemo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_changeColor = menu.addAction(_("Change code color"))
+            action_color = menu.addAction(_("Change code color"))
             action_moveCode = menu.addAction(_("Move code to"))
             action_showCodedMedia = menu.addAction(_("Show coded text and media"))
         action_showCodesLike = menu.addAction(_("Show codes like"))
@@ -1167,7 +1162,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action == action_showCodesLike:
             self.show_codes_like()
             return
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_changeColor:
+        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
         if selected is not None and action == action_moveCode:
             self.move_code(selected)
@@ -1417,6 +1412,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             TextEdit:
             A annotate
             Q Quick Mark with code
+            R opens a context menu for recently used codes for selection from for marking text
 
         Also detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
@@ -1464,6 +1460,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             if key == QtCore.Qt.Key_Q and selected_text != "":
                 self.mark()
                 return True
+            if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
+                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+                return True
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate(self.ui.textEdit.textCursor().position())
@@ -1487,6 +1486,43 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_Less and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
             self.decrease_play_rate()
         return False
+
+    def textEdit_recent_codes_menu(self, position):
+        """ Alternative context menu.
+        Shows a list of recent codes to select from.
+        Called by R key press in the text edit pane, only if there is some selected text. """
+
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        if selected_text == "":
+            return
+        if len(self.recent_codes) == 0:
+            return
+        menu = QtWidgets.QMenu()
+        for item in self.recent_codes:
+            menu.addAction(item['name'])
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def recursive_set_current_item(self, item, text):
+        """ Set matching item to be the current selected item.
+        Recurse through any child categories.
+        Tried to use QTreeWidget.finditems - but this did not find matching item text
+        Called by: textEdit recent codes menu option
+        Required for: mark()
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
+                self.ui.treeWidget.setCurrentItem(item.child(i))
+            self.recursive_set_current_item(item.child(i), text)
 
     def rewind_30_seconds(self):
         """ Rewind AV by 30 seconds. Shift + R """
@@ -2038,6 +2074,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
+        action_code_memo = None
         action_start_pos = None
         action_end_pos = None
         action_play_text = None
@@ -2048,12 +2085,18 @@ class DialogCodeAV(QtWidgets.QDialog):
                     action_play_text = menu.addAction(_("Play text"))
                     play_text_avid = item['avid']
                 action_unmark = menu.addAction(_("Unmark"))
+                action_code_memo = menu.addAction(_("Memo coded text"))
                 action_start_pos = menu.addAction(_("Change start position"))
                 action_end_pos = menu.addAction(_("Change end position"))
                 break
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark"))
+            # Use up to 5 recent codes
+            if len(self.recent_codes) > 0:
+                submenu = menu.addMenu(_("Mark with recent code"))
+                for item in self.recent_codes:
+                    submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate"))
             action_copy = menu.addAction(_("Copy to clipboard"))
             if self.segment_for_text is None:
@@ -2070,27 +2113,92 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
+            return
         if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
+            return
+        if action == action_code_memo:
+            self.coded_text_memo(cursor.position())
+            return
         if action_unmark is not None and action == action_unmark:
             self.unmark(cursor.position())
+            return
         if action_play_text is not None and action == action_play_text:
             self.play_text(play_text_avid)
+            return
         if selectedText != "" and action == action_annotate:
             self.annotate(cursor.position())
+            return
         try:
             if action == action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
+                return
         except:
             pass
         if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
             self.prepare_link_text_to_segment()
+            return
         if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
+            return
         if action == action_start_pos:
             self.change_text_code_pos(cursor.position(), "start")
+            return
         if action == action_end_pos:
             self.change_text_code_pos(cursor.position(), "end")
+            return
+
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def coded_text_memo(self, position=None):
+        """ Add or edit a memo for this coded text.
+        Called by: textEdit context menu option
+        param:
+            position : textEdit cursor position """
+
+        '''if position is None:
+            # Called via button
+            position = self.ui.textEdit.textCursor().position()'''
+        if self.transcription is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if position >= item['pos0'] and position <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+                coded_text_list.append(item)
+        if coded_text_list == []:
+            return
+        text_item = None
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if text_item is None:
+            return
+        # Dictionary with cid fid seltext owner date name color memo
+        #TODO maybe highlight section to be memoed
+        msg = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
+        ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == text_item['memo']:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
+        self.app.conn.commit()
+        for i in self.code_text:
+            if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
+                and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
+                i['memo'] = memo
+                #print(i)
+        self.app.delete_backup = False
 
     def change_text_code_pos(self, location, start_or_end):
         if self.file_ is None:
@@ -2295,6 +2403,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
+        # update recent_codes
+        tmp_code = None
+        for c in self.codes:
+            if c['cid'] == cid:
+                tmp_code = c
+        if tmp_code is None:
+            return
+        for item in self.recent_codes:
+            if item == c:
+                self.recent_codes.remove(item)
+                break
+        self.recent_codes.insert(0, tmp_code)
+        if len(self.recent_codes) > 5:
+            self.recent_codes = self.recent_codes[:5]
+
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
 
@@ -2423,6 +2546,8 @@ class ToolTip_EventFilter(QtCore.QObject):
                         if item['avid'] is not None:
                             text += " [" + msecs_to_mins_and_secs(item['av_pos0'])
                             text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
+                        if item['memo'] is not None and item['memo'] != "":
+                            text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                     except Exception as e:
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                         msg += str(item) + "\n" + str(self.code_text)
