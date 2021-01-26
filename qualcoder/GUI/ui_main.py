@@ -22,9 +22,9 @@ class Ui_MainWindow(object):
         self.tabWidget.setObjectName("tabWidget")
         self.tab_coding = QtWidgets.QWidget()
         self.tab_coding.setObjectName("tab_coding")
-        self.label_manage_2 = QtWidgets.QLabel(self.tab_coding)
-        self.label_manage_2.setGeometry(QtCore.QRect(20, 20, 511, 17))
-        self.label_manage_2.setObjectName("label_manage_2")
+        self.label_coding = QtWidgets.QLabel(self.tab_coding)
+        self.label_coding.setGeometry(QtCore.QRect(9, 9, 581, 17))
+        self.label_coding.setObjectName("label_coding")
         self.tabWidget.addTab(self.tab_coding, "")
         self.tab_reports = QtWidgets.QWidget()
         self.tab_reports.setObjectName("tab_reports")
@@ -209,7 +209,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "QualCoder"))
-        self.label_manage_2.setText(_translate("MainWindow", "Select an option in the Coding menu"))
+        self.label_coding.setText(_translate("MainWindow", "Select an option in the Coding menu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
         self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
