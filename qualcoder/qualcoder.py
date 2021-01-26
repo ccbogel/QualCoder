@@ -870,6 +870,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_sql(self):
         """ Run SQL statements on database. """
 
+        self.ui.label_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
@@ -884,30 +885,35 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_relations(self):
         """ Show code relations in text files. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
         """ Report on coding and categories. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
         """ Show list or acyclic graph of codes and categories. """
 
+        self.ui.label_reports.hide()
         ui = ViewGraphOriginal(self.app)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
@@ -932,6 +938,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
+        self.ui.label_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -949,6 +956,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
+        self.ui.label_manage.hide()
         ui = DialogCases(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -957,6 +965,7 @@ class MainWindow(QtWidgets.QMainWindow):
         plain text. Rename, delete and add memos to files.
         """
 
+        self.ui.label_manage.hide()
         ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -964,6 +973,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Fix any bad links to files.
         File names must match but paths can be different. """
 
+        self.ui.label_manage.hide()
         ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
@@ -973,6 +983,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def journals(self):
         """ Create and edit journals. """
 
+        self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_manage, ui)
@@ -983,6 +994,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
+            self.ui.label_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -996,6 +1008,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_image_filenames()
         if len(files) > 0:
+            self.ui.label_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -1012,6 +1025,8 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec_()
             return
+
+        self.ui.label_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
