@@ -65,6 +65,7 @@ from ebooklib import epub
 
 from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
+from GUI.base64_helper import *
 from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
@@ -139,32 +140,50 @@ class DialogManageFiles(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
-        self.ui.pushButton_create.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create.clicked.connect(self.create)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
-        self.ui.pushButton_view.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
+        self.ui.pushButton_view.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_view.clicked.connect(self.view)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
-        self.ui.pushButton_delete.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
-        self.ui.pushButton_import.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
+        self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
-        self.ui.pushButton_link.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
+        self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_link.clicked.connect(self.link_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
-        self.ui.pushButton_import_from_linked.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(linked_import_icon), "png")
+        self.ui.pushButton_import_from_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
-        self.ui.pushButton_export_to_linked.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(to_link_icon), "png")
+        self.ui.pushButton_export_to_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
-        self.ui.pushButton_export.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
-        self.ui.pushButton_add_attribute.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
@@ -474,7 +493,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
 
         metadata = name + "\n"
-        icon = QtGui.QIcon("GUI/text.png")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(text), "png")
+        icon = QtGui.QIcon(pm)
         if fulltext is not None and len(fulltext) > 0 and mediapath is None:
             metadata += "Characters: " + str(len(fulltext))
             return icon, metadata
@@ -483,7 +504,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
         if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
             metadata += "Characters: " + str(len(fulltext))
-            icon = QtGui.QIcon("GUI/text_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
+            icon = QtGui.QIcon(pm)
             return icon, metadata
 
         abs_path = ""
@@ -497,7 +520,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + mediapath
 
         if mediapath[:8] == "/images/":
-            icon = QtGui.QIcon("GUI/picture.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
+            icon = QtGui.QIcon(pm)
             w = 0
             h = 0
             try:
@@ -508,7 +533,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "images:":
-            icon = QtGui.QIcon("GUI/picture_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(picture_link), "png")
+            icon = QtGui.QIcon(pm)
             w = 0
             h = 0
             try:
@@ -519,13 +546,21 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "/video/":
-            icon = QtGui.QIcon("GUI/play.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] == "video:":
-            icon = QtGui.QIcon("GUI/play_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_link), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:7] == "/audio/":
-            icon = QtGui.QIcon("GUI/sound.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(sound), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] == "audio:":
-            icon = QtGui.QIcon("GUI/sound_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(sound_link), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. " + abs_path)
