@@ -96,7 +96,7 @@ class Ui_Dialog_cases(object):
         self.label_cases.setText(_translate("Dialog_cases", "Cases: "))
         self.pushButton_add.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add case</p></body></html>"))
         self.pushButton_delete.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Delete case</p></body></html>"))
-        self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a <span style=\" font-weight:600;\">comma delimited</span> csv file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
+        self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a csv or xlsx file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add attribute</p></body></html>"))
         self.label_filename.setText(_translate("Dialog_cases", "."))
         self.pushButton_file_manager.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Case file manager</p></body></html>"))
