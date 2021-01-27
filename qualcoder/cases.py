@@ -287,11 +287,6 @@ class DialogCases(QtWidgets.QDialog):
                         row.append(item)
                 data.append(row)
 
-        Message(self.app, _("Warning"), msg, "Function not implemented yet").exec_()
-        return
-        
-        for r in data:
-            print(r)
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         # Get field names and replace blanks with a placeholder
         fields = []
@@ -301,44 +296,9 @@ class DialogCases(QtWidgets.QDialog):
             else:
                 fields.append("Field_" + str(i))
         data = data[1:]
-
-        '''for v in values:
-            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
-                'date': now_date}
-            try:
-                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                    ,(item['name'],item['memo'],item['owner'],item['date']))
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                item['caseid'] = cur.fetchone()[0]
-                self.cases.append(item)
-            except Exception as e:
-                logger.error("item:" + str(item) + ", " + str(e)'''
-
-    def import_csv(self, filename):
-        """ Import from a csv file with the cases and any attributes.
-        The csv file must have a header row which details the attribute names.
-        The csv file must be comma delimited. The first column must have the case ids.
-        The attribute types are calculated from the data.
-        """
-
-        values = []
-        with open(filename, 'r', newline='') as f:
-            reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-            try:
-                for row in reader:
-                    values.append(row)
-            except csv.Error as e:
-                logger.warning(('file %s, line %d: %s' % (filename, reader.line_num, e)))
-        if len(values) <= 1:
-            logger.info(_("Cannot import from csv, only one row in file"))
-            return
-        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
-        header = values[0]
-        values = values[1:]
-        # insert cases
+        # Insert cases
         cur = self.app.conn.cursor()
-        for v in values:
+        for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
                 'date': now_date}
             try:
@@ -350,19 +310,19 @@ class DialogCases(QtWidgets.QDialog):
                 self.cases.append(item)
             except Exception as e:
                 logger.error("item:" + str(item) + ", " + str(e))
-        # determine attribute type
-        attribute_value_type = ["character"] * len(header)
-        for col, att_name in enumerate(header):
+        # Determine attribute type
+        attribute_value_type = ["character"] * len(fields)
+        for col, att_name in enumerate(fields):
             numeric = True
-            for val in values:
+            for val in data:
                 try:
                     float(val[col])
                 except ValueError:
                     numeric = False
             if numeric:
                 attribute_value_type[col] = "numeric"
-        # insert attribute types
-        for col, att_name in enumerate(header):
+        # Insert attribute types
+        for col, att_name in enumerate(fields):
             if col > 0:
                 try:
                     cur.execute("insert into attribute_type (name,date,owner,memo, \
@@ -372,21 +332,97 @@ class DialogCases(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
-        # insert attributes
+        # Insert attributes
         sql = "select name, caseid from cases"
         cur.execute(sql)
         name_and_ids = cur.fetchall()
         for n_i in name_and_ids:
-            for v in values:
+            for v in data:
                 if n_i[0] == v[0]:
                     for col in range(1, len(v)):
                         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-                        cur.execute(sql, (header[col], v[col], n_i[1], 'case',
+                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                         now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
-        msg = _("Cases and attributes imported from: ") + filename
+        msg = _("Cases and attributes imported from: ") + filepath
+        self.app.delete_backup = False
+        self.parent_textEdit.append(msg)
+        logger.info(msg)
+
+    def import_csv(self, filepath):
+        """ Import from a csv file with the cases and any attributes.
+        The csv file must have a header row which details the attribute names.
+        The csv file must be comma delimited. The first column must have the case ids.
+        The attribute types are calculated from the data.
+        """
+
+        values = []
+        with open(filepath, 'r', newline='') as f:
+            reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+            try:
+                for row in reader:
+                    values.append(row)
+            except csv.Error as e:
+                logger.warning(('file %s, line %d: %s' % (filepath, reader.line_num, e)))
+        if len(values) <= 1:
+            logger.info(_("Cannot import from csv, only one row in file"))
+            return
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+        fields = values[0]
+        data = values[1:]
+        # Insert cases
+        cur = self.app.conn.cursor()
+        for v in data:
+            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
+                'date': now_date}
+            try:
+                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                    ,(item['name'],item['memo'],item['owner'],item['date']))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                item['caseid'] = cur.fetchone()[0]
+                self.cases.append(item)
+            except Exception as e:
+                logger.error("item:" + str(item) + ", " + str(e))
+        # Determine attribute type
+        attribute_value_type = ["character"] * len(fields)
+        for col, att_name in enumerate(fields):
+            numeric = True
+            for val in data:
+                try:
+                    float(val[col])
+                except ValueError:
+                    numeric = False
+            if numeric:
+                attribute_value_type[col] = "numeric"
+        # Insert attribute types
+        for col, att_name in enumerate(fields):
+            if col > 0:
+                try:
+                    cur.execute("insert into attribute_type (name,date,owner,memo, \
+                    valueType, caseOrFile) values(?,?,?,?,?,?)"
+                    , (att_name, now_date, self.app.settings['codername'], "",
+                    attribute_value_type[col], 'case'))
+                    self.app.conn.commit()
+                except Exception as e:
+                    logger.error(_("attribute:") + att_name + ", " + str(e))
+        # Insert attributes
+        sql = "select name, caseid from cases"
+        cur.execute(sql)
+        name_and_ids = cur.fetchall()
+        for n_i in name_and_ids:
+            for v in data:
+                if n_i[0] == v[0]:
+                    for col in range(1, len(v)):
+                        sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
+                        now_date, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.load_cases_and_attributes()
+        self.fill_tableWidget()
+        msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
         self.parent_textEdit.append(msg)
         logger.info(msg)
