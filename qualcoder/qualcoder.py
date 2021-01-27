@@ -1553,7 +1553,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for f in files_folders:
             if f[0:lenname] == projectname_and_bkup and f[-4:] == ".qda":
                 backups.append(f)
-        # Sort newest to oldest, and remove any that are more than fifth positon in the list
+        # Sort newest to oldest, and remove any that are more than fifth position in the list
         backups.sort(reverse=True)
         to_remove = []
         if len(backups) > 5:
@@ -1562,9 +1562,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         for f in to_remove:
             try:
-                print("Removing " + directory + f)
                 shutil.rmtree(directory + f)
-                self.ui.textEdit.append(_("Deleting: " + f))
+                self.ui.textEdit.append(_("Deleting: ") + directory + f)
             except Exception as e:
                 print(str(e))
 
