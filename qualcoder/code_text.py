@@ -47,6 +47,7 @@ from color_selector import colors
 from confirm_delete import DialogConfirmDelete
 from helpers import msecs_to_mins_and_secs, Message
 from information import DialogInformation
+from GUI.base64_helper import *
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -136,46 +137,70 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
-        icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
-        self.ui.pushButton_latest.setIcon(icon)
+        #icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
+        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
-        self.ui.pushButton_next_file.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
+        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/bookmark_icon_24.png'))
-        self.ui.pushButton_bookmark_go.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/bookmark_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(bookmark_icon_24), "png")
+        self.ui.pushButton_bookmark_go.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
-        self.ui.pushButton_document_memo.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
+        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_right_icon_24.png'))
-        self.ui.pushButton_show_codings_next.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_right_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
+        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_left_icon_24.png'))
-        self.ui.pushButton_show_codings_prev.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_left_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
+        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
-        self.ui.pushButton_show_all_codings.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
+        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_icon.png'))
-        self.ui.pushButton_annotate.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_icon), "png")
+        self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_red_icon.png'))
-        self.ui.pushButton_coding_memo.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_red_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
+        self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
-        #self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.CustomContextMenu)
-        #self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.auto_code_menu)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/magic_wand_icon.png'))
-        self.ui.pushButton_auto_code.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/magic_wand_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
+        self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_one_file_icon.png'))
-        self.ui.pushButton_auto_code_frag_this_file.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_one_file_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_icon), "png")
+        self.ui.pushButton_auto_code_frag_this_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_all_files_icon.png'))
-        self.ui.pushButton_auto_code_frag_all_files.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_all_files_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_all_files_icon), "png")
+        self.ui.pushButton_auto_code_frag_all_files.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/undo_icon.png'))
-        self.ui.pushButton_auto_code_undo.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/undo_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
+        self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
@@ -183,18 +208,29 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
-        self.ui.label_search_case_sensitive.setPixmap(QtGui.QPixmap('GUI/text_letter_t_icon.png'))
-        self.ui.label_search_all_files.setPixmap(QtGui.QPixmap('GUI/clipboard_copy_icon.png'))
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_back_icon.png'))
-        self.ui.pushButton_previous.setIcon(icon)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(text_letter_t_icon), "png")
+        self.ui.label_search_case_sensitive.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
+        self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm))
+
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_back_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
+        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon.png'))
-        self.ui.pushButton_next.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
+        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
-        self.ui.pushButton_delete_all_codes.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete_all_codes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
         self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
@@ -598,7 +634,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.mark()
 
     def textEdit_menu(self, position):
-        """ Context menu for textEdit. Mark, unmark, annotate, copy. """
+        """ Context menu for textEdit.
+        Mark, unmark, annotate, copy, memo coded. """
 
         if self.ui.textEdit.toPlainText() == "":
             return
@@ -666,7 +703,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Set matching item to be the current selected item.
         Recurse through any child categories.
         Tried to use QTreeWidget.finditems - but this did not find matching item text
-        Called by: textEdit menu option
+        Called by: textEdit recent codes menu option
         Required for: mark()
         """
 
@@ -742,8 +779,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
                 and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
                 i['memo'] = memo
-                print(i)
-
+                #print(i)
         self.app.delete_backup = False
 
     def change_code_pos(self, location, start_or_end):
@@ -954,7 +990,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Q Quick Mark with code
         B Create bookmark
         S search text
-        R opens a context menu for recently used codes for sleection from for marking text
+        R opens a context menu for recently used codes for selection from for marking text
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -1009,7 +1045,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.search_for_text()
                     self.ui.pushButton_next.setFocus()
                 return True
-            if key== QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
+            if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
                 self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
                 return True
         return False
@@ -1136,8 +1172,10 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
-        self.ui.pushButton_show_all_codings.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color)
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color)
 
@@ -1190,8 +1228,10 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
-        self.ui.pushButton_show_all_codings.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color)
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color)
 
@@ -1202,8 +1242,10 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0)
         self.ui.textEdit.setTextCursor(cursor)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
-        self.ui.pushButton_show_all_codings.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
+        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
         self.ui.pushButton_show_codings_next.setStyleSheet("")
         self.unlight()
@@ -2453,7 +2495,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                         try:
                             display_text = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
-                                display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
+                                display_text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                             display_text += "</p>"
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
