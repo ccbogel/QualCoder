@@ -37,6 +37,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from add_attribute import DialogAddAttribute
 from confirm_delete import DialogConfirmDelete
 from memo import DialogMemo
+from GUI.base64_helper import *
 from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
@@ -85,9 +86,15 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.get_attributes()
         self.fill_tableWidget()
-        self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
