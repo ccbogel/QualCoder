@@ -43,6 +43,7 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
+from GUI.base64_helper import *
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from helpers import msecs_to_mins_and_secs, Message
@@ -128,8 +129,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
         # Icon images are 32x32 pixels within 36x36 pixel button
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon.png'))
-        self.ui.pushButton_memo.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
+        self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -145,16 +148,24 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
-        self.ui.pushButton_latest.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
+        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
-        self.ui.pushButton_next_file.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
+        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
-        self.ui.pushButton_document_memo.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
+        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        self.ui.label_coded_area_icon.setPixmap(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.label_coded_area_icon.setPixmap(pm)
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -169,12 +180,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
-
-    def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogcodeimage_w'] = self.size().width()
-        self.app.settings['dialogcodeimage_h'] = self.size().height()
 
     def update_sizes(self):
         """ Called by changed splitter sizes """
@@ -1392,13 +1397,6 @@ class DialogViewImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogviewimage_w'])
-            h = int(self.app.settings['dialogviewimage_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -1435,12 +1433,6 @@ class DialogViewImage(QtWidgets.QDialog):
             if slider_value > 100:
                 slider_value = 100
             self.ui.horizontalSlider.setValue(slider_value)
-
-    def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogviewimage_w'] = self.size().width()
-        self.app.settings['dialogviewimage_h'] = self.size().height()
 
     def change_scale(self):
         """ Resize image based on slider position. """
