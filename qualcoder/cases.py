@@ -32,6 +32,11 @@ import os
 import platform
 import sys
 import traceback
+openpyxl_module = True
+try:
+    from openpyxl import load_workbook
+except Exception as e:
+    openpyxl_module = False
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -40,6 +45,7 @@ from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
 from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
+from GUI.base64_helper import *
 from GUI.ui_dialog_cases import Ui_Dialog_cases
 from helpers import Message
 
@@ -50,11 +56,6 @@ from view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -100,29 +101,37 @@ class DialogCases(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogcases_w'])
-            h = int(self.app.settings['dialogcases_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.load_cases_and_attributes()
-        self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
+        #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add.clicked.connect(self.add_case)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
-        self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
+        #self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
+        self.ui.pushButton_file_manager.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        #self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
+        #self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
+        self.ui.pushButton_import_cases.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
@@ -142,10 +151,8 @@ class DialogCases(QtWidgets.QDialog):
             pass
 
     def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
+        """ Save splitter dimensions. """
 
-        self.app.settings['dialogcases_w'] = self.size().width()
-        self.app.settings['dialogcases_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcases_splitter0'] = sizes[0]
         self.app.settings['dialogcases_splitter1'] = sizes[1]
@@ -242,23 +249,79 @@ class DialogCases(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
+        """  """
+
+        if self.cases != []:
+            logger.warning(_("Cases have already been created."))
+        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select cases file'),
+            self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[0]
+        if filename == "":
+            return
+        if filename[-4:].lower() == ".csv":
+            self.import_csv(filename)
+        if filename[-5:].lower() == ".xlsx":
+            self.import_xlsx(filename)
+
+    def import_xlsx(self, filepath):
+        """ Import from a xlsx file with the cases and any attributes.
+        The file must have a header row which details the attribute names.
+        The first column must have the case ids.
+        The attribute types are calculated from the data.
+        """
+
+        if openpyxl_module is False:
+            self.fail_msg = _("Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
+            return False
+        data = []
+        wb = load_workbook(filename=filepath)
+        sheet = wb.active
+        for value in sheet.iter_rows(values_only=True):
+            # some rows may be complete blank so ignore importation
+            if (set(value)) != {None}:
+                # values are tuples, convert to list, and remove 'None' string
+                row = []
+                for item in value:
+                    if item is None:
+                        row.append("")
+                    else:
+                        row.append(item)
+                data.append(row)
+
+        Message(self.app, _("Warning"), msg, "Function not implemented yet").exec_()
+        return
+        
+        for r in data:
+            print(r)
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+        # Get field names and replace blanks with a placeholder
+        fields = []
+        for i, f in enumerate(data[0]):
+            if f != '':
+                fields.append(f)
+            else:
+                fields.append("Field_" + str(i))
+        data = data[1:]
+
+        '''for v in values:
+            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
+                'date': now_date}
+            try:
+                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                    ,(item['name'],item['memo'],item['owner'],item['date']))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                item['caseid'] = cur.fetchone()[0]
+                self.cases.append(item)
+            except Exception as e:
+                logger.error("item:" + str(item) + ", " + str(e)'''
+
+    def import_csv(self, filename):
         """ Import from a csv file with the cases and any attributes.
         The csv file must have a header row which details the attribute names.
         The csv file must be comma delimited. The first column must have the case ids.
         The attribute types are calculated from the data.
         """
 
-        if self.cases != []:
-            logger.warning(_("Cases have already been created."))
-        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select attributes file'),
-            self.app.settings['directory'], "(*.csv)")[0]
-        if filename == "":
-            return
-        if filename[-4:].lower() != ".csv":
-            msg = filename + "\n" + _("is not a .csv file. File not imported")
-            Message(self.app, _("Warning"), msg, "warning").exec_()
-            self.parent_textEdit.append(msg)
-            return
         values = []
         with open(filename, 'r', newline='') as f:
             reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
@@ -422,7 +485,7 @@ class DialogCases(QtWidgets.QDialog):
         if y > 2:  # update attribute value
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
-            print(attribute_name)
+            #print(attribute_name)
             cur = self.app.conn.cursor()
 
             # Check numeric for numeric attributes, clear "" if cannot be cast
