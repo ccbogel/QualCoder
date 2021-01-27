@@ -37,6 +37,7 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
+from GUI.base64_helper import *
 from GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from select_items import DialogSelectItems
 
@@ -76,10 +77,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         try:
-            w = int(self.app.settings['dialogcodecrossovers_w'])
-            h = int(self.app.settings['dialogcodecrossovers_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
             s0 = int(self.app.settings['dialogcodecrossovers_splitter0'])
             s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
             if s0 > 10 and s1 > 10:
@@ -96,11 +93,15 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
-        self.ui.pushButton_exportcsv.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
-        self.ui.pushButton_calculate.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
 
     def get_code_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -553,12 +554,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         mb.exec_()
         self.parent_textEdit.append(_("Code relations csv file exported to: ") + filename)
 
-
     def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
+        """ Save splitter dimensions. """
 
-        self.app.settings['dialogcodecrossovers_w'] = self.size().width()
-        self.app.settings['dialogcodecrossovers_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodecrossovers_splitter0'] = sizes[0]
         self.app.settings['dialogcodecrossovers_splitter1'] = sizes[1]
