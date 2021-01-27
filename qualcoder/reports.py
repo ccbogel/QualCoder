@@ -40,9 +40,11 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
+from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -84,11 +86,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
-        self.ui.pushButton_exporttext.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
-        self.ui.pushButton_exportcsv.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -99,12 +105,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
-
-    '''def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogreportcodefrequencies_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()'''
 
     def select_files(self):
         """ Report code frequencies for all files or selected files. """
@@ -476,14 +476,20 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
-        self.ui.pushButton_run.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/clear_icon.png'))
-        self.ui.pushButton_clear.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/clear_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
+        self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
-        self.ui.pushButton_exporttext.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -829,9 +835,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
-        self.ui.pushButton_search.setIcon(icon)
-        self.ui.label_exports.setPixmap(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_search.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.label_exports.setPixmap(pm)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
