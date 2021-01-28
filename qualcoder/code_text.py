@@ -989,6 +989,7 @@ class DialogCodeText(QtWidgets.QWidget):
         A annotate - for current selection
         Q Quick Mark with code - for current selection
         B Create bookmark - at clicked position
+        M memo code - at clicked position
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
@@ -1015,13 +1016,16 @@ class DialogCodeText(QtWidgets.QWidget):
             if len(codes_here) == 1:
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
                     self.shrink_to_left(codes_here[0])
+                    return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
                     self.shrink_to_right(codes_here[0])
+                    return True
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
                     self.extend_left(codes_here[0])
+                    return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
-                return True
+                    return True
 
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
@@ -1034,13 +1038,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_cursor_pos])
                 self.app.conn.commit()
                 return True
-            '''# Memo for current code
-            #TODO does not recognise M press when on a coded text segment ? Dont know why?
-            #TODO recognises overlapping codes, and recognises uncoded areas
+            # Memo for current code
             if key == QtCore.Qt.Key_M:
-                print("Memo", cursor_pos)
                 self.coded_text_memo(cursor_pos)
-                return True'''
+                return True
             # Overlapping codes cycle
             if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled():
                 i = self.ui.comboBox_codes_in_text.currentIndex()
