@@ -2189,19 +2189,19 @@ class DialogCodeAV(QtWidgets.QDialog):
                     action_play_text = menu.addAction(_("Play text"))
                     play_text_avid = item['avid']
                 action_unmark = menu.addAction(_("Unmark"))
-                action_code_memo = menu.addAction(_("Memo coded text"))
-                action_start_pos = menu.addAction(_("Change start position"))
-                action_end_pos = menu.addAction(_("Change end position"))
+                action_code_memo = menu.addAction(_("Memo coded text M"))
+                action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 break
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
-                action_mark = menu.addAction(_("Mark"))
+                action_mark = menu.addAction(_("Mark (Q)"))
             # Use up to 5 recent codes
             if len(self.recent_codes) > 0:
-                submenu = menu.addMenu(_("Mark with recent code"))
+                submenu = menu.addMenu(_("Mark with recent code (R)"))
                 for item in self.recent_codes:
                     submenu.addAction(item['name'])
-            action_annotate = menu.addAction(_("Annotate"))
+            action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
             if self.segment_for_text is None:
                 action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))
@@ -2628,6 +2628,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             for c in self.codes:
                 if item['cid'] == c['cid']:
                     item['name'] = c['name']
+                    item['color'] = c['color']
 
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
@@ -2644,16 +2645,14 @@ class ToolTip_EventFilter(QtCore.QObject):
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
-                    # print(item)
                     try:
-                        if text != "":
-                            text = text + "\n"
-                        text += item['name']  # += as can have multiple codes on same position
+                        text += '<p style="background-color:' + item['color'] + '">' + item['name']
                         if item['avid'] is not None:
                             text += " [" + msecs_to_mins_and_secs(item['av_pos0'])
                             text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
                         if item['memo'] is not None and item['memo'] != "":
                             text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                        text += "</p>"
                     except Exception as e:
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                         msg += str(item) + "\n" + str(self.code_text)
