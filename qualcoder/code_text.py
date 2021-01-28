@@ -650,7 +650,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.code_text:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
-                action_code_memo = menu.addAction(_("Memo coded text"))
+                action_code_memo = menu.addAction(_("Memo coded text (M)"))
                 action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 break
