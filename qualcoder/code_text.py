@@ -986,11 +986,12 @@ class DialogCodeText(QtWidgets.QWidget):
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
-        A annotate
-        Q Quick Mark with code
-        B Create bookmark
-        S search text
-        R opens a context menu for recently used codes for selection from for marking text
+        A annotate - for current selection
+        Q Quick Mark with code - for current selection
+        B Create bookmark - at clicked position
+        O Shortcut to cycle through overlapping codes - at clicked position
+        S search text - may include current selection
+        R opens a context menu for recently used codes for marking text
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -1006,6 +1007,7 @@ class DialogCodeText(QtWidgets.QWidget):
             key = event.key()
             mod = event.modifiers()
             cursor_pos = self.ui.textEdit.textCursor().position()
+            selected_text = self.ui.textEdit.textCursor().selectedText()
             codes_here = []
             for item in self.code_text:
                 if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
@@ -1020,11 +1022,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
                 return True
-            selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Quick Mark selected
-            if key == QtCore.Qt.Key_Q and selected_text != "":
-                self.mark()
-                return True
+
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate()
@@ -1036,6 +1034,28 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_cursor_pos])
                 self.app.conn.commit()
                 return True
+            '''# Memo for current code
+            #TODO does not recognise M press when on a coded text segment ? Dont know why?
+            #TODO recognises overlapping codes, and recognises uncoded areas
+            if key == QtCore.Qt.Key_M:
+                print("Memo", cursor_pos)
+                self.coded_text_memo(cursor_pos)
+                return True'''
+            # Overlapping codes cycle
+            if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled():
+                i = self.ui.comboBox_codes_in_text.currentIndex()
+                self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
+                if self.ui.comboBox_codes_in_text.currentIndex() < 1:
+                    self.ui.comboBox_codes_in_text.setCurrentIndex(1)
+                return True
+            # Quick mark selected
+            if key == QtCore.Qt.Key_Q and selected_text != "":
+                self.mark()
+                return True
+            # Recent codes context menu
+            if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
+                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+                return True
             # Search, with or without selected
             if key == QtCore.Qt.Key_S and self.file_ is not None:
                 if selected_text == "":
@@ -1044,9 +1064,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.lineEdit_search.setText(selected_text)
                     self.search_for_text()
                     self.ui.pushButton_next.setFocus()
-                return True
-            if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
-                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
                 return True
         return False
 
@@ -1989,7 +2006,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def overlapping_codes_in_text(self):
         """ When coded text is clicked on, the code names at this location are
         displayed in the combobox above the text edit widget.
-        Only enabled if two or more codes are here. """
+        Only enabled if two or more codes are here.
+        Called by: textEdit cursor position changed. """
 
         self.ui.comboBox_codes_in_text.setEnabled(False)
         self.ui.label_codes_count.setEnabled(False)
