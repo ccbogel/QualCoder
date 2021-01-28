@@ -138,6 +138,9 @@ class DialogCodeAV(QtWidgets.QDialog):
     # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
+    # overlapping codes in text index
+    overlap_code_index = 0
+
     def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of audio and video files.
         Can code a transcribed text file for the audio / video.
@@ -172,12 +175,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        try:
-            x = int(self.app.settings['codeav_abs_pos_x'])
-            y = int(self.app.settings['codeav_abs_pos_y'])
-            self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
-        except:
-            pass
         try:
             s0 = int(self.app.settings['dialogcodeav_splitter0'])
             s1 = int(self.app.settings['dialogcodeav_splitter1'])
@@ -752,9 +749,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                     w = 100
                     h = 80
                 self.ddialog.resize(w, h)
-                x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
-                y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
-                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
+                '''x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
+                y = int(self.app.settings['codeav_video_pos_y'])  - int(self.app.settings['codeav_abs_pos_y'])
+                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))'''
             except:
                 self.ddialog.resize(500, 400)
         else:
@@ -1099,6 +1096,12 @@ class DialogCodeAV(QtWidgets.QDialog):
     def update_sizes(self):
         """ Called by splitter resizes and play/pause """
 
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodeav_splitter0'] = sizes[0]
+        self.app.settings['dialogcodeav_splitter1'] = sizes[2]  # as 30 is for size[1] for the buttons
+        sizes = self.ui.splitter_2.sizes()
+        self.app.settings['dialogcodeav_splitter_h0'] = sizes[0]
+        self.app.settings['dialogcodeav_splitter_h1'] = sizes[1]
         if self.file_ is not None and self.file_['mediapath'] is not None \
                 and self.file_['mediapath'][0:7] != "/audio/" \
                 and self.file_['mediapath'][0:6] != "audio:":
@@ -1111,12 +1114,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.app.settings['video_h'] = size.height()
             else:
                 self.app.settings['video_h'] = 80
-        # Get absolute video dialog position
+        '''# Get absolute video dialog position
         self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
         #To change below ?
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
-        self.app.settings['codeav_abs_pos_y'] = self.pos().y()
+        self.app.settings['codeav_abs_pos_y'] = self.pos().y()'''
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
@@ -1441,9 +1444,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             Ctrl + Shift + < to decrease play rate
 
             TextEdit:
-            A annotate
-            Q Quick Mark with code
-            R opens a context menu for recently used codes for selection from for marking text
+            A annotate - for current selection
+            M memo code - at clicked position
+            O Shortcut to cycle through overlapping codes - at clicked position
+            Q Quick Mark with code - for current selection
+            R opens a context menu for recently used codes for marking text
 
         Also detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
@@ -1487,17 +1492,26 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Quick Mark selected
-            if key == QtCore.Qt.Key_Q and selected_text != "":
-                self.mark()
-                return True
-            if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
-                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
-                return True
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate(self.ui.textEdit.textCursor().position())
                 return True
+            # Memo for current code
+            if key == QtCore.Qt.Key_M:
+                self.coded_text_memo(cursor_pos)
+                return True
+            # Overlapping codes cycle
+            if key == QtCore.Qt.Key_O and len(codes_here) > 1:
+                self.cycle_overlap()
+            # Quick Mark selected
+            if key == QtCore.Qt.Key_Q and selected_text != "":
+                self.mark()
+                return True
+            # Recent codes menu
+            if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
+                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+                return True
+
         #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
@@ -1554,6 +1568,35 @@ class DialogCodeAV(QtWidgets.QDialog):
             if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text)
+
+    def cycle_overlap(self):
+        """ Cycle through coded text items located at current cursor position.
+        Highlight the coded text. """
+
+        pos = self.ui.textEdit.textCursor().position()
+        codes_here = []
+        for i in self.code_text:
+            if i['pos0'] <= pos and i['pos1'] >= pos:
+                codes_here.append(i)
+        self.overlap_code_index += 1
+        if self.overlap_code_index >= len(codes_here):
+            self.overlap_code_index = 0
+        item = codes_here[self.overlap_code_index]
+        for c in self.codes:
+            if item['cid'] == c['cid']:
+                item['color'] = c['color']
+                break
+        # Remove formatting
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+        # Reapply formatting
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(item['color']))
+        fmt.setBackground(brush)
+        cursor.setCharFormat(fmt)
+        self.apply_overline_to_overlaps()
 
     def rewind_30_seconds(self):
         """ Rewind AV by 30 seconds. Shift + R """
@@ -2094,6 +2137,36 @@ class DialogCodeAV(QtWidgets.QDialog):
                 formatB = QtGui.QTextCharFormat()
                 formatB.setFontWeight(QtGui.QFont.Bold)
                 cursor.mergeCharFormat(formatB)
+        self.apply_overline_to_overlaps()
+
+    def apply_overline_to_overlaps(self):
+        """ Apply overline format to coded text sections which are overlapping. """
+
+        overlapping = []
+        overlaps = []
+        for i in self.code_text:
+            #print(item['pos0'], type(item['pos0']), item['pos1'], type(item['pos1']))
+            for j in self.code_text:
+                if j != i:
+                    if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
+                        #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
+                        if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                            overlaps.append([j['pos0'], j['pos1']])
+                        elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                            overlaps.append([i['pos0'], i['pos1']])
+                        elif j['pos0'] > i['pos0']:
+                            overlaps.append([j['pos0'], i['pos1']])
+                        else:  # j['pos0'] < i['pos0']:
+                            overlaps.append([j['pos1'], i['pos0']])
+        #print(overlaps)
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        for o in overlaps:
+            fmt = QtGui.QTextCharFormat()
+            fmt.setFontOverline(True)
+            cursor.setPosition(o[0], QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
+            cursor.mergeCharFormat(fmt)
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
@@ -2921,10 +2994,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui = Ui_Dialog_view_av()
         self.ui.setupUi(self)
         try:
-            '''w = int(self.app.settings['dialogviewav_w'])
-            h = int(self.app.settings['dialogviewav_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)'''
             x = int(self.app.settings['viewav_abs_pos_x'])
             y = int(self.app.settings['viewav_abs_pos_y'])
             self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
@@ -3652,8 +3721,6 @@ class DialogViewAV(QtWidgets.QDialog):
     def update_sizes(self):
         """ Called by play/pause and close event """
 
-        '''self.app.settings['dialogviewav_w'] = self.size().width()
-        self.app.settings['dialogviewav_h'] = self.size().height()'''
         if self.file_['mediapath'][0:7] != "/audio/" and self.file_['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
