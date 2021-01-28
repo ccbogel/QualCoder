@@ -515,7 +515,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
-        Only where text is two or more characters long.
+        Only where text is three or more characters long.
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
@@ -524,14 +524,14 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
-        if len(self.search_indices) == 0:
+        if self.search_indices == []:
             self.ui.pushButton_next.setEnabled(False)
             self.ui.pushButton_previous.setEnabled(False)
         self.search_indices = []
         self.search_index = -1
         search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(search_term) >= 2:
+        if len(search_term) >= 3:
             pattern = None
             flags = 0
             if not self.ui.checkBox_search_case.isChecked():
@@ -577,13 +577,14 @@ class DialogCodeText(QtWidgets.QWidget):
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.file_ is None:
+        if self.file_ is None or self.search_indices== []:
             return
         self.search_index -= 1
-        if self.search_index == -1:
+        if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
+
         # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
         if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
             self.load_file(prev_result[0])
@@ -595,9 +596,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
 
-        if self.file_ is None:
+        if self.file_ is None or self.search_indices == []:
             return
-
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
