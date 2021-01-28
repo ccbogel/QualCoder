@@ -651,20 +651,20 @@ class DialogCodeText(QtWidgets.QWidget):
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
                 action_code_memo = menu.addAction(_("Memo coded text"))
-                action_start_pos = menu.addAction(_("Change start position"))
-                action_end_pos = menu.addAction(_("Change end position"))
+                action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 break
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
-                action_mark = menu.addAction(_("Mark"))
+                action_mark = menu.addAction(_("Mark (Q)"))
             # Use up to 10 recent codes
             if len(self.recent_codes) > 0:
-                submenu = menu.addMenu(_("Mark with recent code"))
+                submenu = menu.addMenu(_("Mark with recent code (R)"))
                 for item in self.recent_codes:
                     submenu.addAction(item['name'])
-            action_annotate = menu.addAction(_("Annotate"))
+            action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-        action_set_bookmark = menu.addAction(_("Set bookmark"))
+        action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
