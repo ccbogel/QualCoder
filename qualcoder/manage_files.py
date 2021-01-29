@@ -193,12 +193,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         #Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        dialog_w = self.size().width() - 20
-        table_w = 0
-        for i in range(self.ui.tableWidget.columnCount()):
-            table_w += self.ui.tableWidget.columnWidth(i)
-        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
-            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -1815,6 +1809,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if fid == a[2] and a[0] == header:
                         #print("found", a)
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
+        dialog_w = self.size().width() - 20
+        table_w = 0
+        for i in range(self.ui.tableWidget.columnCount()):
+            table_w += self.ui.tableWidget.columnWidth(i)
+        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
+            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':
