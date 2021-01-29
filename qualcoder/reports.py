@@ -845,7 +845,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_matrix.setPixmap(pm)
-        options = [_("Categories"), _("Codes")]
+        options = [_("Top categories"), _("Categories"), _("Codes")]
         self.ui.comboBox_matrix.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
@@ -2126,6 +2126,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.splitter.replaceWidget(2, QtWidgets.QTableWidget())
         elif matrix_option == "Categories":
             self.fill_matrix_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+        elif matrix_option == "Top categories":
+            self.fill_matrix_top_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
         else:
             self.fill_matrix_codes(self.text_results, self.image_results, self.av_results, self.case_ids)
 
@@ -2246,18 +2248,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Fill a tableWidget with rows of cases and columns of codes.
         First identify all codes.
         Fill tableWidget with columns of codes and rows of cases.
+        Called by: fill_text_edit_with_search_results
         param:
-            text_results
-            image_results
-            av_results
-            case_ids
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
         """
 
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
         horizontal_labels = []  # column (code) labels
         for item in items:
-            print(item.text(0), item.text(1))
+            #print(item.text(0), item.text(1))
             if item.text(1)[:3] == "cid":
                 horizontal_labels.append(item.text(0))  #, 'cid': item.text(1)})
 
@@ -2304,17 +2307,121 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
-        First identify top-level categories and codes. Then map all other codes to the
-        top-level categories.
-        Fill tableWidget with columns of top-level categories and rows of cases.
+        First identify the categories. Then map all codes which are directly assigned to the categories.
+        Fill tableWidget with columns of categories and rows of cases.
+        Called by: fill_text_edit_with_search_results
         param:
-            text_results
-            image_results
-            av_results
-            case_ids
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
         """
 
-        # get top level categories and codes
+        # G categories
+        items = self.ui.treeWidget.selectedItems()
+        top_level = []  # the categories at any level
+        horizontal_labels = []
+        sub_codes = []
+        for item in items:
+            #print(item.text(0), item.text(1), "root", root)
+            if item.text(1)[0:3] == "cat":
+                top_level.append({'name': item.text(0), 'cat': item.text(1)})
+                horizontal_labels.append(item.text(0))
+            # Find sub-code and traverse upwards to map to category
+            if item.text(1)[0:3] == 'cid':
+                #print("sub", item.text(0), item.text(1))
+                not_top = True
+                sub_code = {'codename': item.text(0), 'cid': item.text(1)}
+                # May be None of a top level code - as this will have no parent
+                if item.parent() is not None:
+                    sub_code['top'] = item.parent().text(0)
+                    sub_codes.append(sub_code)
+
+        # Add category name - which will match the tableWidget column category name
+        res_text_categories = []
+        for i in text_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_text_categories.append(i)
+
+        res_image_categories = []
+        for i in image_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_image_categories.append(i)
+
+        res_av_categories = []
+        for i in av_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_av_categories.append(i)
+
+        cur = self.app.conn.cursor()
+        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
+        cases = cur.fetchall()
+        vertical_labels = []
+        for c in cases:
+            vertical_labels.append(c[1])
+
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # Already have been replaced with a textEdit (file selection the view text in context)
+        ta = QtWidgets.QTableWidget()
+        ta.setColumnCount(len(horizontal_labels))
+        ta.setHorizontalHeaderLabels(horizontal_labels)
+        ta.setRowCount(len(cases))
+        ta.setVerticalHeaderLabels(vertical_labels)
+        for row, case in enumerate(cases):
+            for col, colname in enumerate(horizontal_labels):
+                txt_edit = QtWidgets.QTextEdit("")
+                for t in res_text_categories:
+                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertPlainText(t['text'] + "\n")
+                for a in res_av_categories:
+                    if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertPlainText(a['text'] + "\n")
+                for counter, i in enumerate(res_image_categories):
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(i))
+                        self.put_image_into_textedit(i, counter, txt_edit)
+                ta.setCellWidget(row, col, txt_edit)
+        ta.resizeRowsToContents()
+        ta.resizeColumnsToContents()
+        # Maximise the space from one column or one row
+        if ta.columnCount() == 1:
+            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if ta.rowCount() == 1:
+            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, ta)
+        self.ui.splitter.setSizes([100, 300, 300])
+
+    def fill_matrix_top_categories(self, text_results, image_results, av_results, case_ids):
+        """ Fill a tableWidget with rows of cases and columns of categories.
+        First identify top-level categories. Then map all other codes to the
+        top-level categories.
+        Fill tableWidget with columns of top-level categories and rows of cases.
+        Called by: fill_text_edit_with_search_results
+        param:
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
+        """
+
+        # get top level categories
         items = self.ui.treeWidget.selectedItems()
         top_level = []
         horizontal_labels = []
@@ -2322,10 +2429,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         for item in items:
             root = self.ui.treeWidget.indexOfTopLevelItem(item)
             #print(item.text(0), item.text(1), "root", root)
-            if root > -1:
-                top_level.append({'name': item.text(0), 'cat_or_cid': item.text(1)})
+            if root > -1 and item.text(1)[0:3] == "cat":
+                top_level.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
-            #find sub-code and traverse upwards to map to top-level category
+            # Find sub-code and traverse upwards to map to top-level category
             if root == -1 and item.text(1)[0:3] == 'cid':
                 #print("sub", item.text(0), item.text(1))
                 not_top = True
@@ -2337,28 +2444,36 @@ class DialogReportCodes(QtWidgets.QDialog):
                         sub_code['top'] = item.text(0)
                         sub_codes.append(sub_code)
 
-        # add the top-level name - which will match the tableWidget column name
+        # Add the top-level name - which will match the tableWidget column category name
+        res_text_categories = []
         for i in text_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_text_categories.append(i)
+
+        res_image_categories = []
         for i in image_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_image_categories.append(i)
+
+        res_av_categories = []
         for i in av_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_av_categories.append(i)
 
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
@@ -2367,8 +2482,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in cases:
             vertical_labels.append(c[1])
 
-        # need to dynamically replace the existing table widget. Because, the tablewidget may
-        # already have been replaced with a textEdit (file selection the view text in context)
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # Already have been replaced with a textEdit (file selection the view text in context)
         ta = QtWidgets.QTableWidget()
         ta.setColumnCount(len(horizontal_labels))
         ta.setHorizontalHeaderLabels(horizontal_labels)
@@ -2377,22 +2492,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
-                for t in text_results:
+                for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(t))
                         txt_edit.insertPlainText(t['text'] + "\n")
-                for a in av_results:
+                for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(a))
                         txt_edit.insertPlainText(a['text'] + "\n")
-                for counter, i in enumerate(image_results):
+                for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(i))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
         ta.resizeRowsToContents()
         ta.resizeColumnsToContents()
-        # maximise the space from one column or one row
+        # Maximise the space from one column or one row
         if ta.columnCount() == 1:
             ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         if ta.rowCount() == 1:
