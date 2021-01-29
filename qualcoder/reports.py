@@ -842,6 +842,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.label_exports.setPixmap(pm)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.label_matrix.setPixmap(pm)
+        options = [_("Categories"), _("Codes")]
+        self.ui.comboBox_matrix.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
@@ -2116,10 +2121,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
 
         # Fill case matrix or clear third splitter pane.
-        if self.case_ids != "":
-            self.fill_matrix(self.text_results, self.image_results, self.av_results, self.case_ids)
-        else:
+        matrix_option = self.ui.comboBox_matrix.currentText()
+        if self.case_ids == "":
             self.ui.splitter.replaceWidget(2, QtWidgets.QTableWidget())
+        elif matrix_option == "Categories":
+            self.fill_matrix_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+        else:
+            self.fill_matrix_codes(self.text_results, self.image_results, self.av_results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -2170,20 +2178,28 @@ class DialogReportCodes(QtWidgets.QDialog):
         if img['memo'] != "":
             text_edit.insertPlainText(_("Memo: ") + img['memo'] + "\n")
 
-    @staticmethod
-    def html_heading(item):
+    def html_heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
         param:
             item: dictionary of code, file or case, positions, text, coder
         """
 
+        cur = self.app.conn.cursor()
+        cur.execute("select name from source where id=?", [item['fid']])
+        filename = ""
+        try:  # In case no filename results, rare possibility
+            filename = cur.fetchone()[0]
+        except:
+            pass
+
         html = "<br />"
         if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
             item['file_or_casename'][-5:].lower() in (".html", ".docx", ".epub") or \
             item['file_or_casename'][-12:] == ".transcribed":
-            html += "[VIEW] "
+            html += _("[VIEW] ")
         html += "<em><span style=\"background-color:" + item['color'] + "\">"
         html += item['codename'] + "</span>, "
+        html += _("File: ")  + filename + ", "
         html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
         html += ", " + item['coder'] + "</em><br />"
         return html
@@ -2226,11 +2242,77 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.replaceWidget(2, te)
         self.ui.splitter.setSizes([100,100, 200])
 
-    def fill_matrix(self, text_results, image_results, av_results, case_ids):
+    def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
+        """ Fill a tableWidget with rows of cases and columns of codes.
+        First identify all codes.
+        Fill tableWidget with columns of codes and rows of cases.
+        param:
+            text_results
+            image_results
+            av_results
+            case_ids
+        """
+
+        # Get selected codes (Matrix columns)
+        items = self.ui.treeWidget.selectedItems()
+        horizontal_labels = []  # column (code) labels
+        for item in items:
+            print(item.text(0), item.text(1))
+            if item.text(1)[:3] == "cid":
+                horizontal_labels.append(item.text(0))  #, 'cid': item.text(1)})
+
+        # Get cases (rows)
+        cur = self.app.conn.cursor()
+        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
+        cases = cur.fetchall()
+        vertical_labels = []
+        for c in cases:
+            vertical_labels.append(c[1])
+
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # already have been replaced with a textEdit (file selection the view text in context)
+        ta = QtWidgets.QTableWidget()
+        ta.setColumnCount(len(horizontal_labels))
+        ta.setHorizontalHeaderLabels(horizontal_labels)
+        ta.setRowCount(len(cases))
+        ta.setVerticalHeaderLabels(vertical_labels)
+        for row, case in enumerate(cases):
+            for col, colname in enumerate(horizontal_labels):
+                txt_edit = QtWidgets.QTextEdit("")
+                for t in text_results:
+                    if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertPlainText(t['text'] + "\n")
+                for a in av_results:
+                    if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertPlainText(a['text'] + "\n")
+                for counter, i in enumerate(image_results):
+                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(i))
+                        self.put_image_into_textedit(i, counter, txt_edit)
+                ta.setCellWidget(row, col, txt_edit)
+        ta.resizeRowsToContents()
+        ta.resizeColumnsToContents()
+        # maximise the space from one column or one row
+        if ta.columnCount() == 1:
+            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if ta.rowCount() == 1:
+            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, ta)
+        self.ui.splitter.setSizes([100, 300, 300])
+
+    def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
-        First identify top-lvel categories and codes. Then map all other codes to the
-        top-level cataegories. Fill tableWidget with columns of top-level items and rows
-        of cases. """
+        First identify top-level categories and codes. Then map all other codes to the
+        top-level categories.
+        Fill tableWidget with columns of top-level categories and rows of cases.
+        param:
+            text_results
+            image_results
+            av_results
+            case_ids
+        """
 
         # get top level categories and codes
         items = self.ui.treeWidget.selectedItems()
