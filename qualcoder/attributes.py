@@ -86,6 +86,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.get_attributes()
         self.fill_tableWidget()
+        #Initial resize of table columns
+        self.ui.tableWidget.resizeColumnsToContents()
         #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
@@ -299,7 +301,6 @@ class DialogManageAttributes(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.VALUETYPE_COLUMN, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
-        self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
 
 

@@ -141,6 +141,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.fill_tableWidget()
+        #Initial resize of table columns
+        self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 1])
         try:
             s0 = int(self.app.settings['dialogcases_splitter0'])
@@ -249,7 +251,7 @@ class DialogCases(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
-        """  """
+        """ Get user chosen file as xlxs or csv for importation """
 
         if self.cases != []:
             logger.warning(_("Cases have already been created."))
@@ -619,12 +621,11 @@ class DialogCases(QtWidgets.QDialog):
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
 
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.label_cases.setText(_("Cases: ") + str(len(self.cases)))
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-
-        self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         for row, c in enumerate(self.cases):
             self.ui.tableWidget.insertRow(row)
@@ -648,14 +649,12 @@ class DialogCases(QtWidgets.QDialog):
             item.setFlags(QtCore.Qt.ItemIsEnabled)
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
-
-            # add the attribute values
+            # 0Add attribute values to their columns
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if cid == a[2] and a[0] == header:
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.verticalHeader().setVisible(False)
-        self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':

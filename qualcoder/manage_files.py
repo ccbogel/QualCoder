@@ -191,6 +191,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
+        #Initial resize of table columns
+        self.ui.tableWidget.resizeColumnsToContents()
+        dialog_w = self.size().width() - 20
+        table_w = 0
+        for i in range(self.ui.tableWidget.columnCount()):
+            table_w += self.ui.tableWidget.columnWidth(i)
+        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
+            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -1773,9 +1781,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = data['icon']
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
-            # having un-editable file names helps with assigning icons
+            # Having un-editable file names helps with assigning icons
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            # if externally linked add link details to tooltip
+            # Externally linked - add link details to tooltip
             name_tt = data['metadata']
             if data['mediapath'] is not None and ':' in data['mediapath']:
                 name_tt += _("\nExternally linked file:\n")
@@ -1807,15 +1815,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if fid == a[2] and a[0] == header:
                         #print("found", a)
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
-        self.ui.tableWidget.resizeColumnsToContents()
-        table_w = 0
-        for i in range(self.ui.tableWidget.columnCount()):
-            table_w += self.ui.tableWidget.columnWidth(i)
-        #print("t", table_w)
-        #print("d", self.size().width() - 20)  # 20 for L and R margins
-        dialog_w = self.size().width() - 20
-        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
-            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':
