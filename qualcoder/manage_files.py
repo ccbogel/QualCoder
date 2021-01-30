@@ -193,6 +193,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         #Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
