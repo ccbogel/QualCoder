@@ -128,6 +128,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_counts.setText(_translate("Dialog_reportCodings", "Counts:"))
         self.label_title.setText(_translate("Dialog_reportCodings", "Coding report"))
         self.label_matrix.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Matrix options</p></body></html>"))
+        self.comboBox_matrix.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Case matrix options</p></body></html>"))
 
 
 if __name__ == "__main__":
