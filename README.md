@@ -112,7 +112,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyserial pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
+pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
 ```
 
 4) Install system dependencies using Homebrew (aka `brew`) 
