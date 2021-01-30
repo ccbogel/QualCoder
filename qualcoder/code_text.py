@@ -214,6 +214,11 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
+        self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm))
+        self.ui.spinBox_font_size.setValue(self.app.settings['fontsize'])
+        self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
 
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_back_icon.png'))
         pm = QtGui.QPixmap()
@@ -260,6 +265,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
+
+    def change_text_font_size(self):
+        """ Spinbox font size changed, range: 6 - 32 points. """
+
+        font = 'font: ' + str(self.ui.spinBox_font_size.value()) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit.setStyleSheet(font)
 
     def get_files(self):
         """ Get files with additional details and fill list widget """
@@ -989,6 +1001,7 @@ class DialogCodeText(QtWidgets.QWidget):
         A annotate - for current selection
         Q Quick Mark with code - for current selection
         B Create bookmark - at clicked position
+        H Hide / Unhide top groupbox
         M memo code - at clicked position
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
@@ -1004,7 +1017,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
-        if event.type() == 7 and self.ui.textEdit.hasFocus():
+        if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
             key = event.key()
             mod = event.modifiers()
             cursor_pos = self.ui.textEdit.textCursor().position()
@@ -1031,12 +1044,16 @@ class DialogCodeText(QtWidgets.QWidget):
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate()
                 return True
-            # Set Bookmark
+            # Bookmark
             if key == QtCore.Qt.Key_B and self.file_ is not None:
                 text_cursor_pos = self.ui.textEdit.textCursor().position()
                 cur = self.app.conn.cursor()
                 cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_cursor_pos])
                 self.app.conn.commit()
+                return True
+            # Hide unHide top groupbox
+            if key == QtCore.Qt.Key_H:
+                self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
                 return True
             # Memo for current code
             if key == QtCore.Qt.Key_M:

@@ -822,6 +822,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
         Also use eventFilter for QGraphicsView.
+
+        Key events on scene
+        H Hide / unHide top groupbox
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -852,6 +855,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
                     p = event.buttonDownScenePos(2)
                     self.scene_context_menu(p)
+                    return True
+            # Hide / unHide top groupbox
+            if type(event) == QtGui.QKeyEvent:
+                key = event.key()
+                if key == QtCore.Qt.Key_H:
+                    self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                     return True
         return False
 
@@ -892,6 +901,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         returns: None or coded item
         """
 
+        if self.file_ is None:
+            return
         for item in self.code_areas:
             if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
                 #print(pos, item['x1'], item['y1'], item['width'], item['height'])
