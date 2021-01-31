@@ -44,7 +44,9 @@ from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 
+from helpers import Message
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -1189,6 +1191,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_option_selected(self):
         """ ComboBox export option selected. """
 
+        #TODO add case matrix as csv, xlsx options
         text = self.ui.comboBox_export.currentText()
         if text == "":
             return
@@ -2195,10 +2198,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             pass
 
         html = "<br />"
-        if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
+        '''if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
             item['file_or_casename'][-5:].lower() in (".html", ".docx", ".epub") or \
-            item['file_or_casename'][-12:] == ".transcribed":
-            html += _("[VIEW] ")
+            item['file_or_casename'][-12:] == ".transcribed":'''
+        html += _("[VIEW] ")
         html += "<em><span style=\"background-color:" + item['color'] + "\">"
         html += item['codename'] + "</span>, "
         html += _("File: ")  + filename + ", "
@@ -2207,42 +2210,60 @@ class DialogReportCodes(QtWidgets.QDialog):
         return html
 
     def show_context_of_clicked_heading(self):
-        """ Heading (code, file, owner) clicked so show context of coding in dialog. """
-
-        pos = self.ui.textEdit.textCursor().position()
-        coded_text = None
-        for row in self.text_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                coded_text = row
-                break
-        if coded_text is None:
-            return
-        self.view_text_result_in_context(coded_text)
-
-    def view_text_result_in_context(self, coded_text):
-        """ View the coded text in context of the original text file in the third split pane.
-        The third split pane contains a tablewidget. So add a textedit to this.
-        If a case matrix is shown, this method override it and replaces the matrix with the text in context.
+        """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
+        Called by: textEdit.cursorPositionChanged, after results are filled.
+        Results contain textedit_start and textedit_end which map the cursor position to the specific text result.
         """
 
-        file_list = self.app.get_file_texts([coded_text['fid'], ])
+        pos = self.ui.textEdit.textCursor().position()
+        # Check the clicked position for a text result
+        found = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                self.view_text_result_in_context(row)
+                found = row
+                return
+        # Check the position for an image result
+        for row in self.image_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInImage(self.app, row)
+                ui.exec_()
+                return
+        # Check the position for an a/v result
+        for row in self.av_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                print(row)
+                #TODO
+                break
+
+    def view_text_result_in_context(self, result):
+        """ View the coded text in context of the original text file in a modal dialog.
+        """
+
+        file_list = self.app.get_file_texts([result['fid'], ])
         file_text = file_list[0]
         title = ""
-        if coded_text['file_or_case'] == "File":
-            title = _("File: ") + coded_text['file_or_casename']
-        if coded_text['file_or_case'] == "Case":
-            title = _("Case: ") +coded_text['file_or_casename'] + ", " + file_text['name']
+        if result['file_or_case'] == "File":
+            title = _("File: ") + result['file_or_casename']
+        if result['file_or_case'] == "Case":
+            title = _("Case: ") + result['file_or_casename'] + ", " + file_text['name']
         te = QtWidgets.QTextEdit()
         te.setPlainText(file_text['fulltext'])
         cursor = te.textCursor()
-        cursor.setPosition(coded_text['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(coded_text['pos1'], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(result['pos0'], QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(result['pos1'], QtGui.QTextCursor.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(coded_text['color']))
+        brush = QtGui.QBrush(QtGui.QColor(result['color']))
         fmt.setBackground(brush)
         cursor.setCharFormat(fmt)
-        self.ui.splitter.replaceWidget(2, te)
-        self.ui.splitter.setSizes([100,100, 200])
+        ui = QtWidgets.QDialog()
+        ui.setWindowTitle(title)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        ui.setStyleSheet(font)
+        gridLayout = QtWidgets.QGridLayout(ui)
+        gridLayout.addWidget(te, 1, 0)
+        ui.exec_()
 
     def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
@@ -2284,15 +2305,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 txt_edit = QtWidgets.QTextEdit("")
                 for t in text_results:
                     if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(t['text'] + "\n")
                 for a in av_results:
                     if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(image_results):
                     if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(i))
+                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
         ta.resizeRowsToContents()
@@ -2387,15 +2408,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 txt_edit = QtWidgets.QTextEdit("")
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(t['text'] + "\n")
                 for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(i))
+                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
         ta.resizeRowsToContents()
@@ -2494,15 +2515,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 txt_edit = QtWidgets.QTextEdit("")
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(t['text'] + "\n")
                 for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(i))
+                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
         ta.resizeRowsToContents()
@@ -2568,5 +2589,108 @@ class ToolTip_EventFilter(QtCore.QObject):
                         receiver.setToolTip(msg)
         #Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
+
+
+class DialogCodeInImage(QtWidgets.QDialog):
+    """ View coded section in original image.
+    Scaleable and scrollable image. The slider values range from 10 to 99.
+    Could not use DialogViewImage as this would result in a circular import, as ViewImage import reports Classes.
+    """
+
+    app = None
+    data = None
+    pixmap = None
+    label = None
+    scale = None
+    scene = None
+
+    def __init__(self, app, data, parent=None):
+        """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
+        mediapath may be a link as: 'images:path'
+        param:
+            app : class containing app details such as database connection
+            image_data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
+                    mediapath, fid, memo, file_or_case}
+        """
+
+        sys.excepthook = exception_handler
+        self.app = app
+        self.data = data
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_Dialog_code_context_image()
+        self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        abs_path = ""
+        if "images:" in self.data['mediapath']:
+            abs_path = self.data['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + self.data['mediapath']
+        self.setWindowTitle(abs_path)
+        image = QtGui.QImage(abs_path)
+        if image.isNull():
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
+            self.close()
+            return
+        self.scene = QtWidgets.QGraphicsScene()
+        self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setPos(0, 0)
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
+        self.scene.addItem(pixmap_item)
+        self.ui.horizontalSlider.setValue(99)
+
+        self.ui.scrollArea.setWidget(self.label)
+        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
+        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 80  # slider and textedit heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 80:
+            self.scale = (self.height() - 30 - 80) / self.pixmap.height()
+            slider_value = int(self.scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
+        self.draw_coded_area()
+
+    def draw_coded_area(self):
+        """ Draw the coded rectangle in the scene """
+
+        tooltip = self.data['codename'] + " (" + self.data['coder'] + ")"
+        tooltip += "\nMemo: " + self.data['memo']
+        x = self.data['x1'] * self.scale
+        y = self.data['y1'] * self.scale
+        width = self.data['width'] * self.scale
+        height = self.data['height'] * self.scale
+        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
+        rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.DashLine))
+        rect_item.setToolTip(tooltip)
+        self.scene.addItem(rect_item)
+
+    def change_scale(self):
+        """ Resize image. Triggered by user change in slider.
+        Also called by unmark, as all items need to be redrawn. """
+
+        if self.pixmap is None:
+            return
+        self.scale = (self.ui.horizontalSlider.value() + 1) / 100
+        height = self.scale * self.pixmap.height()
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
+        pixmap_item.setPos(0, 0)
+        self.scene.clear()
+        self.scene.addItem(pixmap_item)
+        self.draw_coded_area()
+        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+
+
 
 
