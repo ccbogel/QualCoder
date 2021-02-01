@@ -31,9 +31,11 @@ import csv
 import datetime
 import logging
 import os
+import platform
 from shutil import copyfile
 import sys
 import traceback
+import vlc
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.Qt import QHelpEvent
@@ -46,7 +48,7 @@ from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 
-from helpers import Message
+from helpers import Message, msecs_to_mins_and_secs
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -2232,8 +2234,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Check the position for an a/v result
         for row in self.av_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                print(row)
-                #TODO
+                ui = DialogCodeInAV(self.app, row)
+                ui.exec_()
                 break
 
     def view_text_result_in_context(self, result):
@@ -2591,6 +2593,104 @@ class ToolTip_EventFilter(QtCore.QObject):
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
 
+class DialogCodeInAV(QtWidgets.QDialog):
+    """ View coded section in original image.
+    Scalable and scrollable image. The slider values range from 10 to 99.
+    Could not use DialogViewImage as this would result in a circular import, as ViewImage import reports Classes.
+    """
+
+    app = None
+    data = None
+    frame = None
+
+    def __init__(self, app, data, parent=None):
+        """ View audio/video segment in a dialog window.
+        mediapath may be a link as: 'video:path'
+        param:
+            app : class containing app details such as database connection
+            data : dictionary {codename, color, file_or_casename, pos0, pos1, coder, text,
+                    mediapath, fid, memo, file_or_case}
+        """
+
+        sys.excepthook = exception_handler
+        self.app = app
+        self.data = data
+        print(data)
+        QtWidgets.QDialog.__init__(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        self.resize(400, 300)
+
+        # enable custom window hint - must be set to enable customizing window controls
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowTitle(self.data['text'])
+        self.gridLayout = QtWidgets.QGridLayout(self)
+        self.frame = QtWidgets.QFrame(self)
+        if platform.system() == "Darwin":  # for MacOS
+            self.frame = QtWidgets.QMacCocoaViewContainer(0)
+        '''self.palette = self.frame.palette()
+        self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
+        self.frame.setPalette(self.palette)
+        self.frame.setAutoFillBackground(True)'''
+        self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
+        # Create a vlc instance with an empty vlc media player
+        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
+        self.instance = vlc.Instance()
+        self.mediaplayer = self.instance.media_player_new()
+        self.mediaplayer.video_set_mouse_input(False)
+        self.mediaplayer.video_set_key_input(False)
+        # Load media
+        try:
+            if self.data['mediapath'][0:6] in ('/audio', '/video'):
+                self.media = self.instance.media_new(self.app.project_path + self.data['mediapath'])
+            if self.data['mediapath'][0:6] in ('audio:', 'video:'):
+                self.media = self.instance.media_new(self.file_['mediapath'][6:])
+        except Exception as e:
+            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.data['mediapath'], "warning").exec_()
+            self.close()
+            return
+        self.mediaplayer.set_media(self.media)
+        # Parse the metadata of the file
+        self.media.parse()
+        self.mediaplayer.video_set_mouse_input(False)
+        self.mediaplayer.video_set_key_input(False)
+        # The media player has to be connected to the QFrame (otherwise the
+        # video would be displayed in it's own window). This is platform
+        # specific, so we must give the ID of the QFrame (or similar object) to
+        # vlc. Different platforms have different functions for this
+        if platform.system() == "Linux":  # for Linux using the X Server
+            # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
+            self.mediaplayer.set_xwindow(int(self.frame.winId()))
+        elif platform.system() == "Windows":  # for Windows
+            self.mediaplayer.set_hwnd(int(self.winId()))
+        elif platform.system() == "Darwin":  # for MacOS
+            self.mediaplayer.set_nsobject(int(self.winId()))
+
+        # The vlc MediaPlayer needs a float value between 0 and 1 for AV position,
+        pos = self.data['pos0'] / self.mediaplayer.get_media().get_duration()
+        #print("dur", self.mediaplayer.get_media().get_duration())
+        #print("pos as float", pos)
+        self.mediaplayer.play()  # Need to start play forst
+        self.mediaplayer.set_position(pos)
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.update_ui)
+        self.timer.start()
+
+    def update_ui(self):
+        """ Checks for end of playing segment. """
+
+        msecs = self.mediaplayer.get_time()
+        msg = msecs_to_mins_and_secs(msecs)
+        msg += "\n" + _("Memo: ") + self.data['memo']
+        self.setToolTip(msg)
+        if self.data['pos1'] < msecs:
+            self.mediaplayer.stop()
+
+    def closeEvent(self, event):
+        self.mediaplayer.stop()
+
+
 class DialogCodeInImage(QtWidgets.QDialog):
     """ View coded section in original image.
     Scaleable and scrollable image. The slider values range from 10 to 99.
@@ -2609,7 +2709,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         mediapath may be a link as: 'images:path'
         param:
             app : class containing app details such as database connection
-            image_data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
+            data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
                     mediapath, fid, memo, file_or_case}
         """
 
