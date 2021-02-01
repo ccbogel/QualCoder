@@ -2265,6 +2265,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         ui.setStyleSheet(font)
         gridLayout = QtWidgets.QGridLayout(ui)
         gridLayout.addWidget(te, 1, 0)
+        ui.resize(400, 300)
+        # Make marked text visible in the textEdit and not ned to scroll to it
+        textCursor = te.textCursor()
+        textCursor.setPosition(result['pos0'])
+        te.setTextCursor(textCursor)
         ui.exec_()
 
     def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
