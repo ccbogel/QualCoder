@@ -139,6 +139,155 @@ class Message(QtWidgets.QMessageBox):
             #ui.exec_()
 
 
+class DialogCodeInAllFiles(QtWidgets.QDialog):
+    """ Display all coded media for this code, in a modal dialog.
+    Coded media comes from ALL files for this coder.
+    Need to store textedit start and end positions so that code in context can be used.
+    Called from code_text, code_av, code_image.
+    """
+
+    app = None
+    code_dict = None
+
+    def __init__(self, app, code_dict, parent=None):
+        """ Create dialog with textEdit widget.
+        param:
+            app : class containing app details such as database connection
+            code_dict : dictionary of this code {name, color, cid, catid, date, owner, memo}
+            coder : The coder name, String
+        """
+
+        sys.excepthook = exception_handler
+        self.app = app
+        self.code_dict = code_dict
+        QtWidgets.QDialog.__init__(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        self.resize(500, 500)
+        # enable custom window hint - must be set to enable customizing window controls
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowTitle(_("Coded files: ") + self.code_dict['name'])
+        self.gridLayout = QtWidgets.QGridLayout(self)
+        te = QtWidgets.QTextEdit()
+        self.gridLayout.addWidget(te, 1, 0)
+
+        # Get the coded by this coder data
+        cur = self.app.conn.cursor()
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext from "
+        sql += "code_text "
+        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
+        sql += " where code_name.cid=? and code_text.owner=?"
+        sql += " order by source.name, pos0"
+        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+
+        results = cur.fetchall()
+        text_results = []
+        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'text'
+        for row in results:
+            text_results.append(dict(zip(keys, row)))
+        # Text
+        for row in text_results:
+            row['file_or_case'] = "File"
+            row['textedit_start'] = len(te.toPlainText())
+            title = '<span style=\"background-color:' + row['color'] + '\">'
+            title += " File: <em>" + row['codename'] + "</em></span>"
+            title += ", " + str(row['pos0']) + " - " + str(row['pos1'])
+            te.insertHtml(title)
+            row['textedit_end'] = len(te.toPlainText())
+            te.append(row['text'] + "\n\n")
+
+        # Images
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+        sql += " source.mediapath, source.id, code_image.memo "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+        sql += "where code_name.cid =? and code_image.owner=? "
+        sql += " order by source.name"
+        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+        results = cur.fetchall()
+        image_results = []
+        keys = 'codename', 'color', 'case_or_filename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo'
+        for row in results:
+            image_results.append(dict(zip(keys, row)))
+        for counter, row in enumerate(image_results):
+            row['file_or_case'] = "File"
+            row['textedit_start'] = len(te.toPlainText())
+            te.insertHtml('<p><span style=\"background-color:' + row['color'] + '\">File: ' + row['mediapath'] + '</span></p>')
+            row['textedit_end'] = len(te.toPlainText())
+            te.append("\n")
+            img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'], 'height': row['height']}
+            self.put_image_into_textedit(img, counter, te)
+            te.append(_("Memo: ") + row['memo'] + "\n\n")
+
+        # Media
+        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
+        sql += "source.mediapath, source.id from code_av join code_name "
+        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+        sql += "where code_name.cid =? and code_av.owner=? "
+        sql += " order by source.name"
+        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+        results = cur.fetchall()
+        av_results = []
+        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid'
+        for row in results:
+            av_results.append(dict(zip(keys, row)))
+        for row in av_results:
+            row['file_or_case'] = "File"
+            row['textedit_start'] = len(te.toPlainText())
+            te.insertHtml('<span style=\"background-color:' + row['color'] + '\">File: ' + row['mediapath'] + '</span>')
+            start = msecs_to_mins_and_secs(row['pos0'])
+            end = msecs_to_mins_and_secs(row['pos1'])
+            te.insertHtml('<br />[' + start + ' - ' + end + '] ')
+            row['textedit_end'] = len(te.toPlainText())
+            te.append("Memo: " + row['memo'] + "\n\n")
+
+        self.exec_()
+
+    def put_image_into_textedit(self, img, counter, text_edit):
+        """ Scale image, add resource to document, insert image.
+        A counter is important as each image slice needs a unique name, counter adds
+        the uniqueness to the name.
+        Called by: coded_media_dialog
+        param:
+            img: image data dictionary with file location and width, height, position data
+            counter: a changing counter is needed to make discrete different images
+            text_edit:  the widget that shows the data
+        """
+
+        path = self.app.project_path
+        if img['mediapath'][0] == "/":
+            path = path + img['mediapath']
+        else:
+            path = img['mediapath'][7:]
+        document = text_edit.document()
+        image = QtGui.QImageReader(path).read()
+        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        # scale to max 300 wide or high. perhaps add option to change maximum limit?
+        scaler = 1.0
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 300:
+            scaler_w = 300 / image.width()
+        if image.height() > 300:
+            scaler_h = 300 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        # need unique image names or the same image from the same path is reproduced
+        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        url = QtCore.QUrl(imagename)
+        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        cursor = text_edit.textCursor()
+        image_format = QtGui.QTextImageFormat()
+        image_format.setWidth(image.width() * scaler)
+        image_format.setHeight(image.height() * scaler)
+        image_format.setName(url.toString())
+        cursor.insertImage(image_format)
+        text_edit.insertHtml("<br />")
+
+
 class DialogCodeInAV(QtWidgets.QDialog):
     """ View coded section in original image.
     Scalable and scrollable image. The slider values range from 10 to 99.
@@ -272,7 +421,6 @@ class DialogCodeInText(QtWidgets.QDialog):
             title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
         self.setWindowTitle(title)
         self.gridLayout = QtWidgets.QGridLayout(self)
-
         te = QtWidgets.QTextEdit()
         te.setPlainText(file_text['fulltext'])
         cursor = te.textCursor()

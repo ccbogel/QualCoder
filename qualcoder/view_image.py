@@ -46,7 +46,7 @@ from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from GUI.ui_dialog_view_image import Ui_Dialog_view_image
-from helpers import msecs_to_mins_and_secs, Message
+from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -653,108 +653,16 @@ class DialogCodeImage(QtWidgets.QDialog):
             if found:
                 self.coded_media_dialog(found)
 
-    def coded_media_dialog(self, data):
+    def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
-        Called from tree_menu
+        Need to store textedit start and end positions so that code in context can be used.
+        Called from tree_menu.
         param:
-            data: code dictionary
-        """
-        ui = DialogInformation(self.app, "Coded text and media: " + data['name'], " ")
-        cur = self.app.conn.cursor()
-        COLOR = 1
-        SOURCE_NAME = 2
-        POS0 = 3
-        POS1 = 4
-        SELTEXT = 5
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext from "
-        sql += "code_text "
-        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
-        sql += " where code_name.cid=? and code_text.owner=?"
-        sql += " order by source.name, pos0"
-        cur.execute(sql, [data['cid'], self.app.settings['codername']])
-        results = cur.fetchall()
-        # Text
-        for row in results:
-            title = '<span style=\"background-color:' + row[COLOR] + '\">'
-            title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
-            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
-            ui.ui.textEdit.insertHtml(title)
-            ui.ui.textEdit.append(row[SELTEXT] + "\n\n")
-
-        # Images
-        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += " source.mediapath, source.id, code_image.memo "
-        sql += " from code_image join code_name "
-        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-        sql += "where code_name.cid =? and code_image.owner=? "
-        sql += " order by source.name"
-        cur.execute(sql, [data['cid'], self.app.settings['codername']])
-        results = cur.fetchall()
-        for counter, row in enumerate(results):
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[7] + '</span>')
-            img = {'mediapath': row[7], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
-            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
-            ui.ui.textEdit.append("\nMemo: " + row[9] + "\n\n")
-
-        # Media
-        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "source.mediapath, source.id from code_av join code_name "
-        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-        sql += "where code_name.cid = " + str(data['cid']) + " "
-        sql += " order by source.name"
-        cur.execute(sql)
-        results = cur.fetchall()
-        for row in results:
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[6] + '</span>')
-            start = msecs_to_mins_and_secs(row[3])
-            end = msecs_to_mins_and_secs(row[4])
-            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] ')
-            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
-        ui.exec_()
-
-    def put_image_into_textedit(self, img, counter, text_edit):
-        """ Scale image, add resource to document, insert image.
-        A counter is important as each image slice needs a unique name, counter adds
-        the uniqueness to the name.
-        Called by: coded_media_dialog
-        param:
-            img: image data dictionary with file location and width, height, position data
-            counter: a changing counter is needed to make discrete different images
-            text_edit:  the widget that shows the data
+            code_dict : code dictionary
         """
 
-        path = self.app.project_path
-        if img['mediapath'][0] == "/":
-            path = path + img['mediapath']
-        else:
-            path = img['mediapath'][7:]
-        document = text_edit.document()
-        image = QtGui.QImageReader(path).read()
-        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
-        # scale to max 300 wide or high. perhaps add option to change maximum limit?
-        scaler = 1.0
-        scaler_w = 1.0
-        scaler_h = 1.0
-        if image.width() > 300:
-            scaler_w = 300 / image.width()
-        if image.height() > 300:
-            scaler_h = 300 / image.height()
-        if scaler_w < scaler_h:
-            scaler = scaler_w
-        else:
-            scaler = scaler_h
-        # need unique image names or the same image from the same path is reproduced
-        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
-        url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
-        cursor = text_edit.textCursor()
-        image_format = QtGui.QTextImageFormat()
-        image_format.setWidth(image.width() * scaler)
-        image_format.setHeight(image.height() * scaler)
-        image_format.setName(url.toString())
-        cursor.insertImage(image_format)
-        text_edit.insertHtml("<br />")
+        DialogCodeInAllFiles(self.app, code_dict)
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
@@ -1456,8 +1364,5 @@ class DialogViewImage(QtWidgets.QDialog):
         w_h = _("Width: ") + str(self.label.pixmap().size().width()) + _(" Height: ") + str(self.label.pixmap().size().height())
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
-
-
-
 
 
