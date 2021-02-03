@@ -152,6 +152,10 @@ Remember: You can install it anywhere you want, so the path above depends on whe
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
+
+Another option to install on Mac:
+
+`python3 setup.py py2app` 
  
 ## Dependencies
 Required:
