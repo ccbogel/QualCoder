@@ -46,9 +46,9 @@ from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
+#from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 
-from helpers import Message, msecs_to_mins_and_secs
+from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -2222,8 +2222,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         found = None
         for row in self.text_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                self.view_text_result_in_context(row)
-                found = row
+                ui = DialogCodeInText(self.app, row)
+                ui.exec_()
                 return
         # Check the position for an image result
         for row in self.image_results:
@@ -2237,40 +2237,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 ui = DialogCodeInAV(self.app, row)
                 ui.exec_()
                 break
-
-    def view_text_result_in_context(self, result):
-        """ View the coded text in context of the original text file in a modal dialog.
-        """
-
-        file_list = self.app.get_file_texts([result['fid'], ])
-        file_text = file_list[0]
-        title = ""
-        if result['file_or_case'] == "File":
-            title = _("File: ") + result['file_or_casename']
-        if result['file_or_case'] == "Case":
-            title = _("Case: ") + result['file_or_casename'] + ", " + file_text['name']
-        te = QtWidgets.QTextEdit()
-        te.setPlainText(file_text['fulltext'])
-        cursor = te.textCursor()
-        cursor.setPosition(result['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(result['pos1'], QtGui.QTextCursor.KeepAnchor)
-        fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(result['color']))
-        fmt.setBackground(brush)
-        cursor.setCharFormat(fmt)
-        ui = QtWidgets.QDialog()
-        ui.setWindowTitle(title)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        ui.setStyleSheet(font)
-        gridLayout = QtWidgets.QGridLayout(ui)
-        gridLayout.addWidget(te, 1, 0)
-        ui.resize(400, 300)
-        # Make marked text visible in the textEdit and not ned to scroll to it
-        textCursor = te.textCursor()
-        textCursor.setPosition(result['pos0'])
-        te.setTextCursor(textCursor)
-        ui.exec_()
 
     def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
@@ -2302,35 +2268,48 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # already have been replaced with a textEdit (file selection the view text in context)
-        ta = QtWidgets.QTableWidget()
-        ta.setColumnCount(len(horizontal_labels))
-        ta.setHorizontalHeaderLabels(horizontal_labels)
-        ta.setRowCount(len(cases))
-        ta.setVerticalHeaderLabels(vertical_labels)
+        self.ta = QtWidgets.QTableWidget()
+        self.ta.setColumnCount(len(horizontal_labels))
+        self.ta.setHorizontalHeaderLabels(horizontal_labels)
+        self.ta.setRowCount(len(cases))
+        self.ta.setVerticalHeaderLabels(vertical_labels)
+        # Tried lots of things to get the below signal to work.
+        # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
+        # Gave up.
+        self.te = []
+        for row, case in enumerate(cases):
+            inner = []
+            for col, colname in enumerate(horizontal_labels):
+                tedit = QtWidgets.QTextEdit("")
+                tedit.setReadOnly(True)
+                #tedit.cursorPositionChanged.connect(lambda: self.test_matrix_textEdit(tedit))
+                inner.append(tedit)
+            self.te.append(inner)
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
-                txt_edit = QtWidgets.QTextEdit("")
+                '''self.te[row][col].setContextMenuPolicy(Qt.CustomContextMenu)
+                self.te[row][col].customContextMenuRequested.connect(lambda: self.matrix_text_edit_menu(self.te[row][col]))'''
                 for t in text_results:
                     if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
-                        txt_edit.insertPlainText(t['text'] + "\n")
+                        self.te[row][col].insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
                 for a in av_results:
                     if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
-                        txt_edit.insertPlainText(a['text'] + "\n")
+                        self.te[row][col].insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        self.te[row][col].insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(image_results):
                     if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
-                        self.put_image_into_textedit(i, counter, txt_edit)
-                ta.setCellWidget(row, col, txt_edit)
-        ta.resizeRowsToContents()
-        ta.resizeColumnsToContents()
+                        self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.put_image_into_textedit(i, counter, self.te[row][col])
+                self.ta.setCellWidget(row, col, self.te[row][col])
+        self.ta.resizeRowsToContents()
+        self.ta.resizeColumnsToContents()
         # maximise the space from one column or one row
-        if ta.columnCount() == 1:
-            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        if ta.rowCount() == 1:
-            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.ui.splitter.replaceWidget(2, ta)
+        if self.ta.columnCount() == 1:
+            self.ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if self.ta.rowCount() == 1:
+            self.ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, self.ta)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
@@ -2413,6 +2392,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
+                txt_edit.setReadOnly(True)
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
@@ -2520,6 +2500,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
+                txt_edit.setReadOnly(True)
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
@@ -2596,206 +2577,4 @@ class ToolTip_EventFilter(QtCore.QObject):
                         receiver.setToolTip(msg)
         #Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
-
-
-class DialogCodeInAV(QtWidgets.QDialog):
-    """ View coded section in original image.
-    Scalable and scrollable image. The slider values range from 10 to 99.
-    Could not use DialogViewImage as this would result in a circular import, as ViewImage import reports Classes.
-    """
-
-    app = None
-    data = None
-    frame = None
-
-    def __init__(self, app, data, parent=None):
-        """ View audio/video segment in a dialog window.
-        mediapath may be a link as: 'video:path'
-        param:
-            app : class containing app details such as database connection
-            data : dictionary {codename, color, file_or_casename, pos0, pos1, coder, text,
-                    mediapath, fid, memo, file_or_case}
-        """
-
-        sys.excepthook = exception_handler
-        self.app = app
-        self.data = data
-        print(data)
-        QtWidgets.QDialog.__init__(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(font)
-        self.resize(400, 300)
-
-        # enable custom window hint - must be set to enable customizing window controls
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        self.setWindowTitle(self.data['text'])
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        self.frame = QtWidgets.QFrame(self)
-        if platform.system() == "Darwin":  # for MacOS
-            self.frame = QtWidgets.QMacCocoaViewContainer(0)
-        '''self.palette = self.frame.palette()
-        self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
-        self.frame.setPalette(self.palette)
-        self.frame.setAutoFillBackground(True)'''
-        self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
-        # Create a vlc instance with an empty vlc media player
-        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
-        self.instance = vlc.Instance()
-        self.mediaplayer = self.instance.media_player_new()
-        self.mediaplayer.video_set_mouse_input(False)
-        self.mediaplayer.video_set_key_input(False)
-        # Load media
-        try:
-            if self.data['mediapath'][0:6] in ('/audio', '/video'):
-                self.media = self.instance.media_new(self.app.project_path + self.data['mediapath'])
-            if self.data['mediapath'][0:6] in ('audio:', 'video:'):
-                self.media = self.instance.media_new(self.file_['mediapath'][6:])
-        except Exception as e:
-            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.data['mediapath'], "warning").exec_()
-            self.close()
-            return
-        self.mediaplayer.set_media(self.media)
-        # Parse the metadata of the file
-        self.media.parse()
-        self.mediaplayer.video_set_mouse_input(False)
-        self.mediaplayer.video_set_key_input(False)
-        # The media player has to be connected to the QFrame (otherwise the
-        # video would be displayed in it's own window). This is platform
-        # specific, so we must give the ID of the QFrame (or similar object) to
-        # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux":  # for Linux using the X Server
-            # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
-            self.mediaplayer.set_xwindow(int(self.frame.winId()))
-        elif platform.system() == "Windows":  # for Windows
-            self.mediaplayer.set_hwnd(int(self.winId()))
-        elif platform.system() == "Darwin":  # for MacOS
-            self.mediaplayer.set_nsobject(int(self.winId()))
-
-        # The vlc MediaPlayer needs a float value between 0 and 1 for AV position,
-        pos = self.data['pos0'] / self.mediaplayer.get_media().get_duration()
-        #print("dur", self.mediaplayer.get_media().get_duration())
-        #print("pos as float", pos)
-        self.mediaplayer.play()  # Need to start play forst
-        self.mediaplayer.set_position(pos)
-        self.timer = QtCore.QTimer(self)
-        self.timer.timeout.connect(self.update_ui)
-        self.timer.start()
-
-    def update_ui(self):
-        """ Checks for end of playing segment. """
-
-        msecs = self.mediaplayer.get_time()
-        msg = msecs_to_mins_and_secs(msecs)
-        msg += "\n" + _("Memo: ") + self.data['memo']
-        self.setToolTip(msg)
-        if self.data['pos1'] < msecs:
-            self.mediaplayer.stop()
-
-    def closeEvent(self, event):
-        self.mediaplayer.stop()
-
-
-class DialogCodeInImage(QtWidgets.QDialog):
-    """ View coded section in original image.
-    Scaleable and scrollable image. The slider values range from 10 to 99.
-    Could not use DialogViewImage as this would result in a circular import, as ViewImage import reports Classes.
-    """
-
-    app = None
-    data = None
-    pixmap = None
-    label = None
-    scale = None
-    scene = None
-
-    def __init__(self, app, data, parent=None):
-        """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
-        mediapath may be a link as: 'images:path'
-        param:
-            app : class containing app details such as database connection
-            data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
-                    mediapath, fid, memo, file_or_case}
-        """
-
-        sys.excepthook = exception_handler
-        self.app = app
-        self.data = data
-        QtWidgets.QDialog.__init__(self)
-        self.ui = Ui_Dialog_code_context_image()
-        self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(font)
-        abs_path = ""
-        if "images:" in self.data['mediapath']:
-            abs_path = self.data['mediapath'].split(':')[1]
-        else:
-            abs_path = self.app.project_path + self.data['mediapath']
-        self.setWindowTitle(abs_path)
-        image = QtGui.QImage(abs_path)
-        if image.isNull():
-            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
-            self.close()
-            return
-        self.scene = QtWidgets.QGraphicsScene()
-        self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-
-        self.pixmap = QtGui.QPixmap.fromImage(image)
-        self.pixmap = QtGui.QPixmap.fromImage(image)
-        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
-        pixmap_item.setPos(0, 0)
-        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
-        self.scene.addItem(pixmap_item)
-        self.ui.horizontalSlider.setValue(99)
-
-        self.ui.scrollArea.setWidget(self.label)
-        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
-        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
-
-        # Scale initial picture by height to mostly fit inside scroll area
-        # Tried other methods e.g. sizes of components, but nothing was correct.
-        self_h = self.height() - 30 - 80  # slider and textedit heights
-        s_w = self.width()
-        if self.pixmap.height() > self.height() - 30 - 80:
-            self.scale = (self.height() - 30 - 80) / self.pixmap.height()
-            slider_value = int(self.scale * 100)
-            if slider_value > 100:
-                slider_value = 100
-            self.ui.horizontalSlider.setValue(slider_value)
-        self.draw_coded_area()
-
-    def draw_coded_area(self):
-        """ Draw the coded rectangle in the scene """
-
-        tooltip = self.data['codename'] + " (" + self.data['coder'] + ")"
-        tooltip += "\nMemo: " + self.data['memo']
-        x = self.data['x1'] * self.scale
-        y = self.data['y1'] * self.scale
-        width = self.data['width'] * self.scale
-        height = self.data['height'] * self.scale
-        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.DashLine))
-        rect_item.setToolTip(tooltip)
-        self.scene.addItem(rect_item)
-
-    def change_scale(self):
-        """ Resize image. Triggered by user change in slider.
-        Also called by unmark, as all items need to be redrawn. """
-
-        if self.pixmap is None:
-            return
-        self.scale = (self.ui.horizontalSlider.value() + 1) / 100
-        height = self.scale * self.pixmap.height()
-        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
-        pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
-        pixmap_item.setPos(0, 0)
-        self.scene.clear()
-        self.scene.addItem(pixmap_item)
-        self.draw_coded_area()
-        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
-
-
-
 
