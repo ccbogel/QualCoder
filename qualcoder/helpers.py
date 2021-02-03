@@ -149,12 +149,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     app = None
     code_dict = None
 
-    def __init__(self, app, code_dict, parent=None):
+    def __init__(self, app, code_dict, case_or_file="File", parent=None):
         """ Create dialog with textEdit widget.
         param:
             app : class containing app details such as database connection
             code_dict : dictionary of this code {name, color, cid, catid, date, owner, memo}
-            coder : The coder name, String
+            case_or_file: default to "File", but view_graph has a "Case" option
         """
 
         sys.excepthook = exception_handler
@@ -164,46 +164,73 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.resize(500, 500)
+        self.resize(550, 580)
         # enable custom window hint - must be set to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        self.setWindowTitle(_("Coded files: ") + self.code_dict['name'])
+        title = _("Coded files: ") + self.code_dict['name']
+        if case_or_file == "Case":
+            title = _("Coded cases: ") + self.code_dict['name']
+        self.setWindowTitle(title)
         self.gridLayout = QtWidgets.QGridLayout(self)
         te = QtWidgets.QTextEdit()
         self.gridLayout.addWidget(te, 1, 0)
 
-        # Get the coded by this coder data
+        # Get coded text by file for this coder data
         cur = self.app.conn.cursor()
         sql = "select code_name.name, color, source.name, pos0, pos1, seltext from "
         sql += "code_text "
         sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
         sql += " where code_name.cid=? and code_text.owner=?"
         sql += " order by source.name, pos0"
+        if case_or_file == "Case":
+            sql = "select code_name.name, color, cases.name, "
+            sql += "code_text.pos0, code_text.pos1, seltext, source.name from code_text "
+            sql += " join code_name on code_name.cid = code_text.cid "
+            sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += " code_text.fid = case_text.fid "
+            sql += "and (code_text.pos0 between case_text.pos0 and case_text.pos1) "
+            sql += "and (code_text.pos1 between case_text.pos0 and case_text.pos1) "
+            sql += " join source on source.id = case_text.fid "
+            sql += " where code_name.cid=? and code_text.owner=? "
+            sql += " order by cases.name, code_text.pos0, code_text.owner"
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
-
         results = cur.fetchall()
         text_results = []
-        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'text'
+        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'text', 'source_name'
         for row in results:
             text_results.append(dict(zip(keys, row)))
+
         # Text
         for row in text_results:
-            row['file_or_case'] = "File"
+            row['file_or_case'] = case_or_file
             row['textedit_start'] = len(te.toPlainText())
             title = '<span style=\"background-color:' + row['color'] + '\">'
-            title += " File: <em>" + row['codename'] + "</em></span>"
+            if case_or_file == "File":
+                title += _(" File: ") + row['case_or_filename']
+            else:
+                title += _("Case: ") + row['case_or_filename'] + _(" File: ") + row['source_name']
+            title += "<em>" + row['case_or_filename'] + "</em></span>"
             title += ", " + str(row['pos0']) + " - " + str(row['pos1'])
             te.insertHtml(title)
             row['textedit_end'] = len(te.toPlainText())
             te.append(row['text'] + "\n\n")
 
-        # Images
+        # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
         sql += " source.mediapath, source.id, code_image.memo "
         sql += " from code_image join code_name "
         sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
         sql += "where code_name.cid =? and code_image.owner=? "
         sql += " order by source.name"
+        if case_or_file == "Case":
+            sql = "select code_name.name, color, cases.name, "
+            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo  "
+            sql += "from code_image join code_name on code_name.cid = code_image.cid "
+            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += "code_image.id = case_text.fid "
+            sql += " join source on case_text.fid = source.id "
+            sql += "where code_name.cid=? and code_image.owner=? "
+            sql += " order by cases.name, code_image.owner "
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         image_results = []
@@ -211,21 +238,36 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in results:
             image_results.append(dict(zip(keys, row)))
         for counter, row in enumerate(image_results):
-            row['file_or_case'] = "File"
+            row['file_or_case'] = case_or_file
             row['textedit_start'] = len(te.toPlainText())
-            te.insertHtml('<p><span style=\"background-color:' + row['color'] + '\">File: ' + row['mediapath'] + '</span></p>')
+            title = '<p><span style=\"background-color:' + row['color'] + '\">'
+            if case_or_file == "Case":
+                title += _(" Case: ") + row['case_or_filename'] + _(" File: ") + row['mediapath']
+            else:
+                title += _(" File: ") + row['mediapath']
+            title += '</span></p>'
+            te.insertHtml(title)
             row['textedit_end'] = len(te.toPlainText())
             te.append("\n")
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'], 'height': row['height']}
             self.put_image_into_textedit(img, counter, te)
             te.append(_("Memo: ") + row['memo'] + "\n\n")
 
-        # Media
+        # Get coded A/V by file for this coder data
         sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
         sql += "source.mediapath, source.id from code_av join code_name "
         sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
         sql += "where code_name.cid =? and code_av.owner=? "
         sql += " order by source.name"
+        if case_or_file == "Case":
+            sql = "select code_name.name, color, cases.name, code_av.pos0, code_av.pos1, code_av.memo, "
+            sql += "source.mediapath, source.id from "
+            sql += "code_av join code_name on code_name.cid = code_av.cid "
+            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += "code_av.id = case_text.fid "
+            sql += " join source on case_text.fid = source.id "
+            sql += "where code_name.cid=? and code_av.owner=? "
+            sql += " order by source.name, code_av.owner "
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         av_results = []
@@ -233,15 +275,20 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in results:
             av_results.append(dict(zip(keys, row)))
         for row in av_results:
-            row['file_or_case'] = "File"
+            row['file_or_case'] = case_or_file
             row['textedit_start'] = len(te.toPlainText())
-            te.insertHtml('<span style=\"background-color:' + row['color'] + '\">File: ' + row['mediapath'] + '</span>')
+            title = '<span style=\"background-color:' + row['color'] + '\">'
+            if case_or_file == "Case":
+                title += _("Case: ") + row['case_or_filename'] + _(" File: ") + row['mediapath']
+            else:
+                title += _("File: ") + row['mediapath']
+            title += '</span>'
+            te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
             te.insertHtml('<br />[' + start + ' - ' + end + '] ')
             row['textedit_end'] = len(te.toPlainText())
             te.append("Memo: " + row['memo'] + "\n\n")
-
         self.exec_()
 
     def put_image_into_textedit(self, img, counter, text_edit):
