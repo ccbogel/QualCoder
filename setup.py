@@ -1,6 +1,6 @@
 """ from setup example: https://github.com/pypa/sampleproject/blob/master/setup.py
 """
-
+import sys
 from setuptools import setup, find_packages
 from os import path
 here = path.abspath(path.dirname(__file__))
@@ -8,9 +8,36 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+mainscript = 'qualcoder/qualcoder.py'
+OPTIONS = {
+    'argv_emulation': True,
+    'iconfile': 'qualcoder/GUI/qualcoder.icns'
+}
+
+if sys.platform == 'darwin':
+     extra_options = dict(
+         setup_requires=['py2app'],
+         app=[mainscript],
+         # Cross-platform applications generally expect sys.argv to
+         # be used for opening files.
+         options={'py2app': OPTIONS},
+     )
+elif sys.platform == 'win32':
+     extra_options = dict(
+         setup_requires=['py2exe'],
+         app=[mainscript],
+     )
+else:
+     extra_options = dict(
+         # Normally unix-like platforms will use "setup.py install"
+         # and install the main script as such
+         scripts=[mainscript],
+     )
+
+
 setup(
-    name='qualcoder',
-    version='1.8',
+    name='Qualcoder',
+    version='2.2',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
     author_email='ccbogel@hotmail.com',
@@ -23,7 +50,7 @@ setup(
         'Development Status :: 3 - Alpha'
     ],
     keywords='qualitative data analysis',
-    packages=find_packages(where='qualcoder'),
+    package_dir={'': 'qualcoder'},
     python_requires='>=3.5',
     install_requires=[
         'pyqt5',
@@ -33,8 +60,9 @@ setup(
         'pdfminer.six',
         'ply',
         'chardet',
-        'openpxyl'
+        'openpyxl'
     ],
+    data_files=['qualcoder/locale'],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
         'GUI/*.html', 'GUI/NotoSans-hinted/*.ttf',
@@ -44,4 +72,5 @@ setup(
         'locale/en/LC_MESSAGES/en,mo',]
     },
     zip_safe=False,
+    **extra_options
 )
