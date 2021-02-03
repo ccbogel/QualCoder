@@ -154,6 +154,7 @@ Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/r
 You can make an alias to the file and place it on your desktop.
 
 **Another option to install on Mac:**
+
 Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following command:
 
 `python3 setup.py py2app` 
