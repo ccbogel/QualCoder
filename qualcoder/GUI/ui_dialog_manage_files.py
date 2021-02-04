@@ -39,7 +39,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export.setText("")
         self.pushButton_export.setObjectName("pushButton_export")
         self.pushButton_delete = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(450, 3, 36, 36))
+        self.pushButton_delete.setGeometry(QtCore.QRect(540, 3, 36, 36))
         self.pushButton_delete.setText("")
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.pushButton_import = QtWidgets.QPushButton(self.groupBox)
@@ -62,6 +62,10 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export_to_linked.setGeometry(QtCore.QRect(310, 3, 36, 36))
         self.pushButton_export_to_linked.setText("")
         self.pushButton_export_to_linked.setObjectName("pushButton_export_to_linked")
+        self.pushButton_export_attributes = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_export_attributes.setGeometry(QtCore.QRect(450, 4, 36, 36))
+        self.pushButton_export_attributes.setText("")
+        self.pushButton_export_attributes.setObjectName("pushButton_export_attributes")
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 1)
         self.label_fcount = QtWidgets.QLabel(Dialog_manage_files)
         self.label_fcount.setObjectName("label_fcount")
@@ -82,6 +86,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_link.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Link to a file that is outside the project folder</p></body></html>"))
         self.pushButton_import_from_linked.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Import linked file into project folder</p></body></html>"))
         self.pushButton_export_to_linked.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export file from project folder as a linked file</p></body></html>"))
+        self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
         self.label_fcount.setText(_translate("Dialog_manage_files", "Files:"))
 
 
