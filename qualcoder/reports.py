@@ -297,13 +297,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             item = it.value()
         f.write(text)
         f.close()
-        logger.info("Report exported to " + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Text file Export'))
-        msg = filename + _(" exported")
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Text file Export'), filename + _(" exported")).exec_()
         self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
 
     def export_csv_file(self):
@@ -348,13 +342,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f = open(filename, 'w')
         f.write(data)
         f.close()
-        logger.info("Report exported to " + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Csv file Export'))
-        msg = filename + _(" exported")
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
         self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
 
     def fill_tree(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,9 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-import logging
+import csv
 import datetime
+import logging
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -185,6 +186,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -423,6 +428,45 @@ class DialogManageFiles(QtWidgets.QDialog):
         for r in res:
             cur.execute("delete from attribute where id=?", [r[0],])
             self.app.conn.commit()
+
+    def export_attributes(self):
+        """ Export attributes from table as a csv file. """
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_file_attributes.csv"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        filename = directory + "/" + filename
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
+
+        cols = self.ui.tableWidget.columnCount()
+        rows = self.ui.tableWidget.rowCount()
+        header = []
+        for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        with open(filename, mode='w') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(header)
+            for r in range(0, rows):
+                data = []
+                for c in range(0, cols):
+                    data.append(self.ui.tableWidget.item(r, c).text())
+                writer.writerow(data)
+        logger.info("Report exported to " + filename)
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
+        self.parent_textEdit.append(_("File attributes csv file exported to: ") + filename)
 
     def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
@@ -1068,7 +1112,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
         ui = DialogViewImage(self.app, self.source[x])
-        self.dialog_list.append(ui)
         ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
