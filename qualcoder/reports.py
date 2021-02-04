@@ -2098,29 +2098,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
         # block signals of text cursor moving when filling text edit - stops context dialog appearing
-        # discinnected in search
 
         for row in self.text_results:
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
         for i, row in enumerate(self.image_results):
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.put_image_into_textedit(row, i, self.ui.textEdit)
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
         for i, row in enumerate(self.av_results):
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
 
         self.eventFilterTT.setTextResults(self.text_results)
         self.ui.textEdit.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
@@ -2188,7 +2181,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def html_heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
         param:
-            item: dictionary of code, file or case, positions, text, coder
+            item: dictionary of code, file_or_casename, positions, text, coder
         """
 
         cur = self.app.conn.cursor()
@@ -2200,9 +2193,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             pass
 
         html = "<br />"
-        '''if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
-            item['file_or_casename'][-5:].lower() in (".html", ".docx", ".epub") or \
-            item['file_or_casename'][-12:] == ".transcribed":'''
         html += _("[VIEW] ")
         html += "<em><span style=\"background-color:" + item['color'] + "\">"
         html += item['codename'] + "</span>, "
@@ -2214,7 +2204,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def show_context_of_clicked_heading(self):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
         Called by: textEdit.cursorPositionChanged, after results are filled.
-        Results contain textedit_start and textedit_end which map the cursor position to the specific text result.
+        text/image/av results contain textedit_start and textedit_end which map the cursor position to the specific result.
         """
 
         pos = self.ui.textEdit.textCursor().position()

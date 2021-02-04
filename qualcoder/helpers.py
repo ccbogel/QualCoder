@@ -148,6 +148,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
     app = None
     code_dict = None
+    text_results = []
+    image_results = []
+    av_results = []
+    te = None
 
     def __init__(self, app, code_dict, case_or_file="File", parent=None):
         """ Create dialog with textEdit widget.
@@ -172,19 +176,19 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             title = _("Coded cases: ") + self.code_dict['name']
         self.setWindowTitle(title)
         self.gridLayout = QtWidgets.QGridLayout(self)
-        te = QtWidgets.QTextEdit()
-        self.gridLayout.addWidget(te, 1, 0)
+        self.te = QtWidgets.QTextEdit()
+        self.gridLayout.addWidget(self.te, 1, 0)
 
         # Get coded text by file for this coder data
         cur = self.app.conn.cursor()
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext from "
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id from "
         sql += "code_text "
         sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
         sql += " where code_name.cid=? and code_text.owner=?"
         sql += " order by source.name, pos0"
         if case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, source.name from code_text "
+            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id from code_text "
             sql += " join code_name on code_name.cid = code_text.cid "
             sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += " code_text.fid = case_text.fid "
@@ -195,25 +199,25 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             sql += " order by cases.name, code_text.pos0, code_text.owner"
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
-        text_results = []
-        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'text', 'source_name'
+        self.text_results = []
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid'
         for row in results:
-            text_results.append(dict(zip(keys, row)))
+            self.text_results.append(dict(zip(keys, row)))
 
-        # Text
-        for row in text_results:
+        # Text insertion into textEdit
+        for row in self.text_results:
             row['file_or_case'] = case_or_file
-            row['textedit_start'] = len(te.toPlainText())
+            row['textedit_start'] = len(self.te.toPlainText())
             title = '<span style=\"background-color:' + row['color'] + '\">'
             if case_or_file == "File":
-                title += _(" File: ") + row['case_or_filename']
+                title += _(" File: ") + row['file_or_casename']
             else:
-                title += _("Case: ") + row['case_or_filename'] + _(" File: ") + row['source_name']
-            title += "<em>" + row['case_or_filename'] + "</em></span>"
+                title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
+            title += "</span>"
             title += ", " + str(row['pos0']) + " - " + str(row['pos1'])
-            te.insertHtml(title)
-            row['textedit_end'] = len(te.toPlainText())
-            te.append(row['text'] + "\n\n")
+            self.te.insertHtml(title)
+            row['textedit_end'] = len(self.te.toPlainText())
+            self.te.append(row['text'] + "\n\n")
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
@@ -233,25 +237,26 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             sql += " order by cases.name, code_image.owner "
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
-        image_results = []
-        keys = 'codename', 'color', 'case_or_filename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo'
+        self.image_results = []
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo'
         for row in results:
-            image_results.append(dict(zip(keys, row)))
-        for counter, row in enumerate(image_results):
+            self.image_results.append(dict(zip(keys, row)))
+        # Image - textEdit insertion
+        for counter, row in enumerate(self.image_results):
             row['file_or_case'] = case_or_file
-            row['textedit_start'] = len(te.toPlainText())
+            row['textedit_start'] = len(self.te.toPlainText())
             title = '<p><span style=\"background-color:' + row['color'] + '\">'
             if case_or_file == "Case":
-                title += _(" Case: ") + row['case_or_filename'] + _(" File: ") + row['mediapath']
+                title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
             title += '</span></p>'
-            te.insertHtml(title)
-            row['textedit_end'] = len(te.toPlainText())
-            te.append("\n")
+            self.te.insertHtml(title)
+            row['textedit_end'] = len(self.te.toPlainText())
+            self.te.append("\n")
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'], 'height': row['height']}
-            self.put_image_into_textedit(img, counter, te)
-            te.append(_("Memo: ") + row['memo'] + "\n\n")
+            self.put_image_into_textedit(img, counter, self.te)
+            self.te.append(_("Memo: ") + row['memo'] + "\n\n")
 
         # Get coded A/V by file for this coder data
         sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
@@ -270,25 +275,27 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             sql += " order by source.name, code_av.owner "
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
-        av_results = []
-        keys = 'codename', 'color', 'case_or_filename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid'
+        self.av_results = []
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid'
         for row in results:
-            av_results.append(dict(zip(keys, row)))
-        for row in av_results:
+            self.av_results.append(dict(zip(keys, row)))
+        # A/V - textEdit insertion
+        for row in self.av_results:
             row['file_or_case'] = case_or_file
-            row['textedit_start'] = len(te.toPlainText())
+            row['textedit_start'] = len(self.te.toPlainText())
             title = '<span style=\"background-color:' + row['color'] + '\">'
             if case_or_file == "Case":
-                title += _("Case: ") + row['case_or_filename'] + _(" File: ") + row['mediapath']
+                title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
             title += '</span>'
-            te.insertHtml(title)
+            self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
-            te.insertHtml('<br />[' + start + ' - ' + end + '] ')
-            row['textedit_end'] = len(te.toPlainText())
-            te.append("Memo: " + row['memo'] + "\n\n")
+            self.te.insertHtml('<br />[' + start + ' - ' + end + '] ')
+            row['textedit_end'] = len(self.te.toPlainText())
+            self.te.append("Memo: " + row['memo'] + "\n\n")
+        self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
         self.exec_()
 
     def put_image_into_textedit(self, img, counter, text_edit):
@@ -334,6 +341,33 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
 
+    def show_context_of_clicked_heading(self):
+        """ Heading (code, file, etc) in textEdit clicked so show context of coding in dialog.
+        Called by: textEdit.cursorPositionChanged, after results are filled.
+        text/image/AV results contain textedit_start and textedit_end which map the cursor position to the specific result.
+        """
+
+        pos = self.te.textCursor().position()
+        # Check the clicked position for a text result
+        found = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInText(self.app, row)
+                ui.exec_()
+                return
+        # Check the position for an image result
+        for row in self.image_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInImage(self.app, row)
+                ui.exec_()
+                return
+        # Check the position for an a/v result
+        for row in self.av_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInAV(self.app, row)
+                ui.exec_()
+                break
+
 
 class DialogCodeInAV(QtWidgets.QDialog):
     """ View coded section in original image.
@@ -363,10 +397,9 @@ class DialogCodeInAV(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.resize(400, 300)
-
         # enable custom window hint - must be set to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        self.setWindowTitle(self.data['text'])
+        self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
         if platform.system() == "Darwin":  # for MacOS
@@ -452,6 +485,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.data = data
+        print(data)
         QtWidgets.QDialog.__init__(self)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -561,7 +595,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     def draw_coded_area(self):
         """ Draw the coded rectangle in the scene """
 
-        tooltip = self.data['codename'] + " (" + self.data['coder'] + ")"
+        tooltip = self.data['codename']   #+ " (" + self.data['coder'] + ")"
         tooltip += "\nMemo: " + self.data['memo']
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
