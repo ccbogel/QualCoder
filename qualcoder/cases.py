@@ -133,6 +133,10 @@ class DialogCases(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
         self.ui.pushButton_import_cases.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -178,6 +182,51 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)
 
         return i
+
+    def export_attributes(self):
+        """ Export attributes from table as a csv file. """
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_case_attributes.csv"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        filename = directory + "/" + filename
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
+
+        cols = self.ui.tableWidget.columnCount()
+        rows = self.ui.tableWidget.rowCount()
+        header = []
+        for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        with open(filename, mode='w') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(header)
+            for r in range(0, rows):
+                data = []
+                for c in range(0, cols):
+                    # Table cell may be a None type
+                    cell = ""
+                    try:
+                        cell = self.ui.tableWidget.item(r, c).text()
+                    except AttributeError:
+                        pass
+                    data.append(cell)
+                writer.writerow(data)
+        logger.info("Report exported to " + filename)
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
+        self.parent_textEdit.append(_("Case attributes csv file exported to: ") + filename)
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.

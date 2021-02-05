@@ -462,7 +462,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, rows):
                 data = []
                 for c in range(0, cols):
-                    data.append(self.ui.tableWidget.item(r, c).text())
+                    # Table cell may be a None type
+                    cell = ""
+                    try:
+                        cell = self.ui.tableWidget.item(r, c).text()
+                    except AttributeError:
+                        pass
+                    data.append(cell)
                 writer.writerow(data)
         logger.info("Report exported to " + filename)
         Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
@@ -471,7 +477,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question or created internally.
-        This also fills out the table header lables with file attribute names.
+        This also fills out the table header labels with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
         Obtain some file metadata to use in table tooltip.
