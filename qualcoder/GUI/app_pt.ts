@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="pt_BR" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="pt_BR">
 <context>
     <name>Dialog_CodeRelations</name>
     <message>
         <location filename="ui_dialog_code_relations.py" line="77"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Relações de código</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="78"/>
@@ -580,7 +581,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="ui_dialog_code_text.py" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
