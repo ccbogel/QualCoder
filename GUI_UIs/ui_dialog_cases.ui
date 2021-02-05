@@ -112,7 +112,7 @@
         <widget class="QPushButton" name="pushButton_delete">
          <property name="geometry">
           <rect>
-           <x>280</x>
+           <x>310</x>
            <y>0</y>
            <width>36</width>
            <height>36</height>
@@ -196,6 +196,22 @@
          </property>
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_export_attributes">
+         <property name="geometry">
+          <rect>
+           <x>230</x>
+           <y>0</y>
+           <width>36</width>
+           <height>36</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string/>
