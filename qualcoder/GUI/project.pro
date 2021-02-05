@@ -37,7 +37,8 @@ TRANSLATIONS    = app_de.ts \
                   app_es.ts \
                   app_fr.ts \
                   app_it.ts \
-                  app_jp.ts
+                  app_jp.ts \
+                  app_pt.ts
 CODECFORTR      = ISO-8859-5
 
 
