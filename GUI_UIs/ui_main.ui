@@ -164,8 +164,10 @@
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionView_Graph"/>
     <addaction name="actionCode_relations"/>
+    <addaction name="actionFile_summary"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -401,6 +403,11 @@
   <action name="actionSpecial_functions">
    <property name="text">
     <string>Special functions</string>
+   </property>
+  </action>
+  <action name="actionFile_summary">
+   <property name="text">
+    <string>File summary</string>
    </property>
   </action>
  </widget>
