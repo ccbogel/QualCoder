@@ -118,6 +118,9 @@ class DialogCodeText(QtWidgets.QWidget):
         tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
@@ -220,7 +223,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
         self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm))
-        self.ui.spinBox_font_size.setValue(self.app.settings['fontsize'])
+        self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
         self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
 
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_back_icon.png'))

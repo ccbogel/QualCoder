@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ https://qualcoder.wordpress.com/
 import configparser
 import datetime
 import gettext
-import json  # to get latest release
+import json  # to get latest Github release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -384,6 +384,8 @@ class App(object):
             result['fontsize'] = default.getint('fontsize')
         if 'treefontsize' in default:
             result['treefontsize'] = default.getint('treefontsize')
+        if 'docfontsize' in default:
+            result['docfontsize'] = default.getint('docfontsize')
         return result
 
     def check_and_add_additional_settings(self, data):
@@ -419,6 +421,7 @@ class App(object):
         'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
+        'docfontsize'
         ]
         for key in keys:
             if key not in data:
@@ -430,7 +433,6 @@ class App(object):
         # write out new ini file, if needed
         if len(data) > dict_len:
             self.write_config_ini(data)
-            logger.info('Added window sizings to config.ini')
         return data
 
     def merge_settings_with_default_stylesheet(self, settings):
@@ -470,6 +472,7 @@ class App(object):
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
+            'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
