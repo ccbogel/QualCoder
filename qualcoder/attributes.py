@@ -229,6 +229,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
+        if row == -1 or col == -1:
+            return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         text = str(self.ui.tableWidget.item(row, col).text())
