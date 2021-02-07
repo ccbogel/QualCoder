@@ -69,7 +69,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.3"
+qualcoder_version = "QualCoder 2.4"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1555,7 +1555,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
             )).read())
-            if _json['name'] not in qualcoder_version:
+            if _json['name'] > qualcoder_version:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
