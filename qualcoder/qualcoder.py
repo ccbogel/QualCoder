@@ -422,7 +422,8 @@ class App(object):
         'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
-        'docfontsize'
+        'docfontsize',
+        'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0'
         ]
         for key in keys:
             if key not in data:
@@ -530,7 +531,9 @@ class App(object):
             'dialogmanagelinks_w': 0,
             'dialogmanagelinks_h': 0,
             'bookmark_file_id': 0,
-            'bookmark_pos': 0
+            'bookmark_pos': 0,
+            'dialogreport_file_summary_splitter0': 100,
+            'dialogreport_file_summary_splitter1': 100
         }
 
     def get_file_texts(self, fileids=None):
