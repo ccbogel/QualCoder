@@ -158,32 +158,75 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         res = cur.fetchone()
         text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
         media_path = ""
+        file_type = ""
         if res[3] is None or res[3] == "":
             media_path = _("Internal text document")
+            file_type = "text"
         elif res[3][0:5] == "docs:":
             media_path = _("External text document: ") + res[3][5:]
+            file_type = "text"
         elif res[3][0:6] == "audio:":
             media_path = _("External audio file: ") + res[3][6:]
+            file_type = "audio"
         elif res[3][0:7] == "/audio/":
             media_path = _("Internal audio file")
+            file_type = "audio"
         elif res[3][0:6] == "video:":
             media_path = _("External video file: ") + res[3][6:]
+            file_type = "video"
         elif res[3][0:7] == "/video/":
             media_path = _("Internal video file")
+            file_type = "video"
         elif res[3][0:7] == "images:":
             media_path = _("External image file: ") + res[3][7:]
+            file_type = "image"
         elif res[3][0:8] == "/images/":
             media_path = _("Internal image file")
+            file_type = "image"
         text += _("Media path: ") + media_path + "\n"
 
-        #TODO summary stats of fulltext
-
+        if file_type == "text":
+            text += self.text_statistics(file_)
         #TODO summary of image
-
         # TODO summary of audio / video
 
-
         self.ui.textEdit.setText(text)
+
+    def text_statistics(self, file_):
+        """ Get details of text file statistics
+        param: file_ Dictionary of {name, id, memo}
+        """
+        print(file_)
+
+        text = ""
+        cur = self.app.conn.cursor()
+        cur.execute("select fulltext from source where id=?", [file_['id']])
+        fulltext = cur.fetchone()[0]
+        text += _("Characters: ") + str(len(fulltext)) + "\n"
+        # Remove punctuation. Convert to lower case
+        chars = ""
+        for c in range(0, len(fulltext)):
+            if fulltext[c].isalpha() or fulltext[c] =="'":
+                chars += fulltext[c]
+            else:
+                chars += " "
+        chars = chars.lower()
+        word_list = chars.split()
+        print(word_list)
+        text += _("Words: ") + str(len(word_list)) + "\n"
+        #TODO word frequency
+        d = {}
+        for word in word_list:
+            d[word] = d.get(word, 0) + 1  # get(key, value if not present)
+        # https://codeburst.io/python-basics-11-word-count-filter-out-punctuation-dictionary-manipulation-and-sorting-lists-3f6c55420855
+        word_freq = []
+        for key, value in d.items():
+            word_freq.append((value, key))
+        word_freq.sort(reverse=True)
+        print(word_freq)
+        #TODO Codes
+
+        return text
 
 
 if __name__ == "__main__":
