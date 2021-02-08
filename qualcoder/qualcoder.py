@@ -60,6 +60,7 @@ from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
 from rqda import Rqda_import
 from settings import DialogSettings
@@ -668,6 +669,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -781,6 +783,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
+        self.ui.actionFile_summary.setEnabled(False)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(False)
 
@@ -815,6 +818,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
+        self.ui.actionFile_summary.setEnabled(True)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
@@ -885,6 +889,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def report_file_summary(self):
+        """ Report on file details. """
+
+        self.ui.label_reports.hide()
+        ui = DialogReportFileSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
