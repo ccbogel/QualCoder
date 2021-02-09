@@ -212,9 +212,12 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                 chars += " "
         chars = chars.lower()
         word_list = chars.split()
-        print(word_list)
+        #print(word_list)
+        msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
+        text += msg + "\n"
+        #TODO use word lis for word proximity
         text += _("Words: ") + str(len(word_list)) + "\n"
-        #TODO word frequency
+        # Word frequency
         d = {}
         for word in word_list:
             d[word] = d.get(word, 0) + 1  # get(key, value if not present)
@@ -223,7 +226,16 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
-        print(word_freq)
+        #print(word_freq)
+        text += _("Unique words: ") + str(len(word_freq)) + "\n"
+        # Top 100 or maximum of less than 100
+        max_count = len(word_freq)
+        if max_count > 100:
+            max_count = 100
+        text += _("Top 100 words") + "\n"
+        for i in range(0, max_count):
+            text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
+
         #TODO Codes
 
         return text
