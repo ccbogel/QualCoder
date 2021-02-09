@@ -204,7 +204,7 @@ Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/1.9
 
 ## Leave a review
-If you like QualCoder and found it useful for your work. Please leave a review on on of these sites:
+If you like QualCoder and found it useful for your work. Please leave a review on these sites:
 
 https://www.saashub.com/qualcoder-alternatives
 
