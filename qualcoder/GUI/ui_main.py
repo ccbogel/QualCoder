@@ -158,6 +158,8 @@ class Ui_MainWindow(object):
         self.actionManage_bad_links_to_files.setObjectName("actionManage_bad_links_to_files")
         self.actionSpecial_functions = QtWidgets.QAction(MainWindow)
         self.actionSpecial_functions.setObjectName("actionSpecial_functions")
+        self.actionFile_summary = QtWidgets.QAction(MainWindow)
+        self.actionFile_summary.setObjectName("actionFile_summary")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -191,8 +193,10 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionView_Graph)
         self.menuReports.addAction(self.actionCode_relations)
+        self.menuReports.addAction(self.actionFile_summary)
         self.menuReports.addAction(self.actionText_mining)
         self.menuReports.addAction(self.actionSQL_statements)
+        self.menuReports.addSeparator()
         self.menuHelp.addAction(self.actionContents)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionSpecial_functions)
@@ -268,6 +272,7 @@ class Ui_MainWindow(object):
         self.actionExport_coded_text_as_html.setText(_translate("MainWindow", "Export coded text as html"))
         self.actionManage_bad_links_to_files.setText(_translate("MainWindow", "Manage bad links to files"))
         self.actionSpecial_functions.setText(_translate("MainWindow", "Special functions"))
+        self.actionFile_summary.setText(_translate("MainWindow", "File summary"))
 
 
 if __name__ == "__main__":

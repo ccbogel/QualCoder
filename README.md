@@ -200,9 +200,16 @@ Required:
 QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
-
 Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/1.9
+
+## Leave a review
+If you like QualCoder and found it useful for your work. Please leave a review on these sites:
+
+https://www.saashub.com/qualcoder-alternatives
+
+https://alternativeto.net/software/qualcoder
+
 
 ## Publications using QualCoder
 Local–global linkages: Challenges in organizing functional communities for ecosocial justice. Joel Izlar, Journal of Community Practice 27(3-4) 2019

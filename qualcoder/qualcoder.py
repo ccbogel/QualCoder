@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ https://qualcoder.wordpress.com/
 import configparser
 import datetime
 import gettext
-import json  # to get latest release
+import json  # to get latest Github release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -60,6 +60,7 @@ from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
 from rqda import Rqda_import
 from settings import DialogSettings
@@ -384,6 +385,8 @@ class App(object):
             result['fontsize'] = default.getint('fontsize')
         if 'treefontsize' in default:
             result['treefontsize'] = default.getint('treefontsize')
+        if 'docfontsize' in default:
+            result['docfontsize'] = default.getint('docfontsize')
         return result
 
     def check_and_add_additional_settings(self, data):
@@ -419,6 +422,8 @@ class App(object):
         'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
+        'docfontsize',
+        'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0'
         ]
         for key in keys:
             if key not in data:
@@ -430,7 +435,6 @@ class App(object):
         # write out new ini file, if needed
         if len(data) > dict_len:
             self.write_config_ini(data)
-            logger.info('Added window sizings to config.ini')
         return data
 
     def merge_settings_with_default_stylesheet(self, settings):
@@ -470,6 +474,7 @@ class App(object):
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
+            'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
@@ -526,7 +531,9 @@ class App(object):
             'dialogmanagelinks_w': 0,
             'dialogmanagelinks_h': 0,
             'bookmark_file_id': 0,
-            'bookmark_pos': 0
+            'bookmark_pos': 0,
+            'dialogreport_file_summary_splitter0': 100,
+            'dialogreport_file_summary_splitter1': 100
         }
 
     def get_file_texts(self, fileids=None):
@@ -665,6 +672,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -778,6 +786,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
+        self.ui.actionFile_summary.setEnabled(False)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(False)
 
@@ -812,6 +821,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
+        self.ui.actionFile_summary.setEnabled(True)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
@@ -882,6 +892,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def report_file_summary(self):
+        """ Report on file details. """
+
+        self.ui.label_reports.hide()
+        ui = DialogReportFileSummary(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):

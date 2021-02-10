@@ -785,7 +785,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         annoted_coded = cur.fetchall()
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
-        format_.setFontPointSize(self.app.settings['fontsize'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
         # add formatting
         cursor = self.text_view.ui.textEdit.textCursor()
         for item in annoted_coded:
@@ -819,6 +819,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # cannot easily edit file text of there are linked cases, codes or annotations
         self.text_view = DialogMemo(self.app, title, self.source[x]['fulltext'], "hide")
         self.text_view.ui.textEdit.setReadOnly(restricted)
+
         if restricted:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_restricted_menu)
@@ -842,7 +843,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
-        format_.setFontPointSize(self.app.settings['fontsize'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.text_view.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(len(self.text_view.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
