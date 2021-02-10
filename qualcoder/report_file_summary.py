@@ -196,7 +196,6 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         """ Get details of text file statistics
         param: file_ Dictionary of {name, id, memo}
         """
-        print(file_)
 
         text = ""
         cur = self.app.conn.cursor()
@@ -214,9 +213,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         word_list = chars.split()
         #print(word_list)
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        text += msg + "\n"
-        #TODO use word lis for word proximity
-        text += _("Words: ") + str(len(word_list)) + "\n"
+        text += "\n" + msg + "\n"
+        #TODO use word list for word proximity
+
+        text += "\n" + _("Words: ") + str(len(word_list)) + "\n"
         # Word frequency
         d = {}
         for word in word_list:
@@ -236,7 +236,18 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         for i in range(0, max_count):
             text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
 
-        #TODO Codes
+        # Codes
+        sql = "select code_name.name, code_text.cid, count(code_text.cid), sum(length(code_text.seltext)), "
+        sql += "round(avg(length(code_text.seltext))) from code_text join code_name "
+        sql += "on code_name.cid=code_text.cid where fid=? "
+        sql += "group by code_name.name, code_text.cid order by count(code_text.cid) desc"
+        cur.execute(sql, [file_['id']])
+        res = cur.fetchall()
+        text += "\n\n" + _("Code counts:") + "\n"
+        for r in res:
+            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + str(r[3])
+            text += "  " + _("Average characters: ") + str(r[4]) + "\n"
+            #print(r)
 
         return text
 
