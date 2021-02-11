@@ -27,6 +27,8 @@ https://github.com/ccbogel/QualCoder
 
 import datetime
 import os
+from PIL import Image
+from PIL.ExifTags import TAGS
 import platform
 import sys
 import logging
@@ -187,10 +189,98 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
         if file_type == "text":
             text += self.text_statistics(file_)
-        #TODO summary of image
+        if file_type == "image":
+            text += self.image_statistics(file_)
         # TODO summary of audio / video
 
         self.ui.textEdit.setText(text)
+
+    def video_statistics(self, file_):
+        """ Get video statistics for image file
+        param: file_ Dictionary of {name, id, memo} """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select mediapath from source where id=?", [file_['id']])
+        mediapath = cur.fetchone()[0]
+        abs_path = ""
+        if 'video:' == mediapath[0:6]:
+            abs_path = mediapath[6:]
+        else:
+            abs_path = self.app.project_path + mediapath
+
+    def audio_statistics(self, file_):
+        """ Get audio statistics for image file
+        param: file_ Dictionary of {name, id, memo} """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select mediapath from source where id=?", [file_['id']])
+        mediapath = cur.fetchone()[0]
+        abs_path = ""
+        if 'audio:' == mediapath[0:6]:
+            abs_path = mediapath[6:]
+        else:
+            abs_path = self.app.project_path + mediapath
+
+    def image_statistics(self, file_):
+        """ Get image statistics for image file
+        param: file_ Dictionary of {name, id, memo} """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select mediapath from source where id=?", [file_['id']])
+        mediapath = cur.fetchone()[0]
+        abs_path = ""
+        '''if 'audio:' == mediapath[0:6]:
+            abs_path = mediapath[6:]
+        elif 'video:' == mediapath[0:6]:
+            abs_path = mediapath[6:]'''
+        if 'images:' == mediapath[0:7]:
+            abs_path = mediapath[7:]
+        else:
+            abs_path = self.app.project_path + mediapath
+
+        # Image size and metadata
+        image = Image.open(abs_path)
+        w, h = image.size
+        text = _("Width: ") + f"{w:,d}"  + "  " + _("Height: ") + f"{h:,d}" + "  " + _("Area: ") + f"{w * h:,d}" + _(" pixels") + "\n"
+        image_type = abs_path[-3:].lower()
+        # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
+        text += _("Image metadata: ") + "\n"
+        if image_type in ("jpg", "peg"):
+            exifdata = image.getexif()
+            # iterating over the EXIF data fields
+            for tag_id in exifdata:
+                # get the tag name, instead of human unreadable tag id
+                tag = TAGS.get(tag_id, tag_id)
+                data = exifdata.get(tag_id)
+                # Decode bytes
+                if isinstance(data, bytes):
+                    try:
+                        data = data.decode()
+                        text += f"{tag:25}: {data}" + "\n"
+                    except UnicodeDecodeError as e:
+                        text += str(e) + "\n"
+        # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
+        if image_type == "png":
+            for tag, value in image.info.items():
+                key = TAGS.get(tag, tag)
+                text += key + " " + str(value) + "\n"
+
+        # Codes
+        sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)) "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid=code_image.cid where id=? "
+        sql += "group by code_name.name, code_image.cid order by count(code_image.cid) desc"
+        cur.execute(sql, [file_['id']])
+        res = cur.fetchall()
+        text += "\n\n" + _("Code counts:") + "\n"
+        #TODO more image statistics
+
+        for r in res:
+            area = int(r[3] * r[4])
+            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
+
+        return text
+
 
     def text_statistics(self, file_):
         """ Get details of text file statistics
@@ -201,7 +291,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [file_['id']])
         fulltext = cur.fetchone()[0]
-        text += _("Characters: ") + str(len(fulltext)) + "\n"
+        text += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
         # Remove punctuation. Convert to lower case
         chars = ""
         for c in range(0, len(fulltext)):
@@ -216,7 +306,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text += "\n" + msg + "\n"
         #TODO use word list for word proximity
 
-        text += "\n" + _("Words: ") + str(len(word_list)) + "\n"
+        text += "\n" + _("Words: ") + f"{len(word_list):,d}" + "\n"
         # Word frequency
         d = {}
         for word in word_list:
@@ -245,8 +335,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         res = cur.fetchall()
         text += "\n\n" + _("Code counts:") + "\n"
         for r in res:
-            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + str(r[3])
-            text += "  " + _("Average characters: ") + str(r[4]) + "\n"
+            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
+            text += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
             #print(r)
 
         return text
