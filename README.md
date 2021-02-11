@@ -155,7 +155,9 @@ You can make an alias to the file and place it on your desktop.
 
 **Another option to install on Mac:**
 
-Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following command:
+Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
+
+`pip install -U py2app`  or for a system installation of python `sudo pip install -U py2app`
 
 `python3 setup.py py2app` 
  
