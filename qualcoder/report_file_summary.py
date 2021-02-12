@@ -26,13 +26,14 @@ https://github.com/ccbogel/QualCoder
 """
 
 import datetime
+import logging
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
 import platform
 import sys
-import logging
 import traceback
+import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -51,6 +52,41 @@ def exception_handler(exception_type, value, tb_obj):
     print(text)
     logger.error(_("Uncaught exception:") + "\n" + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+
+
+'''meta_keys = {vlc.Meta.Actors: None,
+        vlc.Meta.Album: None,
+        vlc.Meta.AlbumArtist: None,
+        vlc.Meta.Artist: None,
+        vlc.Meta.ArtworkURL: None,
+        vlc.Meta.Copyright: None,
+        vlc.Meta.Date: None,
+        vlc.Meta.Description: None,
+        vlc.Meta.Director: None,
+        vlc.Meta.DiscNumber: None,
+        vlc.Meta.DiscTotal: None,
+        vlc.Meta.EncodedBy: None,
+        vlc.Meta.Episode: None,
+        vlc.Meta.Genre: None,
+        vlc.Meta.Language: None,
+        vlc.Meta.NowPlaying: None,
+        vlc.Meta.Publisher: None,
+        vlc.Meta.Rating: None,
+        vlc.Meta.Season: None,
+        vlc.Meta.Setting: None,
+        vlc.Meta.ShowName: None,
+        vlc.Meta.Title: None,
+        vlc.Meta.TrackID: None,
+        vlc.Meta.TrackNumber: None,
+        vlc.Meta.TrackTotal: None,
+        vlc.Meta.URL: None}'''
+
+meta_keys = [vlc.Meta.Actors, vlc.Meta.Album, vlc.Meta.AlbumArtist, vlc.Meta.Artist,
+        vlc.Meta.ArtworkURL, vlc.Meta.Copyright, vlc.Meta.Date, vlc.Meta.Description,
+        vlc.Meta.Director, vlc.Meta.DiscTotal, vlc.Meta.EncodedBy,
+        vlc.Meta.Episode, vlc.Meta.Genre, vlc.Meta.Language, vlc.Meta.NowPlaying, vlc.Meta.Publisher,
+        vlc.Meta.Rating, vlc.Meta.Season, vlc.Meta.Setting, vlc.Meta.ShowName, vlc.Meta.Title,
+        vlc.Meta.TrackID, vlc.Meta.TrackNumber, vlc.Meta.TrackTotal, vlc.Meta.URL]
 
 
 class DialogReportFileSummary(QtWidgets.QDialog):
@@ -191,7 +227,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text += self.text_statistics(file_)
         if file_type == "image":
             text += self.image_statistics(file_)
-        # TODO summary of audio / video
+        if file_type == "audio":
+            text += self.audio_statistics(file_)
+        if file_type == "video":
+            text += self.video_statistics(file_)
 
         self.ui.textEdit.setText(text)
 
@@ -208,6 +247,46 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + mediapath
 
+        instance = vlc.Instance()
+        mediaplayer = instance.media_player_new()
+        media = instance.media_new(abs_path)
+        media.parse()
+        mediaplayer.play()
+        mediaplayer.pause()
+        msecs = media.get_duration()
+        secs = int(msecs / 1000)
+        mins = int(secs / 60)
+        remainder_secs = str(secs - mins * 60)
+        if len(remainder_secs) == 1:
+            remainder_secs = "0" + remainder_secs
+        text = _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
+        '''ar = mediaplayer.video_get_aspect_ratio()
+        text += _("Aspect ratio: ") + str(ar) + "\n"
+        fps = mediaplayer.get_fps()
+        text += _("FPS: ") + str(fps) + "\n"
+        pr = mediaplayer.get_rate()
+        text += _("Recommended play rate: ") + str(pr) + "\n"'''
+        for k in meta_keys:
+            meta = media.get_meta(k)
+            if meta is not None:
+                text += str(k)+ ":  " + meta + "\n"
+
+        #TODO codes
+        sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)) "
+        sql += " from code_av join code_name "
+        sql += "on code_name.cid=code_av.cid where id=? "
+        sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
+        cur.execute(sql, [file_['id']])
+        res = cur.fetchall()
+        text += "\n\n" + _("Code counts:") + "\n"
+        # TODO more statistics
+
+        for r in res:
+            text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
+            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+
+        return text
+
     def audio_statistics(self, file_):
         """ Get audio statistics for image file
         param: file_ Dictionary of {name, id, memo} """
@@ -221,6 +300,38 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + mediapath
 
+        instance = vlc.Instance()
+        mediaplayer = instance.media_player_new()
+        media = instance.media_new(abs_path)
+        media.parse()
+        msecs = media.get_duration()
+        secs = int(msecs / 1000)
+        mins = int(secs / 60)
+        remainder_secs = str(secs - mins * 60)
+        if len(remainder_secs) == 1:
+            remainder_secs = "0" + remainder_secs
+        text = _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
+        for k in meta_keys:
+            meta = media.get_meta(k)
+            if meta is not None:
+                text += str(k)+ ":  " + meta + "\n"
+
+        #TODO codes
+        sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)) "
+        sql += " from code_av join code_name "
+        sql += "on code_name.cid=code_av.cid where id=? "
+        sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
+        cur.execute(sql, [file_['id']])
+        res = cur.fetchall()
+        text += "\n\n" + _("Code counts:") + "\n"
+        # TODO more statistics
+
+        for r in res:
+            text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
+            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+
+        return text
+
     def image_statistics(self, file_):
         """ Get image statistics for image file
         param: file_ Dictionary of {name, id, memo} """
@@ -229,10 +340,6 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         cur.execute("select mediapath from source where id=?", [file_['id']])
         mediapath = cur.fetchone()[0]
         abs_path = ""
-        '''if 'audio:' == mediapath[0:6]:
-            abs_path = mediapath[6:]
-        elif 'video:' == mediapath[0:6]:
-            abs_path = mediapath[6:]'''
         if 'images:' == mediapath[0:7]:
             abs_path = mediapath[7:]
         else:
@@ -258,7 +365,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                         data = data.decode()
                         text += f"{tag:25}: {data}" + "\n"
                     except UnicodeDecodeError as e:
-                        text += str(e) + "\n"
+                        logger.debug(e)
+                        #text += str(e) + "\n"
         # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
         if image_type == "png":
             for tag, value in image.info.items():
