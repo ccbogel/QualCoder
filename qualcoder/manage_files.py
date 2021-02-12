@@ -550,13 +550,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(text), "png")
         icon = QtGui.QIcon(pm)
         if fulltext is not None and len(fulltext) > 0 and mediapath is None:
-            metadata += "Characters: " + str(len(fulltext))
+            metadata += _("Characters: ") + str(len(fulltext))
             return icon, metadata
         if mediapath is None:
             logger.debug("empty media path error")
             return icon, metadata
         if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
-            metadata += "Characters: " + str(len(fulltext))
+            metadata += _("Characters: ") + str(len(fulltext))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
             icon = QtGui.QIcon(pm)
@@ -582,7 +582,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 image = Image.open(abs_path)
                 w, h = image.size
             except:
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "images:":
@@ -595,7 +595,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 image = Image.open(abs_path)
                 w, h = image.size
             except:
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "/video/":
@@ -616,7 +616,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = QtGui.QIcon(pm)
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
 
             instance = vlc.Instance()
@@ -630,10 +630,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 remainder_secs = str(secs - mins * 60)
                 if len(remainder_secs) == 1:
                     remainder_secs = "0" + remainder_secs
-                metadata += "Duration: " + str(mins) + ":" + remainder_secs
+                metadata += _("Duration: ") + str(mins) + ":" + remainder_secs
             except Exception as e:
                 logger.debug(str(e))
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
         bytes = 0
         try:
