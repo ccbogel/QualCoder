@@ -191,8 +191,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         text = file_name + "\n\n"
-        text += _("MEMO: ") + file_['memo'] + "\n"
-        text += self.get_attributes(file_)
+        text += _("MEMO: ") + "\n" + file_['memo'] + "\n"
+        text += self.get_attributes(file_['id'])
+        text += self.get_case_assignment(file_['id'])
 
         cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
         res = cur.fetchone()
@@ -225,46 +226,48 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             file_type = "image"
         text += _("Media path: ") + media_path + "\n"
         if file_type == "text":
-            text += self.text_statistics(file_)
+            text += self.text_statistics(file_['id'])
         if file_type == "image":
-            text += self.image_statistics(file_)
+            text += self.image_statistics(file_['id'])
         if file_type == "audio":
-            text += self.audio_statistics(file_)
+            text += self.audio_statistics(file_['id'])
         if file_type == "video":
-            text += self.video_statistics(file_)
-        text += self.get_case_assignment(file_)
+            text += self.video_statistics(file_['id'])
 
         self.ui.textEdit.setText(text)
 
-    def get_case_assignment(self, file_):
+    def get_case_assignment(self, id):
         """ Get case or cases associated with this file.
         Show text positions if a text file.
-        param: file_ Dictionary of {name, id, memo} """
+        param: id : Integer """
 
-        text = _("CASE:") + "\n"
+        text = "\n" + _("CASE:") + "\n"
         cur = self.app.conn.cursor()
         sql = "select cases.name, pos0, pos1 from case_text \
               join cases on cases.caseid=case_text.caseid \
               where case_text.fid=?"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         result = cur.fetchall()
         for row in result:
             if row[1] == 0 and row[2] == 0:
                 text += row[0] + "\n"
             else:
                 text += row[0] + " [" + str(row[1]) + " - " + str(row[2]) + "]" + "\n"
+        if result == []:
+            text += _("No case assignment") + "\n"
+        text += "\n"
         return text
 
-    def get_attributes(self, file_):
+    def get_attributes(self, id):
         """ Get attributes and return text representation.
-        param: file_ Dictionary of {name, id, memo} """
+        param: id : Integer """
 
         text = _("ATTRIBUTES:") + "\n"
         cur = self.app.conn.cursor()
         sql = "select attribute.name, value from attribute join attribute_type on \
             attribute_type.name=attribute.name where attribute_type.caseOrFile='file' and \
             id=? order by attribute.name"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         result = cur.fetchall()
         if result == []:
             return ""
@@ -273,13 +276,13 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         text += "\n"
         return text
 
-    def video_statistics(self, file_):
+    def video_statistics(self, id):
         """ Get video statistics for image file
-        param: file_ Dictionary of {name, id, memo} """
+        param: id : Integer """
 
         text = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [file_['id']])
+        cur.execute("select mediapath from source where id=?", [id])
         mediapath = cur.fetchone()[0]
         abs_path = ""
         if 'video:' == mediapath[0:6]:
@@ -310,21 +313,31 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += " from code_av join code_name "
         sql += "on code_name.cid=code_av.cid where id=? "
         sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         res = cur.fetchall()
         text += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
             text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
             text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+
+        # Transcript
+        cur.execute("select name from source where id=?", [id])
+        filename = cur.fetchone()[0]
+        cur.execute("select id from source where name=?", [filename + ".transcribed"])
+        res = cur.fetchone()
+        if res is not None:
+            text += "\n" + _("TRANSCRIPT:") + filename + ".transcribed" + "\n"
+            text += self.text_statistics(res[0])
+            text += _("END OF TRANSCRIPT") + "\n"
         return text
 
-    def audio_statistics(self, file_):
+    def audio_statistics(self, id):
         """ Get audio statistics for image file
         param: file_ Dictionary of {name, id, memo} """
 
         text = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [file_['id']])
+        cur.execute("select mediapath from source where id=?", [id])
         mediapath = cur.fetchone()[0]
         abs_path = ""
         if 'audio:' == mediapath[0:6]:
@@ -353,22 +366,32 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += " from code_av join code_name "
         sql += "on code_name.cid=code_av.cid where id=? "
         sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         res = cur.fetchall()
         text += "\n\n" + _("CODE COUNTS:") + "\n"
 
         for r in res:
             text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
             text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+
+        # Transcript
+        cur.execute("select name from source where id=?", [id])
+        filename = cur.fetchone()[0]
+        cur.execute("select id from source where name=?", [filename + ".transcribed"])
+        res = cur.fetchone()
+        if res is not None:
+            text += "\n" + _("TRANSCRIPT: ") + filename + ".transcribed" + "\n"
+            text += self.text_statistics(res[0])
+            text += _("END OF TRANSCRIPT") + "\n"
         return text
 
-    def image_statistics(self, file_):
+    def image_statistics(self, id):
         """ Get image statistics for image file
-        param: file_ Dictionary of {name, id, memo} """
+        param: id: Integer """
 
         text = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [file_['id']])
+        cur.execute("select mediapath from source where id=?", [id])
         mediapath = cur.fetchone()[0]
         abs_path = ""
         if 'images:' == mediapath[0:7]:
@@ -408,7 +431,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += " from code_image join code_name "
         sql += "on code_name.cid=code_image.cid where id=? "
         sql += "group by code_name.name, code_image.cid order by count(code_image.cid) desc"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         res = cur.fetchall()
         text += "\n\n" + _("CODE COUNTS:") + "\n"
 
@@ -417,15 +440,17 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
         return text
 
-    def text_statistics(self, file_):
+    def text_statistics(self, id):
         """ Get details of text file statistics
-        param: file_ Dictionary of {name, id, memo}
+        param: id Integer
         """
 
         text = _("STATISTICS:") + "\n"
         cur = self.app.conn.cursor()
-        cur.execute("select fulltext from source where id=?", [file_['id']])
+        cur.execute("select fulltext from source where id=?", [id])
         fulltext = cur.fetchone()[0]
+        if fulltext is None:
+            fulltext = ""
         text += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
         # Remove punctuation. Convert to lower case
         chars = ""
@@ -466,7 +491,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "round(avg(length(code_text.seltext))) from code_text join code_name "
         sql += "on code_name.cid=code_text.cid where fid=? "
         sql += "group by code_name.name, code_text.cid order by count(code_text.cid) desc"
-        cur.execute(sql, [file_['id']])
+        cur.execute(sql, [id])
         res = cur.fetchall()
         text += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
