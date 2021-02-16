@@ -60,6 +60,7 @@ from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from report_code_summary import DialogReportCodeSummary
 from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
 from rqda import Rqda_import
@@ -910,7 +911,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_code_summary(self):
         """ Report on code details. """
 
-        print("TODO")
+        self.ui.label_reports.hide()
+        ui = DialogReportCodeSummary(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def view_graph_original(self):
         """ Show list or acyclic graph of codes and categories. """
