@@ -165,6 +165,7 @@
     <addaction name="actionView_Graph"/>
     <addaction name="actionCode_relations"/>
     <addaction name="actionFile_summary"/>
+    <addaction name="actionCode_summary"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
     <addaction name="separator"/>
@@ -408,6 +409,11 @@
   <action name="actionFile_summary">
    <property name="text">
     <string>File summary</string>
+   </property>
+  </action>
+  <action name="actionCode_summary">
+   <property name="text">
+    <string>Code summary</string>
    </property>
   </action>
  </widget>
