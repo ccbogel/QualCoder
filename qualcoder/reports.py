@@ -818,10 +818,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(treefont)
+        self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.label_counts.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
+        self.ui.listWidget_files.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.ui.listWidget_cases.setStyleSheet(treefont)
+        self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
@@ -850,6 +853,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_export.setEnabled(False)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        self.ui.textEdit.installEventFilter(self)  # for H key
         self.ui.textEdit.setReadOnly(True)
         self.ui.splitter.setSizes([100, 200, 0])
         try:
@@ -1532,6 +1536,24 @@ class DialogReportCodes(QtWidgets.QDialog):
         mb.setWindowTitle(_('Report exported'))
         mb.setText(msg)
         mb.exec_()
+
+    def eventFilter(self, object, event):
+        """ Used to detect key events in the textedit.
+        H Hide / Unhide top groupbox
+        """
+
+        # change start and end code positions using alt arrow left and alt arrow right
+        # and shift arrow left, shift arrow right
+        # QtGui.QKeyEvent = 7
+        if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or \
+            self.ui.listWidget_files.hasFocus() or self.ui.listWidget_cases.hasFocus()):
+            key = event.key()
+            mod = event.modifiers()
+            # Hide unHide top groupbox
+            if key == QtCore.Qt.Key_H:
+                self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
+                return True
+        return False
 
     def recursive_set_selected(self, item):
         """ Set all children of this item to be selected if the item is selected.
