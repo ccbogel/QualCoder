@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-05 18:11+1100\n"
-"PO-Revision-Date: 2021-02-05 18:34+1100\n"
+"PO-Revision-Date: 2021-02-17 14:31+0100\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3324,7 +3324,7 @@ msgstr "Voir l'averror"
 #: manage_files.py:1086 manage_files.py:1164 manage_files.py:1140
 #: manage_files.py:1179 manage_files.py:1229
 msgid "pdf miner is not installed"
-msgstr "PDF miner n'est pas installé"
+msgstr "pdf miner n'est pas installé"
 
 #: manage_files.py:1290 manage_files.py:1382 refi.py:898 manage_files.py:1380
 #: manage_files.py:1419 refi.py:923 manage_files.py:1469
@@ -3754,7 +3754,7 @@ msgstr "numérique"
 
 #: attributes.py:236
 msgid "Change to character"
-msgstr "Changement de caractère"
+msgstr "Changer vers caractères"
 
 #: cases.py:258 cases.py:307
 msgid "Select cases file"
@@ -3774,7 +3774,7 @@ msgstr "Changement de position finale (SHIFT DROITE/ALT GAUCHE)"
 
 #: code_text.py:674 view_av.py:2106
 msgid "Mark (Q)"
-msgstr "Mark (Q)"
+msgstr "Surligner (Q)"
 
 #: code_text.py:677 view_av.py:2109
 msgid "Mark with recent code (R)"
