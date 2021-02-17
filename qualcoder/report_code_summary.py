@@ -25,17 +25,19 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-import datetime
+from copy import deepcopy
+#import datetime
 import logging
 import os
-from PIL import Image
-from PIL.ExifTags import TAGS
-import platform
+#from PIL import Image
+#from PIL.ExifTags import TAGS
+#import platform
 import sys
 import traceback
-import vlc
+#import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
 from GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 
@@ -60,7 +62,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
     app = None
     parent_tetEdit = None
-    files = []
+    categories = []
+    codes = []
+    #files = []
 
     def __init__(self, app, parent_textEdit):
         sys.excepthook = exception_handler
@@ -87,7 +91,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.get_files()
+        self.fill_tree()
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
 
     def splitter_sizes(self, pos, index):
@@ -97,71 +101,123 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.app.settings['dialogreport_code_summary_splitter0'] = sizes[0]
         self.app.settings['dialogreport_code_summary_splitter1'] = sizes[1]
 
-    def get_files(self):
-        """ Get source files with additional details and fill list widget.
-        """
+    #TODO UPDATE CODES CATEGORIES WHEN CHANGED IN CODING DIALOG
 
-        '''self.ui.listWidget.clear()
-        self.files = self.app.get_filenames()
-        # Fill additional details about each file in the memo
-        cur = self.app.conn.cursor()
-        sql = "select length(fulltext), mediapath from source where id=?"
-        sql_text_codings = "select count(cid) from code_text where fid=?"
-        sql_av_codings = "select count(cid) from code_av where id=?"
-        sql_image_codings = "select count(cid) from code_image where id=?"
-        for f in self.files:
-            cur.execute(sql, [f['id'], ])
-            res = cur.fetchone()
-            if res is None:  # safety catch
-                res = [0]
-            tt = ""
-            if res[1] is None or res[1][0:5] == "docs:":
-                tt += _("Text file\n")
-                tt += _("Characters: ") + str(res[0])
-            if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
-                tt += _("Image")
-            if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
-                tt += _("Audio")
-            if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
-                tt += _("Video")
-            cur.execute(sql_text_codings, [f['id']])
-            txt_res = cur.fetchone()
-            cur.execute(sql_av_codings, [f['id']])
-            av_res = cur.fetchone()
-            cur.execute(sql_image_codings, [f['id']])
-            img_res = cur.fetchone()
-            tt += _("\nCodings: ")
-            if txt_res[0] > 0:
-                tt += str(txt_res[0])
-            if av_res[0] > 0:
-                tt += str(av_res[0])
-            if img_res[0] > 0:
-                tt += str(img_res[0])
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] is not None and f['memo'] != "":
-                tt += _("\nMemo: ") + f['memo']
-            item.setToolTip(tt)
-            self.ui.listWidget.addItem(item)'''
-        print("TODO")
+    def get_codes_and_categories(self):
+        """ Called from init, delete category/code.
+        Also called on other coding dialogs in the dialog_list. """
+
+        self.codes, self.categories = self.app.get_data()
+
+    def fill_tree(self):
+        """ Fill tree widget, top level items are main categories and unlinked codes.
+        The Count column counts the number of times that code has been used by selected coder in selected file. """
+
+        self.get_codes_and_categories()
+        cats = deepcopy(self.categories)
+        codes = deepcopy(self.codes)
+        self.ui.treeWidget.clear()
+        self.ui.treeWidget.setColumnCount(4)
+        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
+        if self.app.settings['showids'] == 'False':
+            self.ui.treeWidget.setColumnHidden(1, True)
+        else:
+            self.ui.treeWidget.setColumnHidden(1, False)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setStretchLastSection(False)
+        # add top level categories
+        remove_list = []
+        for c in cats:
+            if c['supercatid'] is None:
+                memo = ""
+                if c['memo'] != "" and c['memo'] is not None:
+                    memo = _("Memo")
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item.setToolTip(2, c['memo'])
+                self.ui.treeWidget.addTopLevelItem(top_item)
+                remove_list.append(c)
+        for item in remove_list:
+            #try:
+            cats.remove(item)
+            #except Exception as e:
+            #    logger.debug(e, item)
+
+        ''' Add child categories. look at each unmatched category, iterate through tree
+         to add as child, then remove matched categories from the list '''
+        count = 0
+        while len(cats) > 0 and count < 10000:
+            remove_list = []
+            #logger.debug("Cats: " + str(cats))
+            for c in cats:
+                it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+                item = it.value()
+                count2 = 0
+                while item and count2 < 10000:  # while there is an item in the list
+                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                        memo = ""
+                        if c['memo'] != "" and c['memo'] is not None:
+                            memo = _("Memo")
+                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child.setToolTip(2, c['memo'])
+                        item.addChild(child)
+                        remove_list.append(c)
+                    it += 1
+                    item = it.value()
+                    count2 += 1
+            for item in remove_list:
+                cats.remove(item)
+            count += 1
+
+        # add unlinked codes as top level items
+        remove_items = []
+        for c in codes:
+            if c['catid'] is None:
+                memo = ""
+                if c['memo'] != "" and c['memo'] is not None:
+                    memo = _("Memo")
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item.setToolTip(2, c['memo'])
+                top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                self.ui.treeWidget.addTopLevelItem(top_item)
+                remove_items.append(c)
+        for item in remove_items:
+            codes.remove(item)
+
+        # add codes as children
+        for c in codes:
+            it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+            item = it.value()
+            count = 0
+            while item and count < 10000:
+                if item.text(1) == 'catid:' + str(c['catid']):
+                    memo = ""
+                    if c['memo'] != "" and c['memo'] is not None:
+                        memo = _("Memo")
+                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setToolTip(2, c['memo'])
+                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    item.addChild(child)
+                    c['catid'] = -1  # Make unmatchable
+                it += 1
+                item = it.value()
+                count += 1
+        self.ui.treeWidget.expandAll()
+
 
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
 
-        '''file_ = ""
-        file_name = self.ui.listWidget.currentItem().text()
-        for f in self.files:
-            if f['name'] == file_name:
-                file_ = f
-                break
-        if file_ == "":
+        current = self.ui.treeWidget.currentItem()
+        if current.text(1)[0:3] != 'cid':
             return
         cur = self.app.conn.cursor()
-        text = file_name + "\n\n"
-        text += _("MEMO: ") + "\n" + file_['memo'] + "\n"
-        text += self.get_attributes(file_['id'])
-        text += self.get_case_assignment(file_['id'])
+        text = _("CODE: ") + current.text(0) + "  " + current.text(1) + "\n"
 
-        cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
+        #text += _("MEMO: ") + "\n" + "\n"
+
+        '''cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
         res = cur.fetchone()
         text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
         media_path = ""
@@ -198,53 +254,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         if file_type == "audio":
             text += self.audio_statistics(file_['id'])
         if file_type == "video":
-            text += self.video_statistics(file_['id'])
+            text += self.video_statistics(file_['id'])'''
 
-        self.ui.textEdit.setText(text)'''
+        self.ui.textEdit.setText(text)
 
-        print("TODO")
 
-    '''def get_case_assignment(self, id):
-        """ Get case or cases associated with this file.
-        Show text positions if a text file.
-        param: id : Integer """
-
-        text = "\n" + _("CASE:") + "\n"
-        cur = self.app.conn.cursor()
-        sql = "select cases.name, pos0, pos1 from case_text \
-              join cases on cases.caseid=case_text.caseid \
-              where case_text.fid=?"
-        cur.execute(sql, [id])
-        result = cur.fetchall()
-        for row in result:
-            if row[1] == 0 and row[2] == 0:
-                text += row[0] + "\n"
-            else:
-                text += row[0] + " [" + str(row[1]) + " - " + str(row[2]) + "]" + "\n"
-        if result == []:
-            text += _("No case assignment") + "\n"
-        text += "\n"
-        return text
-
-    def get_attributes(self, id):
-        """ Get attributes and return text representation.
-        param: id : Integer """
-
-        text = _("ATTRIBUTES:") + "\n"
-        cur = self.app.conn.cursor()
-        sql = "select attribute.name, value from attribute join attribute_type on \
-            attribute_type.name=attribute.name where attribute_type.caseOrFile='file' and \
-            id=? order by attribute.name"
-        cur.execute(sql, [id])
-        result = cur.fetchall()
-        if result == []:
-            return ""
-        for row in result:
-            text += row[0] + ": " + str(row[1]) + " | "
-        text += "\n"
-        return text
-
-    def video_statistics(self, id):
+    '''def video_statistics(self, id):
         """ Get video statistics for image file
         param: id : Integer """
 
@@ -275,28 +290,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             meta = media.get_meta(k)
             if meta is not None:
                 text += str(k)+ ":  " + meta + "\n"
-
-        # Codes
-        sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)) "
-        sql += " from code_av join code_name "
-        sql += "on code_name.cid=code_av.cid where id=? "
-        sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
-        cur.execute(sql, [id])
-        res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
-        for r in res:
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
-            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
-
-        # Transcript
-        cur.execute("select name from source where id=?", [id])
-        filename = cur.fetchone()[0]
-        cur.execute("select id from source where name=?", [filename + ".transcribed"])
-        res = cur.fetchone()
-        if res is not None:
-            text += "\n" + _("TRANSCRIPT:") + filename + ".transcribed" + "\n"
-            text += self.text_statistics(res[0])
-            text += _("END OF TRANSCRIPT") + "\n"
         return text
 
     def audio_statistics(self, id):
@@ -341,16 +334,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for r in res:
             text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
             text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
-
-        # Transcript
-        cur.execute("select name from source where id=?", [id])
-        filename = cur.fetchone()[0]
-        cur.execute("select id from source where name=?", [filename + ".transcribed"])
-        res = cur.fetchone()
-        if res is not None:
-            text += "\n" + _("TRANSCRIPT: ") + filename + ".transcribed" + "\n"
-            text += self.text_statistics(res[0])
-            text += _("END OF TRANSCRIPT") + "\n"
         return text
 
     def image_statistics(self, id):
