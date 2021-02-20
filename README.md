@@ -79,6 +79,8 @@ Alternatively move to the qualcoder directory and run the qualcoder.py file in f
 
 `python qualcoder.py`  or `py qualcoder.py`
 
+you might need to install modules and run the program by typing python3 rather than python or py, it seems different on different Winows versions.
+
 Run QualCoder and hide the black DOS box:
 
 `C:\Windows\pyw.exe "C:\the location of your Qualcoder folder\QualCoder-master\qualcoder\qualcoder.py"`
