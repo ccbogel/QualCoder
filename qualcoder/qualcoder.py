@@ -237,7 +237,7 @@ class App(object):
             return result[0]
 
     def create_connection(self, project_path):
-        """ Create connection to recent project and load codes, categories and model """
+        """ Create connection to recent project. """
 
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
@@ -320,7 +320,7 @@ class App(object):
         return res
 
     def get_data(self):
-        """ Called from init and gets all the codes, categories.
+        """ Gets all the codes, categories.
         Called from code_text, code_av, code_image, reports, report_crossovers """
 
         categories = []
@@ -1386,6 +1386,33 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+
+        # Delete codings (fid, id) that do not have a matching source id
+        sql = "select fid from code_text where fid not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_text coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_text where fid=?", [r[0]])
+        sql = "select code_image.id from code_image where code_image.id not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_image coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_image where id=?", [r[0]])
+        sql = "select code_av.id from code_av where code_av.id not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_av coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_av where id=?", [r[0]])
+        self.app.conn.commit()
+        # Vacuum database
+        cur.execute("vacuum")
+        self.app.conn.commit()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
