@@ -212,51 +212,113 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] != 'cid':
             return
+        code_= None
+        for c in self.codes:
+            if c['name'] == current.text(0):
+                code_ = c
+        if code_ is None:
+            return
         cur = self.app.conn.cursor()
-        text = _("CODE: ") + current.text(0) + "  " + current.text(1) + "\n"
+        text = _("CODE: ") + code_['name'] + "  " + current.text(1)
+        text += "  " + _("COLOUR: ") + code_['color'] + "  " + _("CREATED BY: ") + code_['owner'] + "\n\n"
+        text += _("MEMO: ") + "\n" + code_['memo'] + "\n\n"
 
-        #text += _("MEMO: ") + "\n" + "\n"
+        # Number of sources
+        # Number of words
+        # numbers of pixel area, minutes/seconds
+        coders = []
+        sources = []
+        text_sql = "select fid, seltext, pos0, pos1, owner, memo, avid from code_text where cid=?"
+        cur.execute(text_sql, [code_['cid']])
+        text_res = cur.fetchall()
+        for r in text_res:
+            coders.append(r[4])
+            sources.append(r[0])
+            print(r)
+        img_sql = "select id, x1, y1, width, height, owner, memo from code_image where cid=?"
+        cur.execute(img_sql, [code_['cid']])
+        img_res = cur.fetchall()
+        for r in img_res:
+            coders.append(r[5])
+            sources.append(r[0])
+            print(r)
+        av_sql = "select id, pos0, pos1, owner, memo from code_av where cid=?"
+        cur.execute(av_sql, [code_['cid']])
+        av_res = cur.fetchall()
+        for r in av_res:
+            coders.append(r[3])
+            sources.append(r[0])
+            print(r)
 
-        '''cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
-        res = cur.fetchone()
-        text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
-        media_path = ""
-        file_type = ""
-        if res[3] is None or res[3] == "":
-            media_path = _("Internal text document")
-            file_type = "text"
-        elif res[3][0:5] == "docs:":
-            media_path = _("External text document: ") + res[3][5:]
-            file_type = "text"
-        elif res[3][0:6] == "audio:":
-            media_path = _("External audio file: ") + res[3][6:]
-            file_type = "audio"
-        elif res[3][0:7] == "/audio/":
-            media_path = _("Internal audio file")
-            file_type = "audio"
-        elif res[3][0:6] == "video:":
-            media_path = _("External video file: ") + res[3][6:]
-            file_type = "video"
-        elif res[3][0:7] == "/video/":
-            media_path = _("Internal video file")
-            file_type = "video"
-        elif res[3][0:7] == "images:":
-            media_path = _("External image file: ") + res[3][7:]
-            file_type = "image"
-        elif res[3][0:8] == "/images/":
-            media_path = _("Internal image file")
-            file_type = "image"
-        text += _("Media path: ") + media_path + "\n"
-        if file_type == "text":
-            text += self.text_statistics(file_['id'])
-        if file_type == "image":
-            text += self.image_statistics(file_['id'])
-        if file_type == "audio":
-            text += self.audio_statistics(file_['id'])
-        if file_type == "video":
-            text += self.video_statistics(file_['id'])'''
+        # Coders total and names
+        coders = list(set(coders))
+        text += _("CODERS: ") + " " + str(len(coders))
+        for c in coders:
+            text += " | " + c
+        text += "\n\n"
+
+        # Sources total and names
+        sources = list(set(sources))
+        text += _("FILES: ") + " " + str(len(sources))
+        for s in sources:
+            cur.execute("select name from source where id=?", [s])
+            sourcename = cur.fetchone()
+            if sourcename is None:
+                sourcename = [""]
+                self.ui.textEdit.append(_("Report code summary. Code_text, code_image or code_av had a coding to a deleted file"))
+            text += " | " + sourcename[0]
+        text += "\n"
+
+
+
+
+
+
+
+
 
         self.ui.textEdit.setText(text)
+
+
+
+    '''cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
+    res = cur.fetchone()
+    text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
+    media_path = ""
+    file_type = ""
+    if res[3] is None or res[3] == "":
+        media_path = _("Internal text document")
+        file_type = "text"
+    elif res[3][0:5] == "docs:":
+        media_path = _("External text document: ") + res[3][5:]
+        file_type = "text"
+    elif res[3][0:6] == "audio:":
+        media_path = _("External audio file: ") + res[3][6:]
+        file_type = "audio"
+    elif res[3][0:7] == "/audio/":
+        media_path = _("Internal audio file")
+        file_type = "audio"
+    elif res[3][0:6] == "video:":
+        media_path = _("External video file: ") + res[3][6:]
+        file_type = "video"
+    elif res[3][0:7] == "/video/":
+        media_path = _("Internal video file")
+        file_type = "video"
+    elif res[3][0:7] == "images:":
+        media_path = _("External image file: ") + res[3][7:]
+        file_type = "image"
+    elif res[3][0:8] == "/images/":
+        media_path = _("Internal image file")
+        file_type = "image"
+    text += _("Media path: ") + media_path + "\n"
+    if file_type == "text":
+        text += self.text_statistics(file_['id'])
+    if file_type == "image":
+        text += self.image_statistics(file_['id'])
+    if file_type == "audio":
+        text += self.audio_statistics(file_['id'])
+    if file_type == "video":
+        text += self.video_statistics(file_['id'])'''
 
 
     '''def video_statistics(self, id):
