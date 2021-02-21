@@ -221,11 +221,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         text = _("CODE: ") + code_['name'] + "  " + current.text(1)
         text += "  " + _("COLOUR: ") + code_['color'] + "  " + _("CREATED BY: ") + code_['owner'] + "\n\n"
-        text += _("MEMO: ") + "\n" + code_['memo'] + "\n\n"
+        text += _("MEMO: ") + "\n" + code_['memo'] + "\n"
 
-        # Number of sources
-        # Number of words
-        # numbers of pixel area, minutes/seconds
+        # Coding statistics
         coders = []
         sources = []
         text_sql = "select fid, seltext, pos0, pos1, owner, memo, avid from code_text where cid=?"
@@ -269,12 +267,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             text += " | " + sourcename[0]
         text += "\n"
 
+        # Text codings statistics, number of words
+        text += _("TEXT CODINGS: ") + str(len(text_res)) + "\n"
 
+        # Picture coding statistics, of pixel areas
+        text += _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
 
-
-
-
-
+        # AV coding statistics, of minutes/seconds
+        text += _("A/V CODINGS: ") + str(len(av_res)) + "\n"
 
 
         self.ui.textEdit.setText(text)
