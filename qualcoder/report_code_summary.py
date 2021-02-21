@@ -29,8 +29,7 @@ from copy import deepcopy
 #import datetime
 import logging
 import os
-#from PIL import Image
-#from PIL.ExifTags import TAGS
+from PIL import Image
 #import platform
 import sys
 import traceback
@@ -266,60 +265,105 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 self.ui.textEdit.append(_("Report code summary. Code_text, code_image or code_av had a coding to a deleted file"))
             text += " | " + sourcename[0]
         text += "\n"
-
-        # Text codings statistics, number of words
-        text += _("TEXT CODINGS: ") + str(len(text_res)) + "\n"
-
-        # Picture coding statistics, of pixel areas
-        text += _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
-
+        text += self.text_statistics(code_, text_res)
+        text += self.image_statistics(code_, img_res)
         # AV coding statistics, of minutes/seconds
         text += _("A/V CODINGS: ") + str(len(av_res)) + "\n"
-
-
         self.ui.textEdit.setText(text)
 
+    def text_statistics(self, code_, text_res):
+        """ Get text statistics for code.
+        param:
+            code_ : dictionary {name, color, cid,}
+            text_res: list of text results
+        """
 
+        text = "\n" + _("TEXT CODINGS: ") + str(len(text_res)) + "\n"
+        if text_res == []:
+            return text
+        total_chars = 0
+        fulltext = ""
+        for t in text_res:
+            total_chars += len(t[1])
+            fulltext += t[1] + " "
+        avg_chars = total_chars / len(text_res)
+        # Remove punctuation. Convert to lower case
+        chars = ""
+        for c in range(0, len(fulltext)):
+            if fulltext[c].isalpha() or fulltext[c] == "'":
+                chars += fulltext[c]
+            else:
+                chars += " "
+        chars = chars.lower()
+        word_list = chars.split()
+        # print(word_list)
+        msg = _(
+            "Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
+        text += msg + "\n"
+        # TODO use word list for word proximity
 
-    '''cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
-    res = cur.fetchone()
-    text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
-    media_path = ""
-    file_type = ""
-    if res[3] is None or res[3] == "":
-        media_path = _("Internal text document")
-        file_type = "text"
-    elif res[3][0:5] == "docs:":
-        media_path = _("External text document: ") + res[3][5:]
-        file_type = "text"
-    elif res[3][0:6] == "audio:":
-        media_path = _("External audio file: ") + res[3][6:]
-        file_type = "audio"
-    elif res[3][0:7] == "/audio/":
-        media_path = _("Internal audio file")
-        file_type = "audio"
-    elif res[3][0:6] == "video:":
-        media_path = _("External video file: ") + res[3][6:]
-        file_type = "video"
-    elif res[3][0:7] == "/video/":
-        media_path = _("Internal video file")
-        file_type = "video"
-    elif res[3][0:7] == "images:":
-        media_path = _("External image file: ") + res[3][7:]
-        file_type = "image"
-    elif res[3][0:8] == "/images/":
-        media_path = _("Internal image file")
-        file_type = "image"
-    text += _("Media path: ") + media_path + "\n"
-    if file_type == "text":
-        text += self.text_statistics(file_['id'])
-    if file_type == "image":
-        text += self.image_statistics(file_['id'])
-    if file_type == "audio":
-        text += self.audio_statistics(file_['id'])
-    if file_type == "video":
-        text += self.video_statistics(file_['id'])'''
+        text += _("Words: ") + f"{len(word_list):,d}" + "\n"
+        # Word frequency
+        d = {}
+        for word in word_list:
+            d[word] = d.get(word, 0) + 1  # get(key, value if not present)
+        # https://codeburst.io/python-basics-11-word-count-filter-out-punctuation-dictionary-manipulation-and-sorting-lists-3f6c55420855
+        word_freq = []
+        for key, value in d.items():
+            word_freq.append((value, key))
+        word_freq.sort(reverse=True)
+        # print(word_freq)
+        text += _("Unique words: ") + str(len(word_freq)) + "\n"
+        # Top 100 or maximum of less than 100
+        max_count = len(word_freq)
+        if max_count > 100:
+            max_count = 100
+        text += _("Top 100 words") + "\n"
+        for i in range(0, max_count):
+            text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
+        _("Total characters: ") + f"{total_chars:,d}"
+        text += "  " + _("Average characters: ") + str(int(avg_chars)) + "\n"
+        return text
 
+    def image_statistics(self, code_, img_res):
+        """ Get image statistics for code
+        param:
+            code_ : dictionary {name, color, cid,}
+            img_res: list of text results
+        """
+
+        text = "\n" + _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
+        if img_res == []:
+            return text
+
+        cur = self.app.conn.cursor()
+
+        images = []  # list of list of id, area
+        for i in img_res:
+            cur.execute("select mediapath from source where id=?", [i[0]])
+            mediapath = cur.fetchone()[0]
+            abs_path = ""
+            if 'images:' == mediapath[0:7]:
+                abs_path = mediapath[7:]
+            else:
+                abs_path = self.app.project_path + mediapath
+            # Image size
+            image = Image.open(abs_path)
+            w, h = image.size
+            area = w * h
+            can_append = True
+            for existing in images:
+                if existing[0] == i[0]:
+                    can_append = False
+            if can_append:
+                images.append([i[0], area])
+
+        print(images)
+        '''for r in res:
+            area = int(r[3] * r[4])
+            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
+            '''
+        return text
 
     '''def video_statistics(self, id):
         """ Get video statistics for image file
@@ -397,120 +441,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
             text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
         return text
-
-    def image_statistics(self, id):
-        """ Get image statistics for image file
-        param: id: Integer """
-
-        text = _("METADATA:") + "\n"
-        cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [id])
-        mediapath = cur.fetchone()[0]
-        abs_path = ""
-        if 'images:' == mediapath[0:7]:
-            abs_path = mediapath[7:]
-        else:
-            abs_path = self.app.project_path + mediapath
-
-        # Image size and metadata
-        image = Image.open(abs_path)
-        w, h = image.size
-        text += _("Width: ") + f"{w:,d}"  + "  " + _("Height: ") + f"{h:,d}" + "  " + _("Area: ") + f"{w * h:,d}" + _(" pixels") + "\n"
-        image_type = abs_path[-3:].lower()
-        # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
-        if image_type in ("jpg", "peg"):
-            exifdata = image.getexif()
-            # iterating over the EXIF data fields
-            for tag_id in exifdata:
-                # get the tag name, instead of human unreadable tag id
-                tag = TAGS.get(tag_id, tag_id)
-                data = exifdata.get(tag_id)
-                # Decode bytes
-                if isinstance(data, bytes):
-                    try:
-                        data = data.decode()
-                        text += f"{tag:25}: {data}" + "\n"
-                    except UnicodeDecodeError as e:
-                        logger.debug(e)
-                        #text += str(e) + "\n"
-        # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
-        if image_type == "png":
-            for tag, value in image.info.items():
-                key = TAGS.get(tag, tag)
-                text += key + " " + str(value) + "\n"
-
-        # Codes
-        sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)) "
-        sql += " from code_image join code_name "
-        sql += "on code_name.cid=code_image.cid where id=? "
-        sql += "group by code_name.name, code_image.cid order by count(code_image.cid) desc"
-        cur.execute(sql, [id])
-        res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
-
-        for r in res:
-            area = int(r[3] * r[4])
-            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
-        return text
-
-    def text_statistics(self, id):
-        """ Get details of text file statistics
-        param: id Integer
-        """
-
-        text = _("STATISTICS:") + "\n"
-        cur = self.app.conn.cursor()
-        cur.execute("select fulltext from source where id=?", [id])
-        fulltext = cur.fetchone()[0]
-        if fulltext is None:
-            fulltext = ""
-        text += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
-        # Remove punctuation. Convert to lower case
-        chars = ""
-        for c in range(0, len(fulltext)):
-            if fulltext[c].isalpha() or fulltext[c] =="'":
-                chars += fulltext[c]
-            else:
-                chars += " "
-        chars = chars.lower()
-        word_list = chars.split()
-        #print(word_list)
-        msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        text += "\n" + msg + "\n"
-        #TODO use word list for word proximity
-
-        text += "\n" + _("Words: ") + f"{len(word_list):,d}" + "\n"
-        # Word frequency
-        d = {}
-        for word in word_list:
-            d[word] = d.get(word, 0) + 1  # get(key, value if not present)
-        # https://codeburst.io/python-basics-11-word-count-filter-out-punctuation-dictionary-manipulation-and-sorting-lists-3f6c55420855
-        word_freq = []
-        for key, value in d.items():
-            word_freq.append((value, key))
-        word_freq.sort(reverse=True)
-        #print(word_freq)
-        text += _("Unique words: ") + str(len(word_freq)) + "\n"
-        # Top 100 or maximum of less than 100
-        max_count = len(word_freq)
-        if max_count > 100:
-            max_count = 100
-        text += _("Top 100 words") + "\n"
-        for i in range(0, max_count):
-            text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
-
-        # Codes
-        sql = "select code_name.name, code_text.cid, count(code_text.cid), sum(length(code_text.seltext)), "
-        sql += "round(avg(length(code_text.seltext))) from code_text join code_name "
-        sql += "on code_name.cid=code_text.cid where fid=? "
-        sql += "group by code_name.name, code_text.cid order by count(code_text.cid) desc"
-        cur.execute(sql, [id])
-        res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
-        for r in res:
-            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
-            text += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
-        return text'''
+        '''
 
 
 if __name__ == "__main__":
