@@ -231,7 +231,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for r in text_res:
             coders.append(r[4])
             sources.append(r[0])
-            print(r)
+            #print(r)
         img_sql = "select id, x1, y1, width, height, owner, memo from code_image where cid=?"
         cur.execute(img_sql, [code_['cid']])
         img_res = cur.fetchall()
@@ -321,7 +321,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += _("Top 100 words") + "\n"
         for i in range(0, max_count):
             text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
-        _("Total characters: ") + f"{total_chars:,d}"
+        text += "\n" + _("Total characters: ") + f"{total_chars:,d}"
         text += "  " + _("Average characters: ") + str(int(avg_chars)) + "\n"
         return text
 
@@ -335,30 +335,27 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text = "\n" + _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
         if img_res == []:
             return text
-
         cur = self.app.conn.cursor()
-
-        images = []  # list of list of id, area
-        for i in img_res:
-            cur.execute("select mediapath from source where id=?", [i[0]])
-            mediapath = cur.fetchone()[0]
+        image_areas = []  # list of list of id, area
+        sql = "select id, mediapath from source where (mediapath like '/images%' or mediapath like 'images:%') "
+        cur.execute(sql)
+        res = cur.fetchall()
+        images = []
+        for r in res:
+            image = {"id": r[0], "mediapath": r[1]}
             abs_path = ""
-            if 'images:' == mediapath[0:7]:
-                abs_path = mediapath[7:]
+            if 'images:' == r[1][0:7]:
+                abs_path = r[1][7:]
             else:
-                abs_path = self.app.project_path + mediapath
+                abs_path = self.app.project_path + r[1]
+            image['abspath'] = abs_path
             # Image size
-            image = Image.open(abs_path)
-            w, h = image.size
-            area = w * h
-            can_append = True
-            for existing in images:
-                if existing[0] == i[0]:
-                    can_append = False
-            if can_append:
-                images.append([i[0], area])
-
+            img = Image.open(abs_path)
+            w, h = img.size
+            image['area'] = w * h
+            images.append(image)
         print(images)
+
         '''for r in res:
             area = int(r[3] * r[4])
             text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
