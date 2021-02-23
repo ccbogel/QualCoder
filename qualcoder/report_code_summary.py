@@ -238,14 +238,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for r in img_res:
             coders.append(r[5])
             sources.append(r[0])
-            print(r)
+            #print(r)
         av_sql = "select id, pos0, pos1, owner, memo from code_av where cid=?"
         cur.execute(av_sql, [code_['cid']])
         av_res = cur.fetchall()
         for r in av_res:
             coders.append(r[3])
             sources.append(r[0])
-            print(r)
+            #print(r)
 
         # Coders total and names
         coders = list(set(coders))
@@ -267,8 +267,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += "\n"
         text += self.text_statistics(code_, text_res)
         text += self.image_statistics(code_, img_res)
-        # AV coding statistics, of minutes/seconds
-        text += _("A/V CODINGS: ") + str(len(av_res)) + "\n"
+        text += self.av_statistics(code_, av_res)
         self.ui.textEdit.setText(text)
 
     def text_statistics(self, code_, text_res):
@@ -354,19 +353,31 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             w, h = img.size
             image['area'] = w * h
             images.append(image)
-        print(images)
-
-        '''for r in res:
-            area = int(r[3] * r[4])
-            text += r[0]+ "  " + _("Count: ") + str(r[2]) + "   " + _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
-            '''
+            text += _("Image: ") + abs_path.split("/")[-1] + "  "
+            total_area = 0
+            count = 0
+            for i in img_res:
+                if i[0] == r[0]:
+                    total_area += int(i[3] * i[4])
+                    count += 1
+            try:
+                avg_area = int(total_area / count)
+            except:
+                avg_area = 0
+            percent_of_image = round(avg_area / image['area'] *100, 3)
+            if count > 0:
+                text += _("Count: ") + str(count) + "   " + _("Average coded area: ") + f"{avg_area:,d}" + _(" pixels")
+                text += "  " + _("Average area of image: ") + str(percent_of_image) + "%"
+            text += "\n"
         return text
 
-    '''def video_statistics(self, id):
+    def av_statistics(self, id, av_res):
         """ Get video statistics for image file
         param: id : Integer """
 
-        text = _("METADATA:") + "\n"
+        text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
+
+        '''
         cur = self.app.conn.cursor()
         cur.execute("select mediapath from source where id=?", [id])
         mediapath = cur.fetchone()[0]
@@ -392,53 +403,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for k in meta_keys:
             meta = media.get_meta(k)
             if meta is not None:
-                text += str(k)+ ":  " + meta + "\n"
+                text += str(k)+ ":  " + meta + "\n"'''
         return text
-
-    def audio_statistics(self, id):
-        """ Get audio statistics for image file
-        param: file_ Dictionary of {name, id, memo} """
-
-        text = _("METADATA:") + "\n"
-        cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [id])
-        mediapath = cur.fetchone()[0]
-        abs_path = ""
-        if 'audio:' == mediapath[0:6]:
-            abs_path = mediapath[6:]
-        else:
-            abs_path = self.app.project_path + mediapath
-
-        instance = vlc.Instance()
-        mediaplayer = instance.media_player_new()
-        media = instance.media_new(abs_path)
-        media.parse()
-        msecs = media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        text += _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
-        for k in meta_keys:
-            meta = media.get_meta(k)
-            if meta is not None:
-                text += str(k)+ ":  " + meta + "\n"
-
-        # Codes
-        sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)) "
-        sql += " from code_av join code_name "
-        sql += "on code_name.cid=code_av.cid where id=? "
-        sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
-        cur.execute(sql, [id])
-        res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
-
-        for r in res:
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "   "
-            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
-        return text
-        '''
 
 
 if __name__ == "__main__":
