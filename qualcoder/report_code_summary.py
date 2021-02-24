@@ -33,7 +33,7 @@ from PIL import Image
 #import platform
 import sys
 import traceback
-#import vlc
+import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -353,7 +353,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             w, h = img.size
             image['area'] = w * h
             images.append(image)
-            text += _("Image: ") + abs_path.split("/")[-1] + "  "
             total_area = 0
             count = 0
             for i in img_res:
@@ -364,38 +363,49 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 avg_area = int(total_area / count)
             except:
                 avg_area = 0
-            percent_of_image = round(avg_area / image['area'] *100, 3)
+            percent_of_image = round(avg_area / image['area'] * 100, 3)
             if count > 0:
+                text += _("Image: ") + abs_path.split("/")[-1] + "  "
                 text += _("Count: ") + str(count) + "   " + _("Average coded area: ") + f"{avg_area:,d}" + _(" pixels")
-                text += "  " + _("Average area of image: ") + str(percent_of_image) + "%"
-            text += "\n"
+                text += "  " + _("Average area of image: ") + str(percent_of_image) + "%\n"
         return text
 
-    def av_statistics(self, id, av_res):
+    def av_statistics(self, code_, av_res):
         """ Get video statistics for image file
         param: id : Integer """
 
         text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
 
-        '''
-        cur = self.app.conn.cursor()
-        cur.execute("select mediapath from source where id=?", [id])
-        mediapath = cur.fetchone()[0]
-        abs_path = ""
-        if 'video:' == mediapath[0:6]:
-            abs_path = mediapath[6:]
-        else:
-            abs_path = self.app.project_path + mediapath
+        print(code_)
+        for r in av_res:
+            print(r)
 
-        instance = vlc.Instance()
-        mediaplayer = instance.media_player_new()
-        media = instance.media_new(abs_path)
-        media.parse()
-        mediaplayer.play()
-        mediaplayer.pause()
-        msecs = media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
+        cur = self.app.conn.cursor()
+        image_areas = []  # list of list of id, area
+        sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or mediapath like '/audio%' or mediapath like 'audio:%') "
+        cur.execute(sql)
+        res = cur.fetchall()
+        media = []
+        for r in res:
+            av = {"id": r[0], "mediapath": r[1]}
+            abs_path = ""
+            if r[1][0:6] in ('video:', 'audio:'):
+                abs_path = r[1][6:]
+            else:
+                abs_path = self.app.project_path + r[1]
+            av['abspath'] = abs_path
+            # media duration
+            instance = vlc.Instance()
+            mediaplayer = instance.media_player_new()
+            media = instance.media_new(abs_path)
+            media.parse()
+            mediaplayer.play()
+            mediaplayer.pause()
+            msecs = media.get_duration()
+            secs = int(msecs / 1000)
+            av['secs'] = secs
+
+        '''mins = int(secs / 60)
         remainder_secs = str(secs - mins * 60)
         if len(remainder_secs) == 1:
             remainder_secs = "0" + remainder_secs
