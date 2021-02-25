@@ -355,6 +355,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             images.append(image)
             total_area = 0
             count = 0
+            avg_area = 0
             for i in img_res:
                 if i[0] == r[0]:
                     total_area += int(i[3] * i[4])
@@ -362,7 +363,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             try:
                 avg_area = int(total_area / count)
             except:
-                avg_area = 0
+                pass
             percent_of_image = round(avg_area / image['area'] * 100, 3)
             if count > 0:
                 text += _("Image: ") + abs_path.split("/")[-1] + "  "
@@ -375,11 +376,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         param: id : Integer """
 
         text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
-
-        print(code_)
+        '''print(code_)
         for r in av_res:
-            print(r)
-
+            print(r)'''
         cur = self.app.conn.cursor()
         image_areas = []  # list of list of id, area
         sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or mediapath like '/audio%' or mediapath like 'audio:%') "
@@ -402,18 +401,27 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             mediaplayer.play()
             mediaplayer.pause()
             msecs = media.get_duration()
-            secs = int(msecs / 1000)
-            av['secs'] = secs
+            media_secs = int(msecs / 1000)
+            av['secs'] = media_secs
 
-        '''mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        text += _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
-        for k in meta_keys:
-            meta = media.get_meta(k)
-            if meta is not None:
-                text += str(k)+ ":  " + meta + "\n"'''
+            total_coded_secs = 0
+            count = 0
+            avg_coded_secs = 0
+            for a in av_res:
+                if a[0] == r[0]:
+                    total_coded_secs += int((a[2] - a[1]) / 1000)
+                    count += 1
+            try:
+                avg_coded_secs = int(total_coded_secs / count)
+            except:
+                pass
+            percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
+            percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
+            if count > 0:
+                text += _("Media: ") + abs_path.split("/")[-1] + "  "
+                text += _("Count: ") + str(count) + "   "
+                text += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs")
+                text += "  " + _("Average percent of media: ") + str(percent_of_media) + "%\n"
         return text
 
 
