@@ -231,21 +231,18 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for r in text_res:
             coders.append(r[4])
             sources.append(r[0])
-            #print(r)
         img_sql = "select id, x1, y1, width, height, owner, memo from code_image where cid=?"
         cur.execute(img_sql, [code_['cid']])
         img_res = cur.fetchall()
         for r in img_res:
             coders.append(r[5])
             sources.append(r[0])
-            #print(r)
         av_sql = "select id, pos0, pos1, owner, memo from code_av where cid=?"
         cur.execute(av_sql, [code_['cid']])
         av_res = cur.fetchall()
         for r in av_res:
             coders.append(r[3])
             sources.append(r[0])
-            #print(r)
 
         # Coders total and names
         coders = list(set(coders))
@@ -376,23 +373,17 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         param: id : Integer """
 
         text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
-        '''print(code_)
-        for r in av_res:
-            print(r)'''
         cur = self.app.conn.cursor()
         image_areas = []  # list of list of id, area
         sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or mediapath like '/audio%' or mediapath like 'audio:%') "
         cur.execute(sql)
         res = cur.fetchall()
-        media = []
         for r in res:
-            av = {"id": r[0], "mediapath": r[1]}
             abs_path = ""
             if r[1][0:6] in ('video:', 'audio:'):
                 abs_path = r[1][6:]
             else:
                 abs_path = self.app.project_path + r[1]
-            av['abspath'] = abs_path
             # media duration
             instance = vlc.Instance()
             mediaplayer = instance.media_player_new()
@@ -402,8 +393,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             mediaplayer.pause()
             msecs = media.get_duration()
             media_secs = int(msecs / 1000)
-            av['secs'] = media_secs
-
             total_coded_secs = 0
             count = 0
             avg_coded_secs = 0
@@ -415,7 +404,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 avg_coded_secs = int(total_coded_secs / count)
             except:
                 pass
-            percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
             percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
             if count > 0:
                 text += _("Media: ") + abs_path.split("/")[-1] + "  "
