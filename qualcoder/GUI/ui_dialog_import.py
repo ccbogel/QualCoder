@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_import.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_Import(object):
     def setupUi(self, Dialog_Import):
@@ -65,7 +67,7 @@ class Ui_Dialog_Import(object):
         self.comboBox_quote.addItem("")
         self.comboBox_quote.addItem("")
         self.label_information = QtWidgets.QLabel(self.groupBox)
-        self.label_information.setGeometry(QtCore.QRect(10, 100, 901, 51))
+        self.label_information.setGeometry(QtCore.QRect(10, 70, 901, 81))
         self.label_information.setWordWrap(True)
         self.label_information.setObjectName("label_information")
         self.gridLayout.addWidget(self.groupBox, 3, 0, 1, 1)
@@ -92,7 +94,7 @@ class Ui_Dialog_Import(object):
         self.comboBox_quote.setItemText(0, _translate("Dialog_Import", "NONE"))
         self.comboBox_quote.setItemText(1, _translate("Dialog_Import", "MINIMAL"))
         self.comboBox_quote.setItemText(2, _translate("Dialog_Import", "ALL"))
-        self.label_information.setText(_translate("Dialog_Import", "Changes made on the top row will override any user changes to field names and field types below."))
+        self.label_information.setText(_translate("Dialog_Import", "Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text)."))
 
 
 if __name__ == "__main__":
@@ -103,4 +105,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_Import)
     Dialog_Import.show()
     sys.exit(app.exec_())
-

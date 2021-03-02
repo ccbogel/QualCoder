@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 import datetime
 import os
@@ -52,6 +52,7 @@ DATE = 6
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -134,7 +135,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.app.settings['dialogcasefilemanager_splitter1'] = sizes[1]
 
     def get_files(self):
-        """ Get files for this case """
+        """ Get files for this case. """
 
         cur = self.app.conn.cursor()
         sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by lower(source.name) asc"
@@ -200,7 +201,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             text_len = len(file_[2])
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
         'pos1': text_len, 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
         # check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
@@ -253,7 +254,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def fill_table(self):
-        """ Fill list widget with files """
+        """ Fill list widget with file details. """
 
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
@@ -294,7 +295,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.view_file()
 
     def view_file(self):
-        """ View text file in text browser. """
+        """ View text file in qtext browser, or open image or media file.
+         Check media file link works, as media may have moved. """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         index = None
@@ -305,7 +307,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.textBrowser.setText("")
         self.ui.tableWidget.selectRow(index)
         self.selected_text_file = None
-        # a fulltext source is displaysed if filltext is present
+        # a fulltext source is displayed if filltext is present
         # if the mediapath is None, this represents an A/V transcribed file
         self.ui.label_file.setText(_("Displayed file: ") + self.allfiles[index][NAME])
         if self.allfiles[index][FULLTEXT] != "" and self.allfiles[index][FULLTEXT] is not None:
@@ -319,14 +321,41 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         dictionary = {'name': self.allfiles[index][NAME], 'mediapath': self.allfiles[index][MEDIAPATH],
                       'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0], 'date': self.allfiles[index][DATE],
                       'memo': self.allfiles[index][MEMO], 'fulltext': self.allfiles[index][FULLTEXT]}
-        # the mediapath will be None for a .transcribed empty text media entry, so need to check for this
-        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:6] == "/video":
+        # Mediapath will be None for a .transcribed empty text media entry, and 'docs:' for a linked text document
+        if self.allfiles[index][MEDIAPATH] is None or self.allfiles[index][MEDIAPATH][0:5] == 'docs:':
+            return
+        # Added checks to test for media presence
+        if self.allfiles[index][MEDIAPATH][:6] in ("/video", "video:"):
+            if self.allfiles[index][MEDIAPATH][:6] == "video:":
+                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
+                if not os.path.exists(abs_path):
+                    return
+            if self.allfiles[index][MEDIAPATH][:6] == "/video":
+                abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
+                if not os.path.exists(abs_path):
+                    return
             ui = DialogViewAV(self.app, dictionary)
             ui.exec_()
-        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:6] == "/audio":
+        if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
+            if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
+                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
+                if not os.path.exists(abs_path):
+                    return
+            if self.allfiles[index][MEDIAPATH][0:6] == "/audio":
+                abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
+                if not os.path.exists(abs_path):
+                    return
             ui = DialogViewAV(self.app, dictionary)
             ui.exec_()
-        if self.allfiles[index][MEDIAPATH] is not None and self.allfiles[index][MEDIAPATH][:7] == "/images":
+        if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
+            if self.allfiles[index][MEDIAPATH][0:7] == "images:":
+                abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
+                if not os.path.exists(abs_path):
+                    return
+            if self.allfiles[index][MEDIAPATH][0:7] == "/images":
+                abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
+                if not os.path.exists(abs_path):
+                    return
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
             ui = DialogViewImage(self.app, dictionary)
             ui.exec_()
@@ -452,7 +481,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 'fid': self.selected_text_file[ID],
                 'pos0': pos0, 'pos1': pos1,
                 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                 'memo': ""}
         self.case_text.append(item)
         self.highlight()
@@ -565,7 +594,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
                     'pos0': startPos, 'pos1': pos1,
                     'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
                     # check if already assigned to case_text
                     sql = "select id from case_text where caseid=? and fid=? and pos0=? and pos1=?"
                     cur.execute(sql, [item['caseid'], item['fid'], item['pos0'], item['pos1']])
@@ -581,7 +610,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # update messages and table widget
         self.get_files()
         self.fill_table()
-        #TODO if text file is loaded in browser then update the highlights
+        # Text file is loaded in browser then update the highlights
         self.load_case_text()
         self.highlight()
         msg += "\n" + str(entries) + _(" sections found.")

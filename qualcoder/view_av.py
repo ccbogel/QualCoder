@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2020 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from copy import deepcopy
 import datetime
@@ -34,18 +34,33 @@ import platform
 from random import randint
 import re
 import sys
+import time
 import traceback
+
+path = os.path.abspath(os.path.dirname(__file__))
+logger = logging.getLogger(__name__)
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
+
 # https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
-try:
-    os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC')
-except Exception as e:
-    if sys.platform.startswith("win"):
-        QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+if sys.platform.startswith("win"):
+    try:
+        # Older x86 32 bit location
+        os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
+    except Exception as e:
+        logger.debug(str(e))
+        # Commented below out, as this would be less common location.
+        # Uncomment if desired
+        # QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+    try:
+        os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC')
+    except Exception as e:
+        # Commented below out, uncomment if desired
+        # QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
+        logger.debug(str(e))
 vlc_msg = ""
 try:
     import vlc
@@ -66,14 +81,14 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
+from GUI.base64_helper import *
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from helpers import msecs_to_mins_and_secs
+from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
+from information import DialogInformation
 from memo import DialogMemo
+from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from select_items import DialogSelectItems
-
-path = os.path.abspath(os.path.dirname(__file__))
-logger = logging.getLogger(__name__)
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -95,17 +110,17 @@ class DialogCodeAV(QtWidgets.QDialog):
     Create codes and categories.  """
 
     app = None
-    dialog_list = None
     parent_textEdit = None
-    filename = None
+    tab_reports = None  # Tab widget reports, used for updates to codes
     files = []
+    file_ = None
     codes = []
+    recent_codes = []  # list of recent codes (up to 5) for textedit context menu
     categories = []
-    code_text = []
+    code_text = []  #
     ddialog = None
-    media_data = None
     instance = None
-    media_player = None
+    mediaplayer = None
     media = None
     metadata = None
     is_paused = False
@@ -120,53 +135,114 @@ class DialogCodeAV(QtWidgets.QDialog):
     annotations = []
     code_text = []
     transcription = None  # A tuple of id, fulltext, name
-    # transcribed timepositions as list of [text_pos0, text_pos1, milliseconds]
+    # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
-    def __init__(self, app, parent_textEdit, dialog_list):
+    # overlapping codes in text index
+    overlap_code_index = 0
+
+    def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of audio and video files.
-        Can create a transcribe file from the audio / video.
+        Can code a transcribed text file for the audio / video.
         """
 
-        super(DialogCodeAV,self).__init__()
+        super(DialogCodeAV, self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.dialog_list = dialog_list
+        self.tab_reports = tab_reports
         self.parent_textEdit = parent_textEdit
         if vlc_msg != "":
             self.parent_textEdit.append(vlc_msg)
         self.codes = []
+        self.recent_codes = []
         self.categories = []
         self.annotations = []
         self.code_text = []
         self.time_positions = []
         self.transcription = None
-        self.media_data = None
+        self.file_ = None
         self.segment['start'] = None
         self.segment['end'] = None
         self.segment['start_msecs'] = None
         self.segment['end_msecs'] = None
         self.play_segment_end = None
         self.segments = []
-        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
+        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
+                'owner': None, 'memo': None, 'date': None, 'avid': None}
         self.segment_for_text = None
         self.get_codes_and_categories()
-        self.get_list_of_media()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         try:
-            w = int(self.app.settings['dialogcodeav_w'])
-            h = int(self.app.settings['dialogcodeav_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-            x = int(self.app.settings['codeav_abs_pos_x'])
-            y = int(self.app.settings['codeav_abs_pos_y'])
-            self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
+            s0 = int(self.app.settings['dialogcodeav_splitter0'])
+            s1 = int(self.app.settings['dialogcodeav_splitter1'])
+            if s0 > 10 and s1 > 10:
+                self.ui.splitter.setSizes([s0, 30, s1])
+            h0 = int(self.app.settings['dialogcodeav_splitter_h0'])
+            h1 = int(self.app.settings['dialogcodeav_splitter_h1'])
+            if h0 > 10 and h1 > 10:
+                self.ui.splitter_2.setSizes([h0, h1])
         except:
             pass
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.ui.splitter.setSizes([100, 200])
+        self.ui.splitter.splitterMoved.connect(self.update_sizes)
+        self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
+        # Labels need to be 32x32 pixels for 32x32 icons
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
+        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
+        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm))
+        # Buttons need to be 36x36 pixels for 32x32 icons
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_30_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
+        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_5_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
+        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/forward_30_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
+        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_down_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
+        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_up_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
+        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+
+        # The buttons in the splitter are smaller 24x24 pixels
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
+        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
+        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
+        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
@@ -187,15 +263,19 @@ class DialogCodeAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.ui.treeWidget.setStyleSheet(font)
+        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font += '"' + self.app.settings['font'] + '";'
+        self.ui.treeWidget.setStyleSheet(tree_font)
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
-        self.ui.pushButton_select.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.pushButton_select.customContextMenuRequested.connect(self.select_media_menu)
-        self.ui.pushButton_select.pressed.connect(self.select_media)
-        #self.ui.checkBox_show_coders.stateChanged.connect(self.show_or_hide_coders)
+        self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
+        self.ui.listWidget.setStyleSheet(tree_font)
+
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_load_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -204,6 +284,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
         self.fill_tree()
+        self.get_files()
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         # A display-dialog named ddialog
@@ -228,15 +309,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        # add context menu for ddialog
+        self.ddialog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Create a vlc instance with an empty vlc media player
+        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
         self.instance = vlc.Instance()
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
-        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
@@ -251,21 +335,63 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
 
+    def ddialog_menu(self, position):
+        """ Context menu to export a screenshot, to resize dialog. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        ActionScreenshot = menu.addAction(_("Screenshot"))
+        ActionResize = menu.addAction(_("Resize"))
+
+        action = menu.exec_(self.ddialog.mapToGlobal(position))
+        if action == ActionScreenshot:
+            time.sleep(0.5)
+            screen = QtWidgets.QApplication.primaryScreen()
+            screenshot = screen.grabWindow(self.ddialog.winId())
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().astimezone().strftime(
+                "%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
+        if action == ActionResize:
+            w = self.ddialog.size().width()
+            h = self.ddialog.size().height()
+            res_w = QtWidgets.QInputDialog.getInt(None, _("Width"), _("Width:"), w, 100, 2000, 5)
+            if res_w[1]:
+                w = res_w[0]
+            res_h = QtWidgets.QInputDialog.getInt(None, _("Height"), _("Height:"), h, 80, 2000, 5)
+            if res_h[1]:
+                h = res_h[0]
+            self.ddialog.resize(w, h)
+
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter. """
 
         self.codes, self.categories = self.app.get_data()
 
-    def get_list_of_media(self):
+    def get_files(self):
+        """ Get AV files and exclude those with bad links.
+        Fill list widget with file names. """
+
+        bad_links = self.app.check_bad_file_links()
+        bl_sql = ""
+        for bl in bad_links:
+            bl_sql += "," + str(bl['id'])
+        if len(bl_sql) > 0:
+            bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
         self.files = []
         cur = self.app.conn.cursor()
         cur.execute("select name, id, memo, owner, date, mediapath from source where \
-            substr(mediapath,1,6) in ('/audio','/video') order by name")
+            substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " order by name")
         result = cur.fetchall()
+        self.files = []
+        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
-            self.files.append({'name': row[0], 'id': row[1], 'memo': row[2],
-                'owner': row[3], 'date': row[4], 'mediapath': row[5]})
+            self.files.append(dict(zip(keys, row)))
+
+        self.ui.listWidget.clear()
+        for f in self.files:
+            item = QtWidgets.QListWidgetItem(f['name'])
+            item.setToolTip(f['memo'])
+            self.ui.listWidget.addItem(item)
 
     def assign_selected_text_to_code(self):
         """ Assign selected text on left-click on code in tree. """
@@ -334,9 +460,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
+            # try:
             cats.remove(item)
-            #except Exception as e:
+            # except Exception as e:
             #    print(e, item)
 
         ''' Add child categories. Look at each unmatched category, iterate through tree
@@ -344,7 +470,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         count = 0
         while len(cats) > 0 and count < 10000:
             remove_list = []
-            #logger.debug("cats:" + str(cats))
+            # logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
@@ -375,7 +501,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                top_item.setFlags(
+                    Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -394,18 +521,21 @@ class DialogCodeAV(QtWidgets.QDialog):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     child.setToolTip(2, c['memo'])
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    child.setFlags(
+                        Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
+        self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file. """
+        """ Count instances of each code for current coder and in the selected file.
+        Called by fill_tree """
 
-        if self.media_data is None:
+        if self.file_ is None:
             return
         cur = self.app.conn.cursor()
         sql = "select count(cid) from code_av where cid=? and id=? and owner=?"
@@ -416,7 +546,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.media_data['id'], self.app.settings['codername']])
+                cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
                 result_av = cur.fetchone()
                 result_txt = [0]
                 try:  # may not have a text file
@@ -443,18 +573,18 @@ class DialogCodeAV(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
-        action = menu.exec_(self.ui.pushButton_select.mapToGlobal(position))
+        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
-            if self.media_data is None:
-                self.media_data = self.files[0]
+            if self.file_ is None:
+                self.file_ = self.files[0]
                 self.load_media()
                 self.load_segments()
                 self.fill_code_counts_in_tree()
                 return
             for i in range(0, len(self.files) - 1):
-                if self.media_data == self.files[i]:
+                if self.file_ == self.files[i]:
                     found = self.files[i + 1]
-                    self.media_data = found
+                    self.file_ = found
                     self.load_media()
                     self.load_segments()
                     self.fill_code_counts_in_tree()
@@ -468,32 +598,82 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
             for f in self.files:
                 if f['id'] == result[0]:
-                    self.media_data = f
+                    self.file_ = f
                     self.load_media()
                     self.load_segments()
                     self.fill_code_counts_in_tree()
                     return
 
-    def select_media(self):
-        """ A dialog of filenames is presented to the user.
-        The selected media file is then displayed for coding. """
+    def file_memo(self):
+        """ Open file memo to view or edit. """
 
-        if self.files == []:
+        if self.file_ is None:
             return
-        ui = DialogSelectItems(self.app, self.files, _("Select file to view"), "single")
-        ok = ui.exec_()
-        if not ok:
+        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == self.file_['memo']:
             return
-        self.media_data = ui.get_selected()
-        self.load_media()
-        self.load_segments()
-        self.fill_code_counts_in_tree()
+        self.file_['memo'] = memo
+        cur = self.app.conn.cursor()
+        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
+        self.app.conn.commit()
+        self.get_files()
+        self.app.delete_backup = False
+
+    def go_to_latest_coded_file(self):
+        """ Vertical splitter button activates this """
+
+        sql = "SELECT id FROM code_av where owner=? order by date desc limit 1"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [self.app.settings['codername'], ])
+        result = cur.fetchone()
+        if result is None:
+            return
+        for i, f in enumerate(self.files):
+            if f['id'] == result[0]:
+                self.file_ = f
+                self.ui.listWidget.setCurrentRow(i)
+                self.load_media()
+                break
+
+    def go_to_next_file(self):
+        """ Vertical splitter button activates this.
+         Assumes one or more items in the list widget.
+         As the coding dialog will not open with no AV files. """
+
+        if self.file_ is None:
+            self.file_ = self.files[0]
+            self.load_media()
+            self.ui.listWidget.setCurrentRow(0)
+            return
+        for i in range(0, len(self.files) - 1):
+            if self.file_ == self.files[i]:
+                found = self.files[i + 1]
+                self.file_ = found
+                self.ui.listWidget.setCurrentRow(i + 1)
+                self.load_media()
+                return
+
+    def listwidgetitem_load_file(self):
+        """ Listwidget file name selected so fill current file variable and load. """
+
+        if len(self.files) == 0:
+            return
+        itemname = self.ui.listWidget.currentItem().text()
+        for f in self.files:
+            if f['name'] == itemname:
+                self.file_ = f
+                self.load_media()
+                self.load_segments()
+                self.fill_code_counts_in_tree()
+                break
 
     def load_segments(self):
         """ Get coded segments for this file and for this coder.
         Called from select_media. """
 
-        if self.media_data is None:
+        if self.file_ is None:
             return
         self.segments = []
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
@@ -501,26 +681,26 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
         sql += " and code_av.owner=? "
-        values = [self.media_data['id']]
+        values = [self.file_['id']]
         values.append(self.app.settings['codername'])
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         code_results = cur.fetchall()
         for row in code_results:
             self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
-            'pos1': row[3], 'cid':row[4], 'memo': row[5], 'date': row[6],
-            'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
+                                  'pos1': row[3], 'cid': row[4], 'memo': row[5], 'date': row[6],
+                                  'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
         # Fix overlapping segments by incrementing y values so segment is shown on a different line
         for i in range(0, len(self.segments) - 1):
             for j in range(i + 1, len(self.segments)):
-                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and  \
-                self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
-                self.segments[i]['y'] == self.segments[j]['y']) or \
-                (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and  \
-                self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
-                self.segments[i]['y'] == self.segments[j]['y']):
-                    #print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
-                    #print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
+                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and \
+                    self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
+                    self.segments[i]['y'] == self.segments[j]['y']) or \
+                        (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and \
+                         self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
+                         self.segments[i]['y'] == self.segments[j]['y']):
+                    # print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
+                    # print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
                     # to overcome the overlap, add to the y value of the i segment
                     self.segments[j]['y'] += 10
         # Draw coded segments in scene
@@ -529,26 +709,41 @@ class DialogCodeAV(QtWidgets.QDialog):
         for s in self.segments:
             self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self.text_for_segment, self))
 
+    def clear_file(self):
+        """ When AV file removed clear all details.
+        Called by null file with load_media, and from ManageFiles.delete. """
+
+        self.stop()
+        self.media = None
+        self.file_ = None
+        self.setWindowTitle(_("Media coding"))
+        self.ui.pushButton_play.setEnabled(False)
+        self.ui.horizontalSlider.setEnabled(False)
+        self.ui.pushButton_coding.setEnabled(False)
+        self.ui.textEdit.clear()
+        self.transcription = None
+        self.ddialog.hide()
+
     def load_media(self):
         """ Add media to media dialog. """
 
         try:
-            self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            if self.file_['mediapath'][0:6] in ('/audio', '/video'):
+                self.media = self.instance.media_new(self.app.project_path + self.file_['mediapath'])
+            if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
+                self.media = self.instance.media_new(self.file_['mediapath'][6:])
         except Exception as e:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Media not found'))
-            mb.setText(str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
-            mb.exec_()
-            self.closeEvent()
+            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.file_['mediapath'], "warning").exec_()
+            self.clear_file()
             return
 
-        self.ddialog.setWindowTitle(self.media_data['name'])
-        self.setWindowTitle(_("Media coding: ") + self.media_data['name'])
+        title = self.file_['name'].split('/')[-1]
+        self.ddialog.setWindowTitle(title)
+        self.setWindowTitle(_("Media coding: ") + title)
         self.ui.pushButton_play.setEnabled(True)
         self.ui.horizontalSlider.setEnabled(True)
         self.ui.pushButton_coding.setEnabled(True)
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
             try:
                 w = int(self.app.settings['video_w'])
@@ -557,9 +752,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                     w = 100
                     h = 80
                 self.ddialog.resize(w, h)
-                x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
-                y = int(self.app.settings['codeav_video_pos_y']) - int(self.app.settings['codeav_abs_pos_y'])
-                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
+                '''x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
+                y = int(self.app.settings['codeav_video_pos_y'])  - int(self.app.settings['codeav_abs_pos_y'])
+                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))'''
             except:
                 self.ddialog.resize(500, 400)
         else:
@@ -577,22 +772,41 @@ class DialogCodeAV(QtWidgets.QDialog):
         # video would be displayed in it's own window). This is platform
         # specific, so we must give the ID of the QFrame (or similar object) to
         # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux": # for Linux using the X Server
-            #self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
+        if platform.system() == "Linux":  # for Linux using the X Server
+            # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
             self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
-        elif platform.system() == "Windows": # for Windows
+        elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
-        elif platform.system() == "Darwin": # for MacOS
+        elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.media_duration_text = "Duration: " + msecs_to_mins_and_secs(msecs)
-        self.ui.label_time_2.setText(self.media_duration_text)
+        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.ui.label_time.setText("0.00" + self.media_duration_text)
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
+
+        # Need this for helping set the slider on user sliding before play begins
+        # Also need to determine how many tracks available
+        self.mediaplayer.play()
+        self.mediaplayer.audio_set_volume(0)
+        time.sleep(0.2)
+        # print( self.mediaplayer.audio_get_track_count()) # > 0
+        tracks = self.mediaplayer.audio_get_track_description()
+        good_tracks = []  # note where track [0] == -1 is a disabled track
+        for track in tracks:
+            if track[0] >= 0:
+                good_tracks.append(track)
+            # print(track[0], track[1])  # track number and track name
+        if len(good_tracks) < 2:
+            self.ui.label.setEnabled(False)
+            self.ui.comboBox_tracks.setEnabled(False)
+        self.mediaplayer.pause()
+        self.mediaplayer.audio_set_volume(100)
+
         # Get the transcribed text and fill textedit
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext, name from source where name = ?", [self.media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext, name from source where name = ?", [self.file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is None:
             return
@@ -603,17 +817,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         # get text annotations
         cur = self.app.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=? and fid=?",
-            [self.app.settings['codername'], self.transcription[0]])
+                    [self.app.settings['codername'], self.transcription[0]])
         result = cur.fetchall()
         for row in result:
             self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
-            'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+                                     'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         self.get_coded_text_update_eventfilter_tooltips()
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
         Segment_Graphics_Item.link_text_to_segment.
-        link_segment_to_text"""
+        link_segment_to_text """
 
         if self.transcription is None:
             return
@@ -630,8 +844,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         code_results = cur.fetchall()
         for row in code_results:
             self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6],
-            'memo': row[7], 'avid': row[8], 'av_pos0': row[9], 'av_pos1': row[10]})
+                                   'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6],
+                                   'memo': row[7], 'avid': row[8], 'av_pos0': row[9], 'av_pos1': row[10]})
 
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
@@ -724,7 +938,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        #print(self.time_positions)
+        # print(self.time_positions)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
@@ -733,10 +947,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         more precise are the results (1000 should suffice).
         """
 
-        self.timer.stop()
-        pos = self.ui.horizontalSlider.value()
-        self.mediaplayer.set_position(pos / 1000.0)
-        self.timer.start()
+        if self.mediaplayer.is_playing():
+            self.mediaplayer.pause()
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
+            self.mediaplayer.play()
+            self.timer.start()
+        else:
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
 
     def audio_track_changed(self):
         """ Audio track changed.
@@ -746,16 +965,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         text = self.ui.comboBox_tracks.currentText()
         if text == "":
             text = 1
-        #print("text: ", text)
+        # print("text: ", text)
         success = self.mediaplayer.audio_set_track(int(text))
-        #print("changed audio ", success)
+        # print("changed audio ", success)
 
     def play_pause(self):
         """ Toggle play or pause status. """
 
+        # user might update window positions and sizes, need to detect it
+        self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -770,10 +994,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-
+            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText(_("Pause"))
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             self.timer.start()
             self.is_paused = False
             self.play_segment_end = None
@@ -782,10 +1008,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop vlc player. Set position slider to the start.
          If multiple audio tracks are shown in the combobox, set the audio track to the first index.
          This is because when beginning play again, the audio track reverts to the first track.
-         Programatically setting the audio track to other values does not work."""
+         Programming setting the audio track to other values does not work."""
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText(_("Play"))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
         self.timer.stop()
         self.ui.horizontalSlider.setProperty("value", 0)
         self.play_segment_end = None
@@ -809,7 +1038,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             tracks = self.mediaplayer.audio_get_track_description()
             for t in tracks:
                 if t[0] > 0:
-                    #print(t[0], t[1])  # track number and track name
+                    # print(t[0], t[1])  # track number and track name
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the slider's position to its corresponding media position
@@ -820,7 +1049,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # update label_time
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
 
         # Check if segments need to be reloaded
         # This only updates if the media is playing, not ideal, but works
@@ -843,6 +1072,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
@@ -859,9 +1092,22 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Stop the vlc player on close.
         Capture the video window size. """
 
-        self.app.settings['dialogcodeav_w'] = self.size().width()
-        self.app.settings['dialogcodeav_h'] = self.size().height()
-        if self.media_data is not None and self.media_data['mediapath'] is not None and  self.media_data['mediapath'][0:7] != "/audio/":
+        self.update_sizes()
+        self.ddialog.close()
+        self.stop()
+
+    def update_sizes(self):
+        """ Called by splitter resizes and play/pause """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodeav_splitter0'] = sizes[0]
+        self.app.settings['dialogcodeav_splitter1'] = sizes[2]  # as 30 is for size[1] for the buttons
+        sizes = self.ui.splitter_2.sizes()
+        self.app.settings['dialogcodeav_splitter_h0'] = sizes[0]
+        self.app.settings['dialogcodeav_splitter_h1'] = sizes[1]
+        if self.file_ is not None and self.file_['mediapath'] is not None \
+                and self.file_['mediapath'][0:7] != "/audio/" \
+                and self.file_['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
@@ -871,13 +1117,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.app.settings['video_h'] = size.height()
             else:
                 self.app.settings['video_h'] = 80
-        # Get absolute video dialog position
+        '''# Get absolute video dialog position
         self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
+        #To change below ?
         self.app.settings['codeav_abs_pos_x'] = self.pos().x()
-        self.app.settings['codeav_abs_pos_y'] = self.pos().y()
-        self.ddialog.close()
-        self.stop()
+        self.app.settings['codeav_abs_pos_y'] = self.pos().y()'''
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
@@ -891,7 +1136,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.fill_code_counts_in_tree()
             return
         time = self.ui.label_time.text()
-        time = time[6:]
+        time = time.split(" / ")[0]
         time_msecs = self.mediaplayer.get_time()
         if self.segment['start'] is None:
             self.segment['start'] = time
@@ -906,7 +1151,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_coding.setText(_("Clear segment"))
 
             # check and reverse start and end times if start is greater than the end
-            #print("start", self.segment['start'], "end", self.segment['end'])
+            # print("start", self.segment['start'], "end", self.segment['end'])
             if float(self.segment['start'].replace(":", ".")) > float(self.segment['end'].replace(":", ".")):
                 tmp = self.segment['start']
                 tmp_msecs = self.segment['start_msecs']
@@ -925,78 +1170,174 @@ class DialogCodeAV(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
-        #logger.debug("selected paremt: " + str(selected.parent()))
-        #logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
-        '''ActionAssignSelectedText = None
-        if selected_text != "" and selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionAssignSelectedText = menu.addAction("Assign selected text")'''
-        ActionItemAssignSegment = None
+        # logger.debug("selected paremt: " + str(selected.parent()))
+        # logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
+        action_color = None
+        action_assignSegment = None
+        action_showCodedMedia = None
+        action_moveCode = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
-            ActionItemAssignSegment = menu.addAction("Assign segment to code")
-        ActionItemAddCode = menu.addAction(_("Add a new code"))
-        ActionItemAddCategory = menu.addAction(_("Add a new category"))
-        ActionItemRename = menu.addAction(_("Rename"))
-        ActionItemEditMemo = menu.addAction(_("View or edit memo"))
-        ActionItemDelete = menu.addAction(_("Delete"))
+            action_assignSegment = menu.addAction("Assign segment to code")
+        action_addCodeToCategory = None
+        action_addCategoryToCategory = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_addCodeToCategory = menu.addAction(_("Add new code to category"))
+            action_addCategoryToCategory = menu.addAction(_("Add a new category to category"))
+        action_addCode = menu.addAction(_("Add a new code"))
+        action_addCategory = menu.addAction(_("Add a new category"))
+        action_rename = menu.addAction(_("Rename"))
+        action_editMemo = menu.addAction(_("View or edit memo"))
+        action_delete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            ActionItemChangeColor = menu.addAction(_("Change code color"))
-
+            action_color = menu.addAction(_("Change code color"))
+            action_moveCode = menu.addAction(_("Move code to"))
+            action_showCodedMedia = menu.addAction(_("Show coded text and media"))
+        action_showCodesLike = menu.addAction(_("Show codes like"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
-        if selected is not None and selected.text(1)[0:3] == 'cid' and action == ActionItemChangeColor:
+        if action is None:
+            return
+        if action == action_showCodesLike:
+            self.show_codes_like()
+            return
+        if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
-        if action == ActionItemAddCategory:
+        if selected is not None and action == action_moveCode:
+            self.move_code(selected)
+        if action == action_addCategoryToCategory:
+            catid = int(selected.text(1).split(":")[1])
+            self.add_category(catid)
+        if action == action_addCategory:
             self.add_category()
-        if action == ActionItemAddCode:
+        if action == action_addCode:
             self.add_code()
-        if selected is not None and action == ActionItemRename:
+        if action == action_addCodeToCategory:
+            catid = int(selected.text(1).split(":")[1])
+            self.add_code(catid)
+        if selected is not None and action == action_rename:
             self.rename_category_or_code(selected)
-        if selected is not None and action == ActionItemEditMemo:
+        if selected is not None and action == action_editMemo:
             self.add_edit_code_memo(selected)
-        if selected is not None and action == ActionItemDelete:
+        if selected is not None and action == action_delete:
             self.delete_category_or_code(selected)
-        if action == ActionItemAssignSegment:
+        if action == action_assignSegment:
             self.assign_segment_to_code(selected)
+        if selected is not None and action == action_showCodedMedia:
+            found = None
+            tofind = int(selected.text(1)[4:])
+            for code in self.codes:
+                if code['cid'] == tofind:
+                    found = code
+                    break
+            if found:
+                self.coded_media_dialog(found)
+
+    def coded_media_dialog(self, code_dict):
+        """ Display all coded media for this code, in a separate modal dialog.
+        Coded media comes from ALL files for this coder.
+        Need to store textedit start and end positions so that code in context can be used.
+        Called from tree_menu.
+        param:
+            code_dict : code dictionary
+        """
+
+        DialogCodeInAllFiles(self.app, code_dict)
+
+    def move_code(self, selected):
+        """ Move code to another category or to no category.
+        Uses a list selection.
+        param:
+            selected : QTreeWidgetItem
+         """
+
+        cid = int(selected.text(1)[4:])
+        cur = self.app.conn.cursor()
+        cur.execute("select name, catid from code_cat order by name")
+        res = cur.fetchall()
+        category_list = [{'name':"", 'catid': None}]
+        for r in res:
+            category_list.append({'name':r[0], 'catid': r[1]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
+        self.update_dialog_codes_and_categories()
+
+    def show_codes_like(self):
+        """ Show all codes if text is empty.
+         Show selected codes that contain entered text. """
+
+        # Input dialog narrow, so code below
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec_()
+        if not ok:
+            return
+        text = str(dialog.textValue())
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, text)
+
+    def recursive_traverse(self, item, text):
+        """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
+        Recurse through all child categories.
+        Called by: show_codes_like
+        param:
+            item: a QTreeWidgetItem
+            text:  Text string for matching with code names
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            #print(item.child(i).text(0) + "|" + item.child(i).text(1))
+            if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
+                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and text == "":
+                item.child(i).setHidden(False)
+            self.recursive_traverse(item.child(i), text)
 
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree in DialogCodeImage, DialogCodeAV,
         DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes, as could not import. There was an import error.
+        Not using isinstance for other classes as could not import the classes to test
+        against. There was an import error.
         Using try except blocks for each instance, as instance may have been deleted. """
 
-        for d in self.dialog_list:
-            if str(type(d)) == "<class 'code_text.DialogCodeText'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if isinstance(d, DialogCodeAV):
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.load_segments()
-                    d.unlight()
-                    d.highlight()
-                    d.get_coded_text_update_eventfilter_tooltips()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'view_image.DialogCodeImage'>":
-                try:
-                    d.get_codes_and_categories()
-                    d.fill_tree()
-                    d.get_coded_areas()
-                    d.draw_coded_areas()
-                except RuntimeError as e:
-                    pass
-            if str(type(d)) == "<class 'reports.DialogReportCodes'>":
-                try:
-                    d.get_data()
-                    d.fill_tree()
-                except RuntimeError as e:
-                    pass
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.load_segments()
+        self.unlight()
+        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    #try:
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCoderComparisons):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
+                if isinstance(c, DialogReportCodeFrequencies):
+                    #try:
+                    c.get_data()
+                    c.fill_tree()
+                    #except RuntimeError as e:
+                    #    pass
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -1010,6 +1351,20 @@ class DialogCodeAV(QtWidgets.QDialog):
             Alt + R rewind 30 seconds
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
+            Ctrl + Shift + > to increase play rate
+            Ctrl + Shift + < to decrease play rate
+
+            TextEdit:
+            A annotate - for current selection
+            M memo code - at clicked position
+            O Shortcut to cycle through overlapping codes - at clicked position
+            Q Quick Mark with code - for current selection
+            R opens a context menu for recently used codes for marking text
+
+        Also detect key events in the textedit. These are used to extend or shrink a text coding.
+        Only works if clicked on a code (text cursor is in the coded text).
+        Shrink start and end code positions using alt arrow left and alt arrow right
+        Extend start and end code positions using shift arrow left, shift arrow right
         """
 
         if object is self.ui.treeWidget.viewport():
@@ -1018,69 +1373,288 @@ class DialogCodeAV(QtWidgets.QDialog):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
 
-        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove and self.media is not None:
-            maxx = self.ui.horizontalSlider.size().width()
-            proportion = event.pos().x() / maxx
-            msecs = self.media.get_duration() * proportion
-            time = msecs_to_mins_and_secs(msecs)
-            self.ui.horizontalSlider.setToolTip(time)
-
-        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent
+        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent = 7
             return False
         key = event.key()
         mods = event.modifiers()
-        #print("KEY ", key, "MODS ", mods)
-        #  ctrl S or ctrl + P pause/play toggle
+        # print("KEY ", key, "MODS ", mods)
+
+        # change start and end code positions using alt arrow left and alt arrow right
+        # and shift arrow left, shift arrow right
+        if self.ui.textEdit.hasFocus():
+            key = event.key()
+            mod = event.modifiers()
+            cursor_pos = self.ui.textEdit.textCursor().position()
+            codes_here = []
+            for item in self.code_text:
+                if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+                    codes_here.append(item)
+            if len(codes_here) == 1:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
+                    self.shrink_to_left(codes_here[0])
+                    return True
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
+                    self.shrink_to_right(codes_here[0])
+                    return True
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
+                    self.extend_left(codes_here[0])
+                    return True
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
+                    self.extend_right(codes_here[0])
+                    return True
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            # Annotate selected
+            if key == QtCore.Qt.Key_A and selected_text != "":
+                self.annotate(self.ui.textEdit.textCursor().position())
+                return True
+            # Memo for current code
+            if key == QtCore.Qt.Key_M:
+                self.coded_text_memo(cursor_pos)
+                return True
+            # Overlapping codes cycle
+            if key == QtCore.Qt.Key_O and len(codes_here) > 1:
+                self.cycle_overlap()
+            # Quick Mark selected
+            if key == QtCore.Qt.Key_Q and selected_text != "":
+                self.mark()
+                return True
+            # Recent codes menu
+            if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
+                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+                return True
+
+        #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() + 30000
-            if time_msecs > self.media.get_duration():
-                time_msecs = self.media.get_duration() - 1
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+        # Advance 30 seconds Shift F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
+            self.forward_30_seconds()
         # Rewind 30 seconds Alt R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
+            self.rewind_30_seconds()
+        # Rewind 5 seconds Shift R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() - 30000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
-        # Rewind 5 seconds ctrl R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 5000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_5_seconds()
+        # Increase play rate  Ctrl + Shift + >
+        if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
+            self.increase_play_rate()
+        # Decrease play rate  Ctrl + Shift + <
+        if key == QtCore.Qt.Key_Less and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
+            self.decrease_play_rate()
         return False
+
+    def textEdit_recent_codes_menu(self, position):
+        """ Alternative context menu.
+        Shows a list of recent codes to select from.
+        Called by R key press in the text edit pane, only if there is some selected text. """
+
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        if selected_text == "":
+            return
+        if len(self.recent_codes) == 0:
+            return
+        menu = QtWidgets.QMenu()
+        for item in self.recent_codes:
+            menu.addAction(item['name'])
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action is None:
+            return
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def recursive_set_current_item(self, item, text):
+        """ Set matching item to be the current selected item.
+        Recurse through any child categories.
+        Tried to use QTreeWidget.finditems - but this did not find matching item text
+        Called by: textEdit recent codes menu option
+        Required for: mark()
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
+                self.ui.treeWidget.setCurrentItem(item.child(i))
+            self.recursive_set_current_item(item.child(i), text)
+
+    def cycle_overlap(self):
+        """ Cycle through coded text items located at current cursor position.
+        Highlight the coded text. """
+
+        pos = self.ui.textEdit.textCursor().position()
+        codes_here = []
+        for i in self.code_text:
+            if i['pos0'] <= pos and i['pos1'] >= pos:
+                codes_here.append(i)
+        self.overlap_code_index += 1
+        if self.overlap_code_index >= len(codes_here):
+            self.overlap_code_index = 0
+        item = codes_here[self.overlap_code_index]
+        for c in self.codes:
+            if item['cid'] == c['cid']:
+                item['color'] = c['color']
+                break
+        # Remove formatting
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+        # Reapply formatting
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(item['color']))
+        fmt.setBackground(brush)
+        cursor.setCharFormat(fmt)
+        self.apply_overline_to_overlaps()
+
+    def rewind_30_seconds(self):
+        """ Rewind AV by 30 seconds. Shift + R """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() - 30000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def rewind_5_seconds(self):
+        """ Rewind AV by 30 seconds. Alt + R """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() - 5000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def forward_30_seconds(self):
+        """ Forward AV 30 seconds. """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def extend_left(self, code_):
+        """ Shift left arrow """
+
+        if code_['pos0'] < 1:
+            return
+        code_['pos0'] -= 1
+        cur = self.app.conn.cursor()
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'], self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def extend_right(self, code_):
+        """ Shift right arrow """
+
+        if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
+            return
+        code_['pos1'] += 1
+        cur = self.app.conn.cursor()
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def shrink_to_left(self, code_):
+        """ Alt left arrow, shrinks code from the right end of the code """
+
+        if code_['pos1'] <= code_['pos0'] + 1:
+            return
+        code_['pos1'] -= 1
+        cur = self.app.conn.cursor()
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def shrink_to_right(self, code_):
+        """ Alt right arrow shrinks code from the left end of the code """
+
+        if code_['pos0'] >= code_['pos1'] - 1:
+            return
+        code_['pos0'] += 1
+        cur = self.app.conn.cursor()
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        cur.execute(sql,
+            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'], self.app.settings['codername']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
+
+    def increase_play_rate(self):
+        """ Several increased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        rate += 0.1
+        if rate > 2:
+            rate = 2
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
+
+    def decrease_play_rate(self):
+        """ Several decreased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        rate -= 0.1
+        if rate < 0.1:
+            rate = 0.1
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def assign_segment_to_code(self, selected):
         """ Assign time segment to selected code. Insert an entry into the database.
         Then clear the segment for re-use."""
 
-        if self.media_data is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
+        if self.file_ is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
             self.clear_segment()
             return
         sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
         cid = int(selected.text(1).split(':')[1])
-        values = [self.media_data['id'], self.segment['start_msecs'],
-            self.segment['end_msecs'], cid, self.segment['memo'],
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            self.app.settings['codername']]
+        values = [self.file_['id'], self.segment['start_msecs'],
+                  self.segment['end_msecs'], cid, self.segment['memo'],
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                  self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
         self.app.conn.commit()
@@ -1127,7 +1701,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.categories[found]['supercatid'] = supercatid
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set supercatid=? where catid=?",
-            [self.categories[found]['supercatid'], self.categories[found]['catid']])
+                        [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
             return
@@ -1151,7 +1725,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.codes[found]['catid'] = catid
             cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=? where cid=?",
-            [self.codes[found]['catid'], self.codes[found]['cid']])
+                        [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
@@ -1161,9 +1735,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         Called by item_moved_update_data when a code is moved onto another code. """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
-        #TODO font size in message box
+        # TODO font size in message box
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
-        msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+                msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return
         cur = self.app.conn.cursor()
@@ -1186,10 +1760,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
         self.load_segments()
 
-    def add_code(self):
-        """ Use add_item dialog to get new code text.
-        Add_code_name dialog checks for duplicate code name.
-        New code is added to data and database. """
+    def add_code(self, catid=None):
+        """  Use add_item dialog to get new code text. Add_code_name dialog checks for
+        duplicate code name. A random color is selected for the code.
+        New code is added to data and database.
+        param:
+            catid : None to add to without category, catid to add to to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("New code name"))
         ui.exec_()
@@ -1198,19 +1774,20 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': new_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),'catid': None, 'color': code_color}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid, 'color': code_color}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
+                    , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code added: ") + item['name'])
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
 
-    def add_category(self):
+    def add_category(self, supercatid=None):
         """ Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
-        Add the new category as a top level item. """
+        param:
+            suoercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
@@ -1219,11 +1796,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         # add to database
         item = {'name': new_name, 'cid': None, 'memo': "",
-        'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                'owner': self.app.settings['codername'],
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date'], None))
+                    , (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
@@ -1301,7 +1878,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if found == -1:
                 return
             ui = DialogMemo(self.app, _("Memo for Code ") + self.codes[found]['name'],
-            self.codes[found]['memo'])
+                            self.codes[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
@@ -1325,7 +1902,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if found == -1:
                 return
             ui = DialogMemo(self.app, _("Memo for Category ") + self.categories[found]['name'],
-            self.categories[found]['memo'])
+                            self.categories[found]['memo'])
             ui.exec_()
             memo = ui.memo
             if memo == "":
@@ -1347,17 +1924,13 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
-            QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    mb = QtWidgets.QMessageBox()
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_('Name in use'))
-                    mb.setText(new_name + _(" Name already in use, choose another."))
-                    mb.exec_()
+                    Message(self.app, _('Name in use'), new_name + _(" Name already in use, choose another."), "warning").exec_()
                     return
             # find the code in the list
             found = -1
@@ -1377,17 +1950,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if selected.text(1)[0:3] == 'cat':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:"),
-            QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other category has this text
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
-                    mb = QtWidgets.QMessageBox()
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_('Duplicate category name'))
-                    mb.setText(msg)
+                    Message(self.app, _('Duplicate category name'), msg, "warning").exec_()
                     mb.exec_()
                     return
             # find the category in the list
@@ -1400,7 +1970,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             # update category list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set name=? where catid=?",
-            (new_name, self.categories[found]['catid']))
+                        (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
@@ -1416,7 +1986,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 found = i
         if found == -1:
             return
-        ui = DialogColorSelect(self.codes[found]['color'])
+        ui = DialogColorSelect(self.app, self.codes[found])  #['color'])
         ok = ui.exec_()
         if not ok:
             return
@@ -1428,7 +1998,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
-        (self.codes[found]['color'], self.codes[found]['cid']))
+                    (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
@@ -1478,18 +2048,48 @@ class DialogCodeAV(QtWidgets.QDialog):
                 formatB = QtGui.QTextCharFormat()
                 formatB.setFontWeight(QtGui.QFont.Bold)
                 cursor.mergeCharFormat(formatB)
+        self.apply_overline_to_overlaps()
+
+    def apply_overline_to_overlaps(self):
+        """ Apply overline format to coded text sections which are overlapping. """
+
+        overlapping = []
+        overlaps = []
+        for i in self.code_text:
+            #print(item['pos0'], type(item['pos0']), item['pos1'], type(item['pos1']))
+            for j in self.code_text:
+                if j != i:
+                    if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
+                        #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
+                        if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                            overlaps.append([j['pos0'], j['pos1']])
+                        elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                            overlaps.append([i['pos0'], i['pos1']])
+                        elif j['pos0'] > i['pos0']:
+                            overlaps.append([j['pos0'], i['pos1']])
+                        else:  # j['pos0'] < i['pos0']:
+                            overlaps.append([j['pos1'], i['pos0']])
+        #print(overlaps)
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        for o in overlaps:
+            fmt = QtGui.QTextCharFormat()
+            fmt.setFontOverline(True)
+            cursor.setPosition(o[0], QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
+            cursor.mergeCharFormat(fmt)
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Mark, unmark, annotate, copy. """
 
         if self.ui.checkBox_scroll_transcript.isChecked():
             return
-
         cursor = self.ui.textEdit.cursorForPosition(position)
         selectedText = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
+        action_code_memo = None
         action_start_pos = None
         action_end_pos = None
         action_play_text = None
@@ -1500,13 +2100,19 @@ class DialogCodeAV(QtWidgets.QDialog):
                     action_play_text = menu.addAction(_("Play text"))
                     play_text_avid = item['avid']
                 action_unmark = menu.addAction(_("Unmark"))
-                action_start_pos = menu.addAction(_("Change start position"))
-                action_end_pos = menu.addAction(_("Change end position"))
+                action_code_memo = menu.addAction(_("Memo coded text M"))
+                action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 break
         if selectedText != "":
             if self.ui.treeWidget.currentItem() is not None:
-                action_mark = menu.addAction(_("Mark"))
-            action_annotate = menu.addAction(_("Annotate"))
+                action_mark = menu.addAction(_("Mark (Q)"))
+            # Use up to 5 recent codes
+            if len(self.recent_codes) > 0:
+                submenu = menu.addMenu(_("Mark with recent code (R)"))
+                for item in self.recent_codes:
+                    submenu.addAction(item['name'])
+            action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
             if self.segment_for_text is None:
                 action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))
@@ -1514,7 +2120,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_link_segment_to_text = menu.addAction(_("Link to segment to text"))
         action_video_position_timestamp = -1
         for ts in self.time_positions:
-            #print(ts, cursor.position())
+            # print(ts, cursor.position())
             if cursor.position() >= ts[0] and cursor.position() <= ts[1]:
                 action_video_position_timestamp = menu.addAction(_("Video position to timestamp"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
@@ -1522,41 +2128,107 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if selectedText != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
+            return
         if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
+            return
+        if action == action_code_memo:
+            self.coded_text_memo(cursor.position())
+            return
         if action_unmark is not None and action == action_unmark:
             self.unmark(cursor.position())
+            return
         if action_play_text is not None and action == action_play_text:
             self.play_text(play_text_avid)
+            return
         if selectedText != "" and action == action_annotate:
             self.annotate(cursor.position())
+            return
         try:
             if action == action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
+                return
         except:
             pass
         if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
             self.prepare_link_text_to_segment()
+            return
         if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
+            return
         if action == action_start_pos:
             self.change_text_code_pos(cursor.position(), "start")
+            return
         if action == action_end_pos:
             self.change_text_code_pos(cursor.position(), "end")
+            return
+
+        # Remaining actions will be the submenu codes
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def coded_text_memo(self, position=None):
+        """ Add or edit a memo for this coded text.
+        Called by: textEdit context menu option
+        param:
+            position : textEdit cursor position """
+
+        '''if position is None:
+            # Called via button
+            position = self.ui.textEdit.textCursor().position()'''
+        if self.transcription is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if position >= item['pos0'] and position <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+                coded_text_list.append(item)
+        if coded_text_list == []:
+            return
+        text_item = None
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if text_item is None:
+            return
+        # Dictionary with cid fid seltext owner date name color memo
+        #TODO maybe highlight section to be memoed
+        msg = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
+        ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
+        ui.exec_()
+        memo = ui.memo
+        if memo == text_item['memo']:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
+        self.app.conn.commit()
+        for i in self.code_text:
+            if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
+                and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
+                i['memo'] = memo
+                #print(i)
+        self.app.delete_backup = False
 
     def change_text_code_pos(self, location, start_or_end):
-        if self.filename == {}:
+        if self.file_ is None:
             return
         code_list = []
         for item in self.code_text:
-            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings[
+                'codername']:
                 code_list.append(item)
         if code_list == []:
             return
         code_to_edit = None
         if len(code_list) == 1:
             code_to_edit = code_list[0]
-        # multiple codes to selet from
+        # multiple codes to select from
         if len(code_list) > 1:
             ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
             ok = ui.exec_()
@@ -1572,14 +2244,16 @@ class DialogCodeAV(QtWidgets.QDialog):
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
             print("start", min, max)
-            changed_start, ok = QtWidgets.QInputDialog.getInt(self, _("Change start position"), _("Change start character position.\nPositive or negative number:"), 0,min,max,1)
+            changed_start, ok = QtWidgets.QInputDialog.getInt(self, _("Change start position"), _(
+                "Change start character position.\nPositive or negative number:"), 0, min, max, 1)
             if not ok:
                 return
         if start_or_end == "end":
             max = txt_len - code_to_edit['pos1']
             min = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
             print("end", min, max)
-            changed_end, ok = QtWidgets.QInputDialog.getInt(self, _("Change end position"), _("Change end character position.\nPositive or negative number:"), 0,min,max,1)
+            changed_end, ok = QtWidgets.QInputDialog.getInt(self, _("Change end position"), _(
+                "Change end character position.\nPositive or negative number:"), 0, min, max, 1)
             if not ok:
                 return
         if changed_start == 0 and changed_end == 0:
@@ -1591,7 +2265,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'], code_to_edit['pos1'], self.app.settings['codername']))
+                    (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'],
+                     code_to_edit['pos1'], self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1610,7 +2285,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        self.ui.pushButton_play.setText(_("Pause"))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
@@ -1625,27 +2303,23 @@ class DialogCodeAV(QtWidgets.QDialog):
         item['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
         item['owner'] = self.app.settings['codername']
         item['memo'] = ""
-        item['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        item['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         item['avid'] = self.segment_for_text['avid']
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-            (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
+                    (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Already Coded'))
-            mb.setText(_("This segment has already been coded with this code by ") + item['owner'])
-            mb.exec_()
+            Message(self.app, _('Already Coded'), _("This segment has already been coded with this code by ") + item['owner'],"warning").exec_()
             return
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date,avid) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
-            item['seltext'], item['pos0'], item['pos1'], item['owner'],
-            item['memo'], item['date'], item['avid']))
+                                                         item['seltext'], item['pos0'], item['pos1'], item['owner'],
+                                                         item['memo'], item['date'], item['avid']))
             self.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
@@ -1668,7 +2342,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.text_for_segment['pos1'] = pos1
         self.text_for_segment['owner'] = self.app.settings['codername']
         self.text_for_segment['memo'] = ""
-        self.text_for_segment['date'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.text_for_segment['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         self.text_for_segment['avid'] = None
 
     def set_video_to_timestamp_position(self, position):
@@ -1701,19 +2375,11 @@ class DialogCodeAV(QtWidgets.QDialog):
        """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_('No transcription'))
-            mb.exec_()
+            Message(self.app, _('Warning'), _('No transcription'), "warning").exec_()
             return
         item = self.ui.treeWidget.currentItem()
         if item is None:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("No code was selected"))
-            mb.exec_()
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
@@ -1725,30 +2391,27 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         # add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
-        'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-        self.code_text.append(coded)
-        self.highlight()
+                 'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-            (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
+                    (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Already Coded'))
-            mb.setText(_("This segment has already been coded with this code by ") + coded['owner'])
-            mb.exec_()
+            Message(self.app, _('Already Coded'), _("This segment has already been coded with this code by ") + coded['owner'], "warning").exec_()
             return
+        self.code_text.append(coded)
+        self.highlight()
 
         # Should not get sqlite3.IntegrityError:
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
-                coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
-                coded['memo'], coded['date']))
+                                                      coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
+                                                      coded['memo'], coded['date']))
             self.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
@@ -1757,6 +2420,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
+        # update recent_codes
+        tmp_code = None
+        for c in self.codes:
+            if c['cid'] == cid:
+                tmp_code = c
+        if tmp_code is None:
+            return
+        for item in self.recent_codes:
+            if item == c:
+                self.recent_codes.remove(item)
+                break
+        self.recent_codes.insert(0, tmp_code)
+        if len(self.recent_codes) > 5:
+            self.recent_codes = self.recent_codes[:5]
+
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file. """
 
@@ -1764,7 +2442,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         to_unmark = None
         for item in self.code_text:
-            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings[
+                'codername']:
                 to_unmark = item
         if to_unmark is None:
             return
@@ -1772,8 +2451,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         # delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
-            (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername'],
-            to_unmark['fid']))
+                    (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername'],
+                     to_unmark['fid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         # update filter for tooltip and update code colours
@@ -1783,14 +2462,12 @@ class DialogCodeAV(QtWidgets.QDialog):
     def annotate(self, location):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
+        params:
+            location : textCursor currept position
         """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("No media transcription selected"))
-            mb.exec_()
+            Message(self.app, _('Warning'), _("No media transcription selected"), "warning").exec_()
             return
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
@@ -1811,16 +2488,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         # add new item to annotations, add to database and update GUI
         if item is None:
             item = {'fid': self.transcription[0], 'pos0': pos0, 'pos1': pos1,
-            'memo': str(annotation), 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+                    'memo': str(annotation), 'owner': self.app.settings['codername'],
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
         if item['memo'] != "":
             cur = self.app.conn.cursor()
             cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
-                values(?,?,?,?,?,?)" ,(item['fid'], item['pos0'], item['pos1'],
-                item['memo'], item['owner'], item['date']))
+                values(?,?,?,?,?,?)", (item['fid'], item['pos0'], item['pos1'],
+                                       item['memo'], item['owner'], item['date']))
             self.app.conn.commit()
             self.app.delete_backup = False
             cur.execute("select last_insert_rowid()")
@@ -1829,17 +2506,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.annotations.append(item)
             self.highlight()
             self.parent_textEdit.append(_("Annotation added at position: ") \
-                + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.transcription[2])
+                                        + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") +
+                                        self.transcription[2])
         # if blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
-            cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
+            cur.execute("delete from annotation where pos0 = ?", (item['pos0'],))
             self.app.conn.commit()
             for note in self.annotations:
                 if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
                     self.annotations.remove(note)
             self.parent_textEdit.append(_("Annotation removed from position ") \
-                + str(item['pos0']) + _(" for: ") + self.transcription[2])
+                                        + str(item['pos0']) + _(" for: ") + self.transcription[2])
         self.unlight()
         self.highlight()
 
@@ -1861,9 +2539,10 @@ class ToolTip_EventFilter(QtCore.QObject):
             for c in self.codes:
                 if item['cid'] == c['cid']:
                     item['name'] = c['name']
+                    item['color'] = c['color']
 
     def eventFilter(self, receiver, event):
-        #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.ToolTip:
             helpEvent = QHelpEvent(event)
             cursor = QtGui.QTextCursor()
@@ -1877,14 +2556,14 @@ class ToolTip_EventFilter(QtCore.QObject):
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
-                    #print(item)
                     try:
-                        if text != "":
-                            text = text + "\n"
-                        text += item['name']  # += as can have multiple codes on same position
+                        text += '<p style="background-color:' + item['color'] + '">' + item['name']
                         if item['avid'] is not None:
                             text += " [" + msecs_to_mins_and_secs(item['av_pos0'])
                             text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
+                        if item['memo'] is not None and item['memo'] != "":
+                            text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                        text += "</p>"
                     except Exception as e:
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                         msg += str(item) + "\n" + str(self.code_text)
@@ -1898,8 +2577,8 @@ class ToolTip_EventFilter(QtCore.QObject):
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
-    def __init__ (self, width, height, parent=None):
-        super(GraphicsScene, self).__init__ (parent)
+    def __init__(self, width, height, parent=None):
+        super(GraphicsScene, self).__init__(parent)
         self.scene_width = width
         self.scene_height = height
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
@@ -1957,7 +2636,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Draws coded segment line. The media duration determines the scaler for the line length and position.
     y values are pre-calculated and stored in the segment data.
-    Refernces Dialog_code_av for variables and methods.
+    References Dialog_code_av for variables and methods.
     """
 
     app = None
@@ -1967,22 +2646,22 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     code_av_dialog = None
 
     def __init__(self, app, segment, scaler, text_for_segment, code_av_dialog):
-            super(SegmentGraphicsItem, self).__init__(None)
+        super(SegmentGraphicsItem, self).__init__(None)
 
-            self.app = app
-            self.segment = segment
-            self.scaler = scaler
-            self.code_av_dialog = code_av_dialog
-            self.reload_segment = False
-            self.setFlag(self.ItemIsSelectable, True)
-            tooltip = self.segment['codename'] + " "
-            seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
-            seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
-            tooltip += seg_time
-            if self.segment['memo'] != "":
-                tooltip += "\n" + _("Memo: ") + self.segment['memo']
-            self.setToolTip(tooltip)
-            self.draw_segment()
+        self.app = app
+        self.segment = segment
+        self.scaler = scaler
+        self.code_av_dialog = code_av_dialog
+        self.reload_segment = False
+        self.setFlag(self.ItemIsSelectable, True)
+        tooltip = self.segment['codename'] + " "
+        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
+        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+        tooltip += seg_time
+        if self.segment['memo'] != "":
+            tooltip += "\n" + _("Memo: ") + self.segment['memo']
+        self.setToolTip(tooltip)
+        self.draw_segment()
 
     def contextMenuEvent(self, event):
         """
@@ -2002,7 +2681,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_edit_end = menu.addAction(_('Edit segment end position'))
         if self.code_av_dialog.text_for_segment['seltext'] is not None:
             action_link_text = menu.addAction(_('Link text to segment'))
-        if self.code_av_dialog.text_for_segment['seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
+        if self.code_av_dialog.text_for_segment[
+            'seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
             action_link_segment = menu.addAction(_("Select segment to link to text"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
@@ -2037,34 +2717,32 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         # check for an existing duplicated marking first
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-            (seg['cid'], seg['fid'], seg['pos0'], seg['pos1'], seg['owner']))
+                    (seg['cid'], seg['fid'], seg['pos0'], seg['pos1'], seg['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Already Coded'))
-            mb.setText(_("This segment has already been coded with this code."))
-            mb.exec_()
+            Message(self.app, _('Already Coded'), _("This segment has already been coded with this code."), "warning").exec_()
             return
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (seg['cid'],
-            seg['fid'],seg['seltext'], seg['pos0'], seg['pos1'],
-            seg['owner'], seg['memo'], seg['date'], seg['avid']))
+                                                          seg['fid'], seg['seltext'], seg['pos0'], seg['pos1'],
+                                                          seg['owner'], seg['memo'], seg['date'], seg['avid']))
             self.code_av_dialog.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
             print(e)
-        #print(self.code_av_dialog.text_for_segment)  # tmp
+        # print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
-        self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None, 'owner': None, 'memo': None, 'date': None, 'avid': None}
+        self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
+                                                'owner': None, 'memo': None, 'date': None, 'avid': None}
 
     def edit_segment_start(self):
         """ Edit segment start time. """
 
         i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment start in mseconds",
-            "Edit time in milliseconds\n1000 msecs = 1 second:", self.segment['pos0'], 1,
-            self.segment['pos1'] - 1, 5)
+                                                      "Edit time in milliseconds\n1000 msecs = 1 second:",
+                                                      self.segment['pos0'], 1,
+                                                      self.segment['pos1'] - 1, 5)
         if not ok_pressed:
             return
         if i < 1:
@@ -2082,8 +2760,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         duration = self.code_av_dialog.media.get_duration()
         i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment end in mseconds",
-            "Edit time in milliseconds\n1000 msecs = 1 second:", self.segment['pos1'],
-            self.segment['pos0'] + 1, duration - 1, 5)
+                                                      "Edit time in milliseconds\n1000 msecs = 1 second:",
+                                                      self.segment['pos1'],
+                                                      self.segment['pos0'] + 1, duration - 1, 5)
         if not ok_pressed:
             return
         if i < 1:
@@ -2103,7 +2782,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.mediaplayer.play()
         self.code_av_dialog.mediaplayer.set_position(pos)
         self.code_av_dialog.is_paused = False
-        self.code_av_dialog.ui.pushButton_play.setText(_("Pause"))
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+        self.code_av_dialog.ui.pushButton_play.setIcon(icon)
         self.code_av_dialog.play_segment_end = self.segment['pos1']
         self.code_av_dialog.timer.start()
 
@@ -2112,8 +2792,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         it from the scene. Reload_segment is set to True, so on playing media, the update
         event will reload all segments. """
 
-        #print(self.segment)
-        ui = DialogConfirmDelete(self.app, _("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
+        # print(self.segment)
+        ui = DialogConfirmDelete(self.app,
+                                 _("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
         ok = ui.exec_()
         if not ok:
             return
@@ -2148,7 +2829,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.segment['memo'] = ui.memo
         sql = "update code_av set memo=?, date=? where avid=?"
         values = [self.segment['memo'],
-            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
         cur = self.code_av_dialog.app.conn.cursor()
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
@@ -2181,11 +2862,13 @@ class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
     Mouse events do work with the vlc player in a separate modal dialog.
+
+    Linked a/v have 'audio:' or 'video:' at start of mediapath
     """
 
     app = None
     label = None
-    media_data = None
+    file_ = None
     is_paused = False
     media_duration_text = ""
     displayframe = None
@@ -2198,15 +2881,20 @@ class DialogViewAV(QtWidgets.QDialog):
     speaker_list = []
     can_transcribe = True
 
-    def __init__(self, app, media_data, parent=None):
+    def __init__(self, app, file_, parent=None):
 
-        """ Media_data contains: {name, mediapath, owner, id, date, memo, fulltext}
+        """ file_ contains: {name, mediapath, owner, id, date, memo, fulltext}
         A separate modal dialog is created to display the video.
         """
 
         sys.excepthook = exception_handler
         self.app = app
-        self.media_data = media_data
+        self.file_ = file_
+        abs_path = ""
+        if self.file_['mediapath'][0:6] in ('/audio', '/video'):
+            abs_path = self.app.project_path + self.file_['mediapath']
+        if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -2215,11 +2903,8 @@ class DialogViewAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
         self.ui.setupUi(self)
+        self.setWindowTitle(abs_path.split('/')[-1])
         try:
-            w = int(self.app.settings['dialogviewav_w'])
-            h = int(self.app.settings['dialogviewav_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
             x = int(self.app.settings['viewav_abs_pos_x'])
             y = int(self.app.settings['viewav_abs_pos_y'])
             self.move(self.mapToGlobal(QtCore.QPoint(x, y)))
@@ -2232,18 +2917,20 @@ class DialogViewAV(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.label_speakers.setStyleSheet(font)
-        self.setWindowTitle(self.media_data['mediapath'])
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit_transcription.setStyleSheet(doc_font)
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext from source where name=?", [media_data['name'] + ".transcribed"])
+        cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit_transcription.installEventFilter(self)
             self.installEventFilter(self)  # for rewind, play/stop
-            cur.execute("select cid from  code_text where fid=?", [self.transcription[0],])
+            cur.execute("select cid from  code_text where fid=?", [self.transcription[0], ])
             coded = cur.fetchall()
-            cur.execute("select anid from  annotation where fid=?", [self.transcription[0],])
+            cur.execute("select anid from  annotation where fid=?", [self.transcription[0], ])
             annoted = cur.fetchall()
             if coded != [] or annoted != []:
                 self.ui.textEdit_transcription.setReadOnly(True)
@@ -2251,11 +2938,50 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_speakers.setVisible(False)
                 self.ui.label_transcription.setToolTip("")
             else:
-                self.ui.label_memo.setText(_("Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"))
+                self.ui.label_memo.setText(
+                    _("Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
             self.add_speaker_names_to_label()
+
+        # Labels need to be 32x32 pixels for 32x32 icons
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
+        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
+        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm))
+        # Buttons need to be 36x36 pixels for 32x32 icons
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_30_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
+        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_5_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
+        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/forward_30_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
+        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_down_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
+        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_up_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
+        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -2264,17 +2990,21 @@ class DialogViewAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.ddialog.setWindowTitle(self.media_data['mediapath'])
+        title = abs_path.split('/')[-1]
+        self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        if platform.system() == "Darwin": # for MacOS
+        if platform.system() == "Darwin":  # for MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
+        # add context menu for ddialog
+        self.ddialog.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Set video dialog position, with a default initial position
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
@@ -2285,9 +3015,10 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))
         except:
             pass
-        self.ddialog.show()
+        if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
+            self.ddialog.show()
 
-        # Create a basic vlc instance
+        # Create a vlc instance
         self.instance = vlc.Instance()
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
@@ -2298,19 +3029,15 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
-        self.ui.horizontalSlider.installEventFilter(self)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
+
         try:
-            self.media = self.instance.media_new(self.app.project_path + self.media_data['mediapath'])
+            self.media = self.instance.media_new(abs_path)
         except Exception as e:
-            mb = QtWidgets.QMessageBox()
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Media not found'))
-            mb.setText(str(e) +"\n" + self.app.project_path + self.media_data['mediapath'])
-            mb.exec_()
+            Message(self.app, _('Media not found'), str(e) + "\n" + abs_path).exec_()
             self.closeEvent()
             return
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        if self.file_['mediapath'][0:7] not in ("/audio", "audio:"):
             try:
                 w = int(self.app.settings['video_w'])
                 h = int(self.app.settings['video_h'])
@@ -2332,97 +3059,116 @@ class DialogViewAV(QtWidgets.QDialog):
         # video would be displayed in it's own window). This is platform
         # specific, so we must give the ID of the QFrame (or similar object) to
         # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux": # for Linux using the X Server
-            #self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
+        if platform.system() == "Linux":  # for Linux using the X Server
             self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
-        elif platform.system() == "Windows": # for Windows
+        elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
-        elif platform.system() == "Darwin": # for MacOS
+        elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.ui.label_time_2.setText("Duration: " + msecs_to_mins_and_secs(msecs))
-        self.ui.textEdit.setText(self.media_data['memo'])
+        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.ui.label_time.setText("0.00" + self.media_duration_text)
+        self.ui.textEdit.setText(self.file_['memo'])
         self.ui.textEdit.ensureCursorVisible()
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
-        #self.play_pause()
+        # Need this for helping set the slider on user sliding before play begins
+        # Detect number of audio tracks in media
+        self.mediaplayer.play()
+        self.mediaplayer.audio_set_volume(0)
+        time.sleep(0.2)
+        #print( self.mediaplayer.audio_get_track_count()) # > 0
+        tracks = self.mediaplayer.audio_get_track_description()
+        good_tracks = []  # note where track [0] == -1 is a disabled track
+        for track in tracks:
+            if track[0] >= 0:
+                good_tracks.append(track)
+            #print(track[0], track[1])  # track number and track name
+        if len(good_tracks) < 2:
+            self.ui.label_audio.setEnabled(False)
+            self.ui.comboBox_tracks.setEnabled(False)
+        self.mediaplayer.stop()
+        self.mediaplayer.audio_set_volume(100)
+        # self.play_pause()
+
+    def ddialog_menu(self, position):
+        """ Context menu to export a screenshot, to resize dialog """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        ActionScreenshot = menu.addAction(_("Screenshot"))
+        ActionResize = menu.addAction(_("Resize"))
+
+        action = menu.exec_(self.ddialog.mapToGlobal(position))
+        if action == ActionScreenshot:
+            time.sleep(0.5)
+            screen = QtWidgets.QApplication.primaryScreen()
+            screenshot = screen.grabWindow(self.ddialog.winId())
+            screenshot.save(self.app.settings['directory'] + '/Frame_' + datetime.datetime.now().astimezone().strftime(
+                "%Y%m%d_%H_%M_%S") + '.jpg', 'jpg')
+        if action == ActionResize:
+            w = self.ddialog.size().width()
+            h = self.ddialog.size().height()
+            res_w = QtWidgets.QInputDialog.getInt(None, _("Width"), _("Width:"), w, 100, 2000, 5)
+            if res_w[1]:
+                w = res_w[0]
+            res_h = QtWidgets.QInputDialog.getInt(None, _("Height"), _("Height:"), h, 80, 2000, 5)
+            if res_h[1]:
+                h = res_h[0]
+            self.ddialog.resize(w, h)
 
     def set_position(self):
-        """ Set the movie position according to the position slider.
+        """ Set the a/v position according to the slider position.
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
         integer variables, so you need a factor; the higher the factor, the
         more precise are the results (1000 should suffice).
         """
 
-        # Set the media position to where the slider was dragged
-        self.timer.stop()
-        pos = self.ui.horizontalSlider.value()
-        self.mediaplayer.set_position(pos / 1000.0)
-        self.timer.start()
+        if self.mediaplayer.is_playing():
+            self.mediaplayer.pause()
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
+            self.mediaplayer.play()
+            self.timer.start()
+        else:
+            pos = self.ui.horizontalSlider.value()
+            self.mediaplayer.set_position(pos / 1000.0)
 
     def eventFilter(self, object, event):
         """ Add key options to improve manual transcribing.
         Options are:
-            Ctrl + R to rewind 5 seconds.
-            Alt + R rewind 30 seconds
-            Alt + F forward 30 seconds
+            Alt + R to rewind 5 seconds.
+            Shift + R rewind 30 seconds
+            Shift + F forward 30 seconds
             Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
         Can only use these options if the transcription is not coded:
             Ctrl + T to insert timestamp in format [hh.mm.ss]
             Ctrl + N to enter a new speakers name into shortcuts
             Ctrl + 1 .. 8 to insert speaker in format [speaker name]
-        """
 
-        if object == self.ui.horizontalSlider and event.type() == QtCore.QEvent.MouseMove:
-            maxx = self.ui.horizontalSlider.size().width()
-            proportion = event.pos().x() / maxx
-            msecs = self.media.get_duration() * proportion
-            time = msecs_to_mins_and_secs(msecs)
-            self.ui.horizontalSlider.setToolTip(time)
+            Ctrl + Shift + > to increase play rate
+            Ctrl + Shift + < to decrease play rate
+        """
 
         if event.type() != 7:  # QtGui.QKeyEvent
             return False
         key = event.key()
         mods = event.modifiers()
-        #print("KEY ", key, "MODS ", mods)
+        # print("KEY ", key, "MODS ", mods)
         #  ctrl S or ctrl P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 30 seconds Alt R
+        # Rewind 30 seconds Shift R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
+            self.rewind_30_seconds()
+        # Rewind 5 seconds   Alt R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() - 30000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
-        # Rewind 5 seconds   Ctrl R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
-            time_msecs = self.mediaplayer.get_time() - 5000
-            if time_msecs < 0:
-                time_msecs = 0
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
-            time_msecs = self.mediaplayer.get_time() + 30000
-            if time_msecs > self.media.get_duration():
-                time_msecs = self.media.get_duration() - 1
-            pos = time_msecs / self.mediaplayer.get_media().get_duration()
-            self.mediaplayer.set_position(pos)
-            # Update timer display
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-            self.update_ui()
+            self.rewind_5_seconds()
+        # Advance 30 seconds Shift F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
+            self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.insert_timestamp()
@@ -2437,7 +3183,72 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
             self.pause()
             self.delete_speakernames()
+        # Increase play rate  Ctrl + Shift + >
+        if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
+            self.increase_play_rate()
+        # Decrease play rate  Ctrl + Shift + <
+        if key == QtCore.Qt.Key_Less and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
+            self.decrease_play_rate()
         return True
+
+    def rewind_30_seconds(self):
+        """ Rewind AV 30 seconds. Shift + R """
+
+        time_msecs = self.mediaplayer.get_time() - 30000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
+    def rewind_5_seconds(self):
+        """ Rewind AV 5 seconds. Alt + R """
+
+        time_msecs = self.mediaplayer.get_time() - 5000
+        if time_msecs < 0:
+            time_msecs = 0
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
+    def forward_30_seconds(self):
+        """ Forward AV 30 seconds. Shift + F """
+
+        time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.update_ui()
+
+    def increase_play_rate(self):
+        """ Several increased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        rate += 0.1
+        if rate > 2:
+            rate = 2
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
+
+    def decrease_play_rate(self):
+        """ Several decreased rate options """
+
+        rate = self.mediaplayer.get_rate()
+        rate -= 0.1
+        if rate < 0.1:
+            rate = 0.1
+        self.mediaplayer.set_rate(rate)
+        self.ui.label_rate.setText(str(round(rate, 1)) + "x")
 
     def delete_speakernames(self):
         """ Delete speakername from list of shortcut names """
@@ -2506,8 +3317,11 @@ class DialogViewAV(QtWidgets.QDialog):
 
         time_msecs = self.mediaplayer.get_time()
         mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
-        mins = int(mins_secs.split(':')[0])
-        secs = mins_secs.split(':')[1]
+        delimiter = ":"
+        if "." in mins_secs:
+            delimiter = "."
+        mins = int(mins_secs.split(delimiter)[0])
+        secs = mins_secs.split(delimiter)[1]
         hours = int(mins / 60)
         remainder_mins = str(mins - hours * 60)
         if len(remainder_mins) == 1:
@@ -2672,7 +3486,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.time_positions.append([match.span()[0], match.span()[1], msecs])
             except:
                 pass
-        #print(self.time_positions)
+        # print(self.time_positions)
 
     def audio_track_changed(self):
         """ Audio track changed.
@@ -2680,20 +3494,23 @@ class DialogViewAV(QtWidgets.QDialog):
         The combobox only has positive integers."""
 
         text = self.ui.comboBox_tracks.currentText()
-        #print("text: ", text)
+        # print("text: ", text)
         if text == "":
             text = 1
         success = self.mediaplayer.audio_set_track(int(text))
-        #print("changed audio ", success)
+        # print("changed audio ", success)
 
     def play_pause(self):
         """ Toggle play or pause status. """
 
-        # check that QDialog containinv vlc is visible (i.e. has not been closed)
-
+        # user might update window positions and sizes, need to detect it
+        self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -2708,10 +3525,12 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
-
+            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            self.ui.pushButton_play.setText(_("Pause"))
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             self.timer.start()
             self.is_paused = False
 
@@ -2721,7 +3540,10 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setText(_("Play"))
+            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
             self.is_paused = True
             self.timer.stop()
 
@@ -2732,15 +3554,17 @@ class DialogViewAV(QtWidgets.QDialog):
          Programatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setText(_("Play"))
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
         self.ui.horizontalSlider.setProperty("value", 0)
-
         # set combobox display of audio track to the first one, or leave it blank if it contains no items
         if self.ui.comboBox_tracks.count() > 0:
             self.ui.comboBox_tracks.setCurrentIndex(0)
 
     def set_volume(self, volume):
-        """ Set the volume. """
+        """ Set the volume. The slider ranges from 0 to 100."""
 
         self.mediaplayer.audio_set_volume(volume)
 
@@ -2755,7 +3579,7 @@ class DialogViewAV(QtWidgets.QDialog):
             tracks = self.mediaplayer.audio_get_track_description()
             for t in tracks:
                 if t[0] > 0:
-                    #print(t[0], t[1])  # track number and track name
+                    # print(t[0], t[1])  # track number and track name
                     self.ui.comboBox_tracks.addItem(str(t[0]))
 
         # Set the slider's position to its corresponding media position
@@ -2764,11 +3588,11 @@ class DialogViewAV(QtWidgets.QDialog):
         media_pos = int(self.mediaplayer.get_position() * 1000)
         self.ui.horizontalSlider.setValue(media_pos)
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(_("Time: ") + msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
 
         """ For long transcripts, update the relevant text position in the textEdit to match the
         video's current position.
-        time_postion list itme: [text_pos0, text_pos1, milliseconds]
+        time_position list itme: [text_pos0, text_pos1, milliseconds]
         """
         if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit_transcription.toPlainText() != "":
             for i in range(1, len(self.time_positions)):
@@ -2793,9 +3617,24 @@ class DialogViewAV(QtWidgets.QDialog):
         Record the dialog and video dialog0 size and positions.
         Update the memo. """
 
-        self.app.settings['dialogviewav_w'] = self.size().width()
-        self.app.settings['dialogviewav_h'] = self.size().height()
-        if self.media_data['mediapath'][0:7] != "/audio/":
+        self.update_sizes()
+        self.ddialog.close()
+        self.stop()
+        memo = self.ui.textEdit.toPlainText()
+        cur = self.app.conn.cursor()
+        cur.execute('update source set memo=? where id=?', (memo, self.file_['id']))
+        self.app.conn.commit()
+        if self.transcription is not None:
+            text = self.ui.textEdit_transcription.toPlainText()
+            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
+            self.app.conn.commit()
+        # following will occur even if memo is not changed
+        self.app.delete_backup = False
+
+    def update_sizes(self):
+        """ Called by play/pause and close event """
+
+        if self.file_['mediapath'][0:7] != "/audio/" and self.file_['mediapath'][0:6] != "audio:":
             size = self.ddialog.size()
             if size.width() > 100:
                 self.app.settings['video_w'] = size.width()
@@ -2808,18 +3647,5 @@ class DialogViewAV(QtWidgets.QDialog):
         # Get absolute video dialog position
         self.app.settings['viewav_video_pos_x'] = self.ddialog.pos().x()
         self.app.settings['viewav_video_pos_y'] = self.ddialog.pos().y()
-        self.ddialog.close()
         self.app.settings['viewav_abs_pos_x'] = self.pos().x()
         self.app.settings['viewav_abs_pos_y'] = self.pos().y()
-        self.stop()
-        memo = self.ui.textEdit.toPlainText()
-        cur = self.app.conn.cursor()
-        cur.execute('update source set memo=? where id=?', (memo, self.media_data['id']))
-        self.app.conn.commit()
-        if self.transcription is not None:
-            text = self.ui.textEdit_transcription.toPlainText()
-            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
-            self.app.conn.commit()
-        # following will occur even if memo is not changed
-        self.app.delete_backup = False
-

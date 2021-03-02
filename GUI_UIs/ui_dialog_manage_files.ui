@@ -22,7 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>60</height>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
       </size>
      </property>
      <property name="title">
@@ -32,81 +38,160 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
-        <width>91</width>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Open</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_create">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>10</y>
-        <width>101</width>
+        <x>110</x>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Create</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>550</x>
-        <y>10</y>
-        <width>101</width>
+        <x>160</x>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make sure the file name does not contain unusual characters such as ': ; &amp;quot; ' otherwise it will raise an error when trying to save this file. Rename the file if needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export selected file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Export</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>660</x>
-        <y>10</y>
-        <width>111</width>
+        <x>540</x>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Delete</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_import">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>10</y>
-        <width>111</width>
+        <x>60</x>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Import</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_add_attribute">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>10</y>
-        <width>201</width>
+        <x>360</x>
+        <y>3</y>
+        <width>36</width>
         <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Add Attribute</string>
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_link">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>3</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_import_from_linked">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>3</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_to_linked">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>3</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file from project folder as a linked file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_attributes">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>4</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

@@ -218,9 +218,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         return True
 
     def get_data_file(self):
-        ''' Check for a .csv or .xlsx extension.
+        """ Check for a .csv or .xlsx extension.
         Determine number of fields. Load the data.
-        Also called when import options changed. '''
+        Also called when import options changed. """
 
         self.fields = []
         self.fields_type = []
@@ -307,8 +307,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         return True
 
     def accept(self):
-        ''' Check the table details are valid and import the data into a new table or
-        append to an existing table. '''
+        """ Check the table details are valid and import the data into a new table or
+        append to an existing table. """
 
         if not self.success:
             super(DialogImportSurvey, self).accept()
@@ -349,9 +349,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         super(DialogImportSurvey, self).accept()
 
     def insert_data(self):
-        ''' Insert case, attributes, attribute values and qualitative text. '''
+        """ Insert case, attributes, attribute values and qualitative text. """
 
-        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         name_and_caseids = []
         for c in self.data:
@@ -433,7 +433,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                         case_text_list.append(case_text)
                 # add the current time to the file name to ensure uniqueness and to
                 # prevent sqlite Integrity Error. Do not use now_date which contains colons
-                now = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
+                now = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H-%M-%S"))
                 cur.execute(source_sql, (self.fields[field] +"_" + now, fulltext, "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
@@ -456,9 +456,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def options_changed(self):
-        ''' When import options are changed do the import and ultimately fill the table.
+        """ When import options are changed do the import and ultimately fill the table.
          Import options are: delimiter
-         The delimiter can only be one character long '''
+         The delimiter can only be one character long """
 
         self.delimiter = str(self.ui.lineEdit_delimiter.text())
         if self.delimiter == "tb" or self.delimiter == "ta" or self.delimiter == "tab":
@@ -469,7 +469,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.read_csv_file()
 
     def fill_tableWidget(self):
-        ''' Fill table widget with data. '''
+        """ Fill table widget with data. """
 
         numRows = self.ui.tableWidget.rowCount()
         for row in range(0, numRows):
@@ -493,10 +493,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 self.ui.tableWidget.setColumnWidth(col, 200)
 
     def table_menu(self, pos):
-        ''' Header context menu to change data types and set primary key(s) and change field names.
+        """ Header context menu to change data types and set primary key(s) and change field names.
         The header index idea came from:
         http://stackoverflow.com/questions/7782071/how-can-i-get-right-click-context-menus-for-clicks-in-qtableview-header
-        '''
+        """
 
         self.headerIndex = self.ui.tableWidget.indexAt(pos)
         self.headerIndex = int(self.headerIndex.column())
@@ -516,8 +516,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
     # NOTE changes to fields types are overwritten if quote type changed
 
     def qualitative_field_type(self):
-        ''' If the current field is listed as character, redefine it as qualitative.
-        Qualitative data is stored in the source table '''
+        """ If the current field is listed as character, redefine it as qualitative.
+        Qualitative data is stored in the source table """
 
         self.fields_type[self.headerIndex] = 'qualitative'
         item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
@@ -525,8 +525,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
 
     def character_field_type(self):
-        ''' If the current field is listed as numeric or qualitative, redefine it as character.
-        '''
+        """ If the current field is listed as numeric or qualitative, redefine it as character.
+        """
 
         self.fields_type[self.headerIndex] = 'character'
         item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
@@ -534,7 +534,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
 
     def change_fieldname(self):
-        ''' change the fieldname '''
+        """ change the fieldname """
 
         fieldname, ok = QtWidgets.QInputDialog.getText(None, _("Change field name"), _("New name:"),
              QtWidgets.QLineEdit.Normal, self.fields[self.headerIndex])

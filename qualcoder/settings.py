@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 import os
@@ -67,6 +67,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
+        self.ui.lineEdit_coderName.setText(self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # get coder names from all tables
         # Note: does not appear to require a distinct clause
@@ -80,9 +81,11 @@ class DialogSettings(QtWidgets.QDialog):
             cur.execute(sql)
             results = cur.fetchall()
             for row in results:
-                coders.append(row[0])
+                if row[0] != "":
+                    coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-        languages = ["Deutsch de", "English en", "Español es", "Français fr", "日本 jp"]
+        languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
+                "Italiano it", "日本 jp"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
@@ -100,6 +103,7 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.comboBox_speaker.setCurrentIndex(index)
         self.ui.spinBox.setValue(self.settings['fontsize'])
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
+        self.ui.spinBox_docfontsize.setValue(self.settings['docfontsize'])
         self.ui.lineEdit_coderName.setText(self.settings['codername'])
         self.ui.comboBox_coders.currentIndexChanged.connect(self.comboBox_coder_changed)
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
@@ -151,6 +155,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['font'] = self.ui.fontComboBox.currentText()
         self.settings['fontsize'] = self.ui.spinBox.value()
         self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()
+        self.settings['docfontsize'] = self.ui.spinBox_docfontsize.value()
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'

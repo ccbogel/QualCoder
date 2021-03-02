@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
-    <height>515</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,23 +20,67 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_coding">
        <attribute name="title">
-        <string>Action log</string>
+        <string>Coding</string>
+       </attribute>
+       <widget class="QLabel" name="label_coding">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>9</y>
+          <width>581</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Coding menu</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_reports">
+       <attribute name="title">
+        <string>Reports</string>
+       </attribute>
+       <widget class="QLabel" name="label_reports">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>511</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Reports menu</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_manage">
+       <attribute name="title">
+        <string>Manage</string>
+       </attribute>
+       <widget class="QLabel" name="label_manage">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>511</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Files and Cases menu</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_action_log">
+       <attribute name="title">
+        <string>Action Log</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QTextEdit" name="textEdit"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Temporary notes</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="textEdit_notes"/>
         </item>
        </layout>
       </widget>
@@ -49,7 +93,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>602</width>
+     <width>1024</width>
      <height>22</height>
     </rect>
    </property>
@@ -101,6 +145,7 @@
     <addaction name="actionManage_cases"/>
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
+    <addaction name="actionManage_bad_links_to_files"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -118,8 +163,12 @@
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionView_Graph"/>
+    <addaction name="actionCode_relations"/>
+    <addaction name="actionFile_summary"/>
+    <addaction name="actionCode_summary"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -127,6 +176,7 @@
     </property>
     <addaction name="actionContents"/>
     <addaction name="actionAbout"/>
+    <addaction name="actionSpecial_functions"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuFiles_and_Cases"/>
@@ -331,6 +381,39 @@
   <action name="actionNone">
    <property name="text">
     <string>None</string>
+   </property>
+  </action>
+  <action name="actionCode_relations">
+   <property name="text">
+    <string>Code relations</string>
+   </property>
+  </action>
+  <action name="actionExport_coded_text_as_html">
+   <property name="text">
+    <string>Export coded text as html</string>
+   </property>
+  </action>
+  <action name="actionManage_bad_links_to_files">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Manage bad links to files</string>
+   </property>
+  </action>
+  <action name="actionSpecial_functions">
+   <property name="text">
+    <string>Special functions</string>
+   </property>
+  </action>
+  <action name="actionFile_summary">
+   <property name="text">
+    <string>File summary</string>
+   </property>
+  </action>
+  <action name="actionCode_summary">
+   <property name="text">
+    <string>Code summary</string>
    </property>
   </action>
  </widget>

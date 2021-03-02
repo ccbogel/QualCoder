@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_information.ui'
 #
-# Created: Fri Dec  1 09:42:41 2017
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_information(object):
     def setupUi(self, Dialog_information):
@@ -17,7 +18,7 @@ class Ui_Dialog_information(object):
         self.gridLayout.setObjectName("gridLayout")
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_information)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
         self.textEdit = QtWidgets.QTextEdit(Dialog_information)
@@ -42,4 +43,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_information)
     Dialog_information.show()
     sys.exit(app.exec_())
-

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>989</width>
-    <height>510</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,38 +40,12 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_caseselect">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>50</y>
-        <width>191</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Cases</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_fileselect">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>20</y>
-        <width>191</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Files</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>211</width>
+        <x>240</x>
+        <y>40</y>
+        <width>181</width>
         <height>30</height>
        </rect>
       </property>
@@ -79,8 +53,8 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>60</y>
+        <x>240</x>
+        <y>20</y>
         <width>211</width>
         <height>21</height>
        </rect>
@@ -95,21 +69,24 @@
      <widget class="QPushButton" name="pushButton_search">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>20</y>
-        <width>121</width>
-        <height>27</height>
+        <x>240</x>
+        <y>80</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Search</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>0</y>
+        <x>10</x>
+        <y>20</y>
         <width>61</width>
         <height>22</height>
        </rect>
@@ -122,7 +99,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>40</y>
         <width>211</width>
         <height>30</height>
        </rect>
@@ -131,10 +108,10 @@
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>80</y>
-        <width>191</width>
-        <height>27</height>
+        <x>10</x>
+        <y>88</y>
+        <width>211</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="text">
@@ -144,23 +121,26 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>60</y>
-        <width>131</width>
-        <height>16</height>
+        <x>290</x>
+        <y>80</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export:</string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>80</y>
+        <x>330</x>
+        <y>81</y>
         <width>91</width>
-        <height>25</height>
+        <height>30</height>
        </rect>
       </property>
       <item>
@@ -189,56 +169,79 @@
        </property>
       </item>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_counts">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Counts:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_selections">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777213</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Search selections:</string>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
+     <widget class="QLabel" name="label_counts">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>70</y>
+        <width>451</width>
+        <height>45</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>45</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>45</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Counts:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_title">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-2</y>
+        <width>231</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Coding report</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_matrix">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>20</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_matrix">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>20</y>
+        <width>151</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
@@ -247,17 +250,30 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QTreeWidget" name="treeWidget">
-         <column>
-          <property name="text">
-           <string notr="true">Code Tree</string>
-          </property>
-         </column>
+        <widget class="QSplitter" name="splitter_vert">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QListWidget" name="listWidget_files"/>
+         <widget class="QListWidget" name="listWidget_cases"/>
+         <widget class="QTreeWidget" name="treeWidget">
+          <column>
+           <property name="text">
+            <string notr="true">Code Tree</string>
+           </property>
+          </column>
+         </widget>
         </widget>
         <widget class="QTextEdit" name="textEdit"/>
         <widget class="QTableWidget" name="tableWidget"/>
@@ -271,8 +287,6 @@
  <tabstops>
   <tabstop>comboBox_coders</tabstop>
   <tabstop>lineEdit</tabstop>
-  <tabstop>pushButton_fileselect</tabstop>
-  <tabstop>pushButton_caseselect</tabstop>
   <tabstop>pushButton_search</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>textEdit</tabstop>

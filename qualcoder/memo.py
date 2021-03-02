@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2020 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtWidgets, QtCore
 import os
@@ -49,15 +49,14 @@ def exception_handler(exception_type, value, tb_obj):
 
 class DialogMemo(QtWidgets.QDialog):
 
-    """
-    Dialog to view and edit memo text.
+    """ Dialog to view and edit memo text.
     """
 
     app = None
     title = ""
     memo = ""
 
-    def __init__(self, app, title="", memo=""):
+    def __init__(self, app, title="", memo="", clear_button="show", tooltip=""):
         """  """
 
         super(DialogMemo, self).__init__(parent=None)  # overrride accept method
@@ -74,6 +73,15 @@ class DialogMemo(QtWidgets.QDialog):
         self.setWindowTitle(title)
         self.ui.textEdit.setPlainText(self.memo)
         self.ui.textEdit.setFocus()
+        if tooltip != "":
+            self.ui.textEdit.setToolTip(tooltip)
+        if clear_button == "hide":
+            self.ui.pushButton_clear.hide()
+        self.ui.pushButton_clear.pressed.connect(self.clear_contents)
+
+    def clear_contents(self):
+        """ Clear all text """
+        self.ui.textEdit.setPlainText("")
 
     def accept(self):
         """ Accepted button overridden method. """

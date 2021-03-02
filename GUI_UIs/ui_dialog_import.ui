@@ -156,13 +156,13 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>70</y>
         <width>901</width>
-        <height>51</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="text">
-       <string>Changes made on the top row will override any user changes to field names and field types below.</string>
+       <string>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text).</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>

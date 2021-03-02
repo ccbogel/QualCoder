@@ -2,17 +2,18 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_SQL.ui'
 #
-# Created: Sun Feb 11 09:50:03 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_sql(object):
     def setupUi(self, Dialog_sql):
         Dialog_sql.setObjectName("Dialog_sql")
-        Dialog_sql.resize(947, 606)
+        Dialog_sql.resize(900, 590)
         self.gridLayout = QtWidgets.QGridLayout(Dialog_sql)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -39,15 +40,20 @@ class Ui_Dialog_sql(object):
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
         self.pushButton_runSQL = QtWidgets.QPushButton(Dialog_sql)
-        self.pushButton_runSQL.setMaximumSize(QtCore.QSize(100, 16777215))
+        self.pushButton_runSQL.setMinimumSize(QtCore.QSize(36, 36))
+        self.pushButton_runSQL.setMaximumSize(QtCore.QSize(36, 36))
+        self.pushButton_runSQL.setText("")
         self.pushButton_runSQL.setObjectName("pushButton_runSQL")
         self.horizontalLayout.addWidget(self.pushButton_runSQL)
         self.pushButton_export = QtWidgets.QPushButton(Dialog_sql)
-        self.pushButton_export.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.pushButton_export.setMinimumSize(QtCore.QSize(36, 36))
+        self.pushButton_export.setMaximumSize(QtCore.QSize(36, 36))
+        self.pushButton_export.setText("")
         self.pushButton_export.setObjectName("pushButton_export")
         self.horizontalLayout.addWidget(self.pushButton_export)
         self.comboBox_delimiter = QtWidgets.QComboBox(Dialog_sql)
-        self.comboBox_delimiter.setMaximumSize(QtCore.QSize(80, 16777215))
+        self.comboBox_delimiter.setMinimumSize(QtCore.QSize(0, 36))
+        self.comboBox_delimiter.setMaximumSize(QtCore.QSize(80, 36))
         self.comboBox_delimiter.setObjectName("comboBox_delimiter")
         self.comboBox_delimiter.addItem("")
         self.comboBox_delimiter.addItem("")
@@ -63,9 +69,10 @@ class Ui_Dialog_sql(object):
     def retranslateUi(self, Dialog_sql):
         _translate = QtCore.QCoreApplication.translate
         Dialog_sql.setWindowTitle(_translate("Dialog_sql", "SQL_statements"))
-        self.label.setText(_translate("Dialog_sql", "."))
-        self.pushButton_runSQL.setText(_translate("Dialog_sql", "Run"))
-        self.pushButton_export.setText(_translate("Dialog_sql", "Export to file"))
+        self.label.setText(_translate("Dialog_sql", "SQL reports"))
+        self.pushButton_runSQL.setToolTip(_translate("Dialog_sql", "<html><head/><body><p>Run</p></body></html>"))
+        self.pushButton_export.setToolTip(_translate("Dialog_sql", "<html><head/><body><p>Export to file</p></body></html>"))
+        self.comboBox_delimiter.setToolTip(_translate("Dialog_sql", "<html><head/><body><p>Delimiter for export</p></body></html>"))
         self.comboBox_delimiter.setItemText(0, _translate("Dialog_sql", "tab"))
         self.comboBox_delimiter.setItemText(1, _translate("Dialog_sql", ","))
         self.comboBox_delimiter.setItemText(2, _translate("Dialog_sql", ";"))
@@ -80,4 +87,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_sql)
     Dialog_sql.show()
     sys.exit(app.exec_())
-

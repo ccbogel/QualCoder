@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from collections import Counter
 from copy import deepcopy
@@ -38,6 +38,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 
 from GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
+from helpers import msecs_to_mins_and_secs, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
 
@@ -58,18 +59,6 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
-
-
-def msecs_to_mins_and_secs(msecs):
-    """ Convert milliseconds to minutes and seconds.
-    msecs is an integer. Minutes and seconds output is a string."""
-
-    secs = int(msecs / 1000)
-    mins = int(secs / 60)
-    remainder_secs = str(secs - mins * 60)
-    if len(remainder_secs) == 1:
-        remainder_secs = "0" + remainder_secs
-    return str(mins) + "." + remainder_secs
 
 
 class ViewGraphOriginal(QDialog):
@@ -527,184 +516,19 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             cur.execute("update code_cat set memo=? where catid=?", (self.data['memo'], self.data['catid']))
             self.conn.commit()
 
-    def case_media(self, data):
+    def case_media(self, code_dict):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
-        ui = DialogInformation(self.app, "Coded media for cases: " + self.data['name'], " ")
-        cur = self.conn.cursor()
-        CODENAME = 0
-        COLOR = 1
-        CASE_NAME = 2
-        POS0 = 3
-        POS1 = 4
-        SELTEXT = 5
-        OWNER = 6
-        # Text
-        sql = "select code_name.name, color, cases.name, "
-        sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner from code_text "
-        sql += " join code_name on code_name.cid = code_text.cid "
-        sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
-        sql += " code_text.fid = case_text.fid "
-        sql += "and (code_text.pos0 between case_text.pos0 and case_text.pos1) "
-        sql += "and (code_text.pos1 between case_text.pos0 and case_text.pos1) "
-        sql += " where code_name.cid=" + str(self.data['cid'])
-        sql += " order by cases.name, code_text.pos0, code_text.owner "
+        DialogCodeInAllFiles(self.app, code_dict, "Case")
 
-        cur.execute(sql)
-        results = cur.fetchall()
-        for row in results:
-            color = row[COLOR]
-            title = '<br /><span style=\"background-color:' + color + '\">'
-            title += " Case: <em>" + row[CASE_NAME] + "</em></span>"
-            title += ", Coder: <em>" + row[OWNER] + "</em> "
-            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
-            title += "<br />"
-            tmp_html = row[SELTEXT].replace("&", "&amp;")
-            tmp_html = tmp_html.replace("<", "&lt;")
-            tmp_html = tmp_html.replace(">", "&gt;")
-            html = title + tmp_html + "</p><br />"
-            ui.ui.textEdit.insertHtml(html)
-
-        # Images
-        sql = "select code_name.name, color, cases.name, "
-        sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-        sql += "code_image.memo from "
-        sql += "code_image join code_name on code_name.cid = code_image.cid "
-        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-        sql += "code_image.id = case_text.fid "
-        sql += " join source on case_text.fid = source.id "
-        sql += "where code_name.cid = " + str(self.data['cid']) + " "
-        sql += " order by cases.name, code_image.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for counter, row in enumerate(results):
-            color = row[COLOR]
-            title = '<br /><span style=\"background-color:' + color + '\">'
-            title += " Case: <em>" + row[CASE_NAME] + "</em></span>, File:" + row[8] + ", "
-            title += "Coder: " + row[7]
-            ui.ui.textEdit.insertHtml(title)
-            img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
-            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
-            ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")
-
-        # A/V Media
-        sql = "select code_name.name, color, cases.name, "
-        sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,source.mediapath, "
-        sql += "source.id from "
-        sql += "code_av join code_name on code_name.cid = code_av.cid "
-        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-        sql += "code_av.id = case_text.fid "
-        sql += " join source on case_text.fid = source.id "
-        sql += "where code_name.cid = " + str(self.data['cid'])
-        sql += " order by source.name, code_av.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for row in results:
-            html = '<span style=\"background-color:' + row[COLOR] + '\">Case: ' + row[CASE_NAME]
-            html += ', File: ' + row[7] + '</span>'
-            ui.ui.textEdit.insertHtml(html)
-            start = msecs_to_mins_and_secs(row[3])
-            end = msecs_to_mins_and_secs(row[4])
-            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] Coder: ' + row[6])
-            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
-
-        ui.exec_()
-
-    def put_image_into_textedit(self, img, counter, text_edit):
-        """ Scale image, add resource to document, insert image.
-        A counter is important as each image slice needs a unique name, counter adds
-        the uniqueness to the name.
-        """
-
-        path = self.project_path + img['mediapath']
-        document = text_edit.document()
-        image = QtGui.QImageReader(path).read()
-        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
-        # scale to max 300 wide or high. perhaps add option to change maximum limit?
-        scaler = 1.0
-        scaler_w = 1.0
-        scaler_h = 1.0
-        if image.width() > 300:
-            scaler_w = 300 / image.width()
-        if image.height() > 300:
-            scaler_h = 300 / image.height()
-        if scaler_w < scaler_h:
-            scaler = scaler_w
-        else:
-            scaler = scaler_h
-        # need unique image names or the same image from the same path is reproduced
-        imagename = self.project_path + '/images/' + str(counter) + '-' + img['mediapath']
-        url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
-        cursor = text_edit.textCursor()
-        image_format = QtGui.QTextImageFormat()
-        image_format.setWidth(image.width() * scaler)
-        image_format.setHeight(image.height() * scaler)
-        image_format.setName(url.toString())
-        cursor.insertImage(image_format)
-        text_edit.insertHtml("<br />")
-
-    def coded_media(self, data):
+    def coded_media(self, code_dict):
         """ Display all coded media for this code.
-        Coded media comes from ALL files and ALL coders. """
+        Coded media comes from ALL files and current coder.
+        param:
+            code_dict : dictionary of code {name, memo, owner, date, cid, catid, color, depth, x, y, supercatid, angle, fontsize} """
 
-        ui = DialogInformation(self.app, "Coded text : " + self.data['name'], " ")
-        cur = self.conn.cursor()
-        CODENAME = 0
-        COLOR = 1
-        SOURCE_NAME = 2
-        POS0 = 3
-        POS1 = 4
-        SELTEXT = 5
-        OWNER = 6
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, code_text.owner from "
-        sql += "code_text "
-        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
-        sql += " where code_name.cid =" + str(self.data['cid']) + " "
-        sql += " order by source.name, pos0, code_text.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        # Text
-        for row in results:
-            title = '<span style=\"background-color:' + row[COLOR] + '\">'
-            title += " File: <em>" + row[SOURCE_NAME] + "</em></span>"
-            title += ", Coder: <em>" + row[OWNER] + "</em> "
-            title += ", " + str(row[POS0]) + " - " + str(row[POS1])
-            ui.ui.textEdit.insertHtml(title)
-            ui.ui.textEdit.append(row[SELTEXT] + "\n\n")
-
-        # Images
-        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
-        sql += " from code_image join code_name "
-        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-        sql += "where code_name.cid =" + str(self.data['cid']) + " "
-        sql += " order by source.name, code_image.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for counter, row in enumerate(results):
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[8] + '</span>')
-            ui.ui.textEdit.insertHtml('<br />Coder: ' + row[7]  + '<br />')
-            img = {'mediapath': row[8], 'x1': row[3], 'y1': row[4], 'width': row[5], 'height': row[6]}
-            self.put_image_into_textedit(img, counter, ui.ui.textEdit)
-            ui.ui.textEdit.append("Memo: " + row[10] + "\n\n")
-
-        # Media
-        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
-        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-        sql += "where code_name.cid = " + str(self.data['cid']) + " "
-        sql += " order by source.name, code_av.owner "
-        cur.execute(sql)
-        results = cur.fetchall()
-        for row in results:
-            ui.ui.textEdit.insertHtml('<span style=\"background-color:' + row[COLOR] + '\">File: ' + row[7] + '</span>')
-            start = msecs_to_mins_and_secs(row[3])
-            end = msecs_to_mins_and_secs(row[4])
-            ui.ui.textEdit.insertHtml('<br />[' + start + ' - ' + end + '] Coder: ' + row[6])
-            ui.ui.textEdit.append("Memo: " + row[5] + "\n\n")
-        ui.exec_()
+        DialogCodeInAllFiles(self.app, code_dict)
 
 
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):

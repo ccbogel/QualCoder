@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1021</width>
-    <height>413</height>
+    <height>450</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="label_transcription">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To rewind 3 seconds. In the text entry box, press ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Transcription:</string>
@@ -115,22 +115,22 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
-        <width>85</width>
-        <height>27</height>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + R rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F forward 30 seconds&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Play</string>
+       <string/>
       </property>
      </widget>
      <widget class="QSlider" name="horizontalSlider_vol">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>680</x>
         <y>40</y>
         <width>160</width>
         <height>18</height>
@@ -149,14 +149,17 @@
      <widget class="QLabel" name="label_volume">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>36</y>
-        <width>61</width>
-        <height>20</height>
+        <x>630</x>
+        <y>29</y>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Volume</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -165,45 +168,32 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>230</x>
         <y>35</y>
-        <width>161</width>
+        <width>131</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Time:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_time_2">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>35</y>
-        <width>161</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Duration: </string>
+       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox_tracks">
       <property name="geometry">
        <rect>
-        <x>820</x>
+        <x>920</x>
         <y>33</y>
         <width>61</width>
         <height>28</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="label_audio">
       <property name="geometry">
        <rect>
-        <x>720</x>
+        <x>850</x>
         <y>36</y>
-        <width>91</width>
+        <width>61</width>
         <height>20</height>
        </rect>
       </property>
@@ -217,14 +207,126 @@
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>61</y>
+        <x>470</x>
+        <y>64</y>
         <width>511</width>
         <height>22</height>
        </rect>
       </property>
       <property name="text">
        <string>Scroll transcript while playing. (Transcript is read only)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_rate">
+      <property name="geometry">
+       <rect>
+        <x>448</x>
+        <y>36</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>1.0x</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_time_3">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>30</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_rate_down">
+      <property name="geometry">
+       <rect>
+        <x>408</x>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_rate_up">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_rewind_5">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_rewind_30">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_forward_30">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>25</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Shift + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

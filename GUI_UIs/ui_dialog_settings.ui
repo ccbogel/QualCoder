@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>542</height>
+    <width>627</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>500</y>
+     <x>270</x>
+     <y>537</y>
      <width>261</width>
      <height>32</height>
     </rect>
@@ -106,6 +106,9 @@
      <height>22</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
    <property name="text">
     <string>Show IDs</string>
    </property>
@@ -114,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>470</y>
+     <y>507</y>
      <width>671</width>
      <height>21</height>
     </rect>
@@ -127,7 +130,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>430</y>
+     <y>467</y>
      <width>391</width>
      <height>31</height>
     </rect>
@@ -230,8 +233,8 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>307</y>
-     <width>721</width>
+     <y>344</y>
+     <width>900</width>
      <height>23</height>
     </rect>
    </property>
@@ -246,8 +249,8 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>340</y>
-     <width>721</width>
+     <y>377</y>
+     <width>601</width>
      <height>81</height>
     </rect>
    </property>
@@ -264,10 +267,13 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>270</y>
+     <y>307</y>
      <width>141</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="text">
     <string>Time format</string>
@@ -280,7 +286,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>263</y>
+     <y>300</y>
      <width>151</width>
      <height>32</height>
     </rect>
@@ -290,10 +296,13 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>270</y>
+     <y>307</y>
      <width>151</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="text">
     <string>Speaker format</string>
@@ -306,10 +315,45 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>520</x>
-     <y>263</y>
+     <y>300</y>
      <width>71</width>
      <height>32</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>260</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Font size for documents</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_docfontsize">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>260</y>
+     <width>71</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>8</number>
+   </property>
+   <property name="maximum">
+    <number>32</number>
+   </property>
+   <property name="singleStep">
+    <number>2</number>
    </property>
   </widget>
  </widget>

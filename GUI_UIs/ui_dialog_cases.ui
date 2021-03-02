@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>677</height>
+    <width>880</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,54 +98,63 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>231</width>
-           <height>28</height>
+           <width>36</width>
+           <height>36</height>
           </rect>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
-          <string>Add case</string>
+          <string/>
          </property>
         </widget>
         <widget class="QPushButton" name="pushButton_delete">
          <property name="geometry">
           <rect>
-           <x>240</x>
-           <y>30</y>
-           <width>231</width>
-           <height>28</height>
+           <x>310</x>
+           <y>0</y>
+           <width>36</width>
+           <height>36</height>
           </rect>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
-          <string>Delete case</string>
+          <string/>
          </property>
         </widget>
         <widget class="QPushButton" name="pushButton_import_cases">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>30</y>
-           <width>231</width>
-           <height>28</height>
+           <x>120</x>
+           <y>0</y>
+           <width>36</width>
+           <height>36</height>
           </rect>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import from a &lt;span style=&quot; font-weight:600;&quot;&gt;comma delimited&lt;/span&gt; csv file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Import cases</string>
+          <string/>
          </property>
         </widget>
         <widget class="QPushButton" name="pushButton_add_attribute">
          <property name="geometry">
           <rect>
-           <x>240</x>
+           <x>60</x>
            <y>0</y>
-           <width>231</width>
-           <height>28</height>
+           <width>36</width>
+           <height>36</height>
           </rect>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
-          <string>Add attribute</string>
+          <string/>
          </property>
         </widget>
         <widget class="QLabel" name="label_filename">
@@ -174,6 +183,38 @@
          </property>
          <property name="wordWrap">
           <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_file_manager">
+         <property name="geometry">
+          <rect>
+           <x>180</x>
+           <y>0</y>
+           <width>36</width>
+           <height>36</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_export_attributes">
+         <property name="geometry">
+          <rect>
+           <x>230</x>
+           <y>0</y>
+           <width>36</width>
+           <height>36</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </widget>

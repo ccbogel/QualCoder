@@ -54,7 +54,7 @@ class Ui_Dialog_case_file_manager(object):
         self.label_case.setMaximumSize(QtCore.QSize(16777215, 24))
         self.label_case.setObjectName("label_case")
         self.label_file = QtWidgets.QLabel(self.groupBox_2)
-        self.label_file.setGeometry(QtCore.QRect(0, 30, 331, 24))
+        self.label_file.setGeometry(QtCore.QRect(0, 30, 841, 24))
         self.label_file.setMinimumSize(QtCore.QSize(0, 24))
         self.label_file.setMaximumSize(QtCore.QSize(16777215, 24))
         self.label_file.setObjectName("label_file")

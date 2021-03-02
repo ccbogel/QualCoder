@@ -1,3 +1,9 @@
+Notes for creating language files
+=================================
+List_of_ISO_639-1_codes
+2 letter codes for differnt languages
+jp should be ja but already in place now.
+
 Installs:
 sudo apt install python-setuptools
 sudo apt install qttools5-dev-tools
@@ -10,21 +16,23 @@ libqt4-devel
 sudo apt install qt5-doc
 
 
-For python run pylupdate5:
-
-pylupdate5 project.pro 
+In directory qualcoder/GUI 
 Need a .pro file  in the qualcoder/GUI directory
+run:
+pylupdate5 project.pro
 
 
 project.pro 
 ===========
-SOURCES         = ui_dialog_add_item.py \
+SOURCES         = ui_attribute.py \
+ui_case_file_manager.py \
+ui_dialog_add_item.py \
 ui_dialog_assign_attribute.py \
-ui_dialog_attribute_type.py \
 ui_dialog_cases.py \
 ui_case_file_manager.py \
 ui_dialog_code_av.py \
 ui_dialog_code_image.py \
+ui_dialog_code_relations.py \
 ui_dialog_codes.py \
 ui_dialog_colour_selector.py \
 ui_dialog_confirm_delete.py \
@@ -37,6 +45,7 @@ ui_dialog_memo.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_comparisons.py \
+ui_dialog_report_file_summary.py \
 ui_dialog_select_items.py \
 ui_dialog_settings.py \
 ui_dialog_SQL.py \
@@ -50,17 +59,24 @@ ui_dialog_attribute_parameters.py \
 ui_dialog_visualise_graph_original.py
 TRANSLATIONS    = app_de.ts \
                   app_fr.ts \
-                  app_es.ts
+                  app_el.ts \
+                  app_it.ts \
+                  app_es.ts \
+                  app_jp.ts \
+                  app_pt.ts
 CODECFORTR      = ISO-8859-5
 
 
 Double-click to open the .pro file in Qt Creator
 Go to Tools > External > Linguist > update Translations
 
+Release as app_name.qm 
+Release is placed in qualcoder/locale/name/name.qm
+
 
 #####################################
 
-Strings in python code need to be translated too
+Strings in python code need to be translated.
 https://docs.python.org/3/library/gettext.html#internationalizing-your-programs-and-modules
 
 
@@ -74,27 +90,34 @@ lang.install()
 # Install poedit
 sudo apt install poedit
 
-Example: xgettext -d es qualcoder.py
+
+In terminal, run these scripts from the qualcoder folder:
 
 -d is default output name    e.g. fr
 -j option to join existing file
+# note dont use -j lang.po on first creating a po file
 
-xgettext -d fr -j fr.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py
+outputs of below scripts are de.po, es.po, fr.po, gr.po, jp.po
 
-output is fr.po
+xgettext -d de -j de.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
-xgettext -d de -j de.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py
+xgettext -d el -j el.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
-output is de.po
+xgettext -d es -j es.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
-xgettext -d es -j es.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py report_attributes.py reports.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py
+xgettext -d fr -j fr.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
-output is es.po
+xgettext -d it -j it.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
-Use Poedit to fill in translations. Download it from http://poedit.net. Select File > New from POT/PO file... and select your language.po file.
+xgettext -d jp -j jp.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
+
+xgettext -d pt -j pt.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
 
-save will produce a .po amd a .mo file
+
+After translating, save will produce a name.po amd a name.mo file
+
+The .mo file is placed in qualcoder/locale/name/LC_MESSAGES/name.mo
 
 
 

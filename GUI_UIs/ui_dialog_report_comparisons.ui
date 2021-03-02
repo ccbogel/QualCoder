@@ -22,13 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>80</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>80</height>
       </size>
      </property>
      <property name="title">
@@ -37,27 +37,33 @@
      <widget class="QPushButton" name="pushButton_exporttext">
       <property name="geometry">
        <rect>
-        <x>370</x>
-        <y>70</y>
-        <width>231</width>
-        <height>41</height>
+        <x>420</x>
+        <y>27</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Export text file</string>
+       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_run">
       <property name="geometry">
        <rect>
-        <x>370</x>
-        <y>20</y>
-        <width>231</width>
-        <height>41</height>
+        <x>320</x>
+        <y>27</y>
+        <width>36</width>
+        <height>36</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Run Comparisons</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
@@ -77,23 +83,39 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>20</y>
+        <y>27</y>
         <width>221</width>
-        <height>41</height>
+        <height>36</height>
        </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>70</y>
-        <width>221</width>
-        <height>41</height>
+        <x>370</x>
+        <y>27</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_title">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>301</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Clear selection</string>
+       <string>Coder comparisons</string>
       </property>
      </widget>
     </widget>
@@ -103,13 +125,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>50</height>
+       <height>36</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777213</width>
-       <height>50</height>
+       <height>36</height>
       </size>
      </property>
      <property name="text">
