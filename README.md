@@ -151,8 +151,8 @@ See [https://github.com/ccbogel/QualCoder-Debians](https://github.com/ccbogel/Qu
 
 ##  Citation APA style
 
-Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/1.9
+Curtain, C. (2021) QualCoder 2.4 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/2.4
 
 ## Publications using QualCoder
 Local–global linkages: Challenges in organizing functional communities for ecosocial justice. Joel Izlar, Journal of Community Practice 27(3-4) 2019
