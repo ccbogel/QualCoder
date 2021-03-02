@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
@@ -137,7 +137,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.fill_tableWidget()
 
     def read_xlsx_file(self):
-        """ Read the data from the xlsx file. """
+        """ Read the data from the xlsx file.
+        Fill Class variables self.fields, self.data """
 
         if openpyxl_module is False:
             self.fail_msg = _("Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
@@ -160,7 +161,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fields = []
         for i, f in enumerate(self.data[0]):
             if f != '':
-                self.fields.append(f)
+                # Using str() method as f may be an Integer or Float
+                self.fields.append(str(f))
             else:
                 self.fields.append("Field_" + str(i))
         self.data = self.data[1:]
@@ -175,7 +177,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         return True
 
     def read_csv_file(self):
-        """ Read the data from the csv file """
+        """ Read the data from the csv file.
+         Fill Class variables self.fields, self.data """
 
         self.data = []
         with open(self.filepath, 'r', newline='') as f:
@@ -211,7 +214,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fields = []
         for i, f in enumerate(self.data[0]):
             if f != '':
-                self.fields.append(f)
+                self.fields.append(str(f))
             else:
                 self.fields.append("Field_" + str(i))
         self.data = self.data[1:]
