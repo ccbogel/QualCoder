@@ -93,14 +93,13 @@ The log file on Windows does not make use of the rotating file handler, so the l
 
 ### MacOS
 
-Install python3 and VLC:
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
+1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-Download Qualcoder-master Zip file and copy it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releasesDownload and extract it into /Applications
 
-1) Open the Terminal app (or any other command shell)
+3) Open the Terminal app (or any other command shell)
 
-2) Install PIP (if not yet installed, try typing `pip3 --version` and hit ENTER) 
+4) Install PIP (if not yet installed, try typing `pip3 --version` and hit ENTER) 
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -109,7 +108,7 @@ python3 get-pip.py
 
 -> You should now be able to run `pip3` as above.
 
-3) Install Python dependency modules using `pip`:
+5) Install Python dependency modules using `pip`:
 
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
@@ -117,40 +116,26 @@ python3 get-pip.py
 pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
 ```
 
-4) Install system dependencies using Homebrew (aka `brew`) 
+6) Install system dependencies using Homebrew (aka `brew`) 
 
-4.1) Install `brew` if do not already have it (try typing `brew` and hit ENTER):
+6.1) Install `brew` if do not already have it (try typing `brew` and hit ENTER):
 
 * Follow instructions here about installing Homebrew on your macOS: https://brew.sh/
 
-4.2) Install QPDF package (needed to deal with PDF files) using Homebrew package manager:
+6.2) Install QPDF package (needed to deal with PDF files) using Homebrew package manager:
 
 ```sh
 brew install qpdf
 ```
 
-5) Finally, install QualCoder, anywhere you want on your system, most likely somewhere in your user home directory.
 
-5.1) Download the latest "Source code" version in TAR/GZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases
-
-Assuming here after, you saved the archive of version 2.2 in your "Downloads" folder, and we would install directly in your "home" (`/Users/YourName/` or `~` for shortcut).
-
-For example:
-
-```sh
-cd ~
-tar -xzvf ~/Downloads/QualCoder-2.2.tar.gz
-```
-
-The last should have extracted all the archive into `~/QualCoder-2.2`. 
-
-You can now run with:
+Assuming you downloaded the2.4 version. You can now run with:
 
 ```
-python3 ~/QualCoder-2.2/qualcoder/qualcoder.py
+python3 /applications/QualCoder-2.4/qualcoder/qualcoder.py
 ```
 
-Remember: You can install it anywhere you want, so the path above depends on where you extracted the archive before ;)
+You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
