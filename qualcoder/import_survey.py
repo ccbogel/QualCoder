@@ -120,7 +120,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.preexisting_fields = []
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
-        self.success = self.get_data_file()
+        self.success = self.prepare_fields()
         if not self.success:
             self.ui.groupBox.setTitle("")
             self.ui.tableWidget.hide()
@@ -220,7 +220,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.data = self.data[1:]
         return True
 
-    def get_data_file(self):
+    def prepare_fields(self):
         """ Check for a .csv or .xlsx extension.
         Determine number of fields. Load the data.
         Also called when import options changed. """
@@ -357,14 +357,16 @@ class DialogImportSurvey(QtWidgets.QDialog):
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         name_and_caseids = []
-        for c in self.data:
+        for i, c in enumerate(self.data):
             try:
+                self.ui.label_msg.setText(_("Inserting cases: " + str(i)))
                 cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)",
                 (c[0], "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 caseid = cur.fetchone()[0]
                 name_and_caseids.append([c[0], caseid])
+                QtWidgets.QApplication.processEvents()
             except sqlite3.IntegrityError as e:
                 self.fail_msg = str(e) + _(" - Duplicate case names, either in the file, or duplicates with existing cases in the project")
                 logger.error(_("Survey not loaded: ") + self.fail_msg)
@@ -407,16 +409,19 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         # insert non-qualitative values to each case using caseids
         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-        for name_id in name_and_caseids:
+        for i, name_id in enumerate(name_and_caseids):
+            self.ui.label_msg.setText(_("Inserting attributes to cases: ") + str(i))
             for val in self.data:
                 if name_id[0] == val[0]:
                     for col in range(1, len(val)):
                         if self.fields_type[col] != "qualitative":
                             cur.execute(sql, (self.fields[col], val[col], name_id[1], 'case',
                             now_date, self.app.settings['codername']))
+            QtWidgets.QApplication.processEvents()
         self.app.conn.commit()
 
         # insert qualitative data into source table
+        self.ui.label_msg.setText(_("Creating qualitative text file"))
         source_sql = "insert into source(name,fulltext,memo,owner,date, mediapath) values(?,?,?,?,?, Null)"
         for field in range(1, len(self.fields)):  # column 0 is for identifiers
             case_text_list = []
@@ -447,6 +452,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     cur.execute(case_text_sql, case_text)
                     self.app.conn.commit()
                     #logger.debug("Case_text: " + str(case_text))
+        #pb.hide()
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
