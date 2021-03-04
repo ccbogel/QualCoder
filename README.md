@@ -176,12 +176,6 @@ Required:
 
 ## Future plans
 
-* ERROR TO FIX: Automatic numeric attribute type for case, files. Does not create a character attribute.
-To fix: 
-Open the sql Statements window in the menu and update the variable, replace the wording variable name with the actual name:
-
-update attribute_type set valuetype='character' where name='variable name'
-
 * Improve packaging for easier installation: currently investigating use of pyinstaller - without success so far.
 * Change from pdfminer.six to pdfminer3
 * Possibly look at use with R.
