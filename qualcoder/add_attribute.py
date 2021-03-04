@@ -82,6 +82,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         """ On pressing accept button, check there is no duplicate name.
         If no duplicate then accept and return True. """
 
+        self.value_type = "character"
         new_name = str(self.ui.lineEdit_name.text())
         duplicate = False
         if new_name in self.existing_names:
@@ -91,10 +92,8 @@ class DialogAddAttribute(QtWidgets.QDialog):
             self.done(0)
         if duplicate is False:
             self.new_name = new_name
-        if self.ui.radioButton_numeric.isChecked:
+        if self.ui.radioButton_numeric.isChecked():
             self.value_type = "numeric"
-        else:
-            self.value_type = "character"
         self.done(1)
 
 
