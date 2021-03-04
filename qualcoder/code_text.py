@@ -294,6 +294,9 @@ class DialogCodeText(QtWidgets.QWidget):
             if res is None:  # safety catch
                 res = [0]
             tt = "Characters: " + str(res[0])
+            f['characters'] = res[0]
+            f['start'] = 0
+            f['end'] = res[0]
             cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
             res = cur.fetchone()
             tt += "\nCodings: " + str(res[0])
@@ -870,7 +873,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cb.setText(selected_text, mode=cb.Clipboard)
 
     def tree_menu(self, position):
-        """ Context menu for treewidget items.
+        """ Context menu for treewidget code/category items.
         Add, rename, memo, move or delete code or category. Change code color.
         Assign selected text to current hovered code. """
 
@@ -1690,24 +1693,54 @@ class DialogCodeText(QtWidgets.QWidget):
     def viewfile_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder.
+        Each file dictionary item in self.filenames contains:
+        {'id', 'name', 'memo', 'characters'= number of characters in the file,
+        'start' = showing characters from this position, 'end' = showing characters to this position}
+
         param:
             position : """
 
-        if len(self.filenames) < 2:
-            return
+        selected = self.ui.listWidget.currentItem()
+        file_ = None
+        for f in self.filenames:
+            if selected.text() == f['name']:
+                file_ = f
+        #print(file_)
+
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_next = menu.addAction(_("Next file"))
-        action_latest = menu.addAction(_("File with latest coding"))
+        action_next = None
+        action_latest = None
+        action_next_chars = None
+        if len(self.filenames) > 1:
+            action_next = menu.addAction(_("Next file"))
+            action_latest = menu.addAction(_("File with latest coding"))
+        '''if f['characters'] > 60000:
+            action_next_chars = menu.addAction(_("Show 60 thousand characters"))'''
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
-
         action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
+        if action is None:
+            return
         if action == action_next:
             self.go_to_next_file()
         if action == action_latest:
             self.go_to_latest_coded_file()
         if action == action_go_to_bookmark:
             self.go_to_bookmark()
+        '''if action == action_next_chars:
+            # First time
+            if file_['start'] == 0 and file_['end'] == file_['characters']:
+                file_['end'] = 60000
+            else:
+                file_['start'] = file_['start'] + 60000
+                file_['end'] = file_['end'] + 60000
+                # shorten displayed text of going over end of characters
+                if file_['end'] > file_['characters']:
+                    file_['end'] = file_['characters']
+                # go to beginning of file if start is going over end of characters
+                if file_['start'] >= file_['characters']:
+                    file_['start'] = 0
+                    file_['end'] = 60000'''
 
     def go_to_next_file(self):
         """ Go to next file in list. """
