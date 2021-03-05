@@ -358,8 +358,11 @@ class DialogCodeText(QtWidgets.QWidget):
     def underline_text_of_this_code(self, code_for_underlining):
         """ User interface, highlight coded text selections for the currently selected code.
         Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
+        Adjust for when portion of entire text file is loaded.
         param:
             code_for_underlining: dictionary of the code to be underlined """
+
+        #TODO test further - did not appear to work on Ubuntu 20.04
 
         # Remove all underlining
         selstart = 0
@@ -375,11 +378,10 @@ class DialogCodeText(QtWidgets.QWidget):
         format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
         format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
         cursor = self.ui.textEdit.textCursor()
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for coded_text in self.code_text:
             if coded_text['cid'] == code_for_underlining['cid']:
-                cursor.setPosition(int(coded_text['pos0']), QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(coded_text['pos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(int(coded_text['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(coded_text['pos1']) - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(format)
 
     def fill_tree(self):
@@ -771,9 +773,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         coded_text_list = []
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for item in self.code_text:
-            if position >= item['pos0'] and position <= item['pos1'] and item['owner'] == self.app.settings[
+            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings[
                 'codername']:
                 coded_text_list.append(item)
         if coded_text_list == []:
@@ -1040,7 +1041,9 @@ class DialogCodeText(QtWidgets.QWidget):
             selected_text = self.ui.textEdit.textCursor().selectedText()
             codes_here = []
             for item in self.code_text:
-                if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+                if cursor_pos + self.file_['start'] >= item['pos0'] and \
+                        cursor_pos + self.file_['start'] <= item['pos1'] and \
+                        item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
@@ -1931,7 +1934,11 @@ class DialogCodeText(QtWidgets.QWidget):
             # Add annotation marks - these are in bold
             for note in self.annotations:
                 if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
-                    if note['fid'] == self.file_['id']:
+                    # Cursor pos could be negative if annotation was for an earlier text portion
+                    if note['fid'] == self.file_['id'] and \
+                            int(note['pos0']) - self.file_['start'] >= 0 and \
+                            int(note['pos1']) - self.file_['start'] > 0 and \
+                            int(note['pos1']) - self.file_['start']< len(self.ui.textEdit.toPlainText()):
                         cursor.setPosition(int(note['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
                         cursor.setPosition(int(note['pos1']) - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
                         formatB = QtGui.QTextCharFormat()
@@ -2012,6 +2019,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ When coded text is clicked on, the code names at this location are
         displayed in the combobox above the text edit widget.
         Only enabled if two or more codes are here.
+        Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
 
         self.ui.comboBox_codes_in_text.setEnabled(False)
@@ -2021,7 +2029,7 @@ class DialogCodeText(QtWidgets.QWidget):
         codes_here = []
         # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for item in self.code_text:
-            if item['pos0'] <= pos and item['pos1'] >= pos:
+            if item['pos0'] <= pos + self.file_['start'] and item['pos1'] >= pos + self.file_['start']:
                 # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 for code in self.codes:
                     if code['cid'] == item['cid']:
@@ -2144,7 +2152,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         unmarked_list = []
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for item in self.code_text:
             if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                 unmarked_list.append(item)
@@ -2179,6 +2186,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def annotate(self):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
+        Adjust for start of text file, as this may be a smaller portion of the full text file.
+
         Called via context menu, button
         """
 
@@ -2194,11 +2203,10 @@ class DialogCodeText(QtWidgets.QWidget):
         details = ""
         annotation = ""
         # Find annotation at this position for this file
-        #TODO !!!!!!!!!!!!!!!!!!!!!!!
         for note in self.annotations:
             #if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.file_['id']:
-            if ((pos0 >= note['pos0'] and pos0 <= note['pos1']) or \
-                    (pos1 >= note['pos0'] and pos1 <= note['pos1'])) \
+            if ((pos0 + self.file_['start'] >= note['pos0'] and pos0 + self.file_['start'] <= note['pos1']) or \
+                    (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
                     and note['fid'] == self.file_['id']:
                 item = note  # use existing annotation
                 details = item['owner'] + " " + item['date']
@@ -2207,7 +2215,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Add new item to annotations, add to database and update GUI
         if item is None:
-            item = {'fid': int(self.file_['id']), 'pos0': pos0, 'pos1': pos1,
+            item = {'fid': int(self.file_['id']), 'pos0': pos0 + self.file_['start'], 'pos1': pos1 + self.file_['start'],
             'memo': str(annotation), 'owner': self.app.settings['codername'],
             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
