@@ -1107,7 +1107,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def extend_left(self, code_):
         """ Shift left arrow. """
 
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         if code_['pos0'] < 1:
             return
         code_['pos0'] -= 1
@@ -1125,7 +1124,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def extend_right(self, code_):
         """ Shift right arrow. """
 
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
             return
         code_['pos1'] += 1
@@ -1143,7 +1141,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def shrink_to_left(self, code_):
         """ Alt left arrow, shrinks code from the right end of the code. """
 
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         if code_['pos1'] <= code_['pos0'] + 1:
             return
         code_['pos1'] -= 1
@@ -1161,7 +1158,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def shrink_to_right(self, code_):
         """ Alt right arrow shrinks code from the left end of the code. """
 
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         if code_['pos0'] >= code_['pos1'] - 1:
             return
         code_['pos0'] += 1
