@@ -362,8 +362,6 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             code_for_underlining: dictionary of the code to be underlined """
 
-        #TODO test further - did not appear to work on Ubuntu 20.04
-
         # Remove all underlining
         selstart = 0
         selend = len(self.ui.textEdit.toPlainText())
@@ -1174,7 +1172,10 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def show_selected_code_in_text_next(self):
         """ Highlight only the selected code in the text. Move to next instance in text
-        from the current textEdit cursor position. """
+        from the current textEdit cursor position.
+        Adjust for a portion of text loaded.
+        Called by: pushButton_show_codings_next
+        """
 
         if self.file_ is None:
             return
@@ -1188,23 +1189,22 @@ class DialogCodeText(QtWidgets.QWidget):
             if ct['cid'] == cid:
                 indexes.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'))
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         cursor = self.ui.textEdit.textCursor()
         cur_pos = cursor.position()
         end_pos = 0
         found_larger = False
         for index in indexes:
-            if index['pos0'] > cur_pos:
-                cur_pos = index['pos0']
-                end_pos = index['pos1']
+            if index['pos0'] - self.file_['start'] > cur_pos:
+                cur_pos = index['pos0'] - self.file_['start']
+                end_pos = index['pos1'] - self.file_['start']
                 found_larger = True
                 break
         if not found_larger and indexes == []:
             return
         # loop around to highest index
         if not found_larger and indexes != []:
-            cur_pos = indexes[0]['pos0']
-            end_pos = indexes[0]['pos1']
+            cur_pos = indexes[0]['pos0'] - self.file_['start']
+            end_pos = indexes[0]['pos1'] - self.file_['start']
         if not found_larger:
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0)
@@ -1236,7 +1236,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
-        the current textEdit cursor position. """
+        the current textEdit cursor position.
+        Called by: pushButton_show_codings_previous
+        """
 
         if self.file_ is None:
             return
@@ -1250,23 +1252,22 @@ class DialogCodeText(QtWidgets.QWidget):
             if ct['cid'] == cid:
                 indexes.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'), reverse=True)
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         cursor = self.ui.textEdit.textCursor()
         cur_pos = cursor.position()
         end_pos = 0
         found_smaller = False
         for index in indexes:
-            if index['pos0'] < cur_pos - 1:
-                cur_pos = index['pos0']
-                end_pos = index['pos1']
+            if index['pos0'] - self.file_['start'] < cur_pos - 1:
+                cur_pos = index['pos0'] - self.file_['start']
+                end_pos = index['pos1'] - self.file_['start']
                 found_smaller = True
                 break
         if not found_smaller and indexes == []:
             return
         # loop around to highest index
         if not found_smaller and indexes != []:
-            cur_pos = indexes[0]['pos0']
-            end_pos = indexes[0]['pos1']
+            cur_pos = indexes[0]['pos0'] - self.file_['start']
+            end_pos = indexes[0]['pos1'] - self.file_['start']
         self.unlight()
         self.highlight(cid)
 
