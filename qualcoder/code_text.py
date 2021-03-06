@@ -815,9 +815,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         code_list = []
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for item in self.code_text:
-            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+            if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                 code_list.append(item)
         if code_list == []:
             return
@@ -826,7 +825,7 @@ class DialogCodeText(QtWidgets.QWidget):
             code_to_edit = code_list[0]
         # Multiple codes to select from
         if len(code_list) > 1:
-            ui = DialogSelectItems(self.app, code_list, _("Select code to unmark"), "single")
+            ui = DialogSelectItems(self.app, code_list, _("Select code for change"), "single")
             ok = ui.exec_()
             if not ok:
                 return
@@ -859,6 +858,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
         if changed_start == 0 and changed_end == 0:
             return
+        int_dialog.done(1)  # need this, as reactiveated when called again with same int value.
 
         # Update database, reload code_text and highlights
         new_pos0 = code_to_edit['pos0'] + changed_start
