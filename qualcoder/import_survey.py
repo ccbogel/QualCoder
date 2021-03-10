@@ -101,6 +101,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.delimiter = ","
         self.fields = []
         self.filepath = ""
+        self.success = True
 
         # Set up the user interface from Designer.
         QtWidgets.QDialog.__init__(self)
@@ -123,8 +124,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.preexisting_fields = []
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
-        self.success = self.prepare_fields()
-        if not self.success:
+        self.select_file()
+
+        #self.success = self.prepare_fields()
+        self.prepare_fields()
+        self.fill_tableWidget()
+
+        '''if not self.success:
             self.ui.groupBox.setTitle("")
             self.ui.tableWidget.hide()
             self.ui.lineEdit_delimiter.hide()
@@ -137,7 +143,23 @@ class DialogImportSurvey(QtWidgets.QDialog):
             super(DialogImportSurvey, self).reject()
             self.close()
         else:
-            self.fill_tableWidget()
+            self.fill_tableWidget()'''
+
+    def select_file(self):
+        """ Select csv or Excel file """
+
+        self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                                                                  _('Select survey file'),
+                                                                  self.app.settings['directory'], "(*.csv *.xlsx)")
+        if not ok or self.filepath == "":
+            self.parent_textEdit.append(_("Survey not imported. Survey not a csv or xlsx file: ") + self.filepath)
+            self.success = False
+            return
+        # Copy file into project folder
+        name_split = self.filepath.split("/")
+        filename = name_split[-1]
+        destination = self.app.project_path + "/documents/" + filename
+        copyfile(self.filepath, destination)
 
     def read_xlsx_file(self):
         """ Read the data from the xlsx file.
@@ -149,7 +171,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
             return False
         self.data = []
         wb = load_workbook(filename=self.filepath)
-        sheet = wb.active
+        # To work with the first sheet (by name)
+        sheets = wb.sheetnames
+        ws = wb[sheets[0]]
+        sheet = ws
         for value in sheet.iter_rows(values_only=True):
             # some rows may be complete blank so ignore importation
             if (set(value)) != {None}:
@@ -227,25 +252,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fields = []
         self.fields_type = []
         self.data = []
-        if self.filepath == "":
-            self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                                      _('Select survey file'),
-                                                                      self.app.settings['directory'], "(*.csv *.xlsx)")
-            if not ok or self.filepath == "":
-                self.fail_msg = _("No file selected")
-                return False
-        # check of csv or xlsx
-        if self.filepath[-5:].lower() != ".xlsx" and self.filepath[-4:].lower() != ".csv":
-            self.fail_msg = self.filepath + "\n" + _("is not a .csv or .xlsx file.\nFile not imported")
-            logger.warning(self.fail_msg)
-            self.parent_textEdit.append(_("Survey not imported. Survey not a csv or xlsx file: ") + self.filepath)
-            return False
-        # copy file into project folder
-        # logger.debug("self.filepath:" + self.filepath)
-        name_split = self.filepath.split("/")
-        filename = name_split[-1]
-        destination = self.app.project_path + "/documents/" + filename
-        copyfile(self.filepath, destination)
+        self.fail_msg = ""
 
         if self.filepath[-4:].lower() == ".csv":
             success = self.read_csv_file()
@@ -288,14 +295,27 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if self.fields_type[field] == 'character':
                 set_of_values = set()
                 for row in range(0, len(self.data)):
-                    set_of_values.add(self.data[row][field])
+                    value = ""
+                    try:
+                        value = self.data[row][field]
+                    except IndexError as e:
+                        msg = "IndexError: [row] " + str(row) + "   [field] " + str(field)
+                        msg += "\nlen(self.data) " + str(len(self.data))
+                        msg += "\n" + str(e)
+                        logger.debug(msg)
+                    set_of_values.add(value)
                 if len(set_of_values) > 19:
                     self.fields_type[field] = "qualitative"
 
         # check first column has unique identifiers
         ids = []
         for row in self.data:
-            ids.append(row[0])
+            try:
+                ids.append(row[0])
+            except IndexError as e:
+                # Occurs with csv import if wrong quote type selected
+                ids.append("")
+
         ids_set = set(ids)
         if len(ids) > len(ids_set):
             self.fail_msg = _("There are duplicated identifiers in the first column.\nFile not imported")
@@ -446,7 +466,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def options_changed(self):
-        """ When import options are changed do the import and ultimately fill the table.
+        """ When import options are changed
+        fill the table.
          Import options are: delimiter
          The delimiter can only be one character long """
 
@@ -457,6 +478,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.ui.lineEdit_delimiter.setText(self.delimiter[0:1])
             self.delimiter = self.delimiter[0:1]
         self.read_csv_file()
+        self.fill_tableWidget()
 
     def fill_tableWidget(self):
         """ Fill table widget with data. """
@@ -473,9 +495,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(len(self.data))
         for row in range(0, len(self.data)):
             for col in range(0, len(self.fields)):
-                value = str(self.data[row][col])
+                value = "MISSING VALUE"
+                try:
+                    value = str(self.data[row][col])
+                except IndexError:
+                    pass
                 item = QtWidgets.QTableWidgetItem(value)
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # not editatble
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Not editable
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()
         for col in range(0, self.ui.tableWidget.columnCount()):
