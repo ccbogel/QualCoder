@@ -125,25 +125,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
         self.select_file()
-
-        #self.success = self.prepare_fields()
         self.prepare_fields()
         self.fill_tableWidget()
-
-        '''if not self.success:
-            self.ui.groupBox.setTitle("")
-            self.ui.tableWidget.hide()
-            self.ui.lineEdit_delimiter.hide()
-            self.ui.comboBox_quote.hide()
-            self.ui.label_delimiter.hide()
-            self.ui.label_quotefmt.hide()
-            self.ui.label_information.hide()
-            self.ui.label_msg.setText(self.fail_msg)
-            self.parent_textEdit.append(_("Survey not imported."))
-            super(DialogImportSurvey, self).reject()
-            self.close()
-        else:
-            self.fill_tableWidget()'''
 
     def select_file(self):
         """ Select csv or Excel file """
@@ -264,7 +247,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if not success:
                 self.parent_textEdit.append(_("Survey not imported.") + self.filepath)
                 return False
-        self.setWindowTitle(_(_("Importing from: ")) + self.filepath.split('/')[-1])
+        self.setWindowTitle(_("Importing from: ") + self.filepath.split('/')[-1])
 
         # clean field names
         removes = "!@#$%^&*()-+=[]{}\|;:,.<>/?~`"
@@ -466,8 +449,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def options_changed(self):
-        """ When import options are changed
-        fill the table.
+        """ When import options are changed fill the table.
          Import options are: delimiter
          The delimiter can only be one character long """
 
@@ -481,8 +463,11 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fill_tableWidget()
 
     def fill_tableWidget(self):
-        """ Fill table widget with data. """
+        """ Fill table widget with data.
+        Warn if an incorrect number of fields in the row. """
 
+        num_fields_in_row_error = False
+        self.ui.label_msg.setText("")
         numRows = self.ui.tableWidget.rowCount()
         for row in range(0, numRows):
             self.ui.tableWidget.removeRow(0)
@@ -499,7 +484,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 try:
                     value = str(self.data[row][col])
                 except IndexError:
-                    pass
+                    num_fields_in_row_error = True
                 item = QtWidgets.QTableWidgetItem(value)
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # Not editable
                 self.ui.tableWidget.setItem(row, col, item)
@@ -507,33 +492,40 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for col in range(0, self.ui.tableWidget.columnCount()):
             if self.ui.tableWidget.columnWidth(col) > 200:
                 self.ui.tableWidget.setColumnWidth(col, 200)
+        if num_fields_in_row_error and self.filepath[-4:].lower() == ".csv":
+            msg = _("Number of fields in row error.") + "\n"
+            msg += _("Use another quote format OR another delimiter")
+            self.ui.label_msg.setText(msg)
+            self.ui.comboBox_quote.setFocus(True)
 
     def table_menu(self, pos):
         """ Header context menu to change data types and set primary key(s) and change field names.
         The header index idea came from:
         http://stackoverflow.com/questions/7782071/how-can-i-get-right-click-context-menus-for-clicks-in-qtableview-header
+        param:
+            pos: TableWidget position
         """
 
         self.headerIndex = self.ui.tableWidget.indexAt(pos)
         self.headerIndex = int(self.headerIndex.column())
 
         menu = QtWidgets.QMenu(self)
-        ActionChangeFieldName = menu.addAction(_('Change fieldname'))
-        ActionChangeFieldName.triggered.connect(self.change_fieldname)
+        action_change_fieldname = menu.addAction(_('Change fieldname'))
+        action_change_fieldname.triggered.connect(self.change_fieldname)
         if self.fields_type[self.headerIndex] == "character" and self.headerIndex != 0:
-            ActionChangeFieldName = menu.addAction(_('Change to Qualitative'))
-            ActionChangeFieldName.triggered.connect(self.qualitative_field_type)
+            action_change_fieldname = menu.addAction(_('Change to Qualitative'))
+            action_change_fieldname.triggered.connect(self.qualitative_field_type)
         if self.fields_type[self.headerIndex] in ('numeric', 'qualitative'):
-            ActionChangeFieldName = menu.addAction(_('Change to Character'))
-            ActionChangeFieldName.triggered.connect(self.character_field_type)
+            action_change_fieldname = menu.addAction(_('Change to Character'))
+            action_change_fieldname.triggered.connect(self.character_field_type)
 
         menu.popup(self.ui.tableWidget.mapToGlobal(pos))
 
-    # NOTE changes to fields types are overwritten if quote type changed
+    # NOTE changes to field types are overwritten if quote type changed
 
     def qualitative_field_type(self):
         """ If the current field is listed as character, redefine it as qualitative.
-        Qualitative data is stored in the source table """
+        Qualitative data is stored in the source table in a generated text file. """
 
         self.fields_type[self.headerIndex] = 'qualitative'
         item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
@@ -550,7 +542,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
 
     def change_fieldname(self):
-        """ change the fieldname """
+        """ Change the fieldname. """
 
         fieldname, ok = QtWidgets.QInputDialog.getText(None, _("Change field name"), _("New name:"),
                                                        QtWidgets.QLineEdit.Normal, self.fields[self.headerIndex])
