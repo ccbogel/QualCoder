@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1982,27 +1982,27 @@ class DialogCodeText(QtWidgets.QWidget):
         Highlight this coded text.
         Account for start of text file, as this may be a smaller portion of the full text file."""
 
-        current_text = self.ui.comboBox_codes_in_text.currentText()
+        current_codename = self.ui.comboBox_codes_in_text.currentText()
         current_code = None
         for code in self.codes:
-            if code['name'] == current_text:
+            if code['name'] == current_codename:
                 current_code = code
                 break
         if current_code is None:
             return
-        #print("Current code", current_code)  # tmp
         pos = self.ui.textEdit.textCursor().position() + self.file_['start']
-        codes_here = []
+        current_item = None
         for item in self.code_text:
             if item['pos0'] <= pos and item['pos1'] >= pos and item['cid'] == current_code['cid']:
-                current_coded_text = item
+                current_item = item
                 break
-        #print("current coded text", current_coded_text)  # tmp
+        #print("current item", current_item)  # tmp
+        if current_item is None:
+            return
         # Remove formatting
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(int(current_item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(int(current_item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         fmt = QtGui.QTextCharFormat()
