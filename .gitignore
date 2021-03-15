@@ -5,9 +5,11 @@ debian/files
 debian/qualcoder.substvars
 debian/qualcoder
 dist
+.eggs
 .pybuild/
 *.egg-info
 *.deb
 */__pycache__
 __pycache__
 build
+.DS_Store

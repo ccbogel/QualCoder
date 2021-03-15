@@ -57,7 +57,7 @@ class Ui_Dialog_cases(object):
         self.pushButton_add.setText("")
         self.pushButton_add.setObjectName("pushButton_add")
         self.pushButton_delete = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(280, 0, 36, 36))
+        self.pushButton_delete.setGeometry(QtCore.QRect(310, 0, 36, 36))
         self.pushButton_delete.setText("")
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.pushButton_import_cases = QtWidgets.QPushButton(self.groupBox)
@@ -78,6 +78,10 @@ class Ui_Dialog_cases(object):
         self.pushButton_file_manager.setGeometry(QtCore.QRect(180, 0, 36, 36))
         self.pushButton_file_manager.setText("")
         self.pushButton_file_manager.setObjectName("pushButton_file_manager")
+        self.pushButton_export_attributes = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_export_attributes.setGeometry(QtCore.QRect(230, 0, 36, 36))
+        self.pushButton_export_attributes.setText("")
+        self.pushButton_export_attributes.setObjectName("pushButton_export_attributes")
         self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBox_2, 1, 1, 1, 1)
 
@@ -96,10 +100,11 @@ class Ui_Dialog_cases(object):
         self.label_cases.setText(_translate("Dialog_cases", "Cases: "))
         self.pushButton_add.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add case</p></body></html>"))
         self.pushButton_delete.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Delete case</p></body></html>"))
-        self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a <span style=\" font-weight:600;\">comma delimited</span> csv file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
+        self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a csv or xlsx file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add attribute</p></body></html>"))
         self.label_filename.setText(_translate("Dialog_cases", "."))
         self.pushButton_file_manager.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Case file manager</p></body></html>"))
+        self.pushButton_export_attributes.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
 
 
 if __name__ == "__main__":

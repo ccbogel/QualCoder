@@ -1,9 +1,9 @@
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 and pyqt5.
+QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt5.
 
 QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu 20.04, Linux Mint 18.04 Lubuntu 18.04, Windows 10. It has not been throughly tested on Mac OS.
+This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on Linux Mint 18.04 Lubuntu 18.04, Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the Github Wiki.
 
 ## INSTALLATION 
@@ -22,7 +22,7 @@ You can install the latest debian package from https://github.com/ccbogel/QualCo
 
 You may need to add unstable repos as described at https://www.binarytides.com/enable-testing-repo-debian/
 
-Install these modules fro mthe command line
+Install these modules from the command line
 
 `sudo apt install python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
 
@@ -63,7 +63,7 @@ This will install QualCoder in the /usr/share directory and create a launcher. A
 
 ### Windows: 
 
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3.
+Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3. Minumum version python 3.6.
 
 Install dependencies in the command prompt:
 
@@ -79,6 +79,8 @@ Alternatively move to the qualcoder directory and run the qualcoder.py file in f
 
 `python qualcoder.py`  or `py qualcoder.py`
 
+you might need to install modules and run the program by typing python3 rather than python or py, it seems different on different Winows versions.
+
 Run QualCoder and hide the black DOS box:
 
 `C:\Windows\pyw.exe "C:\the location of your Qualcoder folder\QualCoder-master\qualcoder\qualcoder.py"`
@@ -91,39 +93,60 @@ The log file on Windows does not make use of the rotating file handler, so the l
 
 ### MacOS
 
-Install python3 and VLC:
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
+1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-Download Qualcoder-master Zip file and copy it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releasesDownload and extract it into /Applications
 
-In a Terminal
+3) Open the Terminal app (or any other command shell)
 
-`curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python3 --version`
+4) Install PIP (if not yet installed, try typing `pip3 --version` and hit ENTER) 
 
-select 3.9 as an answer
+```sh
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+```
 
-`python3 get-pip.py`
+-> You should now be able to run `pip3` as above.
 
-`cd /usr/local/bin`
+5) Install Python dependency modules using `pip`:
 
-`sudo ln -s ../../../Library/Frameworks/Python.framework/Versions/3.9/bin/pip pip`
+(you might already have them, don't do this again if you just update QualCoder to a newer version)
 
-`pip install pyserial`
+```sh
+pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
+```
 
-`pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl`
+6) Install system dependencies using Homebrew (aka `brew`) 
 
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
+6.1) Install `brew` if do not already have it (try typing `brew` and hit ENTER):
 
-`brew install qpdf`
+* Follow instructions here about installing Homebrew on your macOS: https://brew.sh/
 
-To run QualCoder
+6.2) Install QPDF package (needed to deal with PDF files) using Homebrew package manager:
 
-`cd "/Applications/QualCoder-master/qualcoder"
-python3 qualcoder.py`
+```sh
+brew install qpdf
+```
 
-Another option to run Qualcoder is shown here [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher.
- You can make an alias to the file and place it on your desktop.
+
+Assuming you downloaded the2.4 version. You can now run with:
+
+```
+python3 /applications/QualCoder-2.4/qualcoder/qualcoder.py
+```
+
+You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
+
+Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
+You can make an alias to the file and place it on your desktop.
+
+**Another option to install on Mac:**
+
+Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
+
+`pip install -U py2app`  or for a system installation of python `sudo pip install -U py2app`
+
+`python3 setup.py py2app` 
  
 ## Dependencies
 Required:
@@ -136,7 +159,7 @@ Required:
 
 * Pillow
 
-* six
+* six  (Mac OS)
 
 * ebooklib
 
@@ -148,13 +171,13 @@ Required:
 
 * openpyxl
 
-* qpdf
+* qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 
 ## Future plans
-* Improve packaging for easier installation: currently investigating use of pyinstaller - without success.
+
+* Improve packaging for easier installation: currently investigating use of pyinstaller - without success so far.
 * Change from pdfminer.six to pdfminer3
-* Look at RQDA Relation function and Profile matrix function.
 * Possibly look at use with R.
 * Reports:
         Word count report maybe
@@ -168,8 +191,17 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2020) QualCoder 2.0 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/1.9
+Curtain, C. (2021) QualCoder 2.4 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/2.4
+
+
+## Leave a review
+If you like QualCoder and found it useful for your work. Please leave a review on these sites:
+
+https://www.saashub.com/qualcoder-alternatives
+
+https://alternativeto.net/software/qualcoder
+
 
 ## Publications using QualCoder
 Local–global linkages: Challenges in organizing functional communities for ecosocial justice. Joel Izlar, Journal of Community Practice 27(3-4) 2019
@@ -179,4 +211,6 @@ Barriers to Health: Understanding the Barriers Faced by Community Intervention P
 Framing food geographies. S Ramsay, Masters Thesis, Stockholms Universitet 2020
 
 Seeking research software. A qualitative study of humanities scholars' information practices. Ronny Gey, Masters Thesis, Humboldt University of Berlin 2020
+
+Traditional and biomedical care pathways for mental well‐being in rural Nepal. T Pham, R Koirala, B Kohrt, International Journal of Mental Health Systems volume 15 2021
 

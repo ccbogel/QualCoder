@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,9 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-import logging
+import csv
 import datetime
+import logging
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -65,6 +66,7 @@ from ebooklib import epub
 
 from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
+from GUI.base64_helper import *
 from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
@@ -134,57 +136,69 @@ class DialogManageFiles(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogmanagefiles_w'])
-            h = int(self.app.settings['dialogmanagefiles_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
-        self.ui.pushButton_create.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create.clicked.connect(self.create)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
-        self.ui.pushButton_view.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
+        self.ui.pushButton_view.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_view.clicked.connect(self.view)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
-        self.ui.pushButton_delete.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
-        self.ui.pushButton_import.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
+        self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
-        self.ui.pushButton_link.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
+        self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_link.clicked.connect(self.link_files)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
-        self.ui.pushButton_import_from_linked.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(linked_import_icon), "png")
+        self.ui.pushButton_import_from_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
-        self.ui.pushButton_export_to_linked.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(to_link_icon), "png")
+        self.ui.pushButton_export_to_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
-        self.ui.pushButton_export.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
-        self.ui.pushButton_add_attribute.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
-
-    def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
-
-        self.app.settings['dialogmanagefiles_w'] = self.size().width()
-        self.app.settings['dialogmanagefiles_h'] = self.size().height()
+        #Initial resize of table columns
+        self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -415,10 +429,55 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where id=?", [r[0],])
             self.app.conn.commit()
 
+    def export_attributes(self):
+        """ Export attributes from table as a csv file. """
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_file_attributes.csv"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        filename = directory + "/" + filename
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
+
+        cols = self.ui.tableWidget.columnCount()
+        rows = self.ui.tableWidget.rowCount()
+        header = []
+        for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        with open(filename, mode='w') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(header)
+            for r in range(0, rows):
+                data = []
+                for c in range(0, cols):
+                    # Table cell may be a None type
+                    cell = ""
+                    try:
+                        cell = self.ui.tableWidget.item(r, c).text()
+                    except AttributeError:
+                        pass
+                    data.append(cell)
+                writer.writerow(data)
+        logger.info("Report exported to " + filename)
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
+        self.parent_textEdit.append(_("File attributes csv file exported to: ") + filename)
+
     def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question or created internally.
-        This also fills out the table header lables with file attribute names.
+        This also fills out the table header labels with file attribute names.
         Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
         Obtain some file metadata to use in table tooltip.
@@ -487,16 +546,20 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
 
         metadata = name + "\n"
-        icon = QtGui.QIcon("GUI/text.png")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(text), "png")
+        icon = QtGui.QIcon(pm)
         if fulltext is not None and len(fulltext) > 0 and mediapath is None:
-            metadata += "Characters: " + str(len(fulltext))
+            metadata += _("Characters: ") + str(len(fulltext))
             return icon, metadata
         if mediapath is None:
             logger.debug("empty media path error")
             return icon, metadata
         if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
-            metadata += "Characters: " + str(len(fulltext))
-            icon = QtGui.QIcon("GUI/text_link.png")
+            metadata += _("Characters: ") + str(len(fulltext))
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
+            icon = QtGui.QIcon(pm)
             return icon, metadata
 
         abs_path = ""
@@ -510,38 +573,50 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + mediapath
 
         if mediapath[:8] == "/images/":
-            icon = QtGui.QIcon("GUI/picture.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
+            icon = QtGui.QIcon(pm)
             w = 0
             h = 0
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
             except:
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "images:":
-            icon = QtGui.QIcon("GUI/picture_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(picture_link), "png")
+            icon = QtGui.QIcon(pm)
             w = 0
             h = 0
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
             except:
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
         if mediapath[:7] == "/video/":
-            icon = QtGui.QIcon("GUI/play.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] == "video:":
-            icon = QtGui.QIcon("GUI/play_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(play_link), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:7] == "/audio/":
-            icon = QtGui.QIcon("GUI/sound.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(sound), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] == "audio:":
-            icon = QtGui.QIcon("GUI/sound_link.png")
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(sound_link), "png")
+            icon = QtGui.QIcon(pm)
         if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
 
             instance = vlc.Instance()
@@ -555,10 +630,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 remainder_secs = str(secs - mins * 60)
                 if len(remainder_secs) == 1:
                     remainder_secs = "0" + remainder_secs
-                metadata += "Duration: " + str(mins) + ":" + remainder_secs
+                metadata += _("Duration: ") + str(mins) + ":" + remainder_secs
             except Exception as e:
                 logger.debug(str(e))
-                metadata += _("Cannot locate media. " + abs_path)
+                metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
         bytes = 0
         try:
@@ -579,15 +654,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         New attribute is added to the model and database. """
 
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
-        ok = ui = DialogAddAttribute(self.app, check_names)
+        ui = DialogAddAttribute(self.app, check_names)
+        ok = ui.exec_()
         if not ok:
             return
-        ui.exec_()
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
             return
-
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -657,6 +731,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
+
+            # Check numeric for numeric attributes, clear "" if cannot be cast
+            cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?", (attribute_name, ))
+            result = cur.fetchone()
+            if result is None:
+                return
+            if result[0] == "numeric":
+                try:
+                    float(value)
+                except Exception as e:
+                    self.ui.tableWidget.item(x, y).setText("")
+                    value = ""
+                    msg = _("This attribute is numeric")
+                    Message(self.app, _("Warning"), msg, "warning").exec_()
+
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
             (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
@@ -695,7 +784,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         annoted_coded = cur.fetchall()
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
-        format_.setFontPointSize(self.app.settings['fontsize'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
         # add formatting
         cursor = self.text_view.ui.textEdit.textCursor()
         for item in annoted_coded:
@@ -729,6 +818,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # cannot easily edit file text of there are linked cases, codes or annotations
         self.text_view = DialogMemo(self.app, title, self.source[x]['fulltext'], "hide")
         self.text_view.ui.textEdit.setReadOnly(restricted)
+
         if restricted:
             self.text_view.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_restricted_menu)
@@ -752,7 +842,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
-        format_.setFontPointSize(self.app.settings['fontsize'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.text_view.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(len(self.text_view.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
@@ -1028,7 +1118,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
         ui = DialogViewImage(self.app, self.source[x])
-        self.dialog_list.append(ui)
         ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
@@ -1215,7 +1304,7 @@ class DialogManageFiles(QtWidgets.QDialog):
          DialogReportCodes, DialogCodeText, DialogCodeAV, DialogCodeImage """
 
         contents = self.tab_coding.layout()
-        if contents:
+        if contents is not None:
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
                 if isinstance(c, DialogCodeImage):
@@ -1225,7 +1314,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if isinstance(c, DialogCodeText):
                     c.get_files()
         contents = self.tab_reports.layout()
-        if contents:
+        if contents is not None:
             # Examine widgets in layout
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
@@ -1736,9 +1825,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = data['icon']
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
-            # having un-editable file names helps with assigning icons
+            # Having un-editable file names helps with assigning icons
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            # if externally linked add link details to tooltip
+            # Externally linked - add link details to tooltip
             name_tt = data['metadata']
             if data['mediapath'] is not None and ':' in data['mediapath']:
                 name_tt += _("\nExternally linked file:\n")
@@ -1770,13 +1859,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if fid == a[2] and a[0] == header:
                         #print("found", a)
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
-        self.ui.tableWidget.resizeColumnsToContents()
+        dialog_w = self.size().width() - 20
         table_w = 0
         for i in range(self.ui.tableWidget.columnCount()):
             table_w += self.ui.tableWidget.columnWidth(i)
-        #print("t", table_w)
-        #print("d", self.size().width() - 20)  # 20 for L and R margins
-        dialog_w = self.size().width() - 20
         if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
             self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)
         self.ui.tableWidget.resizeRowsToContents()

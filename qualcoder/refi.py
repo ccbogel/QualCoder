@@ -45,9 +45,12 @@ except:
 from xsd import codebook, project
 import zipfile
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
+from confirm_delete import DialogConfirmDelete  # REFI export questin about line endings
+from GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from helpers import Message
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -87,6 +90,7 @@ class Refi_import():
     import_type = None
     xml = None
     base_path = ""
+    sofware_name = ""
 
     def __init__(self, app, parent_textEdit, import_type):
 
@@ -101,14 +105,18 @@ class Refi_import():
         self.sources = []
         self.variables = []
         self.base_path = ""
-        self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-            _('Select REFI_QDA file'), self.app.settings['directory'], "(*." + import_type + ")")
-        if not ok or self.file_path == "":
-            return
-
+        self.software_name = ""
         if import_type == "qdc":
+            self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdc *.QDC)")
+            if not ok or self.file_path == "":
+                return
             self.import_codebook()
         else:
+            self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdpx *.QDPX)")
+            if not ok or self.file_path == "":
+                return
             self.import_project()
 
     def import_codebook(self):
@@ -314,14 +322,15 @@ class Refi_import():
             self.xml = xml_file.read()
         result = self.xml_validation("project")
         self.parent_textEdit.append("Project XML parsing successful: " + str(result))
-
         tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
         root = tree.getroot()
+        # Must parse Project tag first to get software_name
+        # This is used when importing - especially from ATLAS.ti
+        self.parse_project_tag(root)
+
         children = root.getchildren()
         for c in children:
             #print(c.tag)
-            if c.tag == "{urn:QDA-XML:project:1.0}Project":
-                self.parse_project_tag(c)
             if c.tag == "{urn:QDA-XML:project:1.0}Users":
                 count = self.parse_users(c)
                 self.parent_textEdit.append(_("Parse users. Loaded: " + str(count)))
@@ -369,13 +378,13 @@ class Refi_import():
             self.app.settings['codername'] = self.users[0]['name']
             self.app.write_config_ini(self.app.settings)
 
-        msg = "EXPERIMENTAL - NOT FULLY TESTED\n"
-        msg += "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
-        msg += "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
-        msg += "Boolean variables treated as character (text). Integer variables treated as floating point. \n"
-        msg += "All variables are stored as text, but cast as text or float during operations.\n"
-        msg += "Relative paths to external files are untested.\n"
-        msg += "\n\nSelect a coder name in Settings dropbox, otherwise coded text and media may appear uncoded."
+        msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
+        msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")
+        msg += _("Sets and Graphs not imported as QualCoder does not have this functionality.\n")
+        msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
+        msg += _("All variables are stored as text, but cast as text or float during operations.\n")
+        msg += _("Relative paths to external files are untested.\n")
+        msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
 
     def parse_variables(self, element):
@@ -451,6 +460,8 @@ class Refi_import():
         Enter empty values for Variables for each Case.
         Second parse: read variable values and update in attributes table.
 
+        Quirkos - Cases have no name attribute , so use the case count  as a name
+
         Note: some Codes in CodeBook are Cases - they use the same guid
 
         Example xml format:
@@ -473,17 +484,18 @@ class Refi_import():
         cur = self.app.conn.cursor()
         count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"), e.get("guid"))
-
+            #print("CASE TAG", e.tag, "CASE NAME", e.get("name"), "GUID", e.get("guid"))  # tmp
             item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.app.settings['codername'], "memo": "", "caseid": None}
+            # Quirkos: Cases have no name attribute
+            if item['name'] is None:
+                item['name'] = str(count)
             # Get the description text
             d_elements = e.getchildren()
+            item['memo'] = ""
             for d in d_elements:
-                memo = ""
                 #print("Memo ", d.tag)
                 if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
-                    memo = d.text
-                item["memo"] = memo
+                    item['memo'] = d.text
 
             # Enter Case into sqlite and keep a copy in  a list
             try:
@@ -501,6 +513,7 @@ class Refi_import():
             # Create an empty attribute entry for each Case and variable in the attributes table
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             for v in self.variables:
+                print(v)  # tmp
                 if v['caseOrFile'] == 'case':
                     cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.app.settings['codername']))
                     self.app.conn.commit()
@@ -517,7 +530,7 @@ class Refi_import():
                         "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
                         "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
                             value = v_element.text
-                    #print(guid, value)
+                    print(item, guid, value)  # tmp
                     # Get attribute name by linking guids
                     attr_name = ""
                     for attr in self.variables:
@@ -532,7 +545,7 @@ class Refi_import():
 
     def clean_up_case_codes_and_case_text(self):
         """ Some Code guids match the Case guids. So remove these Codes.
-        For text selectino:
+        For text selection:
         Some Coding selections match the Case guid. So re-align to Case selections.
         """
 
@@ -597,11 +610,15 @@ class Refi_import():
 
         name = element.get("name")
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
                 creating_user = u['name']
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         # path starts with internal:// or relative:// (with<Project basePath or absolute
@@ -694,9 +711,13 @@ class Refi_import():
         height = secondY - firstY
         memo = element.get("name")
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -831,11 +852,15 @@ class Refi_import():
         # Change transcript filename to match the audio/video name, unless .srt
         # Add ".transcribed" suffix so qualcoder can interpret as a transcription for this a/v file.
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
                 creating_user = u['name']
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         guid = element.get("guid")
@@ -986,6 +1011,8 @@ class Refi_import():
         seg_end = int(element.get("end"))
         memo = element.get("name")
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         try:
             create_date = create_date.replace('T', ' ')
             create_date = create_date.replace('Z', '')
@@ -993,8 +1020,9 @@ class Refi_import():
             # None type object ??
             print("load_codings_for_audio_video", e)
             create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
-
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1098,6 +1126,13 @@ class Refi_import():
                     pass
             #print('n')
 
+        """Atlas stored correct positions in the project.qde xml
+        as though it is \n  - one character
+        But the source.txt stores \r\n and in ATLAS is treated at one character 
+        To test for docx also """
+        if "ATLAS" in self.software_name:
+            add_ending = False
+
         # Read the text and enter into sqlite source table
         try:
             with open(source_path, encoding='utf-8', errors='replace') as f:
@@ -1164,7 +1199,7 @@ class Refi_import():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        # print("varname:", var_name, " value:",value)
+        print("varname:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
@@ -1197,9 +1232,13 @@ class Refi_import():
         pos0 = int(element.get("startPosition"))
         pos1 = int(element.get("endPosition"))
         create_date = element.get("creationDateTime")
+        if create_date is None:
+            create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
+        if creating_user_guid is None:
+            creating_user_guid = element.get("modifyingUser")
         creating_user = "default"
         for u in self.users:
             if u['guid'] == creating_user_guid:
@@ -1245,26 +1284,34 @@ class Refi_import():
             #print(e.tag, e.get("name"), e.get("plainTextPath"))
             name = e.get("name")
             create_date = e.get("creationDateTime")
+            if create_date is None:
+                create_date = e.get("modifiedDateTime")
             create_date = create_date.replace('T', ' ')
             create_date = create_date.replace('Z', '')
             creating_user_guid = e.get("creatingUser")
+            if creating_user_guid is None:
+                creating_user_guid = e.get("modifyingUser")
             creating_user = "default"
             for u in self.users:
                 if u['guid'] == creating_user_guid:
                     creating_user = u['name']
-            # paths starts with internal://
-            path = e.get("plainTextPath").split('internal:/')[1]
-            path = self.folder_name + '/Sources' + path
-            #print(path)
-            jentry = ""
-            try:
-                with open(path) as f:
-                    jentry = f.read()
-            except Exception as e:
-                self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
-            cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-            (name, jentry, creating_user, create_date))
-            self.app.conn.commit()
+            # journal paths starts with internal://
+            if e.get("plainTextPath") is not None:
+                path = e.get("plainTextPath").split('internal:/')[1]
+                path = self.folder_name + '/Sources' + path
+                #print(path)
+                jentry = ""
+                try:
+                    with open(path) as f:
+                        jentry = f.read()
+                except Exception as e:
+                    self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
+                cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
+                (name, jentry, creating_user, create_date))
+                self.app.conn.commit()
+            else:
+                #TODO
+                print(_("Note element is not a journal."))
             count += 1
         return count
 
@@ -1287,10 +1334,12 @@ class Refi_import():
 
     def parse_project_tag(self, element):
         """ Parse the Project tag.
-        Interested in basePath for relative linked sources. """
-
+        Interested in basePath for relative linked sources.
+         software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
         self.base_path = element.get("basePath")
-        print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        #print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        self.software_name = element.get("origin")
+        #print("SOFTWARE NAME: ", self.software_name)
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
@@ -1335,6 +1384,19 @@ class Refi_import():
         except AssertionError as err:
             print("Incorrect XML schema: {0}".format(err))
             return False
+
+
+class Refi_line_endings(QtWidgets.QDialog):
+    """Refi line endings dialog."""
+
+    def __init__(self, app, parent=None):
+        super().__init__(parent)
+        self.ui = Ui_Dialog_refi_export_line_endings()
+        self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
+        font += '"' + app.settings['font'] + '";'
+        self.setStyleSheet(font)
 
 
 class Refi_export(QtWidgets.QDialog):
@@ -1412,6 +1474,13 @@ class Refi_export(QtWidgets.QDialog):
             Message(self.app,_("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
             logger.debug(str(e))
             return
+
+        add_line_ending_for_maxqda = False
+        add_line_ending_for_atlas = False
+        ui = Refi_line_endings(self.app)
+        ui.exec_()
+        if ui.ui.radioButton_maxqda.isChecked():
+            add_line_ending_for_maxqda = True
         txt_errors = ""
         for s in self.sources:
             #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
@@ -1440,7 +1509,10 @@ class Refi_export(QtWidgets.QDialog):
             if s['plaintext_filename'] is not None:
                 with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
                     try:
-                        f.write(s['fulltext'])
+                        if add_line_ending_for_maxqda:
+                            f.write(s['fulltext'].replace("\n", "\r\n"))
+                        else:
+                            f.write(s['fulltext'])
                     except Exception as e:
                         txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(e)
                         logger.error(str(e) + '\nIn plaintext file export: ' + s['plaintext_filename'])
@@ -1460,8 +1532,8 @@ class Refi_export(QtWidgets.QDialog):
         except FileNotFoundError as e:
             logger.debug(str(e))
         msg = export_path + ".qpdx\n"
-        msg += "This project exchange is not guaranteed compliant with the exchange standard.\n"
-        msg += "REFI-QDA EXPERIMENTAL FUNCTION."
+        msg += _("REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n")
+        msg += _("This project exchange is not guaranteed compliant with the exchange standard.\n")
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
@@ -1482,7 +1554,7 @@ class Refi_export(QtWidgets.QDialog):
             f = open(filename, 'w')
             f.write(self.xml)
             f.close()
-            msg = "Codebook has been exported to "
+            msg = _("Codebook has been exported to ")
             msg += filename
             Message(self.app, _("Codebook exported"), _(msg)).exec_()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
@@ -2293,9 +2365,12 @@ class Refi_export(QtWidgets.QDialog):
         return time_pos
 
     def convert_timestamp(self, time_in):
-        """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ """
+        """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ
+        I have found one instance of an underscore where the space should be. """
 
-        time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + 'Z'
+        time_out = time_in[0:10] + "T" + time_in[11:] + "Z"
+        '''if " " in time_in:
+            time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + "Z"'''
         return time_out
 
     def get_sources(self):

@@ -45,6 +45,7 @@ ui_dialog_memo.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_comparisons.py \
+ui_dialog_report_file_summary.py \
 ui_dialog_select_items.py \
 ui_dialog_settings.py \
 ui_dialog_SQL.py \
@@ -61,7 +62,8 @@ TRANSLATIONS    = app_de.ts \
                   app_el.ts \
                   app_it.ts \
                   app_es.ts \
-                  app_jp.ts
+                  app_jp.ts \
+                  app_pt.ts
 CODECFORTR      = ISO-8859-5
 
 
@@ -108,6 +110,8 @@ xgettext -d fr -j fr.po add_attribute.py add_item_name.py attributes.py case_fil
 xgettext -d it -j it.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
 xgettext -d jp -j jp.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
+
+xgettext -d pt -j pt.po add_attribute.py add_item_name.py attributes.py case_file_manager.py cases.py code_text.py codebook.py color_selector.py confirm_delete.py dialog_sql.py import_survey.py information.py journals.py manage_files.py memo.py qualcoder.py refi.py report_attributes.py reports.py rqda.py select_items.py settings.py text_mining.py view_av.py view_graph_original.py view_image.py report_relations.py
 
 
 

@@ -37,6 +37,7 @@ import traceback
 
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
+from GUI.base64_helper import *
 from GUI.ui_dialog_journals import Ui_Dialog_journals
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -58,7 +59,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogJournals(QtWidgets.QDialog):
-    '''  View, create, export, rename and delete journals. '''
+    """  View, create, export, rename and delete journals. """
 
     NAME_COLUMN = 0
     DATE_COLUMN = 1
@@ -85,13 +86,6 @@ class DialogJournals(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogjournals_w'])
-            h = int(self.app.settings['dialogjournals_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -122,14 +116,20 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
         self.ui.textEdit.textChanged.connect(self.text_changed)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
-        self.ui.pushButton_create.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create.clicked.connect(self.create)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
-        self.ui.pushButton_export.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
-        self.ui.pushButton_delete.setIcon(icon)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete)
 
     def view(self):
@@ -146,9 +146,8 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.blockSignals(False)
 
     def text_changed(self):
-        """ journal entry is changed on changes to text edit.
+        """ Journals list entry and database is updated from changes to text edit.
         The signal is switched off when a different journal is loaded.
-        Changes are not saved to database until dialog is closed.
         """
 
         if self.current_jid is None:
@@ -158,28 +157,19 @@ class DialogJournals(QtWidgets.QDialog):
             if self.journals[j]['jid'] == self.current_jid:
                 current_j = j
         self.journals[current_j]['jentry'] = self.ui.textEdit.toPlainText()
+
+        # Update database as text is edited - might be slow - check with users of slow computers
+        cur = self.app.conn.cursor()
+        cur.execute("update journal set jentry=? where jid=?", (self.journals[current_j]['jentry'], self.current_jid))
+        self.app.conn.commit()
         self.app.delete_backup = False
 
     def closeEvent(self, event):
-        """ Save journal text changes to database.
-        Save dialog and splitter dimensions. """
+        """ Save splitter dimensions. """
 
-        self.app.settings['dialogjournals_w'] = self.size().width()
-        self.app.settings['dialogjournals_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogjournals_splitter0'] = sizes[0]
         self.app.settings['dialogjournals_splitter1'] = sizes[1]
-
-        cur = self.app.conn.cursor()
-        for j in self.journals:
-            cur.execute("select jentry from journal where jid=?", (j['jid'], ))
-            result = cur.fetchone()
-            result = result[0]
-            if result != j['jentry']:
-                cur.execute("update journal set jentry=? where jid=?",
-                    (j['jentry'], j['jid']))
-                self.parent_textEdit.append(_("Journal modified: ") + j['name'])
-        self.app.conn.commit()
 
     def create(self):
         """ Create a new journal by entering text into the dialog. """

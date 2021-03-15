@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_main2.ui'
+# Form implementation generated from reading ui file 'ui_main.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
@@ -17,17 +17,27 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setContentsMargins(-1, 0, -1, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_coding = QtWidgets.QWidget()
         self.tab_coding.setObjectName("tab_coding")
+        self.label_coding = QtWidgets.QLabel(self.tab_coding)
+        self.label_coding.setGeometry(QtCore.QRect(9, 9, 581, 17))
+        self.label_coding.setObjectName("label_coding")
         self.tabWidget.addTab(self.tab_coding, "")
         self.tab_reports = QtWidgets.QWidget()
         self.tab_reports.setObjectName("tab_reports")
+        self.label_reports = QtWidgets.QLabel(self.tab_reports)
+        self.label_reports.setGeometry(QtCore.QRect(20, 20, 511, 17))
+        self.label_reports.setObjectName("label_reports")
         self.tabWidget.addTab(self.tab_reports, "")
         self.tab_manage = QtWidgets.QWidget()
         self.tab_manage.setObjectName("tab_manage")
+        self.label_manage = QtWidgets.QLabel(self.tab_manage)
+        self.label_manage.setGeometry(QtCore.QRect(20, 20, 511, 17))
+        self.label_manage.setObjectName("label_manage")
         self.tabWidget.addTab(self.tab_manage, "")
         self.tab_action_log = QtWidgets.QWidget()
         self.tab_action_log.setObjectName("tab_action_log")
@@ -147,6 +157,12 @@ class Ui_MainWindow(object):
         self.actionManage_bad_links_to_files = QtWidgets.QAction(MainWindow)
         self.actionManage_bad_links_to_files.setEnabled(False)
         self.actionManage_bad_links_to_files.setObjectName("actionManage_bad_links_to_files")
+        self.actionSpecial_functions = QtWidgets.QAction(MainWindow)
+        self.actionSpecial_functions.setObjectName("actionSpecial_functions")
+        self.actionFile_summary = QtWidgets.QAction(MainWindow)
+        self.actionFile_summary.setObjectName("actionFile_summary")
+        self.actionCode_summary = QtWidgets.QAction(MainWindow)
+        self.actionCode_summary.setObjectName("actionCode_summary")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -180,10 +196,14 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionView_Graph)
         self.menuReports.addAction(self.actionCode_relations)
+        self.menuReports.addAction(self.actionFile_summary)
+        self.menuReports.addAction(self.actionCode_summary)
         self.menuReports.addAction(self.actionText_mining)
         self.menuReports.addAction(self.actionSQL_statements)
+        self.menuReports.addSeparator()
         self.menuHelp.addAction(self.actionContents)
         self.menuHelp.addAction(self.actionAbout)
+        self.menuHelp.addAction(self.actionSpecial_functions)
         self.menubar.addAction(self.menuProject.menuAction())
         self.menubar.addAction(self.menuFiles_and_Cases.menuAction())
         self.menubar.addAction(self.menuCoding.menuAction())
@@ -191,14 +211,17 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "QualCoder"))
+        self.label_coding.setText(_translate("MainWindow", "Select an option in the Coding menu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
+        self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
+        self.label_manage.setText(_translate("MainWindow", "Select an option in the Files and Cases menu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_manage), _translate("MainWindow", "Manage"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_action_log), _translate("MainWindow", "Action Log"))
         self.menuProject.setTitle(_translate("MainWindow", "Project"))
@@ -252,6 +275,9 @@ class Ui_MainWindow(object):
         self.actionCode_relations.setText(_translate("MainWindow", "Code relations"))
         self.actionExport_coded_text_as_html.setText(_translate("MainWindow", "Export coded text as html"))
         self.actionManage_bad_links_to_files.setText(_translate("MainWindow", "Manage bad links to files"))
+        self.actionSpecial_functions.setText(_translate("MainWindow", "Special functions"))
+        self.actionFile_summary.setText(_translate("MainWindow", "File summary"))
+        self.actionCode_summary.setText(_translate("MainWindow", "Code summary"))
 
 
 if __name__ == "__main__":

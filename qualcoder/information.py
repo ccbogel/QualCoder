@@ -103,7 +103,8 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
 <p>ebooklib: Aleksandar Erkalović (<a href="https://github.com/aerkalov">https://github.com/aerkalov</a>)</p>\
 <p>The VideoLAN team for the bindings to VLC</p>\
-<p>To various members on github for supporting this project.</p>\
+<p>To various members on github for supporting this project. Greek translations from staff and students of the University of Macedonia.\
+Nikos Koutsoupias, Christos Kokkoris, Ioannis Mpoitsis</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\

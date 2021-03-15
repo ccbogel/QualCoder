@@ -32,6 +32,11 @@ import os
 import platform
 import sys
 import traceback
+openpyxl_module = True
+try:
+    from openpyxl import load_workbook
+except Exception as e:
+    openpyxl_module = False
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -40,6 +45,7 @@ from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
 from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
+from GUI.base64_helper import *
 from GUI.ui_dialog_cases import Ui_Dialog_cases
 from helpers import Message
 
@@ -50,11 +56,6 @@ from view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -100,30 +101,45 @@ class DialogCases(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
-        try:
-            w = int(self.app.settings['dialogcases_w'])
-            h = int(self.app.settings['dialogcases_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textBrowser.setStyleSheet(doc_font)
         self.load_cases_and_attributes()
-        self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
+        #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add.clicked.connect(self.add_case)
-        self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
-        self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
+        #self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
+        self.ui.pushButton_file_manager.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        #self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
+        #self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
+        self.ui.pushButton_import_cases.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -132,6 +148,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.fill_tableWidget()
+        #Initial resize of table columns
+        self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 1])
         try:
             s0 = int(self.app.settings['dialogcases_splitter0'])
@@ -142,10 +160,8 @@ class DialogCases(QtWidgets.QDialog):
             pass
 
     def closeEvent(self, event):
-        """ Save dialog and splitter dimensions. """
+        """ Save splitter dimensions. """
 
-        self.app.settings['dialogcases_w'] = self.size().width()
-        self.app.settings['dialogcases_h'] = self.size().height()
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcases_splitter0'] = sizes[0]
         self.app.settings['dialogcases_splitter1'] = sizes[1]
@@ -169,6 +185,51 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)
 
         return i
+
+    def export_attributes(self):
+        """ Export attributes from table as a csv file. """
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_case_attributes.csv"
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+            _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        if directory != self.app.last_export_directory:
+            self.app.last_export_directory = directory
+        filename = directory + "/" + filename
+        if os.path.exists(filename):
+            mb = QtWidgets.QMessageBox()
+            mb.setWindowTitle(_("File exists"))
+            mb.setText(_("Overwrite?"))
+            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            if mb.exec_() == QtWidgets.QMessageBox.No:
+                return
+
+        cols = self.ui.tableWidget.columnCount()
+        rows = self.ui.tableWidget.rowCount()
+        header = []
+        for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        with open(filename, mode='w') as f:
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(header)
+            for r in range(0, rows):
+                data = []
+                for c in range(0, cols):
+                    # Table cell may be a None type
+                    cell = ""
+                    try:
+                        cell = self.ui.tableWidget.item(r, c).text()
+                    except AttributeError:
+                        pass
+                    data.append(cell)
+                writer.writerow(data)
+        logger.info("Report exported to " + filename)
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
+        self.parent_textEdit.append(_("Case attributes csv file exported to: ") + filename)
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
@@ -242,40 +303,56 @@ class DialogCases(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
-        """ Import from a csv file with the cases and any attributes.
-        The csv file must have a header row which details the attribute names.
-        The csv file must be comma delimited. The first column must have the case ids.
-        The attribute types are calculated from the data.
-        """
+        """ Get user chosen file as xlxs or csv for importation """
 
         if self.cases != []:
             logger.warning(_("Cases have already been created."))
-        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select attributes file'),
-            self.app.settings['directory'], "(*.csv)")[0]
+        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select cases file'),
+            self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[0]
         if filename == "":
             return
-        if filename[-4:].lower() != ".csv":
-            msg = filename + "\n" + _("is not a .csv file. File not imported")
-            Message(self.app, _("Warning"), msg, "warning").exec_()
-            self.parent_textEdit.append(msg)
-            return
-        values = []
-        with open(filename, 'r', newline='') as f:
-            reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-            try:
-                for row in reader:
-                    values.append(row)
-            except csv.Error as e:
-                logger.warning(('file %s, line %d: %s' % (filename, reader.line_num, e)))
-        if len(values) <= 1:
-            logger.info(_("Cannot import from csv, only one row in file"))
-            return
+        if filename[-4:].lower() == ".csv":
+            self.import_csv(filename)
+        if filename[-5:].lower() == ".xlsx":
+            self.import_xlsx(filename)
+
+    def import_xlsx(self, filepath):
+        """ Import from a xlsx file with the cases and any attributes.
+        The file must have a header row which details the attribute names.
+        The first column must have the case ids.
+        The attribute types are calculated from the data.
+        """
+
+        if openpyxl_module is False:
+            self.fail_msg = _("Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
+            return False
+        data = []
+        wb = load_workbook(filename=filepath)
+        sheet = wb.active
+        for value in sheet.iter_rows(values_only=True):
+            # some rows may be complete blank so ignore importation
+            if (set(value)) != {None}:
+                # values are tuples, convert to list, and remove 'None' string
+                row = []
+                for item in value:
+                    if item is None:
+                        row.append("")
+                    else:
+                        row.append(item)
+                data.append(row)
+
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
-        header = values[0]
-        values = values[1:]
-        # insert cases
+        # Get field names and replace blanks with a placeholder
+        fields = []
+        for i, f in enumerate(data[0]):
+            if f != '':
+                fields.append(f)
+            else:
+                fields.append("Field_" + str(i))
+        data = data[1:]
+        # Insert cases
         cur = self.app.conn.cursor()
-        for v in values:
+        for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
                 'date': now_date}
             try:
@@ -287,19 +364,19 @@ class DialogCases(QtWidgets.QDialog):
                 self.cases.append(item)
             except Exception as e:
                 logger.error("item:" + str(item) + ", " + str(e))
-        # determine attribute type
-        attribute_value_type = ["character"] * len(header)
-        for col, att_name in enumerate(header):
+        # Determine attribute type
+        attribute_value_type = ["character"] * len(fields)
+        for col, att_name in enumerate(fields):
             numeric = True
-            for val in values:
+            for val in data:
                 try:
                     float(val[col])
                 except ValueError:
                     numeric = False
             if numeric:
                 attribute_value_type[col] = "numeric"
-        # insert attribute types
-        for col, att_name in enumerate(header):
+        # Insert attribute types
+        for col, att_name in enumerate(fields):
             if col > 0:
                 try:
                     cur.execute("insert into attribute_type (name,date,owner,memo, \
@@ -309,21 +386,97 @@ class DialogCases(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
-        # insert attributes
+        # Insert attributes
         sql = "select name, caseid from cases"
         cur.execute(sql)
         name_and_ids = cur.fetchall()
         for n_i in name_and_ids:
-            for v in values:
+            for v in data:
                 if n_i[0] == v[0]:
                     for col in range(1, len(v)):
                         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-                        cur.execute(sql, (header[col], v[col], n_i[1], 'case',
+                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                         now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
-        msg = _("Cases and attributes imported from: ") + filename
+        msg = _("Cases and attributes imported from: ") + filepath
+        self.app.delete_backup = False
+        self.parent_textEdit.append(msg)
+        logger.info(msg)
+
+    def import_csv(self, filepath):
+        """ Import from a csv file with the cases and any attributes.
+        The csv file must have a header row which details the attribute names.
+        The csv file must be comma delimited. The first column must have the case ids.
+        The attribute types are calculated from the data.
+        """
+
+        values = []
+        with open(filepath, 'r', newline='') as f:
+            reader = csv.reader(f, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+            try:
+                for row in reader:
+                    values.append(row)
+            except csv.Error as e:
+                logger.warning(('file %s, line %d: %s' % (filepath, reader.line_num, e)))
+        if len(values) <= 1:
+            logger.info(_("Cannot import from csv, only one row in file"))
+            return
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+        fields = values[0]
+        data = values[1:]
+        # Insert cases
+        cur = self.app.conn.cursor()
+        for v in data:
+            item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
+                'date': now_date}
+            try:
+                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                    ,(item['name'],item['memo'],item['owner'],item['date']))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                item['caseid'] = cur.fetchone()[0]
+                self.cases.append(item)
+            except Exception as e:
+                logger.error("item:" + str(item) + ", " + str(e))
+        # Determine attribute type
+        attribute_value_type = ["character"] * len(fields)
+        for col, att_name in enumerate(fields):
+            numeric = True
+            for val in data:
+                try:
+                    float(val[col])
+                except ValueError:
+                    numeric = False
+            if numeric:
+                attribute_value_type[col] = "numeric"
+        # Insert attribute types
+        for col, att_name in enumerate(fields):
+            if col > 0:
+                try:
+                    cur.execute("insert into attribute_type (name,date,owner,memo, \
+                    valueType, caseOrFile) values(?,?,?,?,?,?)"
+                    , (att_name, now_date, self.app.settings['codername'], "",
+                    attribute_value_type[col], 'case'))
+                    self.app.conn.commit()
+                except Exception as e:
+                    logger.error(_("attribute:") + att_name + ", " + str(e))
+        # Insert attributes
+        sql = "select name, caseid from cases"
+        cur.execute(sql)
+        name_and_ids = cur.fetchall()
+        for n_i in name_and_ids:
+            for v in data:
+                if n_i[0] == v[0]:
+                    for col in range(1, len(v)):
+                        sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                        cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
+                        now_date, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.load_cases_and_attributes()
+        self.fill_tableWidget()
+        msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
         self.parent_textEdit.append(msg)
         logger.info(msg)
@@ -422,7 +575,7 @@ class DialogCases(QtWidgets.QDialog):
         if y > 2:  # update attribute value
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
-            print(attribute_name)
+            #print(attribute_name)
             cur = self.app.conn.cursor()
 
             # Check numeric for numeric attributes, clear "" if cannot be cast
@@ -520,12 +673,11 @@ class DialogCases(QtWidgets.QDialog):
     def fill_tableWidget(self):
         """ Fill the table widget with case details. """
 
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.label_cases.setText(_("Cases: ") + str(len(self.cases)))
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-
-        self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         for row, c in enumerate(self.cases):
             self.ui.tableWidget.insertRow(row)
@@ -549,14 +701,12 @@ class DialogCases(QtWidgets.QDialog):
             item.setFlags(QtCore.Qt.ItemIsEnabled)
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
-
-            # add the attribute values
+            # 0Add attribute values to their columns
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if cid == a[2] and a[0] == header:
                         self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
         self.ui.tableWidget.verticalHeader().setVisible(False)
-        self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':

@@ -31,18 +31,24 @@ import csv
 import datetime
 import logging
 import os
+import platform
 from shutil import copyfile
 import sys
 import traceback
+import vlc
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
+from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+#from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
+
+from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -83,16 +89,16 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        '''try:
-            w = int(self.app.settings['dialogreportcodefrequencies_w'])
-            h = int(self.app.settings['dialogreportcodefrequencies_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass'''
-
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -103,12 +109,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
-
-    '''def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogreportcodefrequencies_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodefrequencies_h'] = new_size.size().height()'''
 
     def select_files(self):
         """ Report code frequencies for all files or selected files. """
@@ -297,13 +297,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             item = it.value()
         f.write(text)
         f.close()
-        logger.info("Report exported to " + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Text file Export'))
-        msg = filename + _(" exported")
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Text file Export'), filename + _(" exported")).exec_()
         self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
 
     def export_csv_file(self):
@@ -348,13 +342,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f = open(filename, 'w')
         f.write(data)
         f.close()
-        logger.info("Report exported to " + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Csv file Export'))
-        msg = filename + _(" exported")
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
         self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
 
     def fill_tree(self):
@@ -480,8 +468,20 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/clear_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
+        self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -516,8 +516,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             return
         if len(self.selected_coders) == 0:
             self.selected_coders.append(coder)
+            self.ui.label_selections.setText(coder)
         if len(self.selected_coders) == 1 and self.selected_coders[0] != coder:
             self.selected_coders.append(coder)
+            coder1 = self.ui.label_selections.text()
+            self.ui.label_selections.setText(coder1 + " , " + coder)
         if len(self.selected_coders) == 2:
             self.ui.pushButton_run.setEnabled(True)
 
@@ -537,6 +540,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 item.setText(6, "")
             it += 1
             item = it.value()
+        self.ui.label_selections.setText(_("No coders selected"))
 
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
@@ -807,13 +811,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
-        '''try:
-            w = int(self.app.settings['dialogreportcodes_w'])
-            h = int(self.app.settings['dialogreportcodes_h'])
-            if h > 50 and w > 50:
-                self.resize(w, h)
-        except:
-            pass'''
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -821,15 +818,30 @@ class DialogReportCodes(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(treefont)
+        self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.label_counts.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
+        self.ui.listWidget_files.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.ui.listWidget_cases.setStyleSheet(treefont)
+        self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
+        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_search.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.label_exports.setPixmap(pm)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.label_matrix.setPixmap(pm)
+        options = [_("Top categories"), _("Categories"), _("Codes")]
+        self.ui.comboBox_matrix.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
@@ -841,6 +853,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_export.setEnabled(False)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        self.ui.textEdit.installEventFilter(self)  # for H key
         self.ui.textEdit.setReadOnly(True)
         self.ui.splitter.setSizes([100, 200, 0])
         try:
@@ -862,12 +875,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
-
-    '''def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['dialogreportcodes_w'] = new_size.size().width()
-        self.app.settings['dialogreportcodes_h'] = new_size.size().height()'''
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -1178,6 +1185,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_option_selected(self):
         """ ComboBox export option selected. """
 
+        #TODO add case matrix as csv, xlsx options
         text = self.ui.comboBox_export.currentText()
         if text == "":
             return
@@ -1528,6 +1536,24 @@ class DialogReportCodes(QtWidgets.QDialog):
         mb.setWindowTitle(_('Report exported'))
         mb.setText(msg)
         mb.exec_()
+
+    def eventFilter(self, object, event):
+        """ Used to detect key events in the textedit.
+        H Hide / Unhide top groupbox
+        """
+
+        # change start and end code positions using alt arrow left and alt arrow right
+        # and shift arrow left, shift arrow right
+        # QtGui.QKeyEvent = 7
+        if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or \
+            self.ui.listWidget_files.hasFocus() or self.ui.listWidget_cases.hasFocus()):
+            key = event.key()
+            mod = event.modifiers()
+            # Hide unHide top groupbox
+            if key == QtCore.Qt.Key_H:
+                self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
+                return True
+        return False
 
     def recursive_set_selected(self, item):
         """ Set all children of this item to be selected if the item is selected.
@@ -2082,38 +2108,36 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
         # block signals of text cursor moving when filling text edit - stops context dialog appearing
-        # discinnected in search
 
         for row in self.text_results:
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
         for i, row in enumerate(self.image_results):
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.put_image_into_textedit(row, i, self.ui.textEdit)
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
         for i, row in enumerate(self.av_results):
-            startpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertHtml(self.html_heading(row))
-            endpos = len(self.ui.textEdit.toPlainText())
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            row['textedit_start'] = startpos
-            row['textedit_end'] = endpos
 
         self.eventFilterTT.setTextResults(self.text_results)
         self.ui.textEdit.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
 
         # Fill case matrix or clear third splitter pane.
-        if self.case_ids != "":
-            self.fill_matrix(self.text_results, self.image_results, self.av_results, self.case_ids)
-        else:
+        matrix_option = self.ui.comboBox_matrix.currentText()
+        if self.case_ids == "":
             self.ui.splitter.replaceWidget(2, QtWidgets.QTableWidget())
+        elif matrix_option == "Categories":
+            self.fill_matrix_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+        elif matrix_option == "Top categories":
+            self.fill_matrix_top_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+        else:
+            self.fill_matrix_codes(self.text_results, self.image_results, self.av_results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -2164,69 +2188,248 @@ class DialogReportCodes(QtWidgets.QDialog):
         if img['memo'] != "":
             text_edit.insertPlainText(_("Memo: ") + img['memo'] + "\n")
 
-    @staticmethod
-    def html_heading(item):
+    def html_heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
         param:
-            item: dictionary of code, file or case, positions, text, coder
+            item: dictionary of code, file_or_casename, positions, text, coder
         """
 
+        cur = self.app.conn.cursor()
+        cur.execute("select name from source where id=?", [item['fid']])
+        filename = ""
+        try:  # In case no filename results, rare possibility
+            filename = cur.fetchone()[0]
+        except:
+            pass
+
         html = "<br />"
-        if item['file_or_casename'][-4:].lower() in (".htm", ".txt", ".odt", ".pdf") or \
-            item['file_or_casename'][-5:].lower() in (".html", ".docx", ".epub") or \
-            item['file_or_casename'][-12:] == ".transcribed":
-            html += "[VIEW] "
+        html += _("[VIEW] ")
         html += "<em><span style=\"background-color:" + item['color'] + "\">"
         html += item['codename'] + "</span>, "
+        html += _("File: ")  + filename + ", "
         html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
         html += ", " + item['coder'] + "</em><br />"
         return html
 
     def show_context_of_clicked_heading(self):
-        """ Heading (code, file, owner) clicked so show context of coding in dialog. """
-
-        pos = self.ui.textEdit.textCursor().position()
-        coded_text = None
-        for row in self.text_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                coded_text = row
-                break
-        if coded_text is None:
-            return
-        self.view_text_result_in_context(coded_text)
-
-    def view_text_result_in_context(self, coded_text):
-        """ View the coded text in context of the original text file in the third split pane.
-        The third split pane contains a tablewidget. So add a textedit to this.
-        If a case matrix is shown, this method override it and replaces the matrix with the text in context.
+        """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
+        Called by: textEdit.cursorPositionChanged, after results are filled.
+        text/image/av results contain textedit_start and textedit_end which map the cursor position to the specific result.
         """
 
-        file_list = self.app.get_file_texts([coded_text['fid'], ])
-        file_text = file_list[0]
-        title = ""
-        if coded_text['file_or_case'] == "File":
-            title = _("File: ") + coded_text['file_or_casename']
-        if coded_text['file_or_case'] == "Case":
-            title = _("Case: ") +coded_text['file_or_casename'] + ", " + file_text['name']
-        te = QtWidgets.QTextEdit()
-        te.setPlainText(file_text['fulltext'])
-        cursor = te.textCursor()
-        cursor.setPosition(coded_text['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(coded_text['pos1'], QtGui.QTextCursor.KeepAnchor)
-        fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(coded_text['color']))
-        fmt.setBackground(brush)
-        cursor.setCharFormat(fmt)
-        self.ui.splitter.replaceWidget(2, te)
-        self.ui.splitter.setSizes([100,100, 200])
+        pos = self.ui.textEdit.textCursor().position()
+        # Check the clicked position for a text result
+        found = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInText(self.app, row)
+                ui.exec_()
+                return
+        # Check the position for an image result
+        for row in self.image_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInImage(self.app, row)
+                ui.exec_()
+                return
+        # Check the position for an a/v result
+        for row in self.av_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                ui = DialogCodeInAV(self.app, row)
+                ui.exec_()
+                break
 
-    def fill_matrix(self, text_results, image_results, av_results, case_ids):
+    def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
+        """ Fill a tableWidget with rows of cases and columns of codes.
+        First identify all codes.
+        Fill tableWidget with columns of codes and rows of cases.
+        Called by: fill_text_edit_with_search_results
+        param:
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
+        """
+
+        # Get selected codes (Matrix columns)
+        items = self.ui.treeWidget.selectedItems()
+        horizontal_labels = []  # column (code) labels
+        for item in items:
+            #print(item.text(0), item.text(1))
+            if item.text(1)[:3] == "cid":
+                horizontal_labels.append(item.text(0))  #, 'cid': item.text(1)})
+
+        # Get cases (rows)
+        cur = self.app.conn.cursor()
+        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
+        cases = cur.fetchall()
+        vertical_labels = []
+        for c in cases:
+            vertical_labels.append(c[1])
+
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # already have been replaced with a textEdit (file selection the view text in context)
+        self.ta = QtWidgets.QTableWidget()
+        self.ta.setColumnCount(len(horizontal_labels))
+        self.ta.setHorizontalHeaderLabels(horizontal_labels)
+        self.ta.setRowCount(len(cases))
+        self.ta.setVerticalHeaderLabels(vertical_labels)
+        # Tried lots of things to get the below signal to work.
+        # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
+        # Gave up.
+        self.te = []
+        for row, case in enumerate(cases):
+            inner = []
+            for col, colname in enumerate(horizontal_labels):
+                tedit = QtWidgets.QTextEdit("")
+                tedit.setReadOnly(True)
+                #tedit.cursorPositionChanged.connect(lambda: self.test_matrix_textEdit(tedit))
+                inner.append(tedit)
+            self.te.append(inner)
+        for row, case in enumerate(cases):
+            for col, colname in enumerate(horizontal_labels):
+                '''self.te[row][col].setContextMenuPolicy(Qt.CustomContextMenu)
+                self.te[row][col].customContextMenuRequested.connect(lambda: self.matrix_text_edit_menu(self.te[row][col]))'''
+                for t in text_results:
+                    if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
+                        self.te[row][col].insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
+                for a in av_results:
+                    if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
+                        self.te[row][col].insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        self.te[row][col].insertPlainText(a['text'] + "\n")
+                for counter, i in enumerate(image_results):
+                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
+                        self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.put_image_into_textedit(i, counter, self.te[row][col])
+                self.ta.setCellWidget(row, col, self.te[row][col])
+        self.ta.resizeRowsToContents()
+        self.ta.resizeColumnsToContents()
+        # maximise the space from one column or one row
+        if self.ta.columnCount() == 1:
+            self.ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if self.ta.rowCount() == 1:
+            self.ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, self.ta)
+        self.ui.splitter.setSizes([100, 300, 300])
+
+    def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
-        First identify top-lvel categories and codes. Then map all other codes to the
-        top-level cataegories. Fill tableWidget with columns of top-level items and rows
-        of cases. """
+        First identify the categories. Then map all codes which are directly assigned to the categories.
+        Fill tableWidget with columns of categories and rows of cases.
+        Called by: fill_text_edit_with_search_results
+        param:
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
+        """
 
-        # get top level categories and codes
+        # G categories
+        items = self.ui.treeWidget.selectedItems()
+        top_level = []  # the categories at any level
+        horizontal_labels = []
+        sub_codes = []
+        for item in items:
+            #print(item.text(0), item.text(1), "root", root)
+            if item.text(1)[0:3] == "cat":
+                top_level.append({'name': item.text(0), 'cat': item.text(1)})
+                horizontal_labels.append(item.text(0))
+            # Find sub-code and traverse upwards to map to category
+            if item.text(1)[0:3] == 'cid':
+                #print("sub", item.text(0), item.text(1))
+                not_top = True
+                sub_code = {'codename': item.text(0), 'cid': item.text(1)}
+                # May be None of a top level code - as this will have no parent
+                if item.parent() is not None:
+                    sub_code['top'] = item.parent().text(0)
+                    sub_codes.append(sub_code)
+
+        # Add category name - which will match the tableWidget column category name
+        res_text_categories = []
+        for i in text_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_text_categories.append(i)
+
+        res_image_categories = []
+        for i in image_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_image_categories.append(i)
+
+        res_av_categories = []
+        for i in av_results:
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
+            for s in sub_codes:
+                if i['codename'] == s['codename']:
+                    i['top'] = s['top']
+            if "top" in i:
+                res_av_categories.append(i)
+
+        cur = self.app.conn.cursor()
+        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
+        cases = cur.fetchall()
+        vertical_labels = []
+        for c in cases:
+            vertical_labels.append(c[1])
+
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # Already have been replaced with a textEdit (file selection the view text in context)
+        ta = QtWidgets.QTableWidget()
+        ta.setColumnCount(len(horizontal_labels))
+        ta.setHorizontalHeaderLabels(horizontal_labels)
+        ta.setRowCount(len(cases))
+        ta.setVerticalHeaderLabels(vertical_labels)
+        for row, case in enumerate(cases):
+            for col, colname in enumerate(horizontal_labels):
+                txt_edit = QtWidgets.QTextEdit("")
+                txt_edit.setReadOnly(True)
+                for t in res_text_categories:
+                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        txt_edit.insertPlainText(t['text'] + "\n")
+                for a in res_av_categories:
+                    if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        txt_edit.insertPlainText(a['text'] + "\n")
+                for counter, i in enumerate(res_image_categories):
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.put_image_into_textedit(i, counter, txt_edit)
+                ta.setCellWidget(row, col, txt_edit)
+        ta.resizeRowsToContents()
+        ta.resizeColumnsToContents()
+        # Maximise the space from one column or one row
+        if ta.columnCount() == 1:
+            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if ta.rowCount() == 1:
+            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, ta)
+        self.ui.splitter.setSizes([100, 300, 300])
+
+    def fill_matrix_top_categories(self, text_results, image_results, av_results, case_ids):
+        """ Fill a tableWidget with rows of cases and columns of categories.
+        First identify top-level categories. Then map all other codes to the
+        top-level categories.
+        Fill tableWidget with columns of top-level categories and rows of cases.
+        Called by: fill_text_edit_with_search_results
+        param:
+            text_results : list of dictionary text result items
+            image_results : list of dictionary image result items
+            av_results : list of dictionary av result items
+            case_ids : list of case ids
+        """
+
+        # get top level categories
         items = self.ui.treeWidget.selectedItems()
         top_level = []
         horizontal_labels = []
@@ -2234,10 +2437,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         for item in items:
             root = self.ui.treeWidget.indexOfTopLevelItem(item)
             #print(item.text(0), item.text(1), "root", root)
-            if root > -1:
-                top_level.append({'name': item.text(0), 'cat_or_cid': item.text(1)})
+            if root > -1 and item.text(1)[0:3] == "cat":
+                top_level.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
-            #find sub-code and traverse upwards to map to top-level category
+            # Find sub-code and traverse upwards to map to top-level category
             if root == -1 and item.text(1)[0:3] == 'cid':
                 #print("sub", item.text(0), item.text(1))
                 not_top = True
@@ -2249,28 +2452,36 @@ class DialogReportCodes(QtWidgets.QDialog):
                         sub_code['top'] = item.text(0)
                         sub_codes.append(sub_code)
 
-        # add the top-level name - which will match the tableWidget column name
+        # Add the top-level name - which will match the tableWidget column category name
+        res_text_categories = []
         for i in text_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_text_categories.append(i)
+
+        res_image_categories = []
         for i in image_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_image_categories.append(i)
+
+        res_av_categories = []
         for i in av_results:
-            # this assumes the code is already a top-level name (i.e. column in tableWidget)
-            i['top'] = i['codename']
-            # this replaces the top-level name by mapping to the correct top-level category (i.e. column)
+            # Replaces the top-level name by mapping to the correct top-level category name (column)
+            # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
+            if "top" in i:
+                res_av_categories.append(i)
 
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
@@ -2279,8 +2490,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in cases:
             vertical_labels.append(c[1])
 
-        # need to dynamically replace the existing table widget. Because, the tablewidget may
-        # already have been replaced with a textEdit (file selection the view text in context)
+        # Dynamically replace the existing table widget. Because, the tablewidget may
+        # Already have been replaced with a textEdit (file selection the view text in context)
         ta = QtWidgets.QTableWidget()
         ta.setColumnCount(len(horizontal_labels))
         ta.setHorizontalHeaderLabels(horizontal_labels)
@@ -2289,22 +2500,23 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
-                for t in text_results:
+                txt_edit.setReadOnly(True)
+                for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(t))
+                        txt_edit.insertHtml(self.html_heading(t).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(t['text'] + "\n")
-                for a in av_results:
+                for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(a))
+                        txt_edit.insertHtml(self.html_heading(a).replace("[VIEW]", ""))
                         txt_edit.insertPlainText(a['text'] + "\n")
-                for counter, i in enumerate(image_results):
+                for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        txt_edit.insertHtml(self.html_heading(i))
+                        txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
                 ta.setCellWidget(row, col, txt_edit)
         ta.resizeRowsToContents()
         ta.resizeColumnsToContents()
-        # maximise the space from one column or one row
+        # Maximise the space from one column or one row
         if ta.columnCount() == 1:
             ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         if ta.rowCount() == 1:
@@ -2365,5 +2577,4 @@ class ToolTip_EventFilter(QtCore.QObject):
                         receiver.setToolTip(msg)
         #Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
-
 

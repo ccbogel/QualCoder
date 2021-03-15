@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ https://qualcoder.wordpress.com/
 import configparser
 import datetime
 import gettext
-import json  # to get latest release
+import json  # to get latest Github release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -60,15 +60,18 @@ from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from report_code_summary import DialogReportCodeSummary
+from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
 from rqda import Rqda_import
 from settings import DialogSettings
+from special_functions import DialogSpecialFunctions
 #from text_mining import DialogTextMining
 from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.2"
+qualcoder_version = "QualCoder 2.4"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -234,7 +237,7 @@ class App(object):
             return result[0]
 
     def create_connection(self, project_path):
-        """ Create connection to recent project and load codes, categories and model """
+        """ Create connection to recent project. """
 
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
@@ -317,7 +320,7 @@ class App(object):
         return res
 
     def get_data(self):
-        """ Called from init and gets all the codes, categories.
+        """ Gets all the codes, categories.
         Called from code_text, code_av, code_image, reports, report_crossovers """
 
         categories = []
@@ -383,6 +386,8 @@ class App(object):
             result['fontsize'] = default.getint('fontsize')
         if 'treefontsize' in default:
             result['treefontsize'] = default.getint('treefontsize')
+        if 'docfontsize' in default:
+            result['docfontsize'] = default.getint('docfontsize')
         return result
 
     def check_and_add_additional_settings(self, data):
@@ -393,12 +398,8 @@ class App(object):
         """
 
         dict_len = len(data)
-        keys = ['mainwindow_w', 'mainwindow_h', 'dialogcodetext_w','dialogcodetext_h',
-        'dialogcodeimage_w', 'dialogcodeimage_h', 'dialogviewimage_w', 'dialogviewimage_h',
-        'dialogreportcodes_w', 'dialogreportcodes_h', 'dialogmanagefiles_w', 'dialogmanagefiles_h',
-        'dialogjournals_w', 'dialogjournals_h', 'dialogsql_w', 'dialogsql_h',
-        'dialogcases_w', 'dialogcases_h', 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
-        'dialogmanagesttributes_w', 'dialogmanageattributes_h',
+        keys = ['mainwindow_w', 'mainwindow_h',
+        'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
         'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
         'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
         'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
@@ -406,20 +407,25 @@ class App(object):
         'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
         'dialogreportcodes_splitter_v0', 'dialogreportcodes_splitter_v1',
         'dialogreportcodes_splitter_v2',
-        'dialogjournals_splitter0', 'dialogjournals_splitter1', 'dialogsql_splitter_h0',
-        'dialogsql_splitter_h1', 'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
-        'dialogcases_splitter0', 'dialogcases_splitter1', 'dialogreportcodefrequencies_w',
-        'dialogreportcodefrequencies_h', 'mainwindow_w', 'mainwindow_h',
-        'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1', 'timestampformat',
-        'speakernameformat', 'video_w', 'video_h', 'dialogcodeav_w', 'dialogcodeav_h',
-        'codeav_abs_pos_x', 'codeav_abs_pos_y', 'viewav_abs_pos_x', 'viewav_abs_pos_y',
-        'dialogviewav_w', 'dialogviewav_h', 'viewav_video_pos_x', 'viewav_video_pos_y',
+        'dialogjournals_splitter0', 'dialogjournals_splitter1',
+        'dialogsql_splitter_h0', 'dialogsql_splitter_h1',
+        'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
+        'dialogcases_splitter0', 'dialogcases_splitter1',
+        'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1',
+        'timestampformat', 'speakernameformat',
+        'video_w', 'video_h',
+        'codeav_abs_pos_x', 'codeav_abs_pos_y',
+        'viewav_abs_pos_x', 'viewav_abs_pos_y',
+        'viewav_video_pos_x', 'viewav_video_pos_y',
         'codeav_video_pos_x', 'codeav_video_pos_y',
         'dialogcodeav_splitter_0','dialogcodeav_splitter_1',
         'dialogcodeav_splitter_h0','dialogcodeav_splitter_h1',
         'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
         'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
+        'docfontsize',
+        'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
+        'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0'
         ]
         for key in keys:
             if key not in data:
@@ -431,7 +437,6 @@ class App(object):
         # write out new ini file, if needed
         if len(data) > dict_len:
             self.write_config_ini(data)
-            logger.info('Added window sizings to config.ini')
         return data
 
     def merge_settings_with_default_stylesheet(self, settings):
@@ -471,6 +476,7 @@ class App(object):
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
+            'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
             'showids': False,
@@ -481,67 +487,43 @@ class App(object):
             'speakernameformat': "[]",
             'mainwindow_w': 0,
             'mainwindow_h': 0,
-            'dialogcodetext_w': 0,
-            'dialogcodetext_h': 0,
             'dialogcodetext_splitter0': 1,
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
-            'dialogcodeimage_w': 0,
-            'dialogcodeimage_h': 0,
             'dialogcodeimage_splitter0': 1,
             'dialogcodeimage_splitter1': 1,
             'dialogcodeimage_splitter_h0': 1,
             'dialogcodeimage_splitter_h1': 1,
-            'dialogviewimage_w': 0,
-            'dialogviewimage_h': 0,
-            'dialogreportcodes_w': 0,
-            'dialogreportcodes_h': 0,
-            'dialogreportcodefrequencies_w': 0,
-            'dialogreportcodefrequencies_h': 0,
             'dialogreportcodes_splitter0': 1,
             'dialogreportcodes_splitter1': 1,
             'dialogreportcodes_splitter_v0': 30,
             'dialogreportcodes_splitter_v1': 30,
             'dialogreportcodes_splitter_v2': 30,
-            'dialogmanagefiles_w': 0,
-            'dialogmanagefiles_h': 0,
-            'dialogjournals_w': 0,
-            'dialogjournals_h': 0,
             'dialogjournals_splitter0': 1,
             'dialogjournals_splitter1': 1,
-            'dialogsql_w': 0,
-            'dialogsql_h': 0,
             'dialogsql_splitter_h0': 1,
             'dialogsql_splitter_h1': 1,
             'dialogsql_splitter_v0': 1,
             'dialogsql_splitter_v1': 1,
-            'dialogcases_w': 0,
-            'dialogcases_h': 0,
             'dialogcases_splitter0': 1,
             'dialogcases_splitter1': 1,
             'dialogcasefilemanager_w': 0,
             'dialogcasefilemanager_h': 0,
             'dialogcasefilemanager_splitter0': 1,
             'dialogcasefilemanager_splitter1': 1,
-            'dialogmanageattributes_w': 0,
-            'dialogmanageattributes_h': 0,
             'video_w': 0,
             'video_h': 0,
             'viewav_video_pos_x': 0,
             'viewav_video_pos_y': 0,
             'codeav_video_pos_x': 0,
             'codeav_video_pos_y': 0,
-            'dialogcodeav_w': 0,
-            'dialogcodeav_h': 0,
             'codeav_abs_pos_x': 0,
             'codeav_abs_pos_y': 0,
             'dialogcodeav_splitter_0': 0,
             'dialogcodeav_splitter_1': 0,
             'dialogcodeav_splitter_h0': 0,
             'dialogcodeav_splitter_h1': 0,
-            'dialogviewav_w': 0,
-            'dialogviewav_h': 0,
             'viewav_abs_pos_x': 0,
             'viewav_abs_pos_y': 0,
             'dialogcodecrossovers_w': 0,
@@ -551,7 +533,11 @@ class App(object):
             'dialogmanagelinks_w': 0,
             'dialogmanagelinks_h': 0,
             'bookmark_file_id': 0,
-            'bookmark_pos': 0
+            'bookmark_pos': 0,
+            'dialogreport_file_summary_splitter0': 100,
+            'dialogreport_file_summary_splitter1': 100,
+            'dialogreport_code_summary_splitter0': 100,
+            'dialogreport_code_summary_splitter1': 100
         }
 
     def get_file_texts(self, fileids=None):
@@ -690,6 +676,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
+        self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
         #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
@@ -697,6 +685,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionContents.triggered.connect(self.help)
         self.ui.actionContents.setShortcut('Ctrl+H')
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -802,6 +791,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
+        self.ui.actionFile_summary.setEnabled(False)
+        self.ui.actionCode_summary.setEnabled(False)
+        # help menu
+        self.ui.actionSpecial_functions.setEnabled(False)
 
     def show_menu_options(self):
         """ Project opened, show most menu options.
@@ -834,6 +827,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
+        self.ui.actionFile_summary.setEnabled(True)
+        self.ui.actionCode_summary.setEnabled(True)
+        # help menu
+        self.ui.actionSpecial_functions.setEnabled(True)
 
         #TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
@@ -864,6 +861,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_sql(self):
         """ Run SQL statements on database. """
 
+        self.ui.label_reports.hide()
         ui = DialogSQL(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
@@ -878,32 +876,52 @@ class MainWindow(QtWidgets.QMainWindow):
     def report_coding_comparison(self):
         """ Compare two or more coders using Cohens Kappa. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_frequencies(self):
         """ Show code frequencies overall and by coder. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCodeFrequencies(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_code_relations(self):
         """ Show code relations in text files. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
         """ Report on coding and categories. """
 
+        self.ui.label_reports.hide()
         ui = DialogReportCodes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
-    def view_graph_original(self):
-        """ Show acyclic graph of codes and categories. """
+    def report_file_summary(self):
+        """ Report on file details. """
 
+        self.ui.label_reports.hide()
+        ui = DialogReportFileSummary(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def report_code_summary(self):
+        """ Report on code details. """
+
+        self.ui.label_reports.hide()
+        ui = DialogReportCodeSummary(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def view_graph_original(self):
+        """ Show list or acyclic graph of codes and categories. """
+
+        self.ui.label_reports.hide()
         ui = ViewGraphOriginal(self.app)
-        ui.exec_()
+        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def help(self):
         """ Display manual in browser. """
@@ -916,9 +934,16 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogInformation(self.app, "About", "")
         ui.exec_()
 
+    def special_functions(self):
+        """ User requested special functions dialog. """
+
+        ui = DialogSpecialFunctions(self.app, self.ui.textEdit, self.ui.tab_coding)
+        ui.exec_()
+
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
 
+        self.ui.label_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -936,6 +961,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create, edit, delete, rename cases, add cases to files or parts of
         files, add memos to cases. """
 
+        self.ui.label_manage.hide()
         ui = DialogCases(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -944,6 +970,7 @@ class MainWindow(QtWidgets.QMainWindow):
         plain text. Rename, delete and add memos to files.
         """
 
+        self.ui.label_manage.hide()
         ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
@@ -951,6 +978,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Fix any bad links to files.
         File names must match but paths can be different. """
 
+        self.ui.label_manage.hide()
         ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
@@ -960,6 +988,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def journals(self):
         """ Create and edit journals. """
 
+        self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_manage, ui)
@@ -970,6 +999,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
+            self.ui.label_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -983,6 +1013,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_image_filenames()
         if len(files) > 0:
+            self.ui.label_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -999,6 +1030,8 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec_()
             return
+
+        self.ui.label_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -1016,17 +1049,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setCurrentWidget(tab_widget)
         # Check the tab has a layout and widgets
         contents = tab_widget.layout()
-        if contents:
+        if contents is None:
+            # Tab has no layout so add one with widget
+            layout = QtWidgets.QVBoxLayout()
+            layout.addWidget(ui)
+            tab_widget.setLayout(layout)
+        else:
             # Remove widgets from layout
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
             contents.addWidget(ui)
-        else:
-            # Tab has no layout so add one with widget
-            layout = QtWidgets.QVBoxLayout()
-            layout.addWidget(ui)
-            tab_widget.setLayout(layout)
 
     def codebook(self):
         """ Export a text file code book of categories and codes.
@@ -1354,6 +1387,33 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project_summary_report()
         self.show_menu_options()
 
+        # Delete codings (fid, id) that do not have a matching source id
+        sql = "select fid from code_text where fid not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_text coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_text where fid=?", [r[0]])
+        sql = "select code_image.id from code_image where code_image.id not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_image coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_image where id=?", [r[0]])
+        sql = "select code_av.id from code_av where code_av.id not in (select source.id from source)"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res != []:
+            self.ui.textEdit.append(_("Deleting code_av coding to deleted files: ") + str(res))
+        for r in res:
+            cur.execute("delete from code_av where id=?", [r[0]])
+        self.app.conn.commit()
+        # Vacuum database
+        cur.execute("vacuum")
+        self.app.conn.commit()
+
     def save_backup(self):
         """ Save a date and hours stamped backup.
         Do not backup if the name already exists.
@@ -1525,7 +1585,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for f in files_folders:
             if f[0:lenname] == projectname_and_bkup and f[-4:] == ".qda":
                 backups.append(f)
-        # Sort newest to oldest, and remove any that are more than fifth positon in the list
+        # Sort newest to oldest, and remove any that are more than fifth position in the list
         backups.sort(reverse=True)
         to_remove = []
         if len(backups) > 5:
@@ -1534,9 +1594,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         for f in to_remove:
             try:
-                print("Removing " + directory + f)
                 shutil.rmtree(directory + f)
-                self.ui.textEdit.append(_("Deleting: " + f))
+                self.ui.textEdit.append(_("Deleting: ") + directory + f)
             except Exception as e:
                 print(str(e))
 
@@ -1554,7 +1613,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 'https://api.github.com/repos/ccbogel/QualCoder/releases/latest',
                 headers={'Accept': 'application/vnd.github.v3+json'},
             )).read())
-            if _json['name'] not in qualcoder_version:
+            if _json['name'] > qualcoder_version:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
                 html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
