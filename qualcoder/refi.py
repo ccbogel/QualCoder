@@ -50,7 +50,7 @@ from PyQt5 import QtWidgets, QtCore
 from confirm_delete import DialogConfirmDelete  # REFI export questin about line endings
 from GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from helpers import Message
-
+import portableqda
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1555,13 +1555,61 @@ class Refi_export(QtWidgets.QDialog):
             f.write(self.xml)
             f.close()
             msg = _("Codebook has been exported to ")
-            msg += filename
+            msg += filename +". See standard output for messages from portableQDA"
             Message(self.app, _("Codebook exported"), _(msg)).exec_()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
             Message(self.app, _("Codebook NOT exported"), str(e)).exec_()
             self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(e)))
+        #
+        # portableQDA test-drive: exporting categories as REFI-QDA sets
+        #
+        def log_to_stdout():
+            import logging
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(logging.DEBUG)
+            formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            portableqda.log.addHandler(handler)
+            portableqda.log.setLevel(logging.DEBUG)
+        log_to_stdout() #
+        r=portableqda.resultCls  #named tuple, see https://gitlab.com/portableqda/portableQDA/-/blob/master/examples/ex2_flowControl.py
+
+        # create empty codebook
+        codebookNG=portableqda.codebookCls(output=filename.replace(".qdc","-portableQDA.qdc")) #NG for "Next Generation" or "No-Go" ;)
+        catById=dict() #save categrories key
+
+        # load categories in the codebook using codebookNG.createElement()
+        for category in self.categories:
+            categoryProxy = r(*codebookNG.createElement(elementCls=portableqda.setCls,
+                                                      name=category["name"],
+                                                      guid=category["guid"],
+                                                      description=category["memo"]))
+            # check if REFI-QDA set is faulty, throw an error. If healthy, save its catid
+            if categoryProxy.error:
+                portableqda.log.error(categoryProxy.errorDesc)
+            else:
+                catById[category["catid"]]=categoryProxy.result #result references the actual object within the codebook
+                portableqda.log.info(f"category#{category['catid']} found: {categoryProxy.result.name}")
+
+        # now load codes using codebookNG.createElement()
+        for code in self.codes:
+            portableqda.log.info(f"code found: {code['name']}")
+            setsList=["global_set",]
+            if code["catid"] in catById.keys():
+                setsList.append(catById[code["catid"]])
+            else:
+                setsList.append(f"unknown_category_{code['catid']}")
+            codebookNG.createElement(elementCls=portableqda.codeCls,
+                                                  name=code["name"],
+                                                  sets=setsList, #set objects or new set names
+                                                  color=code["color"],
+                                                  guid=code["guid"],
+                                                  description=code["memo"])
+            # no error checking
+        #that's it... save as XML!
+        codebookNG.writeQdcFile()
 
     def user_guid(self, username):
         """ Requires a username. returns matching guid """
