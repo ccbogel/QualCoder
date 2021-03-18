@@ -91,6 +91,9 @@ class Refi_import():
     xml = None
     base_path = ""
     sofware_name = ""
+    # Progress dialog
+    pd = None
+    pd_value = 0
 
     def __init__(self, app, parent_textEdit, import_type):
 
@@ -317,6 +320,20 @@ class Refi_import():
         project_zip = zipfile.ZipFile(self.file_path)
         project_zip.extractall(self.folder_name)
         project_zip.close()
+
+        # Set up progress dialog
+        # Source loading can be slow, so use this for he progress dialog
+        # Sources folder name can be capital or lower case, check and get the correct one
+        contents = os.listdir(self.folder_name)
+        sources_name = "/Sources"
+        for i in contents:
+            if i == "sources":
+                sources_name = "/sources"
+        num_sources = len(os.listdir(self.folder_name + sources_name))
+        self.pd = QtWidgets.QProgressDialog(_("Project Import"), "", 0, num_sources, None)
+        self.pd.setWindowModality(QtCore.Qt.WindowModal)
+        self.pd_value = 0
+
         # Parse xml
         with open(self.folder_name + "/project.qde", "r") as xml_file:
             self.xml = xml_file.read()
@@ -327,7 +344,6 @@ class Refi_import():
         # Must parse Project tag first to get software_name
         # This is used when importing - especially from ATLAS.ti
         self.parse_project_tag(root)
-
         children = root.getchildren()
         for c in children:
             #print(c.tag)
@@ -346,12 +362,10 @@ class Refi_import():
                 self.parent_textEdit.append(_("Parse file variables. Loaded: ") + str(count[0]))
                 self.parent_textEdit.append(_("Parse case variables. Loaded: ") + str(count[1]))
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                count = self.parse_notes(c)
                 self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Description":
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
-            QtWidgets.QApplication.processEvents()
 
         # Parse cases and sources after the variables components parsed
         # Need to fill placeholders and values for variables for sources and cases
@@ -362,6 +376,9 @@ class Refi_import():
                 count = self.parse_cases(c)
                 self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Sources":
+                '''pd_value += 1
+                pd.setLabelText(_("Sources"))
+                pd.setValue(pd_value)'''
                 count = self.parse_sources(c)
                 self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
         self.clean_up_case_codes_and_case_text()
@@ -590,15 +607,25 @@ class Refi_import():
         for e in element.getchildren():
             #print(e.tag, e.get("name"))
             if e.tag == "{urn:QDA-XML:project:1.0}TextSource":
-                self.load_text_source(e)  # TESTING
+                self.pd_value += 1
+                self.pd.setValue(self.pd_value)
+                self.load_text_source(e)
             if e.tag == "{urn:QDA-XML:project:1.0}PictureSource":
-                self.load_picture_source(e)  # TESTING
+                self.pd_value += 1
+                self.pd.setValue(self.pd_value)
+                self.load_picture_source(e)
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSource":
-                self.load_audio_source(e)  # TESTING
+                self.pd_value += 1
+                self.pd.setValue(self.pd_value)
+                self.load_audio_source(e)
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSource":
-                self.load_video_source(e)  # TESTING
+                self.pd_value += 1
+                self.pd.setValue(self.pd_value)
+                self.load_video_source(e)
             if e.tag == "{urn:QDA-XML:project:1.0}PDFSource":
-                self.load_pdf_source(e)  # TESTING
+                self.pd_value += 1
+                self.pd.setValue(self.pd_value)
+                self.load_pdf_source(e)
             count += 1
         return count
 
@@ -1199,7 +1226,7 @@ class Refi_import():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        print("varname:", var_name, " value:",value)  # tmp
+        #print("varname:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
