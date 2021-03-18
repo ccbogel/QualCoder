@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -179,9 +179,70 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         super(DialogSpecialFunctions, self).accept()
 
+    '''def menelic(self):
+        """ Convert MAXQDA REFI-QDA export from many files into one text file.
+         Need to load the qdpx file first. Then run this function to collate and add codings. """
+        text = ""
+        cur = self.app.conn.cursor()
+        owner = "default"
+        date = ""
+        o_sql = "select owner, date from source limit 1"
+        cur.execute(o_sql)
+        o_res = cur.fetchone()
+        owner = o_res[0]
+        date_ = o_res[1]
 
-'''if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSpecialFunctions()
-    ui.show()
-    sys.exit(app.exec_())'''
+        # Insert empty text file, named '0_collated', to get the id_
+        cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+            ('0_collated',  '', None, '', owner, date_))
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        id_ = cur.fetchone()[0]
+        print("id_ ", id_)
+        source_sql = "select id, name, fulltext from source order by id"
+        cur.execute(source_sql)
+        source_res = cur.fetchall()
+        coding_sql = "select cid, pos0, pos1, seltext, owner, date from code_text where fid=?"
+        code_text = []
+        pos = 0
+        for source in source_res:
+            id_text = source[1] + " "
+            insert_text = source[2] + "\n"
+            text += id_text + insert_text  
+            # Get codings for this file
+            cur.execute(coding_sql, [source[0]])
+            coding_res = cur.fetchall()
+            for c in coding_res:
+                pos0 = pos + len(id_text) + c[1]
+                pos1 = pos + len(id_text) + c[2]
+                seltext = insert_text[c[1]:c[2]]
+                code_text.append({'cid': c[0], 'fid': id_, 'seltext': seltext, 'pos0': pos0, 'pos1': pos1, 'owner': c[4], 'date': c[5]})
+                #print(code_text)
+            pos = len(text)
+        #print(text)
+
+        # Update file, named '0_collated' with text
+        cur.execute("update source set fulltext=? where id=?", [text, id_])
+        self.app.conn.commit()
+        self.ui.label_2.setText("0_collated Text file created")
+
+        # Insert codings
+        # Making up memo at nothing and date as current date
+        for c in code_text:
+            try:
+                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                    memo,date) values(?,?,?,?,?,?,?,?)",
+                    [c['cid'], c['fid'], c['seltext'], c['pos0'], c['pos1'], c['owner'], '', c['date']])
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
+        self.ui.label_2.setText("Codes added to file 0_collated")
+        self.ui.pushButton_text_starts.hide()
+
+        # Delete other codes and files
+        """cur.execute("delete from source where id != ?", [id_])
+        self.app.conn.commit()
+        cur.execute("delete from code_text where fid != ?", [id_])
+        self.app.conn.commit()"""'''
+
+
