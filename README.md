@@ -203,14 +203,3 @@ https://www.saashub.com/qualcoder-alternatives
 https://alternativeto.net/software/qualcoder
 
 
-## Publications using QualCoder
-Local–global linkages: Challenges in organizing functional communities for ecosocial justice. Joel Izlar, Journal of Community Practice 27(3-4) 2019
-
-Barriers to Health: Understanding the Barriers Faced by Community Intervention Projects. Vera Landrum, The University of Southern Mississippi 2020, Available from: https://aquila.usm.edu/cgi/viewcontent.cgi?article=1772&context=masters_theses
-
-Framing food geographies. S Ramsay, Masters Thesis, Stockholms Universitet 2020
-
-Seeking research software. A qualitative study of humanities scholars' information practices. Ronny Gey, Masters Thesis, Humboldt University of Berlin 2020
-
-Traditional and biomedical care pathways for mental well‐being in rural Nepal. T Pham, R Koirala, B Kohrt, International Journal of Mental Health Systems volume 15 2021
-
