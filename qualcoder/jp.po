@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 18:11+1100\n"
-"PO-Revision-Date: 2021-02-05 18:46+1100\n"
-"Language: ja\n"
+"POT-Creation-Date: 2021-04-01 23:02+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"X-Generator: Poedit 2.3\n"
 
 #: add_attribute.py:46 add_item_name.py:46
 msgid "Uncaught exception"
@@ -36,20 +36,22 @@ msgstr "獲れない例外"
 #: view_image.py:67 attributes.py:60 cases.py:70 code_text.py:69
 #: dialog_sql.py:54 journals.py:56 manage_files.py:96 qualcoder.py:112
 #: reports.py:66 view_av.py:103 view_graph_original.py:59 view_image.py:68
-#: report_relations.py:55 manage_files.py:97
+#: report_relations.py:55 manage_files.py:97 code_text.py:70
+#: import_survey.py:64
 msgid "Uncaught Exception"
 msgstr "獲れない例外"
 
-#: add_attribute.py:89 add_item_name.py:89
+#: add_attribute.py:89 add_item_name.py:89 add_attribute.py:90
 msgid "Duplicated"
 msgstr "重複"
 
-#: add_attribute.py:89 add_item_name.py:89
+#: add_attribute.py:89 add_item_name.py:89 add_attribute.py:90
 msgid "This already exists"
 msgstr "これはすでに存在している"
 
 #: attributes.py:52 code_text.py:62 code_text.py:63 attributes.py:58
 #: code_text.py:64 code_text.py:65 attributes.py:59 code_text.py:66
+#: code_text.py:67
 msgid "Uncaught exception:"
 msgstr "獲れない例外"
 
@@ -59,6 +61,7 @@ msgstr "獲れない例外"
 #: attributes.py:123 attributes.py:257 qualcoder.py:1502 qualcoder.py:1430
 #: reports.py:1572 reports.py:2334 attributes.py:279 qualcoder.py:1431
 #: reports.py:1588 reports.py:2536 reports.py:1576 reports.py:2524
+#: attributes.py:281 qualcoder.py:1489 reports.py:1598 reports.py:2546
 msgid "Attributes: "
 msgstr "属性のこと。"
 
@@ -67,7 +70,7 @@ msgid "Attribute added: "
 msgstr "属性追加"
 
 #: attributes.py:162 attributes.py:240 attributes.py:170 attributes.py:248
-#: attributes.py:270
+#: attributes.py:270 attributes.py:272 code_text.py:305 code_text.py:1764
 msgid " to "
 msgstr "にとって"
 
@@ -122,11 +125,15 @@ msgstr "属性用メモ"
 #: view_image.py:247 view_image.py:787 view_image.py:798 view_image.py:1164
 #: view_image.py:1188 cases.py:647 cases.py:687 manage_files.py:522
 #: manage_files.py:1095 manage_files.py:1132 manage_files.py:1842
-#: reports.py:1064 reports.py:1078 reports.py:1141
+#: reports.py:1064 reports.py:1078 reports.py:1141 attributes.py:286
+#: cases.py:650 cases.py:690 code_text.py:393 code_text.py:406 code_text.py:431
+#: code_text.py:449 code_text.py:468 code_text.py:1586 code_text.py:1609
+#: reports.py:1068 reports.py:1082 reports.py:1145 view_av.py:444
+#: view_av.py:520 view_av.py:1887 view_av.py:1911
 msgid "Memo"
 msgstr "メモ"
 
-#: attributes.py:240 attributes.py:248 attributes.py:270
+#: attributes.py:240 attributes.py:248 attributes.py:270 attributes.py:272
 msgid "Attribute renamed from: "
 msgstr "属性の名前を変更しました。"
 
@@ -138,20 +145,21 @@ msgstr "属性の名前を変更しました。"
 #: view_image.py:234 code_text.py:343 manage_files.py:463 reports.py:1061
 #: view_av.py:424 view_image.py:242 attributes.py:284 code_text.py:383
 #: manage_files.py:472 reports.py:1076 view_av.py:441 view_image.py:247
-#: manage_files.py:522 reports.py:1064
+#: manage_files.py:522 reports.py:1064 attributes.py:286 code_text.py:393
+#: reports.py:1068 view_av.py:444
 msgid "Name"
 msgstr "名前"
 
-#: attributes.py:254 attributes.py:262 attributes.py:284
+#: attributes.py:254 attributes.py:262 attributes.py:284 attributes.py:286
 msgid "Assigned to"
 msgstr "配属先"
 
-#: attributes.py:254 attributes.py:262 attributes.py:284
+#: attributes.py:254 attributes.py:262 attributes.py:284 attributes.py:286
 msgid "Type"
 msgstr "タイプ"
 
 #: attributes.py:266 case_file_manager.py:277 case_file_manager.py:278
-#: attributes.py:274 attributes.py:296
+#: attributes.py:274 attributes.py:296 attributes.py:298
 msgid "Yes"
 msgstr "嗟乎"
 
@@ -166,7 +174,7 @@ msgstr "嗟乎"
 #: journals.py:52 manage_files.py:92 view_av.py:99 view_image.py:64 cases.py:67
 #: dialog_sql.py:53 journals.py:53 manage_files.py:93 refi.py:65 reports.py:65
 #: view_av.py:100 view_graph_original.py:56 view_image.py:65
-#: report_relations.py:54 manage_files.py:94
+#: report_relations.py:54 manage_files.py:94 import_survey.py:61
 msgid "Uncaught exception: "
 msgstr "獲れない例外 "
 
@@ -211,7 +219,7 @@ msgstr "ファイルを表示しています。"
 #: manage_files.py:789 manage_files.py:814 dialog_sql.py:354
 #: manage_files.py:769 manage_files.py:794 cases.py:811 dialog_sql.py:351
 #: manage_files.py:809 manage_files.py:834 cases.py:860 manage_files.py:859
-#: manage_files.py:884
+#: manage_files.py:884 cases.py:863
 msgid "Select all"
 msgstr "すべて選択"
 
@@ -229,7 +237,7 @@ msgstr "マーク"
 #: manage_files.py:790 manage_files.py:815 dialog_sql.py:355
 #: manage_files.py:770 manage_files.py:795 cases.py:812 dialog_sql.py:352
 #: manage_files.py:810 manage_files.py:835 cases.py:861 manage_files.py:860
-#: manage_files.py:885
+#: manage_files.py:885 cases.py:864
 msgid "Copy"
 msgstr "コピー"
 
@@ -240,7 +248,7 @@ msgstr "コピー"
 #: view_image.py:665 code_text.py:591 view_av.py:1868 view_image.py:714
 #: view_image.py:727 code_text.py:604 view_av.py:2016 view_image.py:854
 #: view_image.py:867 code_text.py:667 view_av.py:2099 view_image.py:788
-#: view_image.py:801
+#: view_image.py:801 code_text.py:677 view_av.py:2102
 msgid "Unmark"
 msgstr "アンマーク"
 
@@ -283,7 +291,11 @@ msgstr "このセグメントは、すでに今回のケースとリンクして
 #: manage_files.py:1419 manage_files.py:1422 manage_files.py:1426 refi.py:923
 #: view_av.py:2375 view_av.py:2379 view_av.py:2467 cases.py:590
 #: manage_files.py:748 manage_files.py:1447 manage_files.py:1469
-#: manage_files.py:1472 manage_files.py:1476
+#: manage_files.py:1472 manage_files.py:1476 cases.py:593 code_text.py:2079
+#: code_text.py:2083 code_text.py:2190 code_text.py:2250 code_text.py:2259
+#: code_text.py:2301 code_text.py:2390 import_survey.py:217 journals.py:316
+#: journals.py:325 manage_files.py:747 refi.py:950 view_av.py:2378
+#: view_av.py:2382 view_av.py:2470
 msgid "Warning"
 msgstr "警告"
 
@@ -336,19 +348,22 @@ msgstr " セクションが見つかりました。"
 #: qualcoder.py:1456 reports.py:1410 cases.py:169 cases.py:523
 #: qualcoder.py:1490 qualcoder.py:1418 reports.py:1564 cases.py:178
 #: cases.py:625 qualcoder.py:1419 reports.py:1580 cases.py:182 cases.py:674
-#: reports.py:1568
+#: reports.py:1568 cases.py:185 cases.py:677 qualcoder.py:1477 reports.py:1590
 msgid "Cases: "
 msgstr "ケース。"
 
 #: cases.py:230 cases.py:229 cases.py:241 cases.py:250 cases.py:299
+#: cases.py:302
 msgid "Attribute added to cases: "
 msgstr "ケースに属性を追加しました。"
 
 #: cases.py:230 cases.py:229 cases.py:241 cases.py:250 cases.py:299
+#: cases.py:302
 msgid "type: "
 msgstr "のタイプがあります。"
 
 #: cases.py:241 cases.py:240 cases.py:252 cases.py:257 cases.py:306
+#: cases.py:309
 msgid "Cases have already been created."
 msgstr "ケースはすでに作成済みです。"
 
@@ -361,78 +376,89 @@ msgid "is not a .csv file. File not imported"
 msgstr "は .csv ファイルではありません。インポートされないファイル"
 
 #: cases.py:260 cases.py:259 cases.py:271 cases.py:372 cases.py:421
+#: cases.py:424
 msgid "Cannot import from csv, only one row in file"
 msgstr "csv からインポートできません。"
 
 #: cases.py:300 cases.py:299 cases.py:311 cases.py:336 cases.py:412
-#: cases.py:385 cases.py:461
+#: cases.py:385 cases.py:461 cases.py:388 cases.py:464
 msgid "attribute:"
 msgstr "属性を使用しています。"
 
 #: cases.py:315 cases.py:314 cases.py:326 cases.py:351 cases.py:427
-#: cases.py:400 cases.py:476
+#: cases.py:400 cases.py:476 cases.py:403 cases.py:479
 msgid "Cases and attributes imported from: "
 msgstr "からインポートされたケースと属性。"
 
 #: cases.py:326 cases.py:325 cases.py:337 cases.py:438 cases.py:487
+#: cases.py:490
 msgid "Case"
 msgstr "ケース。"
 
 #: cases.py:326 cases.py:325 cases.py:337 cases.py:438 cases.py:487
+#: cases.py:490
 msgid "Enter case name"
 msgstr "ケース名を入力してください。"
 
 #: cases.py:350 cases.py:349 cases.py:361 cases.py:462 cases.py:511
+#: cases.py:514
 msgid "Case added: "
 msgstr "ケースを追加しました。"
 
 #: cases.py:453 cases.py:452 cases.py:487 cases.py:588 cases.py:637
+#: cases.py:640
 msgid "Memo for case "
 msgstr "ケースのメモ "
 
 #: cases.py:493 cases.py:496 cases.py:492 cases.py:495 cases.py:536
 #: cases.py:539 cases.py:636 cases.py:639 cases.py:685 cases.py:688
+#: cases.py:691
 msgid "Click to edit memo"
 msgstr "メモを編集するにはクリックしてください。"
 
 #: cases.py:507 cases.py:506 cases.py:550 cases.py:650 cases.py:699
+#: cases.py:702
 msgid "Click to manage files for this case"
 msgstr "このケースのファイルを管理するにはクリックしてください。"
 
 #: cases.py:534 cases.py:533 cases.py:577 cases.py:675 cases.py:724
+#: cases.py:727
 msgid "Viewing text of case: "
 msgstr "事件のテキストを見る "
 
 #: cases.py:558 reports.py:1973 cases.py:557 reports.py:1977 code_text.py:1754
 #: code_text.py:1799 reports.py:2020 cases.py:601 code_text.py:2154
 #: code_text.py:2200 reports.py:2208 cases.py:699 code_text.py:2281
-#: reports.py:2199 cases.py:748 reports.py:2187
+#: reports.py:2199 cases.py:748 reports.py:2187 cases.py:751 code_text.py:2369
+#: reports.py:2209
 msgid "File: "
 msgstr "ファイルです。"
 
 #: cases.py:558 cases.py:557 cases.py:601 cases.py:699 cases.py:748
+#: cases.py:751
 msgid " Text: "
 msgstr " テキスト。"
 
 #: cases.py:576 view_image.py:322 cases.py:575 view_image.py:366 cases.py:574
 #: view_image.py:393 cases.py:618 view_image.py:462 view_image.py:472
-#: cases.py:716 view_image.py:477 cases.py:765
+#: cases.py:716 view_image.py:477 cases.py:765 cases.py:768
 msgid "Image: "
 msgstr "イメージです。"
 
 #: cases.py:594 cases.py:593 cases.py:592 cases.py:636 cases.py:734
-#: cases.py:783
+#: cases.py:783 cases.py:786
 msgid "AV media: "
 msgstr "AVメディア。"
 
 #: cases.py:643 cases.py:642 cases.py:619 cases.py:663 cases.py:761
-#: cases.py:810
+#: cases.py:810 cases.py:813
 msgid "Open"
 msgstr "開く"
 
 #: code_text.py:196 view_image.py:435 code_text.py:187 view_image.py:479
 #: code_text.py:186 view_image.py:506 code_text.py:268 view_image.py:576
 #: code_text.py:281 view_image.py:575 code_text.py:321 view_image.py:580
+#: code_text.py:330
 msgid "NO CODE SELECTED"
 msgstr "選択されたコードなし"
 
@@ -443,7 +469,7 @@ msgstr "選択されたコードなし"
 #: manage_files.py:455 view_av.py:417 view_image.py:234 code_text.py:343
 #: manage_files.py:463 view_av.py:424 view_image.py:242 report_relations.py:413
 #: code_text.py:383 manage_files.py:472 view_av.py:441 view_image.py:247
-#: report_relations.py:418 manage_files.py:522
+#: report_relations.py:418 manage_files.py:522 code_text.py:393 view_av.py:444
 msgid "Id"
 msgstr "しきべつし"
 
@@ -452,7 +478,8 @@ msgstr "しきべつし"
 #: code_text.py:240 view_av.py:370 view_image.py:205 code_text.py:330
 #: view_av.py:417 view_image.py:234 code_text.py:343 reports.py:1061
 #: view_av.py:424 view_image.py:242 code_text.py:383 reports.py:1076
-#: view_av.py:441 view_image.py:247 reports.py:1064
+#: view_av.py:441 view_image.py:247 reports.py:1064 code_text.py:393
+#: reports.py:1068 view_av.py:444
 msgid "Count"
 msgstr "かぞえ"
 
@@ -462,7 +489,7 @@ msgstr "かぞえ"
 #: code_text.py:545 view_av.py:1723 view_av.py:1796 code_text.py:593
 #: code_text.py:733 view_av.py:1869 view_av.py:1942 code_text.py:606
 #: code_text.py:746 view_av.py:2017 view_av.py:2090 code_text.py:836
-#: view_av.py:2244
+#: view_av.py:2244 code_text.py:847 view_av.py:2247
 msgid "Change start position"
 msgstr "開始位置の変更"
 
@@ -472,7 +499,7 @@ msgstr "開始位置の変更"
 #: code_text.py:552 view_av.py:1724 view_av.py:1804 code_text.py:594
 #: code_text.py:740 view_av.py:1870 view_av.py:1950 code_text.py:607
 #: code_text.py:753 view_av.py:2018 view_av.py:2098 code_text.py:843
-#: view_av.py:2252
+#: view_av.py:2252 code_text.py:854 view_av.py:2255
 msgid "Change end position"
 msgstr "終了位置の変更"
 
@@ -485,7 +512,7 @@ msgstr "アノテーション"
 #: code_text.py:475 view_av.py:1465 code_text.py:486 view_av.py:1671
 #: code_text.py:485 view_av.py:1713 view_av.py:1730 code_text.py:600
 #: view_av.py:1876 code_text.py:613 view_av.py:2024 code_text.py:681
-#: view_av.py:2113
+#: view_av.py:2113 code_text.py:691 view_av.py:2116
 msgid "Copy to clipboard"
 msgstr "クリップボードにコピー"
 
@@ -494,13 +521,13 @@ msgstr "クリップボードにコピー"
 #: view_av.py:1765 code_text.py:524 code_text.py:1584 view_av.py:1782
 #: code_text.py:712 code_text.py:1915 view_av.py:1928 code_text.py:725
 #: code_text.py:1961 view_av.py:2076 code_text.py:815 code_text.py:2074
-#: view_av.py:2230
+#: view_av.py:2230 code_text.py:2160 view_av.py:2233
 msgid "Select code to unmark"
 msgstr "マークを解除するコードを選択"
 
 #: code_text.py:523 view_av.py:1530 code_text.py:538 view_av.py:1738
 #: code_text.py:537 view_av.py:1780 view_av.py:1797 view_av.py:1943
-#: view_av.py:2091 view_av.py:2245
+#: view_av.py:2091 view_av.py:2245 view_av.py:2248
 msgid ""
 "Change start character position.\n"
 "Positive or negative number:"
@@ -510,7 +537,7 @@ msgstr ""
 
 #: code_text.py:530 view_av.py:1537 code_text.py:545 view_av.py:1746
 #: code_text.py:544 view_av.py:1788 view_av.py:1805 view_av.py:1951
-#: view_av.py:2099 view_av.py:2253
+#: view_av.py:2099 view_av.py:2253 view_av.py:2256
 msgid ""
 "Change end character position.\n"
 "Positive or negative number:"
@@ -522,7 +549,8 @@ msgstr ""
 #: view_av.py:982 view_image.py:513 code_text.py:584 code_text.py:592
 #: view_av.py:999 view_image.py:540 code_text.py:780 view_av.py:1131
 #: view_image.py:598 code_text.py:793 view_av.py:1152 view_image.py:597
-#: code_text.py:885 view_av.py:1183 view_image.py:607
+#: code_text.py:885 view_av.py:1183 view_image.py:607 code_text.py:897
+#: view_av.py:1186
 msgid "Add a new code"
 msgstr "新しいコードの追加"
 
@@ -530,7 +558,8 @@ msgstr "新しいコードの追加"
 #: view_av.py:983 view_image.py:514 code_text.py:585 code_text.py:593
 #: view_av.py:1000 view_image.py:541 code_text.py:781 view_av.py:1132
 #: view_image.py:599 code_text.py:794 view_av.py:1153 view_image.py:598
-#: code_text.py:886 view_av.py:1184 view_image.py:608
+#: code_text.py:886 view_av.py:1184 view_image.py:608 code_text.py:898
+#: view_av.py:1187
 msgid "Add a new category"
 msgstr "新しいカテゴリを追加する"
 
@@ -538,7 +567,8 @@ msgstr "新しいカテゴリを追加する"
 #: view_av.py:984 view_image.py:515 code_text.py:586 code_text.py:594
 #: view_av.py:1001 view_image.py:542 code_text.py:782 view_av.py:1133
 #: view_image.py:600 code_text.py:795 view_av.py:1154 view_image.py:599
-#: code_text.py:887 view_av.py:1185 view_image.py:609
+#: code_text.py:887 view_av.py:1185 view_image.py:609 code_text.py:899
+#: view_av.py:1188
 msgid "Rename"
 msgstr "名前の変更"
 
@@ -546,7 +576,8 @@ msgstr "名前の変更"
 #: view_av.py:985 view_image.py:516 code_text.py:587 code_text.py:595
 #: view_av.py:1002 view_image.py:543 code_text.py:783 view_av.py:1134
 #: view_image.py:601 code_text.py:796 view_av.py:1155 view_image.py:600
-#: code_text.py:888 view_av.py:1186 view_image.py:610
+#: code_text.py:888 view_av.py:1186 view_image.py:610 code_text.py:900
+#: view_av.py:1189
 msgid "View or edit memo"
 msgstr "メモの閲覧・編集"
 
@@ -557,7 +588,7 @@ msgstr "メモの閲覧・編集"
 #: manage_files.py:224 view_av.py:1135 view_image.py:602 code_text.py:797
 #: dialog_sql.py:357 manage_files.py:230 view_av.py:1156 view_image.py:601
 #: code_text.py:889 dialog_sql.py:354 manage_files.py:239 view_av.py:1187
-#: view_image.py:611 manage_files.py:244
+#: view_image.py:611 manage_files.py:244 code_text.py:901 view_av.py:1190
 msgid "Delete"
 msgstr "削除"
 
@@ -565,13 +596,14 @@ msgstr "削除"
 #: view_av.py:988 view_image.py:519 code_text.py:592 code_text.py:600
 #: view_av.py:1005 view_image.py:546 code_text.py:788 view_av.py:1137
 #: view_image.py:604 code_text.py:802 view_av.py:1158 view_image.py:606
-#: code_text.py:894 view_av.py:1189 view_image.py:616
+#: code_text.py:894 view_av.py:1189 view_image.py:616 code_text.py:906
+#: view_av.py:1192
 msgid "Change code color"
 msgstr "コードの色を変更する"
 
 #: code_text.py:579 code_text.py:594 code_text.py:593 code_text.py:601
 #: code_text.py:789 view_av.py:1160 view_image.py:608 view_av.py:1191
-#: view_image.py:618
+#: view_image.py:618 view_av.py:1194
 msgid "Show coded text and media"
 msgstr "コード化されたテキストとメディアを表示"
 
@@ -580,12 +612,12 @@ msgstr "コード化されたテキストとメディアを表示"
 #: view_image.py:806 code_text.py:929 view_av.py:1383 view_image.py:833
 #: code_text.py:1233 view_av.py:1529 view_image.py:918 code_text.py:1282
 #: view_av.py:1684 view_image.py:1070 code_text.py:1364 view_av.py:1734
-#: view_image.py:1006
+#: view_image.py:1006 code_text.py:1383 view_av.py:1737
 msgid "Merge code: "
 msgstr "コードをマージします。"
 
 #: code_text.py:784 code_text.py:884 code_text.py:921 code_text.py:929
-#: code_text.py:1233 code_text.py:1282 code_text.py:1364
+#: code_text.py:1233 code_text.py:1282 code_text.py:1364 code_text.py:1383
 msgid " into code: "
 msgstr " をコードに変換します。"
 
@@ -594,12 +626,12 @@ msgstr " をコードに変換します。"
 #: view_image.py:808 code_text.py:930 view_av.py:1385 view_image.py:835
 #: code_text.py:1234 view_av.py:1531 view_image.py:920 code_text.py:1283
 #: view_av.py:1686 view_image.py:1072 code_text.py:1365 view_av.py:1736
-#: view_image.py:1008
+#: view_image.py:1008 code_text.py:1384 view_av.py:1739
 msgid "Merge codes"
 msgstr "マージコード"
 
 #: code_text.py:799 code_text.py:899 code_text.py:936 code_text.py:944
-#: code_text.py:1248 code_text.py:1297 code_text.py:1379
+#: code_text.py:1248 code_text.py:1297 code_text.py:1379 code_text.py:1398
 msgid "Cannot merge codes, unmark overlapping text first. "
 msgstr ""
 "コードをマージすることはできません、最初に重複するテキストのマークを解除しま"
@@ -608,7 +640,7 @@ msgstr ""
 #: code_text.py:800 view_av.py:1136 code_text.py:900 view_av.py:1342
 #: code_text.py:937 view_av.py:1384 code_text.py:945 view_av.py:1401
 #: code_text.py:1249 view_av.py:1547 code_text.py:1298 view_av.py:1702
-#: code_text.py:1380 view_av.py:1752
+#: code_text.py:1380 view_av.py:1752 code_text.py:1399 view_av.py:1755
 msgid "Cannot merge"
 msgstr "マージできない"
 
@@ -617,21 +649,21 @@ msgstr "マージできない"
 #: view_image.py:836 code_text.py:961 view_av.py:1414 view_image.py:863
 #: code_text.py:1265 view_av.py:1560 view_image.py:948 code_text.py:1314
 #: view_av.py:1715 view_image.py:1100 code_text.py:1398 view_av.py:1767
-#: view_image.py:1038
+#: view_image.py:1038 code_text.py:1417 view_av.py:1770
 msgid "Add new code"
 msgstr "新しいコードの追加"
 
 #: code_text.py:816 view_image.py:750 code_text.py:916 view_image.py:794
 #: code_text.py:953 view_image.py:836 code_text.py:961 view_image.py:863
 #: code_text.py:1265 view_image.py:948 code_text.py:1314 view_image.py:1100
-#: code_text.py:1398 view_image.py:1038
+#: code_text.py:1398 view_image.py:1038 code_text.py:1417
 msgid "Code name"
 msgstr "コード名"
 
 #: code_text.py:833 view_image.py:763 code_text.py:933 view_image.py:807
 #: code_text.py:970 view_image.py:849 code_text.py:978 view_image.py:876
 #: code_text.py:1282 view_image.py:961 code_text.py:1331 view_image.py:1113
-#: code_text.py:1415 view_image.py:1051
+#: code_text.py:1415 view_image.py:1051 code_text.py:1434
 msgid "New code: "
 msgstr "新しいコードだ "
 
@@ -640,7 +672,7 @@ msgstr "新しいコードだ "
 #: view_image.py:857 code_text.py:1029 view_av.py:1435 view_image.py:884
 #: code_text.py:1333 view_av.py:1581 view_image.py:969 code_text.py:1373
 #: view_av.py:1736 view_image.py:1121 code_text.py:1458 view_av.py:1789
-#: view_image.py:1060
+#: view_image.py:1060 code_text.py:1480 view_av.py:1792
 msgid "Category"
 msgstr "カテゴリー"
 
@@ -649,14 +681,14 @@ msgstr "カテゴリー"
 #: view_image.py:857 code_text.py:1029 view_av.py:1435 view_image.py:884
 #: code_text.py:1333 view_av.py:1581 view_image.py:969 code_text.py:1373
 #: view_av.py:1736 view_image.py:1121 code_text.py:1458 view_av.py:1789
-#: view_image.py:1060
+#: view_image.py:1060 code_text.py:1480 view_av.py:1792
 msgid "Category name"
 msgstr "カテゴリ名"
 
 #: code_text.py:898 view_image.py:785 code_text.py:998 view_image.py:829
 #: code_text.py:1035 view_image.py:871 code_text.py:1043 view_image.py:898
 #: code_text.py:1347 view_image.py:983 code_text.py:1387 view_image.py:1135
-#: code_text.py:1472 view_image.py:1074
+#: code_text.py:1472 view_image.py:1074 code_text.py:1494
 msgid "New category: "
 msgstr "新しいカテゴリーです。"
 
@@ -667,7 +699,7 @@ msgstr "新しいカテゴリーです。"
 #: view_image.py:923 code_text.py:1370 view_av.py:1618 view_image.py:578
 #: view_image.py:1008 code_text.py:1410 reports.py:294 view_av.py:1773
 #: view_image.py:577 view_image.py:1164 code_text.py:1495 view_av.py:1826
-#: view_image.py:582 view_image.py:1103
+#: view_image.py:582 view_image.py:1103 code_text.py:1517 view_av.py:1829
 msgid "Code: "
 msgstr "コードは？"
 
@@ -676,7 +708,7 @@ msgstr "コードは？"
 #: view_image.py:900 code_text.py:1079 view_av.py:1482 view_image.py:927
 #: code_text.py:1383 view_av.py:1628 view_image.py:1012 code_text.py:1423
 #: view_av.py:1783 view_image.py:1168 code_text.py:1508 view_av.py:1836
-#: view_image.py:1107
+#: view_image.py:1107 code_text.py:1530 view_av.py:1839
 msgid "Code deleted: "
 msgstr "コードを削除しました。"
 
@@ -686,6 +718,7 @@ msgstr "コードを削除しました。"
 #: view_av.py:1498 view_image.py:949 code_text.py:1396 view_av.py:1644
 #: view_image.py:1034 code_text.py:1436 reports.py:291 view_av.py:1799
 #: view_image.py:1192 code_text.py:1527 view_av.py:1852 view_image.py:1131
+#: code_text.py:1549 view_av.py:1855
 msgid "Category: "
 msgstr "カテゴリー。"
 
@@ -694,29 +727,29 @@ msgstr "カテゴリー。"
 #: view_image.py:926 code_text.py:1104 view_av.py:1507 view_image.py:953
 #: code_text.py:1408 view_av.py:1653 view_image.py:1038 code_text.py:1448
 #: view_av.py:1808 view_image.py:1196 code_text.py:1539 view_av.py:1861
-#: view_image.py:1135
+#: view_image.py:1135 code_text.py:1561 view_av.py:1864
 msgid "Category deleted: "
 msgstr "カテゴリーを削除しました。"
 
 #: code_text.py:972 code_text.py:1072 code_text.py:1109 code_text.py:1117
-#: code_text.py:1421 code_text.py:1461 code_text.py:1552
+#: code_text.py:1421 code_text.py:1461 code_text.py:1552 code_text.py:1574
 msgid "Memo for Code: "
 msgstr "コードのメモ。"
 
 #: code_text.py:985 code_text.py:1085 code_text.py:1122 code_text.py:1130
-#: code_text.py:1434 code_text.py:1474 code_text.py:1565
+#: code_text.py:1434 code_text.py:1474 code_text.py:1565 code_text.py:1587
 msgid "Memo for code: "
 msgstr "コードのメモ。"
 
 #: code_text.py:995 view_image.py:884 code_text.py:1095 view_image.py:928
 #: code_text.py:1132 view_image.py:970 code_text.py:1140 view_image.py:997
 #: code_text.py:1444 view_image.py:1082 code_text.py:1484 view_image.py:1242
-#: code_text.py:1575 view_image.py:1181
+#: code_text.py:1575 view_image.py:1181 code_text.py:1597
 msgid "Memo for Category: "
 msgstr "カテゴリーのメモ。"
 
 #: code_text.py:1008 code_text.py:1108 code_text.py:1145 code_text.py:1153
-#: code_text.py:1457 code_text.py:1497 code_text.py:1588
+#: code_text.py:1457 code_text.py:1497 code_text.py:1588 code_text.py:1610
 msgid "Memo for category: "
 msgstr "カテゴリーのメモ。"
 
@@ -725,7 +758,7 @@ msgstr "カテゴリーのメモ。"
 #: view_image.py:992 code_text.py:1161 view_av.py:1569 view_image.py:1019
 #: code_text.py:1465 view_av.py:1715 view_image.py:1104 code_text.py:1507
 #: view_av.py:1870 view_image.py:1266 code_text.py:1598 view_av.py:1923
-#: view_image.py:1205
+#: view_image.py:1205 code_text.py:1620 view_av.py:1926
 msgid "Rename code"
 msgstr "コード名の変更"
 
@@ -734,7 +767,7 @@ msgstr "コード名の変更"
 #: view_image.py:992 code_text.py:1162 view_av.py:1569 view_image.py:1019
 #: code_text.py:1466 view_av.py:1715 view_image.py:1104 code_text.py:1508
 #: view_av.py:1870 view_image.py:1266 code_text.py:1599 view_av.py:1923
-#: view_image.py:1205
+#: view_image.py:1205 code_text.py:1621 view_av.py:1926
 msgid "New code name:"
 msgstr "新しいコード名。"
 
@@ -743,24 +776,24 @@ msgstr "新しいコード名。"
 #: view_image.py:1001 code_text.py:1168 view_av.py:1578 view_image.py:1028
 #: code_text.py:1472 view_av.py:1724 view_image.py:1113 code_text.py:1514
 #: view_av.py:1877 view_image.py:1273 code_text.py:1605 view_av.py:1930
-#: view_image.py:1212
+#: view_image.py:1212 code_text.py:1627 view_av.py:1933
 msgid "Name in use"
 msgstr "使用中の名称"
 
 #: code_text.py:1024 code_text.py:1124 code_text.py:1161 code_text.py:1169
-#: code_text.py:1473 code_text.py:1515 code_text.py:1606
+#: code_text.py:1473 code_text.py:1515 code_text.py:1606 code_text.py:1628
 msgid " is already in use, choose another name."
 msgstr " が既に使用されている場合は、別の名前を選択してください。"
 
 #: code_text.py:1039 code_text.py:1139 code_text.py:1176 code_text.py:1184
-#: code_text.py:1488 code_text.py:1530 code_text.py:1626
+#: code_text.py:1488 code_text.py:1530 code_text.py:1626 code_text.py:1648
 msgid "Code renamed from: "
 msgstr "コード名を変更しました。"
 
 #: code_text.py:1039 code_text.py:1069 code_text.py:1139 code_text.py:1169
 #: code_text.py:1176 code_text.py:1206 code_text.py:1184 code_text.py:1214
 #: code_text.py:1488 code_text.py:1518 code_text.py:1530 code_text.py:1560
-#: code_text.py:1626 code_text.py:1656
+#: code_text.py:1626 code_text.py:1656 code_text.py:1648 code_text.py:1678
 msgid " to: "
 msgstr " にとって "
 
@@ -769,7 +802,7 @@ msgstr " にとって "
 #: view_image.py:1026 code_text.py:1189 view_av.py:1599 view_image.py:1053
 #: code_text.py:1493 view_av.py:1745 view_image.py:1138 code_text.py:1535
 #: view_av.py:1896 view_image.py:1296 code_text.py:1631 view_av.py:1949
-#: view_image.py:1235
+#: view_image.py:1235 code_text.py:1653 view_av.py:1952
 msgid "Rename category"
 msgstr "カテゴリ名の変更"
 
@@ -778,46 +811,46 @@ msgstr "カテゴリ名の変更"
 #: view_image.py:1026 code_text.py:1189 view_av.py:1599 view_image.py:1053
 #: code_text.py:1493 view_av.py:1745 view_image.py:1138 code_text.py:1535
 #: view_av.py:1896 view_image.py:1296 code_text.py:1631 view_av.py:1949
-#: view_image.py:1235
+#: view_image.py:1235 code_text.py:1653 view_av.py:1952
 msgid "New category name:"
 msgstr "新しいカテゴリ名です。"
 
 #: code_text.py:1051 code_text.py:1151 code_text.py:1188 code_text.py:1196
-#: code_text.py:1500 code_text.py:1542 code_text.py:1638
+#: code_text.py:1500 code_text.py:1542 code_text.py:1638 code_text.py:1660
 msgid "This code name is already in use."
 msgstr "このコード名はすでに使用されています。"
 
 #: code_text.py:1052 code_text.py:1152 code_text.py:1189 code_text.py:1197
-#: code_text.py:1501 code_text.py:1543 code_text.py:1639
+#: code_text.py:1501 code_text.py:1543 code_text.py:1639 code_text.py:1661
 msgid "Duplicate code name"
 msgstr "コード名の重複"
 
 #: code_text.py:1069 view_image.py:969 code_text.py:1169 view_image.py:1013
 #: code_text.py:1206 view_image.py:1055 code_text.py:1214 view_image.py:1082
 #: code_text.py:1518 view_image.py:1167 code_text.py:1560 view_image.py:1321
-#: code_text.py:1656 view_image.py:1260
+#: code_text.py:1656 view_image.py:1260 code_text.py:1678
 msgid "Category renamed from: "
 msgstr "カテゴリーを変更しました。"
 
 #: code_text.py:1125 code_text.py:1271 code_text.py:1308 code_text.py:1323
-#: code_text.py:1648 code_text.py:1694 code_text.py:1790
+#: code_text.py:1648 code_text.py:1694 code_text.py:1790 code_text.py:1863
 msgid "Code text: "
 msgstr "コードテキスト。"
 
 #: code_text.py:1290 code_text.py:1436 code_text.py:1473 code_text.py:1488
-#: code_text.py:1819 code_text.py:1865 code_text.py:1961
+#: code_text.py:1819 code_text.py:1865 code_text.py:1961 code_text.py:2041
 msgid "No overlapping codes"
 msgstr "重複コードなし"
 
 #: code_text.py:1295 code_text.py:1441 code_text.py:1478 code_text.py:1493
-#: code_text.py:1824 code_text.py:1870 code_text.py:1966
+#: code_text.py:1824 code_text.py:1870 code_text.py:1966 code_text.py:2046
 msgid "overlapping codes. Select to highlight."
 msgstr "コードが重複しています。選択してハイライトします。"
 
 #: code_text.py:1326 code_text.py:1412 code_text.py:1472 code_text.py:1559
 #: code_text.py:1509 code_text.py:1596 code_text.py:1524 code_text.py:1611
 #: code_text.py:1855 code_text.py:1943 code_text.py:1901 code_text.py:1989
-#: code_text.py:1998 code_text.py:2102
+#: code_text.py:1998 code_text.py:2102 code_text.py:2079 code_text.py:2190
 msgid "No file was selected"
 msgstr "ファイルが選択されていません"
 
@@ -829,7 +862,8 @@ msgstr "ファイルが選択されていません"
 #: code_text.py:2175 view_av.py:2086 code_text.py:1905 code_text.py:2081
 #: code_text.py:2090 code_text.py:2132 code_text.py:2221 view_av.py:2223
 #: code_text.py:2002 code_text.py:2162 code_text.py:2171 code_text.py:2213
-#: code_text.py:2302 view_av.py:2379
+#: code_text.py:2302 view_av.py:2379 code_text.py:2083 code_text.py:2250
+#: code_text.py:2259 code_text.py:2301 code_text.py:2390 view_av.py:2382
 msgid "No code was selected"
 msgstr "コードが選択されていません"
 
@@ -840,6 +874,7 @@ msgstr "コードが選択されていません"
 #: code_text.py:1880 view_av.py:2009 view_av.py:2110 view_av.py:2421
 #: code_text.py:1926 view_av.py:2155 view_av.py:2244 view_av.py:2546
 #: code_text.py:2023 view_av.py:2311 view_av.py:2400 view_av.py:2720
+#: code_text.py:2104 view_av.py:2314 view_av.py:2403 view_av.py:2723
 msgid "Already Coded"
 msgstr "すでにコード化されている"
 
@@ -848,21 +883,21 @@ msgstr "すでにコード化されている"
 #: view_av.py:1947 code_text.py:1550 view_av.py:1863 view_av.py:1964
 #: code_text.py:1881 view_av.py:2010 view_av.py:2111 code_text.py:1927
 #: view_av.py:2155 view_av.py:2244 code_text.py:2024 view_av.py:2311
-#: view_av.py:2400
+#: view_av.py:2400 code_text.py:2105 view_av.py:2314 view_av.py:2403
 msgid "This segment has already been coded with this code by "
 msgstr "このセグメントは、すでに "
 
 #: code_text.py:1435 view_av.py:1771 code_text.py:1582 view_av.py:1984
 #: code_text.py:1619 view_av.py:2026 code_text.py:1634 view_av.py:2043
 #: code_text.py:1969 view_av.py:2190 code_text.py:2015 view_av.py:2317
-#: code_text.py:2128 view_av.py:2490
+#: code_text.py:2128 view_av.py:2490 code_text.py:2216 view_av.py:2493
 msgid "Annotation: "
 msgstr "アノテーション。"
 
 #: code_text.py:1450 view_av.py:1786 code_text.py:1597 view_av.py:1999
 #: code_text.py:1634 view_av.py:2041 code_text.py:1649 view_av.py:2058
 #: code_text.py:1984 view_av.py:2205 code_text.py:2030 view_av.py:2332
-#: code_text.py:2143 view_av.py:2505
+#: code_text.py:2143 view_av.py:2505 code_text.py:2231 view_av.py:2508
 msgid "Annotation added at position: "
 msgstr "位置にアノテーションを追加しました。"
 
@@ -873,23 +908,24 @@ msgstr "位置にアノテーションを追加しました。"
 #: code_text.py:1985 code_text.py:1996 view_av.py:2206 view_av.py:2217
 #: code_text.py:2031 code_text.py:2042 view_av.py:2333 view_av.py:2344
 #: code_text.py:2144 code_text.py:2155 view_av.py:2506 view_av.py:2517
+#: code_text.py:2232 code_text.py:2243 view_av.py:2509 view_av.py:2520
 msgid " for: "
 msgstr " のために。"
 
 #: code_text.py:1461 view_av.py:1796 code_text.py:1608 view_av.py:2010
 #: code_text.py:1645 view_av.py:2052 code_text.py:1660 view_av.py:2069
 #: code_text.py:1995 view_av.py:2216 code_text.py:2041 view_av.py:2343
-#: code_text.py:2154 view_av.py:2516
+#: code_text.py:2154 view_av.py:2516 code_text.py:2242 view_av.py:2519
 msgid "Annotation removed from position "
 msgstr "アノテーションを位置から削除 "
 
 #: code_text.py:1480 code_text.py:1627 code_text.py:1779 code_text.py:1829
-#: code_text.py:2184 code_text.py:2230 code_text.py:2311
+#: code_text.py:2184 code_text.py:2230 code_text.py:2311 code_text.py:2399
 msgid "Automatic coding"
 msgstr "自動コーディング"
 
 #: code_text.py:1483 code_text.py:1630 code_text.py:1782 code_text.py:1832
-#: code_text.py:2187 code_text.py:2233 code_text.py:2314
+#: code_text.py:2187 code_text.py:2233 code_text.py:2314 code_text.py:2402
 msgid "Use | to code multiple texts"
 msgstr "使用方法 | 複数のテキストをコード化する"
 
@@ -903,12 +939,12 @@ msgid "Select file to view"
 msgstr "ファイルを選択して表示する"
 
 #: code_text.py:1535 code_text.py:1687 code_text.py:1834 code_text.py:1890
-#: code_text.py:2245 code_text.py:2291 code_text.py:2372
+#: code_text.py:2245 code_text.py:2291 code_text.py:2372 code_text.py:2460
 msgid "Automatic coding in files: "
 msgstr "ファイル内の自動コーディング。"
 
 #: code_text.py:1536 code_text.py:1688 code_text.py:1835 code_text.py:1891
-#: code_text.py:2246 code_text.py:2292 code_text.py:2373
+#: code_text.py:2246 code_text.py:2292 code_text.py:2373 code_text.py:2461
 msgid ". with text: "
 msgstr "テキストで。"
 
@@ -920,7 +956,8 @@ msgstr "テキストで。"
 #: reports.py:316 reports.py:548 report_relations.py:493 journals.py:241
 #: manage_files.py:311 manage_files.py:1545 refi.py:1549 reports.py:564
 #: report_relations.py:498 cases.py:193 manage_files.py:316 manage_files.py:439
-#: manage_files.py:1595 reports.py:310 reports.py:552
+#: manage_files.py:1595 reports.py:310 reports.py:552 cases.py:196
+#: journals.py:242 refi.py:1576
 msgid "Select directory to save file"
 msgstr "ファイルを保存するディレクトリを選択"
 
@@ -938,11 +975,13 @@ msgstr "所有者です。"
 #: view_av.py:2358 view_av.py:2497 reports.py:943 reports.py:2165
 #: view_av.py:2485 view_av.py:2620 code_text.py:2445 reports.py:958
 #: reports.py:2179 view_av.py:2562 view_av.py:2659 view_av.py:2794
-#: reports.py:946 reports.py:2167
+#: reports.py:946 reports.py:2167 code_text.py:2536 reports.py:950
+#: reports.py:2189 view_av.py:2565 view_av.py:2662 view_av.py:2797
 msgid "Memo: "
 msgstr "メモ"
 
 #: codebook.py:203 refi.py:1487 refi.py:1488 refi.py:1559 refi.py:1560
+#: refi.py:1586 refi.py:1587
 msgid "Codebook exported"
 msgstr "コードブックのエクスポート"
 
@@ -960,7 +999,8 @@ msgstr "にエクスポートされたコードブック "
 #: journals.py:248 reports.py:572 reports.py:1229 reports.py:1270
 #: reports.py:1389 reports.py:1428 report_relations.py:506 cases.py:201
 #: manage_files.py:447 reports.py:318 reports.py:560 reports.py:1217
-#: reports.py:1377 reports.py:1416
+#: reports.py:1377 reports.py:1416 cases.py:204 journals.py:249 reports.py:1262
+#: reports.py:1381 reports.py:1420
 msgid "File exists"
 msgstr "ファイルが存在する"
 
@@ -974,7 +1014,8 @@ msgstr "ファイルが存在する"
 #: journals.py:249 reports.py:573 reports.py:1230 reports.py:1271
 #: reports.py:1390 reports.py:1429 report_relations.py:507 cases.py:202
 #: manage_files.py:448 reports.py:319 reports.py:561 reports.py:1218
-#: reports.py:1378 reports.py:1417
+#: reports.py:1378 reports.py:1417 cases.py:205 journals.py:250 reports.py:1263
+#: reports.py:1382 reports.py:1421
 msgid "Overwrite?"
 msgstr "上書き？"
 
@@ -1100,11 +1141,13 @@ msgid " equals: "
 msgstr " イコールです。"
 
 #: import_survey.py:133 import_survey.py:238 import_survey.py:243
-#: import_survey.py:250 import_survey.py:255
+#: import_survey.py:250 import_survey.py:255 import_survey.py:260
+#: import_survey.py:265
 msgid "Survey not imported."
 msgstr "調査は輸入されていません。"
 
-#: import_survey.py:143 cases.py:275 cases.py:324
+#: import_survey.py:143 cases.py:275 cases.py:324 cases.py:327
+#: import_survey.py:170
 msgid ""
 "Please install the openpyxl module.\n"
 "sudo python3 -m pip install openpyxl OR\n"
@@ -1114,16 +1157,16 @@ msgstr ""
 "sudo python3 -m pip install openpyxl ORn\n"
 "python -m pip install openpyxl"
 
-#: import_survey.py:178 import_survey.py:184
+#: import_survey.py:178 import_survey.py:184 import_survey.py:216
 msgid "A column delimiter has not been set."
 msgstr "列の区切り文字が設定されていません。"
 
 #: import_survey.py:201 import_survey.py:202 import_survey.py:207
-#: import_survey.py:208
+#: import_survey.py:208 import_survey.py:234 import_survey.py:235
 msgid "Row error: "
 msgstr "行エラーです。"
 
-#: import_survey.py:218 import_survey.py:230
+#: import_survey.py:218 import_survey.py:230 import_survey.py:152
 msgid "Select survey file"
 msgstr "調査ファイルの選択"
 
@@ -1139,17 +1182,17 @@ msgstr ""
 "は .csv または .xlsx ファイルではありません。\n"
 "ファイルがインポートされません"
 
-#: import_survey.py:226 import_survey.py:238
+#: import_survey.py:226 import_survey.py:238 import_survey.py:155
 msgid "Survey not imported. Survey not a csv or xlsx file: "
 msgstr ""
 "アンケートがインポートされていません。調査は csv または xlsx ファイルではあり"
 "ません。"
 
-#: import_survey.py:246 import_survey.py:257
+#: import_survey.py:246 import_survey.py:257 import_survey.py:267
 msgid "Importing from: "
 msgstr "からの輸入。"
 
-#: import_survey.py:287 import_survey.py:298
+#: import_survey.py:287 import_survey.py:298 import_survey.py:321
 msgid ""
 "There are duplicated identifiers in the first column.\n"
 "File not imported"
@@ -1157,27 +1200,27 @@ msgstr ""
 "最初の列に重複した識別子があります。\n"
 "ファイルがインポートされていません"
 
-#: import_survey.py:291 import_survey.py:302
+#: import_survey.py:291 import_survey.py:302 import_survey.py:325
 msgid "Survey file: "
 msgstr "調査ファイル。"
 
-#: import_survey.py:292 import_survey.py:303
+#: import_survey.py:292 import_survey.py:303 import_survey.py:326
 msgid "Fields: "
 msgstr "フィールド。"
 
-#: import_survey.py:293 import_survey.py:304
+#: import_survey.py:293 import_survey.py:304 import_survey.py:327
 msgid "Rows: "
 msgstr "行。"
 
-#: import_survey.py:312 import_survey.py:323
+#: import_survey.py:312 import_survey.py:323 import_survey.py:343
 msgid "Attribute name error"
 msgstr "属性名エラー"
 
-#: import_survey.py:315 import_survey.py:326
+#: import_survey.py:315 import_survey.py:326 import_survey.py:344
 msgid "Survey Not Imported. Attribute duplicate name error: "
 msgstr "調査はインポートされていません。属性の名前が重複しています。"
 
-#: import_survey.py:327 import_survey.py:338
+#: import_survey.py:327 import_survey.py:338 import_survey.py:356
 msgid ""
 "Number of fields does not match header\n"
 "Possible wrong quote format"
@@ -1187,15 +1230,16 @@ msgstr ""
 
 #: import_survey.py:328 import_survey.py:356 import_survey.py:363
 #: import_survey.py:339 import_survey.py:367 import_survey.py:374
+#: import_survey.py:357 import_survey.py:381 import_survey.py:388
 msgid "Survey not loaded: "
 msgstr "アンケートが読み込まれていません。"
 
 #: import_survey.py:332 import_survey.py:360 import_survey.py:343
-#: import_survey.py:371
+#: import_survey.py:371 import_survey.py:358 import_survey.py:385
 msgid "Survey not loaded"
 msgstr "アンケートが読み込まれていません。"
 
-#: import_survey.py:355 import_survey.py:366
+#: import_survey.py:355 import_survey.py:366 import_survey.py:380
 msgid ""
 " - Duplicate case names, either in the file, or duplicates with existing "
 "cases in the project"
@@ -1204,45 +1248,46 @@ msgstr ""
 
 #: import_survey.py:437 import_survey.py:442 import_survey.py:443
 #: import_survey.py:448 import_survey.py:453 import_survey.py:454
+#: import_survey.py:463 import_survey.py:465
 msgid "Survey imported"
 msgstr "輸入された調査"
 
-#: import_survey.py:438 import_survey.py:449
+#: import_survey.py:438 import_survey.py:449 import_survey.py:464
 msgid "Survey imported."
 msgstr "輸入された調査"
 
-#: import_survey.py:492 import_survey.py:505
+#: import_survey.py:492 import_survey.py:505 import_survey.py:521
 msgid "Change fieldname"
 msgstr "フィールド名の変更"
 
-#: import_survey.py:495 import_survey.py:508
+#: import_survey.py:495 import_survey.py:508 import_survey.py:524
 msgid "Change to Qualitative"
 msgstr "定性的なものへの変更"
 
-#: import_survey.py:498 import_survey.py:511
+#: import_survey.py:498 import_survey.py:511 import_survey.py:527
 msgid "Change to Character"
 msgstr "キャラクターの変更"
 
-#: import_survey.py:526 import_survey.py:539
+#: import_survey.py:526 import_survey.py:539 import_survey.py:555
 msgid "Change field name"
 msgstr "フィールド名の変更"
 
-#: import_survey.py:526 import_survey.py:539
+#: import_survey.py:526 import_survey.py:539 import_survey.py:555
 msgid "New name:"
 msgstr "新しい名前だ"
 
-#: import_survey.py:532 import_survey.py:545
+#: import_survey.py:532 import_survey.py:545 import_survey.py:561
 msgid ""
 "Name must contain only letters and numbers or '_' and must not start with a "
 "number"
 msgstr "名前は文字と数字、または'_'のみで、数字で始まってはいけません。"
 
 #: import_survey.py:536 import_survey.py:544 import_survey.py:549
-#: import_survey.py:557
+#: import_survey.py:557 import_survey.py:566
 msgid "Field name invalid."
 msgstr "フィールド名が無効です。"
 
-#: import_survey.py:545 import_survey.py:558
+#: import_survey.py:545 import_survey.py:558 import_survey.py:565
 msgid " Already in use"
 msgstr " すでに使用されている"
 
@@ -1250,7 +1295,8 @@ msgstr " すでに使用されている"
 #: qualcoder.py:1433 qualcoder.py:1431 qualcoder.py:1472 journals.py:113
 #: journals.py:225 journals.py:300 qualcoder.py:1506 journals.py:108
 #: journals.py:223 journals.py:298 qualcoder.py:1434 journals.py:102
-#: journals.py:212 journals.py:287 qualcoder.py:1435
+#: journals.py:212 journals.py:287 qualcoder.py:1435 journals.py:213
+#: journals.py:288 qualcoder.py:1493
 msgid "Journals: "
 msgstr "ジャーナル。"
 
@@ -1259,53 +1305,63 @@ msgid "Journal modified: "
 msgstr "ジャーナルが変更されました。"
 
 #: journals.py:183 journals.py:192 journals.py:190 journals.py:179
+#: journals.py:180
 msgid "New Journal"
 msgstr "ニュージャーナル"
 
 #: journals.py:183 journals.py:192 journals.py:190 journals.py:179
+#: journals.py:180
 msgid "Journal name"
 msgstr "ジャーナル名"
 
 #: journals.py:194 journals.py:338 journals.py:203 journals.py:347
 #: journals.py:201 journals.py:345 journals.py:190 journals.py:334
+#: journals.py:191 journals.py:335
 msgid "Warning - invalid characters"
 msgstr "警告 - 無効な文字"
 
 #: journals.py:195 journals.py:204 journals.py:202 journals.py:346
-#: journals.py:191 journals.py:335
+#: journals.py:191 journals.py:335 journals.py:192 journals.py:336
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "ジャーナル名では、a-z, A-z 0-9 - スペースのみを使用してください。"
 
 #: journals.py:210 journals.py:219 journals.py:217 journals.py:206
+#: journals.py:207
 msgid "Journal created: "
 msgstr "ジャーナルを作成しました。"
 
 #: journals.py:262 journals.py:271 journals.py:269 journals.py:258
+#: journals.py:259
 msgid "Journal exported to: "
 msgstr "ジャーナルをエクスポートしました。"
 
 #: journals.py:266 journals.py:275 journals.py:273 journals.py:262
+#: journals.py:263
 msgid "Journal export"
 msgstr "ジャーナルのエクスポート"
 
 #: journals.py:290 journals.py:299 journals.py:297 journals.py:286
+#: journals.py:287
 msgid "Journal deleted: "
 msgstr "ジャーナルは削除されました。"
 
 #: journals.py:300 journals.py:309 journals.py:307 journals.py:357
-#: journals.py:296 journals.py:346
+#: journals.py:296 journals.py:346 journals.py:297 journals.py:347
 msgid "Journal: "
 msgstr "ジャーナル。"
 
 #: journals.py:303 journals.py:312 journals.py:310 journals.py:299
+#: journals.py:300
 msgid "No journal selected"
 msgstr "選択されたジャーナルはありません"
 
 #: journals.py:320 journals.py:329 journals.py:327 journals.py:316
+#: journals.py:317
 msgid "No name was entered"
 msgstr "名前の入力はありませんでした。"
 
 #: journals.py:329 journals.py:338 journals.py:336 journals.py:325
+#: journals.py:326
 msgid "Journal name in use"
 msgstr "使用中のジャーナル名"
 
@@ -1379,13 +1435,13 @@ msgstr "日付"
 
 #: manage_files.py:354 manage_files.py:415 manage_files.py:414
 #: manage_files.py:449 manage_files.py:599 manage_files.py:608
-#: manage_files.py:633 manage_files.py:683
+#: manage_files.py:633 manage_files.py:683 manage_files.py:682
 msgid "Attribute added to files: "
 msgstr "ファイルに属性を追加しました。"
 
 #: manage_files.py:354 manage_files.py:415 manage_files.py:414
 #: manage_files.py:449 manage_files.py:599 manage_files.py:608
-#: manage_files.py:633 manage_files.py:683
+#: manage_files.py:633 manage_files.py:683 manage_files.py:682
 msgid "type"
 msgstr "タイプ"
 
@@ -1394,13 +1450,13 @@ msgstr "タイプ"
 #: manage_files.py:471 manage_files.py:479 manage_files.py:619
 #: manage_files.py:627 manage_files.py:628 manage_files.py:636
 #: manage_files.py:653 manage_files.py:661 manage_files.py:703
-#: manage_files.py:711
+#: manage_files.py:711 manage_files.py:702 manage_files.py:710
 msgid "Memo for file "
 msgstr "ファイル用メモ "
 
 #: manage_files.py:516 manage_files.py:577 manage_files.py:576
 #: manage_files.py:610 manage_files.py:746 manage_files.py:726
-#: manage_files.py:766 manage_files.py:816
+#: manage_files.py:766 manage_files.py:816 manage_files.py:815
 msgid "View file: "
 msgstr "ファイルを見る。"
 
@@ -1659,7 +1715,7 @@ msgstr "ファイルを削除しました。"
 #: manage_files.py:1576 qualcoder.py:1452 reports.py:1405 manage_files.py:1699
 #: qualcoder.py:1486 manage_files.py:1728 qualcoder.py:1414 reports.py:1559
 #: manage_files.py:1767 qualcoder.py:1415 reports.py:1575 manage_files.py:1817
-#: reports.py:1563
+#: reports.py:1563 qualcoder.py:1473 reports.py:1585
 msgid "Files: "
 msgstr "ファイルです。"
 
@@ -1669,74 +1725,74 @@ msgid "Uncaught exception : "
 msgstr "捕まえられなかった例外 . "
 
 #: qualcoder.py:771 qualcoder.py:787 qualcoder.py:784 qualcoder.py:818
-#: qualcoder.py:841 qualcoder.py:845 qualcoder.py:825
+#: qualcoder.py:841 qualcoder.py:845 qualcoder.py:825 qualcoder.py:842
 msgid "Settings"
 msgstr "設定"
 
 #: qualcoder.py:773 qualcoder.py:789 qualcoder.py:786 qualcoder.py:820
-#: qualcoder.py:843 qualcoder.py:847 qualcoder.py:827
+#: qualcoder.py:843 qualcoder.py:847 qualcoder.py:827 qualcoder.py:844
 msgid "Coder"
 msgstr "コーダー"
 
 #: qualcoder.py:774 qualcoder.py:790 qualcoder.py:787 qualcoder.py:821
-#: qualcoder.py:844 qualcoder.py:848 qualcoder.py:828
+#: qualcoder.py:844 qualcoder.py:848 qualcoder.py:828 qualcoder.py:845
 msgid "Font"
 msgstr "フォント"
 
 #: qualcoder.py:775 qualcoder.py:791 qualcoder.py:788 qualcoder.py:822
-#: qualcoder.py:845 qualcoder.py:849 qualcoder.py:829
+#: qualcoder.py:845 qualcoder.py:849 qualcoder.py:829 qualcoder.py:846
 msgid "Tree font size"
 msgstr "ツリーのフォントサイズ"
 
 #: qualcoder.py:776 qualcoder.py:792 qualcoder.py:789 qualcoder.py:823
-#: qualcoder.py:846 qualcoder.py:850 qualcoder.py:830
+#: qualcoder.py:846 qualcoder.py:850 qualcoder.py:830 qualcoder.py:847
 msgid "Working directory"
 msgstr "作業ディレクトリ"
 
 #: qualcoder.py:777 qualcoder.py:793 qualcoder.py:790 qualcoder.py:824
-#: qualcoder.py:847 qualcoder.py:851 qualcoder.py:831
+#: qualcoder.py:847 qualcoder.py:851 qualcoder.py:831 qualcoder.py:848
 msgid "Show IDs"
 msgstr "IDを表示"
 
 #: qualcoder.py:778 qualcoder.py:794 qualcoder.py:791 qualcoder.py:825
-#: qualcoder.py:848 qualcoder.py:852 qualcoder.py:832
+#: qualcoder.py:848 qualcoder.py:852 qualcoder.py:832 qualcoder.py:849
 msgid "Language"
 msgstr "言語"
 
 #: qualcoder.py:779 qualcoder.py:795 qualcoder.py:792 qualcoder.py:826
-#: qualcoder.py:849 qualcoder.py:853 qualcoder.py:833
+#: qualcoder.py:849 qualcoder.py:853 qualcoder.py:833 qualcoder.py:850
 msgid "Timestamp format"
 msgstr "タイムスタンプ形式"
 
 #: qualcoder.py:780 qualcoder.py:796 qualcoder.py:793 qualcoder.py:827
-#: qualcoder.py:850 qualcoder.py:854 qualcoder.py:834
+#: qualcoder.py:850 qualcoder.py:854 qualcoder.py:834 qualcoder.py:851
 msgid "Speaker name format"
 msgstr "講演者名のフォーマット"
 
 #: qualcoder.py:781 qualcoder.py:797 qualcoder.py:794 qualcoder.py:828
-#: qualcoder.py:851 qualcoder.py:855 qualcoder.py:835
+#: qualcoder.py:851 qualcoder.py:855 qualcoder.py:835 qualcoder.py:852
 msgid "Backup on open"
 msgstr "オープン時のバックアップ"
 
 #: qualcoder.py:782 qualcoder.py:798 qualcoder.py:795 qualcoder.py:829
-#: qualcoder.py:852 qualcoder.py:856 qualcoder.py:836
+#: qualcoder.py:852 qualcoder.py:856 qualcoder.py:836 qualcoder.py:853
 msgid "Backup AV files"
 msgstr "AVファイルのバックアップ"
 
 #: qualcoder.py:784 qualcoder.py:1390 qualcoder.py:800 qualcoder.py:1439
 #: qualcoder.py:797 qualcoder.py:1437 qualcoder.py:831 qualcoder.py:1480
 #: qualcoder.py:854 qualcoder.py:1514 qualcoder.py:858 qualcoder.py:1442
-#: qualcoder.py:838 qualcoder.py:1443
+#: qualcoder.py:838 qualcoder.py:1443 qualcoder.py:855 qualcoder.py:1501
 msgid "Directory (folder) paths / represents \\"
 msgstr "ディレクトリ(フォルダ)パス/表す \\"
 
 #: qualcoder.py:1037 qualcoder.py:1093 qualcoder.py:1091 qualcoder.py:1132
-#: qualcoder.py:1155 qualcoder.py:1071 qualcoder.py:1072
+#: qualcoder.py:1155 qualcoder.py:1071 qualcoder.py:1072 qualcoder.py:1103
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "REFI-QDAプロジェクトのインポート"
 
 #: qualcoder.py:1039 qualcoder.py:1095 qualcoder.py:1093 qualcoder.py:1134
-#: qualcoder.py:1157 qualcoder.py:1073 qualcoder.py:1074
+#: qualcoder.py:1157 qualcoder.py:1073 qualcoder.py:1074 qualcoder.py:1105
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -1745,17 +1801,17 @@ msgstr ""
 "ステップ2: QDPXファイルを要求されます。"
 
 #: qualcoder.py:1042 qualcoder.py:1098 qualcoder.py:1096 qualcoder.py:1135
-#: qualcoder.py:1158 qualcoder.py:1074 qualcoder.py:1075
+#: qualcoder.py:1158 qualcoder.py:1074 qualcoder.py:1075 qualcoder.py:1106
 msgid "REFI-QDA import steps"
 msgstr "REFI-QDAインポートステップ"
 
 #: qualcoder.py:1063 qualcoder.py:1119 qualcoder.py:1117 qualcoder.py:1157
-#: qualcoder.py:1172 qualcoder.py:1088 qualcoder.py:1089
+#: qualcoder.py:1172 qualcoder.py:1088 qualcoder.py:1089 qualcoder.py:1120
 msgid "IMPORTING RQDA PROJECT"
 msgstr "RQDAプロジェクトのインポート"
 
 #: qualcoder.py:1064 qualcoder.py:1120 qualcoder.py:1118 qualcoder.py:1158
-#: qualcoder.py:1173 qualcoder.py:1089 qualcoder.py:1090
+#: qualcoder.py:1173 qualcoder.py:1089 qualcoder.py:1090 qualcoder.py:1121
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -1764,30 +1820,32 @@ msgstr ""
 "ステップ2: RQDAファイルの提出を求められます。"
 
 #: qualcoder.py:1067 qualcoder.py:1123 qualcoder.py:1121 qualcoder.py:1174
-#: qualcoder.py:1090 qualcoder.py:1091
+#: qualcoder.py:1090 qualcoder.py:1091 qualcoder.py:1122
 msgid "RQDA import steps"
 msgstr "RQDAインポートステップ"
 
 #: qualcoder.py:1075 qualcoder.py:1131 qualcoder.py:1129 qualcoder.py:1139
 #: qualcoder.py:1163 qualcoder.py:1162 qualcoder.py:1178 qualcoder.py:1078
-#: qualcoder.py:1094 qualcoder.py:1079 qualcoder.py:1095
+#: qualcoder.py:1094 qualcoder.py:1079 qualcoder.py:1095 qualcoder.py:1110
+#: qualcoder.py:1126
 msgid "Project creation"
 msgstr "プロジェクトの作成"
 
 #: qualcoder.py:1076 qualcoder.py:1132 qualcoder.py:1130 qualcoder.py:1139
 #: qualcoder.py:1163 qualcoder.py:1225 qualcoder.py:1162 qualcoder.py:1178
 #: qualcoder.py:1240 qualcoder.py:1078 qualcoder.py:1094 qualcoder.py:1155
-#: qualcoder.py:1079 qualcoder.py:1095 qualcoder.py:1156
+#: qualcoder.py:1079 qualcoder.py:1095 qualcoder.py:1156 qualcoder.py:1110
+#: qualcoder.py:1126 qualcoder.py:1187
 msgid "Project not successfully created"
 msgstr "プロジェクトが正常に作成されません"
 
 #: qualcoder.py:1091 qualcoder.py:1147 qualcoder.py:1145 qualcoder.py:1177
-#: qualcoder.py:1192 qualcoder.py:1108 qualcoder.py:1109
+#: qualcoder.py:1192 qualcoder.py:1108 qualcoder.py:1109 qualcoder.py:1140
 msgid "Are you sure you want to quit?"
 msgstr "本当に辞めたいのか？"
 
 #: qualcoder.py:1125 qualcoder.py:1181 qualcoder.py:1179 qualcoder.py:1211
-#: qualcoder.py:1226 qualcoder.py:1141 qualcoder.py:1142
+#: qualcoder.py:1226 qualcoder.py:1141 qualcoder.py:1142 qualcoder.py:1173
 msgid "Enter project name"
 msgstr "プロジェクト名を入力"
 
@@ -1795,17 +1853,18 @@ msgstr "プロジェクト名を入力"
 #: qualcoder.py:1181 qualcoder.py:1193 qualcoder.py:1213 qualcoder.py:1225
 #: qualcoder.py:1228 qualcoder.py:1240 refi.py:1406 refi.py:1412
 #: qualcoder.py:1143 qualcoder.py:1155 qualcoder.py:1144 qualcoder.py:1156
-#: refi.py:1468 refi.py:1474
+#: refi.py:1468 refi.py:1474 qualcoder.py:1175 qualcoder.py:1187 refi.py:1495
+#: refi.py:1501
 msgid "Project"
 msgstr "プロジェクト"
 
 #: qualcoder.py:1127 qualcoder.py:1183 qualcoder.py:1181 qualcoder.py:1213
-#: qualcoder.py:1228 qualcoder.py:1143 qualcoder.py:1144
+#: qualcoder.py:1228 qualcoder.py:1143 qualcoder.py:1144 qualcoder.py:1175
 msgid "No project created."
 msgstr "プロジェクトは作成されていません。"
 
 #: qualcoder.py:1138 qualcoder.py:1194 qualcoder.py:1192 qualcoder.py:1224
-#: qualcoder.py:1239 qualcoder.py:1154 qualcoder.py:1155
+#: qualcoder.py:1239 qualcoder.py:1154 qualcoder.py:1155 qualcoder.py:1186
 msgid "Project creation error "
 msgstr "プロジェクト作成エラー "
 
@@ -1814,128 +1873,128 @@ msgid "No project created. Exiting. "
 msgstr "プロジェクトが作成されていません。終了します。"
 
 #: qualcoder.py:1162 qualcoder.py:1218 qualcoder.py:1216 qualcoder.py:1249
-#: qualcoder.py:1264 qualcoder.py:1179 qualcoder.py:1180
+#: qualcoder.py:1264 qualcoder.py:1179 qualcoder.py:1180 qualcoder.py:1211
 msgid "New project: "
 msgstr "新しいプロジェクト。"
 
 #: qualcoder.py:1162 qualcoder.py:1218 qualcoder.py:1216 manage_files.py:1152
 #: qualcoder.py:1249 manage_files.py:1291 qualcoder.py:1264
 #: manage_files.py:1289 qualcoder.py:1179 manage_files.py:1328
-#: qualcoder.py:1180 manage_files.py:1378
+#: qualcoder.py:1180 manage_files.py:1378 qualcoder.py:1211
 msgid " created."
 msgstr " を作成しました。"
 
 #: qualcoder.py:1164 qualcoder.py:1220 qualcoder.py:1218 qualcoder.py:1251
-#: qualcoder.py:1266 qualcoder.py:1181 qualcoder.py:1182
+#: qualcoder.py:1266 qualcoder.py:1181 qualcoder.py:1182 qualcoder.py:1213
 msgid "Opening: "
 msgstr "オープニング。"
 
 #: qualcoder.py:1174 qualcoder.py:1230 qualcoder.py:1228 qualcoder.py:1261
-#: qualcoder.py:1276 qualcoder.py:1191 qualcoder.py:1192
+#: qualcoder.py:1276 qualcoder.py:1191 qualcoder.py:1192 qualcoder.py:1223
 msgid "New Project Created"
 msgstr "新規プロジェクト作成"
 
 #: qualcoder.py:1175 qualcoder.py:1231 qualcoder.py:1229 qualcoder.py:1262
-#: qualcoder.py:1277 qualcoder.py:1192 qualcoder.py:1193
+#: qualcoder.py:1277 qualcoder.py:1192 qualcoder.py:1193 qualcoder.py:1224
 msgid "DB Version:"
 msgstr "DBのバージョン。"
 
 #: qualcoder.py:1176 reports.py:279 reports.py:574 qualcoder.py:1232
 #: reports.py:570 qualcoder.py:1230 qualcoder.py:1263 qualcoder.py:1278
 #: qualcoder.py:1193 reports.py:277 reports.py:564 qualcoder.py:1194
-#: reports.py:580 reports.py:568
+#: reports.py:580 reports.py:568 qualcoder.py:1225
 msgid "Date: "
 msgstr "日付。"
 
 #: qualcoder.py:1177 qualcoder.py:1233 qualcoder.py:1231 qualcoder.py:1264
-#: qualcoder.py:1279 qualcoder.py:1194 qualcoder.py:1195
+#: qualcoder.py:1279 qualcoder.py:1194 qualcoder.py:1195 qualcoder.py:1226
 msgid "About: "
 msgstr "についてです。"
 
 #: qualcoder.py:1178 qualcoder.py:1234 qualcoder.py:1232 qualcoder.py:1265
-#: qualcoder.py:1280 qualcoder.py:1195 qualcoder.py:1196
+#: qualcoder.py:1280 qualcoder.py:1195 qualcoder.py:1196 qualcoder.py:1227
 msgid "Coder:"
 msgstr "コーダーだ"
 
 #: qualcoder.py:1181 qualcoder.py:1237 qualcoder.py:1235 qualcoder.py:1268
-#: qualcoder.py:1283 qualcoder.py:1198 qualcoder.py:1199
+#: qualcoder.py:1283 qualcoder.py:1198 qualcoder.py:1199 qualcoder.py:1230
 msgid "Problem creating database "
 msgstr "データベースの作成に問題がある "
 
 #: qualcoder.py:1207 qualcoder.py:1270 qualcoder.py:1268 qualcoder.py:1303
-#: qualcoder.py:1318 qualcoder.py:1247 qualcoder.py:1248
+#: qualcoder.py:1318 qualcoder.py:1247 qualcoder.py:1248 qualcoder.py:1279
 msgid "Memo for project "
 msgstr "プロジェクトのメモ "
 
 #: qualcoder.py:1214 qualcoder.py:1277 qualcoder.py:1275 qualcoder.py:1310
-#: qualcoder.py:1325 qualcoder.py:1253 qualcoder.py:1254
+#: qualcoder.py:1325 qualcoder.py:1253 qualcoder.py:1254 qualcoder.py:1285
 msgid "Project memo entered."
 msgstr "プロジェクトメモを入力しました。"
 
 #: qualcoder.py:1235 qualcoder.py:1298 qualcoder.py:1296 qualcoder.py:1331
-#: qualcoder.py:1346 qualcoder.py:1274 qualcoder.py:1275
+#: qualcoder.py:1346 qualcoder.py:1274 qualcoder.py:1275 qualcoder.py:1306
 msgid "Open project directory"
 msgstr "プロジェクトディレクトリを開く"
 
 #: qualcoder.py:1257 qualcoder.py:1320 qualcoder.py:1318 qualcoder.py:1353
-#: qualcoder.py:1368 qualcoder.py:1296 qualcoder.py:1297
+#: qualcoder.py:1368 qualcoder.py:1296 qualcoder.py:1297 qualcoder.py:1328
 msgid "Cannot open file"
 msgstr "ファイルを開けない"
 
 #: qualcoder.py:1271 qualcoder.py:1334 qualcoder.py:1332 qualcoder.py:1366
-#: qualcoder.py:1394 qualcoder.py:1322 qualcoder.py:1323
+#: qualcoder.py:1394 qualcoder.py:1322 qualcoder.py:1323 qualcoder.py:1354
 msgid "Default coder name changed to: "
 msgstr "デフォルトのコーダー名を変更しました。"
 
 #: qualcoder.py:1307 qualcoder.py:1353 qualcoder.py:1351 qualcoder.py:1391
-#: qualcoder.py:1425 qualcoder.py:1354
+#: qualcoder.py:1425 qualcoder.py:1354 qualcoder.py:1385
 msgid "Project Opened: "
 msgstr "プロジェクトがオープンしました。"
 
 #: qualcoder.py:1327 qualcoder.py:1373 qualcoder.py:1371 qualcoder.py:1411
-#: qualcoder.py:1445 qualcoder.py:1374
+#: qualcoder.py:1445 qualcoder.py:1374 qualcoder.py:1432
 msgid "There is already a backup with this name"
 msgstr "すでにこの名前のバックアップがあります"
 
 #: qualcoder.py:1334 qualcoder.py:1380 qualcoder.py:1378 qualcoder.py:1418
-#: qualcoder.py:1452 qualcoder.py:1381
+#: qualcoder.py:1452 qualcoder.py:1381 qualcoder.py:1439
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "警告: オーディオおよびビデオファイルはバックアップされていません。設定を参照"
 "してください。"
 
 #: qualcoder.py:1335 qualcoder.py:1381 qualcoder.py:1379 qualcoder.py:1419
-#: qualcoder.py:1453 qualcoder.py:1382
+#: qualcoder.py:1453 qualcoder.py:1382 qualcoder.py:1440
 msgid "Project backup created: "
 msgstr "プロジェクトのバックアップが作成されました。"
 
 #: qualcoder.py:1354 qualcoder.py:1399 qualcoder.py:1397 qualcoder.py:1438
-#: qualcoder.py:1472 qualcoder.py:1400 qualcoder.py:1401
+#: qualcoder.py:1472 qualcoder.py:1400 qualcoder.py:1401 qualcoder.py:1459
 msgid "PROJECT SUMMARY"
 msgstr "プロジェクト概要"
 
 #: qualcoder.py:1356 qualcoder.py:1401 qualcoder.py:1399 qualcoder.py:1440
-#: qualcoder.py:1474 qualcoder.py:1402 qualcoder.py:1403
+#: qualcoder.py:1474 qualcoder.py:1402 qualcoder.py:1403 qualcoder.py:1461
 msgid "Date time now: "
 msgstr "今の日付の時間。"
 
 #: qualcoder.py:1358 qualcoder.py:1403 qualcoder.py:1401 qualcoder.py:1442
-#: qualcoder.py:1476 qualcoder.py:1404 qualcoder.py:1405
+#: qualcoder.py:1476 qualcoder.py:1404 qualcoder.py:1405 qualcoder.py:1463
 msgid "Project path: "
 msgstr "プロジェクトパス。"
 
 #: qualcoder.py:1360 qualcoder.py:1405 qualcoder.py:1403 qualcoder.py:1444
-#: qualcoder.py:1478 qualcoder.py:1406 qualcoder.py:1407
+#: qualcoder.py:1478 qualcoder.py:1406 qualcoder.py:1407 qualcoder.py:1465
 msgid "Project date: "
 msgstr "プロジェクトの日付。"
 
 #: qualcoder.py:1364 qualcoder.py:1409 qualcoder.py:1407 qualcoder.py:1448
-#: qualcoder.py:1482 qualcoder.py:1410 qualcoder.py:1411
+#: qualcoder.py:1482 qualcoder.py:1410 qualcoder.py:1411 qualcoder.py:1469
 msgid "Project memo: "
 msgstr "プロジェクトメモ。"
 
 #: qualcoder.py:1376 qualcoder.py:1421 qualcoder.py:1419 qualcoder.py:1460
-#: qualcoder.py:1494 qualcoder.py:1422 qualcoder.py:1423
+#: qualcoder.py:1494 qualcoder.py:1422 qualcoder.py:1423 qualcoder.py:1481
 msgid "Code categories: "
 msgstr "コードカテゴリ。"
 
@@ -1944,27 +2003,28 @@ msgstr "コードカテゴリ。"
 #: qualcoder.py:1464 reports.py:1400 reports.py:1481 qualcoder.py:1498
 #: qualcoder.py:1426 reports.py:1554 reports.py:1630 report_relations.py:131
 #: qualcoder.py:1427 reports.py:1570 reports.py:1646 report_relations.py:136
-#: reports.py:1558 reports.py:1634
+#: reports.py:1558 reports.py:1634 qualcoder.py:1485 reports.py:1580
+#: reports.py:1656
 msgid "Codes: "
 msgstr "コード。"
 
 #: qualcoder.py:1458 qualcoder.py:1508 qualcoder.py:1506 qualcoder.py:1558
-#: qualcoder.py:1592 qualcoder.py:1540
+#: qualcoder.py:1592 qualcoder.py:1540 qualcoder.py:1598
 msgid "Deleting: "
 msgstr "削除します。"
 
 #: qualcoder.py:1511 qualcoder.py:1557 qualcoder.py:1555 qualcoder.py:1607
-#: qualcoder.py:1641 qualcoder.py:1552
+#: qualcoder.py:1641 qualcoder.py:1552 qualcoder.py:1610
 msgid "This version: "
 msgstr "このバージョン。"
 
 #: qualcoder.py:1515 qualcoder.py:1564 qualcoder.py:1562 qualcoder.py:1614
-#: qualcoder.py:1648 qualcoder.py:1559
+#: qualcoder.py:1648 qualcoder.py:1559 qualcoder.py:1617
 msgid "Newer release available: "
 msgstr "新しいリリースがあります。"
 
 #: qualcoder.py:1520 qualcoder.py:1569 qualcoder.py:1567 qualcoder.py:1619
-#: qualcoder.py:1653 qualcoder.py:1564
+#: qualcoder.py:1653 qualcoder.py:1564 qualcoder.py:1622
 msgid "Latest Release: "
 msgstr "最新のリリースです。"
 
@@ -2008,7 +2068,7 @@ msgstr "テキストファイルのエクスポート"
 
 #: reports.py:306 reports.py:357 report_relations.py:549 reports.py:304
 #: reports.py:355 report_relations.py:547 report_relations.py:552 cases.py:228
-#: manage_files.py:474 reports.py:300 reports.py:345
+#: manage_files.py:474 reports.py:300 reports.py:345 cases.py:231
 msgid " exported"
 msgstr " ゆしゅつ"
 
@@ -2025,7 +2085,7 @@ msgstr "コードツリー"
 
 #: reports.py:356 report_relations.py:548 reports.py:354
 #: report_relations.py:546 report_relations.py:551 cases.py:228
-#: manage_files.py:474 reports.py:345
+#: manage_files.py:474 reports.py:345 cases.py:231
 msgid "Csv file Export"
 msgstr " Csvファイルのエクスポート"
 
@@ -2074,13 +2134,13 @@ msgid "ZeroDivisionError. unique_codings:"
 msgstr "ゼロ除算エラー。"
 
 #: reports.py:1049 reports.py:1047 reports.py:1201 reports.py:1217
-#: reports.py:1205
+#: reports.py:1205 reports.py:1209
 msgid "Save text file"
 msgstr "テキストファイルの保存"
 
 #: reports.py:1075 reports.py:1112 reports.py:1073 reports.py:1110
 #: reports.py:1227 reports.py:1264 reports.py:1243 reports.py:1280
-#: reports.py:1231 reports.py:1268
+#: reports.py:1231 reports.py:1268 reports.py:1235 reports.py:1272
 msgid "Report exported: "
 msgstr "レポートをエクスポートしました。"
 
@@ -2089,102 +2149,103 @@ msgstr "レポートをエクスポートしました。"
 #: reports.py:1374 reports.py:1231 reports.py:1268 reports.py:1388
 #: reports.py:1528 reports.py:1247 reports.py:1284 reports.py:1404
 #: reports.py:1544 reports.py:1235 reports.py:1272 reports.py:1392
-#: reports.py:1532
+#: reports.py:1532 reports.py:1239 reports.py:1276 reports.py:1396
+#: reports.py:1536
 msgid "Report exported"
 msgstr "エクスポートされたレポート"
 
 #: reports.py:1090 reports.py:1088 reports.py:1242 reports.py:1258
-#: reports.py:1246
+#: reports.py:1246 reports.py:1250
 msgid "Save Open Document Text file"
 msgstr "開いている文書のテキストファイルを保存"
 
 #: reports.py:1209 reports.py:1207 reports.py:1361 reports.py:1377
-#: reports.py:1365
+#: reports.py:1365 reports.py:1369
 msgid "Save CSV file"
 msgstr "CSVファイルの保存"
 
 #: reports.py:1249 reports.py:1247 reports.py:1246 reports.py:1400
-#: reports.py:1416 reports.py:1404
+#: reports.py:1416 reports.py:1404 reports.py:1408
 msgid "Save html file"
 msgstr "htmlファイルの保存"
 
 #: reports.py:1286 reports.py:1284 reports.py:1283 reports.py:1437
-#: reports.py:1453 reports.py:1441
+#: reports.py:1453 reports.py:1441 reports.py:1445
 msgid "html folder creation error "
 msgstr "htmlフォルダ作成エラー "
 
 #: reports.py:1287 reports.py:1285 reports.py:1284 reports.py:1438
-#: reports.py:1454 reports.py:1442
+#: reports.py:1454 reports.py:1442 reports.py:1446
 msgid "Folder creation"
 msgstr "フォルダ作成"
 
 #: reports.py:1287 reports.py:1285 reports.py:1284 reports.py:1438
-#: reports.py:1454 reports.py:1442
+#: reports.py:1454 reports.py:1442 reports.py:1446
 msgid " error"
 msgstr " 誤り"
 
 #: reports.py:1294 reports.py:1292 reports.py:1291 reports.py:1445
-#: reports.py:1461 reports.py:1449
+#: reports.py:1461 reports.py:1449 reports.py:1453
 msgid "html file reading error:"
 msgstr "htmlファイルの読み込みエラー。"
 
 #: reports.py:1335 reports.py:1333 reports.py:1363 reports.py:1517
-#: reports.py:1533 reports.py:1521
+#: reports.py:1533 reports.py:1521 reports.py:1525
 msgid "HTML file creation exception"
 msgstr "ＨＴＭＬファイル作成例外"
 
 #: reports.py:1339 reports.py:1337 reports.py:1367 reports.py:1521
-#: reports.py:1537 reports.py:1525
+#: reports.py:1537 reports.py:1525 reports.py:1529
 msgid "Report exported to: "
 msgstr "レポートをエクスポートしました。"
 
 #: reports.py:1341 reports.py:1339 reports.py:1369 reports.py:1523
-#: reports.py:1539 reports.py:1527
+#: reports.py:1539 reports.py:1527 reports.py:1531
 msgid "Media folder: "
 msgstr "メディアフォルダ。"
 
 #: reports.py:1427 reports.py:1425 reports.py:1455 reports.py:1602
-#: reports.py:1618 reports.py:1606
+#: reports.py:1618 reports.py:1606 reports.py:1628
 msgid "No codes"
 msgstr "コードなし"
 
 #: reports.py:1428 reports.py:1426 reports.py:1456 reports.py:1603
-#: reports.py:1619 reports.py:1607
+#: reports.py:1619 reports.py:1607 reports.py:1629
 msgid "No codes have been selected."
 msgstr "コードが選択されていません。"
 
 #: reports.py:1436 reports.py:1434 reports.py:1464 reports.py:1611
-#: reports.py:1627 reports.py:1615
+#: reports.py:1627 reports.py:1615 reports.py:1637
 msgid "Nothing selected"
 msgstr "何も選択されていない"
 
 #: reports.py:1437 reports.py:1435 reports.py:1465 reports.py:1612
-#: reports.py:1628 reports.py:1616
+#: reports.py:1628 reports.py:1616 reports.py:1638
 msgid "No files, cases or attributes have been selected."
 msgstr "ファイル、ケース、属性が選択されていません。"
 
 #: reports.py:1446 reports.py:1444 reports.py:1474 reports.py:1625
-#: reports.py:1641 reports.py:1629
+#: reports.py:1641 reports.py:1629 reports.py:1651
 msgid "Search parameters"
 msgstr "検索パラメータ"
 
 #: reports.py:1448 reports.py:1446 reports.py:1476 reports.py:1627
-#: reports.py:1643 reports.py:1631
+#: reports.py:1643 reports.py:1631 reports.py:1653
 msgid "Coding by: All coders"
 msgstr "コーディング方法 すべてのコーダー"
 
 #: reports.py:1450 reports.py:1448 reports.py:1478 reports.py:1629
-#: reports.py:1645 reports.py:1633
+#: reports.py:1645 reports.py:1633 reports.py:1655
 msgid "Coding by: "
 msgstr "コーディングをしています。"
 
 #: reports.py:1452 reports.py:1450 reports.py:1480 reports.py:1666
-#: reports.py:1682 reports.py:1670
+#: reports.py:1682 reports.py:1670 reports.py:1692
 msgid "Search text: "
 msgstr "テキストを検索します。"
 
 #: reports.py:1835 reports.py:1839 reports.py:1869 reports.py:2057
-#: reports.py:2073 reports.py:2061
+#: reports.py:2073 reports.py:2061 reports.py:2083
 msgid "No media name in AV results"
 msgstr "AV結果にメディア名がない"
 
@@ -2205,11 +2266,11 @@ msgid "Cases selected: All"
 msgstr "選択されたケース すべて"
 
 #: reports.py:2200 reports.py:2208 reports.py:2251 reports.py:2364
-#: reports.py:2566 reports.py:2554
+#: reports.py:2566 reports.py:2554 reports.py:2576
 msgid "Click to view coding in the original file."
 msgstr "クリックすると元のファイルでのコーデが表示されます。"
 
-#: settings.py:142 settings.py:143 settings.py:145
+#: settings.py:142 settings.py:143 settings.py:145 settings.py:146
 msgid "Choose project directory"
 msgstr "プロジェクトディレクトリを選択"
 
@@ -2222,23 +2283,26 @@ msgid "Cannot import vlc"
 msgstr "vlc をインポートできない"
 
 #: view_av.py:203 view_av.py:206 view_av.py:250 view_av.py:252 view_av.py:269
+#: view_av.py:272
 msgid "Coder: "
 msgstr "コーダーだ "
 
 #: view_av.py:204 view_av.py:207 view_av.py:604 view_av.py:251 view_av.py:704
-#: view_av.py:253 view_av.py:699 view_av.py:270 view_av.py:716
+#: view_av.py:253 view_av.py:699 view_av.py:270 view_av.py:716 view_av.py:273
+#: view_av.py:719
 msgid "Media coding"
 msgstr "メディアコーディング"
 
 #: view_av.py:496 view_av.py:592 view_av.py:609 view_av.py:709 view_av.py:722
-#: view_av.py:739
+#: view_av.py:739 view_av.py:742
 msgid "Media coding: "
 msgstr "メディアコーディング"
 
 #: view_av.py:502 view_av.py:2263 view_av.py:585 view_av.py:2486
 #: view_av.py:2528 view_av.py:599 view_av.py:2555 view_av.py:699
 #: view_av.py:2722 refi.py:2254 refi.py:2287 view_av.py:716 view_av.py:2845
-#: refi.py:2359 view_av.py:733 view_av.py:3031
+#: refi.py:2359 view_av.py:733 view_av.py:3031 refi.py:2386 view_av.py:736
+#: view_av.py:3037
 msgid "Media not found"
 msgstr "見つからないメディア"
 
@@ -2272,12 +2336,12 @@ msgstr "一時停止"
 
 #: view_av.py:845 view_av.py:862 view_av.py:935 view_av.py:952 view_av.py:969
 #: view_av.py:1084 view_av.py:1101 view_av.py:1102 view_av.py:1119
-#: view_av.py:1131 view_av.py:1148
+#: view_av.py:1131 view_av.py:1148 view_av.py:1134 view_av.py:1151
 msgid "Clear segment"
 msgstr "クリアセグメント"
 
 #: view_av.py:856 view_av.py:946 view_av.py:963 view_av.py:1095 view_av.py:1113
-#: view_av.py:1142
+#: view_av.py:1142 view_av.py:1145
 msgid "End segment"
 msgstr "エンドセグメント"
 
@@ -2285,168 +2349,169 @@ msgstr "エンドセグメント"
 #: view_av.py:2290 view_av.py:2332 view_av.py:964 view_av.py:980
 #: view_av.py:2349 view_av.py:1096 view_av.py:1112 view_av.py:2497
 #: view_av.py:1114 view_av.py:1130 view_av.py:2620 view_av.py:1143
-#: view_av.py:1159 view_av.py:2794
+#: view_av.py:1159 view_av.py:2794 view_av.py:1146 view_av.py:1162
+#: view_av.py:2797
 msgid "Segment: "
 msgstr "セグメント。"
 
 #: view_av.py:1055 view_av.py:1261 view_av.py:1303 view_av.py:1320
-#: view_av.py:1466 view_av.py:1621 view_av.py:1671
+#: view_av.py:1466 view_av.py:1621 view_av.py:1671 view_av.py:1674
 msgid "Segment:"
 msgstr "セグメント。"
 
 #: view_av.py:1056 view_av.py:1262 view_av.py:1304 view_av.py:1321
-#: view_av.py:1467 view_av.py:1622 view_av.py:1672
+#: view_av.py:1467 view_av.py:1622 view_av.py:1672 view_av.py:1675
 msgid "Start segment"
 msgstr "開始セグメント"
 
 #: view_av.py:1135 view_av.py:1341 view_av.py:1383 view_av.py:1400
-#: view_av.py:1546 view_av.py:1701 view_av.py:1751
+#: view_av.py:1546 view_av.py:1701 view_av.py:1751 view_av.py:1754
 msgid "Cannot merge codes, unmark overlapping text."
 msgstr "コードをマージできない、重複しているテキストのマークを解除する。"
 
 #: view_av.py:1149 view_av.py:1355 view_av.py:1397 view_av.py:1414
-#: view_av.py:1560 view_av.py:1715 view_av.py:1767
+#: view_av.py:1560 view_av.py:1715 view_av.py:1767 view_av.py:1770
 msgid "New code name"
 msgstr "新しいコード名"
 
 #: view_av.py:1161 view_av.py:1367 view_av.py:1409 view_av.py:1426
-#: view_av.py:1572 view_av.py:1727 view_av.py:1779
+#: view_av.py:1572 view_av.py:1727 view_av.py:1779 view_av.py:1782
 msgid "Code added: "
 msgstr "コードを追加しました。"
 
 #: view_av.py:1258 view_image.py:860 view_av.py:1464 view_image.py:904
 #: view_av.py:1506 view_image.py:946 view_av.py:1523 view_image.py:973
 #: view_av.py:1669 view_image.py:1058 view_av.py:1824 view_image.py:1218
-#: view_av.py:1877 view_image.py:1157
+#: view_av.py:1877 view_image.py:1157 view_av.py:1880
 msgid "Memo for Code "
 msgstr "コードのメモ "
 
 #: view_av.py:1282 view_av.py:1488 view_av.py:1530 view_av.py:1547
-#: view_av.py:1693 view_av.py:1848 view_av.py:1901
+#: view_av.py:1693 view_av.py:1848 view_av.py:1901 view_av.py:1904
 msgid "Memo for Category "
 msgstr "カテゴリー別メモ "
 
 #: view_av.py:1314 view_av.py:1520 view_av.py:1562 view_av.py:1579
-#: view_av.py:1725 view_av.py:1877 view_av.py:1930
+#: view_av.py:1725 view_av.py:1877 view_av.py:1930 view_av.py:1933
 msgid " Name already in use, choose another."
 msgstr " すでに使用されている名前は、別のものを選択してください。"
 
 #: view_av.py:1328 view_image.py:934 view_av.py:1534 view_image.py:978
 #: view_av.py:1576 view_image.py:1020 view_av.py:1593 view_image.py:1047
 #: view_av.py:1739 view_image.py:1132 view_av.py:1890 view_image.py:1290
-#: view_av.py:1943 view_image.py:1229
+#: view_av.py:1943 view_image.py:1229 view_av.py:1946
 msgid "Code renamed: "
 msgstr "コード名を変更しました。"
 
 #: view_av.py:1341 view_image.py:947 view_av.py:1547 view_image.py:991
 #: view_av.py:1589 view_image.py:1033 view_av.py:1606 view_image.py:1060
 #: view_av.py:1752 view_image.py:1145 view_av.py:1903 view_image.py:1303
-#: view_av.py:1956 view_image.py:1242
+#: view_av.py:1956 view_image.py:1242 view_av.py:1959
 msgid "This category name is already in use"
 msgstr "このカテゴリ名はすでに使用されています"
 
 #: view_av.py:1344 view_image.py:950 view_av.py:1550 view_image.py:994
 #: view_av.py:1592 view_image.py:1036 view_av.py:1609 view_image.py:1063
 #: view_av.py:1755 view_image.py:1148 view_av.py:1904 view_image.py:1304
-#: view_av.py:1957 view_image.py:1243
+#: view_av.py:1957 view_image.py:1243 view_av.py:1960
 msgid "Duplicate category name"
 msgstr "カテゴリー名の重複"
 
 #: view_av.py:1360 view_av.py:1566 view_av.py:1608 view_av.py:1625
-#: view_av.py:1771 view_av.py:1919 view_av.py:1972
+#: view_av.py:1771 view_av.py:1919 view_av.py:1972 view_av.py:1975
 msgid "Category renamed: "
 msgstr "カテゴリ名を変更しました。"
 
 #: view_av.py:1455 view_av.py:1661 view_av.py:1703 view_av.py:1720
-#: view_av.py:1866 view_av.py:2014 view_av.py:2097
+#: view_av.py:1866 view_av.py:2014 view_av.py:2097 view_av.py:2100
 msgid "Play text"
 msgstr "テキストを再生する"
 
 #: view_av.py:1467 view_av.py:1673 view_av.py:1715 view_av.py:1732
-#: view_av.py:1878 view_av.py:2026 view_av.py:2115
+#: view_av.py:1878 view_av.py:2026 view_av.py:2115 view_av.py:2118
 msgid "Prepare text_link to segment"
 msgstr "セグメントへのテキストリンクの準備"
 
 #: view_av.py:1469 view_av.py:1675 view_av.py:1717 view_av.py:1734
-#: view_av.py:1880 view_av.py:2028 view_av.py:2117
+#: view_av.py:1880 view_av.py:2028 view_av.py:2117 view_av.py:2120
 msgid "Link to segment to text"
 msgstr "セグメントからテキストへのリンク"
 
 #: view_av.py:1474 view_av.py:1680 view_av.py:1722 view_av.py:1739
-#: view_av.py:1885 view_av.py:2033 view_av.py:2122
+#: view_av.py:1885 view_av.py:2033 view_av.py:2122 view_av.py:2125
 msgid "Video position to timestamp"
 msgstr "動画の位置からタイムスタンプまで"
 
 #: view_av.py:1662 view_av.py:1872 view_av.py:1914 view_av.py:1931
-#: view_av.py:2078 view_av.py:2219 view_av.py:2375
+#: view_av.py:2078 view_av.py:2219 view_av.py:2375 view_av.py:2378
 msgid "No transcription"
 msgstr "転写なし"
 
 #: view_av.py:1747 view_av.py:1960 view_av.py:2002 view_av.py:2019
-#: view_av.py:2166 view_av.py:2294 view_av.py:2467
+#: view_av.py:2166 view_av.py:2294 view_av.py:2467 view_av.py:2470
 msgid "No media transcription selected"
 msgstr "メディア転写は選択されていません"
 
 #: view_av.py:1953 view_av.py:2098 view_av.py:2167 view_av.py:2317
 #: view_av.py:2209 view_av.py:2359 view_av.py:2226 view_av.py:2376
 #: view_av.py:2373 view_av.py:2524 view_av.py:2500 view_av.py:2647
-#: view_av.py:2674 view_av.py:2821
+#: view_av.py:2674 view_av.py:2821 view_av.py:2677 view_av.py:2824
 msgid "Memo for segment"
 msgstr "セグメント別メモ"
 
 #: view_av.py:1954 view_av.py:2168 view_av.py:2210 view_av.py:2227
-#: view_av.py:2374 view_av.py:2501 view_av.py:2675
+#: view_av.py:2374 view_av.py:2501 view_av.py:2675 view_av.py:2678
 msgid "Delete segment"
 msgstr "セグメントの削除"
 
 #: view_av.py:1955 view_av.py:2169 view_av.py:2211 view_av.py:2228
-#: view_av.py:2375 view_av.py:2502 view_av.py:2676
+#: view_av.py:2375 view_av.py:2502 view_av.py:2676 view_av.py:2679
 msgid "Play segment"
 msgstr "再生セグメント"
 
 #: view_av.py:1956 view_av.py:2170 view_av.py:2212 view_av.py:2229
-#: view_av.py:2376 view_av.py:2503 view_av.py:2677
+#: view_av.py:2376 view_av.py:2503 view_av.py:2677 view_av.py:2680
 msgid "Edit segment start position"
 msgstr "セグメント開始位置の編集"
 
 #: view_av.py:1957 view_av.py:2171 view_av.py:2213 view_av.py:2230
-#: view_av.py:2377 view_av.py:2504 view_av.py:2678
+#: view_av.py:2377 view_av.py:2504 view_av.py:2678 view_av.py:2681
 msgid "Edit segment end position"
 msgstr "セグメント終了位置の編集"
 
 #: view_av.py:1959 view_av.py:2173 view_av.py:2215 view_av.py:2232
-#: view_av.py:2379 view_av.py:2506 view_av.py:2680
+#: view_av.py:2379 view_av.py:2506 view_av.py:2680 view_av.py:2683
 msgid "Link text to segment"
 msgstr "セグメントへのリンクテキスト"
 
 #: view_av.py:1961 view_av.py:2176 view_av.py:2218 view_av.py:2235
-#: view_av.py:2382 view_av.py:2509 view_av.py:2683
+#: view_av.py:2382 view_av.py:2509 view_av.py:2683 view_av.py:2686
 msgid "Select segment to link to text"
 msgstr "テキストにリンクするセグメントを選択"
 
 #: view_av.py:2001 view_av.py:2216 view_av.py:2258 view_av.py:2275
-#: view_av.py:2422 view_av.py:2546 view_av.py:2720
+#: view_av.py:2422 view_av.py:2546 view_av.py:2720 view_av.py:2723
 msgid "This segment has already been coded with this code."
 msgstr "このセグメントは、すでにこのコードでコード化されています。"
 
 #: view_av.py:2209 view_av.py:2429 view_av.py:2471 view_av.py:2495
-#: view_av.py:2643 view_av.py:2766 view_av.py:2936
+#: view_av.py:2643 view_av.py:2766 view_av.py:2936 view_av.py:2942
 msgid ""
 "Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
 msgstr "転写領域： ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"
 
 #: view_av.py:2404 view_av.py:2686 view_av.py:2728 view_av.py:2755
-#: view_av.py:2949 view_av.py:3072 view_av.py:3258
+#: view_av.py:2949 view_av.py:3072 view_av.py:3258 view_av.py:3264
 msgid "Select name to delete"
 msgstr "削除する名前を選択"
 
 #: view_av.py:2423 view_av.py:2705 view_av.py:2747 view_av.py:2774
-#: view_av.py:2968 view_av.py:3091 view_av.py:3277
+#: view_av.py:2968 view_av.py:3091 view_av.py:3277 view_av.py:3283
 msgid "Speaker name"
 msgstr "講演者名"
 
 #: view_av.py:2424 view_av.py:2706 view_av.py:2748 view_av.py:2775
-#: view_av.py:2969 view_av.py:3092 view_av.py:3278
+#: view_av.py:2969 view_av.py:3092 view_av.py:3278 view_av.py:3284
 msgid "Name:"
 msgstr "名前です。"
 
@@ -2512,6 +2577,7 @@ msgstr "ブックマークを設定する"
 #: code_text.py:1251 view_av.py:498 view_image.py:323 code_text.py:1555
 #: view_av.py:545 view_image.py:408 code_text.py:1601 view_av.py:554
 #: view_image.py:418 code_text.py:1697 view_av.py:571 view_image.py:423
+#: code_text.py:1732 view_av.py:574
 msgid "Next file"
 msgstr "次のファイル"
 
@@ -2519,57 +2585,59 @@ msgstr "次のファイル"
 #: code_text.py:1252 view_av.py:499 view_image.py:324 code_text.py:1556
 #: view_av.py:546 view_image.py:409 code_text.py:1602 view_av.py:555
 #: view_image.py:419 code_text.py:1698 view_av.py:572 view_image.py:424
+#: code_text.py:1733 view_av.py:575
 msgid "File with latest coding"
 msgstr "最新のコーディングを施したファイル"
 
 #: code_text.py:1208 code_text.py:1245 code_text.py:1253 code_text.py:1557
-#: code_text.py:1603 code_text.py:1699
+#: code_text.py:1603 code_text.py:1699 code_text.py:1736
 msgid "Go to bookmark"
 msgstr "ブックマークへ"
 
 #: code_text.py:1647 code_text.py:1799 code_text.py:1849 code_text.py:2204
-#: code_text.py:2250 code_text.py:2331
+#: code_text.py:2250 code_text.py:2331 code_text.py:2419
 msgid "Select files to code"
 msgstr "コード化するファイルを選択"
 
 #: code_text.py:1680 code_text.py:1751 code_text.py:1832 code_text.py:1796
 #: code_text.py:1888 code_text.py:2151 code_text.py:2243 code_text.py:2197
-#: code_text.py:2289 code_text.py:2278 code_text.py:2370
+#: code_text.py:2289 code_text.py:2278 code_text.py:2370 code_text.py:2366
+#: code_text.py:2458
 msgid "Autocode insert error "
 msgstr "オートコード挿入エラー "
 
 #: qualcoder.py:988 qualcoder.py:984 qualcoder.py:1027 qualcoder.py:1050
-#: qualcoder.py:978 qualcoder.py:976
+#: qualcoder.py:978 qualcoder.py:976 qualcoder.py:1007
 msgid "This project contains no text files."
 msgstr "このプロジェクトにはテキストファイルは含まれていません。"
 
 #: qualcoder.py:991 qualcoder.py:987 qualcoder.py:1028 qualcoder.py:1051
-#: qualcoder.py:979 qualcoder.py:977
+#: qualcoder.py:979 qualcoder.py:977 qualcoder.py:1008
 msgid "No text files"
 msgstr "テキストファイルはありません"
 
 #: qualcoder.py:1011 qualcoder.py:1008 qualcoder.py:1055 qualcoder.py:1078
-#: qualcoder.py:991 qualcoder.py:990
+#: qualcoder.py:991 qualcoder.py:990 qualcoder.py:1021
 msgid "This project contains no image files."
 msgstr "このプロジェクトには画像ファイルは含まれていません。"
 
 #: qualcoder.py:1014 qualcoder.py:1011 qualcoder.py:1056 qualcoder.py:1079
-#: qualcoder.py:992 qualcoder.py:991
+#: qualcoder.py:992 qualcoder.py:991 qualcoder.py:1022
 msgid "No image files"
 msgstr "画像ファイルはありません"
 
 #: qualcoder.py:1037 qualcoder.py:1035 qualcoder.py:1077 qualcoder.py:1100
-#: qualcoder.py:1000 qualcoder.py:999
+#: qualcoder.py:1000 qualcoder.py:999 qualcoder.py:1030
 msgid "This project contains no audio/video files."
 msgstr "このプロジェクトには、オーディオ/ビデオファイルは含まれていません。"
 
 #: qualcoder.py:1040 qualcoder.py:1038 qualcoder.py:1078 qualcoder.py:1101
-#: qualcoder.py:1001 qualcoder.py:1000
+#: qualcoder.py:1001 qualcoder.py:1000 qualcoder.py:1031
 msgid "No a/v files"
 msgstr "a/vファイルはありません。"
 
 #: qualcoder.py:1576 qualcoder.py:1574 qualcoder.py:1626 qualcoder.py:1660
-#: qualcoder.py:1571
+#: qualcoder.py:1571 qualcoder.py:1629
 msgid "Could not detect latest release from Github\n"
 msgstr "Githubから最新のリリースを検出できませんでした。\n"
 
@@ -2583,37 +2651,37 @@ msgstr "辞書には「名前」キーがない"
 
 #: view_av.py:276 view_av.py:2535 view_av.py:2577 view_av.py:2604
 #: view_av.py:323 view_av.py:2786 view_av.py:2909 view_av.py:340
-#: view_av.py:3095
+#: view_av.py:3095 view_av.py:343 view_av.py:3101
 msgid "Screenshot"
 msgstr "スクリーンショット"
 
 #: view_av.py:277 view_av.py:2536 view_av.py:2578 view_av.py:2605
 #: view_av.py:324 view_av.py:2787 view_av.py:2910 view_av.py:341
-#: view_av.py:3096
+#: view_av.py:3096 view_av.py:344 view_av.py:3102
 msgid "Resize"
 msgstr "サイズ変更"
 
 #: view_av.py:289 view_av.py:2548 view_av.py:2590 view_av.py:2617
 #: view_av.py:336 view_av.py:2799 view_av.py:2922 view_av.py:353
-#: view_av.py:3108
+#: view_av.py:3108 view_av.py:356 view_av.py:3114
 msgid "Width"
 msgstr "幅"
 
 #: view_av.py:289 view_av.py:2548 view_av.py:2590 view_av.py:2617
 #: view_av.py:336 view_av.py:2799 view_av.py:2922 view_av.py:353
-#: view_av.py:3108
+#: view_av.py:3108 view_av.py:356 view_av.py:3114
 msgid "Width:"
 msgstr "幅"
 
 #: view_av.py:292 view_av.py:2551 view_av.py:2593 view_av.py:2620
 #: view_av.py:339 view_av.py:2802 view_av.py:2925 view_av.py:356
-#: view_av.py:3111
+#: view_av.py:3111 view_av.py:359 view_av.py:3117
 msgid "Height"
 msgstr "高さ"
 
 #: view_av.py:292 view_av.py:2551 view_av.py:2593 view_av.py:2620
 #: view_av.py:339 view_av.py:2802 view_av.py:2925 view_av.py:356
-#: view_av.py:3111
+#: view_av.py:3111 view_av.py:359 view_av.py:3117
 msgid "Height:"
 msgstr "高さ"
 
@@ -2657,19 +2725,20 @@ msgstr "コード関係のcsvファイルをエクスポートします。"
 #: code_text.py:594 view_av.py:989 view_image.py:520 code_text.py:602
 #: view_av.py:1006 view_image.py:547 code_text.py:790 view_av.py:1138
 #: view_image.py:605 code_text.py:805 view_av.py:1161 view_image.py:609
-#: code_text.py:897 view_av.py:1192 view_image.py:619
+#: code_text.py:897 view_av.py:1192 view_image.py:619 code_text.py:909
+#: view_av.py:1195
 msgid "Show codes like"
 msgstr "以下のようなコードを表示する"
 
 #: code_text.py:629 view_av.py:1017 view_image.py:546 view_av.py:1034
 #: view_image.py:573 view_av.py:1166 view_image.py:631 view_av.py:1325
-#: view_image.py:771 view_av.py:1271 view_image.py:696
+#: view_image.py:771 view_av.py:1271 view_image.py:696 view_av.py:1274
 msgid "Show codes containing"
 msgstr "を含むコードを表示します。"
 
 #: code_text.py:632 view_av.py:1020 view_image.py:549 view_av.py:1037
 #: view_image.py:576 view_av.py:1169 view_image.py:634 view_av.py:1328
-#: view_image.py:774 view_av.py:1274 view_image.py:699
+#: view_image.py:774 view_av.py:1274 view_image.py:699 view_av.py:1277
 msgid ""
 "Show codes containing text.\n"
 "(Blank for all)"
@@ -2687,7 +2756,7 @@ msgstr "文章をコード化するテキスト。すべてのテキストファ
 
 #: code_text.py:1699 code_text.py:1712 code_text.py:1738 code_text.py:1751
 #: code_text.py:2093 code_text.py:2106 code_text.py:2139 code_text.py:2152
-#: code_text.py:2220 code_text.py:2233
+#: code_text.py:2220 code_text.py:2233 code_text.py:2308 code_text.py:2321
 msgid "Code sentence"
 msgstr "コード文"
 
@@ -2704,19 +2773,19 @@ msgid "Define sentence ending:"
 msgstr "文末を定義します。"
 
 #: code_text.py:1754 code_text.py:1799 code_text.py:2154 code_text.py:2200
-#: code_text.py:2281
+#: code_text.py:2281 code_text.py:2369
 msgid " added codes"
 msgstr " 追加コード"
 
 #: code_text.py:1755 code_text.py:1805 code_text.py:2160 code_text.py:2206
-#: code_text.py:2287
+#: code_text.py:2287 code_text.py:2375
 msgid "Automatic code sentence in files:"
 msgstr "ファイル内のコードセンテンスを自動生成します。"
 
 #: code_text.py:1756 code_text.py:1801 code_text.py:1806 code_text.py:1893
 #: code_text.py:2156 code_text.py:2161 code_text.py:2248 code_text.py:2202
 #: code_text.py:2207 code_text.py:2294 code_text.py:2283 code_text.py:2288
-#: code_text.py:2375
+#: code_text.py:2375 code_text.py:2371 code_text.py:2376 code_text.py:2463
 msgid ""
 "\n"
 "Code: "
@@ -2725,7 +2794,7 @@ msgstr ""
 "コードは？"
 
 #: code_text.py:1757 code_text.py:1807 code_text.py:2162 code_text.py:2208
-#: code_text.py:2289
+#: code_text.py:2289 code_text.py:2377
 msgid ""
 "\n"
 "With text fragment: "
@@ -2735,7 +2804,7 @@ msgstr ""
 
 #: code_text.py:1757 code_text.py:1802 code_text.py:1807 code_text.py:2157
 #: code_text.py:2162 code_text.py:2203 code_text.py:2208 code_text.py:2284
-#: code_text.py:2289
+#: code_text.py:2289 code_text.py:2372 code_text.py:2377
 msgid ""
 "\n"
 "Using line ending: "
@@ -2744,6 +2813,7 @@ msgstr ""
 "行末を使って "
 
 #: code_text.py:538 code_text.py:726 code_text.py:739 code_text.py:829
+#: code_text.py:840
 msgid ""
 "Key shortcuts\n"
 "Shift left Arrow\n"
@@ -2758,18 +2828,22 @@ msgstr ""
 "Alt 右矢印"
 
 #: code_text.py:545 code_text.py:733 code_text.py:746 code_text.py:836
+#: code_text.py:847
 msgid "Change start character position. Positive or negative number:"
 msgstr "開始文字の位置を変更します。正の値または負の値を指定します。"
 
 #: code_text.py:552 code_text.py:740 code_text.py:753 code_text.py:843
+#: code_text.py:854
 msgid "Change end character position. Positive or negative number:"
 msgstr "終了文字の位置を変更します。正または負の数値。"
 
 #: code_text.py:637 code_text.py:825 code_text.py:864 code_text.py:962
+#: code_text.py:974
 msgid "Show some codes"
 msgstr "いくつかのコードを表示する"
 
 #: code_text.py:640 code_text.py:828 code_text.py:867 code_text.py:965
+#: code_text.py:977
 msgid "Show codes containing the text. (Blank for all)"
 msgstr "テキストを含むコードを表示します。(すべて空白)"
 
@@ -2778,31 +2852,38 @@ msgid "Undo auto coding"
 msgstr "自動コーディングを元に戻す"
 
 #: code_text.py:1702 code_text.py:2057 code_text.py:2103 code_text.py:2184
+#: code_text.py:2272
 msgid "Select auto-codings to undo"
 msgstr "自動コーディングを選択して元に戻す"
 
 #: code_text.py:1714 code_text.py:2069 code_text.py:2115 code_text.py:2196
+#: code_text.py:2284
 msgid "Undo autocoding: "
 msgstr "自動コーディングを元に戻す"
 
 #: code_text.py:1741 code_text.py:2096 code_text.py:2142 code_text.py:2223
+#: code_text.py:2311
 msgid "Auto code sentence using this text fragment:"
 msgstr "この文章を使って文章を自動コード化します。"
 
 #: code_text.py:1754 code_text.py:2109 code_text.py:2155 code_text.py:2236
+#: code_text.py:2324
 msgid "Do not use line endings such as \\n"
 msgstr "\\nのような行末は使わないでください。"
 
 #: code_text.py:1755 code_text.py:2110 code_text.py:2156 code_text.py:2237
+#: code_text.py:2325
 msgid "Define sentence ending (Default is period space. ):"
 msgstr "文末を定義します（デフォルトはピリオドスペースです）。"
 
 #: code_text.py:1801 code_text.py:2156 code_text.py:2202 code_text.py:2283
+#: code_text.py:2371
 msgid "Sentence coding: "
 msgstr "文章のコーディング。"
 
 #: code_text.py:1802 code_text.py:1894 code_text.py:2157 code_text.py:2249
 #: code_text.py:2203 code_text.py:2295 code_text.py:2284 code_text.py:2376
+#: code_text.py:2372 code_text.py:2464
 msgid ""
 "\n"
 "With: "
@@ -2811,10 +2892,12 @@ msgstr ""
 "一緒に。"
 
 #: code_text.py:1833 code_text.py:2188 code_text.py:2234 code_text.py:2315
+#: code_text.py:2403
 msgid "Auto code files with the current code for this text:"
 msgstr "このテキストの現在のコードを自動コードファイルにします。"
 
 #: code_text.py:1893 code_text.py:2248 code_text.py:2294 code_text.py:2375
+#: code_text.py:2463
 msgid "Text coding: "
 msgstr "テキストのコーディング。"
 
@@ -2873,10 +2956,11 @@ msgstr ""
 "外部リンクされたファイル。\n"
 
 #: qualcoder.py:1108 qualcoder.py:1131 qualcoder.py:1047 qualcoder.py:1048
+#: qualcoder.py:1079
 msgid "REFI QDA Project export"
 msgstr "REFI QDAプロジェクト輸出"
 
-#: qualcoder.py:1150 refi.py:379 refi.py:388
+#: qualcoder.py:1150 refi.py:379 refi.py:388 refi.py:405
 msgid "REFI-QDA Project import"
 msgstr "REFI-QDAプロジェクトのインポート"
 
@@ -2885,6 +2969,7 @@ msgid "RDDA import steps"
 msgstr "RQDAインポートステップ"
 
 #: qualcoder.py:1485 qualcoder.py:1519 qualcoder.py:1447 qualcoder.py:1448
+#: qualcoder.py:1506
 msgid "Bad links to files"
 msgstr "ファイルへのリンクが悪い"
 
@@ -2897,19 +2982,19 @@ msgid "This data does not contain names to select from"
 msgstr "このデータには、選択する名前が含まれていません。"
 
 #: cases.py:439 cases.py:540 manage_files.py:697 cases.py:589
-#: manage_files.py:747
+#: manage_files.py:747 cases.py:592 manage_files.py:746
 msgid "This attribute is numeric"
 msgstr "この属性は数値です。"
 
-#: code_text.py:464 code_text.py:477 code_text.py:517
+#: code_text.py:464 code_text.py:477 code_text.py:517 code_text.py:527
 msgid "Delete all codings in this file made by "
 msgstr "で作成されたこのファイルのすべてのコーディングを削除します。"
 
-#: code_text.py:475 code_text.py:488 code_text.py:528
+#: code_text.py:475 code_text.py:488 code_text.py:528 code_text.py:538
 msgid "All codes by "
 msgstr "すべてのコード "
 
-#: code_text.py:475 code_text.py:488 code_text.py:528
+#: code_text.py:475 code_text.py:488 code_text.py:528 code_text.py:538
 msgid " deleted from "
 msgstr " 削除 "
 
@@ -2919,15 +3004,17 @@ msgstr "メモコード化されたテキスト"
 
 #: code_text.py:633 view_av.py:583 view_image.py:349 code_text.py:646
 #: view_av.py:592 view_image.py:359 code_text.py:737 view_av.py:609
-#: view_image.py:364
+#: view_image.py:364 code_text.py:748 view_av.py:612
 msgid "Memo for file: "
 msgstr "ファイル用のメモ。"
 
 #: code_text.py:670 code_text.py:683 code_text.py:774 view_av.py:2189
+#: code_text.py:785 view_av.py:2192
 msgid "Select code to memo"
 msgstr "メモするコードを選択"
 
 #: code_text.py:680 code_text.py:693 code_text.py:784 view_av.py:2199
+#: code_text.py:795 view_av.py:2202
 msgid "Memo for Coded text: "
 msgstr "コード化されたテキストのメモ。"
 
@@ -2974,7 +3061,7 @@ msgid "Cannot import file"
 msgstr "ファイルをインポートできない"
 
 #: manage_files.py:1382 refi.py:898 manage_files.py:1380 manage_files.py:1419
-#: refi.py:923 manage_files.py:1469
+#: refi.py:923 manage_files.py:1469 refi.py:950
 msgid "Cannot import"
 msgstr "インポートできない"
 
@@ -2996,123 +3083,126 @@ msgstr "スケール。"
 msgid "Select REFI_QDA file"
 msgstr "REFI-QDAファイルを選択"
 
-#: refi.py:139 refi.py:147
+#: refi.py:139 refi.py:147 refi.py:150
 msgid "Codebook imported"
 msgstr "コードブックのインポート"
 
-#: refi.py:140 refi.py:148
+#: refi.py:140 refi.py:148 refi.py:151
 msgid " categories and codes imported from "
 msgstr " からインポートされたカテゴリとコード "
 
-#: refi.py:142 refi.py:150
+#: refi.py:142 refi.py:150 refi.py:153
 msgid "Codebook importation"
 msgstr "コードブックのインポート"
 
-#: refi.py:142 refi.py:150
+#: refi.py:142 refi.py:150 refi.py:153
 msgid " NOT imported"
 msgstr " 非輸入品"
 
-#: refi.py:305 refi.py:313
+#: refi.py:305 refi.py:313 refi.py:316
 msgid "Reading from: "
 msgstr "朗読しています。"
 
-#: refi.py:306 refi.py:314
+#: refi.py:306 refi.py:314 refi.py:317
 msgid "Creating temporary directory: "
 msgstr "テンポラリディレクトリの作成 "
 
-#: refi.py:327 refi.py:336
+#: refi.py:327 refi.py:336 refi.py:352
 msgid "Parse users. Loaded: "
 msgstr "ユーザーを解析します。ロードされています。"
 
-#: refi.py:334 refi.py:343
+#: refi.py:334 refi.py:343 refi.py:359
 msgid "Parse codes and categories. Loaded: "
 msgstr "コードとカテゴリを解析する。ロードされています。"
 
-#: refi.py:337 refi.py:346
+#: refi.py:337 refi.py:346 refi.py:362
 msgid "Parse file variables. Loaded: "
 msgstr "ファイル変数を解析する。ロードされています。"
 
-#: refi.py:338 refi.py:347
+#: refi.py:338 refi.py:347 refi.py:363
 msgid "Parse case variables. Loaded: "
 msgstr "大文字小文字の変数を解析します。ロードされています。"
 
-#: refi.py:341 refi.py:350
+#: refi.py:341 refi.py:350 refi.py:365
 msgid "Parsing journal notes. Loaded: "
 msgstr "ジャーナルノートのパース ロードされています。"
 
-#: refi.py:343 refi.py:352
+#: refi.py:343 refi.py:352 refi.py:367
 msgid "Parsing and loading project memo"
 msgstr "プロジェクトメモの解析と読み込み"
 
-#: refi.py:354 refi.py:363
+#: refi.py:354 refi.py:363 refi.py:377
 msgid "Parsing cases. Loaded: "
 msgstr "ケースを解析しています。ロードされています。"
 
-#: refi.py:357 refi.py:366
+#: refi.py:357 refi.py:366 refi.py:383
 msgid "Parsing sources. Loaded: "
 msgstr "ソースを解析します。ロードされています。"
 
-#: refi.py:359 refi.py:368
+#: refi.py:359 refi.py:368 refi.py:385
 msgid " loaded."
 msgstr " がロードされました。"
 
-#: refi.py:441 refi.py:450
+#: refi.py:441 refi.py:450 refi.py:467
 msgid "Variable import error"
 msgstr "変数インポートエラー"
 
-#: refi.py:441 refi.py:450
+#: refi.py:441 refi.py:450 refi.py:467
 msgid "Variable name already exists: "
 msgstr "変数名が既に存在します。"
 
-#: refi.py:498 refi.py:510
+#: refi.py:498 refi.py:510 refi.py:527
 msgid "Error entering Case into database"
 msgstr "ケースをデータベースに入力する際のエラー"
 
-#: refi.py:652 refi.py:669
+#: refi.py:652 refi.py:669 refi.py:696
 msgid "Cannot copy Image file from: "
 msgstr "画像ファイルをコピーできません。"
 
-#: refi.py:736 refi.py:757
+#: refi.py:736 refi.py:757 refi.py:784
 msgid "Cannot copy Audio file from: "
 msgstr "オーディオファイルをコピーできません。"
 
-#: refi.py:784 refi.py:805
+#: refi.py:784 refi.py:805 refi.py:832
 msgid "Cannot copy Video file from: "
 msgstr "動画ファイルをコピーできません。"
 
-#: refi.py:879 refi.py:904
+#: refi.py:879 refi.py:904 refi.py:931
 msgid "Cannot copy transcript file from: "
 msgstr "トランスクリプトファイルをコピーできません。"
 
-#: refi.py:1035 refi.py:1063
+#: refi.py:1035 refi.py:1063 refi.py:1090
 msgid "Cannot copy PDF file from: "
 msgstr "からPDFファイルをコピーできません。"
 
-#: refi.py:1120 refi.py:1155
+#: refi.py:1120 refi.py:1155 refi.py:1182
 msgid "Cannot read from TextSource: "
 msgstr "テキストソースから読み込めません。"
 
-#: refi.py:1128 refi.py:1163
+#: refi.py:1128 refi.py:1163 refi.py:1190
 msgid "Cannot copy TextSource file from: "
 msgstr "テキストソースファイルをコピーできません。"
 
-#: refi.py:1264 refi.py:1308
+#: refi.py:1264 refi.py:1308 refi.py:1335
 msgid "Trying to read Note element: "
 msgstr "Note要素を読み込もうとしています。"
 
-#: refi.py:1405 refi.py:1467
+#: refi.py:1405 refi.py:1467 refi.py:1494
 msgid "Project export error "
 msgstr "プロジェクトのエクスポートエラー "
 
-#: refi.py:1406 refi.py:1412 refi.py:1468 refi.py:1474
+#: refi.py:1406 refi.py:1412 refi.py:1468 refi.py:1474 refi.py:1495
+#: refi.py:1501
 msgid "Project not exported. Exiting. "
 msgstr "プロジェクトがエクスポートされていません。終了します。"
 
-#: refi.py:1468 refi.py:1469 refi.py:1540 refi.py:1541
+#: refi.py:1468 refi.py:1469 refi.py:1540 refi.py:1541 refi.py:1567
+#: refi.py:1568
 msgid "Project exported"
 msgstr "エクスポートされたプロジェクト"
 
-#: refi.py:1491 refi.py:1492 refi.py:1563 refi.py:1564
+#: refi.py:1491 refi.py:1492 refi.py:1563 refi.py:1564 refi.py:1590
+#: refi.py:1591
 msgid "Codebook NOT exported"
 msgstr "コードブックがエクスポートされない"
 
@@ -3192,17 +3282,17 @@ msgstr " インポートされたファイル属性値"
 msgid " case linked texts imported"
 msgstr " ケースリンクテキストのインポート"
 
-#: code_text.py:803 code_text.py:895
+#: code_text.py:803 code_text.py:895 code_text.py:907
 msgid "Show coded files"
 msgstr "コード化されたファイルを表示"
 
 #: code_text.py:804 view_av.py:1159 view_image.py:607 code_text.py:896
-#: view_av.py:1190 view_image.py:617
+#: view_av.py:1190 view_image.py:617 code_text.py:908 view_av.py:1193
 msgid "Move code to"
 msgstr "コードを移動"
 
 #: code_text.py:849 view_av.py:1310 view_image.py:756 code_text.py:947
-#: view_av.py:1256 view_image.py:681
+#: view_av.py:1256 view_image.py:681 code_text.py:959 view_av.py:1259
 msgid "Select blank or category"
 msgstr "空白またはカテゴリを選択します。"
 
@@ -3210,7 +3300,7 @@ msgstr "空白またはカテゴリを選択します。"
 msgid "SQL error"
 msgstr "エスエッチエルエラー"
 
-#: journals.py:355 journals.py:344
+#: journals.py:355 journals.py:344 journals.py:345
 msgid "Journal name changed from: "
 msgstr "ジャーナル名を変更しました。"
 
@@ -3219,35 +3309,36 @@ msgstr "ジャーナル名を変更しました。"
 msgid "Bad link or non-existent file "
 msgstr "リンクが悪いか、存在しないファイル "
 
-#: qualcoder.py:1222 qualcoder.py:1223
+#: qualcoder.py:1222 qualcoder.py:1223 qualcoder.py:1254
 msgid "Coder name changed to: "
 msgstr "コーダー名を変更しました。"
 
-#: reports.py:898 reports.py:913 reports.py:901
+#: reports.py:898 reports.py:913 reports.py:901 reports.py:905
 msgid "No file selection"
 msgstr "ファイル選択なし"
 
-#: reports.py:907 reports.py:922 reports.py:910
+#: reports.py:907 reports.py:922 reports.py:910 reports.py:914
 msgid "Text file\n"
 msgstr "テキストファイル\n"
 
-#: reports.py:908 reports.py:923 reports.py:911
+#: reports.py:908 reports.py:923 reports.py:911 code_text.py:298
+#: manage_files.py:553 manage_files.py:559 reports.py:915
 msgid "Characters: "
 msgstr "登場人物。"
 
-#: reports.py:910 reports.py:925 reports.py:913
+#: reports.py:910 reports.py:925 reports.py:913 reports.py:917
 msgid "Image"
 msgstr "イメージ"
 
-#: reports.py:912 reports.py:927 reports.py:915
+#: reports.py:912 reports.py:927 reports.py:915 reports.py:919
 msgid "Audio"
 msgstr "オーディオ"
 
-#: reports.py:914 reports.py:929 reports.py:917
+#: reports.py:914 reports.py:929 reports.py:917 reports.py:921
 msgid "Video"
 msgstr "ビデオ"
 
-#: reports.py:921 reports.py:936 reports.py:924
+#: reports.py:921 reports.py:936 reports.py:924 reports.py:928
 msgid ""
 "\n"
 "Codings: "
@@ -3255,7 +3346,7 @@ msgstr ""
 "\n"
 "コーディング。"
 
-#: reports.py:930 reports.py:945 reports.py:933
+#: reports.py:930 reports.py:945 reports.py:933 reports.py:937
 msgid ""
 "\n"
 "Memo: "
@@ -3263,52 +3354,52 @@ msgstr ""
 "\n"
 "メモ。"
 
-#: reports.py:937 reports.py:952 reports.py:940
+#: reports.py:937 reports.py:952 reports.py:940 reports.py:944
 msgid "No case selection"
 msgstr "ケース選択なし"
 
-#: reports.py:989 reports.py:1004 reports.py:992
+#: reports.py:989 reports.py:1004 reports.py:992 reports.py:996
 msgid "Select all files"
 msgstr "すべてのファイルを選択"
 
-#: reports.py:990 reports.py:1005 reports.py:993
+#: reports.py:990 reports.py:1005 reports.py:993 reports.py:997
 msgid "Select files like"
 msgstr "のようなファイルを選択します。"
 
 #: reports.py:991 reports.py:1026 reports.py:1006 reports.py:1041
-#: reports.py:994 reports.py:1029
+#: reports.py:994 reports.py:1029 reports.py:998 reports.py:1033
 msgid "Select none"
 msgstr "どれも選択しない"
 
-#: reports.py:1003 reports.py:1018 reports.py:1006
+#: reports.py:1003 reports.py:1018 reports.py:1006 reports.py:1010
 msgid "Select some files"
 msgstr "どれも選択しない"
 
-#: reports.py:1006 reports.py:1021 reports.py:1009
+#: reports.py:1006 reports.py:1021 reports.py:1009 reports.py:1013
 msgid "Show files containing text"
 msgstr "テキストを含むファイルを表示"
 
-#: reports.py:1024 reports.py:1039 reports.py:1027
+#: reports.py:1024 reports.py:1039 reports.py:1027 reports.py:1031
 msgid "Select all cases"
 msgstr "すべてのケースを選択"
 
-#: reports.py:1025 reports.py:1040 reports.py:1028
+#: reports.py:1025 reports.py:1040 reports.py:1028 reports.py:1032
 msgid "Select cases like"
 msgstr "のようなケースを選択します。"
 
-#: reports.py:1038 reports.py:1053 reports.py:1041
+#: reports.py:1038 reports.py:1053 reports.py:1041 reports.py:1045
 msgid "Select some cases"
 msgstr "いくつかのケースを選択してください。"
 
-#: reports.py:1041 reports.py:1056 reports.py:1044
+#: reports.py:1041 reports.py:1056 reports.py:1044 reports.py:1048
 msgid "Select cases containing text"
 msgstr "テキストを含むケースを選択"
 
-#: reports.py:1062 reports.py:1077 reports.py:1065
+#: reports.py:1062 reports.py:1077 reports.py:1065 reports.py:1069
 msgid "Codes and categories"
 msgstr "コードとカテゴリ"
 
-#: reports.py:1645 reports.py:1661 reports.py:1649
+#: reports.py:1645 reports.py:1661 reports.py:1649 reports.py:1671
 msgid ""
 "\n"
 "Attributes:\n"
@@ -3316,7 +3407,7 @@ msgstr ""
 "\n"
 "属性のこと。\n"
 
-#: reports.py:1652 reports.py:1668 reports.py:1656
+#: reports.py:1652 reports.py:1668 reports.py:1656 reports.py:1678
 msgid ""
 "\n"
 "Files:\n"
@@ -3324,7 +3415,7 @@ msgstr ""
 "\n"
 "ファイルです。\n"
 
-#: reports.py:1658 reports.py:1674 reports.py:1662
+#: reports.py:1658 reports.py:1674 reports.py:1662 reports.py:1684
 msgid ""
 "\n"
 "Cases:\n"
@@ -3344,78 +3435,80 @@ msgstr " 高さです。"
 msgid " Scale: "
 msgstr " スケール。"
 
-#: attributes.py:235
+#: attributes.py:235 attributes.py:237
 msgid "numeric"
 msgstr "すうじてき"
 
-#: attributes.py:236
+#: attributes.py:236 attributes.py:238
 msgid "Change to character"
 msgstr "キャラクターへの変更"
 
-#: cases.py:258 cases.py:307
+#: cases.py:258 cases.py:307 cases.py:310
 msgid "Select cases file"
 msgstr "ケースファイルの選択"
 
-#: code_text.py:668
+#: code_text.py:668 code_text.py:678
 msgid "Memo coded text (M)"
 msgstr "メモコード化テキスト(M)"
 
-#: code_text.py:669 view_av.py:2101
+#: code_text.py:669 view_av.py:2101 code_text.py:679 view_av.py:2104
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
 msgstr "スタート位置の変更（SHIFT LEFT/ALT RIGHT)"
 
-#: code_text.py:670 view_av.py:2102
+#: code_text.py:670 view_av.py:2102 code_text.py:680 view_av.py:2105
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "終了位置の変更（SHIFT RIGHT/ALT LEFT)"
 
-#: code_text.py:674 view_av.py:2106
+#: code_text.py:674 view_av.py:2106 code_text.py:684 view_av.py:2109
 msgid "Mark (Q)"
 msgstr "マーク (Q)"
 
-#: code_text.py:677 view_av.py:2109
+#: code_text.py:677 view_av.py:2109 code_text.py:687 view_av.py:2112
 msgid "Mark with recent code (R)"
 msgstr "最近のコードでマーク(R)"
 
-#: code_text.py:680 view_av.py:2112
+#: code_text.py:680 view_av.py:2112 code_text.py:690 view_av.py:2115
 msgid "Annotate (A)"
 msgstr "アノテーション(A)"
 
-#: code_text.py:682
+#: code_text.py:682 code_text.py:692
 msgid "Set bookmark (B)"
 msgstr "しおりを設定する(B)"
 
-#: code_text.py:883 view_av.py:1181 view_image.py:605
+#: code_text.py:883 view_av.py:1181 view_image.py:605 code_text.py:895
+#: view_av.py:1184
 msgid "Add new code to category"
 msgstr "カテゴリに新しいコードを追加"
 
-#: code_text.py:884 view_av.py:1182 view_image.py:606
+#: code_text.py:884 view_av.py:1182 view_image.py:606 code_text.py:896
+#: view_av.py:1185
 msgid "Add a new category to category"
 msgstr "カテゴリに新しいカテゴリを追加する"
 
-#: refi.py:111 refi.py:117
+#: refi.py:111 refi.py:117 refi.py:114 refi.py:120
 msgid "Select REFI-QDA file"
 msgstr "REFI-QDAファイルを選択"
 
-#: refi.py:381
+#: refi.py:381 refi.py:398
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
 msgstr ""
 "REFI-QDAプロジェクトインポート実験機能 - 完全にテストされていません。\n"
 
-#: refi.py:382
+#: refi.py:382 refi.py:399
 msgid ""
 "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
 msgstr ""
 "オーディオ/ビデオトランスクリプト: トランスクリプトコーディングとシンクポイン"
 "トはテストされていません。\n"
 
-#: refi.py:383
+#: refi.py:383 refi.py:400
 msgid ""
 "Sets and Graphs not imported as QualCoder does not have this functionality.\n"
 msgstr ""
 "QualCoderとしてインポートされていないセットとグラフには、この機能はありませ"
 "ん。\n"
 
-#: refi.py:384
+#: refi.py:384 refi.py:401
 msgid ""
 "Boolean variables treated as character (text). Integer variables treated as "
 "floating point. \n"
@@ -3423,7 +3516,7 @@ msgstr ""
 "ブール変数は文字（テキスト）として扱われます。整数変数は浮動小数点として扱わ"
 "れます。\n"
 
-#: refi.py:385
+#: refi.py:385 refi.py:402
 msgid ""
 "All variables are stored as text, but cast as text or float during "
 "operations.\n"
@@ -3431,11 +3524,11 @@ msgstr ""
 "すべての変数はテキストとして保存されますが、操作中はテキストまたはフロートと"
 "してキャストされます。\n"
 
-#: refi.py:386
+#: refi.py:386 refi.py:403
 msgid "Relative paths to external files are untested.\n"
 msgstr "外部ファイルへの相対パスは未検証です。\n"
 
-#: refi.py:387
+#: refi.py:387 refi.py:404
 msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
@@ -3443,22 +3536,22 @@ msgstr ""
 "設定」ドロップボックスでコーダー名を選択すると、コード化されたテキストやメ"
 "ディアがコード化されていない状態で表示されることがあります。"
 
-#: refi.py:1314
+#: refi.py:1314 refi.py:1341
 msgid "Note element is not a journal."
 msgstr "ノート要素はジャーナルではありません。"
 
-#: refi.py:1535
+#: refi.py:1535 refi.py:1562
 msgid "REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n"
 msgstr "REFI-QDAプロジェクトエクスポート体験機能\n"
 
-#: refi.py:1536
+#: refi.py:1536 refi.py:1563
 msgid ""
 "This project exchange is not guaranteed compliant with the exchange "
 "standard.\n"
 msgstr ""
 "本プロジェクトの交換は、交換規格への準拠を保証するものではありません。\n"
 
-#: refi.py:1557
+#: refi.py:1557 refi.py:1584
 msgid "Codebook has been exported to "
 msgstr "コードブックが "
 
@@ -3466,30 +3559,90 @@ msgstr "コードブックが "
 msgid "No coders selected"
 msgstr "コーダーは選択されていません"
 
-#: reports.py:852 reports.py:840
+#: reports.py:852 reports.py:840 reports.py:843
 msgid "Top categories"
 msgstr "トップカテゴリ"
 
-#: reports.py:852 reports.py:840
+#: reports.py:852 reports.py:840 reports.py:843
 msgid "Categories"
 msgstr "カテゴリー"
 
-#: reports.py:852 reports.py:840
+#: reports.py:852 reports.py:840 reports.py:843
 msgid "Codes"
 msgstr "コード"
 
-#: reports.py:2196 reports.py:2184
+#: reports.py:2196 reports.py:2184 reports.py:2206
 msgid "[VIEW] "
 msgstr "[ビュー]"
 
-#: view_av.py:2100
+#: view_av.py:2100 view_av.py:2103
 msgid "Memo coded text M"
 msgstr "メモコード化されたテキスト M"
 
-#: cases.py:229
+#: cases.py:229 cases.py:232
 msgid "Case attributes csv file exported to: "
 msgstr "ケース属性のcsvファイルをエクスポートします。"
 
 #: manage_files.py:475
 msgid "File attributes csv file exported to: "
 msgstr "エクスポート先のファイル属性csvファイル。"
+
+#: code_text.py:304
+msgid "Codings: "
+msgstr ""
+
+#: code_text.py:305 code_text.py:1764
+msgid "From: "
+msgstr ""
+
+#: code_text.py:826
+msgid "Select code for change"
+msgstr ""
+
+#: code_text.py:1735
+msgid " next  characters"
+msgstr ""
+
+#: code_text.py:1814
+msgid "Entire text file will be loaded"
+msgstr ""
+
+#: code_text.py:1815
+msgid "Information"
+msgstr ""
+
+#: import_survey.py:371
+msgid "Inserting cases: "
+msgstr ""
+
+#: import_survey.py:421
+msgid "Inserting attributes to cases: "
+msgstr ""
+
+#: import_survey.py:432
+msgid "Creating qualitative text file"
+msgstr ""
+
+#: import_survey.py:562
+msgid "Field name invalid"
+msgstr ""
+
+#: manage_files.py:633
+msgid "Duration: "
+msgstr ""
+
+#: qualcoder.py:1395
+msgid "Deleting code_text coding to deleted files: "
+msgstr ""
+
+#: qualcoder.py:1402
+msgid "Deleting code_image coding to deleted files: "
+msgstr ""
+
+#: qualcoder.py:1409
+msgid "Deleting code_av coding to deleted files: "
+msgstr ""
+
+#: refi.py:333
+msgid "Project Import"
+msgstr ""
