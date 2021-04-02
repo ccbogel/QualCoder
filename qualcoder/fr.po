@@ -3,19 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-01 23:02+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2021-04-02 12:19+1100\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.3\n"
 
 #: add_item_name.py:44 add_attribute.py:46 add_item_name.py:46
 msgid "Uncaught exception"
@@ -4030,60 +4030,60 @@ msgstr "Attributs de fichier fichier csv exporté vers : "
 
 #: code_text.py:304
 msgid "Codings: "
-msgstr ""
+msgstr "Codages : "
 
 #: code_text.py:305 code_text.py:1764
 msgid "From: "
-msgstr ""
+msgstr "De : "
 
 #: code_text.py:826
 msgid "Select code for change"
-msgstr ""
+msgstr "Sélectionnez le code à modifier"
 
 #: code_text.py:1735
 msgid " next  characters"
-msgstr ""
+msgstr " caractères suivants"
 
 #: code_text.py:1814
 msgid "Entire text file will be loaded"
-msgstr ""
+msgstr "Le fichier texte entier sera chargé"
 
 #: code_text.py:1815
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 #: import_survey.py:371
 msgid "Inserting cases: "
-msgstr ""
+msgstr "Insertion de cas : "
 
 #: import_survey.py:421
 msgid "Inserting attributes to cases: "
-msgstr ""
+msgstr "Insertion d'attributs dans les cas : "
 
 #: import_survey.py:432
 msgid "Creating qualitative text file"
-msgstr ""
+msgstr "Création d'un fichier texte qualitatif"
 
 #: import_survey.py:562
 msgid "Field name invalid"
-msgstr ""
+msgstr "Le nom du champ n'est pas valide"
 
 #: manage_files.py:633
 msgid "Duration: "
-msgstr ""
+msgstr "Durée : "
 
 #: qualcoder.py:1395
 msgid "Deleting code_text coding to deleted files: "
-msgstr ""
+msgstr "Suppression du code_texte codant pour les fichiers supprimés : "
 
 #: qualcoder.py:1402
 msgid "Deleting code_image coding to deleted files: "
-msgstr ""
+msgstr "Suppression du codage code_image dans les fichiers supprimés : "
 
 #: qualcoder.py:1409
 msgid "Deleting code_av coding to deleted files: "
-msgstr ""
+msgstr "Suppression du codage code_av dans les fichiers supprimés : "
 
 #: refi.py:333
 msgid "Project Import"
-msgstr ""
+msgstr "Importation du projet"
