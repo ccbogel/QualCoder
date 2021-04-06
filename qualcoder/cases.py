@@ -538,15 +538,14 @@ class DialogCases(QtWidgets.QDialog):
         for id in ids_to_delete:
             for c in self.cases:
                 if c['caseid'] == id:
-                    self.parent_textEdit.append("Case deleted: " + c['name'])
-                    self.cases.remove(c)
                     cur = self.app.conn.cursor()
                     #logger.debug(str(id) + "  "+ str(type(id)))
-                    cur.execute("delete from cases where caseid = ?", [id])
-                    cur.execute("delete from case_text where caseid = ?", [id])
-                    sql = "delete from attribute where id=? and attr_type='case'"
-                    cur.execute(sql, [id])
+                    cur.execute("delete from cases where caseid=?", [id])
+                    cur.execute("delete from case_text where caseid=?", [id])
+                    cur.execute("delete from attribute where id=? and attr_type='case'", [id])
                     self.app.conn.commit()
+                    self.parent_textEdit.append("Case deleted: " + c['name'])
+        self.load_cases_and_attributes()
         self.app.delete_backup = False
         self.fill_tableWidget()
 
