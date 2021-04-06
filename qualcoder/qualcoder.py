@@ -71,7 +71,7 @@ from view_av import DialogCodeAV
 from view_graph_original import ViewGraphOriginal
 from view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.4"
+qualcoder_version = "QualCoder 2.5"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1643,7 +1643,7 @@ def gui():
     lang = settings.get('language', 'en')
     getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
     #if lang != "en":
-    if lang in ["de", "el", "es", "fr", "it", "jp"]:
+    if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
         translator = QtCore.QTranslator()
         translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
         getlang = gettext.translation(lang, localedir=path + '/locale', languages=[lang])
