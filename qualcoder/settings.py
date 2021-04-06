@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ class DialogSettings(QtWidgets.QDialog):
                     coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
         languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
-                "Italiano it", "日本 jp"]
+                "Italiano it", "日本 jp", "Português, pt"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
