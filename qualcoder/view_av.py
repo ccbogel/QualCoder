@@ -2937,6 +2937,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.can_transcribe = False
                 self.ui.label_speakers.setVisible(False)
                 self.ui.label_transcription.setToolTip("")
+                self.ui.label_memo.setText(_("Cannot edit transcript. It is coded or annotated."))
             else:
                 self.ui.label_memo.setText(
                     _("Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"))
