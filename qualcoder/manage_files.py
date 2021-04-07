@@ -811,6 +811,16 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.view_av(x)
                 return
 
+        # Important. Fulltext may need to be updated, if a transcribed files have been edited via viewAV
+        cur = self.app.conn.cursor()
+        cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
+        res = cur.fetchone()
+        fulltext = ""
+        if res is not None:
+            fulltext = res[0]
+        self.source[x]['fulltext'] = fulltext
+
+        # Checking for limited restricted edit
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
         title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
         if restricted:
@@ -832,7 +842,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if text == self.source[x]['fulltext']:
             return
         self.source[x]['fulltext'] = text
-        cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
         self.app.conn.commit()
 
