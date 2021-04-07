@@ -1846,17 +1846,27 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def load_file(self, file_):
         """ Load and display file text for this file.
+        Set the file as a selected item in the list widget. (due to the search text function searching across files).
         Get and display coding highlights.
 
         Called from:
             view_file_dialog, context_menu
         """
 
+        items = []
+        for x in range(self.ui.listWidget.count()):
+            if self.ui.listWidget.item(x).text() == file_['name']:
+                self.ui.listWidget.item(x).setSelected(True)
+
         self.file_ = file_
+        if "start" not in self.file_:
+            self.file_['start'] = 0
         sql_values = []
         file_result = self.app.get_file_texts([file_['id']])[0]
+        if "end" not in self.file_:
+            self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
-        self.source_text = file_result['fulltext'][file_['start']:file_['end']]
+        self.source_text = file_result['fulltext'][self.file_['start']:self.file_['end']]
         self.ui.textEdit.setPlainText(self.source_text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -1947,12 +1957,10 @@ class DialogCodeText(QtWidgets.QWidget):
     def apply_overline_to_overlaps(self):
         """ Apply overline format to coded text sections which are overlapping.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
-
         """
 
         overlapping = []
         overlaps = []
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for i in self.code_text:
             #print(item['pos0'], type(item['pos0']), item['pos1'], type(item['pos1']))
             for j in self.code_text:
