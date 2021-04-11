@@ -44,12 +44,9 @@ Retrieve the current package code from this repository
 
 `git clone https://github.com/ccbogel/QualCoder.git`
 
-Install dependencies 
+Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and run the `./install_fedora.sh` script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). The script is for python version 3.9.
 
-`sudo dnf install python3-pip python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
-
-QualCoder uses an Ebook library that you can currently install via a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784
-The UNTESTED `install_fedora.sh` should install the dependencies fand a desktop start icon for Fedora. The script is for python verrsion 3.8.
+This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
 
 ### Linux Use 
