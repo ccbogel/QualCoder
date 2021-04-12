@@ -1347,8 +1347,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         Also use eventFilter for QGraphicsView.
 
         Options are:
-            Ctrl + R to rewind 3 seconds.
-            Alt + R rewind 30 seconds
+            Alt + R to rewind 5 seconds.
+            Shift + R rewind 30 seconds
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
             Ctrl + Shift + > to increase play rate
@@ -2940,7 +2940,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_memo.setText(_("Cannot edit transcript. It is coded or annotated."))
             else:
                 self.ui.label_memo.setText(
-                    _("Transcription area: ctrl+R alt+R alt+F ctrl+P/S ctrl+T ctrl+N ctrl+1-8 ctrl+D"))
+                    _("Transcription area: Alt+R Shit+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
