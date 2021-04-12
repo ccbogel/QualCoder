@@ -2862,6 +2862,7 @@ class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
     Mouse events do work with the vlc player in a separate modal dialog.
+    Transvribing the text file can be done here also.
 
     Linked a/v have 'audio:' or 'video:' at start of mediapath
     """
@@ -2945,6 +2946,16 @@ class DialogViewAV(QtWidgets.QDialog):
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
             self.add_speaker_names_to_label()
+        if self.transcription is None:
+            entry = {'name': file_['name'] + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+                     'owner': self.app.settings['codername'],
+                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                        (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
+                         entry['date']))
+            self.app.conn.commit()
+            cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
+            self.transcription = cur.fetchone()
 
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
@@ -3627,9 +3638,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.app.conn.commit()
         if self.transcription is not None:
             text = self.ui.textEdit_transcription.toPlainText()
-            cur.execute("update source set fulltext=? where id=?", [text, self.transcription[0]])
-            self.app.conn.commit()
-        # following will occur even if memo is not changed
+            # self.transcription[0] is file id, [1] is the original text
+            if text != self.transcription[1]:
+                date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cur.execute("update source set fulltext=?, date=? where id=?", [text, date, self.transcription[0]])
+                self.app.conn.commit()
         self.app.delete_backup = False
 
     def update_sizes(self):
