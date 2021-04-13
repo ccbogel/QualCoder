@@ -809,7 +809,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("select id, fulltext, name from source where name = ?", [self.file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is None:
-            return
+            # Create a new empty transcription file
+            entry = {'name': self.file['name'] + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+                     'owner': self.app.settings['codername'],
+                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                        (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
+                         entry['date']))
+            self.app.conn.commit()
+            cur.execute("select id, fulltext from source where name=?", [self.file['name'] + ".transcribed"])
+            self.transcription = cur.fetchone()
         self.ui.textEdit.setText(self.transcription[1])
         self.ui.textEdit.ensureCursorVisible()
         self.get_timestamps_from_transcription()
@@ -2941,7 +2950,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_memo.setText(_("Cannot edit transcript. It is coded or annotated."))
             else:
                 self.ui.label_memo.setText(
-                    _("Transcription area: Alt+R Shift+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+                    _("Transcription area: Alt+R Shit+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
