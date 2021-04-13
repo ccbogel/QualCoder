@@ -2941,7 +2941,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_memo.setText(_("Cannot edit transcript. It is coded or annotated."))
             else:
                 self.ui.label_memo.setText(
-                    _("Transcription area: Alt+R Shit+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+                    _("Transcription area: Alt+R Shift+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
