@@ -57,6 +57,8 @@ from select_items import DialogSelectItems  # for isinstance()
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+CHAR_LIMIT = 50000  # For loading text file chunks
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -1200,11 +1202,13 @@ class DialogCodeText(QtWidgets.QWidget):
                 found_larger = True
                 break
         if not found_larger and indexes == []:
+            print("if not found_larger and indexes == [] move to next file")
             return
         # loop around to highest index
         if not found_larger and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
+            print("if not found_larger and indexes != [] move to next file")
         if not found_larger:
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0)
@@ -1722,17 +1726,20 @@ class DialogCodeText(QtWidgets.QWidget):
             if selected.text() == f['name']:
                 file_ = f
         #print(file_)  # tmp
-        CHAR_LIMIT = 60000
+
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = None
         action_latest = None
         action_next_chars = None
+        action_prev_chars = None
         if len(self.filenames) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
         if f['characters'] > CHAR_LIMIT:
-            action_next_chars = menu.addAction( str(CHAR_LIMIT) + _(" next  characters"))
+            action_next_chars = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
+            if file_['start'] >= CHAR_LIMIT:
+                action_prev_chars = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
         if action is None:
@@ -1744,27 +1751,62 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_go_to_bookmark:
             self.go_to_bookmark()
         if action == action_next_chars:
-            # First time
-            if file_['start'] == 0 and file_['end'] == file_['characters']:
-                file_['end'] = CHAR_LIMIT
-            else:
-                file_['start'] = file_['start'] + CHAR_LIMIT
-                file_['end'] = file_['end'] + CHAR_LIMIT
-                # Check displayed text going past end of characters
-                if file_['end'] >= file_['characters']:
-                    file_['end'] = file_['characters'] - 1
-                # Go to beginning of file if start is going over end of characters
-                if file_['start'] >= file_['characters']:
-                    file_['start'] = 0
-                    file_['end'] = CHAR_LIMIT
+            self.next_chars(file_, selected)
+        if action == action_prev_chars:
+            self.prev_chars(file_, selected)
 
-            # Update tooltip for listItem
-            tt = selected.toolTip()
-            tt2 = tt.split("From: ")[0]
-            tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-            selected.setToolTip(tt2)
-            # Load file section into textEdit
-            self.load_file(file_)
+    def prev_chars(self, file_, selected):
+        """ Load previous CHAR_LIMIT chunk of the text file.
+        params:
+            file_  : selected file, Dictionary
+            selected:  list widget item """
+
+        # Alreadt at start
+        if file_['start'] == 0:
+            return
+        if file_['start'] - CHAR_LIMIT < 0:
+            file_['start'] = 0
+            file_['end'] = CHAR_LIMIT
+        file_['start'] = file_['start'] - CHAR_LIMIT
+        file_['end'] = file_['end'] - CHAR_LIMIT
+        # Check displayed text going past end of characters
+        if file_['end'] >= file_['characters']:
+            file_['end'] = file_['characters'] - 1
+
+        # Update tooltip for listItem
+        tt = selected.toolTip()
+        tt2 = tt.split("From: ")[0]
+        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
+        selected.setToolTip(tt2)
+        # Load file section into textEdit
+        self.load_file(file_)
+
+    def next_chars(self, file_, selected):
+        """ Load next CHAR_LIMIT chunk of the text file.
+        params:
+            file_  : selected file, Dictionary
+            selected:  list widget item """
+
+        # First time
+        if file_['start'] == 0 and file_['end'] == file_['characters']:
+            file_['end'] = CHAR_LIMIT
+        else:
+            file_['start'] = file_['start'] + CHAR_LIMIT
+            file_['end'] = file_['end'] + CHAR_LIMIT
+            # Check displayed text going past end of characters
+            if file_['end'] >= file_['characters']:
+                file_['end'] = file_['characters'] - 1
+            # Go to beginning of file if start is going over end of characters
+            if file_['start'] >= file_['characters']:
+                file_['start'] = 0
+                file_['end'] = CHAR_LIMIT
+        # Update tooltip for listItem
+        tt = selected.toolTip()
+        tt2 = tt.split("From: ")[0]
+        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
+        selected.setToolTip(tt2)
+        # Load file section into textEdit
+        self.load_file(file_)
 
     def go_to_next_file(self):
         """ Go to next file in list. """
@@ -2032,7 +2074,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_codes_clicked_in_text.setEnabled(False)
         pos = self.ui.textEdit.textCursor().position()
         codes_here = []
-        # TODO !!!!!!!!!!!!!!!!!!!!!!!
         for item in self.code_text:
             if item['pos0'] <= pos + self.file_['start'] and item['pos1'] >= pos + self.file_['start']:
                 # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
