@@ -1626,7 +1626,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             print(e)
             logger.debug(str(e))
-            self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
+            #self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
 
 
 def gui():
