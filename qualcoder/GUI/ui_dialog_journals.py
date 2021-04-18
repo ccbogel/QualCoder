@@ -56,7 +56,7 @@ class Ui_Dialog_journals(object):
         self.pushButton_next.setText("")
         self.pushButton_next.setObjectName("pushButton_next")
         self.label_search_totals = QtWidgets.QLabel(self.groupBox)
-        self.label_search_totals.setGeometry(QtCore.QRect(862, 12, 81, 22))
+        self.label_search_totals.setGeometry(QtCore.QRect(630, 12, 81, 22))
         self.label_search_totals.setAlignment(QtCore.Qt.AlignCenter)
         self.label_search_totals.setObjectName("label_search_totals")
         self.lineEdit_search = QtWidgets.QLineEdit(self.groupBox)
