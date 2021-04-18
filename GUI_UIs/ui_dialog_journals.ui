@@ -168,7 +168,7 @@
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>862</x>
+        <x>630</x>
         <y>12</y>
         <width>81</width>
         <height>22</height>
