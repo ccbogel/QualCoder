@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
         self.tab_coding = QtWidgets.QWidget()
         self.tab_coding.setObjectName("tab_coding")
         self.label_coding = QtWidgets.QLabel(self.tab_coding)
-        self.label_coding.setGeometry(QtCore.QRect(9, 9, 581, 17))
+        self.label_coding.setGeometry(QtCore.QRect(20, 20, 581, 17))
         self.label_coding.setObjectName("label_coding")
         self.tabWidget.addTab(self.tab_coding, "")
         self.tab_reports = QtWidgets.QWidget()
