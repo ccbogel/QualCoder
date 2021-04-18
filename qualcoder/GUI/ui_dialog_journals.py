@@ -107,7 +107,7 @@ class Ui_Dialog_journals(object):
         self.pushButton_delete.setToolTip(_translate("Dialog_journals", "<html><head/><body><p>Delete</p></body></html>"))
         self.label_jname.setText(_translate("Dialog_journals", "Journal:"))
         self.label_jcount.setText(_translate("Dialog_journals", "Journals: "))
-        self.pushButton_export_all.setToolTip(_translate("Dialog_journals", "<html><head/><body><p>Export</p></body></html>"))
+        self.pushButton_export_all.setToolTip(_translate("Dialog_journals", "<html><head/><body><p>Export all journals as single text file.</p></body></html>"))
         self.label_search_regex.setToolTip(_translate("Dialog_journals", "<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style=\" background-color:transparent;\">A ‘*’ after a character will match zero or more times. </span></p><p><span style=\" background-color:transparent;\">‘</span>\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol. </p><p>Regex cheatsheet: <a href=\"http://www.rexegg.com/regex-quickstart.html\"><span style=\" text-decoration: underline; color:#000080;\">www.rexegg.com/regex-quickstart.html</span></a></p></body></html>"))
         self.pushButton_next.setToolTip(_translate("Dialog_journals", "<html><head/><body><p>Next</p></body></html>"))
         self.label_search_totals.setText(_translate("Dialog_journals", "0 / 0"))
