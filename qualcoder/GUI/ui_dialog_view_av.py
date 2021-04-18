@@ -142,7 +142,7 @@ class Ui_Dialog_view_av(object):
         self.pushButton_rewind_5.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Rewind 5 seconds</p><p>Ctrl + R</p></body></html>"))
         self.pushButton_rewind_30.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Rewind 30 seconds</p><p>Alt + R</p></body></html>"))
         self.pushButton_forward_30.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Forward 30 seconds</p><p>Alt + F</p></body></html>"))
-        self.horizontalSlider.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
+        self.horizontalSlider.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change audio/video position.</p></body></html>"))
 
 
 if __name__ == "__main__":
