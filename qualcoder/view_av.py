@@ -2950,7 +2950,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 self.ui.label_memo.setText(_("Cannot edit transcript. It is coded or annotated."))
             else:
                 self.ui.label_memo.setText(
-                    _("Transcription area: Alt+R Shit+R Shift+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+                    _("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             self.get_speaker_names_from_bracketed_text()
@@ -3161,8 +3161,8 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Add key options to improve manual transcribing.
         Options are:
             Alt + R to rewind 5 seconds.
-            Shift + R rewind 30 seconds
-            Shift + F forward 30 seconds
+            Ctrl + R rewind 30 seconds
+            Alt + F forward 30 seconds
             Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
         Can only use these options if the transcription is not coded:
             Ctrl + T to insert timestamp in format [hh.mm.ss]
@@ -3181,14 +3181,14 @@ class DialogViewAV(QtWidgets.QDialog):
         #  ctrl S or ctrl P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Rewind 30 seconds Shift R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
-            self.rewind_30_seconds()
-        # Rewind 5 seconds   Alt R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+        # Rewind 5 seconds   Ctrl + R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             self.rewind_5_seconds()
-        # Advance 30 seconds Shift F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
+        # Rewind 30 seconds Alt R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+            self.rewind_30_seconds()
+        # Advance 30 seconds Alt F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
             self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
@@ -3213,7 +3213,7 @@ class DialogViewAV(QtWidgets.QDialog):
         return True
 
     def rewind_30_seconds(self):
-        """ Rewind AV 30 seconds. Shift + R """
+        """ Rewind 30 seconds. Alt + R """
 
         time_msecs = self.mediaplayer.get_time() - 30000
         if time_msecs < 0:
@@ -3226,7 +3226,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_ui()
 
     def rewind_5_seconds(self):
-        """ Rewind AV 5 seconds. Alt + R """
+        """ Rewind 5 seconds. Ctrl + R """
 
         time_msecs = self.mediaplayer.get_time() - 5000
         if time_msecs < 0:
@@ -3239,7 +3239,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_ui()
 
     def forward_30_seconds(self):
-        """ Forward AV 30 seconds. Shift + F """
+        """ Forward 30 seconds. Alt + F """
 
         time_msecs = self.mediaplayer.get_time() + 30000
         if time_msecs > self.media.get_duration():

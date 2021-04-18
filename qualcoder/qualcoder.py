@@ -648,7 +648,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # file cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
-        self.ui.actionManage_files.setShortcut('Alt+F')
+        #self.ui.actionManage_files.setShortcut('Alt+F') Affects code AV function
         self.ui.actionManage_journals.triggered.connect(self.journals)
         self.ui.actionManage_journals.setShortcut('Alt+J')
         self.ui.actionManage_cases.triggered.connect(self.manage_cases)
@@ -670,7 +670,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
-        self.ui.actionCoding_reports.setShortcut('Ctrl+R')
+        #self.ui.actionCoding_reports.setShortcut('Ctrl+R') Affects code AV function
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
