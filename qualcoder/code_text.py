@@ -290,7 +290,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.filenames = self.app.get_text_filenames()
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
-        sql = "select length(fulltext) from source where id=?"
+        sql = "select length(fulltext), fulltext from source where id=?"
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
         for f in self.filenames:
             cur.execute(sql, [f['id'], ])
@@ -301,6 +301,7 @@ class DialogCodeText(QtWidgets.QWidget):
             f['characters'] = res[0]
             f['start'] = 0
             f['end'] = res[0]
+            f['fulltext'] = res[1]
             cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
             res = cur.fetchone()
             tt += "\n" + _("Codings: ") + str(res[0])
@@ -1738,7 +1739,7 @@ class DialogCodeText(QtWidgets.QWidget):
             action_latest = menu.addAction(_("File with latest coding"))
         if f['characters'] > CHAR_LIMIT:
             action_next_chars = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
-            if file_['start'] >= CHAR_LIMIT:
+            if file_['start'] > 0:
                 action_prev_chars = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
@@ -1761,18 +1762,24 @@ class DialogCodeText(QtWidgets.QWidget):
             file_  : selected file, Dictionary
             selected:  list widget item """
 
-        # Alreadt at start
+        # Already at start
         if file_['start'] == 0:
             return
-        if file_['start'] - CHAR_LIMIT < 0:
-            file_['start'] = 0
-            file_['end'] = CHAR_LIMIT
+        file_['end'] = file_['start']
         file_['start'] = file_['start'] - CHAR_LIMIT
-        file_['end'] = file_['end'] - CHAR_LIMIT
-        # Check displayed text going past end of characters
-        if file_['end'] >= file_['characters']:
-            file_['end'] = file_['characters'] - 1
-
+        # Forward track to the first line ending for a better start of text chunk
+        line_ending = False
+        i = 0
+        while file_['start'] + i < file_['end'] and not line_ending:
+            if file_['fulltext'][file_['start'] + i] == "\n":
+                line_ending = True
+            else:
+                i += 1
+        file_['start'] += i
+        # Check displayed text not going before start of characters
+        if file_['start'] < 0:
+            file_['start'] = 0
+        #print("Prev chars method ", file_['start'], file_['end'])
         # Update tooltip for listItem
         tt = selected.toolTip()
         tt2 = tt.split("From: ")[0]
@@ -1789,17 +1796,45 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # First time
         if file_['start'] == 0 and file_['end'] == file_['characters']:
-            file_['end'] = CHAR_LIMIT
+            # Backtrack to the first line ending for a better end of text chunk
+            i = CHAR_LIMIT
+            line_ending = False
+            print("HERE")
+            while i > 0 and not line_ending:
+                if file_['fulltext'][i] == "\n":
+                   line_ending = True
+                else:
+                    i -= 1
+            if i <= 0:
+                file_['end'] = CHAR_LIMIT
+            else:
+                file_['end'] = i
         else:
             file_['start'] = file_['start'] + CHAR_LIMIT
-            file_['end'] = file_['end'] + CHAR_LIMIT
+            # Backtrack from start to next line ending for a better start of text chunk
+            i = file_['start']
+            line_ending = False
+            while file_['start'] > 0 and not line_ending:
+                if file_['fulltext'][file_['start']] == "\n":
+                   line_ending = True
+                else:
+                    file_['start'] -= 1
+            # Backtrack from end to next line ending for a better end of text chunk
+            i = CHAR_LIMIT
+            if file_['start'] + i >= file_['characters']:
+                i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
+            line_ending = False
+            while i > 0 and not line_ending:
+                if file_['fulltext'][file_['start'] + i] == "\n":
+                   line_ending = True
+                else:
+                    i -= 1
+            file_['end'] = file_['start'] + i
             # Check displayed text going past end of characters
             if file_['end'] >= file_['characters']:
                 file_['end'] = file_['characters'] - 1
-            # Go to beginning of file if start is going over end of characters
-            if file_['start'] >= file_['characters']:
-                file_['start'] = 0
-                file_['end'] = CHAR_LIMIT
+        #print("Next chars method ", file_['start'], file_['end'])
+
         # Update tooltip for listItem
         tt = selected.toolTip()
         tt2 = tt.split("From: ")[0]
