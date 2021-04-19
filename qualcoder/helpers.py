@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,6 +64,25 @@ def msecs_to_mins_and_secs(msecs):
     if len(remainder_secs) == 1:
         remainder_secs = "0" + remainder_secs
     return str(mins) + "." + remainder_secs
+
+def msecs_to_hours_mins_and_secs(msecs):
+    """ Convert milliseconds to hours, minutes and seconds.
+    msecs is an integer. Hours, minutes and seconds output is a string."""
+
+    secs = int(msecs / 1000)
+    mins = int(secs / 60)
+    remainder_secs = str(secs - mins * 60)
+    if len(remainder_secs) == 1:
+        remainder_secs = "0" + remainder_secs
+    hours = int(mins / 60)
+    remainder_mins = str(mins - hours * 60)
+    if len(remainder_mins) == 1:
+        remainder_mins = "0" + remainder_mins
+    hours = str(hours)
+    if len(hours) == 1:
+        hours = "0" + hours
+    res = hours + "." + remainder_mins + "." + remainder_secs
+    return res
 
 
 class Message(QtWidgets.QMessageBox):
