@@ -277,6 +277,11 @@
         <string>Coder</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string>jid</string>
+       </property>
+      </column>
      </widget>
      <widget class="QTextEdit" name="textEdit"/>
     </widget>
