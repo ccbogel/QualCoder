@@ -561,6 +561,27 @@ class App(object):
             result.append(dict(zip(keys, row)))
         return result
 
+    def get_journal_texts(self, jids=None):
+        """ Get the texts of all journals as a list of dictionaries.
+        Called by DialogJournals.search_for_text
+        param:
+            jids - a list of jids or None
+        """
+
+        cur = self.conn.cursor()
+        if jids is not None:
+            cur.execute(
+                "select name, jid, jentry, owner, date from journal where id in (?)",
+                jids
+            )
+        else:
+            cur.execute("select name, jid, jentry, owner, date from journal")
+        keys = 'name', 'jid', 'jentry', 'owner', 'date'
+        result = []
+        for row in cur.fetchall():
+            result.append(dict(zip(keys, row)))
+        return result
+
     def get_coder_names_in_project(self):
         """ Get all coder names from all tables and from the config.ini file
         Possible design flaw is that codernames are not stored in a specific table in the database.
