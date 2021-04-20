@@ -84,7 +84,7 @@ class Ui_Dialog_journals(object):
         self.splitter.setObjectName("splitter")
         self.tableWidget = QtWidgets.QTableWidget(self.splitter)
         self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(3)
+        self.tableWidget.setColumnCount(4)
         self.tableWidget.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -92,6 +92,8 @@ class Ui_Dialog_journals(object):
         self.tableWidget.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, item)
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
@@ -121,6 +123,8 @@ class Ui_Dialog_journals(object):
         item.setText(_translate("Dialog_journals", "Date"))
         item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("Dialog_journals", "Coder"))
+        item = self.tableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("Dialog_journals", "jid"))
 
 
 if __name__ == "__main__":
