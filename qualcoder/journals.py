@@ -44,6 +44,11 @@ from helpers import Message
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+NAME_COLUMN = 0
+DATE_COLUMN = 1
+OWNER_COLUMN = 2
+JID_COLUMN = 3
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -62,11 +67,8 @@ def exception_handler(exception_type, value, tb_obj):
 class DialogJournals(QtWidgets.QDialog):
     """  View, create, export, rename and delete journals. """
 
-    NAME_COLUMN = 0
-    DATE_COLUMN = 1
-    OWNER_COLUMN = 2
     journals = []
-    current_jid = None
+    jid = None  # journal database jid
     app = None
     parent_textEdit = None
     textDialog = None
@@ -97,7 +99,6 @@ class DialogJournals(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        #self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         try:
             s0 = int(self.app.settings['dialogjournals_splitter0'])
             s1 = int(self.app.settings['dialogjournals_splitter1'])
@@ -105,22 +106,10 @@ class DialogJournals(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except:
             pass
-        self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
-        for row, details in enumerate(self.journals):
-            self.ui.tableWidget.insertRow(row)
-            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
-            item = QtWidgets.QTableWidgetItem(details['date'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, item)
-            item = QtWidgets.QTableWidgetItem(details['owner'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, self.OWNER_COLUMN, item)
-
-        self.ui.tableWidget.verticalHeader().setVisible(False)
-        self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.tableWidget.resizeRowsToContents()
+        self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
+
         self.ui.textEdit.textChanged.connect(self.text_changed)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
         pm = QtGui.QPixmap()
@@ -162,7 +151,41 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         #self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
-        self.ui.checkBox_search_all_journals.setEnabled(False)
+        #self.ui.checkBox_search_all_journals.setEnabled(False)
+
+    def fill_table(self):
+        """ Fill journals table """
+
+        self.ui.tableWidget.blockSignals(True)
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+        for row, details in enumerate(self.journals):
+            print(row, details)
+            self.ui.tableWidget.insertRow(row)
+            self.ui.tableWidget.setItem(row, NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
+            item = QtWidgets.QTableWidgetItem(details['date'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, DATE_COLUMN, item)
+            item = QtWidgets.QTableWidgetItem(details['owner'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, OWNER_COLUMN, item)
+            item = QtWidgets.QTableWidgetItem(str(details['jid']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, JID_COLUMN, item)
+
+        self.ui.tableWidget.verticalHeader().setVisible(False)
+        if self.app.settings['showids'] == 'True':
+            self.ui.tableWidget.showColumn(JID_COLUMN)
+        else:
+            self.ui.tableWidget.hideColumn(JID_COLUMN)
+        self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.resizeRowsToContents()
+        self.jid = None
+        self.ui.tableWidget.clearSelection()
+        self.ui.tableWidget.blockSignals(False)
+        self.ui.textEdit.setText("")
+        self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
 
     def export_all_journals_as_one_file(self):
         """ Export a collation of all journals as one text file. """
@@ -172,7 +195,6 @@ class DialogJournals(QtWidgets.QDialog):
             text += _("Journal: ") + j['name'] + "\n"
             text += j['jentry'] + "\n========\n\n"
 
-        print(text)
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
              _("Select directory to save file"), self.app.last_export_directory, options)
@@ -180,7 +202,6 @@ class DialogJournals(QtWidgets.QDialog):
             return
         d = str(datetime.datetime.now().astimezone().strftime("_%Y_%m_%dT%H_%M"))
         filename = directory + "/" + "Collated_journals" + d + ".txt"
-        print(filename)
         '''if os.path.exists(filename):
             pass'''
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
@@ -196,14 +217,14 @@ class DialogJournals(QtWidgets.QDialog):
     def view(self):
         """ View and edit journal contents in the textEdit """
 
-        x = self.ui.tableWidget.currentRow()
-        if x == -1:
-            self.current_jid = None
+        row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            self.jid = None
             self.ui.textEdit.setPlainText("")
             return
-        self.current_jid = self.journals[x]['jid']
+        self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
         self.ui.textEdit.blockSignals(True)
-        self.ui.textEdit.setPlainText(self.journals[x]['jentry'])
+        self.ui.textEdit.setPlainText(self.journals[row]['jentry'])
         self.ui.textEdit.blockSignals(False)
 
     def text_changed(self):
@@ -211,17 +232,12 @@ class DialogJournals(QtWidgets.QDialog):
         The signal is switched off when a different journal is loaded.
         """
 
-        if self.current_jid is None:
+        if self.jid is None:
             return
-        #logger.debug("self.current_jid:" + str(self.current_jid))
-        for j in range(0, len(self.journals)):
-            if self.journals[j]['jid'] == self.current_jid:
-                current_j = j
-        self.journals[current_j]['jentry'] = self.ui.textEdit.toPlainText()
-
-        # Update database as text is edited - might be slow - check with users of slow computers
+        self.journals[self.ui.tableWidget.currentRow()]['jentry'] = self.ui.textEdit.toPlainText()
+        # Update database as text is edited
         cur = self.app.conn.cursor()
-        cur.execute("update journal set jentry=? where jid=?", (self.journals[current_j]['jentry'], self.current_jid))
+        cur.execute("update journal set jentry=? where jid=?", (self.journals[self.ui.tableWidget.currentRow()]['jentry'], self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
 
@@ -235,8 +251,9 @@ class DialogJournals(QtWidgets.QDialog):
     def create(self):
         """ Create a new journal by entering text into the dialog. """
 
-        self.current_jid = None
+        self.jid = None
         self.ui.textEdit.setPlainText("")
+        self.ui.tableWidget.clearSelection()
 
         ui = DialogAddItemName(self.app, self.journals, _('New Journal'), _('Journal name'))
         ui.exec_()
@@ -263,40 +280,25 @@ class DialogJournals(QtWidgets.QDialog):
             (journal['name'], journal['jentry'], journal['owner'], journal['date']))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
-        jid = cur.fetchone()
-        journal['jid'] = jid[0]
+        jid = cur.fetchone()[0]
+        journal['jid'] = jid
         self.parent_textEdit.append(_("Journal created: ") + journal['name'])
-
-        # clear and refill table widget
-        for r in self.journals:
-            self.ui.tableWidget.removeRow(0)
         self.journals.append(journal)
-        self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
-
-        for row, itm in enumerate(self.journals):
-            self.ui.tableWidget.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(itm['name'])
-            self.ui.tableWidget.setItem(row, self.NAME_COLUMN, item)
-            item = QtWidgets.QTableWidgetItem(itm['date'])
-            self.ui.tableWidget.setItem(row, self.DATE_COLUMN, item)
-            item = QtWidgets.QTableWidgetItem(itm['owner'])
-            self.ui.tableWidget.setItem(row, self.OWNER_COLUMN, item)
-        self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.tableWidget.resizeRowsToContents()
-
+        self.fill_table()
         newest = len(self.journals) - 1
         if newest < 0:
             return
         self.ui.tableWidget.setCurrentCell(newest, 0)
+        self.jid = jid
         self.ui.textEdit.setFocus()
 
     def export(self):
         """ Export journal to a plain text file, filename will have .txt ending. """
 
-        x = self.ui.tableWidget.currentRow()
-        if x == -1:
+        row = self.ui.tableWidget.currentRow()
+        if row == -1:
             return
-        filename = self.journals[x]['name']
+        filename = self.journals[row]['name']
         filename += ".txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -313,7 +315,7 @@ class DialogJournals(QtWidgets.QDialog):
                 mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
                 if mb.exec_() == QtWidgets.QMessageBox.No:
                     return
-            data = self.journals[x]['jentry']
+            data = self.journals[row]['jentry']
             f = open(filename, 'w')
             f.write(data)
             f.close()
@@ -329,14 +331,12 @@ class DialogJournals(QtWidgets.QDialog):
     def delete(self):
         """ Delete journal from database and update model and widget. """
 
-        x = self.ui.tableWidget.currentRow()
-        if x == -1:
+        row = self.ui.tableWidget.currentRow()
+        if row == -1:
             return
-        journalname = self.journals[x]['name']
-        #logger.debug(("Delete row: " + str(x)))
-        ui = DialogConfirmDelete(self.app, self.journals[x]['name'])
+        journalname = self.journals[row]['name']
+        ui = DialogConfirmDelete(self.app, self.journals[row]['name'])
         ok = ui.exec_()
-
         if ok:
             cur = self.app.conn.cursor()
             cur.execute("delete from journal where name = ?", [journalname])
@@ -344,30 +344,26 @@ class DialogJournals(QtWidgets.QDialog):
             for item in self.journals:
                 if item['name'] == journalname:
                     self.journals.remove(item)
-            self.ui.tableWidget.removeRow(x)
+            self.fill_table()
             self.parent_textEdit.append(_("Journal deleted: ") + journalname)
-            self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
 
     def table_selection_changed(self):
         """ Update the journal text for the current selection. """
 
         row = self.ui.tableWidget.currentRow()
-        try:
-            self.current_jid = self.journals[row]['jid']
-            self.view()
-            self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
-        except IndexError:
-            # occurs when journal deleted
-            self.ui.label_jname.setText(_("No journal selected"))
+        self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
+        self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
+        self.view()
 
     def cell_modified(self):
         """ If the journal name has been changed in the table widget update the database
         """
 
-        x = self.ui.tableWidget.currentRow()
+        row = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
+        self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
         if y == self.NAME_COLUMN:
-            new_name = self.ui.tableWidget.item(x, y).text().strip()
+            new_name = self.ui.tableWidget.item(row, y).text().strip()
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
@@ -398,16 +394,16 @@ class DialogJournals(QtWidgets.QDialog):
                 mb.exec_()
                 update = False
             if update:
-                # update source list and database
+                # update journals list and database
                 cur = self.app.conn.cursor()
                 cur.execute("update journal set name=? where name=?",
-                    (new_name, self.journals[x]['name']))
+                    (new_name, self.journals[row]['name']))
                 self.app.conn.commit()
-                self.parent_textEdit.append(_("Journal name changed from: ") + self.journals[x]['name'] + " to: " + new_name)
-                self.journals[x]['name'] = new_name
-                self.ui.label_jname.setText(_("Journal: ") + self.journals[x]['name'])
-            else:  # put the original text in the cell
-                self.ui.tableWidget.item(x, y).setText(self.journals[x]['name'])
+                self.parent_textEdit.append(_("Journal name changed from: ") + self.journals[row]['name'] + " to: " + new_name)
+                self.journals[row]['name'] = new_name
+                self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
+            else:  # Put the original text in the cell
+                self.ui.tableWidget.item(row, y).setText(self.journals[row]['name'])
 
     # Functions to search though the journal(s) text
     def search_for_text(self):
@@ -419,7 +415,7 @@ class DialogJournals(QtWidgets.QDialog):
         If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
-        if self.current_jid is None:
+        if self.jid is None and not(self.ui.checkBox_search_all_journals.isChecked()):
             return
         if self.search_indices == []:
             self.ui.pushButton_next.setEnabled(False)
@@ -428,40 +424,45 @@ class DialogJournals(QtWidgets.QDialog):
         self.search_index = -1
         search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(search_term) >= 3:
-            pattern = None
-            flags = 0
-            '''if not self.ui.checkBox_search_case.isChecked():
-                flags |= re.IGNORECASE'''
+        if len(search_term) < 3:
+            return
+        pattern = None
+        flags = 0
+        '''if not self.ui.checkBox_search_case.isChecked():
+            flags |= re.IGNORECASE'''
+        try:
+            pattern = re.compile(search_term, flags)
+        except:
+            logger.warning('Bad escape')
+        if pattern is None:
+            print("no pattern")
+            return
+        self.search_indices = []
+        if self.ui.checkBox_search_all_journals.isChecked():
+            """ Search for this text across all journals. Show each journal in textEdit
+            """
+            for jdata in self.app.get_journal_texts():
+                try:
+                    text = jdata['fulltext']
+                    for match in pattern.finditer(text):
+                        self.search_indices.append((jdata, match.start(), len(match.group(0))))
+                except:
+                    logger.exception('Failed searching text %s for %s',jdata['name'], search_term)
+        else:  # Current journal only
+            row = self.ui.tableWidget.currentRow()
             try:
-                pattern = re.compile(search_term, flags)
+                print(4, "match pattern")
+                for match in pattern.finditer(self.journals[row]['jentry']):
+                    # Get result as first dictionary item
+                    j_name = self.app.get_journal_texts([self.jid, ])[0]
+                    self.search_indices.append((j_name, match.start(), len(match.group(0))))
             except:
-                logger.warning('Bad escape')
-
-            if pattern is not None:
-                self.search_indices = []
-                if self.ui.checkBox_search_all_journals.isChecked():
-                    """ Search for this text across all journals. Show each journal in textEdit
-                    """
-                    for jdata in self.app.get_journal_texts():
-                        try:
-                            text = jdata['fulltext']
-                            for match in pattern.finditer(text):
-                                self.search_indices.append((jdata, match.start(), len(match.group(0))))
-                        except:
-                            logger.exception('Failed searching text %s for %s',jdata['name'],search_term)
-                else:
-                    try:
-                        for match in pattern.finditer(self.source_text):
-                            # Get result as first dictionary item
-                            jdata = self.app.get_journal_texts([self.file_['id'], ])[0]
-                            self.search_indices.append((jdata, match.start(), len(match.group(0))))
-                    except:
-                        logger.exception('Failed searching current journal for %s',search_term)
-                if len(self.search_indices) > 0:
-                    self.ui.pushButton_next.setEnabled(True)
-                    self.ui.pushButton_previous.setEnabled(True)
-                self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+                logger.exception('Failed searching current journal for %s', search_term)
+        print(3, self.search_indices, self.search_index)
+        if len(self.search_indices) > 0:
+            self.ui.pushButton_next.setEnabled(True)
+            self.ui.pushButton_previous.setEnabled(True)
+        self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
