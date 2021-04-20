@@ -39,6 +39,7 @@ from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_journals import Ui_Dialog_journals
+from helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -69,6 +70,9 @@ class DialogJournals(QtWidgets.QDialog):
     app = None
     parent_textEdit = None
     textDialog = None
+    # variables for searching through journal(s)
+    search_indices = []
+    search_index = 0
 
     def __init__(self, app, parent_textEdit, parent=None):
 
@@ -78,6 +82,8 @@ class DialogJournals(QtWidgets.QDialog):
         self.parent_textEdit = parent_textEdit
         self.journals = []
         self.current_jid = None
+        self.search_indices = []
+        self.search_index = 0
         cur = self.app.conn.cursor()
         cur.execute("select name, date, jentry, owner, jid from journal")
         result = cur.fetchall()
@@ -132,6 +138,12 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete)
         pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_all.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_all.clicked.connect(self.export_all_journals_as_one_file)
+
+        # Search text in journals
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm))
         pm = QtGui.QPixmap()
@@ -141,16 +153,45 @@ class DialogJournals(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
-        #self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next.setEnabled(False)
-        #self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export_all.setIcon(QtGui.QIcon(pm))
-        #self.ui.pushButton_export_all.clicked.connect(self.export_all_journals_as_one_file)
+        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        #self.ui.lineEdit_search.setEnabled(False)
+        self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
+        self.ui.checkBox_search_all_journals.setEnabled(False)
+
+    def export_all_journals_as_one_file(self):
+        """ Export a collation of all journals as one text file. """
+
+        text = ""
+        for j in self.journals:
+            text += _("Journal: ") + j['name'] + "\n"
+            text += j['jentry'] + "\n========\n\n"
+
+        print(text)
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+             _("Select directory to save file"), self.app.last_export_directory, options)
+        if directory == "":
+            return
+        d = str(datetime.datetime.now().astimezone().strftime("_%Y_%m_%dT%H_%M"))
+        filename = directory + "/" + "Collated_journals" + d + ".txt"
+        print(filename)
+        '''if os.path.exists(filename):
+            pass'''
+        ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
+        Using a byte order mark so that other software recognises UTF-8
+        '''
+        f = open(filename, 'w', encoding='utf-8-sig')
+        f.write(text)
+        f.close()
+        msg = _("Collated journals exported as text file to: ") + filename
+        self.parent_textEdit.append(msg)
+        Message(self.app, _("Journals exported"), msg).exec_()
 
     def view(self):
         """ View and edit journal contents in the textEdit """
@@ -367,4 +408,96 @@ class DialogJournals(QtWidgets.QDialog):
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[x]['name'])
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.journals[x]['name'])
+
+    # Functions to search though the journal(s) text
+    def search_for_text(self):
+        """ On text changed in lineEdit_search, find indices of matching text.
+        Only where text is three or more characters long.
+        Resets current search_index.
+        If all files is checked then searches for all matching text across all text files
+        and displays the file text and current position to user.
+        If case sensitive is checked then text searched is matched for case sensitivity.
+        """
+
+        if self.current_jid is None:
+            return
+        if self.search_indices == []:
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+        self.search_indices = []
+        self.search_index = -1
+        search_term = self.ui.lineEdit_search.text()
+        self.ui.label_search_totals.setText("0 / 0")
+        if len(search_term) >= 3:
+            pattern = None
+            flags = 0
+            '''if not self.ui.checkBox_search_case.isChecked():
+                flags |= re.IGNORECASE'''
+            try:
+                pattern = re.compile(search_term, flags)
+            except:
+                logger.warning('Bad escape')
+
+            if pattern is not None:
+                self.search_indices = []
+                if self.ui.checkBox_search_all_journals.isChecked():
+                    """ Search for this text across all journals. Show each journal in textEdit
+                    """
+                    for jdata in self.app.get_journal_texts():
+                        try:
+                            text = jdata['fulltext']
+                            for match in pattern.finditer(text):
+                                self.search_indices.append((jdata, match.start(), len(match.group(0))))
+                        except:
+                            logger.exception('Failed searching text %s for %s',jdata['name'],search_term)
+                else:
+                    try:
+                        for match in pattern.finditer(self.source_text):
+                            # Get result as first dictionary item
+                            jdata = self.app.get_journal_texts([self.file_['id'], ])[0]
+                            self.search_indices.append((jdata, match.start(), len(match.group(0))))
+                    except:
+                        logger.exception('Failed searching current journal for %s',search_term)
+                if len(self.search_indices) > 0:
+                    self.ui.pushButton_next.setEnabled(True)
+                    self.ui.pushButton_previous.setEnabled(True)
+                self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+
+    def move_to_previous_search_text(self):
+        """ Push button pressed to move to previous search text position. """
+
+        if self.current_jid is None or self.search_indices== []:
+            return
+        self.search_index -= 1
+        if self.search_index < 0:
+            self.search_index = len(self.search_indices) - 1
+        cursor = self.ui.textEdit.textCursor()
+        prev_result = self.search_indices[self.search_index]
+
+        # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
+        if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
+            self.load_file(prev_result[0])
+        cursor.setPosition(prev_result[1])
+        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
+    def move_to_next_search_text(self):
+        """ Push button pressed to move to next search text position. """
+
+        if self.current_jid is None or self.search_indices == []:
+            return
+        self.search_index += 1
+        if self.search_index == len(self.search_indices):
+            self.search_index = 0
+        cursor = self.ui.textEdit.textCursor()
+        next_result = self.search_indices[self.search_index]
+        # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
+        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
+            self.load_file(next_result[0])
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
 
