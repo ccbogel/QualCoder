@@ -73,7 +73,7 @@ class DialogJournals(QtWidgets.QDialog):
     parent_textEdit = None
     textDialog = None
     # variables for searching through journal(s)
-    search_indices = []
+    search_indices = []   # A list of tuples of (journal name, match.start, match length)
     search_index = 0
 
     def __init__(self, app, parent_textEdit, parent=None):
@@ -154,14 +154,13 @@ class DialogJournals(QtWidgets.QDialog):
         #self.ui.checkBox_search_all_journals.setEnabled(False)
 
     def fill_table(self):
-        """ Fill journals table """
+        """ Fill journals table. Update journal count label. """
 
         self.ui.tableWidget.blockSignals(True)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         for row, details in enumerate(self.journals):
-            print(row, details)
             self.ui.tableWidget.insertRow(row)
             self.ui.tableWidget.setItem(row, NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
             item = QtWidgets.QTableWidgetItem(details['date'])
@@ -272,7 +271,7 @@ class DialogJournals(QtWidgets.QDialog):
             mb.exec_()
             return
 
-        # update database
+        # Update database
         journal = {'name':name, 'jentry': '', 'owner':self.app.settings['codername'],
             'date':datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid':None}
         cur = self.app.conn.cursor()
@@ -435,30 +434,28 @@ class DialogJournals(QtWidgets.QDialog):
         except:
             logger.warning('Bad escape')
         if pattern is None:
-            print("no pattern")
             return
         self.search_indices = []
         if self.ui.checkBox_search_all_journals.isChecked():
-            """ Search for this text across all journals. Show each journal in textEdit
-            """
+            """ Search for this text across all journals. """
             for jdata in self.app.get_journal_texts():
                 try:
-                    text = jdata['fulltext']
+                    text = jdata['jentry']
                     for match in pattern.finditer(text):
                         self.search_indices.append((jdata, match.start(), len(match.group(0))))
-                except:
+                except Exception as e:
+                    print(e)
                     logger.exception('Failed searching text %s for %s',jdata['name'], search_term)
         else:  # Current journal only
             row = self.ui.tableWidget.currentRow()
             try:
-                print(4, "match pattern")
                 for match in pattern.finditer(self.journals[row]['jentry']):
                     # Get result as first dictionary item
                     j_name = self.app.get_journal_texts([self.jid, ])[0]
                     self.search_indices.append((j_name, match.start(), len(match.group(0))))
-            except:
+            except Exception as e:
+                print(e)
                 logger.exception('Failed searching current journal for %s', search_term)
-        print(3, self.search_indices, self.search_index)
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
@@ -467,17 +464,22 @@ class DialogJournals(QtWidgets.QDialog):
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.current_jid is None or self.search_indices== []:
+        if self.search_indices == []:
             return
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
-
-        # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
-        if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
-            self.load_file(prev_result[0])
+        # prev_result is a tuple containing a dictionary of
+        # {name, jid, jentry, owner, date} and char position and search string length
+        if self.jid is None or self.jid != prev_result[0]['jid']:
+            self.jid = prev_result[0]['jid']
+            for row in range(0, self.ui.tableWidget.rowCount()):
+                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
+                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
+                    # This will also load the jentry into the textEdit
+                    break
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
@@ -486,16 +488,22 @@ class DialogJournals(QtWidgets.QDialog):
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
 
-        if self.current_jid is None or self.search_indices == []:
+        if self.search_indices == []:
             return
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
         cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
-        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
-            self.load_file(next_result[0])
+        # next_result is a tuple containing a dictionary of
+        # {name, jid, jentry, owner, date} and char position and search string length
+        if self.jid is None or self.jid != next_result[0]['jid']:
+            self.jid = next_result[0]['jid']
+            for row in range(0, self.ui.tableWidget.rowCount()):
+                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
+                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
+                    # This will also load the jentry into the textEdit
+                    break
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
