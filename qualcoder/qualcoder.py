@@ -571,7 +571,7 @@ class App(object):
         cur = self.conn.cursor()
         if jids is not None:
             cur.execute(
-                "select name, jid, jentry, owner, date from journal where id in (?)",
+                "select name, jid, jentry, owner, date from journal where jid in (?)",
                 jids
             )
         else:
