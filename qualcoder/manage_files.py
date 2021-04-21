@@ -121,7 +121,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     rows_hidden = False
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
-    dialog_list = []  # Used for opened image , text and AV dialogs
+    av_dialog_open = None  # Used for opened AV dialog
 
     def __init__(self, app, parent_textEdit, tab_coding, tab_reports):
 
@@ -132,7 +132,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.tab_coding = tab_coding
         self.tab_reports = tab_reports
         self.attributes = []
-        self.dialog_list = []
+        self.av_dialog_open = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
@@ -205,7 +205,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-        # Use these next few lines to use for mvoing a linked file into or an internal file out of the project folder
+        # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         id_ = None
         mediapath = None
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
@@ -251,12 +251,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
+
+        if action == action_view:
+            self.view()
+            return
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         if action == action_import_linked:
             self.import_linked_file(id_, mediapath)
         if action == action_export_to_linked:
             self.export_file_as_linked_file(id_, mediapath)
-        if action == action_view:
-            self.view()
         if action == action_export:
             self.export()
         if action== action_delete:
@@ -291,6 +296,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ User presses button to export current row's file.
          Only to work with an exportable file. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
@@ -313,6 +321,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             mediapath: stored path to media, will be None for text files, or String
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.last_export_directory, options)
@@ -360,6 +371,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ User presses button to import a linked file into the project folder.
         Only to work with an importable file. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
@@ -377,6 +391,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def import_linked_file(self, id_, mediapath):
         """ Import a linked file into the project folder, and change mediapath details. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         name_split1 = mediapath.split(":")[1]
         filename = name_split1.split('/')[-1]
         if mediapath[0:6] == "audio:":
@@ -436,6 +453,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def export_attributes(self):
         """ Export attributes from table as a csv file. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         shortname = self.app.project_name.split(".qda")[0]
         filename = shortname + "_file_attributes.csv"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
@@ -657,6 +677,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         AddAttribute dialog checks for duplicate attribute name.
         New attribute is added to the model and database. """
 
+
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         check_names = self.attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddAttribute(self.app, check_names)
         ok = ui.exec_()
@@ -686,7 +710,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_textEdit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + value_type)
 
     def cell_double_clicked(self):
-        """  """
+        """ View file """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -802,6 +826,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ View and edit text file contents.
         Alternatively view an image, audio or video media. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         x = self.ui.tableWidget.currentRow()
         self.ui.tableWidget.selectRow(x)
         if self.source[x]['mediapath'] is not None and 'docs:' != self.source[x]['mediapath'][0:5]:
@@ -1094,7 +1121,10 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         try:
             ui = DialogViewAV(self.app, self.source[x])
-            ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+            #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+            # The vlc window becomes unmovable and not resizable
+            self.av_dialog_open = ui
+            ui.show()
             memo = ui.ui.textEdit.toPlainText()
             if self.source[x]['memo'] != memo:
                 self.source[x]['memo'] = memo
@@ -1110,6 +1140,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             logger.debug(e)
             print(e)
             Message(self.app, _('view AV error'), str(e), "warning").exec_()
+            self.av_dialog_open = None
             return
 
     def view_image(self, x):
@@ -1129,7 +1160,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             #TODO update bad links
             self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
-
         ui = DialogViewImage(self.app, self.source[x])
         ui.exec_()
         memo = ui.ui.textEdit.toPlainText()
@@ -1147,6 +1177,10 @@ class DialogManageFiles(QtWidgets.QDialog):
     def create(self):
         """ Create a new text file by entering text into the dialog.
         Implements the QtDesigner memo dialog. """
+
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
 
         ui = DialogAddItemName(self.app, self.source,_('New File'), _('Enter file name'))
         ui.exec_()
@@ -1190,6 +1224,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def link_files(self):
         """ Trigger to link to file location. """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         self.import_files(True)
 
     def import_files(self, link=False):
@@ -1207,6 +1244,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     True- files are linked and not imported
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
             self.default_import_directory)
         if not ok or imports == []:
@@ -1400,8 +1440,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             link_path:  filepath of file to be linked, String
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         text = ""
-
         # Import from odt
         if import_file[-4:].lower() == ".odt":
             text = self.convert_odt_to_text(import_file)
@@ -1580,6 +1622,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         Need to check for this condition.
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = []
         for i in index_list:
@@ -1664,6 +1709,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         Called by: delete button.
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         ui = DialogSelectItems(self.app, self.source, _("Delete files"), "multi")
         ok = ui.exec_()
         if not ok:
@@ -1748,6 +1796,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         Called by: right-click table context menu.
         """
 
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = []
         for i in index_list:
