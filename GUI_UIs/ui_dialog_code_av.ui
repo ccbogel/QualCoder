@@ -74,7 +74,7 @@
      <widget class="QPushButton" name="pushButton_play">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>200</x>
         <y>10</y>
         <width>36</width>
         <height>36</height>
@@ -141,8 +141,8 @@
      <widget class="QPushButton" name="pushButton_coding">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>11</y>
+        <x>10</x>
+        <y>10</y>
         <width>181</width>
         <height>36</height>
        </rect>
@@ -257,7 +257,7 @@
      <widget class="QPushButton" name="pushButton_rewind_30">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>280</x>
         <y>10</y>
         <width>36</width>
         <height>36</height>
@@ -273,7 +273,7 @@
      <widget class="QPushButton" name="pushButton_forward_30">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>320</x>
         <y>10</y>
         <width>36</width>
         <height>36</height>
@@ -321,7 +321,7 @@
      <widget class="QPushButton" name="pushButton_rewind_5">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>240</x>
         <y>10</y>
         <width>36</width>
         <height>36</height>
