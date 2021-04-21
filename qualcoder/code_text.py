@@ -559,61 +559,61 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_index = -1
         search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(search_term) >= 3:
-            pattern = None
-            flags = 0
-            if not self.ui.checkBox_search_case.isChecked():
-                flags |= re.IGNORECASE
-            '''if self.ui.checkBox_search_escaped.isChecked():
-                pattern = re.compile(re.escape(search_term), flags)
-            else:
-                try:
-                    pattern = re.compile(search_term, flags)
-                except:
-                    logger.warning('Bad escape')'''
+        if len(search_term) < 3:
+            return
+        pattern = None
+        flags = 0
+        if not self.ui.checkBox_search_case.isChecked():
+            flags |= re.IGNORECASE
+        '''if self.ui.checkBox_search_escaped.isChecked():
+            pattern = re.compile(re.escape(search_term), flags)
+        else:
             try:
                 pattern = re.compile(search_term, flags)
             except:
-                logger.warning('Bad escape')
-
-            if pattern is not None:
-                self.search_indices = []
-                if self.ui.checkBox_search_all_files.isChecked():
-                    """ Search for this text across all files. Show each file in textEdit
-                    """
-                    for filedata in self.app.get_file_texts():
-                        try:
-                            text = filedata['fulltext']
-                            for match in pattern.finditer(text):
-                                self.search_indices.append((filedata, match.start(), len(match.group(0))))
-                        except:
-                            logger.exception('Failed searching text %s for %s',filedata['name'],search_term)
-                else:
-                    try:
-                        if self.source_text:
-                            for match in pattern.finditer(self.source_text):
-                                # Get result as first dictionary item
-                                filedata = self.app.get_file_texts([self.file_['id'], ])[0]
-                                self.search_indices.append((filedata,match.start(), len(match.group(0))))
-                    except:
-                        logger.exception('Failed searching current file for %s',search_term)
-                if len(self.search_indices) > 0:
-                    self.ui.pushButton_next.setEnabled(True)
-                    self.ui.pushButton_previous.setEnabled(True)
-                self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+                logger.warning('Bad escape')'''
+        try:
+            pattern = re.compile(search_term, flags)
+        except:
+            logger.warning('Bad escape')
+        if pattern is None:
+            return
+        self.search_indices = []
+        if self.ui.checkBox_search_all_files.isChecked():
+            """ Search for this text across all files. """
+            for filedata in self.app.get_file_texts():
+                try:
+                    text = filedata['fulltext']
+                    for match in pattern.finditer(text):
+                        self.search_indices.append((filedata, match.start(), len(match.group(0))))
+                except:
+                    logger.exception('Failed searching text %s for %s',filedata['name'],search_term)
+        else:
+            try:
+                if self.source_text:
+                    for match in pattern.finditer(self.source_text):
+                        # Get result as first dictionary item
+                        source_name = self.app.get_file_texts([self.file_['id'], ])[0]
+                        self.search_indices.append((source_name, match.start(), len(match.group(0))))
+            except:
+                logger.exception('Failed searching current file for %s',search_term)
+        if len(self.search_indices) > 0:
+            self.ui.pushButton_next.setEnabled(True)
+            self.ui.pushButton_previous.setEnabled(True)
+        self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.file_ is None or self.search_indices== []:
+        if self.file_ is None or self.search_indices == []:
             return
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
-
-        # prev_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
+        # prev_result is a tuple containing a dictionary of
+        # (name, id, fullltext, memo, owner, date) and char position and search string length
         if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
             self.load_file(prev_result[0])
         cursor.setPosition(prev_result[1])
@@ -631,7 +631,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.search_index = 0
         cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictonary of {name, id, fullltext, memo, owner, date} and char position and search string length
+        # next_result is a tuple containing a dictionary of
+        # (name, id, fullltext, memo, owner, date) and char position and search string length
         if self.file_ is None or self.file_['id'] != next_result[0]['id']:
             self.load_file(next_result[0])
         cursor.setPosition(next_result[1])
@@ -2187,8 +2188,7 @@ class DialogCodeText(QtWidgets.QWidget):
             (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            Message(self.app, _("Already Coded"),
-            _("This segment has already been coded with this code by ") + coded['owner'], "warning").exec_()
+            # The event can trigger multiple times, so dont present a warning to the user
             return
         self.code_text.append(coded)
         self.highlight()
