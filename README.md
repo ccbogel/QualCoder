@@ -48,6 +48,8 @@ Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and run the `
 
 This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
+Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
+
 
 ### Linux Use 
 
