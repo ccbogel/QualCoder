@@ -292,6 +292,8 @@ class DialogManageFiles(QtWidgets.QDialog):
          Only to work with an exportable file. """
 
         row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            return
         id_ = None
         mediapath = None
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
@@ -359,6 +361,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         Only to work with an importable file. """
 
         row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            return
         id_ = None
         mediapath = None
         id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
