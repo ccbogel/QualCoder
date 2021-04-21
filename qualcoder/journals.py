@@ -361,7 +361,7 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
-        if y == self.NAME_COLUMN:
+        if y == NAME_COLUMN:
             new_name = self.ui.tableWidget.item(row, y).text().strip()
             # check that no other journal has this name and it is not empty
             update = True
