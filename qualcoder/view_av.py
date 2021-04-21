@@ -1356,8 +1356,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         Also use eventFilter for QGraphicsView.
 
         Options are:
+            Ctrl + R rewind 30 seconds
             Alt + R to rewind 5 seconds.
-            Shift + R rewind 30 seconds
             Alt +F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
             Ctrl + Shift + > to increase play rate
@@ -1435,14 +1435,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
             self.play_pause()
-        # Advance 30 seconds Shift F
-        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.ShiftModifier:
+        # Advance 30 seconds Alt F
+        if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
             self.forward_30_seconds()
         # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ShiftModifier:
-            self.rewind_30_seconds()
-        # Rewind 5 seconds Shift R
         if key == QtCore.Qt.Key_R and mods == QtCore.Qt.AltModifier:
+            self.rewind_30_seconds()
+        # Rewind 5 seconds Ctrl R
+        if key == QtCore.Qt.Key_R and mods == QtCore.Qt.ControlModifier:
             self.rewind_5_seconds()
         # Increase play rate  Ctrl + Shift + >
         if key == QtCore.Qt.Key_Greater and (mods and QtCore.Qt.ShiftModifier) and (mods and QtCore.Qt.ControlModifier):
@@ -1519,7 +1519,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.apply_overline_to_overlaps()
 
     def rewind_30_seconds(self):
-        """ Rewind AV by 30 seconds. Shift + R """
+        """ Rewind AV by 30 seconds. Alt + R """
 
         if self.mediaplayer.get_media() is None:
             return
@@ -1534,7 +1534,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_ui()
 
     def rewind_5_seconds(self):
-        """ Rewind AV by 30 seconds. Alt + R """
+        """ Rewind AV by 30 seconds. Ctrl + R """
 
         if self.mediaplayer.get_media() is None:
             return
@@ -1549,7 +1549,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_ui()
 
     def forward_30_seconds(self):
-        """ Forward AV 30 seconds. """
+        """ Forward AV 30 seconds. Alt + F """
 
         if self.mediaplayer.get_media() is None:
             return
@@ -2953,8 +2953,8 @@ class DialogViewAV(QtWidgets.QDialog):
                     _("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
-            self.get_speaker_names_from_bracketed_text()
-            self.add_speaker_names_to_label()
+            #self.get_speaker_names_from_bracketed_text()
+            #self.add_speaker_names_to_label()
         if self.transcription is None:
             entry = {'name': file_['name'] + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
                      'owner': self.app.settings['codername'],
@@ -3375,7 +3375,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit_transcription.setTextCursor(textCursor)
 
     def add_speaker_names_to_label(self):
-        """ Add speaker names to label, four on each line. """
+        """ Add speaker names to label, four on each line.
+        Called by init, delete_speakernames, add_speakernames """
 
         text = ""
         for i, n in enumerate(self.speaker_list):
@@ -3386,7 +3387,10 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def get_speaker_names_from_bracketed_text(self):
         """ Parse text for format of [] or {} to find speaker names.
-        If needed limit to 8 names. """
+        If needed limit to 8 names.
+        Called by init
+        #TODO This method annoys some users. So is commented out in init
+        """
 
         if self.transcription is None:
             return
