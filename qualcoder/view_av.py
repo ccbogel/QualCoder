@@ -2891,6 +2891,10 @@ class DialogViewAV(QtWidgets.QDialog):
     speaker_list = []
     can_transcribe = True
 
+    # variables for searching through journal(s)
+    search_indices = []   # A list of tuples of (journal name, match.start, match length)
+    search_index = 0
+
     def __init__(self, app, file_, parent=None):
 
         """ file_ contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -2900,6 +2904,8 @@ class DialogViewAV(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.file_ = file_
+        self.search_indices = []
+        self.search_index = 0
         abs_path = ""
         if self.file_['mediapath'][0:6] in ('/audio', '/video'):
             abs_path = self.app.project_path + self.file_['mediapath']
@@ -2953,6 +2959,7 @@ class DialogViewAV(QtWidgets.QDialog):
                     _("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit_transcription.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
+            # Commented ut as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
         if self.transcription is None:
@@ -3004,27 +3011,22 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
 
-        # Search text in journals
+        # Search text in transcription
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm))
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.label_search_all_journals.setPixmap(QtGui.QPixmap(pm))
-        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
-        #self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next.setEnabled(False)
-        #self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
-        #self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         #self.ui.lineEdit_search.setEnabled(False)
-        #self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
-        #self.ui.checkBox_search_all_journals.setEnabled(False)
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -3704,13 +3706,9 @@ class DialogViewAV(QtWidgets.QDialog):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is three or more characters long.
         Resets current search_index.
-        If all files is checked then searches for all matching text across all text files
-        and displays the file text and current position to user.
-        If case sensitive is checked then text searched is matched for case sensitivity.
+        NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
-        if self.jid is None and not (self.ui.checkBox_search_all_journals.isChecked()):
-            return
         if self.search_indices == []:
             self.ui.pushButton_next.setEnabled(False)
             self.ui.pushButton_previous.setEnabled(False)
@@ -3731,26 +3729,16 @@ class DialogViewAV(QtWidgets.QDialog):
         if pattern is None:
             return
         self.search_indices = []
-        if self.ui.checkBox_search_all_journals.isChecked():
-            """ Search for this text across all journals. """
-            for jdata in self.app.get_journal_texts():
-                try:
-                    text = jdata['jentry']
-                    for match in pattern.finditer(text):
-                        self.search_indices.append((jdata, match.start(), len(match.group(0))))
-                except Exception as e:
-                    print(e)
-                    logger.exception('Failed searching text %s for %s', jdata['name'], search_term)
-        else:  # Current journal only
-            row = self.ui.tableWidget.currentRow()
-            try:
-                for match in pattern.finditer(self.journals[row]['jentry']):
-                    # Get result as first dictionary item
-                    j_name = self.app.get_journal_texts([self.jid, ])[0]
-                    self.search_indices.append((j_name, match.start(), len(match.group(0))))
-            except Exception as e:
-                print(e)
-                logger.exception('Failed searching current journal for %s', search_term)
+
+        text = self.ui.textEdit_transcription.toPlainText()
+        try:
+            for match in pattern.finditer(text):
+                # Get result as first dictionary item
+                self.search_indices.append((match.start(), len(match.group(0))))
+        except Exception as e:
+            print(e)
+            logger.exception('Failed searching transcription text for %s', search_term)
+
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
@@ -3764,20 +3752,12 @@ class DialogViewAV(QtWidgets.QDialog):
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.textEdit_transcription.textCursor()
         prev_result = self.search_indices[self.search_index]
-        # prev_result is a tuple containing a dictionary of
-        # {name, jid, jentry, owner, date} and char position and search string length
-        if self.jid is None or self.jid != prev_result[0]['jid']:
-            self.jid = prev_result[0]['jid']
-            for row in range(0, self.ui.tableWidget.rowCount()):
-                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
-                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
-                    # This will also load the jentry into the textEdit
-                    break
-        cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+        # prev_result is a tuple containing: char position and search string length
+        cursor.setPosition(prev_result[0])
+        cursor.setPosition(cursor.position() + prev_result[1], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit_transcription.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
@@ -3788,19 +3768,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.textEdit_transcription.textCursor()
         next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictionary of
-        # {name, jid, jentry, owner, date} and char position and search string length
-        if self.jid is None or self.jid != next_result[0]['jid']:
-            self.jid = next_result[0]['jid']
-            for row in range(0, self.ui.tableWidget.rowCount()):
-                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
-                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
-                    # This will also load the jentry into the textEdit
-                    break
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+        # next_result is a tuple containing: char position and search string length
+        cursor.setPosition(next_result[0])
+        cursor.setPosition(cursor.position() + next_result[1], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit_transcription.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
