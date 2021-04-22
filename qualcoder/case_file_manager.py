@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,8 @@ from PyQt5.QtCore import Qt
 
 
 from GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
-from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 from confirm_delete import DialogConfirmDelete
+from helpers import DialogGetStartAndEndMarks
 from view_av import DialogViewAV
 from view_image import DialogViewImage
 
@@ -618,30 +618,6 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(warning_msg)
         self.app.delete_backup = False
-
-
-class DialogGetStartAndEndMarks(QtWidgets.QDialog):
-    ''' This dialog gets the start and end mark text to allow file text to be
-    automatically assigned to the currently selected case.
-    It requires the name of the selected case and the filenames - for display purposes only.
-    Methods return the user's choices for the startmark text and the endmark text.
-    '''
-
-    caseName = ""
-
-    def __init__(self, case_name, filenames):
-
-        QtWidgets.QDialog.__init__(self)
-        self.ui = Ui_Dialog_StartAndEndMarks()
-        self.ui.setupUi(self)
-        self.ui.label_case.setText(case_name)
-        self.ui.label_files.setText("Files: " + str(filenames))
-
-    def get_start_mark(self):
-        return str(self.ui.lineEdit_startmark.text())
-
-    def get_end_mark(self):
-        return str(self.ui.lineEdit_endmark.text())
 
 
 if __name__ == "__main__":
