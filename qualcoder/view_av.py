@@ -84,7 +84,7 @@ from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
+from helpers import msecs_to_hours_mins_secs, Message, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
 from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -780,7 +780,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.media_duration_text = " / " + msecs_to_hours_mins_secs(msecs)
         self.ui.label_time.setText("0.00" + self.media_duration_text)
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
@@ -1003,7 +1003,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+            self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
             #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
             pm = QtGui.QPixmap()
@@ -1058,7 +1058,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # update label_time
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
 
         # Check if segments need to be reloaded
         # This only updates if the media is playing, not ideal, but works
@@ -1530,7 +1530,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
         self.update_ui()
 
     def rewind_5_seconds(self):
@@ -1545,7 +1545,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
         self.update_ui()
 
     def forward_30_seconds(self):
@@ -1560,7 +1560,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
         self.update_ui()
 
     def extend_left(self, code_):
@@ -2568,8 +2568,8 @@ class ToolTip_EventFilter(QtCore.QObject):
                     try:
                         text += '<p style="background-color:' + item['color'] + '">' + item['name']
                         if item['avid'] is not None:
-                            text += " [" + msecs_to_mins_and_secs(item['av_pos0'])
-                            text += " - " + msecs_to_mins_and_secs(item['av_pos1']) + "]"
+                            text += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
+                            text += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
                         if item['memo'] is not None and item['memo'] != "":
                             text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                         text += "</p>"
@@ -2664,8 +2664,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.reload_segment = False
         self.setFlag(self.ItemIsSelectable, True)
         tooltip = self.segment['codename'] + " "
-        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
-        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+        seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
+        seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
         if self.segment['memo'] != "":
             tooltip += "\n" + _("Memo: ") + self.segment['memo']
@@ -2844,8 +2844,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.app.conn.commit()
         self.app.delete_backup = False
         tooltip = self.segment['codename'] + " "
-        seg_time = "[" + msecs_to_mins_and_secs(self.segment['pos0']) + " - "
-        seg_time += msecs_to_mins_and_secs(self.segment['pos1']) + "]"
+        seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
+        seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
         if self.segment['memo'] != "":
             tooltip += "\nMemo: " + self.segment['memo']
@@ -3087,7 +3087,7 @@ class DialogViewAV(QtWidgets.QDialog):
         elif platform.system() == "Darwin":  # for MacOS
             self.mediaplayer.set_nsobject(int(self.ddialog.winId()))
         msecs = self.media.get_duration()
-        self.media_duration_text = " / " + msecs_to_mins_and_secs(msecs)
+        self.media_duration_text = " / " + msecs_to_hours_mins_secs(msecs)
         self.ui.label_time.setText("0.00" + self.media_duration_text)
         self.ui.textEdit.setText(self.file_['memo'])
         self.ui.textEdit.ensureCursorVisible()
@@ -3222,7 +3222,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs))
         self.update_ui()
 
     def rewind_5_seconds(self):
@@ -3235,7 +3235,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs))
         self.update_ui()
 
     def forward_30_seconds(self):
@@ -3248,7 +3248,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.set_position(pos)
         # Update timer display
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs))
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs))
         self.update_ui()
 
     def increase_play_rate(self):
@@ -3337,7 +3337,7 @@ class DialogViewAV(QtWidgets.QDialog):
         fmt = self.app.settings['timestampformat']
 
         time_msecs = self.mediaplayer.get_time()
-        mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
+        mins_secs = msecs_to_hours_mins_secs(time_msecs)  # String
         delimiter = ":"
         if "." in mins_secs:
             delimiter = "."
@@ -3550,7 +3550,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos)
             # Update timer display
             msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+            self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
             #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
             pm = QtGui.QPixmap()
@@ -3613,7 +3613,7 @@ class DialogViewAV(QtWidgets.QDialog):
         media_pos = int(self.mediaplayer.get_position() * 1000)
         self.ui.horizontalSlider.setValue(media_pos)
         msecs = self.mediaplayer.get_time()
-        self.ui.label_time.setText(msecs_to_mins_and_secs(msecs) + self.media_duration_text)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
 
         """ For long transcripts, update the relevant text position in the textEdit to match the
         video's current position.
