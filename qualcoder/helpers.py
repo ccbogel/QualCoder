@@ -65,7 +65,7 @@ def msecs_to_mins_and_secs(msecs):
         remainder_secs = "0" + remainder_secs
     return str(mins) + "." + remainder_secs
 
-def msecs_to_hours_mins_and_secs(msecs):
+def msecs_to_hours_mins_secs(msecs):
     """ Convert milliseconds to hours, minutes and seconds.
     msecs is an integer. Hours, minutes and seconds output is a string."""
 

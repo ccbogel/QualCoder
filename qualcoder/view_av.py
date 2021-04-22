@@ -3004,6 +3004,28 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
 
+        # Search text in journals
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
+        self.ui.label_search_all_journals.setPixmap(QtGui.QPixmap(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
+        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_previous.setEnabled(False)
+        #self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
+        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next.setEnabled(False)
+        #self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        #self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        #self.ui.lineEdit_search.setEnabled(False)
+        #self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
+        #self.ui.checkBox_search_all_journals.setEnabled(False)
+
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
         # enable custom window hint - must be set to enable customizing window controls
@@ -3676,3 +3698,109 @@ class DialogViewAV(QtWidgets.QDialog):
         self.app.settings['viewav_video_pos_y'] = self.ddialog.pos().y()
         self.app.settings['viewav_abs_pos_x'] = self.pos().x()
         self.app.settings['viewav_abs_pos_y'] = self.pos().y()
+
+    # Functions to search though the journal(s) text
+    def search_for_text(self):
+        """ On text changed in lineEdit_search, find indices of matching text.
+        Only where text is three or more characters long.
+        Resets current search_index.
+        If all files is checked then searches for all matching text across all text files
+        and displays the file text and current position to user.
+        If case sensitive is checked then text searched is matched for case sensitivity.
+        """
+
+        if self.jid is None and not (self.ui.checkBox_search_all_journals.isChecked()):
+            return
+        if self.search_indices == []:
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+        self.search_indices = []
+        self.search_index = -1
+        search_term = self.ui.lineEdit_search.text()
+        self.ui.label_search_totals.setText("0 / 0")
+        if len(search_term) < 3:
+            return
+        pattern = None
+        flags = 0
+        '''if not self.ui.checkBox_search_case.isChecked():
+            flags |= re.IGNORECASE'''
+        try:
+            pattern = re.compile(search_term, flags)
+        except:
+            logger.warning('Bad escape')
+        if pattern is None:
+            return
+        self.search_indices = []
+        if self.ui.checkBox_search_all_journals.isChecked():
+            """ Search for this text across all journals. """
+            for jdata in self.app.get_journal_texts():
+                try:
+                    text = jdata['jentry']
+                    for match in pattern.finditer(text):
+                        self.search_indices.append((jdata, match.start(), len(match.group(0))))
+                except Exception as e:
+                    print(e)
+                    logger.exception('Failed searching text %s for %s', jdata['name'], search_term)
+        else:  # Current journal only
+            row = self.ui.tableWidget.currentRow()
+            try:
+                for match in pattern.finditer(self.journals[row]['jentry']):
+                    # Get result as first dictionary item
+                    j_name = self.app.get_journal_texts([self.jid, ])[0]
+                    self.search_indices.append((j_name, match.start(), len(match.group(0))))
+            except Exception as e:
+                print(e)
+                logger.exception('Failed searching current journal for %s', search_term)
+        if len(self.search_indices) > 0:
+            self.ui.pushButton_next.setEnabled(True)
+            self.ui.pushButton_previous.setEnabled(True)
+        self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+
+    def move_to_previous_search_text(self):
+        """ Push button pressed to move to previous search text position. """
+
+        if self.search_indices == []:
+            return
+        self.search_index -= 1
+        if self.search_index < 0:
+            self.search_index = len(self.search_indices) - 1
+        cursor = self.ui.textEdit.textCursor()
+        prev_result = self.search_indices[self.search_index]
+        # prev_result is a tuple containing a dictionary of
+        # {name, jid, jentry, owner, date} and char position and search string length
+        if self.jid is None or self.jid != prev_result[0]['jid']:
+            self.jid = prev_result[0]['jid']
+            for row in range(0, self.ui.tableWidget.rowCount()):
+                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
+                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
+                    # This will also load the jentry into the textEdit
+                    break
+        cursor.setPosition(prev_result[1])
+        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
+    def move_to_next_search_text(self):
+        """ Push button pressed to move to next search text position. """
+
+        if self.search_indices == []:
+            return
+        self.search_index += 1
+        if self.search_index == len(self.search_indices):
+            self.search_index = 0
+        cursor = self.ui.textEdit.textCursor()
+        next_result = self.search_indices[self.search_index]
+        # next_result is a tuple containing a dictionary of
+        # {name, jid, jentry, owner, date} and char position and search string length
+        if self.jid is None or self.jid != next_result[0]['jid']:
+            self.jid = next_result[0]['jid']
+            for row in range(0, self.ui.tableWidget.rowCount()):
+                if int(self.ui.tableWidget.item(row, JID_COLUMN).text()) == self.jid:
+                    self.ui.tableWidget.setCurrentCell(row, NAME_COLUMN)
+                    # This will also load the jentry into the textEdit
+                    break
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
