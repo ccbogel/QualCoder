@@ -386,57 +386,13 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_search_all_journals">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>5</y>
-        <width>34</width>
-        <height>34</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_search_all_journals">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>5</y>
-        <width>21</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>280</x>
         <y>3</y>
         <width>36</width>
         <height>36</height>
@@ -480,7 +436,7 @@
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>240</x>
         <y>3</y>
         <width>36</width>
         <height>36</height>
@@ -496,7 +452,7 @@
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>320</x>
         <y>7</y>
         <width>81</width>
         <height>22</height>
