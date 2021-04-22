@@ -33,11 +33,9 @@ import sys
 import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-# from PyQt5.QtCore import Qt
 
 from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
-
-# from information import DialogInformation
+from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -102,60 +100,85 @@ class Message(QtWidgets.QMessageBox):
             self.setIcon(QtWidgets.QMessageBox.Critical)
 
 
-    class DialogCodeInText(QtWidgets.QDialog):
-        """ View the coded text in context of the original text file in a modal dialog.
-        Called by: reports.DialogReportCodes after results are produced
+class DialogGetStartAndEndMarks(QtWidgets.QDialog):
+    """ This dialog gets the start and end mark text to allow text to be
+    automatically assigned to the currently selected case or a code to be assigned when coding text.
+    It requires the name of the selected case and filename(s) - for display purposes only.
+    Methods return the user's choices for the startmark text and the endmark text.
+    """
+
+    title = ""
+
+    def __init__(self, title, filenames):
+        """ title is a String. Filenames is a String """
+
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_Dialog_StartAndEndMarks()
+        self.ui.setupUi(self)
+        self.ui.label_case.setText(title)
+        self.ui.label_files.setText(filenames)
+
+    def get_start_mark(self):
+        return str(self.ui.lineEdit_startmark.text())
+
+    def get_end_mark(self):
+        return str(self.ui.lineEdit_endmark.text())
+
+
+class DialogCodeInText(QtWidgets.QDialog):
+    """ View the coded text in context of the original text file in a modal dialog.
+    Called by: reports.DialogReportCodes after results are produced
+    """
+
+    app = None
+    data = None
+
+    def __init__(self, app, data, parent=None):
+        """ Prepare QDialog window.
+        param:
+            data : dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
+            app : class containing app details such as database connection
         """
 
-        app = None
-        data = None
+        sys.excepthook = exception_handler
+        self.app = app
+        self.data = data
+        QtWidgets.QDialog.__init__(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        self.resize(400, 300)
 
-        def __init__(self, app, data, parent=None):
-            """ Prepare QDialog window.
-            param:
-                data : dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
-                app : class containing app details such as database connection
-            """
-
-            sys.excepthook = exception_handler
-            self.app = app
-            self.data = data
-            QtWidgets.QDialog.__init__(self)
-            font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-            font += '"' + self.app.settings['font'] + '";'
-            self.setStyleSheet(font)
-            self.resize(400, 300)
-
-            file_list = self.app.get_file_texts([data['fid'], ])
-            file_text = file_list[0]
-            title = ""
-            if data['file_or_case'] == "File":
-                title = _("File: ") + data['file_or_casename']
-            if data['file_or_case'] == "Case":
-                title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
-            te = QtWidgets.QTextEdit()
-            te.setPlainText(file_text['fulltext'])
-            cursor = te.textCursor()
-            cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
-            fmt = QtGui.QTextCharFormat()
-            brush = QtGui.QBrush(QtGui.QColor(data['color']))
-            fmt.setBackground(brush)
-            cursor.setCharFormat(fmt)
-            #ui = QtWidgets.QDialog()
-            self.setWindowTitle(title)
-            font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-            font += '"' + self.app.settings['font'] + '";'
-            self.setStyleSheet(font)
-            gridLayout = QtWidgets.QGridLayout(self)
-            gridLayout.addWidget(te, 1, 0)
-            self.resize(400, 300)
-            # Make marked text visible in the textEdit and not ned to scroll to it
-            text_cursor = te.textCursor()
-            text_cursor.setPosition(data['pos0'])
-            te.setTextCursor(text_cursor)
-            te.setReadOnly(True)
-            #ui.exec_()
+        file_list = self.app.get_file_texts([data['fid'], ])
+        file_text = file_list[0]
+        title = ""
+        if data['file_or_case'] == "File":
+            title = _("File: ") + data['file_or_casename']
+        if data['file_or_case'] == "Case":
+            title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
+        te = QtWidgets.QTextEdit()
+        te.setPlainText(file_text['fulltext'])
+        cursor = te.textCursor()
+        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(data['color']))
+        fmt.setBackground(brush)
+        cursor.setCharFormat(fmt)
+        #ui = QtWidgets.QDialog()
+        self.setWindowTitle(title)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        gridLayout = QtWidgets.QGridLayout(self)
+        gridLayout.addWidget(te, 1, 0)
+        self.resize(400, 300)
+        # Make marked text visible in the textEdit and not ned to scroll to it
+        text_cursor = te.textCursor()
+        text_cursor.setPosition(data['pos0'])
+        te.setTextCursor(text_cursor)
+        te.setReadOnly(True)
+        #ui.exec_()
 
 
 class DialogCodeInAllFiles(QtWidgets.QDialog):
