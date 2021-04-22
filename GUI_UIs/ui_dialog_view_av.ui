@@ -168,9 +168,9 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>220</x>
         <y>35</y>
-        <width>131</width>
+        <width>171</width>
         <height>21</height>
        </rect>
       </property>
@@ -236,7 +236,7 @@
      <widget class="QLabel" name="label_time_3">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>180</x>
         <y>30</y>
         <width>32</width>
         <height>32</height>
