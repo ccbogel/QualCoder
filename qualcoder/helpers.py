@@ -105,6 +105,8 @@ class DialogGetStartAndEndMarks(QtWidgets.QDialog):
     automatically assigned to the currently selected case or a code to be assigned when coding text.
     It requires the name of the selected case and filename(s) - for display purposes only.
     Methods return the user's choices for the startmark text and the endmark text.
+    Called by:
+        case_file_manager, code_text.
     """
 
     title = ""
@@ -115,7 +117,7 @@ class DialogGetStartAndEndMarks(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_StartAndEndMarks()
         self.ui.setupUi(self)
-        self.ui.label_case.setText(title)
+        self.ui.label_title.setText(title)
         self.ui.label_files.setText(filenames)
 
     def get_start_mark(self):
@@ -165,7 +167,6 @@ class DialogCodeInText(QtWidgets.QDialog):
         brush = QtGui.QBrush(QtGui.QColor(data['color']))
         fmt.setBackground(brush)
         cursor.setCharFormat(fmt)
-        #ui = QtWidgets.QDialog()
         self.setWindowTitle(title)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -178,7 +179,6 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_cursor.setPosition(data['pos0'])
         te.setTextCursor(text_cursor)
         te.setReadOnly(True)
-        #ui.exec_()
 
 
 class DialogCodeInAllFiles(QtWidgets.QDialog):
@@ -507,61 +507,6 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
     def closeEvent(self, event):
         self.mediaplayer.stop()
-
-
-class DialogCodeInText(QtWidgets.QDialog):
-    """View the coded text in context of the original text file in a modal dialog.
-    """
-
-    app = None
-    data = None
-
-    def __init__(self, app, data, parent=None):
-        """ Set up QDialog
-        param:
-            app : class containing app details such as database connection
-            data : dictionary {codename, color, file_or_casename, pos0, pos1, text, coder,
-                    fid, memo, file_or_case, textedit_start, textedit_end}
-        """
-
-        sys.excepthook = exception_handler
-        self.app = app
-        self.data = data
-        print(data)
-        QtWidgets.QDialog.__init__(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(font)
-        self.resize(400, 300)
-        # enable custom window hint - must be set to enable customizing window controls
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        file_list = self.app.get_file_texts([data['fid'], ])
-        file_text = file_list[0]
-        title = ""
-        if data['file_or_case'] == "File":
-            title = _("File: ") + data['file_or_casename']
-        if data['file_or_case'] == "Case":
-            title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
-        self.setWindowTitle(title)
-        self.gridLayout = QtWidgets.QGridLayout(self)
-        te = QtWidgets.QTextEdit()
-        te.setPlainText(file_text['fulltext'])
-        cursor = te.textCursor()
-        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
-        fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(data['color']))
-        fmt.setBackground(brush)
-        cursor.setCharFormat(fmt)
-        '''font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        ui.setStyleSheet(font)'''
-        self.gridLayout.addWidget(te, 1, 0)
-        # Make marked text visible in the textEdit and not ned to scroll to it
-        text_cursor = te.textCursor()
-        text_cursor.setPosition(data['pos0'])
-        te.setTextCursor(text_cursor)
-        te.setReadOnly(True)
 
 
 class DialogCodeInImage(QtWidgets.QDialog):
