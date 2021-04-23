@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_start_and_end_marks.ui'
 #
-# Created: Fri Dec 28 23:06:49 2018
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_StartAndEndMarks(object):
     def setupUi(self, Dialog_StartAndEndMarks):
@@ -26,15 +27,12 @@ class Ui_Dialog_StartAndEndMarks(object):
         self.lineEdit_endmark = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_endmark.setGeometry(QtCore.QRect(150, 120, 221, 27))
         self.lineEdit_endmark.setObjectName("lineEdit_endmark")
-        self.label_case_2 = QtWidgets.QLabel(self.groupBox)
-        self.label_case_2.setGeometry(QtCore.QRect(10, 47, 41, 17))
-        self.label_case_2.setObjectName("label_case_2")
         self.lineEdit_startmark = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_startmark.setGeometry(QtCore.QRect(150, 80, 221, 27))
         self.lineEdit_startmark.setObjectName("lineEdit_startmark")
-        self.label_case = QtWidgets.QLabel(self.groupBox)
-        self.label_case.setGeometry(QtCore.QRect(60, 47, 331, 17))
-        self.label_case.setObjectName("label_case")
+        self.label_title = QtWidgets.QLabel(self.groupBox)
+        self.label_title.setGeometry(QtCore.QRect(10, 47, 381, 20))
+        self.label_title.setObjectName("label_title")
         self.label_startmark = QtWidgets.QLabel(self.groupBox)
         self.label_startmark.setGeometry(QtCore.QRect(10, 80, 131, 17))
         self.label_startmark.setObjectName("label_startmark")
@@ -62,9 +60,8 @@ class Ui_Dialog_StartAndEndMarks(object):
     def retranslateUi(self, Dialog_StartAndEndMarks):
         _translate = QtCore.QCoreApplication.translate
         Dialog_StartAndEndMarks.setWindowTitle(_translate("Dialog_StartAndEndMarks", "Define start and end marks for auto assigning"))
-        self.label_2.setText(_translate("Dialog_StartAndEndMarks", "Define the start and end text marks.This allows parts of files to be allocated to the selected case."))
-        self.label_case_2.setText(_translate("Dialog_StartAndEndMarks", "Case:"))
-        self.label_case.setText(_translate("Dialog_StartAndEndMarks", "."))
+        self.label_2.setText(_translate("Dialog_StartAndEndMarks", "Define the start and end text marks."))
+        self.label_title.setText(_translate("Dialog_StartAndEndMarks", "."))
         self.label_startmark.setText(_translate("Dialog_StartAndEndMarks", "Start mark"))
         self.label_endmark.setText(_translate("Dialog_StartAndEndMarks", "End mark"))
         self.label_files.setText(_translate("Dialog_StartAndEndMarks", "File(s):"))
@@ -78,4 +75,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_StartAndEndMarks)
     Dialog_StartAndEndMarks.show()
     sys.exit(app.exec_())
-
