@@ -35,7 +35,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Define the start and end text marks.This allows parts of files to be allocated to the selected case.</string>
+       <string>Define the start and end text marks.</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -51,19 +51,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_case_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>47</y>
-        <width>41</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Case:</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="lineEdit_startmark">
       <property name="geometry">
        <rect>
@@ -74,13 +61,13 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_case">
+     <widget class="QLabel" name="label_title">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>10</x>
         <y>47</y>
-        <width>331</width>
-        <height>17</height>
+        <width>381</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
