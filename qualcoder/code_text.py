@@ -45,7 +45,7 @@ from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
 from color_selector import colors
 from confirm_delete import DialogConfirmDelete
-from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
+from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
 from information import DialogInformation
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
@@ -99,7 +99,10 @@ class DialogCodeText(QtWidgets.QWidget):
     search_index = 0
     selected_code_index = 0
     eventFilter = None
-    autocode_history = [] # A list of dictionaries {title, list of dictionary of sql commands}
+    # A list of dictionaries {title, list of dictionary of sql commands}
+    autocode_history = []
+    # Timer to reduce overly sensitive key events where re-size oversteps by multiple characters
+    code_resize_timer = 0
 
     def __init__(self, app, parent_textEdit, tab_reports):
 
@@ -113,6 +116,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_index = 0
         self.codes, self.categories = self.app.get_data()
         self.recent_codes = []
+        self.autocode_history = []
+        self.code_resize_timer = datetime.datetime.now()
+        print(datetime.datetime.now())
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -149,62 +155,54 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/bookmark_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(bookmark_icon_24), "png")
         self.ui.pushButton_bookmark_go.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_right_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_left_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_icon), "png")
         self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_pencil_red_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/magic_wand_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_one_file_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_icon), "png")
         self.ui.pushButton_auto_code_frag_this_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/wand_all_files_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(wand_all_files_icon), "png")
         self.ui.pushButton_auto_code_frag_all_files.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/undo_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_brackets_icon), "png")
+        self.ui.pushButton_auto_code_surround.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
@@ -229,20 +227,16 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm))
         self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
         self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
-
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_back_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete_all_codes.setIcon(QtGui.QIcon(pm))
@@ -284,7 +278,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setStyleSheet(font)
 
     def get_files(self):
-        """ Get files with additional details and fill list widget """
+        """ Get files with additional details and fill list widget.
+         Called by: init """
 
         self.ui.listWidget.clear()
         self.filenames = self.app.get_text_filenames()
@@ -887,56 +882,54 @@ class DialogCodeText(QtWidgets.QWidget):
         Add, rename, memo, move or delete code or category. Change code color.
         Assign selected text to current hovered code. """
 
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        #selected_text = self.ui.textEdit.textCursor().selectedText()  # commented out 24 Apr 2021 not used
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
-        #logger.debug("Selected parent: " + selected.parent())
-        #index = self.ui.treeWidget.currentIndex()
-        action_addCodeToCategory = None
-        action_addCategoryToCategory = None
+        action_add_code_to_category = None
+        action_add_category_to_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_addCodeToCategory = menu.addAction(_("Add new code to category"))
-            action_addCategoryToCategory = menu.addAction(_("Add a new category to category"))
-        action_addCode = menu.addAction(_("Add a new code"))
-        action_addCategory = menu.addAction(_("Add a new category"))
+            action_add_code_to_category = menu.addAction(_("Add new code to category"))
+            action_add_category_to_category = menu.addAction(_("Add a new category to category"))
+        action_add_code = menu.addAction(_("Add a new code"))
+        action_add_category = menu.addAction(_("Add a new category"))
         action_rename = menu.addAction(_("Rename"))
-        action_editMemo = menu.addAction(_("View or edit memo"))
+        action_edit_memo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         action_color = None
-        action_showCodedMedia = None
-        action_moveCode = None
+        action_show_coded_media = None
+        action_move_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = menu.addAction(_("Change code color"))
-            action_showCodedMedia = menu.addAction(_("Show coded files"))
-            action_moveCode = menu.addAction(_("Move code to"))
-        action_showCodesLike = menu.addAction(_("Show codes like"))
+            action_show_coded_media = menu.addAction(_("Show coded files"))
+            action_move_code = menu.addAction(_("Move code to"))
+        action_show_codes_like = menu.addAction(_("Show codes like"))
 
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
-            if action == action_showCodesLike:
+            if action == action_show_codes_like:
                 self.show_codes_like()
             if selected is not None and action == action_color:
                 self.change_code_color(selected)
-            if action == action_addCategory:
+            if action == action_add_category:
                 self.add_category()
-            if action == action_addCode:
+            if action == action_add_code:
                 self.add_code()
-            if action == action_addCodeToCategory:
+            if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
-            if action == action_addCategoryToCategory:
+            if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
-            if selected is not None and action == action_moveCode:
+            if selected is not None and action == action_move_code:
                 self.move_code(selected)
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
-            if selected is not None and action == action_editMemo:
+            if selected is not None and action == action_edit_memo:
                 self.add_edit__cat_or_code_memo(selected)
             if selected is not None and action == action_delete:
                 self.delete_category_or_code(selected)
-            if selected is not None and action == action_showCodedMedia:
+            if selected is not None and action == action_show_coded_media:
                 found_code = None
                 tofind = int(selected.text(1)[4:])
                 for code in self.codes:
@@ -970,9 +963,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
-         Show selected codes that contain entered text. """
+         Show selected codes that contain entered text.
+         The input dialog is too narrow, so it is re-created. """
 
-        # Input dialog narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Show some codes"))
@@ -996,10 +989,8 @@ class DialogCodeText(QtWidgets.QWidget):
             text:  Text string for matching with code names
         """
 
-        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
         child_count = item.childCount()
         for i in range(child_count):
-            #print(item.child(i).text(0) + "|" + item.child(i).text(1))
             if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
                 item.child(i).setHidden(True)
             if "cid:" in item.child(i).text(1) and text == "":
@@ -1048,17 +1039,25 @@ class DialogCodeText(QtWidgets.QWidget):
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
+                # Can be too sensitive, adjusted  for 150 millisecond gap
+                now = datetime.datetime.now()
+                diff = now - self.code_resize_timer
+                self.code_resize_timer = datetime.datetime.now()
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_left(codes_here[0])
+                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_right(codes_here[0])
+                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_left(codes_here[0])
+                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_right(codes_here[0])
+                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
 
             # Annotate selected
@@ -1204,13 +1203,13 @@ class DialogCodeText(QtWidgets.QWidget):
                 found_larger = True
                 break
         if not found_larger and indexes == []:
-            print("if not found_larger and indexes == [] move to next file")
+            #print("if not found_larger and indexes == [] move to next file")
             return
         # loop around to highest index
         if not found_larger and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
-            print("if not found_larger and indexes != [] move to next file")
+            #print("if not found_larger and indexes != [] move to next file")
         if not found_larger:
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0)
@@ -1727,7 +1726,6 @@ class DialogCodeText(QtWidgets.QWidget):
         for f in self.filenames:
             if selected.text() == f['name']:
                 file_ = f
-        #print(file_)  # tmp
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -1780,7 +1778,6 @@ class DialogCodeText(QtWidgets.QWidget):
         # Check displayed text not going before start of characters
         if file_['start'] < 0:
             file_['start'] = 0
-        #print("Prev chars method ", file_['start'], file_['end'])
         # Update tooltip for listItem
         tt = selected.toolTip()
         tt2 = tt.split("From: ")[0]
@@ -1915,7 +1912,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.filenames) == 0:
             return
         itemname = self.ui.listWidget.currentItem().text()
-        self.filename = None
         for f in self.filenames:
             if f['name'] == itemname:
                 self.file_ = f
@@ -1999,6 +1995,8 @@ class DialogCodeText(QtWidgets.QWidget):
             id_  : code identifier. .-1 for all or a specific code id to highlight. Integer
         """
 
+        if self.file_ is None:
+            return
         if self.source_text is not None:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.textEdit.textCursor()
@@ -2332,21 +2330,99 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def button_autocode_sentences_this_file(self):
         item = self.ui.treeWidget.currentItem()
-        if item is None:
+        if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
-            return
-        if item.text(1)[0:3] == 'cat':
             return
         self.code_sentences(item, "")
 
     def button_autocode_sentences_all_files(self):
         item = self.ui.treeWidget.currentItem()
-        if item is None:
+        if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
-        if item.text(1)[0:3] == 'cat':
-            return
         self.code_sentences(item, "all")
+
+    def button_autocode_surround(self):
+        """ Autocode with selected code using start and end marks.
+         Currently, only using the current selected file. """
+
+        item = self.ui.treeWidget.currentItem()
+        if item is None or item.text(1)[0:3] == 'cat':
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
+            return
+        if self.file_ is None:
+            Message(self.app, _('Warning'), _("No file was selected"), "warning").exec_()
+            return
+        ui = DialogGetStartAndEndMarks(self.file_['name'], self.file_['name'])
+        ok = ui.exec_()
+        if not ok:
+            return
+        start_mark = ui.get_start_mark()
+        end_mark = ui.get_end_mark()
+        if start_mark == "" or end_mark == "":
+            QtWidgets.QMessageBox.warning(None, _('Warning'), _('Cannot have blank text marks'))
+            return
+
+        msg = _("Code text using start and end marks: ") + self.file_['name']
+        msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
+
+        text_starts = [match.start() for match in re.finditer(re.escape(start_mark), self.file_['fulltext'])]
+        text_ends = [match.start() for match in re.finditer(re.escape(end_mark), self.file_['fulltext'])]
+        # Find and insert into database
+        already_assigned = 0
+        cid = int(item.text(1)[4:])
+        cname = item.text(0)
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        warning_msg = ""
+        entries = 0
+        undo_list = []
+        cur = self.app.conn.cursor()
+        for start_pos in text_starts:
+            pos1 = -1  # default if not found
+            text_end_iterator = 0
+            try:
+                while start_pos >= text_ends[text_end_iterator]:
+                    text_end_iterator += 1
+            except IndexError as e:
+                text_end_iterator = -1
+                #warning_msg += _("Could not find an end mark: ") + self.file_['name'] + "  " + end_mark + "\n"
+                # logger.warning(warning_msg)
+            if text_end_iterator >= 0:
+                pos1 = text_ends[text_end_iterator]
+                # Check if already coded in this file for this coder
+                sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+                cur.execute(sql, [cid, self.file_['id'], start_pos, pos1, self.app.settings['codername']])
+                res = cur.fetchone()
+                if res is None:
+                    seltext = self.file_['fulltext'][start_pos : pos1]
+                    sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
+                    cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
+                                   self.app.settings['codername'],now_date, ""))
+                    # Add to undo auto-coding history
+                    undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                            "cid": cid, "fid": self.file_['id'], "pos0": start_pos, "pos1": pos1, "owner": self.app.settings['codername']
+                            }
+                    undo_list.append(undo)
+                    entries += 1
+                    self.app.conn.commit()
+                else:
+                    already_assigned += 1
+        # Add to undo auto-coding history
+        if len(undo_list) > 0:
+            name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
+            name += _("\nWith start mark: ") + start_mark + _("\nEnd mark: ") + end_mark
+            undo_dict = {"name": name, "sql_list": undo_list}
+            self.autocode_history.insert(0, undo_dict)
+
+        # Update filter for tooltip and update code colours
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+        msg += str(entries) + _(" new coded sections found.") + "\n"
+        if already_assigned > 0:
+            msg += str(already_assigned) + " " + _("previously coded.") + "\n"
+        #msg += warning_msg
+        self.parent_textEdit.append(msg)
+        self.app.delete_backup = False
 
     def undo_autocoding(self):
         """ Present a list of choices for the undo operation.
@@ -2367,7 +2443,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for i in undo['sql_list']:
             cur.execute(i['sql'], [i['cid'], i['fid'], i['pos0'], i['pos1'], i['owner']])
         self.app.conn.commit()
-        self.ui.textEdit.append(_("Undo autocoding: " + undo['name'] + "\n"))
+        self.parent_textEdit.append(_("Undo autocoding: " + undo['name'] + "\n"))
 
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()

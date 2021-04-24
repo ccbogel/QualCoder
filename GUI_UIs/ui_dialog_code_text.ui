@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>870</x>
+        <x>840</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -79,9 +79,9 @@
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>340</x>
         <y>0</y>
-        <width>191</width>
+        <width>171</width>
         <height>32</height>
        </rect>
       </property>
@@ -92,7 +92,7 @@
      <widget class="QCheckBox" name="checkBox_search_case">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>520</x>
         <y>0</y>
         <width>21</width>
         <height>36</height>
@@ -108,7 +108,7 @@
      <widget class="QCheckBox" name="checkBox_search_all_files">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>580</x>
         <y>0</y>
         <width>21</width>
         <height>36</height>
@@ -124,7 +124,7 @@
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>770</x>
+        <x>740</x>
         <y>2</y>
         <width>81</width>
         <height>22</height>
@@ -205,7 +205,7 @@
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>650</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -221,7 +221,7 @@
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>720</x>
+        <x>690</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -237,7 +237,7 @@
      <widget class="QLabel" name="label_search_all_files">
       <property name="geometry">
        <rect>
-        <x>638</x>
+        <x>608</x>
         <y>0</y>
         <width>34</width>
         <height>34</height>
@@ -265,7 +265,7 @@
      <widget class="QLabel" name="label_search_case_sensitive">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>540</x>
         <y>0</y>
         <width>34</width>
         <height>34</height>
@@ -293,7 +293,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
       <property name="geometry">
        <rect>
-        <x>910</x>
+        <x>880</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -309,7 +309,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
       <property name="geometry">
        <rect>
-        <x>950</x>
+        <x>920</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -325,7 +325,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>990</x>
+        <x>1000</x>
         <y>0</y>
         <width>36</width>
         <height>36</height>
@@ -439,7 +439,7 @@
      <widget class="QLabel" name="label_search_regex">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>300</x>
         <y>0</y>
         <width>34</width>
         <height>34</height>
@@ -462,6 +462,22 @@
       </property>
       <property name="wordWrap">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_auto_code_surround">
+      <property name="geometry">
+       <rect>
+        <x>960</x>
+        <y>0</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
