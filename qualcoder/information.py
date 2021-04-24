@@ -102,9 +102,8 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>Mike MacCana for the source code for the docx module.</p>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
 <p>ebooklib: Aleksandar Erkalović (<a href="https://github.com/aerkalov">https://github.com/aerkalov</a>)</p>\
-<p>The VideoLAN team for the bindings to VLC</p>\
-<p>To various members on github for supporting this project. Greek translations from staff and students of the University of Macedonia.\
-Nikos Koutsoupias, Christos Kokkoris, Ioannis Mpoitsis</p>\
+<p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
+<p>To various members on github for supporting this project. Greek translations from staff and students of the University of Macedonia.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
@@ -116,7 +115,7 @@ default working directory, selected font and other parameters.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
-<p>Copyright (c) 2020 Colin Curtain</p>\
+<p>Copyright (c) 2021 Colin Curtain</p>\
 <p>Permission is hereby granted, free of charge, to any person<br />\
 obtaining a copy of this software and associated documentation files<br />\
 (the &quot;Software&quot;), to deal in the Software without<br />\
