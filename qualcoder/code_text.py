@@ -118,7 +118,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []
         self.autocode_history = []
         self.code_resize_timer = datetime.datetime.now()
-        print(datetime.datetime.now())
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -2344,7 +2343,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def button_autocode_surround(self):
         """ Autocode with selected code using start and end marks.
-         Currently, only using the current selected file. """
+         Currently, only using the current selected file.
+         Line ending text representation \\n is replaced with the actual line ending character. """
 
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
@@ -2358,10 +2358,16 @@ class DialogCodeText(QtWidgets.QWidget):
         if not ok:
             return
         start_mark = ui.get_start_mark()
+        if "\\n" in start_mark:
+            start_mark = start_mark.replace("\\n", "\n")
         end_mark = ui.get_end_mark()
+        if "\\n" in end_mark:
+            end_mark = end_mark.replace("\\n", "\n")
         if start_mark == "" or end_mark == "":
             QtWidgets.QMessageBox.warning(None, _('Warning'), _('Cannot have blank text marks'))
             return
+
+        print("end mark: " + end_mark)
 
         msg = _("Code text using start and end marks: ") + self.file_['name']
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
