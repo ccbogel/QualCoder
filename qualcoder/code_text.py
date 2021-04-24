@@ -2364,7 +2364,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if "\\n" in end_mark:
             end_mark = end_mark.replace("\\n", "\n")
         if start_mark == "" or end_mark == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _('Cannot have blank text marks'))
+            Message(self.app, _('Warning'), _("Cannot have blank text marks"), "warning").exec_()
             return
 
         print("end mark: " + end_mark)
@@ -2555,8 +2555,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None:
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _("No code was selected"),
-                QtWidgets.QMessageBox.Ok)
+            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
         if code_item.text(1)[0:3] == 'cat':
             return
