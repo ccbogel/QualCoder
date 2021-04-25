@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,7 @@ from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-#from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
-
-from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText
+from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -95,7 +93,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
@@ -253,29 +250,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding frequencies to text file. """
 
-        shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + " code frequencies.txt"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        filename = "Code_frequencies.txt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        if os.path.exists(directory + "/" + filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
-        filename = directory + "/" + filename
-        f = open(filename, 'w')
+        f = open(filepath, 'w',  encoding='utf-8-sig')
         text = _("Code frequencies") + "\n"
         text += self.app.project_name + "\n"
         text += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
-
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -297,37 +280,24 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             item = it.value()
         f.write(text)
         f.close()
-        Message(self.app, _('Text file Export'), filename + _(" exported")).exec_()
-        self.parent_textEdit.append(_("Coding frequencies text file exported to: ") + filename)
+        msg = _("Coding frequencies text file exported to: ") + filepath
+        Message(self.app, _('Text file Export'), msg).exec_()
+        self.parent_textEdit.append(msg)
 
     def export_csv_file(self):
         """ Export data as csv. """
 
-        shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + " code frequencies.csv"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        filename = "Code_frequencies.csv"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = directory + "/" + filename
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
         data = ""
         header = [_("Code Tree"), "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
         data += ",".join(header) + "\n"
-
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -339,11 +309,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             #self.depthgauge(item)
             it += 1
             item = it.value()
-        f = open(filename, 'w')
+        f = open(filepath, 'w',  encoding='utf-8-sig')
         f.write(data)
         f.close()
-        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
-        self.parent_textEdit.append(_("Coding frequencies csv file exported to: ") + filename)
+        msg = _("Coding frequencies csv file exported to: ") + filepath
+        Message(self.app, _('Csv file Export'), msg).exec_()
+        self.parent_textEdit.append(msg)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
@@ -407,7 +378,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -423,7 +394,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -473,12 +444,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/clear_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
         self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
@@ -545,37 +514,18 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + " coder comparison.txt"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        filename = "Coder_comparison.txt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = directory + "/" + filename
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
-        f = open(filename, 'w')
+        f = open(filepath, 'w', encoding="'utf-8-sig'")
         f.write(self.app.project_name + "\n")
         f.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
         f.write(self.comparisons)
         f.close()
-        logger.info(_("Coder comparisons report exported to ") + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Text file export'))
-        msg = _("Coder comparison text file exported to: ") + filename
-        mb.setText(msg)
-        mb.exec_()
+        msg = _("Coder comparison text file exported to: ") + filepath
+        Message(self.app, _('Text file export'), msg, "information").exec_()
         self.parent_textEdit.append(msg)
 
     def calculate_statistics(self):
@@ -745,7 +695,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -758,7 +708,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -797,7 +747,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     text_results = []
     image_results = []
     av_results = []
-    # variables for search restrictions
+    # Variables for search restrictions
     file_ids = ""
     case_ids = ""
     attribute_selection = []
@@ -1206,39 +1156,21 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save text file"),
-            self.app.last_export_directory)
-        filename = file_tuple[0]
-        if filename == "":
+        filename = "Report_codings.txt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        tmp = filename.split("/")[-1]
-        directory = filename[:len(filename) - len(tmp)]
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = filename + ".txt"
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
-        Using a byte order mark so that other software recognised UTF-8
+        Using a byte order mark so that other software recognises UTF-8
         '''
         data = self.ui.textEdit.toPlainText()
-        f = open(filename, 'w', encoding='utf-8-sig')
+        f = open(filepath, 'w', encoding='utf-8-sig')
         f.write(data)
         f.close()
-
-        self.parent_textEdit.append(_("Report exported: ") + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Report exported'))
-        mb.setText(filename)
-        mb.exec_()
+        msg = _('Report exported: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec_()
+        self.parent_textEdit.append(msg)
 
     def export_odt_file(self):
         """ Export report to open document format with .odt ending.
@@ -1247,35 +1179,18 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save Open Document Text file"),
-            self.app.last_export_directory)
-        filename = file_tuple[0]
-        if filename == "":
+        filename = "Report_codings.odt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        tmp = filename.split("/")[-1]
-        directory = filename[:len(filename) - len(tmp)]
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = filename + ".odt"
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
         tw = QtGui.QTextDocumentWriter()
-        tw.setFileName(filename)
+        tw.setFileName(filepath)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
-        self.parent_textEdit.append(_("Report exported: ") + filename)
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Report exported'))
-        mb.setText(filename)
-        mb.exec_()
+        msg = _("Report exported: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Report exported'), msg, "information").exec_()
 
     def export_csv_file(self):
         """ Export report to csv file.
@@ -1288,11 +1203,9 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if self.text_results == [] and self.image_results == [] and self.av_results == []:
             return
-
         codes_all = []
         codes_set = []
         codes_freq_list = []
-
         #print("TEXT")  # tmp
         for i in self.text_results:
             codes_all.append(i['codename'])
@@ -1305,12 +1218,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i in self.av_results:
             codes_all.append(i['codename'])
             #print(i)
-
         codes_set = list(set(codes_all))
         codes_set.sort()
         for x in codes_set:
             codes_freq_list.append(codes_all.count(x))
-
         #print(codes_all)
         #print(codes_set)
         #print(codes_freq_list)
@@ -1365,37 +1276,20 @@ class DialogReportCodes(QtWidgets.QDialog):
                     d += trimmed
                     csv_data[row][col] = d
                     row += 1
-
-        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save CSV file"),
-            self.app.last_export_directory)
-        filename = file_tuple[0]
-        if filename == "":
+        filename = "Report_codings.csv"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        tmp = filename.split("/")[-1]
-        directory = filename[:len(filename) - len(tmp)]
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = filename + ".csv"
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
-        with open(filename, 'w', encoding ='utf-8-sig', newline='') as csvfile:
+        with open(filepath, 'w', encoding ='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
             for row in csv_data:
                 filewriter.writerow(row)
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Report exported'))
-        mb.setText(filename)
-        mb.exec_()
+        msg = _('Report exported: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec_()
+        self.parent_textEdit.append(msg)
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
@@ -1405,26 +1299,13 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        file_tuple = QtWidgets.QFileDialog.getSaveFileName(None, _("Save html file"),
-            self.app.last_export_directory)
-        filename = file_tuple[0]
-        if filename == "":
+        filename = "Report_codings.html"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        tmp = filename.split("/")[-1]
-        directory = filename[:len(filename) - len(tmp)]
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = filename + ".html"
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
         tw = QtGui.QTextDocumentWriter()
-        tw.setFileName(filename)
+        tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
         tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
@@ -1435,7 +1316,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 need_media_folders = True
         if need_media_folders:
             # Create folder of images and media and change html links
-            foldername = filename[:-5]
+            foldername = filepath[:-5]
             foldername_without_path = foldername.split('/')[-1]
             try:
                 os.mkdir(foldername)
@@ -1443,11 +1324,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 os.mkdir(foldername + "/video")
             except Exception as e:
                 logger.warning(_("html folder creation error ") + str(e))
-                QtWidgets.QMessageBox.warning(None, _("Folder creation"), foldername + _(" error"))
+                Message(self.app, _("Folder creation"), foldername + _(" error ") + str(e), "critical").exec_()
                 return
         html = ""
         try:
-            with open(filename, 'r') as f:
+            with open(filepath, 'r') as f:
                 html = f.read()
         except Exception as e:
             logger.warning(_('html file reading error:') + str(e))
@@ -1465,9 +1346,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item['image'].save(folder_link)
                 html_link = foldername_without_path + "/" + imagename
                 ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
-                this needs to be upper case for the replace method to work:  c:  =>  C:
-                '''
-                #TODO this may fail on Windows now
+                this needs to be upper case for the replace method to work:  c:  =>  C: '''
+                #TODO Check, this may fail on Windows now
                 unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
                 html = html.replace(item['imagename'], html_link)
                 if unreplaced_html == html:
@@ -1522,20 +1402,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                     html = tmp
                 except Exception as e:
                     logger.debug(str(e))
-                    QtWidgets.QMessageBox.warning(None, _("HTML file creation exception"), str(e))
+                    Message(self.app, _("HTML folder creation error"), str(e), "warning").exec_()
 
-        with open(filename, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8-sig') as f:
             f.write(html)
-        msg = _("Report exported to: ") + filename
+        msg = _("Report exported to: ") + filepath
         if need_media_folders:
             msg += "\n" + _("Media folder: ") + foldername
         self.parent_textEdit.append(msg)
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Report exported'))
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Report exported'), msg, "information").exec_()
 
     def eventFilter(self, object, event):
         """ Used to detect key events in the textedit.
@@ -1914,7 +1789,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             while len(case_sql) > 0:
                     sql += " and id in ( " + case_sql[0] + ") "
                     del case_sql[0]
-            logger.debug(sql)
+            #logger.debug(sql)
             cur.execute(sql)
             result = cur.fetchall()
             case_ids = ""
@@ -1922,9 +1797,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 case_ids += "," + str(i[0])
             if len(case_ids) > 0:
                 case_ids = case_ids[1:]
-            logger.debug("case_ids: " + case_ids)
+            #logger.debug("case_ids: " + case_ids)
 
-            # text from attribute selection
+            # Text from attribute selection
             sql = ""
             # first sql is for cases with/without file parameters
             if case_ids != "":
@@ -1939,7 +1814,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if file_ids != "":
                     sql += "and code_text.fid in (" + file_ids + ") "
             else:
-                # second sql is for file parameters only
+                # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
                 sql += "code_text.owner, fid from code_text join code_name "
                 sql += "on code_name.cid = code_text.cid join source on fid = source.id "
@@ -1959,7 +1834,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.text_results.append(row)
 
-            # images from attribute selection
+            # Images from attribute selection
             sql = ""
             # first sql is for cases with/without file parameters
             if case_ids != "":
@@ -1974,7 +1849,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if file_ids != "":
                     sql += "and case_text.fid in (" + file_ids + ") "
             else:
-                # second sql is for file parameters only
+                # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, x1, y1, width, height,"
                 sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
                 sql += " from code_image join code_name "
@@ -1997,9 +1872,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in result:
                 self.image_results.append(row)
 
-            # audio and video from attribute selection
+            # Audio and video from attribute selection
             sql = ""
-            # first sql is for cases with/without file parameters
+            # First sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
                 sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,"
@@ -2013,7 +1888,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if file_ids != "":
                     sql += "and case_text.fid in (" + file_ids + ") "
             else:
-                # second sql is for file parameters only
+                # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, code_av.pos0, "
                 sql += "code_av.pos1, code_av.memo,"
                 sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
@@ -2041,7 +1916,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     logger.debug("Parameters:\n" + str(parameters))
             for row in result:
                 self.av_results.append(row)
-
         self.fill_text_edit_with_search_results()
 
     def fill_text_edit_with_search_results(self):
@@ -2054,33 +1928,32 @@ class DialogReportCodes(QtWidgets.QDialog):
         right-click context menu to display contextualised coding in another dialog.
         """
 
-        fileOrCase = ""  # default for attributes selection
+        file_or_case = ""  # Default for attributes selection
         if self.file_ids != "":
-            fileOrCase = "File"
+            file_or_case = "File"
         if self.case_ids != "":
-            fileOrCase = "Case"
+            file_or_case = "Case"
 
-        # convert results to dictionaries for ease of use
+        # Convert results to dictionaries for ease of use
         tmp = []
         for i in self.text_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'pos0': i[3],
-                'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': fileOrCase})
+                'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': file_or_case})
         self.text_results = tmp
         tmp = []
         for i in self.image_results:
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
                 'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
-                'fid': i[9], 'memo': i[10], 'file_or_case': fileOrCase})
+                'fid': i[9], 'memo': i[10], 'file_or_case': file_or_case})
         self.image_results = tmp
         tmp = []
         for i in self.av_results:
-            # prepare additional text describing coded segment
+            # Prepare additional text describing coded segment
             text = ""
             if i[7] is None:
-                msg = "Should not have a None value for a/v media name.\n"
-                msg += str(i)
-                msg += "\nFirst backup project then: delete from code_av where id=" + str(i[9])
-                QtWidgets.QMessageBox.information(None, _("No media name in AV results"), msg)
+                msg = _("Should not have a None value for a/v media name.") + "\n" + str(i) + "\n"
+                msg += _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
+                Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
                 logger.error("None value for a/v media name in AV results\n" + str(i))
             if i[7] is not None:
                 text = i[7] + ": "
@@ -2102,12 +1975,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 text += "\nMemo: " + i[5]
             tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
             'pos0': i[3], 'pos1': i[4], 'memo': i[5], 'coder': i[6], 'mediapath': i[7],
-                'fid': i[8], 'file_or_case': fileOrCase, 'text': text})
+                'fid': i[8], 'file_or_case': file_or_case, 'text': text})
         self.av_results = tmp
 
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
-        # block signals of text cursor moving when filling text edit - stops context dialog appearing
+        # Block signals of text cursor moving when filling text edit - stops context dialog appearing
 
         for row in self.text_results:
             row['textedit_start'] = len(self.ui.textEdit.toPlainText())
@@ -2149,7 +2022,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         document = text_edit.document()
         image = QtGui.QImageReader(path).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
-        # scale to max 300 wide or high. perhaps add option to change maximum limit?
+        # Scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler = 1.0
         scaler_w = 1.0
         scaler_h = 1.0
