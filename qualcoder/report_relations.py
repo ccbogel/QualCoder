@@ -39,8 +39,7 @@ from PyQt5.QtGui import QBrush
 
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
-from helpers import ExportDirectoryPathDialog
-from select_items import DialogSelectItems, Message
+from helpers import ExportDirectoryPathDialog, Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -124,17 +123,11 @@ class DialogReportRelations(QtWidgets.QDialog):
                 codes_str += i.text(0) + "|"
                 code_ids += "," + i.text(1)[4:]
         if len(sel_codes) < 2:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Selection warning'))
             msg = _("Select 2 or more codes\nUse Ctrl or Shift and mouse click")
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Selection warning'), msg, "warning").exec_()
             return
         code_ids = code_ids[1:]
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
-
         self.result_relations = []
         if self.ui.radioButton_this.isChecked():
             self.calculate_relations_for_coder(self.app.settings['codername'], code_ids)
@@ -161,15 +154,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r in result:
             file_ids.append(r[0])
             file_ids_str += "," + str(r[0])
-
         if file_ids == []:
-            '''mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Selection warning'))
-            msg = _("There are no files containing this combination of codes for " + coder_name)
-            mb.setText(msg)
-            mb.exec_()'''
             return
 
         # To add file names to relation result - makes easier for diplaying results
@@ -177,9 +162,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         sql = "select distinct id, name from source where id in (" + file_ids_str + ")"
         cur.execute(sql)
         file_id_names = cur.fetchall()
-        #print(file_id_names)
 
-        # Need to look at each text file separately,
+        # Look at each text file separately,
         for fid in file_ids:
             filename = ""
             for f in file_id_names:
