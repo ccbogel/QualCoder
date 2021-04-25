@@ -2328,18 +2328,18 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
 
     def button_autocode_sentences_this_file(self):
-        item = self.ui.treeWidget.currentItem()
+        '''item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
-            return
-        self.code_sentences(item, "")
+            return'''
+        self.code_sentences("")
 
     def button_autocode_sentences_all_files(self):
-        item = self.ui.treeWidget.currentItem()
+        '''item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
-            return
-        self.code_sentences(item, "all")
+            return'''
+        self.code_sentences("all")
 
     def button_autocode_surround(self):
         """ Autocode with selected code using start and end marks.
@@ -2367,8 +2367,7 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('Warning'), _("Cannot have blank text marks"), "warning").exec_()
             return
 
-        print("end mark: " + end_mark)
-
+        #print("end mark: " + end_mark)
         msg = _("Code text using start and end marks: ") + self.file_['name']
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
 
@@ -2455,22 +2454,19 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-    def code_sentences(self, item, all=""):
+    def code_sentences(self, all=""):
         """ Code full sentence based on text fragment.
 
         param:
-            item: qtreewidgetitem
             all = "" :  for this text file only.
             all = "all" :  for all text files.
         """
 
-        code_item = self.ui.treeWidget.currentItem()
-        if item is None:
+        item = self.ui.treeWidget.currentItem()
+        if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
             return
-        if code_item.text(1)[0:3] == 'cat':
-            return
-        cid = int(code_item.text(1).split(':')[1])
+        cid = int(item.text(1).split(':')[1])
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Code sentence"))
@@ -2489,16 +2485,17 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog2.setWindowTitle(_("Code sentence"))
         dialog2.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         dialog2.setInputMode(QtWidgets.QInputDialog.TextInput)
-        dialog2.setToolTip(_("Do not use line endings such as \\n"))
-        dialog2.setLabelText(_("Define sentence ending (Default is period space. ):"))
+        dialog2.setToolTip("Use \\n for line ending")
+        dialog2.setLabelText(_("Define sentence ending. Default is period space.\nUse \\n for line ending:"))
         dialog2.setTextValue(". ")
-        dialog2.resize(200, 20)
+        dialog2.resize(200, 40)
         ok2 = dialog2.exec_()
         if not ok2:
             return
         ending = dialog2.textValue()
         if ending == "":
             return
+        ending = ending.replace("\\n", "\n")
         files= []
         if all == "all":
             files = self.app.get_file_texts()
@@ -2536,7 +2533,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if codes_added > 0:
                 msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
         if len(undo_list) > 0:
-            name = _("Sentence coding: ") + _("\nCode: ") + code_item.text(0)
+            name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
             name += _("\nWith: ") + text + _("\nUsing line ending: ") + ending
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
@@ -2544,7 +2541,6 @@ class DialogCodeText(QtWidgets.QWidget):
             + _("\nCode: ") + item.text(0)
             + _("\nWith text fragment: ") + text  + _("\nUsing line ending: ") + ending + "\n" + msg)
         self.app.delete_backup = False
-
         # Update tooltip filter and code tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2554,10 +2550,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         code_item = self.ui.treeWidget.currentItem()
-        if code_item is None:
+        if code_item is None or code_item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
-            return
-        if code_item.text(1)[0:3] == 'cat':
             return
         cid = int(code_item.text(1).split(':')[1])
         # Input dialog too narrow, so code below
