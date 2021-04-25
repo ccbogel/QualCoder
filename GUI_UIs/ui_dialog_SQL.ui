@@ -50,14 +50,14 @@
         <widget class="QPushButton" name="pushButton_runSQL">
          <property name="minimumSize">
           <size>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </size>
          </property>
          <property name="toolTip">
@@ -72,14 +72,14 @@
         <widget class="QPushButton" name="pushButton_export">
          <property name="minimumSize">
           <size>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </size>
          </property>
          <property name="toolTip">
@@ -95,13 +95,13 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>36</height>
+           <height>32</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>80</width>
-           <height>36</height>
+           <height>32</height>
           </size>
          </property>
          <property name="toolTip">
