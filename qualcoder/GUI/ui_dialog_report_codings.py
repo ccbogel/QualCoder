@@ -35,7 +35,7 @@ class Ui_Dialog_reportCodings(object):
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
         self.pushButton_search = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_search.setGeometry(QtCore.QRect(240, 80, 36, 36))
+        self.pushButton_search.setGeometry(QtCore.QRect(240, 80, 32, 32))
         self.pushButton_search.setText("")
         self.pushButton_search.setObjectName("pushButton_search")
         self.label_2 = QtWidgets.QLabel(self.groupBox)
