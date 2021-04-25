@@ -101,8 +101,8 @@ class Message(QtWidgets.QMessageBox):
             self.setIcon(QtWidgets.QMessageBox.Critical)
 
 
-class ExportDialog():
-    """ Dialog to get export directory, but also to check for existing file.
+class ExportDirectoryPathDialog():
+    """ Dialog to get export directory path, but also to check for existing file.
     If an existing file found, add a counter to the file name until a new file name is made.
      Counter in format _1, _2, etc. """
 
