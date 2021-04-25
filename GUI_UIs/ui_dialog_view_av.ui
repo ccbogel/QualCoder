@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="5" column="0">
-    <widget class="QTextEdit" name="textEdit_transcription">
+    <widget class="QTextEdit" name="textEdit">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -452,7 +452,7 @@
   <tabstop>horizontalSlider_vol</tabstop>
   <tabstop>comboBox_tracks</tabstop>
   <tabstop>checkBox_scroll_transcript</tabstop>
-  <tabstop>textEdit_transcription</tabstop>
+  <tabstop>textEdit</tabstop>
   <tabstop>horizontalSlider</tabstop>
  </tabstops>
  <resources/>
