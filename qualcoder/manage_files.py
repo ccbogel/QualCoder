@@ -72,7 +72,7 @@ from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
-from helpers import Message
+from helpers import Message, ExportDirectoryPathDialog
 from html_parser import *
 from memo import DialogMemo
 from select_items import DialogSelectItems
@@ -146,42 +146,34 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create.clicked.connect(self.create)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/eye_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
         self.ui.pushButton_view.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_view.clicked.connect(self.view)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_import_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
         self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/link_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
         self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_link.clicked.connect(self.link_files)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/linked_import_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(linked_import_icon), "png")
         self.ui.pushButton_import_from_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/to_link_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(to_link_icon), "png")
         self.ui.pushButton_export_to_linked.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/plus_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
@@ -458,29 +450,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
         shortname = self.app.project_name.split(".qda")[0]
         filename = shortname + "_file_attributes.csv"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = directory + "/" + filename
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
-
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = []
         for i in range(0, cols):
             header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
-        with open(filename, mode='w') as f:
+        with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
             for r in range(0, rows):
@@ -494,9 +473,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                         pass
                     data.append(cell)
                 writer.writerow(data)
-        logger.info("Report exported to " + filename)
-        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
-        self.parent_textEdit.append(_("File attributes csv file exported to: ") + filename)
+        msg = _("File attributes csv file exported to: ") + filepath
+        Message(self.app, _('Csv file Export'), msg).exec_()
+        self.parent_textEdit.append(msg)
 
     def load_file_data(self, order_by=""):
         """ Documents images and audio contain the filetype suffix.
@@ -1612,13 +1591,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         return text
 
     def export(self):
-        """ Export files to selected directory.
+        """ Export selected file to selected directory.
         If an imported file was from a docx, odt, pdf, html, epub then export the original file
         If the file was created within QualCoder (so only in the database), export as plain text.
-
-        Currently can only export ONE file at time, due to tableWidget single selection mode
-
-        Can only export files that were imported into the project folder.
+        Can only export ONE file at time, due to tableWidget single selection mode
+        Can only export file that was imported into the project folder.
         Need to check for this condition.
         """
 
@@ -1647,32 +1624,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
             Message(self.app, _("Can export text"), msg, "warning").exec_()
             text_rep = True
-
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
-            return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        names = _("Export to ") + directory + "\n"
-        #for row in rows:
-        # Currently single selection mode in tableWidget
-        names = names + self.source[rows[0]]['name'] + "\n"
-        ui = DialogConfirmDelete(self.app, names, _("Export files"))
-        ok = ui.exec_()
-        if not ok:
-            return
-        msg = _("Export to ") + directory + "\n"
         # Currently can only export ONE file at time, due to tableWidget single selection mode
-        #for row in rows:
         row = rows[0]
         filename = self.source[row]['name']
+        if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:'):
+            filename = filename + ".txt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        destination = e.filepath
+        if destination is None:
+            return
+        msg = _("Export to ") + destination + "\n"
 
         # export audio, video, picture files
         if self.source[row]['mediapath'] is not None and text_rep is False:
             file_path = self.app.project_path + self.source[row]['mediapath']
-            destination = directory + "/" + filename
+            #destination = directory + "/" + filename
             try:
                 copyfile(file_path, destination)
                 msg += destination + "\n"
@@ -1682,7 +1648,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # export pdf, docx, odt, epub, html files if located in documents directory
         document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
         if document_stored and self.source[row]['mediapath'] is None:
-            destination = directory + "/" + self.source[row]['name']
+            #destination = directory + "/" + self.source[row]['name']
             try:
                 copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
                 msg += destination + "\n"
@@ -1692,13 +1658,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Export transcribed files, user created text files, text representations of linked files
         if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:') and not document_stored:
-            filename_txt = filename + ".txt"
-            filename_txt = directory + "/" + filename_txt
             filedata = self.source[row]['fulltext']
-            f = open(filename_txt, 'w', encoding='utf-8-sig')
+            f = open(destination, 'w', encoding='utf-8-sig')
             f.write(filedata)
             f.close()
-            msg += filename_txt + "\n"
+            msg += destination + "\n"
         Message(self.app, _("Files exported"), msg).exec_()
         self.parent_textEdit.append(filename + _(" exported to ") + msg)
 
