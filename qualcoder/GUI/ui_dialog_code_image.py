@@ -22,7 +22,7 @@ class Ui_Dialog_code_image(object):
         self.groupBox_2.setTitle("")
         self.groupBox_2.setObjectName("groupBox_2")
         self.pushButton_memo = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_memo.setGeometry(QtCore.QRect(20, 3, 36, 36))
+        self.pushButton_memo.setGeometry(QtCore.QRect(20, 3, 32, 32))
         self.pushButton_memo.setText("")
         self.pushButton_memo.setObjectName("pushButton_memo")
         self.label_coder = QtWidgets.QLabel(self.groupBox_2)
