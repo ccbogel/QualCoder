@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ from case_file_manager import DialogCaseFileManager
 from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_cases import Ui_Dialog_cases
-from helpers import Message
+from helpers import Message, ExportDirectoryPathDialog
 
 from memo import DialogMemo
 from view_av import DialogViewAV
@@ -114,24 +114,20 @@ class DialogCases(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add.clicked.connect(self.add_case)
-        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
-        #self.ui.pushButton_file_manager.setStyleSheet("background-image : url("+PTH+"GUI/clipboard_copy_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         self.ui.pushButton_file_manager.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        #self.ui.pushButton_add_attribute.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        #self.ui.pushButton_import_cases.setStyleSheet("background-image : url("+PTH+"GUI/doc_import_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
         self.ui.pushButton_import_cases.setIcon(QtGui.QIcon(pm))
@@ -191,29 +187,16 @@ class DialogCases(QtWidgets.QDialog):
 
         shortname = self.app.project_name.split(".qda")[0]
         filename = shortname + "_case_attributes.csv"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        if directory != self.app.last_export_directory:
-            self.app.last_export_directory = directory
-        filename = directory + "/" + filename
-        if os.path.exists(filename):
-            mb = QtWidgets.QMessageBox()
-            mb.setWindowTitle(_("File exists"))
-            mb.setText(_("Overwrite?"))
-            mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            if mb.exec_() == QtWidgets.QMessageBox.No:
-                return
-
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = []
         for i in range(0, cols):
             header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
-        with open(filename, mode='w') as f:
+        with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
             for r in range(0, rows):
@@ -227,9 +210,9 @@ class DialogCases(QtWidgets.QDialog):
                         pass
                     data.append(cell)
                 writer.writerow(data)
-        logger.info("Report exported to " + filename)
-        Message(self.app, _('Csv file Export'), filename + _(" exported")).exec_()
-        self.parent_textEdit.append(_("Case attributes csv file exported to: ") + filename)
+        msg = _("Case attributes csv file exported to: ") + filepath
+        Message(self.app, _('Csv file Export'), msg).exec_()
+        self.parent_textEdit.append(msg)
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
