@@ -39,7 +39,7 @@ from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_journals import Ui_Dialog_journals
-from helpers import Message
+from helpers import Message, ExportDirectoryPathDialog
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -193,23 +193,18 @@ class DialogJournals(QtWidgets.QDialog):
         for j in self.journals:
             text += _("Journal: ") + j['name'] + "\n"
             text += j['jentry'] + "\n========\n\n"
-
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-             _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory == "":
+        filename = "Collated_journals.txt"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
             return
-        d = str(datetime.datetime.now().astimezone().strftime("_%Y_%m_%dT%H_%M"))
-        filename = directory + "/" + "Collated_journals" + d + ".txt"
-        '''if os.path.exists(filename):
-            pass'''
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
         Using a byte order mark so that other software recognises UTF-8
         '''
-        f = open(filename, 'w', encoding='utf-8-sig')
+        f = open(filepath, 'w', encoding='utf-8-sig')
         f.write(text)
         f.close()
-        msg = _("Collated journals exported as text file to: ") + filename
+        msg = _("Collated journals exported as text file to: ") + filepath
         self.parent_textEdit.append(msg)
         Message(self.app, _("Journals exported"), msg).exec_()
 
@@ -299,33 +294,17 @@ class DialogJournals(QtWidgets.QDialog):
             return
         filename = self.journals[row]['name']
         filename += ".txt"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
-        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.last_export_directory, options)
-        if directory:
-            if directory != self.app.last_export_directory:
-                self.app.last_export_directory = directory
-            filename = directory + "/" + filename
-            if os.path.exists(filename):
-                mb = QtWidgets.QMessageBox()
-                mb.setWindowTitle(_("File exists"))
-                mb.setText(_("Overwrite?"))
-                mb.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                if mb.exec_() == QtWidgets.QMessageBox.No:
-                    return
-            data = self.journals[row]['jentry']
-            f = open(filename, 'w')
-            f.write(data)
-            f.close()
-            msg = _("Journal exported to: ") + str(filename)
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Journal export'))
-            mb.setText(msg)
-            mb.exec_()
-            self.parent_textEdit.append(msg)
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
+            return
+        data = self.journals[row]['jentry']
+        f = open(filepath, 'w')
+        f.write(data)
+        f.close()
+        msg = _("Journal exported to: ") + str(filepath)
+        Message(self.app, _("Journal export"), msg, "information").exec_()
+        self.parent_textEdit.append(msg)
 
     def delete(self):
         """ Delete journal from database and update model and widget. """
@@ -366,31 +345,16 @@ class DialogJournals(QtWidgets.QDialog):
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
-                mb = QtWidgets.QMessageBox()
-                mb.setIcon(QtWidgets.QMessageBox.Warning)
-                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                mb.setWindowTitle(_('Warning'))
-                mb.setText(_("No name was entered"))
-                mb.exec_()
+                Message(self.app, _('Warning'), _("No name was entered"), "warning").exec_()
                 update = False
             for c in self.journals:
                 if c['name'] == new_name:
-                    mb = QtWidgets.QMessageBox()
-                    mb.setIcon(QtWidgets.QMessageBox.Warning)
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_('Warning'))
-                    mb.setText(_("Journal name in use"))
-                    mb.exec_()
+                    Message(self.app, _('Warning'), _("Journal name in use"), "warning").exec_()
                     update = False
             # Check for unusual characters in filename that would affect exporting
             valid = re.match('^[\ \w-]+$', new_name) is not None
             if not valid:
-                mb = QtWidgets.QMessageBox()
-                mb.setIcon(QtWidgets.QMessageBox.Warning)
-                mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                mb.setWindowTitle(_('Warning - invalid characters'))
-                mb.setText(_("In the journal name use only: a-z, A-z 0-9 - space"))
-                mb.exec_()
+                Message(self.app, _('Warning - invalid characters'), _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec_()
                 update = False
             if update:
                 # update journals list and database
@@ -411,7 +375,7 @@ class DialogJournals(QtWidgets.QDialog):
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
-        If case sensitive is checked then text searched is matched for case sensitivity.
+        NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
         if self.jid is None and not(self.ui.checkBox_search_all_journals.isChecked()):
