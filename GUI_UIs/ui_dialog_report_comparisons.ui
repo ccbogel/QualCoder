@@ -22,13 +22,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>74</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>80</height>
+       <height>74</height>
       </size>
      </property>
      <property name="title">
@@ -37,10 +37,10 @@
      <widget class="QPushButton" name="pushButton_exporttext">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>400</x>
         <y>27</y>
-        <width>36</width>
-        <height>36</height>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -55,8 +55,8 @@
        <rect>
         <x>320</x>
         <y>27</y>
-        <width>36</width>
-        <height>36</height>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -85,17 +85,17 @@
         <x>90</x>
         <y>27</y>
         <width>221</width>
-        <height>36</height>
+        <height>32</height>
        </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>360</x>
         <y>27</y>
-        <width>36</width>
-        <height>36</height>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
