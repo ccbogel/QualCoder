@@ -111,7 +111,6 @@ class ExportDialog():
     def __init__(self, app, filename):
         """ params:
                     app : App class
-                    title: String
                     filename: String of filename with extension only"""
 
         extension = filename.split('.')[-1]
