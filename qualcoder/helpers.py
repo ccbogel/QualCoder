@@ -63,6 +63,7 @@ def msecs_to_mins_and_secs(msecs):
         remainder_secs = "0" + remainder_secs
     return str(mins) + "." + remainder_secs
 
+
 def msecs_to_hours_mins_secs(msecs):
     """ Convert milliseconds to hours, minutes and seconds.
     msecs is an integer. Hours, minutes and seconds output is a string."""
@@ -98,6 +99,37 @@ class Message(QtWidgets.QMessageBox):
             self.setIcon(QtWidgets.QMessageBox.Information)
         if icon == "critical":
             self.setIcon(QtWidgets.QMessageBox.Critical)
+
+
+class ExportDialog():
+    """ Dialog to get export directory, but also to check for existing file.
+    If an existing file found, add a counter to the file name until a new file name is made.
+     Counter in format _1, _2, etc. """
+
+    filepath = ""
+
+    def __init__(self, app, filename):
+        """ params:
+                    app : App class
+                    title: String
+                    filename: String of filename with extension only"""
+
+        extension = filename.split('.')[-1]
+        filename_only = filename[0:-len(extension) -1]
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+                                                               _("Select directory to save file"),
+                                                               app.last_export_directory, options)
+        if directory:
+            if directory != app.last_export_directory:
+                app.last_export_directory = directory
+            self.filepath = directory + "/" + filename_only + "." + extension
+            counter = 0
+            while os.path.exists(self.filepath):
+                self.filepath = directory + "/" + filename_only + "_" + str(counter) + "." + extension
+                counter += 1
+        else:
+            self.filepath = None
 
 
 class DialogGetStartAndEndMarks(QtWidgets.QDialog):
