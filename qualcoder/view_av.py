@@ -2935,21 +2935,21 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.label_speakers.setStyleSheet(font)
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
-        self.ui.textEdit_transcription.setStyleSheet(doc_font)
+        self.ui.textEdit.setStyleSheet(doc_font)
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
         cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
-            self.ui.textEdit_transcription.installEventFilter(self)
+            self.ui.textEdit.installEventFilter(self)
             self.installEventFilter(self)  # for rewind, play/stop
             cur.execute("select cid from  code_text where fid=?", [self.transcription[0], ])
             coded = cur.fetchall()
             cur.execute("select anid from  annotation where fid=?", [self.transcription[0], ])
             annoted = cur.fetchall()
             if coded != [] or annoted != []:
-                self.ui.textEdit_transcription.setReadOnly(True)
+                self.ui.textEdit.setReadOnly(True)
                 self.can_transcribe = False
                 self.ui.label_speakers.setVisible(False)
                 self.ui.label_transcription.setToolTip("")
@@ -2957,7 +2957,7 @@ class DialogViewAV(QtWidgets.QDialog):
             else:
                 self.ui.label_note.setText(
                     _("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
-            self.ui.textEdit_transcription.setText(self.transcription[1])
+            self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             # Commented ut as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
@@ -2972,7 +2972,6 @@ class DialogViewAV(QtWidgets.QDialog):
             self.app.conn.commit()
             cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
             self.transcription = cur.fetchone()
-
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
@@ -3000,17 +2999,14 @@ class DialogViewAV(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
         self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_down_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
         self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_up_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
         self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
-
         # Search text in transcription
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
@@ -3027,7 +3023,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         #self.ui.lineEdit_search.setEnabled(False)
-
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
         # enable custom window hint - must be set to enable customizing window controls
@@ -3050,7 +3045,6 @@ class DialogViewAV(QtWidgets.QDialog):
         # add context menu for ddialog
         self.ddialog.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
-
         # Set video dialog position, with a default initial position
         self.ddialog.move(self.mapToGlobal(QtCore.QPoint(40, 20)))
         # ddialog is relative to self global position
@@ -3062,7 +3056,6 @@ class DialogViewAV(QtWidgets.QDialog):
             pass
         if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
-
         # Create a vlc instance
         self.instance = vlc.Instance()
         # Create an empty vlc media player
@@ -3075,7 +3068,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-
         try:
             self.media = self.instance.media_new(abs_path)
         except Exception as e:
@@ -3113,8 +3105,6 @@ class DialogViewAV(QtWidgets.QDialog):
         msecs = self.media.get_duration()
         self.media_duration_text = " / " + msecs_to_hours_mins_secs(msecs)
         self.ui.label_time.setText("0.00" + self.media_duration_text)
-        self.ui.textEdit.setText(self.file_['memo'])
-        self.ui.textEdit.ensureCursorVisible()
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
@@ -3349,7 +3339,7 @@ class DialogViewAV(QtWidgets.QDialog):
             speaker = '[' + speaker + ']'
         else:
             speaker = '{' + speaker + '}'
-        self.ui.textEdit_transcription.insertPlainText(speaker)
+        self.ui.textEdit.insertPlainText(speaker)
 
     def insert_timestamp(self):
         """ Insert timestamp using current format.
@@ -3391,12 +3381,12 @@ class DialogViewAV(QtWidgets.QDialog):
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
             ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
-        self.ui.textEdit_transcription.insertPlainText("\n" + ts + " ")
+        self.ui.textEdit.insertPlainText("\n" + ts + " ")
         # Code here makes the current text location visible on the textEdit pane
-        textCursor = self.ui.textEdit_transcription.textCursor()
+        textCursor = self.ui.textEdit.textCursor()
         pos = textCursor.position()
         textCursor.setPosition(pos)
-        self.ui.textEdit_transcription.setTextCursor(textCursor)
+        self.ui.textEdit.setTextCursor(textCursor)
 
     def add_speaker_names_to_label(self):
         """ Add speaker names to label, four on each line.
@@ -3448,11 +3438,11 @@ class DialogViewAV(QtWidgets.QDialog):
             # occurs if there is coded or annotated text.
             return
         if self.ui.checkBox_scroll_transcript.isChecked():
-            self.ui.textEdit_transcription.setReadOnly(True)
+            self.ui.textEdit.setReadOnly(True)
         else:
             # redo timestamps as text may have been changed by user
             self.get_timestamps_from_transcription()
-            self.ui.textEdit_transcription.setReadOnly(False)
+            self.ui.textEdit.setReadOnly(False)
 
     def get_timestamps_from_transcription(self):
         """ Get a list of starting/ending characterpositions and time in milliseconds
@@ -3473,7 +3463,7 @@ class DialogViewAV(QtWidgets.QDialog):
         hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
         srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
-        transcription = self.ui.textEdit_transcription.toPlainText()
+        transcription = self.ui.textEdit.toPlainText()
         self.time_positions = []
         for match in re.finditer(mmss1, transcription):
             stamp = match.group()[1:-1]
@@ -3603,7 +3593,6 @@ class DialogViewAV(QtWidgets.QDialog):
          Programatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -3643,13 +3632,13 @@ class DialogViewAV(QtWidgets.QDialog):
         video's current position.
         time_position list itme: [text_pos0, text_pos1, milliseconds]
         """
-        if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit_transcription.toPlainText() != "":
+        if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit.toPlainText() != "":
             for i in range(1, len(self.time_positions)):
                 if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
                     text_pos = self.time_positions[i][0]
-                    textCursor = self.ui.textEdit_transcription.textCursor()
+                    textCursor = self.ui.textEdit.textCursor()
                     textCursor.setPosition(text_pos)
-                    self.ui.textEdit_transcription.setTextCursor(textCursor)
+                    self.ui.textEdit.setTextCursor(textCursor)
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -3669,12 +3658,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_sizes()
         self.ddialog.close()
         self.stop()
-        memo = self.ui.textEdit.toPlainText()
         cur = self.app.conn.cursor()
-        cur.execute('update source set memo=? where id=?', (memo, self.file_['id']))
-        self.app.conn.commit()
         if self.transcription is not None:
-            text = self.ui.textEdit_transcription.toPlainText()
+            text = self.ui.textEdit.toPlainText()
             # self.transcription[0] is file id, [1] is the original text
             if text != self.transcription[1]:
                 date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -3701,7 +3687,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.app.settings['viewav_abs_pos_x'] = self.pos().x()
         self.app.settings['viewav_abs_pos_y'] = self.pos().y()
 
-    # Functions to search though the journal(s) text
+    # Functions to search though the transcription text
     def search_for_text(self):
         """ On text changed in lineEdit_search, find indices of matching text.
         Only where text is three or more characters long.
@@ -3730,7 +3716,7 @@ class DialogViewAV(QtWidgets.QDialog):
             return
         self.search_indices = []
 
-        text = self.ui.textEdit_transcription.toPlainText()
+        text = self.ui.textEdit.toPlainText()
         try:
             for match in pattern.finditer(text):
                 # Get result as first dictionary item
@@ -3752,12 +3738,12 @@ class DialogViewAV(QtWidgets.QDialog):
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
-        cursor = self.ui.textEdit_transcription.textCursor()
+        cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
         # prev_result is a tuple containing: char position and search string length
         cursor.setPosition(prev_result[0])
         cursor.setPosition(cursor.position() + prev_result[1], QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit_transcription.setTextCursor(cursor)
+        self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
@@ -3768,11 +3754,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
-        cursor = self.ui.textEdit_transcription.textCursor()
+        cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
         # next_result is a tuple containing: char position and search string length
         cursor.setPosition(next_result[0])
         cursor.setPosition(cursor.position() + next_result[1], QtGui.QTextCursor.KeepAnchor)
-        self.ui.textEdit_transcription.setTextCursor(cursor)
+        self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
