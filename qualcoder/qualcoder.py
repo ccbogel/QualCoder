@@ -49,7 +49,6 @@ from cases import DialogCases
 from codebook import Codebook
 from code_text import DialogCodeText
 from copy import copy
-from dialog_sql import DialogSQL
 from GUI.ui_main import Ui_MainWindow
 from helpers import Message
 from import_survey import DialogImportSurvey
@@ -63,6 +62,7 @@ from reports import DialogReportCodes, DialogReportCoderComparisons, DialogRepor
 from report_code_summary import DialogReportCodeSummary
 from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
+from report_sql import DialogSQL
 from rqda import Rqda_import
 from settings import DialogSettings
 from special_functions import DialogSpecialFunctions
@@ -321,7 +321,7 @@ class App(object):
 
     def get_data(self):
         """ Gets all the codes, categories.
-        Called from code_text, code_av, code_image, reports, report_crossovers """
+        Called from code_text, code_av, code_image, reports, report_relations """
 
         categories = []
         cur = self.conn.cursor()
@@ -392,7 +392,8 @@ class App(object):
 
     def check_and_add_additional_settings(self, data):
         """ Newer features include width and height settings for many dialogs and main window.
-        timestamp format
+        timestamp format.
+        dialog_crossovers IS dialog relations
         :param data:  dictionary of most or all settings
         :return: dictionary of all settings
         """
@@ -425,7 +426,8 @@ class App(object):
         'dialogmanagelinks_w', 'dialogmanagelinks_h',
         'docfontsize',
         'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
-        'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0'
+        'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
+        'stylesheet'
         ]
         for key in keys:
             if key not in data:
@@ -443,17 +445,58 @@ class App(object):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
         avoids potential data file import errors with pyinstaller. """
 
-        stylesheet = "* {font-size: 16px;}\n\
+        style_gray = "* {font-size: 12px; background-color: #B1B1B1; color:#000000;}\n\
+        QWidget:focus {border: 2px solid #f89407;}\n\
+        QLabel:disabled {color: #202020;}\n\
+        QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QGroupBox {border: None;}\n\
+        QGroupBox:focus {border: 3px solid #ffaa00;}\n\
+        QTextEdit {background-color: #AAAAAA; border: 1px solid #ffaa00;}\n\
+        QTextEdit:focus {border: 2px solid #ffaa00;}\n\
+        QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QTreeWidget {font-size: 12px;}"
+        style_gray = style_gray.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style_gray = style_gray.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+
+        style_black = "* {font-size: 12px; background-color: #2a2a2a; color:#cccccc;}\n\
+        QWidget:focus {border: 2px solid #f89407;}\n\
+        QLabel#label_search_regex {background-color:#707070;}\n\
+        QLabel#label_search_case_sensitive {background-color:#707070;}\n\
+        QLabel#label_search_all_files {background-color:#707070;}\n\
+        QLabel#label_font_size {background-color:#707070;}\n\
+        QLabel#label_search_all_journals {background-color:#707070;}\n\
+        QLabel:disabled {color: #707070;}\n\
+        QCheckBox::indicator {border: 1px solid #707070;}\n\
+        QRadioButton::indicator {border: 1px solid #707070;}\n\
+        QLineEdit {border: 1px solid #707070;}\n\
+        QPushButton {background-color: #505050;}\n\
+        QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QGroupBox {border: None;}\n\
+        QGroupBox:focus {border: 3px solid #ffaa00;}\n\
+        QTextEdit {border: 1px solid #ffaa00;}\n\
+        QTextEdit:focus {border: 2px solid #ffaa00;}\n\
+        QTableWidget {border: 1px solid #ffaa00;}\n\
+        QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QTreeWidget {font-size: 12px;}"
+        style_black = style_black.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style_black = style_black.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+
+        style = "* {font-size: 12px;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
-        QTreeWidget {font-size: 14px;}"
-        stylesheet = stylesheet.replace("* {font-size: 16", "* {font-size:" + str(settings.get('fontsize')))
-        stylesheet = stylesheet.replace("QTreeWidget {font-size: 14", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
-        return stylesheet
+        QTreeWidget {font-size: 12px;}"
+        style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style = style.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+
+        if self.settings['stylesheet'] == 'gray':
+            return style_gray
+        if self.settings['stylesheet'] == 'black':
+            return style_black
+        return style
 
     def load_settings(self):
         result = self._load_config_ini()
@@ -537,7 +580,8 @@ class App(object):
             'dialogreport_file_summary_splitter0': 100,
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
-            'dialogreport_code_summary_splitter1': 100
+            'dialogreport_code_summary_splitter1': 100,
+            'stylesheet': 'original'
         }
 
     def get_file_texts(self, fileids=None):
