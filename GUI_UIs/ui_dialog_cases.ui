@@ -81,13 +81,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>60</height>
+          <height>42</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>60</height>
+          <height>42</height>
          </size>
         </property>
         <property name="title">
@@ -98,8 +98,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -112,10 +112,10 @@
         <widget class="QPushButton" name="pushButton_delete">
          <property name="geometry">
           <rect>
-           <x>310</x>
+           <x>260</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -128,10 +128,10 @@
         <widget class="QPushButton" name="pushButton_import_cases">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>80</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -144,10 +144,10 @@
         <widget class="QPushButton" name="pushButton_add_attribute">
          <property name="geometry">
           <rect>
-           <x>60</x>
+           <x>40</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -188,10 +188,10 @@
         <widget class="QPushButton" name="pushButton_file_manager">
          <property name="geometry">
           <rect>
-           <x>180</x>
+           <x>120</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
@@ -204,10 +204,10 @@
         <widget class="QPushButton" name="pushButton_export_attributes">
          <property name="geometry">
           <rect>
-           <x>230</x>
+           <x>160</x>
            <y>0</y>
-           <width>36</width>
-           <height>36</height>
+           <width>32</width>
+           <height>32</height>
           </rect>
          </property>
          <property name="toolTip">
