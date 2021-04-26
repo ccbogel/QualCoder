@@ -786,7 +786,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_search.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.label_exports.setPixmap(pm)
+        self.ui.label_exports.setPixmap(pm.scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_matrix.setPixmap(pm)
