@@ -116,12 +116,10 @@ class DialogJournals(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create.clicked.connect(self.create)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/delete_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
@@ -134,10 +132,10 @@ class DialogJournals(QtWidgets.QDialog):
         # Search text in journals
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm))
+        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.label_search_all_journals.setPixmap(QtGui.QPixmap(pm))
+        self.ui.label_search_all_journals.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
@@ -149,9 +147,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-        #self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
-        #self.ui.checkBox_search_all_journals.setEnabled(False)
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """
