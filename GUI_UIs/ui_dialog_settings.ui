@@ -100,7 +100,7 @@
   <widget class="QCheckBox" name="checkBox">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>370</x>
      <y>180</y>
      <width>151</width>
      <height>22</height>
@@ -354,6 +354,19 @@ You must store these files elsewhere.</string>
    </property>
    <property name="singleStep">
     <number>2</number>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_dark_mode">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>210</y>
+     <width>191</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Dark mode</string>
    </property>
   </widget>
  </widget>
