@@ -79,7 +79,7 @@
      <widget class="QLineEdit" name="lineEdit_search">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>40</x>
         <y>38</y>
         <width>171</width>
         <height>30</height>
@@ -237,10 +237,10 @@
      <widget class="QLabel" name="label_search_all_files">
       <property name="geometry">
        <rect>
-        <x>318</x>
-        <y>38</y>
-        <width>34</width>
-        <height>34</height>
+        <x>316</x>
+        <y>41</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -266,9 +266,9 @@
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>38</y>
-        <width>34</width>
-        <height>34</height>
+        <y>41</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -389,10 +389,10 @@
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>0</y>
-        <width>34</width>
-        <height>34</height>
+        <x>470</x>
+        <y>2</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -440,9 +440,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>38</y>
-        <width>34</width>
-        <height>34</height>
+        <y>41</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">

@@ -110,9 +110,9 @@
       <property name="geometry">
        <rect>
         <x>678</x>
-        <y>10</y>
-        <width>32</width>
-        <height>32</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -242,9 +242,9 @@
       <property name="geometry">
        <rect>
         <x>350</x>
-        <y>10</y>
-        <width>32</width>
-        <height>32</height>
+        <y>12</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">

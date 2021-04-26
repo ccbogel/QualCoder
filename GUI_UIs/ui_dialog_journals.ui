@@ -124,10 +124,10 @@
      <widget class="QLabel" name="label_search_regex">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>10</y>
-        <width>34</width>
-        <height>34</height>
+        <x>190</x>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -138,6 +138,9 @@
       </property>
       <property name="frameShape">
        <enum>QFrame::Box</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
       </property>
       <property name="text">
        <string/>
@@ -230,9 +233,9 @@
       <property name="geometry">
        <rect>
         <x>440</x>
-        <y>10</y>
-        <width>34</width>
-        <height>34</height>
+        <y>14</y>
+        <width>24</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -243,6 +246,9 @@
       </property>
       <property name="frameShape">
        <enum>QFrame::Box</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
       </property>
       <property name="text">
        <string/>
