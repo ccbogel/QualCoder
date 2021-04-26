@@ -39,7 +39,7 @@ class Ui_Dialog_settings(object):
         self.label.setGeometry(QtCore.QRect(30, 150, 211, 21))
         self.label.setObjectName("label")
         self.checkBox = QtWidgets.QCheckBox(Dialog_settings)
-        self.checkBox.setGeometry(QtCore.QRect(410, 180, 151, 22))
+        self.checkBox.setGeometry(QtCore.QRect(370, 180, 151, 22))
         self.checkBox.setObjectName("checkBox")
         self.label_directory = QtWidgets.QLabel(Dialog_settings)
         self.label_directory.setGeometry(QtCore.QRect(30, 507, 671, 21))
@@ -103,6 +103,9 @@ class Ui_Dialog_settings(object):
         self.spinBox_docfontsize.setMaximum(32)
         self.spinBox_docfontsize.setSingleStep(2)
         self.spinBox_docfontsize.setObjectName("spinBox_docfontsize")
+        self.checkBox_dark_mode = QtWidgets.QCheckBox(Dialog_settings)
+        self.checkBox_dark_mode.setGeometry(QtCore.QRect(370, 210, 191, 23))
+        self.checkBox_dark_mode.setObjectName("checkBox_dark_mode")
 
         self.retranslateUi(Dialog_settings)
         self.buttonBox.accepted.connect(Dialog_settings.accept)
@@ -142,6 +145,7 @@ class Ui_Dialog_settings(object):
         self.label_6.setToolTip(_translate("Dialog_settings", "<html><head/><body><p>Used when entering speaker name in transcription</p></body></html>"))
         self.label_6.setText(_translate("Dialog_settings", "Speaker format"))
         self.label_7.setText(_translate("Dialog_settings", "Font size for documents"))
+        self.checkBox_dark_mode.setText(_translate("Dialog_settings", "Dark mode"))
 
 
 if __name__ == "__main__":
