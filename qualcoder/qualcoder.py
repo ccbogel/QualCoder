@@ -460,22 +460,37 @@ class App(object):
 
         style_black = "* {font-size: 12px; background-color: #2a2a2a; color:#cccccc;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
-        QLabel#label_search_regex {background-color:#707070;}\n\
-        QLabel#label_search_case_sensitive {background-color:#707070;}\n\
-        QLabel#label_search_all_files {background-color:#707070;}\n\
-        QLabel#label_font_size {background-color:#707070;}\n\
-        QLabel#label_search_all_journals {background-color:#707070;}\n\
-        QLabel:disabled {color: #707070;}\n\
-        QCheckBox::indicator {border: 1px solid #707070;}\n\
-        QRadioButton::indicator {border: 1px solid #707070;}\n\
-        QLineEdit {border: 1px solid #707070;}\n\
-        QPushButton {background-color: #505050;}\n\
-        QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QLabel#label_search_regex {background-color:#808080;}\n\
+        QLabel#label_search_case_sensitive {background-color:#808080;}\n\
+        QLabel#label_search_all_files {background-color:#808080;}\n\
+        QLabel#label_font_size {background-color:#808080;}\n\
+        QLabel#label_search_all_journals {background-color:#808080;}\n\
+        QLabel#label_exports {background-color:#808080;}\n\
+        QLabel#label_time_3 {background-color:#808080;}\n\
+        QLabel#label_volume {background-color:#808080;}\n\
+        QLabel:disabled {color: #808080;}\n\
+        QCheckBox {border: None}\n\
+        QCheckBox::indicator {border: 2px solid #808080; background-color: #2a2a2a;}\n\
+        QCheckBox::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
+        QRadioButton::indicator {border: 1px solid #808080; background-color: #2a2a2a;}\n\
+        QRadioButton::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
+        QLineEdit {border: 1px solid #808080;}\n\
+        QMenu {border: 1px solid #808080;}\n\
+        QMenu::item:selected {background-color: #707070;}\n\
+        QPushButton {background-color: #808080;}\n\
+        QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QComboBox {border: 1px solid #707070;}\n\
+        QComboBox:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
+        QTabWidget::pane {border: 1px solid #808080;}\n\
+        QTabBar {border: 2px solid #808080;}\n\
+        QTabBar::tab {border: 1px solid #808080;}\n\
+        QTabBar::tab:selected {border: 2px solid #f89407; background-color: #707070; margin-left: 3px;}\n\
+        QTabBar::tab:!selected {border: 2px solid #707070; background-color: #2a2a2a; margin-left: 3px;}\n\
         QTextEdit {border: 1px solid #ffaa00;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
-        QTableWidget {border: 1px solid #ffaa00;}\n\
+        QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QTreeWidget {font-size: 12px;}"
         style_black = style_black.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
