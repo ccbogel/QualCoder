@@ -48,7 +48,7 @@ class Ui_Dialog_reportCodings(object):
         self.pushButton_attributeselect.setGeometry(QtCore.QRect(10, 88, 211, 30))
         self.pushButton_attributeselect.setObjectName("pushButton_attributeselect")
         self.label_exports = QtWidgets.QLabel(self.groupBox)
-        self.label_exports.setGeometry(QtCore.QRect(290, 80, 36, 36))
+        self.label_exports.setGeometry(QtCore.QRect(300, 84, 24, 24))
         self.label_exports.setText("")
         self.label_exports.setObjectName("label_exports")
         self.comboBox_export = QtWidgets.QComboBox(self.groupBox)
