@@ -48,6 +48,11 @@ def exception_handler(exception_type, value, tb_obj):
     logger.error(_("Uncaught exception: ") + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
+
+# Need white text
+need_white_text = ["#B71C1C" , "#BF360C",  "#9F3E72", "#880E4F", "#9651D7","#7D26CD",
+                 "#487E4B", "#1B5E20", "#6B6BDA", "#4646D1", "#3D6CB3", "#0D47A1"]
+
 colors = [
     "#F5F6CE","#F2F5A9","#F2F5A9","#F4FA58","#F7FE2E","#F8ECE0","#F6E3CE","#F5D0A9","#F7BE81","#FAAC58",
     "#F5ECCE","#F3E2A9","#F5DA81","#F7D358","#FACC2E","#F8E0E0","#F6CECE","#F5A9A9","#F78181","#FA5858",
