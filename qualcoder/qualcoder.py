@@ -492,6 +492,7 @@ class App(object):
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QHeaderView::section {background-color: #505050; color: #ffce42}\n\
         QTreeWidget {font-size: 12px;}"
         style_black = style_black.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style_black = style_black.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
