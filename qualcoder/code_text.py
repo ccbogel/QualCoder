@@ -437,9 +437,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 cats.remove(item)
             count += 1
 
-        # Need this to assign foreground color
-        font = QtGui.QFont("", self.app.settings['treefontsize'])
-
         # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
@@ -451,9 +448,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
-                print(color, c['name'])
-                top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
-                top_item.setFont(0, font)
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -473,9 +468,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
-                    print(color, c['name'])
-                    top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
-                    top_item.setFont(0, font)
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
@@ -2708,7 +2701,9 @@ class ToolTip_EventFilter(QtCore.QObject):
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
                     if display_text == "":
                         try:
-                            display_text = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            color = TextColor(item['color']).recommendation
+                            display_text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            display_text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
                                 display_text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                             display_text += "</p>"
@@ -2718,7 +2713,9 @@ class ToolTip_EventFilter(QtCore.QObject):
                             logger.error(msg)
                     else:  # Can have multiple codes on same selected area
                         try:
-                            display_text += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            color = TextColor(item['color']).recommendation
+                            display_text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            display_text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
                                 display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
                             display_text += "</p>"
