@@ -437,7 +437,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Need this to assign foreground color
+        font = QtGui.QFont("", self.app.settings['treefontsize'])
+
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -447,13 +450,17 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                print(color, c['name'])
+                top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
+                top_item.setFont(0, font)
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -465,6 +472,10 @@ class DialogCodeText(QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    print(color, c['name'])
+                    top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
+                    top_item.setFont(0, font)
                     child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
