@@ -445,20 +445,7 @@ class App(object):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
         avoids potential data file import errors with pyinstaller. """
 
-        style_gray = "* {font-size: 12px; background-color: #B1B1B1; color:#000000;}\n\
-        QWidget:focus {border: 2px solid #f89407;}\n\
-        QLabel:disabled {color: #202020;}\n\
-        QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
-        QGroupBox {border: None;}\n\
-        QGroupBox:focus {border: 3px solid #ffaa00;}\n\
-        QTextEdit {background-color: #AAAAAA; border: 1px solid #ffaa00;}\n\
-        QTextEdit:focus {border: 2px solid #ffaa00;}\n\
-        QTableWidget:focus {border: 3px solid #ffaa00;}\n\
-        QTreeWidget {font-size: 12px;}"
-        style_gray = style_gray.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style_gray = style_gray.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
-
-        style_black = "* {font-size: 12px; background-color: #2a2a2a; color:#cccccc;}\n\
+        style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#cccccc;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QLabel#label_search_regex {background-color:#808080;}\n\
         QLabel#label_search_case_sensitive {background-color:#808080;}\n\
@@ -494,10 +481,10 @@ class App(object):
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42}\n\
         QTreeWidget {font-size: 12px;}"
-        style_black = style_black.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style_black = style_black.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style_dark = style_dark.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
-        style = "* {font-size: 12px;}\n\
+        style = "* {font-size: 12px; color: #000000;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
@@ -508,10 +495,8 @@ class App(object):
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
-        if self.settings['stylesheet'] == 'gray':
-            return style_gray
-        if self.settings['stylesheet'] == 'black':
-            return style_black
+        if self.settings['stylesheet'] == 'dark':
+            return style_dark
         return style
 
     def load_settings(self):
@@ -1327,6 +1312,8 @@ class MainWindow(QtWidgets.QMainWindow):
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
         ui.exec_()
+        ss = self.app.merge_settings_with_default_stylesheet(self.app.settings)
+        #self.setStyleSheet(ss)
         self.settings_report()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
