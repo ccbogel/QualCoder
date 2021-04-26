@@ -445,7 +445,7 @@ class App(object):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
         avoids potential data file import errors with pyinstaller. """
 
-        style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#cccccc;}\n\
+        style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QLabel#label_search_regex {background-color:#808080;}\n\
         QLabel#label_search_case_sensitive {background-color:#808080;}\n\
@@ -508,9 +508,11 @@ class App(object):
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
-        #TODO TEMPORARY delete in 2021
+        #TODO TEMPORARY delete in 2022
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
+        if result['stylesheet'] == 0:
+            result['stylesheet'] = "original"
         return result
 
     @property

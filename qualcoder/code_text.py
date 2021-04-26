@@ -43,7 +43,7 @@ from PyQt5.QtGui import QBrush
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
-from color_selector import colors
+from color_selector import colors, TextColor
 from confirm_delete import DialogConfirmDelete
 from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
 from information import DialogInformation
@@ -1990,6 +1990,7 @@ class DialogCodeText(QtWidgets.QWidget):
         If no colour has been assigned to a code, those coded text fragments are coloured gray.
         Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
         name, owner.
+        For defined colours in color_selector, make text light on dark, and conversely dark on light
         params:
             id_  : code identifier. .-1 for all or a specific code id to highlight. Integer
         """
@@ -2005,9 +2006,13 @@ class DialogCodeText(QtWidgets.QWidget):
             for item in self.code_text:
                 cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
-                color = codes.get(item['cid'],{}).get('color',"#F8E0E0")  # default light red
+                color = codes.get(item['cid'],{}).get('color', "#777777")  # default gray
                 brush = QtGui.QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
+                # Foreground depends on the defined need_white_text color in color_selector
+                # It also depends on the stylesheet: orginal or dark
+                text_brush = QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
                 if id_ > 0 and id_ == item['cid']:
                     cursor.setCharFormat(fmt)
                 if id_ == -1:
