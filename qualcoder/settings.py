@@ -33,6 +33,7 @@ import logging
 import traceback
 
 from GUI.ui_dialog_settings import Ui_Dialog_settings
+from helpers import Message
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -112,6 +113,10 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
+        if self.settings['stylesheet'] == 'dark':
+            self.ui.checkBox_dark_mode.setChecked(True)
+        else:
+            self.ui.checkBox_dark_mode.setChecked(False)
         if self.settings['backup_on_open'] == 'True':
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
@@ -149,6 +154,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_directory.setText(directory)
 
     def accept(self):
+        restart_qualcoder = False
         self.settings['codername'] = self.ui.lineEdit_coderName.text()
         if self.settings['codername'] == "":
             self.settings['codername'] = "default"
@@ -161,6 +167,14 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['showids'] = 'True'
         else:
             self.settings['showids'] = 'False'
+        if self.ui.checkBox_dark_mode.isChecked():
+            if self.settings['stylesheet'] != 'dark':
+                restart_qualcoder = True
+            self.settings['stylesheet'] = 'dark'
+        else:
+            self.settings['stylesheet'] = 'original'
+        if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
+            restart_qualcoder = True
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
@@ -173,6 +187,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['backup_av_files'] = 'False'
         self.save_settings()
+        if restart_qualcoder:
+            Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec_()
         self.close()
 
     def save_settings(self):
