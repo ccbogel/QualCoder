@@ -38,7 +38,7 @@ from PyQt5.QtCore import Qt
 
 from GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
 from confirm_delete import DialogConfirmDelete
-from helpers import DialogGetStartAndEndMarks
+from helpers import DialogGetStartAndEndMarks, Message
 from view_av import DialogViewAV
 from view_image import DialogViewImage
 
@@ -182,7 +182,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # update messages and table widget
         self.get_files()
         self.fill_table()
-        QtWidgets.QMessageBox.information(None, _("File added to case"), msg)
+        Message(self.app, _("File added to case"), msg, "information").exec_()
         self.parent_textEdit.append(msg)
         self.app.delete_backup = False
 
@@ -492,8 +492,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     (item['caseid'], item['fid'], item['pos0'], item['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
-            QtWidgets.QMessageBox.warning(None, _("Already Linked"),
-                _("This segment has already been linked to this case"))
+            Message(self.app, _("Already Linked"),
+                _("This segment has already been linked to this case"), "warning").exec_()
             return
         cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
             , (item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
@@ -614,7 +614,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.load_case_text()
         self.highlight()
         msg += "\n" + str(entries) + _(" sections found.")
-        QtWidgets.QMessageBox.information(None, _("File added to case"), msg + "\n" + warning_msg + "\n" + already_assigned)
+        Message(self.app, _("File added to case"), msg + "\n" + warning_msg + "\n" + already_assigned).exec_()
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(warning_msg)
         self.app.delete_backup = False
