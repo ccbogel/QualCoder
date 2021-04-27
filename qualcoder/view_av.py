@@ -138,8 +138,11 @@ class DialogCodeAV(QtWidgets.QDialog):
     # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
 
-    # overlapping codes in text index
+    # Overlapping codes in text index
     overlap_code_index = 0
+    # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
+    code_resize_timer = 0
+    overlap_timer = 0
 
     def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of audio and video files.
@@ -159,6 +162,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.annotations = []
         self.code_text = []
         self.time_positions = []
+        self.code_resize_timer = datetime.datetime.now()
+        self.overlap_timer = datetime.datetime.now()
         self.transcription = None
         self.file_ = None
         self.segment['start'] = None
@@ -1391,16 +1396,20 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier:
+                # Key event can be too sensitive, adjusted  for 150 millisecond gap
+                now = datetime.datetime.now()
+                diff = now - self.code_resize_timer
+                self.code_resize_timer = datetime.datetime.now()
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_right(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -1413,7 +1422,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.coded_text_memo(cursor_pos)
                 return True
             # Overlapping codes cycle
-            if key == QtCore.Qt.Key_O and len(codes_here) > 1:
+            now = datetime.datetime.now()
+            overlap_diff = now - self.overlap_timer
+            if key == QtCore.Qt.Key_O and len(codes_here) > 1 and overlap_diff.microseconds > 150000:
+                self.overlap_timer = datetime.datetime.now()
                 self.cycle_overlap()
             # Quick Mark selected
             if key == QtCore.Qt.Key_Q and selected_text != "":
