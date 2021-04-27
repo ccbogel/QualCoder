@@ -37,6 +37,7 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
+from color_selector import TextColor
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from helpers import ExportDirectoryPathDialog, Message
@@ -442,19 +443,21 @@ class DialogReportRelations(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -462,6 +465,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable

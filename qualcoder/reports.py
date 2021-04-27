@@ -42,6 +42,7 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
+from color_selector import TextColor
 from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
@@ -388,6 +389,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     display_list.append(str(i))
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -406,6 +409,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         display_list.append(str(i))
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -660,7 +665,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.ui.treeWidget.showColumn(1)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -702,6 +707,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -717,6 +724,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -1023,7 +1032,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -1065,7 +1074,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -1075,6 +1084,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -1082,7 +1093,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -1095,6 +1106,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)

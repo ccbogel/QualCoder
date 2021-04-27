@@ -26,11 +26,9 @@ https://github.com/ccbogel/QualCoder
 """
 
 from copy import deepcopy
-#import datetime
 import logging
 import os
 from PIL import Image
-#import platform
 import sys
 import traceback
 import vlc
@@ -39,6 +37,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 from GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
+from color_selector import TextColor
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -99,8 +98,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogreport_code_summary_splitter0'] = sizes[0]
         self.app.settings['dialogreport_code_summary_splitter1'] = sizes[1]
-
-    #TODO UPDATE CODES CATEGORIES WHEN CHANGED IN CODING DIALOG
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
@@ -167,7 +164,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -177,13 +174,15 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -195,6 +194,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
