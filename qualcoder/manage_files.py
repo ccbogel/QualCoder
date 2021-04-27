@@ -1104,13 +1104,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             # The vlc window becomes unmovable and not resizable
             self.av_dialog_open = ui
             ui.show()
-            memo = ui.ui.textEdit.toPlainText()
-            if self.source[x]['memo'] != memo:
-                self.source[x]['memo'] = memo
-                cur = self.app.conn.cursor()
-                cur.execute('update source set memo=? where id=?', (self.source[x]['memo'],
-                    self.source[x]['id']))
-                self.app.conn.commit()
             if self.source[x]['memo'] == "":
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
