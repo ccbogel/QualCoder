@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QColor
 
 # https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
 if sys.platform.startswith("win"):
@@ -79,7 +79,7 @@ except Exception as e:
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
-from color_selector import colors
+from color_selector import colors, TextColor
 from confirm_delete import DialogConfirmDelete
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_av import Ui_Dialog_code_av
@@ -491,7 +491,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -501,6 +501,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(
                     Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -508,7 +510,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -520,6 +522,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -2040,8 +2044,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             for fcode in self.codes:
                 if fcode['cid'] == item['cid']:
                     color = fcode['color']
-            fmt.setBackground(QtGui.QBrush(QtGui.QColor(color)))
-            # highlight codes with memos - these are italicised
+            fmt.setBackground(QBrush(QtGui.QColor(color)))
+            # Foreground depends on the defined need_white_text color in color_selector
+            text_brush = QBrush(QColor(TextColor(color).recommendation))
+            fmt.setForeground(text_brush)
+            # Highlight codes with memos - these are italicised
+            # Italics alsp used for overlapping codes
             if item['memo'] is not None and item['memo'] != "":
                 fmt.setFontItalic(True)
             else:
@@ -2084,6 +2092,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontOverline(True)
+            fmt.setFontItalic(True)
             cursor.setPosition(o[0], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
@@ -2559,7 +2568,9 @@ class ToolTip_EventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             text = ""
-            # occasional None type error
+            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
+            multiple = 0
+            # Occasional None type error
             if self.code_text is None:
                 # Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
@@ -2573,11 +2584,14 @@ class ToolTip_EventFilter(QtCore.QObject):
                         if item['memo'] is not None and item['memo'] != "":
                             text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                         text += "</p>"
+                        multiple += 1
                     except Exception as e:
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                         msg += str(item) + "\n" + str(self.code_text)
                         logger.error(msg)
             if text != "":
+                if multiple > 1:
+                    text = multiple_msg + text    
                 receiver.setToolTip(text)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)

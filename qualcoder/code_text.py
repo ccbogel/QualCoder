@@ -2011,12 +2011,18 @@ class DialogCodeText(QtWidgets.QWidget):
                 cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
                 color = codes.get(item['cid'],{}).get('color', "#777777")  # default gray
-                brush = QtGui.QBrush(QtGui.QColor(color))
+                brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
                 # Foreground depends on the defined need_white_text color in color_selector
-                # It also depends on the stylesheet: orginal or dark
-                text_brush = QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation))
+                text_brush = QBrush(QColor(TextColor(color).recommendation))
                 fmt.setForeground(text_brush)
+                # Highlight codes with memos - these are italicised
+                # Italics alsp used for overlapping codes
+                if item['memo'] is not None and item['memo'] != "":
+                    fmt.setFontItalic(True)
+                else:
+                    fmt.setFontItalic(False)
+                #TODO need this ?
                 if id_ > 0 and id_ == item['cid']:
                     cursor.setCharFormat(fmt)
                 if id_ == -1:
@@ -2669,23 +2675,23 @@ class ToolTip_EventFilter(QtCore.QObject):
                     item['color'] = c['color']
 
     def eventFilter(self, receiver, event):
-        #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.ToolTip:
             helpEvent = QHelpEvent(event)
             cursor = QtGui.QTextCursor()
             cursor = receiver.cursorForPosition(helpEvent.pos())
             pos = cursor.position()
             receiver.setToolTip("")
-            display_text = ""
+            text = ""
             multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
-            multiple = False
+            multiple = 0
             # Occasional None type error
             if self.code_text is None:
-                #Call Base Class Method to Continue Normal Event Processing
+                # Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos and item['seltext'] is not None:
-                    # keep the snippets short
+                    # Keep the snippets short
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
                     seltext = seltext.replace("\r", "")
@@ -2702,15 +2708,15 @@ class ToolTip_EventFilter(QtCore.QObject):
                         except:
                             pass
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
-                    if display_text == "":
+                    if text == "":
                         try:
-                            multiple = True
                             color = TextColor(item['color']).recommendation
-                            display_text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                            display_text += item['name'] + "</em><br />" + seltext
+                            text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
-                                display_text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
-                            display_text += "</p>"
+                                text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                            text += "</p>"
+                            multiple += 1
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
                             msg += str(item)
@@ -2718,19 +2724,20 @@ class ToolTip_EventFilter(QtCore.QObject):
                     else:  # Can have multiple codes on same selected area
                         try:
                             color = TextColor(item['color']).recommendation
-                            display_text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                            display_text += item['name'] + "</em><br />" + seltext
+                            text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
-                                display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
-                            display_text += "</p>"
+                                text += "<br /><em>Memo: " + item['memo'] + "</em>"
+                            text += "</p>"
+                            multiple += 1
                         except Exception as e:
                             msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
                             msg += str(item)
                             logger.error(msg)
-            if display_text != "":
-                if multiple:
-                    display_text = multiple_msg + display_text
-                receiver.setToolTip(display_text)
+            if text != "":
+                if multiple > 1:
+                    text = multiple_msg + text
+                receiver.setToolTip(text)
 
-        #Call Base Class Method to Continue Normal Event Processing
+        # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
