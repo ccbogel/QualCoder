@@ -101,8 +101,9 @@ class DialogCodeText(QtWidgets.QWidget):
     eventFilter = None
     # A list of dictionaries {title, list of dictionary of sql commands}
     autocode_history = []
-    # Timer to reduce overly sensitive key events where re-size oversteps by multiple characters
+    # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
     code_resize_timer = 0
+    overlap_timer = 0
 
     def __init__(self, app, parent_textEdit, tab_reports):
 
@@ -118,6 +119,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []
         self.autocode_history = []
         self.code_resize_timer = datetime.datetime.now()
+        self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -1048,19 +1050,15 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.code_resize_timer = datetime.datetime.now()
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_left(codes_here[0])
-                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
                     self.shrink_to_right(codes_here[0])
-                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
                 if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_left(codes_here[0])
-                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
                     self.extend_right(codes_here[0])
-                    print(diff, "diff msecs: ", diff.microseconds)
                     return True
 
             # Annotate selected
@@ -1083,7 +1081,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.coded_text_memo(cursor_pos)
                 return True
             # Overlapping codes cycle
-            if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled():
+            now = datetime.datetime.now()
+            overlap_diff = now - self.overlap_timer
+            if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled() and overlap_diff.microseconds > 150000:
+                self.overlap_timer = datetime.datetime.now()
                 i = self.ui.comboBox_codes_in_text.currentIndex()
                 self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
                 if self.ui.comboBox_codes_in_text.currentIndex() < 1:
