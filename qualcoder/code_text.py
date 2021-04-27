@@ -334,10 +334,13 @@ class DialogCodeText(QtWidgets.QWidget):
         code_for_underlining = None
         for c in self.codes:
             if current.text(0) == c['name']:
-                palette = self.ui.label_code.palette()
-                code_color = QColor(c['color'])
-                palette.setColor(QtGui.QPalette.Window, code_color)
-                self.ui.label_code.setPalette(palette)
+                #palette = self.ui.label_code.palette()
+                #code_color = QColor(c['color'])
+                fg_color = TextColor(c['color']).recommendation
+                #palette.setColor(QtGui.QPalette.Window, code_color)
+                #self.ui.label_code.setPalette(palette)
+                style = "QLabel {background-color :" + c['color'] + "; color : "+ fg_color +";}"
+                self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
                 code_for_underlining = c
                 break
@@ -1044,7 +1047,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                # Can be too sensitive, adjusted  for 150 millisecond gap
+                # Key event can be too sensitive, adjusted  for 150 millisecond gap
                 now = datetime.datetime.now()
                 diff = now - self.code_resize_timer
                 self.code_resize_timer = datetime.datetime.now()
