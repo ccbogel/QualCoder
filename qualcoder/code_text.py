@@ -39,7 +39,7 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QColor
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
@@ -1229,7 +1229,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
-        brush = QtGui.QBrush(QtGui.QColor(color))
+        brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         fmt.setFontOverline(True)
@@ -2065,6 +2065,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontOverline(True)
+            fmt.setFontItalic(True)
             cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
@@ -2676,6 +2677,8 @@ class ToolTip_EventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             display_text = ""
+            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
+            multiple = False
             # Occasional None type error
             if self.code_text is None:
                 #Call Base Class Method to Continue Normal Event Processing
@@ -2701,6 +2704,7 @@ class ToolTip_EventFilter(QtCore.QObject):
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
                     if display_text == "":
                         try:
+                            multiple = True
                             color = TextColor(item['color']).recommendation
                             display_text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
                             display_text += item['name'] + "</em><br />" + seltext
@@ -2724,6 +2728,8 @@ class ToolTip_EventFilter(QtCore.QObject):
                             msg += str(item)
                             logger.error(msg)
             if display_text != "":
+                if multiple:
+                    display_text = multiple_msg + display_text
                 receiver.setToolTip(display_text)
 
         #Call Base Class Method to Continue Normal Event Processing
