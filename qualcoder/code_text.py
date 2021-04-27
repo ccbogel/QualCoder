@@ -333,7 +333,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in self.codes:
             if current.text(0) == c['name']:
                 palette = self.ui.label_code.palette()
-                code_color = QtGui.QColor(c['color'])
+                code_color = QColor(c['color'])
                 palette.setColor(QtGui.QPalette.Window, code_color)
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
@@ -446,9 +446,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
-                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
+                top_item.setForeground(0, QBrush(QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -466,9 +466,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
-                    child.setForeground(0, QBrush(QtGui.QColor(color)))
+                    child.setForeground(0, QBrush(QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
@@ -1287,7 +1287,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
-        brush = QtGui.QBrush(QtGui.QColor(color))
+        brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         fmt.setFontOverline(True)
@@ -1704,7 +1704,7 @@ class DialogCodeText(QtWidgets.QWidget):
         new_color = ui.get_color()
         if new_color is None:
             return
-        selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
+        selected.setBackground(0, QBrush(QColor(new_color), Qt.SolidPattern))
         # Update codes list, database and color markings
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
@@ -2105,10 +2105,10 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(current_code['color']))
+        brush = QBrush(QColor(current_code['color']))
         fmt.setBackground(brush)
+        fmt.setForeground(QBrush(QColor(TextColor(current_code['color']).recommendation)))
         cursor.setCharFormat(fmt)
-        #self.select_tree_item_by_code_name(current_text)
         self.apply_overline_to_overlaps()
 
     def overlapping_codes_in_text(self):
@@ -2129,7 +2129,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 for code in self.codes:
                     if code['cid'] == item['cid']:
                         codes_here.append(code)
-        # can show multiple codes for this location
+        # Can show multiple codes for this location
         fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
         self.ui.comboBox_codes_in_text.clear()
         code_names = [""]
@@ -2149,7 +2149,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.comboBox_codes_in_text.addItems(code_names)
         for i in range(1, len(code_names)):
             self.ui.comboBox_codes_in_text.setItemData(i, code_names[i], QtCore.Qt.ToolTipRole)
-            self.ui.comboBox_codes_in_text.setItemData(i, QtGui.QColor(codes_here[i - 1]['color']), QtCore.Qt.BackgroundRole)
+            self.ui.comboBox_codes_in_text.setItemData(i, QColor(codes_here[i - 1]['color']), QtCore.Qt.BackgroundRole)
 
     def select_tree_item_by_code_name(self, codename):
         """ Set a tree item code. This still call fill_code_label and

@@ -200,44 +200,36 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_30_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
         self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rewind_5_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
         self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/forward_30_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
         self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_down_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
         self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/rate_up_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
         self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
 
         # The buttons in the splitter are smaller 24x24 pixels
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
@@ -300,7 +292,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if platform.system() == "Darwin":  # For MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
-        self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
+        self.palette.setColor(QtGui.QPalette.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
@@ -500,9 +492,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
-                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
+                top_item.setForeground(0, QBrush(QColor(color)))
                 top_item.setFlags(
                     Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -521,9 +513,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
-                    child.setForeground(0, QBrush(QtGui.QColor(color)))
+                    child.setForeground(0, QBrush(QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -989,7 +981,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -1009,7 +1000,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -1024,7 +1014,6 @@ class DialogCodeAV(QtWidgets.QDialog):
          Programming setting the audio track to other values does not work."""
 
         self.mediaplayer.stop()
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -1085,7 +1074,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -1386,7 +1374,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
 
-        if event.type() != 7 or self.media is None:  # QtGui.QKeyEvent = 7
+        if event.type() != 7 or self.media is None:
             return False
         key = event.key()
         mods = event.modifiers()
@@ -1517,8 +1505,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(item['color']))
+        brush = QBrush(QColor(item['color']))
         fmt.setBackground(brush)
+        fmt.setForeground(QBrush(QColor(TextColor(item['color']).recommendation)))
         cursor.setCharFormat(fmt)
         self.apply_overline_to_overlaps()
 
@@ -2006,7 +1995,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         new_color = ui.get_color()
         if new_color is None:
             return
-        selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
+        selected.setBackground(0, QBrush(QColor(new_color), Qt.SolidPattern))
         # update codes list and database
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
@@ -2044,7 +2033,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             for fcode in self.codes:
                 if fcode['cid'] == item['cid']:
                     color = fcode['color']
-            fmt.setBackground(QBrush(QtGui.QColor(color)))
+            fmt.setBackground(QBrush(QColor(color)))
             # Foreground depends on the defined need_white_text color in color_selector
             text_brush = QBrush(QColor(TextColor(color).recommendation))
             fmt.setForeground(text_brush)
@@ -2303,7 +2292,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
         self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -2577,7 +2565,8 @@ class ToolTip_EventFilter(QtCore.QObject):
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
                     try:
-                        text += '<p style="background-color:' + item['color'] + '">' + item['name']
+                        text += '<p style="background-color:' + item['color']
+                        text += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
                         if item['avid'] is not None:
                             text += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
                             text += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
@@ -2876,7 +2865,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_x = self.segment['pos0'] * self.scaler
         to_x = self.segment['pos1'] * self.scaler
         line_width = 8
-        color = QtGui.QColor(self.segment['color'])
+        color = QColor(self.segment['color'])
         self.setPen(QtGui.QPen(color, line_width, QtCore.Qt.SolidLine))
         self.setLine(from_x, self.segment['y'], to_x, self.segment['y'])
 
@@ -3046,7 +3035,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if platform.system() == "Darwin":  # for MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
-        self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
+        self.palette.setColor(QtGui.QPalette.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
@@ -3554,7 +3543,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -3574,7 +3562,6 @@ class DialogViewAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
@@ -3587,7 +3574,6 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            #icon = QtGui.QIcon(QtGui.QPixmap('GUI/play_icon.png'))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
             self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
