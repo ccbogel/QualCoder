@@ -237,7 +237,7 @@ class ViewGraphOriginal(QDialog):
                 for n in self.scene.items():
                     if isinstance(n, TextGraphicsItem) and m.data['supercatid'] is not None and m.data['supercatid'] == n.data['catid'] and n.data['depth'] < m.data['depth']:
                         #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
-                        item = LinkGraphicsItem(m, n, True)  # corners only = True
+                        item = LinkGraphicsItem(self.app, m, n, True)  # corners only = True
                         self.scene.addItem(item)
 
     def circular_graph(self):
@@ -304,7 +304,7 @@ class ViewGraphOriginal(QDialog):
                 for n in self.scene.items():
                     if isinstance(n, TextGraphicsItem) and m.data['supercatid'] is not None and m.data['supercatid'] == n.data['catid'] and n.data['depth'] < m.data['depth']:
                         #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
-                        item = LinkGraphicsItem(m, n)
+                        item = LinkGraphicsItem(self.app, m, n)
                         self.scene.addItem(item)
 
     def get_node_with_children(self, node, model):
@@ -543,7 +543,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     line_color = QtCore.Qt.black
     corners_only = False  # True for list graph
 
-    def __init__(self, from_widget, to_widget, corners_only=False):
+    def __init__(self, app, from_widget, to_widget, corners_only=False):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
@@ -552,6 +552,9 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         #self.setFlag(self.ItemIsSelectable, True)
         self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.calculatePointsAndDraw()
+        self.line_color = QtCore.Qt.black
+        if app.settings['stylesheet'] == "dark":
+            self.line_color = QtCore.Qt.white
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
