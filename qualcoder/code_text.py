@@ -39,11 +39,11 @@ import traceback
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
-from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QBrush, QColor
 
 from add_item_name import DialogAddItemName
 from color_selector import DialogColorSelect
-from color_selector import colors
+from color_selector import colors, TextColor
 from confirm_delete import DialogConfirmDelete
 from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
 from information import DialogInformation
@@ -437,7 +437,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 cats.remove(item)
             count += 1
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
@@ -447,13 +447,15 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
 
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -465,6 +467,8 @@ class DialogCodeText(QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
@@ -1225,7 +1229,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.KeepAnchor)
-        brush = QtGui.QBrush(QtGui.QColor(color))
+        brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
         fmt.setFontOverline(True)
@@ -1990,6 +1994,7 @@ class DialogCodeText(QtWidgets.QWidget):
         If no colour has been assigned to a code, those coded text fragments are coloured gray.
         Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
         name, owner.
+        For defined colours in color_selector, make text light on dark, and conversely dark on light
         params:
             id_  : code identifier. .-1 for all or a specific code id to highlight. Integer
         """
@@ -2005,9 +2010,13 @@ class DialogCodeText(QtWidgets.QWidget):
             for item in self.code_text:
                 cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
-                color = codes.get(item['cid'],{}).get('color',"#F8E0E0")  # default light red
+                color = codes.get(item['cid'],{}).get('color', "#777777")  # default gray
                 brush = QtGui.QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
+                # Foreground depends on the defined need_white_text color in color_selector
+                # It also depends on the stylesheet: orginal or dark
+                text_brush = QtGui.QBrush(QtGui.QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
                 if id_ > 0 and id_ == item['cid']:
                     cursor.setCharFormat(fmt)
                 if id_ == -1:
@@ -2056,6 +2065,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontOverline(True)
+            fmt.setFontItalic(True)
             cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
@@ -2667,6 +2677,8 @@ class ToolTip_EventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             display_text = ""
+            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
+            multiple = False
             # Occasional None type error
             if self.code_text is None:
                 #Call Base Class Method to Continue Normal Event Processing
@@ -2692,7 +2704,10 @@ class ToolTip_EventFilter(QtCore.QObject):
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
                     if display_text == "":
                         try:
-                            display_text = '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            multiple = True
+                            color = TextColor(item['color']).recommendation
+                            display_text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            display_text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
                                 display_text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                             display_text += "</p>"
@@ -2702,7 +2717,9 @@ class ToolTip_EventFilter(QtCore.QObject):
                             logger.error(msg)
                     else:  # Can have multiple codes on same selected area
                         try:
-                            display_text += '<p style="background-color:' + item['color'] + '"><em>' + item['name'] + "</em><br />" + seltext
+                            color = TextColor(item['color']).recommendation
+                            display_text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                            display_text += item['name'] + "</em><br />" + seltext
                             if item['memo'] is not None and item['memo'] != "":
                                 display_text += "<br /><em>Memo: " + item['memo'] + "</em>"
                             display_text += "</p>"
@@ -2711,6 +2728,8 @@ class ToolTip_EventFilter(QtCore.QObject):
                             msg += str(item)
                             logger.error(msg)
             if display_text != "":
+                if multiple:
+                    display_text = multiple_msg + display_text
                 receiver.setToolTip(display_text)
 
         #Call Base Class Method to Continue Normal Event Processing
