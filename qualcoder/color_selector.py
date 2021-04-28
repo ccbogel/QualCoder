@@ -108,10 +108,13 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.selected_color = code_['color']
         # preset with the current colour
-        palette = self.ui.label_colour_old.palette()
-        c = QtGui.QColor(self.selected_color)
-        palette.setColor(QtGui.QPalette.Window, c)
-        self.ui.label_colour_old.setPalette(palette)
+        #palette = self.ui.label_colour_old.palette()
+        #c = QtGui.QColor(self.selected_color)
+        #palette.setColor(QtGui.QPalette.Window, c)
+        #self.ui.label_colour_old.setPalette(palette)
+        fg_color = TextColor(code_['color']).recommendation
+        style = "QLabel {background-color :" + code_['color'] + "; color : "+ fg_color +";}"
+        self.ui.label_colour_old.setStyleSheet(style)
         self.ui.label_colour_old.setAutoFillBackground(True)
         self.ui.label_colour_old.setText(code_['name'])
         self.ui.label_colour_new.setText(code_['name'])
@@ -122,10 +125,13 @@ class DialogColorSelect(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         self.selected_color = colors[x * COLS + y]
-        palette = self.ui.label_colour_new.palette()
-        c = QtGui.QColor(self.selected_color)
-        palette.setColor(QtGui.QPalette.Window, c)
-        self.ui.label_colour_new.setPalette(palette)
+        #palette = self.ui.label_colour_new.palette()
+        #c = QtGui.QColor(self.selected_color)
+        #palette.setColor(QtGui.QPalette.Window, c)
+        #self.ui.label_colour_new.setPalette(palette)
+        fg_color = TextColor(self.selected_color).recommendation
+        style = "QLabel {background-color :" + self.selected_color + "; color : "+ fg_color +";}"
+        self.ui.label_colour_new.setStyleSheet(style)
         self.ui.label_colour_new.setAutoFillBackground(True)
 
     def get_color(self):
