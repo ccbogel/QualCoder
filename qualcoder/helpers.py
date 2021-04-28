@@ -34,6 +34,7 @@ import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from color_selector import TextColor
 from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
@@ -106,7 +107,7 @@ class ExportDirectoryPathDialog():
     If an existing file found, add a counter to the file name until a new file name is made.
      Counter in format _1, _2, etc. """
 
-    filepath = ""
+    filepath = None
 
     def __init__(self, app, filename):
         """ params:
@@ -197,6 +198,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(data['color']))
         fmt.setBackground(brush)
+        text_brush = QtGui.QBrush(QtGui.QColor(TextColor(data['color']).recommendation))
+        fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
         self.setWindowTitle(title)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '

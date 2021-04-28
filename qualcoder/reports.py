@@ -2090,10 +2090,11 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         html = "<br />"
         html += _("[VIEW] ")
-        html += "<em><span style=\"background-color:" + item['color'] + "\">"
+        html += "<em><span style=\"background-color:" + item['color'] + "; color:" + TextColor(item['color']).recommendation + "\">"
         html += item['codename'] + "</span>, "
         html += _("File: ")  + filename + ", "
-        html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
+        if item['file_or_case'] == 'Case:':
+            html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
         html += ", " + item['coder'] + "</em><br />"
         return html
 
