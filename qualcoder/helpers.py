@@ -178,11 +178,10 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.resize(400, 300)
-
         file_list = self.app.get_file_texts([data['fid'], ])
         file_text = file_list[0]
         title = ""
@@ -191,6 +190,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         if data['file_or_case'] == "Case":
             title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
         te = QtWidgets.QTextEdit()
+        te.setStyleSheet(font)
         te.setPlainText(file_text['fulltext'])
         cursor = te.textCursor()
         cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
