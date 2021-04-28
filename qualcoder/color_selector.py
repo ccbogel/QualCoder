@@ -52,8 +52,18 @@ def exception_handler(exception_type, value, tb_obj):
 class TextColor():
     """ Returns light or dark depending on the code color. """
 
-    white_text = ["#B71C1C" , "#BF360C",  "#9F3E72", "#880E4F", "#9651D7","#7D26CD",
-                 "#487E4B", "#1B5E20", "#6B6BDA", "#4646D1", "#3D6CB3", "#0D47A1"]
+    white_text = [
+
+        "#EB7333", "#E65100",
+        "#C54949", "#B71C1C",
+        "#CB5E3C", "#BF360C",  "#F5A9F2","#F781F3","#FA58F4",
+        "B76E95", "#9F3E72", "#880E4F",
+        "#7D26CD",
+        "#1B5E20",  "#487E4B", "#1B5E20",  "#5E9179",
+        "#AC58FA",
+        "#5E9179",
+        "#9090E3", "#6B6BDA", "#4646D1",  "#3498DB",
+        "#6D91C6", "#3D6CB3", "#0D47A1"]
     recommendation = "#000000"
 
     def __init__(self, color):
@@ -61,8 +71,6 @@ class TextColor():
             self.recommendation = "#eeeeee"
         else:
             self.recommendation = "#000000"
-
-
 
 colors = [
     "#F5F6CE","#F2F5A9","#F2F5A9","#F4FA58","#F7FE2E","#F8ECE0","#F6E3CE","#F5D0A9","#F7BE81","#FAAC58",
@@ -108,12 +116,8 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.selected_color = code_['color']
         # preset with the current colour
-        #palette = self.ui.label_colour_old.palette()
-        #c = QtGui.QColor(self.selected_color)
-        #palette.setColor(QtGui.QPalette.Window, c)
-        #self.ui.label_colour_old.setPalette(palette)
         fg_color = TextColor(code_['color']).recommendation
-        style = "QLabel {background-color :" + code_['color'] + "; color : "+ fg_color +";}"
+        style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
         self.ui.label_colour_old.setStyleSheet(style)
         self.ui.label_colour_old.setAutoFillBackground(True)
         self.ui.label_colour_old.setText(code_['name'])
@@ -125,13 +129,10 @@ class DialogColorSelect(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         self.selected_color = colors[x * COLS + y]
-        #palette = self.ui.label_colour_new.palette()
-        #c = QtGui.QColor(self.selected_color)
-        #palette.setColor(QtGui.QPalette.Window, c)
-        #self.ui.label_colour_new.setPalette(palette)
         fg_color = TextColor(self.selected_color).recommendation
-        style = "QLabel {background-color :" + self.selected_color + "; color : "+ fg_color +";}"
+        style = "QLabel {background-color :" + self.selected_color + "; color : " + fg_color + ";}"
         self.ui.label_colour_new.setStyleSheet(style)
+        self.ui.label_colour_new.setToolTip(self.selected_color)
         self.ui.label_colour_new.setAutoFillBackground(True)
 
     def get_color(self):
