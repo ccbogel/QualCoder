@@ -777,6 +777,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(treefont)
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.label_counts.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
@@ -2156,6 +2159,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # already have been replaced with a textEdit (file selection the view text in context)
         self.ta = QtWidgets.QTableWidget()
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ta.setStyleSheet(doc_font)
         self.ta.setColumnCount(len(horizontal_labels))
         self.ta.setHorizontalHeaderLabels(horizontal_labels)
         self.ta.setRowCount(len(cases))
@@ -2272,6 +2278,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # Already have been replaced with a textEdit (file selection the view text in context)
         ta = QtWidgets.QTableWidget()
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        ta.setStyleSheet(doc_font)
         ta.setColumnCount(len(horizontal_labels))
         ta.setHorizontalHeaderLabels(horizontal_labels)
         ta.setRowCount(len(cases))
@@ -2380,6 +2389,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # Already have been replaced with a textEdit (file selection the view text in context)
         ta = QtWidgets.QTableWidget()
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        ta.setStyleSheet(doc_font)
         ta.setColumnCount(len(horizontal_labels))
         ta.setHorizontalHeaderLabels(horizontal_labels)
         ta.setRowCount(len(cases))
