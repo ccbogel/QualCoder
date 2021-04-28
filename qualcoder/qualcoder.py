@@ -447,7 +447,7 @@ class App(object):
 
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
-        QDialog {border: 1px solid #f89407;}\n\
+        QDialog {border: 1px solid #707070;}\n\
         QLabel#label_search_regex {background-color:#808080;}\n\
         QLabel#label_search_case_sensitive {background-color:#808080;}\n\
         QLabel#label_search_all_files {background-color:#808080;}\n\
