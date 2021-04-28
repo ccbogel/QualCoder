@@ -2158,14 +2158,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # already have been replaced with a textEdit (file selection the view text in context)
-        self.ta = QtWidgets.QTableWidget()
+        #self.ta = QtWidgets.QTableWidget()
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
-        self.ta.setStyleSheet(doc_font)
-        self.ta.setColumnCount(len(horizontal_labels))
-        self.ta.setHorizontalHeaderLabels(horizontal_labels)
-        self.ta.setRowCount(len(cases))
-        self.ta.setVerticalHeaderLabels(vertical_labels)
+        self.ui.tableWidget.setStyleSheet(doc_font)
+        self.ui.tableWidget.setColumnCount(len(horizontal_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
+        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Tried lots of things to get the below signal to work.
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         # Gave up.
@@ -2194,15 +2194,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
                         self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, self.te[row][col])
-                self.ta.setCellWidget(row, col, self.te[row][col])
-        self.ta.resizeRowsToContents()
-        self.ta.resizeColumnsToContents()
+                self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+        self.ui.tableWidget.resizeRowsToContents()
+        self.ui.tableWidget.resizeColumnsToContents()
         # maximise the space from one column or one row
-        if self.ta.columnCount() == 1:
-            self.ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        if self.ta.rowCount() == 1:
-            self.ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.ui.splitter.replaceWidget(2, self.ta)
+        if self.ui.tableWidget.columnCount() == 1:
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if self.ui.tableWidget.rowCount() == 1:
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, self.ui.tableWidget)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
@@ -2277,14 +2277,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # Already have been replaced with a textEdit (file selection the view text in context)
-        ta = QtWidgets.QTableWidget()
+        #ta = QtWidgets.QTableWidget()
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
-        ta.setStyleSheet(doc_font)
-        ta.setColumnCount(len(horizontal_labels))
-        ta.setHorizontalHeaderLabels(horizontal_labels)
-        ta.setRowCount(len(cases))
-        ta.setVerticalHeaderLabels(vertical_labels)
+        self.ui.tableWidget.setStyleSheet(doc_font)
+        self.ui.tableWidget.setColumnCount(len(horizontal_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
+        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
@@ -2301,15 +2301,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
-                ta.setCellWidget(row, col, txt_edit)
-        ta.resizeRowsToContents()
-        ta.resizeColumnsToContents()
+                self.ui.tableWidget.setCellWidget(row, col, txt_edit)
+        self.ui.tableWidget.resizeRowsToContents()
+        self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
-        if ta.columnCount() == 1:
-            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        if ta.rowCount() == 1:
-            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.ui.splitter.replaceWidget(2, ta)
+        if self.ui.tableWidget.columnCount() == 1:
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if self.ui.tableWidget.rowCount() == 1:
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, self.ui.tableWidget)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def fill_matrix_top_categories(self, text_results, image_results, av_results, case_ids):
@@ -2388,14 +2388,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Dynamically replace the existing table widget. Because, the tablewidget may
         # Already have been replaced with a textEdit (file selection the view text in context)
-        ta = QtWidgets.QTableWidget()
+        #ta = QtWidgets.QTableWidget()
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
-        ta.setStyleSheet(doc_font)
-        ta.setColumnCount(len(horizontal_labels))
-        ta.setHorizontalHeaderLabels(horizontal_labels)
-        ta.setRowCount(len(cases))
-        ta.setVerticalHeaderLabels(vertical_labels)
+        self.ui.tableWidget.setStyleSheet(doc_font)
+        self.ui.tableWidget.setColumnCount(len(horizontal_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
+        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 txt_edit = QtWidgets.QTextEdit("")
@@ -2412,15 +2412,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
                         txt_edit.insertHtml(self.html_heading(i).replace("[VIEW]", ""))
                         self.put_image_into_textedit(i, counter, txt_edit)
-                ta.setCellWidget(row, col, txt_edit)
-        ta.resizeRowsToContents()
-        ta.resizeColumnsToContents()
+                self.ui.tableWidget.setCellWidget(row, col, txt_edit)
+        self.ui.tableWidget.resizeRowsToContents()
+        self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
-        if ta.columnCount() == 1:
-            ta.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        if ta.rowCount() == 1:
-            ta.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        self.ui.splitter.replaceWidget(2, ta)
+        if self.ui.tableWidget.columnCount() == 1:
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        if self.ui.tableWidget.rowCount() == 1:
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self.ui.splitter.replaceWidget(2, self.ui.tableWidget)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def select_attributes(self):
