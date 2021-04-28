@@ -2107,6 +2107,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
+        action_copy_all = menu.addAction(_("Copy all to clipboard"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -2116,6 +2117,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             cb = QtWidgets.QApplication.clipboard()
             cb.clear(mode=cb.Clipboard)
             cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_copy_all:
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            text = self.ui.textEdit.toPlainText()
+            cb.setText(text, mode=cb.Clipboard)
 
     def show_context_from_text_edit(self):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
