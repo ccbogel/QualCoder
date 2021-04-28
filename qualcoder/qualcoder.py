@@ -447,6 +447,7 @@ class App(object):
 
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
+        QDialog {border: 1px solid #f89407;}\n\
         QLabel#label_search_regex {background-color:#808080;}\n\
         QLabel#label_search_case_sensitive {background-color:#808080;}\n\
         QLabel#label_search_all_files {background-color:#808080;}\n\
@@ -466,7 +467,7 @@ class App(object):
         QMenu {border: 1px solid #808080;}\n\
         QMenu::item:selected {background-color:  #3498db ;}\n\
         QToolTip {background-color: #2a2a2a; color:#eeeeee; border: 1px solid #f89407; }\n\
-        QPushButton {background-color: #909090;}\n\
+        QPushButton {background-color: #808080;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QComboBox {border: 1px solid #707070;}\n\
         QComboBox:hover {border: 2px solid #ffaa00;}\n\
