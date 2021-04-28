@@ -178,6 +178,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -241,6 +242,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.app = app
         self.code_dict = code_dict
         QtWidgets.QDialog.__init__(self)
+
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
