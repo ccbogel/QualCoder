@@ -56,7 +56,7 @@ class TextColor():
 
         "#EB7333", "#E65100",
         "#C54949", "#B71C1C",
-        "#CB5E3C", "#BF360C",  "#F5A9F2","#F781F3","#FA58F4",
+        "#CB5E3C", "#BF360C",  "#F781F3", "#FA58F4",
         "B76E95", "#9F3E72", "#880E4F",
         "#7D26CD",
         "#1B5E20",  "#487E4B", "#1B5E20",  "#5E9179",
@@ -167,6 +167,7 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(text)
                 item.setToolTip(ttip)
                 item.setBackground(QtGui.QBrush(QtGui.QColor(code_color)))
+                item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
