@@ -140,7 +140,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
@@ -182,6 +181,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
+        self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -1724,6 +1724,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_image where id = ?", [s['id']])
                 cur.execute("delete from code_av where id = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type='file' and id=?", [s['id']])
+                # Just in case, added this line
+                cur.execute("delete from case_text where fid = ?", [s['id']])
                 self.app.conn.commit()
 
                 # Delete the .transcribed text file

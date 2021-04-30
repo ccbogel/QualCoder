@@ -40,6 +40,7 @@ except Exception as e:
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.Qt import QHelpEvent
 
 from add_attribute import DialogAddAttribute
 from add_item_name import DialogAddItemName
@@ -154,6 +155,8 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except:
             pass
+        self.eventFilterTT = ToolTip_EventFilter()
+        self.ui.textBrowser.installEventFilter(self.eventFilterTT)
 
     def closeEvent(self, event):
         """ Save splitter dimensions. """
@@ -631,7 +634,6 @@ class DialogCases(QtWidgets.QDialog):
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             self.app.delete_backup = False
-
         if y == self.FILES_COLUMN:
             self.open_case_file_manager()
 
@@ -714,72 +716,68 @@ class DialogCases(QtWidgets.QDialog):
             [self.selected_case['caseid'],])
         result = cur.fetchall()
         for row in result:
-            caseText = ""
-            fname = ""
+            case_text = ""
+            filename = ""
             mediapath = ""
             for src in self.source:
                 if src['id'] == row[1] and src['fulltext'] is not None:
-                    caseText = src['fulltext'][int(row[2]):int(row[3])]
-                    fname = src['name']
+                    case_text = src['fulltext'][int(row[2]):int(row[3])]
+                    filename = src['name']
                 if src['id'] == row[1] and src['fulltext'] is None:
-                    fname = src['name']
+                    filename = src['name']
                     mediapath = src['mediapath']
             display_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
             'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-            'text': caseText, 'name': fname, 'mediapath': mediapath})
+            'text': case_text, 'name': filename, 'mediapath': mediapath})
+
+        format = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
+        if self.app.settings['stylesheet'] == 'dark':
+            QtGui.QBrush(QtGui.QColor("#eeeeee"))
+        format.setForeground(brush)
+        format_blue = QtGui.QTextCharFormat()
+        format_blue.setFontWeight(QtGui.QFont.Bold)
+        # This blue colour good on dark and light background
+        brushB = QtGui.QBrush(QtGui.QColor("#00b2ee"))
+        format_blue.setForeground(brushB)
+        cursor = self.ui.textBrowser.textCursor()
 
         for c in display_text:
-            if c['mediapath'] == '':  # text source
+            if c['mediapath'] is None or c['mediapath'] == '' or c['mediapath'][:5] == "docs:":  # text source
+                cursor.setCharFormat(format)
                 header = "\n" + _("File: ") + c['name'] + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
                 self.ui.textBrowser.append(header)
-                fmt = QtGui.QTextCharFormat()
-                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
-                fmt.setForeground(brush)
-                cursor = self.ui.textBrowser.textCursor()
-                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
+                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
-                cursor.setCharFormat(fmt)
-                formatB = QtGui.QTextCharFormat()
-                formatB.setFontWeight(QtGui.QFont.Bold)
-                cursor.mergeCharFormat(formatB)
                 self.ui.textBrowser.append(c['text'])
+                cursor.setCharFormat(format)
 
             if c['mediapath'][:7] in ("/images", "images:"):
                 header = "\n" + _('Image: ') + c['name']
+                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
                 self.ui.textBrowser.append(header)
-                fmt = QtGui.QTextCharFormat()
-                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.blue))
-                fmt.setForeground(brush)
-                cursor = self.ui.textBrowser.textCursor()
-                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = len(self.ui.textBrowser.toPlainText()) # -1 ?
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
-                cursor.setCharFormat(fmt)
-                # Maybe review this approach for copying data over
-                # Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
+                cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
                 self.display_text_links.append(data)
 
             if c['mediapath'][:6] in ("/audio", "audio:", "/video", "video:"):
                 header = "\n" + _('AV media: ') + c['name']
+                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
                 self.ui.textBrowser.append(header)
-                fmt = QtGui.QTextCharFormat()
-                brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.blue))
-                fmt.setForeground(brush)
-                cursor = self.ui.textBrowser.textCursor()
-                pos0 = len(self.ui.textBrowser.toPlainText()) - len(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText())
+                pos1 = len(self.ui.textBrowser.toPlainText()) # -1 ?
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
-                cursor.setCharFormat(fmt)
-                #Media data contains: {name, mediapath, owner, id, date, memo, fulltext}
+                cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
                 self.display_text_links.append(data)
+        self.eventFilterTT.set_positions(self.display_text_links)  # uses pos0, pos1
 
     def link_clicked(self, position):
         """ View image or audio/video media in dialog.
@@ -854,4 +852,33 @@ class DialogCases(QtWidgets.QDialog):
             cb.setText(selected_text, mode=cb.Clipboard)
 
 
+class ToolTip_EventFilter(QtCore.QObject):
+    """ Used to add a dynamic tooltip for the textBrowser.
+    The tool top text is presented according to its position in the text.
+    """
+
+    media_data = None
+
+    def set_positions(self, media_data):
+        """ Code_text contains the positionsfor the tooltip to be displayed.
+
+        param:
+            media_data: List of dictionaries of the text contains: pos0, pos1
+        """
+
+        self.media_data = media_data
+
+    def eventFilter(self, receiver, event):
+        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
+        if event.type() == QtCore.QEvent.ToolTip:
+            helpEvent = QHelpEvent(event)
+            cursor = QtGui.QTextCursor()
+            cursor = receiver.cursorForPosition(helpEvent.pos())
+            pos = cursor.position()
+            receiver.setToolTip("")
+            for item in self.media_data:
+                if item['pos0'] <= pos and item['pos1'] >= pos:
+                    receiver.setToolTip(_("Right click to view"))
+        # Call Base Class Method to Continue Normal Event Processing
+        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
