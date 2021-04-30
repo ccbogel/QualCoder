@@ -87,7 +87,8 @@ from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from helpers import msecs_to_hours_mins_secs, Message, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
-from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from report_codes import DialogReportCodes
 from select_items import DialogSelectItems
 
 
@@ -3658,8 +3659,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def closeEvent(self, event):
         """ Stop the vlc player on close.
-        Record the dialog and video dialog0 size and positions.
-        Update the memo. """
+        Record the dialog and video dialog0 size and positions. """
 
         self.update_sizes()
         self.ddialog.close()

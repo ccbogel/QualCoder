@@ -49,7 +49,8 @@ from GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
-from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from report_codes import DialogReportCodes
 from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))

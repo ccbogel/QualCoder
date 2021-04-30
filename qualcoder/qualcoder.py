@@ -58,8 +58,9 @@ from manage_files import DialogManageFiles
 from manage_links import DialogManageLinks
 from memo import DialogMemo
 from refi import Refi_export, Refi_import
-from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies
+from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from report_code_summary import DialogReportCodeSummary
+from report_codes import DialogReportCodes
 from report_file_summary import DialogReportFileSummary
 from report_relations import DialogReportRelations
 from report_sql import DialogSQL

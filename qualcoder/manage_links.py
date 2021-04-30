@@ -37,7 +37,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from code_text import DialogCodeText  # for isinstance()
 from confirm_delete import DialogConfirmDelete
 from GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
-from reports import DialogReportCodes  # for isinstance()
+from report_codes import DialogReportCodes  # for isinstance()
 from view_image import DialogCodeImage  # for isinstance()
 from view_av import DialogCodeAV  # for isinstance()
 from view_image import DialogCodeImage  # DialogCodeImage for isinstance()

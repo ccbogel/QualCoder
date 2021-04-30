@@ -78,7 +78,7 @@ from memo import DialogMemo
 from select_items import DialogSelectItems
 from view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
 from view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
-from reports import DialogReportCodes  # for isInstance()
+from report_codes import DialogReportCodes  # for isInstance()
 
 
 path = os.path.abspath(os.path.dirname(__file__))

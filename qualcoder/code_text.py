@@ -50,7 +50,8 @@ from information import DialogInformation
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
-from reports import DialogReportCodes, DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from report_codes import DialogReportCodes
 from report_code_summary import DialogReportCodeSummary  # for isinstance()
 from select_items import DialogSelectItems  # for isinstance()
 
@@ -672,7 +673,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.ui.textEdit.toPlainText() == "":
             return
         cursor = self.ui.textEdit.cursorForPosition(position)
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
@@ -686,7 +687,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 break
-        if selectedText != "":
+        if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
             # Use up to 10 recent codes
@@ -700,13 +701,13 @@ class DialogCodeText(QtWidgets.QWidget):
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
-        if selectedText != "" and action == action_copy:
+        if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
             return
-        if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
+        if selected_text != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
             return
-        if selectedText != "" and action == action_annotate:
+        if selected_text != "" and action == action_annotate:
             self.annotate()
             return
         if action == action_unmark:
@@ -727,7 +728,6 @@ class DialogCodeText(QtWidgets.QWidget):
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], bookmark_pos])
             self.app.conn.commit()
             return
-
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
