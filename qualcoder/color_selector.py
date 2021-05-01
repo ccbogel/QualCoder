@@ -53,17 +53,10 @@ class TextColor():
     """ Returns light or dark depending on the code color. """
 
     white_text = [
-
-        "#EB7333", "#E65100",
-        "#C54949", "#B71C1C",
-        "#CB5E3C", "#BF360C",  "#F781F3", "#FA58F4",
-        "B76E95", "#9F3E72", "#880E4F",
-        "#7D26CD",
-        "#1B5E20",  "#487E4B", "#1B5E20",  "#5E9179",
-        "#AC58FA",
-        "#5E9179",
-        "#9090E3", "#6B6BDA", "#4646D1",  "#3498DB",
-        "#6D91C6", "#3D6CB3", "#0D47A1"]
+        "#EB7333", "#E65100", "#C54949", "#B71C1C", "#CB5E3C", "#BF360C",
+        "#FA58F4", "B76E95", "#9F3E72", "#880E4F", "#7D26CD",  "#1B5E20",
+        "#487E4B", "#1B5E20",  "#5E9179", "#AC58FA", "#5E9179","#9090E3",
+        "#6B6BDA", "#4646D1",  "#3498DB", "#6D91C6", "#3D6CB3", "#0D47A1"]
     recommendation = "#000000"
 
     def __init__(self, color):
