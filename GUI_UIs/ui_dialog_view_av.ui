@@ -296,6 +296,22 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="geometry">
+       <rect>
+        <x>890</x>
+        <y>10</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="4" column="0">
