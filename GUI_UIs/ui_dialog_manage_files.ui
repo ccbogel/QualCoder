@@ -39,8 +39,8 @@
        <rect>
         <x>10</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -55,8 +55,8 @@
        <rect>
         <x>90</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -71,8 +71,8 @@
        <rect>
         <x>130</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -87,8 +87,8 @@
        <rect>
         <x>430</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -103,8 +103,8 @@
        <rect>
         <x>50</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -119,8 +119,8 @@
        <rect>
         <x>290</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -135,8 +135,8 @@
        <rect>
         <x>170</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -151,8 +151,8 @@
        <rect>
         <x>210</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -167,8 +167,8 @@
        <rect>
         <x>250</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -183,12 +183,28 @@
        <rect>
         <x>330</x>
         <y>4</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>2</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
       </property>
       <property name="text">
        <string/>
