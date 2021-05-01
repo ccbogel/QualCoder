@@ -1470,6 +1470,43 @@ class DialogReportCodes(QtWidgets.QDialog):
         html += ", " + item['coder'] + "</em><br />"
         return html'''
 
+    def matrix_heading(self, item, textEdit):
+        """ Takes a dictionary item and creates a html heading for the coded text portion.
+        param:
+            item: dictionary of code, file_or_casename, positions, text, coder
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name from source where id=?", [item['fid']])
+        filename = ""
+        try:  # In case no filename results, rare possibility
+            filename = cur.fetchone()[0]
+        except:
+            pass
+
+        head = "\n" + _("[VIEW] ")
+        head += item['codename'] + ", "
+        head += _("File: ") + filename + ", "
+        if item['file_or_case'] == 'Case:':
+            head += " " + item['file_or_case'] + ": " + item['file_or_casename']
+        head += ", " + item['coder'] + "\n"
+
+        cursor = textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        pos0 = len(textEdit.toPlainText())
+        item['textedit_start'] = pos0
+        #self.ui.textEdit.append(self.heading(row))
+        textEdit.append(head)
+        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+        pos1 = len(textEdit.toPlainText())
+        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+        brush = QBrush(QtGui.QColor(item['color']))
+        fmt.setBackground(brush)
+        text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.setCharFormat(fmt)
+        item['textedit_end'] = len(textEdit.toPlainText())
+
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
         To view coded in context. """
@@ -1591,15 +1628,15 @@ class DialogReportCodes(QtWidgets.QDialog):
             for col, colname in enumerate(horizontal_labels):
                 for t in text_results:
                     if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
                         self.te[row][col].insertPlainText(t['text'] + "\n")
                 for a in av_results:
                     if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
                         self.te[row][col].insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(image_results):
                     if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
                         self.put_image_into_textedit(i, counter, self.te[row][col])
                 self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
@@ -1702,15 +1739,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.te[row][col].setReadOnly(True)
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
                         self.te[row][col].insertPlainText(t['text'] + "\n")
                 for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
                         self.te[row][col].insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
                         self.put_image_into_textedit(i, counter, self.te[row][col])
                 self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
@@ -1817,15 +1854,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.te[row][col].setReadOnly(True)
                 for t in res_text_categories:
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(t).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
                         self.te[row][col].insertPlainText(t['text'] + "\n")
                 for a in res_av_categories:
                     if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(a).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
                         self.te[row][col].insertPlainText(a['text'] + "\n")
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.html_heading(i).replace("[VIEW]", ""))
+                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
                         self.put_image_into_textedit(i, counter, self.te[row][col])
                 self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
@@ -1890,6 +1927,8 @@ class ToolTip_EventFilter(QtCore.QObject):
             cursor = receiver.cursorForPosition(helpEvent.pos())
             pos = cursor.position()
             receiver.setToolTip("")
+            if self.media_data is None:
+                return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.media_data:
                 if item['textedit_start'] <= pos and item['textedit_end'] >= pos:
                     receiver.setToolTip(_("Right click to view"))
