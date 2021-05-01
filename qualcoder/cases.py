@@ -730,36 +730,48 @@ class DialogCases(QtWidgets.QDialog):
             'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
             'text': case_text, 'name': filename, 'mediapath': mediapath})
 
-        format = QtGui.QTextCharFormat()
+        format_reg = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
         if self.app.settings['stylesheet'] == 'dark':
-            QtGui.QBrush(QtGui.QColor("#eeeeee"))
-        format.setForeground(brush)
+            brush = QtGui.QBrush(QtGui.QColor("#eeeeee"))
+        format_reg.setForeground(brush)
+
+        format_bold = QtGui.QTextCharFormat()
+        format_bold.setFontWeight(QtGui.QFont.Bold)
+        brush_bold = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
+        if self.app.settings['stylesheet'] == 'dark':
+            brush_bold = QtGui.QBrush(QtGui.QColor("#eeeeee"))
+        format_bold.setForeground(brush_bold)
+
         format_blue = QtGui.QTextCharFormat()
         format_blue.setFontWeight(QtGui.QFont.Bold)
         # This blue colour good on dark and light background
-        brushB = QtGui.QBrush(QtGui.QColor("#00b2ee"))
-        format_blue.setForeground(brushB)
-        cursor = self.ui.textBrowser.textCursor()
+        format_blue.setForeground(QtGui.QBrush(QtGui.QColor("#9090e3")))
 
+        cursor = self.ui.textBrowser.textCursor()
         for c in display_text:
             if c['mediapath'] is None or c['mediapath'] == '' or c['mediapath'][:5] == "docs:":  # text source
-                cursor.setCharFormat(format)
-                header = "\n" + _("File: ") + c['name'] + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
+                header = "\n" + _("File: ") + c['name']  # + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
+                header += ", " + _("Characters: ") + str(c['pos1'] - c['pos0'])
+                pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
-                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(format_bold)
+                pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(c['text'])
-                cursor.setCharFormat(format)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                pos1 = len(self.ui.textBrowser.toPlainText())
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(format_reg)
 
             if c['mediapath'][:7] in ("/images", "images:"):
                 header = "\n" + _('Image: ') + c['name']
-                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
+                pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText()) # -1 ?
+                pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
                 cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
@@ -768,10 +780,10 @@ class DialogCases(QtWidgets.QDialog):
 
             if c['mediapath'][:6] in ("/audio", "audio:", "/video", "video:"):
                 header = "\n" + _('AV media: ') + c['name']
-                pos0 = len(self.ui.textBrowser.toPlainText())  # -1 ?
+                pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                pos1 = len(self.ui.textBrowser.toPlainText()) # -1 ?
+                pos1 = len(self.ui.textBrowser.toPlainText())
                 cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
                 cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
