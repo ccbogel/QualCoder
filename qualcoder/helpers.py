@@ -570,6 +570,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.data = data
+        self.scale = 1
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
