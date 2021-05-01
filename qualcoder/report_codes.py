@@ -92,6 +92,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     file_ids = ""
     case_ids = ""
     attribute_selection = []
+    text_links = []  # Text positions in the textEdit for right-click context menu to View original file
 
     def __init__(self, app, parent_textEdit):
         super(DialogReportCodes, self).__init__()
@@ -169,6 +170,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
+        self.eventFilterTT = ToolTip_EventFilter()
+        self.ui.textEdit.installEventFilter(self.eventFilterTT)
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -1276,6 +1279,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             file_or_case = "File"
         if self.case_ids != "":
             file_or_case = "Case"
+        self.text_links = []
 
         # Convert results to dictionaries for ease of use
         tmp = []
@@ -1325,20 +1329,39 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Add textedit positioning for context on clicking appropriate heading in results
 
         for row in self.text_results:
-            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
-            self.ui.textEdit.insertHtml(self.html_heading(row))
-            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
+            '''pos0 = len(self.ui.textEdit.toPlainText())
+            row['textedit_start'] = pos0
+            self.ui.textEdit.append(self.heading(row))
+            cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+            pos1 = len(self.ui.textEdit.toPlainText())
+            cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+            brush = QBrush(QtGui.QColor(row['color']))
+            fmt.setBackground(brush)
+            text_brush = QBrush(QtGui.QColor(TextColor(row['color']).recommendation))
+            fmt.setForeground(text_brush)
+            cursor.setCharFormat(fmt)
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())'''
+            self.heading(row)
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            self.text_links.append(row)
         for i, row in enumerate(self.image_results):
-            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
-            self.ui.textEdit.insertHtml(self.html_heading(row))
-            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
+            '''row['textedit_start'] = len(self.ui.textEdit.toPlainText())
+            #self.ui.textEdit.insertHtml(self.heading(row))
+            self.ui.textEdit.append(self.heading(row))
+            row['textedit_end'] = len(self.ui.textEdit.toPlainText())'''
+            self.heading(row)
             self.put_image_into_textedit(row, i, self.ui.textEdit)
+            self.text_links.append(row)
         for i, row in enumerate(self.av_results):
-            row['textedit_start'] = len(self.ui.textEdit.toPlainText())
-            self.ui.textEdit.insertHtml(self.html_heading(row))
+            '''row['textedit_start'] = len(self.ui.textEdit.toPlainText())
+            #self.ui.textEdit.insertHtml(self.heading(row))
+            self.ui.textEdit.append(self.heading(row))
             row['textedit_end'] = len(self.ui.textEdit.toPlainText())
-            self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            self.ui.textEdit.insertPlainText(row['text'] + "\n")'''
+            self.heading(row)
+            self.text_links.append(row)
+
+        self.eventFilterTT.set_positions(self.text_links)
 
         # Fill case matrix or clear third splitter pane.
         matrix_option = self.ui.comboBox_matrix.currentText()
@@ -1400,7 +1423,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if img['memo'] != "":
             text_edit.insertPlainText(_("Memo: ") + img['memo'] + "\n")
 
-    def html_heading(self, item):
+    def heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
         param:
             item: dictionary of code, file_or_casename, positions, text, coder
@@ -1414,7 +1437,30 @@ class DialogReportCodes(QtWidgets.QDialog):
         except:
             pass
 
-        html = "<br />"
+        head = "\n" + _("[VIEW] ")
+        head += item['codename'] + ", "
+        head += _("File: ") + filename + ", "
+        if item['file_or_case'] == 'Case:':
+            head += " " + item['file_or_case'] + ": " + item['file_or_casename']
+        head += ", " + item['coder'] + "\n"
+
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        pos0 = len(self.ui.textEdit.toPlainText())
+        item['textedit_start'] = pos0
+        #self.ui.textEdit.append(self.heading(row))
+        self.ui.textEdit.append(head)
+        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+        pos1 = len(self.ui.textEdit.toPlainText())
+        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+        brush = QBrush(QtGui.QColor(item['color']))
+        fmt.setBackground(brush)
+        text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.setCharFormat(fmt)
+        item['textedit_end'] = len(self.ui.textEdit.toPlainText())
+
+        '''html = "<br />"
         html += _("[VIEW] ")
         html += "<em><span style=\"background-color:" + item['color'] + "; color:" + TextColor(item['color']).recommendation + "\">"
         html += item['codename'] + "</span>, "
@@ -1422,7 +1468,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if item['file_or_case'] == 'Case:':
             html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
         html += ", " + item['coder'] + "</em><br />"
-        return html
+        return html'''
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
@@ -1430,7 +1476,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if self.ui.textEdit.toPlainText() == "":
             return
-        cursor = self.ui.textEdit.cursorForPosition(position)
+
+        cursor_context_pos = self.ui.textEdit.cursorForPosition(position)
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -1443,7 +1490,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action is None:
             return
         if action == action_view:
-            self.show_context_from_text_edit()
+            self.show_context_from_text_edit(cursor_context_pos)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.clear(mode=cb.Clipboard)
@@ -1454,14 +1501,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             text = self.ui.textEdit.toPlainText()
             cb.setText(text, mode=cb.Clipboard)
 
-    def show_context_from_text_edit(self):
+    def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
         Called by: textEdit.cursorPositionChanged, after results are filled.
         text/image/av results contain textedit_start and textedit_end which map the cursor position to the specific result.
         Called by context menu.
         """
 
-        pos = self.ui.textEdit.textCursor().position()
+        pos = cursor_context_pos.position()
+        #print("pos", pos)
+
         # Check the clicked position for a text result
         found = None
         for row in self.text_results:
@@ -1842,7 +1891,7 @@ class ToolTip_EventFilter(QtCore.QObject):
             pos = cursor.position()
             receiver.setToolTip("")
             for item in self.media_data:
-                if item['pos0'] <= pos and item['pos1'] >= pos:
+                if item['textedit_start'] <= pos and item['textedit_end'] >= pos:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
