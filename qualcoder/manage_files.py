@@ -37,6 +37,7 @@ import sys
 from shutil import copyfile, move
 import subprocess
 import traceback
+import webbrowser
 import zipfile
 
 vlc_msg = ""
@@ -181,6 +182,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
@@ -191,6 +196,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         #Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
+        webbrowser.open(url)
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
