@@ -968,6 +968,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             pos = self.ui.horizontalSlider.value()
             self.mediaplayer.set_position(pos / 1000.0)
 
+        # msecs is -1 if the video has not been played yet ?
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
+
     def audio_track_changed(self):
         """ Audio track changed.
         The video needs to be playing/paused before the combobox is filled with track options.
@@ -3119,7 +3123,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_ui)
         self.ui.checkBox_scroll_transcript.stateChanged.connect(self.scroll_transcribed_checkbox_changed)
-        # Need this for helping set the slider on user sliding before play begins
+        # Need this for helping set the slider if user sliding before play begins
         # Detect number of audio tracks in media
         self.mediaplayer.play()
         self.mediaplayer.audio_set_volume(0)
@@ -3177,9 +3181,12 @@ class DialogViewAV(QtWidgets.QDialog):
             self.mediaplayer.set_position(pos / 1000.0)
             self.mediaplayer.play()
             self.timer.start()
+            msecs = self.mediaplayer.get_time()
+            self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
         else:
             pos = self.ui.horizontalSlider.value()
             self.mediaplayer.set_position(pos / 1000.0)
+            # msecs is -1 if the video has not been played yet  - unsure why
 
     def eventFilter(self, object, event):
         """ Add key options to improve manual transcribing.
