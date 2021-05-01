@@ -34,6 +34,7 @@ import re
 import sys
 import logging
 import traceback
+import webbrowser
 
 from add_item_name import DialogAddItemName
 from confirm_delete import DialogConfirmDelete
@@ -128,6 +129,10 @@ class DialogJournals(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_all.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_all.clicked.connect(self.export_all_journals_as_one_file)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
 
         # Search text in journals
         pm = QtGui.QPixmap()
@@ -148,6 +153,12 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/04-Journals"
+        webbrowser.open(url)
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """

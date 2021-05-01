@@ -35,6 +35,7 @@ from random import randint
 import re
 import sys
 import traceback
+import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
@@ -240,6 +241,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete_all_codes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
@@ -271,6 +276,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
         self.setAttribute(Qt.WA_QuitOnClose, False)
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
+        webbrowser.open(url)
 
     def change_text_font_size(self):
         """ Spinbox font size changed, range: 6 - 32 points. """

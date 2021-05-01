@@ -32,6 +32,8 @@ import os
 import platform
 import sys
 import traceback
+import webbrowser
+
 openpyxl_module = True
 try:
     from openpyxl import load_workbook
@@ -137,6 +139,10 @@ class DialogCases(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -157,6 +163,12 @@ class DialogCases(QtWidgets.QDialog):
             pass
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/06-Cases"
+        webbrowser.open(url)
 
     def closeEvent(self, event):
         """ Save splitter dimensions. """

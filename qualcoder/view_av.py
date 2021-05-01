@@ -227,6 +227,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
         self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
 
         # The buttons in the splitter are smaller 24x24 pixels
         pm = QtGui.QPixmap()
@@ -333,6 +337,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene = GraphicsScene(self.scene_width, self.scene_height)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/09-Coding-audio-and-video"
+        webbrowser.open(url)
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog. """
@@ -3031,6 +3041,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help.pressed.connect(self.help)
