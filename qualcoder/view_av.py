@@ -36,6 +36,7 @@ import re
 import sys
 import time
 import traceback
+import webbrowser
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -3030,6 +3031,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.pressed.connect(self.help)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
@@ -3141,6 +3145,12 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
+
+    def help(self):
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
+        webbrowser.open(url)
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog """
