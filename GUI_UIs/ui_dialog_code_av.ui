@@ -90,7 +90,7 @@
      <widget class="QSlider" name="horizontalSlider_vol">
       <property name="geometry">
        <rect>
-        <x>720</x>
+        <x>670</x>
         <y>19</y>
         <width>160</width>
         <height>18</height>
@@ -109,7 +109,7 @@
      <widget class="QLabel" name="label_volume">
       <property name="geometry">
        <rect>
-        <x>678</x>
+        <x>640</x>
         <y>14</y>
         <width>24</width>
         <height>24</height>
@@ -128,7 +128,7 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>360</x>
         <y>15</y>
         <width>141</width>
         <height>21</height>
@@ -186,27 +186,11 @@
      <widget class="QComboBox" name="comboBox_tracks">
       <property name="geometry">
        <rect>
-        <x>950</x>
+        <x>840</x>
         <y>13</y>
         <width>51</width>
         <height>28</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>880</x>
-        <y>17</y>
-        <width>61</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Audio:</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -225,7 +209,7 @@
      <widget class="QLabel" name="label_rate">
       <property name="geometry">
        <rect>
-        <x>584</x>
+        <x>550</x>
         <y>17</y>
         <width>41</width>
         <height>21</height>
@@ -241,7 +225,7 @@
      <widget class="QLabel" name="label_time_3">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>330</x>
         <y>12</y>
         <width>24</width>
         <height>24</height>
@@ -289,7 +273,7 @@
      <widget class="QPushButton" name="pushButton_rate_down">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>510</x>
         <y>10</y>
         <width>30</width>
         <height>30</height>
@@ -305,7 +289,7 @@
      <widget class="QPushButton" name="pushButton_rate_up">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>600</x>
         <y>10</y>
         <width>30</width>
         <height>30</height>
@@ -329,6 +313,22 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_help">
+      <property name="geometry">
+       <rect>
+        <x>930</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
       </property>
       <property name="text">
        <string/>
