@@ -659,6 +659,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             metadata += "  " + str(int(bytes / 1024)) + "KB"
         if bytes > 1024 * 1024:
             metadata += "  " + str(int(bytes / 1024 / 1024)) + "MB"
+        # Get case names linked to the file
+        cur = self.app.conn.cursor()
+        sql = "select distinct cases.name from cases join case_text on case_text.caseid=cases.caseid "
+        sql += "join source on source.id=case_text.fid where source.name=?"
+        cur.execute(sql, [name,])
+        res = cur.fetchall()
+        if res != []:
+            metadata += "\n" + _("Case linked:") + "\n"
+            for r in res:
+                metadata += r[0] + " "
         return icon, metadata
 
     def add_attribute(self):
