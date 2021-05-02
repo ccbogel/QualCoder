@@ -458,7 +458,7 @@ class App(object):
         QLabel#label_time_3 {background-color:#808080;}\n\
         QLabel#label_volume {background-color:#808080;}\n\
         QLabel:disabled {color: #808080;}\n\
-        QSlider::handle:horizontal{background-color: #f89407;}\n\
+        QSlider::handle:horizontal {background-color: #f89407;}\n\
         QCheckBox {border: None}\n\
         QCheckBox::indicator {border: 2px solid #808080; background-color: #2a2a2a;}\n\
         QCheckBox::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
@@ -999,7 +999,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def help(self):
         """ Display manual in browser. """
 
-        webbrowser.open(path + "/GUI/QualCoder_Manual.pdf")
+        webbrowser.open("https://github.com/ccbogel/QualCoder/wiki")
 
     def about(self):
         """ About dialog. """
