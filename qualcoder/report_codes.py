@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
+from copy import copy, deepcopy
 import csv
 import datetime
 import logging
@@ -92,7 +92,11 @@ class DialogReportCodes(QtWidgets.QDialog):
     file_ids = ""
     case_ids = ""
     attribute_selection = []
-    text_links = []  # Text positions in the textEdit for right-click context menu to View original file
+    # Text positions in the main textEdit for right-click context menu to View original file
+    text_links = []
+    # Text positions in the matrix textEdits for right-click context menu to View original file
+    # list of dictionaries of row, col, textEdit, list of links
+    matrix_links = []
 
     def __init__(self, app, parent_textEdit):
         super(DialogReportCodes, self).__init__()
@@ -1280,6 +1284,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.case_ids != "":
             file_or_case = "Case"
         self.text_links = []
+        self.matrix_links = []
 
         # Convert results to dictionaries for ease of use
         tmp = []
@@ -1329,36 +1334,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Add textedit positioning for context on clicking appropriate heading in results
 
         for row in self.text_results:
-            '''pos0 = len(self.ui.textEdit.toPlainText())
-            row['textedit_start'] = pos0
-            self.ui.textEdit.append(self.heading(row))
-            cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-            pos1 = len(self.ui.textEdit.toPlainText())
-            cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
-            brush = QBrush(QtGui.QColor(row['color']))
-            fmt.setBackground(brush)
-            text_brush = QBrush(QtGui.QColor(TextColor(row['color']).recommendation))
-            fmt.setForeground(text_brush)
-            cursor.setCharFormat(fmt)
-            row['textedit_end'] = len(self.ui.textEdit.toPlainText())'''
             self.heading(row)
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
             self.text_links.append(row)
         for i, row in enumerate(self.image_results):
-            '''row['textedit_start'] = len(self.ui.textEdit.toPlainText())
-            #self.ui.textEdit.insertHtml(self.heading(row))
-            self.ui.textEdit.append(self.heading(row))
-            row['textedit_end'] = len(self.ui.textEdit.toPlainText())'''
             self.heading(row)
             self.put_image_into_textedit(row, i, self.ui.textEdit)
             self.text_links.append(row)
         for i, row in enumerate(self.av_results):
-            '''row['textedit_start'] = len(self.ui.textEdit.toPlainText())
-            #self.ui.textEdit.insertHtml(self.heading(row))
-            self.ui.textEdit.append(self.heading(row))
-            row['textedit_end'] = len(self.ui.textEdit.toPlainText())
-            self.ui.textEdit.insertPlainText(row['text'] + "\n")'''
             self.heading(row)
+            self.ui.textEdit.insertPlainText(row['text'] + "\n")
             self.text_links.append(row)
 
         self.eventFilterTT.set_positions(self.text_links)
@@ -1366,7 +1351,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Fill case matrix or clear third splitter pane.
         matrix_option = self.ui.comboBox_matrix.currentText()
         if self.case_ids == "":
-            self.ui.splitter.replaceWidget(2, QtWidgets.QTableWidget())
+            self.ui.tableWidget.setColumnCount(0)
+            self.ui.tableWidget.setRowCount(0)
         elif matrix_option == "Categories":
             self.fill_matrix_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
         elif matrix_option == "Top categories":
@@ -1425,6 +1411,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
+        Inserts the heading into the main textEdit.
+        Fills the textedit_start and textedit_end link positions
         param:
             item: dictionary of code, file_or_casename, positions, text, coder
         """
@@ -1441,8 +1429,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += item['codename'] + ", "
         head += _("File: ") + filename + ", "
         if item['file_or_case'] == 'Case:':
-            head += " " + item['file_or_case'] + ": " + item['file_or_casename']
-        head += ", " + item['coder'] + "\n"
+            head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
+        head += item['coder'] + "\n"
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1460,65 +1448,36 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
 
-        '''html = "<br />"
-        html += _("[VIEW] ")
-        html += "<em><span style=\"background-color:" + item['color'] + "; color:" + TextColor(item['color']).recommendation + "\">"
-        html += item['codename'] + "</span>, "
-        html += _("File: ")  + filename + ", "
-        if item['file_or_case'] == 'Case:':
-            html += " "+ item['file_or_case'] + ": " + item['file_or_casename']
-        html += ", " + item['coder'] + "</em><br />"
-        return html'''
-
-    def matrix_heading(self, item, textEdit):
-        """ Takes a dictionary item and creates a html heading for the coded text portion.
-        param:
-            item: dictionary of code, file_or_casename, positions, text, coder
-        """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select name from source where id=?", [item['fid']])
-        filename = ""
-        try:  # In case no filename results, rare possibility
-            filename = cur.fetchone()[0]
-        except:
-            pass
-
-        head = "\n" + _("[VIEW] ")
-        head += item['codename'] + ", "
-        head += _("File: ") + filename + ", "
-        if item['file_or_case'] == 'Case:':
-            head += " " + item['file_or_case'] + ": " + item['file_or_casename']
-        head += ", " + item['coder'] + "\n"
-
-        cursor = textEdit.textCursor()
-        fmt = QtGui.QTextCharFormat()
-        pos0 = len(textEdit.toPlainText())
-        item['textedit_start'] = pos0
-        #self.ui.textEdit.append(self.heading(row))
-        textEdit.append(head)
-        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-        pos1 = len(textEdit.toPlainText())
-        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
-        brush = QBrush(QtGui.QColor(item['color']))
-        fmt.setBackground(brush)
-        text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
-        fmt.setForeground(text_brush)
-        cursor.setCharFormat(fmt)
-        item['textedit_end'] = len(textEdit.toPlainText())
-
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
         To view coded in context. """
 
         if self.ui.textEdit.toPlainText() == "":
             return
-
         cursor_context_pos = self.ui.textEdit.cursorForPosition(position)
+        pos = cursor_context_pos.position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_view = menu.addAction(_("View in context"))
+
+        # Check that there is a link to view at this location before showing menu option
+        action_view = None
+        found = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                found = True
+                break
+        for row in self.image_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                found = True
+                break
+        for row in self.av_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                found = True
+                break
+        if found:
+            action_view = menu.addAction(_("View in context"))
+
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -1546,10 +1505,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         pos = cursor_context_pos.position()
-        #print("pos", pos)
-
         # Check the clicked position for a text result
-        found = None
         for row in self.text_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInText(self.app, row)
@@ -1566,18 +1522,45 @@ class DialogReportCodes(QtWidgets.QDialog):
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInAV(self.app, row)
                 ui.exec_()
-                break
+                return
 
-    def show_context_from_table(self):
-        """ When text edit inside the table is clicked, show context. """
+    def matrix_heading(self, item, textEdit):
+        """ Takes a dictionary item and creates a heading for the coded text portion.
+        Also adds the textEdit start and end character positions for this text in this text edit
+        param:
+            item: dictionary of code, file_or_casename, positions, text, coder
+        """
 
-        x = self.ui.tableWidget.currentRow()
-        y = self.ui.tableWidget.currentColumn()
-        te = self.te[x][y]
-        pos = te.textCursor().position()
-        text = te.toPlainText()
-        print(text)
-        print(pos)
+        cur = self.app.conn.cursor()
+        cur.execute("select name from source where id=?", [item['fid']])
+        filename = ""
+        try:  # In case no filename results, rare possibility
+            filename = cur.fetchone()[0]
+        except:
+            pass
+
+        head = "\n" + _("[VIEW] ")
+        head += item['codename'] + ", "
+        head += _("File: ") + filename + ", "
+        if item['file_or_case'] == 'Case:':
+            head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
+        head += item['coder'] + "\n"
+
+        cursor = textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        pos0 = len(textEdit.toPlainText())
+        item['textedit_start'] = pos0
+        #self.ui.textEdit.append(self.heading(row))
+        textEdit.append(head)
+        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+        pos1 = len(textEdit.toPlainText())
+        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+        brush = QBrush(QtGui.QColor(item['color']))
+        fmt.setBackground(brush)
+        text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.setCharFormat(fmt)
+        item['textedit_end'] = len(textEdit.toPlainText())
 
     def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
@@ -1590,6 +1573,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_results : list of dictionary av result items
             case_ids : list of case ids
         """
+
+        # Do not overwrite positions in orinial text_links object
+        text_results = deepcopy(text_results)
+        image_results = deepcopy(image_results)
+        av_results = deepcopy(av_results)
 
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
@@ -1618,27 +1606,38 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         for row, case in enumerate(cases):
-            inner = []
+            column_list = []
             for col, colname in enumerate(horizontal_labels):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                inner.append(tedit)
-            self.te.append(inner)
+                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                column_list.append(tedit)
+            self.te.append(column_list)
+        self.matrix_links = []
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
-                for t in text_results:
-                    if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.te[row][col].insertPlainText(t['text'] + "\n")
-                for a in av_results:
-                    if a['file_or_casename'] == vertical_labels[row] and a['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
-                        self.te[row][col].insertPlainText(a['text'] + "\n")
-                for counter, i in enumerate(image_results):
+                for i in text_results:
                     if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].insertPlainText(i['text'] + "\n")
+                for a in av_results:
+                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].insertPlainText(i['text'] + "\n")
+                for counter, im in enumerate(image_results):
+                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
                         self.put_image_into_textedit(i, counter, self.te[row][col])
-                self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1660,6 +1659,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_results : list of dictionary av result items
             case_ids : list of case ids
         """
+
+        # Do not overwrite positions in orinial text_links object
+        text_results = deepcopy(text_results)
+        image_results = deepcopy(image_results)
+        av_results = deepcopy(av_results)
 
         # All categories within selection
         items = self.ui.treeWidget.selectedItems()
@@ -1728,28 +1732,39 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         for row, case in enumerate(cases):
-            inner = []
+            column_list = []
             for col, colname in enumerate(horizontal_labels):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                inner.append(tedit)
-            self.te.append(inner)
+                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                column_list.append(tedit)
+            self.te.append(column_list)
+        self.matrix_links = []
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for t in res_text_categories:
-                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.te[row][col].insertPlainText(t['text'] + "\n")
-                for a in res_av_categories:
-                    if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
-                        self.te[row][col].insertPlainText(a['text'] + "\n")
+                for i in res_text_categories:
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].insertPlainText(i['text'] + "\n")
+                for i in res_av_categories:
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].append(i['text'] + "\n")
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
                         self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
                         self.put_image_into_textedit(i, counter, self.te[row][col])
-                self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1772,6 +1787,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_results : list of dictionary av result items
             case_ids : list of case ids
         """
+
+        # Do not overwrite positions in orinial text_links object
+        text_results = deepcopy(text_results)
+        image_results = deepcopy(image_results)
+        av_results = deepcopy(av_results)
 
         # Get top level categories
         items = self.ui.treeWidget.selectedItems()
@@ -1843,28 +1863,39 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         for row, case in enumerate(cases):
-            inner = []
+            column_list = []
             for col, colname in enumerate(horizontal_labels):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                inner.append(tedit)
-            self.te.append(inner)
+                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                column_list.append(tedit)
+            self.te.append(column_list)
+        self.matrix_links = []
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for t in res_text_categories:
-                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.te[row][col].insertPlainText(t['text'] + "\n")
-                for a in res_av_categories:
-                    if a['file_or_casename'] == vertical_labels[row] and a['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(a, self.te[row][col]))
-                        self.te[row][col].insertPlainText(a['text'] + "\n")
+                for i in res_text_categories:
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].append(i['text'] + "\n")
+                for i in res_av_categories:
+                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
+                        self.te[row][col].append(i['text'] + "\n")  # The time duration
                 for counter, i in enumerate(res_image_categories):
                     if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
+                        i['row'] = row
+                        i['col'] = col
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.matrix_links.append(i)
                         self.put_image_into_textedit(i, counter, self.te[row][col])
-                self.te[row][col].cursorPositionChanged.connect(self.show_context_from_table)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1874,6 +1905,63 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
+
+    def table_textEdit_menu(self, position):
+        """ Context menu for textEdit.
+        To view coded in context. """
+
+        x = self.ui.tableWidget.currentRow()
+        y = self.ui.tableWidget.currentColumn()
+        te = self.te[x][y]
+        text = te.toPlainText()
+        if text == "":
+            return
+        cursor_context_pos = te.cursorForPosition(position)
+        pos = cursor_context_pos.position()
+        #print("POS:", pos, "row",x, "col",y, "text",text)
+        selected_text = te.textCursor().selectedText()
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+
+        # Check that there is a link to view at this location before showing menu option
+        action_view = None
+        found = None
+        for m in self.matrix_links:
+            if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
+                found = True
+        if found:
+            action_view = menu.addAction(_("View in context"))
+        action_copy = None
+        if selected_text != "":
+            action_copy = menu.addAction(_("Copy to clipboard"))
+        action_copy_all = menu.addAction(_("Copy all to clipboard"))
+        action = menu.exec_(te.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_copy:
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_copy_all:
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            text = te.toPlainText()
+            cb.setText(text, mode=cb.Clipboard)
+        if action == action_view:
+            for m in self.matrix_links:
+                if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
+                    if 'mediapath' not in m:
+                        ui = DialogCodeInText(self.app, m)
+                        ui.exec_()
+                        return
+                    if m['mediapath'][0:7] in ('images:', '/images'):
+                        ui = DialogCodeInImage(self.app, m)
+                        ui.exec_()
+                        return
+                    if m['mediapath'][0:6] in ('audio:', 'video:', '/audio', '/video'):
+                        ui = DialogCodeInAV(self.app, m)
+                        ui.exec_()
+                        return
 
     def select_attributes(self):
         """ Select attributes from case or file attributes for search method.
@@ -1935,29 +2023,5 @@ class ToolTip_EventFilter(QtCore.QObject):
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
 
-'''class ToolTip_EventFilter(QtCore.QObject):
-    """ Used to add a dynamic tooltip for the textEdit.
-    wording to left click for context of text in the original file are displayed in the tooltip.
-    """
 
-    text_results = None
-
-    def setTextResults(self, text_results):
-        self.text_results = text_results
-
-    def eventFilter(self, receiver, event):
-        #QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        if event.type() == QtCore.QEvent.ToolTip:
-            helpEvent = QHelpEvent(event)
-            cursor = QtGui.QTextCursor()
-            cursor = receiver.cursorForPosition(helpEvent.pos())
-            pos = cursor.position()
-            receiver.setToolTip("")
-            if self.text_results is not None:
-                for item in self.text_results:
-                    if pos >= item['textedit_start'] and pos < item['textedit_end']:
-                        msg = _("Click to view coding in the original file.")
-                        receiver.setToolTip(msg)
-        #Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)'''
 
