@@ -205,7 +205,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.expandAll()
 
-
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
 
@@ -221,7 +220,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         text = _("CODE: ") + code_['name'] + "  " + current.text(1)
         text += "  " + _("COLOUR: ") + code_['color'] + "  " + _("CREATED BY: ") + code_['owner'] + "\n\n"
-        text += _("MEMO: ") + "\n" + code_['memo'] + "\n"
+        memo = ""
+        if code_['memo'] is not None:
+            memo = code_['memo']
+        text += _("MEMO: ") + "\n" + memo + "\n"
 
         # Coding statistics
         coders = []
