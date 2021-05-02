@@ -232,16 +232,18 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_alphabetic = None
         action_date = None
         action_type = None
+        action_casename = None
         action_equals_value = None
         action_order_by_value = None
         action_show_all = None
         action_import_linked = None
         action_export_to_linked = None
-        if col < 4:
+        if col <= self.CASE_COLUMN:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
             action_type = menu.addAction(_("File type order"))
-        if col > 3:
+            action_casename = menu.addAction(_("Case order"))
+        if col > self.CASE_COLUMN:
             action_equals_value = menu.addAction(_("Show this value"))
             action_order_by_value = menu.addAction(_("Order by attribute"))
         action_export = menu.addAction(_("Export"))
@@ -277,6 +279,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.fill_table()
         if action == action_type:
             self.load_file_data("filetype")
+        if action == action_casename:
+            self.load_file_data("casename")
         if action == action_order_by_value:
             self.load_file_data("attribute:" + self.header_labels[col])
 
@@ -497,7 +501,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         video files.
         Obtain some file metadata to use in table tooltip.
         param:
-            order_by: string ""= name, "date" = date, "filetype" = mediapath, "attribute:attribute name" selected atribute
+            order_by: string ""= name, "date" = date, "filetype" = mediapath,
+                "casename" = by alphabetic casename
+                "attribute:attribute name" selected atribute
         """
 
         # check a placeholder attribute is present for the file, add if missing
@@ -511,6 +517,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
         if order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
+        if order_by == "casename":
+            sql = 'select distinct source.name, source.id, source.fulltext, source.mediapath, source.memo, source.owner, \
+                    source.date \
+                    from source left join case_text on source.id=case_text.fid \
+                    left join cases on cases.caseid=case_text.caseid \
+                   order by cases.name, source.name '
+
         if order_by[:10] == "attribute:":
             attribute_name = order_by[10:]
             # two types of ordering character or numeric
