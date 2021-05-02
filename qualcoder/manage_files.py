@@ -119,6 +119,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     MEMO_COLUMN = 1
     DATE_COLUMN = 2
     ID_COLUMN = 3
+    CASE_COLUMN = 4
     rows_hidden = False
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtributewww.git dialog
@@ -531,9 +532,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         for row in result:
             icon, metadata = self.get_icon_and_metadata(row[0], row[2], row[3])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6], 'metadata': metadata, 'icon': icon})
+            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
+            'metadata': metadata, 'icon': icon, 'case': self.get_cases_by_filename(row[0])})
         # attributes
-        self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id")]
+        self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         result = cur.fetchall()
@@ -660,16 +662,24 @@ class DialogManageFiles(QtWidgets.QDialog):
         if bytes > 1024 * 1024:
             metadata += "  " + str(int(bytes / 1024 / 1024)) + "MB"
         # Get case names linked to the file
+        txt = self.get_cases_by_filename(name)
+        if txt != "":
+            metadata += "\n" + _("Case linked:") + "\n" + txt
+        return icon, metadata
+
+    def get_cases_by_filename(self, name):
+        """ Called by get_icon_and_metadata, get_file_data
+        """
         cur = self.app.conn.cursor()
         sql = "select distinct cases.name from cases join case_text on case_text.caseid=cases.caseid "
         sql += "join source on source.id=case_text.fid where source.name=?"
+        text = ""
         cur.execute(sql, [name,])
         res = cur.fetchall()
         if res != []:
-            metadata += "\n" + _("Case linked:") + "\n"
             for r in res:
-                metadata += r[0] + " "
-        return icon, metadata
+                text += r[0] + " "
+        return text
 
     def add_attribute(self):
         """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
@@ -755,7 +765,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         y = self.ui.tableWidget.currentColumn()
 
         # update attribute value
-        if y > self.ID_COLUMN:
+        if y > self.CASE_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
@@ -1895,6 +1905,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             iditem = QtWidgets.QTableWidgetItem(str(fid))
             iditem.setFlags(iditem.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, iditem)
+            case_item = QtWidgets.QTableWidgetItem(data['case'])
+            case_item.setFlags(case_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
+
             # Add the attribute values
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
