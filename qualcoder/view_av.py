@@ -1174,7 +1174,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
             # check and reverse start and end times if start is greater than the end
             # print("start", self.segment['start'], "end", self.segment['end'])
-            if float(self.segment['start'].replace(":", ".")) > float(self.segment['end'].replace(":", ".")):
+            '''str_start = self.segment['start'].replace(":", ".")
+            s_list = str_start.split{'.')
+            int_start = int(s_list[0]) * 3600 + int(s_list[1]) * 60 + int(s_list[2])
+            str_end = self.segment['end'].replace(":", ".")
+            e_list = str_end.split('.')
+            int_end = int(e_list[0]) * 3600 + int(e_list[1]) * 60 + int(e_list[2])'''
+            #if int_start > int_end:
+            if self.segment['start_msecs'] > self.segment['end_msecs']:    
                 tmp = self.segment['start']
                 tmp_msecs = self.segment['start_msecs']
                 self.segment['start'] = self.segment['end']
