@@ -62,7 +62,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
     parent_tetEdit = None
     categories = []
     codes = []
-    #files = []
 
     def __init__(self, app, parent_textEdit):
         sys.excepthook = exception_handler
@@ -210,6 +209,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] != 'cid':
+            self.ui.textEdit.setText("")
             return
         code_= None
         for c in self.codes:
