@@ -114,7 +114,9 @@ class DialogColorSelect(QtWidgets.QDialog):
         style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
         self.ui.label_colour_old.setStyleSheet(style)
         self.ui.label_colour_old.setAutoFillBackground(True)
+        self.ui.label_colour_old.setToolTip(_("Current colour"))
         self.ui.label_colour_old.setText(code_['name'])
+        self.ui.label_colour_new.setToolTip(_("New colour"))
         self.ui.label_colour_new.setText(code_['name'])
 
     def color_selected(self):
@@ -126,7 +128,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         fg_color = TextColor(self.selected_color).recommendation
         style = "QLabel {background-color :" + self.selected_color + "; color : " + fg_color + ";}"
         self.ui.label_colour_new.setStyleSheet(style)
-        self.ui.label_colour_new.setToolTip(self.selected_color)
+        self.ui.label_colour_new.setToolTip(_("New colour: ") + self.selected_color)
         self.ui.label_colour_new.setAutoFillBackground(True)
 
     def get_color(self):
