@@ -1236,7 +1236,8 @@ class MainWindow(QtWidgets.QMainWindow):
         Note the database does not keep a table specifically for users (coders), instead
         usernames can be freely entered through the settings dialog and are collated from
         coded text, images and a/v.
-        v2 had added column in code_text table to link to avid in code_av table.
+        v2 ha added column in code_text table to link to avid in code_av table.
+        v3 has added columns in code_text, code_image, code_av for important - to mark particular important codings.
         """
 
         self.app = App()
@@ -1266,18 +1267,18 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.app.conn.cursor()
         cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer);")
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
-        cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text);")
-        cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text);")
+        cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
+        cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
         cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text);")
         cur.execute("CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
         cur.execute("CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
         cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
         cur.execute("CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
         cur.execute("CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
-        cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, unique(cid,fid,pos0,pos1, owner));")
+        cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v2',datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),'', qualcoder_version, 0, 0))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v3', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0))
         self.app.conn.commit()
         try:
             # get and display some project details
@@ -1432,8 +1433,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fill_recent_projects_menu_actions()
         self.setWindowTitle("QualCoder " + self.app.project_name)
 
-        # check avid column in code_text table
-        # database version < 2
+        # Check avid column in code_text table, v2
         cur = self.app.conn.cursor()
         try:
             cur.execute("select avid from code_text")
@@ -1450,6 +1450,34 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur.execute("ALTER TABLE project ADD bookmarkfile integer;")
                 self.app.conn.commit()
                 cur.execute("ALTER TABLE project ADD bookmarkpos integer;")
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
+        # Check important column in code_text, code_image, code_av v3
+        cur = self.app.conn.cursor()
+        try:
+            cur.execute("select important from code_text")
+        except:
+            try:
+                cur.execute("ALTER TABLE code_text ADD important integer;")
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
+                cur = self.app.conn.cursor()
+        try:
+            cur.execute("select important from code_av")
+        except:
+            try:
+                cur.execute("ALTER TABLE code_av ADD important integer;")
+                self.app.conn.commit()
+            except Exception as e:
+                logger.debug(str(e))
+        cur = self.app.conn.cursor()
+        try:
+            cur.execute("select important from code_image")
+        except:
+            try:
+                cur.execute("ALTER TABLE code_image ADD important integer;")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
