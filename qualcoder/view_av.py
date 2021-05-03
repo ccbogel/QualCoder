@@ -812,7 +812,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 good_tracks.append(track)
             # print(track[0], track[1])  # track number and track name
         if len(good_tracks) < 2:
-            self.ui.label.setEnabled(False)
+            #self.ui.label.setEnabled(False)
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.pause()
         self.mediaplayer.audio_set_volume(100)
