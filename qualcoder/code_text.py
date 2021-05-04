@@ -679,7 +679,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
-        Mark, unmark, annotate, copy, memo coded. """
+        Mark, unmark, annotate, copy, memo coded, coded importance. """
 
         if self.ui.textEdit.toPlainText() == "":
             return
@@ -691,12 +691,18 @@ class DialogCodeText(QtWidgets.QWidget):
         action_code_memo = None
         action_start_pos = None
         action_end_pos = None
+        action_important = None
+        action_not_important = None
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
                 action_code_memo = menu.addAction(_("Memo coded text (M)"))
                 action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                if item['important'] is None or item['important'] > 1:
+                    action_important = menu.addAction(_("Add important mark"))
+                if item['important'] == 1:
+                    action_not_important = menu.addAction(_("Remove important mark"))
                 break
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
@@ -711,6 +717,12 @@ class DialogCodeText(QtWidgets.QWidget):
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_important:
+            self.set_coded_importance(cursor.position())
+            return
+        if action == action_not_important:
+            self.set_coded_importance(cursor.position(), False)
             return
         if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
@@ -757,6 +769,39 @@ class DialogCodeText(QtWidgets.QWidget):
             if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text)
+
+    def set_coded_importance(self, position, add=True):
+        """ Add or remove importance to coded text. """
+
+        if position is None:
+            # Called via button
+            position = self.ui.textEdit.textCursor().position()
+        if self.file_ is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings[
+                'codername'] and ((add and item['important'] == 1) or (not add and item['important'] != 1)):
+                coded_text_list.append(item)
+        if coded_text_list == []:
+            return
+        text_item = None
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if text_item is None:
+            return
+
+        print(text_item)
+        '''cur = self.app.conn.cursor()
+
+        self.conn.commit()'''
 
     def file_memo(self):
         """ Open file memo to view or edit. """
@@ -1978,7 +2023,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo from code_text"
+        coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         coding_sql += " where fid=? and owner=? "
         # for file text segment which is currently loaded
         coding_sql += " and pos0 >=? and pos1 <=? "
@@ -1986,9 +2031,9 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute(coding_sql, sql_values)
         code_results = cur.fetchall()
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important'
         for row in code_results:
-            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-            'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6], 'memo': row[7]})
+            self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes, self.file_['start'])
         self.unlight()
