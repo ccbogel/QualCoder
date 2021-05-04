@@ -333,9 +333,9 @@ class App(object):
             categories.append(dict(zip(keys, row)))
         codes = []
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, memo, owner, date, cid, catid, color, important from code_name order by lower(name)")
         result = cur.fetchall()
-        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color', 'important'
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
