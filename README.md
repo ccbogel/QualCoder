@@ -24,7 +24,7 @@ You may need to add unstable repos as described at https://www.binarytides.com/e
 
 Install these modules from the command line
 
-`sudo apt install python3-lxml python3-ply python3-six python3-chardet python3-qt5 python3-pillow`
+`sudo apt install python3-lxml python3-ply python3-six python3-pdfminer python3-chardet python3-qt5 python3-pillow`
 
 On some Linux versions you will need to install pip
 
