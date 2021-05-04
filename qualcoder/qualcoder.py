@@ -324,8 +324,8 @@ class App(object):
         """ Gets all the codes, categories.
         Called from code_text, code_av, code_image, reports, report_relations """
 
-        categories = []
         cur = self.conn.cursor()
+        categories = []
         cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         keys = 'name', 'catid', 'owner', 'date', 'memo', 'supercatid'
@@ -333,9 +333,9 @@ class App(object):
             categories.append(dict(zip(keys, row)))
         codes = []
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color, important from code_name order by lower(name)")
+        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
-        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color', 'important'
+        keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
@@ -1439,7 +1439,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select avid from code_text")
         except:
             try:
-                cur.execute("ALTER TABLE code_text ADD avid integer;")
+                cur.execute("ALTER TABLE code_text ADD avid integer")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
@@ -1447,9 +1447,9 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select bookmarkfile from project")
         except:
             try:
-                cur.execute("ALTER TABLE project ADD bookmarkfile integer;")
+                cur.execute("ALTER TABLE project ADD bookmarkfile integer")
                 self.app.conn.commit()
-                cur.execute("ALTER TABLE project ADD bookmarkpos integer;")
+                cur.execute("ALTER TABLE project ADD bookmarkpos integer")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
@@ -1459,7 +1459,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select important from code_text")
         except:
             try:
-                cur.execute("ALTER TABLE code_text ADD important integer;")
+                cur.execute("ALTER TABLE code_text ADD important integer")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
@@ -1468,7 +1468,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select important from code_av")
         except:
             try:
-                cur.execute("ALTER TABLE code_av ADD important integer;")
+                cur.execute("ALTER TABLE code_av ADD important integer")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
@@ -1477,7 +1477,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("select important from code_image")
         except:
             try:
-                cur.execute("ALTER TABLE code_image ADD important integer;")
+                cur.execute("ALTER TABLE code_image ADD important integer")
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
