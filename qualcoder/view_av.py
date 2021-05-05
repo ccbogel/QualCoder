@@ -716,6 +716,16 @@ class DialogCodeAV(QtWidgets.QDialog):
                     # print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
                     # to overcome the overlap, add to the y value of the i segment
                     self.segments[j]['y'] += 10
+        # Add seltext, the text link to the segment
+        sql = "select seltext from code_text where avid=?"
+        for s in self.segments:
+            cur.execute(sql, [s['avid']])
+            res = cur.fetchall()
+            text = ""
+            for r in res:
+                text += str(r[0]) + "\n"
+            s['seltext'] = text
+
         # Draw coded segments in scene
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
@@ -1167,6 +1177,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['start_msecs'] = time_msecs
             self.segment['memo'] = ""
             self.segment['important'] = None
+            self.segment['seltext'] = ""
             self.ui.pushButton_coding.setText(_("End segment"))
             self.ui.label_segment.setText(_("Segment: ") + str(self.segment['start']) + " - ")
             return
@@ -1705,6 +1716,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end_msecs'] = None
         self.segment['memo'] = ""
         self.segment['important'] = None
+        self.segment['seltext'] = ""
         self.ui.label_segment.setText(_("Segment:"))
         self.ui.pushButton_coding.setText(_("Start segment"))
 
@@ -1740,7 +1752,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.update_dialog_codes_and_categories()
             return
 
-        # find the code in the list
+        # Find the code in the list
         if item.text(1)[0:3] == 'cid':
             found = -1
             for i in range(0, len(self.codes)):
@@ -2330,13 +2342,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
-    def link_segment_to_text(self):
+    '''def link_segment_to_text(self):
         """ Link selected segment to selected text. """
 
         item = {}
         item['cid'] = self.segment_for_text['cid']
         item['fid'] = self.transcription[0]
         item['seltext'] = self.ui.textEdit.textCursor().selectedText()
+        if item['seltext'] is None:
+            item['seltext'] = ""  # Strange
         item['pos0'] = self.ui.textEdit.textCursor().selectionStart()
         item['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
         item['owner'] = self.app.settings['codername']
@@ -2363,7 +2377,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         except Exception as e:
             logger.debug(str(e))
         # update codes and filter for tooltip
-        self.get_coded_text_update_eventfilter_tooltips()
+        self.get_coded_text_update_eventfilter_tooltips()'''
 
     def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
@@ -2700,15 +2714,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog = code_av_dialog
         self.reload_segment = False
         self.setFlag(self.ItemIsSelectable, True)
-        tooltip = self.segment['codename'] + " "
-        seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
-        seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
-        tooltip += seg_time
-        if self.segment['memo'] != "":
-            tooltip += "\n" + _("Memo: ") + self.segment['memo']
-        if self.segment['important'] == 1:
-            tooltip += "<br /><em>IMPORTANT</em>"
-        self.setToolTip(tooltip)
+        self.set_segment_tooltip()
         self.draw_segment()
 
     def contextMenuEvent(self, event):
@@ -2716,10 +2722,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
         I was not able to mapToGlobal position so, the menu maps to scene position plus
         the Dialog screen position.
+        Makes use of current segment: self.segment
         """
 
-        action_link_segment = 1
-        action_link_text = 1
+        seltext = self.code_av_dialog.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo for segment'))
@@ -2727,37 +2733,109 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_play = menu.addAction(_('Play segment'))
         action_edit_start = menu.addAction(_('Edit segment start position'))
         action_edit_end = menu.addAction(_('Edit segment end position'))
+        action_important = None
+        action_not_important = None
+        action_link_segment_to_text = None
         if self.code_av_dialog.text_for_segment['seltext'] is not None:
             action_link_text = menu.addAction(_('Link text to segment'))
-        if self.code_av_dialog.text_for_segment[
-            'seltext'] is None and self.code_av_dialog.ui.textEdit.toPlainText() != "":
-            action_link_segment = menu.addAction(_("Select segment to link to text"))
+        if self.code_av_dialog.ui.textEdit.toPlainText() != "" and seltext != "":
+            action_link_segment_to_text = menu.addAction(_("Link segment to selected text"))
+        if self.segment['important'] is None or self.segment['important'] > 1:
+            action_important = menu.addAction(_("Add important mark"))
+        if self.segment['important'] == 1:
+            action_not_important = menu.addAction(_("Remove important mark"))
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
         if action == action_memo:
             self.edit_memo()
+            return
         if action == action_delete:
             self.delete()
+            return
         if action == action_play:
             self.play_segment()
+            return
         if action == action_edit_start:
             self.edit_segment_start()
+            return
         if action == action_edit_end:
             self.edit_segment_end()
+            return
         if self.code_av_dialog.text_for_segment['seltext'] is not None and action == action_link_text:
             self.link_text_to_segment()
-        if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment:
+            return
+        if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment_to_text:
             self.link_segment_to_text()
+            return
+        if action == action_important:
+            self.set_coded_importance()
+            return
+        if action == action_not_important:
+            self.set_coded_importance(False)
+            return
+
+    def set_coded_importance(self, important=True):
+        """ Set or unset importance to self.segment.
+        Importance is denoted using '1'
+        params:
+            important: boolean, default True """
+
+        importance = None
+        if important:
+            importance = 1
+        self.segment['important'] = important
+        cur = self.app.conn.cursor()
+        sql = "update code_av set important=?, date=? where avid=?"
+        values = [important, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.set_segment_tooltip()
 
     def link_segment_to_text(self):
-        """ Prepare Dialog_code_av to link segment to text """
+        """ Link segment to selected text """
 
-        self.code_av_dialog.segment_for_text = self.segment
+        seg = {}
+        cursor = self.code_av_dialog.ui.textEdit.textCursor()
+        seg['pos0'] = cursor.selectionStart()
+        seg['pos1'] = cursor.selectionEnd()
+        seg['seltext'] = cursor.selectedText()
+        self.segment['seltext'] = seg['seltext']
+        seg['cid'] = self.segment['cid']
+        seg['fid'] = self.code_av_dialog.transcription[0]
+        seg['avid'] = self.segment['avid']
+        seg['owner'] = self.app.settings['codername']
+        seg['memo'] = ""
+        seg['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        # Check for an existing duplicated text entry first
+        cur = self.code_av_dialog.app.conn.cursor()
+        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
+                    (seg['cid'], seg['fid'], seg['pos0'], seg['pos1'], seg['owner']))
+        result = cur.fetchall()
+        if len(result) > 0:
+            Message(self.app, _('Already Coded'), _("This segment has already been coded with this code."), "warning").exec_()
+            return
+        try:
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            memo,date, avid) values(?,?,?,?,?,?,?,?,?)", (seg['cid'],
+                                                          seg['fid'], seg['seltext'], seg['pos0'], seg['pos1'],
+                                                          seg['owner'], seg['memo'], seg['date'], seg['avid']))
+            self.code_av_dialog.app.conn.commit()
+            self.app.delete_backup = False
+        except Exception as e:
+            print(e)
+        print(self.code_av_dialog.text_for_segment)  # tmp
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
+                                                'owner': None, 'memo': None, 'date': None, 'avid': None}
+        # update codes and filter for tooltip
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        self.set_segment_tooltip()
 
     def link_text_to_segment(self):
         """ Link text to this segment. this will add a code to the text and insert
-        a code_text entry into database. """
+        a code_text entry into database.
+        Must prepare to link text to segment by selecting tex and using context menu to prepare."""
 
         seg = self.code_av_dialog.text_for_segment
         seg['cid'] = self.segment['cid']
@@ -2779,7 +2857,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.app.delete_backup = False
         except Exception as e:
             print(e)
-        # print(self.code_av_dialog.text_for_segment)  # tmp
+        print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
                                                 'owner': None, 'memo': None, 'date': None, 'avid': None}
@@ -2882,12 +2960,21 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur.execute(sql, values)
         self.code_av_dialog.app.conn.commit()
         self.app.delete_backup = False
-        tooltip = self.segment['codename'] + " "
+        self.set_segment_tooltip()
+
+    def set_segment_tooltip(self):
+        """ Set segment tooltip from self.segment data """
+
+        tooltip = self.segment['codename'] + "\n"
         seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
         seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
         if self.segment['memo'] != "":
-            tooltip += "\nMemo: " + self.segment['memo']
+            tooltip += "\n" + _("MEMO: ") + self.segment['memo']
+        if self.segment['seltext'] is not None and self.segment['seltext'] != "":
+            tooltip += "\n" + _("LINKED TEXT: ") + self.segment['seltext']
+        if self.segment['important'] == 1:
+            tooltip += "\n" + _("IMPORTANT")
         self.setToolTip(tooltip)
 
     def redraw(self):
