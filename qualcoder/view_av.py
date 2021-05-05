@@ -688,9 +688,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
-        self.segments = []
+        # 10 is assigned as an initial default for y values for segments
         sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
-        sql += " code_av.owner, code_name.name, code_name.color from code_av"
+        sql += " code_av.owner, code_name.name, code_name.color, 10, code_av.important from code_av"
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
         sql += " and code_av.owner=? "
@@ -698,11 +698,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         values.append(self.app.settings['codername'])
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
-        code_results = cur.fetchall()
-        for row in code_results:
-            self.segments.append({'avid': row[0], 'id': row[1], 'pos0': row[2],
-                                  'pos1': row[3], 'cid': row[4], 'memo': row[5], 'date': row[6],
-                                  'owner': row[7], 'codename': row[8], 'color': row[9], 'y': 10})
+        results = cur.fetchall()
+        keys = 'avid', 'id', 'pos0', 'pos1', 'cid', 'memo', 'date', 'owner', 'codename', 'color', 'y', 'important'
+        self.segments = []
+        for row in results:
+            self.segments.append(dict(zip(keys, row)))
         # Fix overlapping segments by incrementing y values so segment is shown on a different line
         for i in range(0, len(self.segments) - 1):
             for j in range(i + 1, len(self.segments)):
@@ -721,6 +721,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.scene.clear()
         for s in self.segments:
             self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self.text_for_segment, self))
+        # Set te scene to the top
+        self.ui.graphicsView.verticalScrollBar().setValue(0)
 
     def clear_file(self):
         """ When AV file removed clear all details.
@@ -841,9 +843,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=? and fid=?",
                     [self.app.settings['codername'], self.transcription[0]])
         result = cur.fetchall()
+        keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
         for row in result:
-            self.annotations.append({'anid': row[0], 'fid': row[1], 'pos0': row[2],
-                                     'pos1': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+            self.annotations.append(dict(zip(keys, row)))
         self.get_coded_text_update_eventfilter_tooltips()
 
     def get_coded_text_update_eventfilter_tooltips(self):
@@ -859,15 +861,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
         sql = "select code_text.cid, code_text.fid, seltext, code_text.pos0, code_text.pos1, "
-        sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1 "
+        sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1, "
+        sql += "code_text.important "
         sql += "from code_text left join code_av on code_text.avid = code_av.avid "
         sql += " where code_text.fid=? and code_text.owner=? order by length(seltext) desc"
         cur.execute(sql, values)
         code_results = cur.fetchall()
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo','avid', 'av_pos0', 'av_pos1', 'important'
         for row in code_results:
-            self.code_text.append({'cid': row[0], 'fid': row[1], 'seltext': row[2],
-                                   'pos0': row[3], 'pos1': row[4], 'owner': row[5], 'date': row[6],
-                                   'memo': row[7], 'avid': row[8], 'av_pos0': row[9], 'av_pos1': row[10]})
+            self.code_text.append(dict(zip(keys, row)))
 
         # Update filter for tooltip and redo formatting
         self.eventFilterTT.setCodes(self.code_text, self.codes)
@@ -1164,6 +1166,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['start'] = time
             self.segment['start_msecs'] = time_msecs
             self.segment['memo'] = ""
+            self.segment['important'] = None
             self.ui.pushButton_coding.setText(_("End segment"))
             self.ui.label_segment.setText(_("Segment: ") + str(self.segment['start']) + " - ")
             return
@@ -1172,15 +1175,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['end_msecs'] = time_msecs
             self.ui.pushButton_coding.setText(_("Clear segment"))
 
-            # check and reverse start and end times if start is greater than the end
+            # Check and reverse start and end times if start is greater than the end
             # print("start", self.segment['start'], "end", self.segment['end'])
-            '''str_start = self.segment['start'].replace(":", ".")
-            s_list = str_start.split{'.')
-            int_start = int(s_list[0]) * 3600 + int(s_list[1]) * 60 + int(s_list[2])
-            str_end = self.segment['end'].replace(":", ".")
-            e_list = str_end.split('.')
-            int_end = int(e_list[0]) * 3600 + int(e_list[1]) * 60 + int(e_list[2])'''
-            #if int_start > int_end:
             if self.segment['start_msecs'] > self.segment['end_msecs']:    
                 tmp = self.segment['start']
                 tmp_msecs = self.segment['start_msecs']
@@ -1592,7 +1588,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_ui()
 
     def extend_left(self, code_):
-        """ Shift left arrow """
+        """ Extend left to coded text. Shift left arrow """
 
         if code_['pos0'] < 1:
             return
@@ -1609,7 +1605,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def extend_right(self, code_):
-        """ Shift right arrow """
+        """ Extend to right coded text. Shift right arrow """
 
         if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
             return
@@ -1626,7 +1622,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_left(self, code_):
-        """ Alt left arrow, shrinks code from the right end of the code """
+        """ Alt left arrow, shrinks coded text from the right end of the coded text. """
 
         if code_['pos1'] <= code_['pos0'] + 1:
             return
@@ -1643,7 +1639,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_right(self, code_):
-        """ Alt right arrow shrinks code from the left end of the code """
+        """ Alt right arrow shrinks coded text from the left end of the coded text. """
 
         if code_['pos0'] >= code_['pos1'] - 1:
             return
@@ -1686,7 +1682,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.file_ is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
             self.clear_segment()
             return
-        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner) values(?,?,?,?,?,?,?)"
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
         cid = int(selected.text(1).split(':')[1])
         values = [self.file_['id'], self.segment['start_msecs'],
                   self.segment['end_msecs'], cid, self.segment['memo'],
@@ -1708,6 +1704,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end'] = None
         self.segment['end_msecs'] = None
         self.segment['memo'] = ""
+        self.segment['important'] = None
         self.ui.label_segment.setText(_("Segment:"))
         self.ui.pushButton_coding.setText(_("Start segment"))
 
@@ -1904,7 +1901,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
-        """ View and edit a memo. """
+        """ View and edit a memo to a code. """
 
         if selected.text(1)[0:3] == 'cid':
             # find the code in the list
@@ -2607,6 +2604,8 @@ class ToolTip_EventFilter(QtCore.QObject):
                             text += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
                         if item['memo'] is not None and item['memo'] != "":
                             text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                        if item['important'] == 1:
+                            text += "<br /><em>IMPORTANT</em>"
                         text += "</p>"
                         multiple += 1
                     except Exception as e:
@@ -2707,6 +2706,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         tooltip += seg_time
         if self.segment['memo'] != "":
             tooltip += "\n" + _("Memo: ") + self.segment['memo']
+        if self.segment['important'] == 1:
+            tooltip += "<br /><em>IMPORTANT</em>"
         self.setToolTip(tooltip)
         self.draw_segment()
 
