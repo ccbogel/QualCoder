@@ -770,9 +770,14 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text)
 
-    def set_coded_importance(self, position, add=True):
-        """ Add or remove importance to coded text. """
+    def set_coded_importance(self, position, important=True):
+        """ Set or unset importance to coded text.
+        Importance is denoted using '1'
+        params:
+            position: textEdit character cursor position
+            add: boolean, default True """
 
+        # Need to get coded segments at this position
         if position is None:
             # Called via button
             position = self.ui.textEdit.textCursor().position()
@@ -780,8 +785,9 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings[
-                'codername'] and ((add and item['important'] == 1) or (not add and item['important'] != 1)):
+            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername'] and \
+                    ((not important and item['important'] == 1) or (important and item['important'] != 1)):
                 coded_text_list.append(item)
         if coded_text_list == []:
             return
@@ -797,11 +803,15 @@ class DialogCodeText(QtWidgets.QWidget):
             text_item = ui.get_selected()
         if text_item is None:
             return
-
-        print(text_item)
-        '''cur = self.app.conn.cursor()
-
-        self.conn.commit()'''
+        importance = None
+        if important:
+            importance = 1
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            (importance, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def file_memo(self):
         """ Open file memo to view or edit. """
@@ -2404,6 +2414,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
 
     def button_autocode_sentences_this_file(self):
+        """ Flag to autocode sentences in one file """
         '''item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
@@ -2411,6 +2422,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.code_sentences("")
 
     def button_autocode_sentences_all_files(self):
+        """ Flag to autocode sentences across all text files. """
         '''item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec_()
@@ -2768,32 +2780,20 @@ class ToolTip_EventFilter(QtCore.QObject):
                         except:
                             pass
                         seltext = " ".join(pretext) + " ... " + " ".join(posttext)
-                    if text == "":
-                        try:
-                            color = TextColor(item['color']).recommendation
-                            text = '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                            text += item['name'] + "</em><br />" + seltext
-                            if item['memo'] is not None and item['memo'] != "":
-                                text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
-                            text += "</p>"
-                            multiple += 1
-                        except Exception as e:
-                            msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
-                            msg += str(item)
-                            logger.error(msg)
-                    else:  # Can have multiple codes on same selected area
-                        try:
-                            color = TextColor(item['color']).recommendation
-                            text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                            text += item['name'] + "</em><br />" + seltext
-                            if item['memo'] is not None and item['memo'] != "":
-                                text += "<br /><em>Memo: " + item['memo'] + "</em>"
-                            text += "</p>"
-                            multiple += 1
-                        except Exception as e:
-                            msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
-                            msg += str(item)
-                            logger.error(msg)
+                    try:
+                        color = TextColor(item['color']).recommendation
+                        text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                        text += item['name'] + "</em><br />" + seltext
+                        if item['memo'] is not None and item['memo'] != "":
+                            text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                        if item['important'] == 1:
+                            text += "<br /><em>IMPORTANT</em>"
+                        text += "</p>"
+                        multiple += 1
+                    except Exception as e:
+                        msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
+                        msg += str(item)
+                        logger.error(msg)
             if text != "":
                 if multiple > 1:
                     text = multiple_msg + text
