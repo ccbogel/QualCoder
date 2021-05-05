@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Copyright (c) 2020 Colin Curtain
+"""Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -202,14 +202,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by init and by unmark. """
 
         self.code_areas = []
-        sql = "select imid,id,x1, y1, width, height, memo, date, owner, cid from code_image"
+        sql = "select imid,id,x1, y1, width, height, memo, date, owner, cid, important from code_image"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         results = cur.fetchall()
+        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important'
         for row in results:
-            self.code_areas.append({'imid': row[0], 'id': row[1], 'x1': row[2], 'y1': row[3],
-            'width': row[4], 'height': row[5], 'memo': row[6], 'date': row[7], 'owner': row[8],
-            'cid': row[9]})
+            self.code_areas.append(dict(zip(keys, row)))
 
     def get_files(self):
         """ Load the image file data. Exclude those image file data where there are bad links.
@@ -252,7 +251,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -561,7 +560,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for c in self.codes:
                     if c['cid'] == item['cid']:
                         tooltip = c['name'] + " (" + item['owner'] + ")"
-                        tooltip += "\nMemo: " + item['memo']
+                        if item['memo'] != "":
+                            tooltip += "\nMemo: " + item['memo']
+                        if item['important'] == 1:
+                            tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
@@ -758,7 +760,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if event.type() == QtCore.QEvent.GraphicsSceneMouseRelease:
                     p1 = event.lastScenePos()
                     #logger.debug("rectangle release: " + str(p1.x()) +", " + str(p1.y()))
-                    self.code_area(p1)
+                    self.create_code_area(p1)
                     return True
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 2:  # right mouse
                 if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
@@ -774,7 +776,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         return False
 
     def scene_context_menu(self, pos):
-        """ Scene context menu for unmarking coded areas and adding memos. """
+        """ Scene context menu for setting importance, unmarking coded areas and adding memos. """
 
         # outside image area, no context menu
         for item in self.scene.items():
@@ -782,26 +784,39 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if pos.x() > item.boundingRect().width() or pos.y() > item.boundingRect().height():
                     self.selection = None
                     return
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        menu.addAction(_('Memo'))
-        menu.addAction(_('Unmark'))
         global_pos = QtGui.QCursor.pos()
         item = self.find_coded_areas_for_pos(pos)
-        # no coded area item in this mouse position
+        # No coded area item in this mouse position
         if item is None:
             return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_memo = menu.addAction(_('Memo'))
+        action_unmark = menu.addAction(_('Unmark'))
+        action_important = None
+        if item['important'] is None or item['important'] != 1:
+            action_important = menu.addAction(_("Add important mark"))
+        action_not_important = None
+        if item['important'] == 1:
+            action_not_important = menu.addAction(_("Remove important mark"))
         self.fill_coded_area_label(item)
         action = menu.exec_(global_pos)
         if action is None:
             return
-        if action.text() == _('Memo'):
+        if action == action_memo:
             self.coded_area_memo(item)
             self.app.delete_backup = False
-        if action.text() == _('Unmark'):
+            return
+        if action == action_unmark:
             self.unmark(item)
             self.app.delete_backup = False
+            return
+        if action == action_important:
+            self.set_coded_importance(item)
+            return
+        if action == action_not_important:
+            self.set_coded_importance(item, False)
+            return
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for this coder.
@@ -844,6 +859,23 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.label_coded_area.setText(msg)
         self.ui.label_coded_area.setToolTip(item['memo'])
 
+    def set_coded_importance(self, item, important=True):
+        """ Set or unset importance to coded image item.
+        Importance is denoted using '1'
+        params:
+            item: dictionary of coded area
+            important: boolean, default True """
+
+        importance = None
+        if important:
+            importance = 1
+        item['important'] = importance
+        cur = self.app.conn.cursor()
+        cur.execute('update code_image set important=? where imid=?', (importance, item['imid']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.draw_coded_areas()
+
     def coded_area_memo(self, item):
         """ Add memo to this coded area.
         param:
@@ -873,7 +905,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.change_scale()
         self.fill_code_counts_in_tree()
 
-    def code_area(self, p1):
+    def create_code_area(self, p1):
         """ Create coded area coordinates from mouse release.
         The point and width and height must be based on the original image size,
         so add in scale factor.
@@ -912,9 +944,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         #print("UNSCALED x", x, "y", y, "w", width, "h", height)
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
         'width': width_unscaled, 'height':height_unscaled, 'owner': self.app.settings['codername'],
-         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'cid': cid,'memo': ''}
+         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+        'cid': cid, 'memo': '', 'important': None}
         cur = self.app.conn.cursor()
-        cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner) values(?,?,?,?,?,?,?,?,?)"
+        cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,null)"
             , (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
             item['date'],item['owner']))
         self.app.conn.commit()
