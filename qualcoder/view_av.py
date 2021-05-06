@@ -174,8 +174,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment['end_msecs'] = None
         self.play_segment_end = None
         self.segments = []
-        self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
-                'owner': None, 'memo': None, 'date': None, 'avid': None}
+        '''self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
+                'owner': None, 'memo': None, 'date': None, 'avid': None}'''
         self.segment_for_text = None
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
@@ -730,7 +730,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         scaler = self.scene_width / self.media.get_duration()
         self.scene.clear()
         for s in self.segments:
-            self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self.text_for_segment, self))
+            self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))  # self.text_for_segment, self))
         # Set te scene to the top
         self.ui.graphicsView.verticalScrollBar().setValue(0)
 
@@ -861,7 +861,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_media, update_dialog_codes_and_categories,
         Segment_Graphics_Item.link_text_to_segment.
-        link_segment_to_text """
+        """
 
         if self.transcription is None:
             return
@@ -2136,7 +2136,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.ui.checkBox_scroll_transcript.isChecked():
             return
         cursor = self.ui.textEdit.cursorForPosition(position)
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
@@ -2145,6 +2145,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_end_pos = None
         action_play_text = None
         play_text_avid = None
+        action_important = None
+        action_not_important = None
         for item in self.code_text:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 if item['avid'] is not None:
@@ -2154,8 +2156,13 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_code_memo = menu.addAction(_("Memo coded text M"))
                 action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+                if item['important'] is None or item['important'] > 1:
+                    action_important = menu.addAction(_("Add important mark"))
+                if item['important'] == 1:
+                    action_not_important = menu.addAction(_("Remove important mark"))
                 break
-        if selectedText != "":
+        if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
             # Use up to 5 recent codes
@@ -2165,10 +2172,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                     submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-            if self.segment_for_text is None:
-                action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))
-            if self.segment_for_text is not None:
-                action_link_segment_to_text = menu.addAction(_("Link to segment to text"))
+            '''if self.segment_for_text is None:
+                action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))'''
+            '''if self.segment_for_text is not None:
+                action_link_segment_to_text = menu.addAction(_("Link to segment to text"))'''
         action_video_position_timestamp = -1
         for ts in self.time_positions:
             # print(ts, cursor.position())
@@ -2177,11 +2184,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
-        if selectedText != "" and action == action_copy:
+        if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
             return
-        if selectedText != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
+        if selected_text != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
+            return
+        if action == action_important:
+            self.set_coded_importance(cursor.position())
+            return
+        if action == action_not_important:
+            self.set_coded_importance(cursor.position(), False)
             return
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
@@ -2192,7 +2205,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action_play_text is not None and action == action_play_text:
             self.play_text(play_text_avid)
             return
-        if selectedText != "" and action == action_annotate:
+        if selected_text != "" and action == action_annotate:
             self.annotate(cursor.position())
             return
         try:
@@ -2201,12 +2214,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return
         except:
             pass
-        if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
+        '''if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
             self.prepare_link_text_to_segment()
             return
         if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
-            return
+            return'''
         if action == action_start_pos:
             self.change_text_code_pos(cursor.position(), "start")
             return
@@ -2217,6 +2230,50 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
+
+    def set_coded_importance(self, position, important=True):
+        """ Set or unset importance to coded text.
+        Importance is denoted using '1'
+        params:
+            position: textEdit character cursor position
+            important: boolean, default True """
+
+        # Need to get coded segments at this position
+        if position is None:
+            # Called via button
+            position = self.ui.textEdit.textCursor().position()
+        if self.file_ is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            #if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and \
+            if position >= item['pos0'] and position <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername'] and \
+                    ((not important and item['important'] == 1) or (important and item['important'] != 1)):
+                coded_text_list.append(item)
+        if coded_text_list == []:
+            return
+        text_item = None
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ok = ui.exec_()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if text_item is None:
+            return
+        importance = None
+        if important:
+            importance = 1
+        cur = self.app.conn.cursor()
+        cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            (importance, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def coded_text_memo(self, position=None):
         """ Add or edit a memo for this coded text.
@@ -2379,7 +2436,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # update codes and filter for tooltip
         self.get_coded_text_update_eventfilter_tooltips()'''
 
-    def prepare_link_text_to_segment(self):
+    '''def prepare_link_text_to_segment(self):
         """ Select text in transcription and prepare variable to be linked to a/v segment. """
 
         selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -2395,7 +2452,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.text_for_segment['owner'] = self.app.settings['codername']
         self.text_for_segment['memo'] = ""
         self.text_for_segment['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        self.text_for_segment['avid'] = None
+        self.text_for_segment['avid'] = None'''
 
     def set_video_to_timestamp_position(self, position):
         """ Set the video position to this time stamp.
@@ -2705,7 +2762,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     reload_segment = False
     code_av_dialog = None
 
-    def __init__(self, app, segment, scaler, text_for_segment, code_av_dialog):
+    def __init__(self, app, segment, scaler, code_av_dialog):  # text_for_segment, code_av_dialog):
         super(SegmentGraphicsItem, self).__init__(None)
 
         self.app = app
@@ -2736,8 +2793,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_important = None
         action_not_important = None
         action_link_segment_to_text = None
-        if self.code_av_dialog.text_for_segment['seltext'] is not None:
-            action_link_text = menu.addAction(_('Link text to segment'))
+        '''if self.code_av_dialog.text_for_segment['seltext'] is not None:
+            action_link_text = menu.addAction(_('Link text to segment'))'''
         if self.code_av_dialog.ui.textEdit.toPlainText() != "" and seltext != "":
             action_link_segment_to_text = menu.addAction(_("Link segment to selected text"))
         if self.segment['important'] is None or self.segment['important'] > 1:
@@ -2762,10 +2819,11 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action == action_edit_end:
             self.edit_segment_end()
             return
-        if self.code_av_dialog.text_for_segment['seltext'] is not None and action == action_link_text:
+        '''if self.code_av_dialog.text_for_segment['seltext'] is not None and action == action_link_text:
             self.link_text_to_segment()
-            return
-        if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment_to_text:
+            return'''
+        #if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment_to_text:
+        if seltext != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
             return
         if action == action_important:
@@ -2832,7 +2890,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.set_segment_tooltip()
 
-    def link_text_to_segment(self):
+    '''def link_text_to_segment(self):
         """ Link text to this segment. this will add a code to the text and insert
         a code_text entry into database.
         Must prepare to link text to segment by selecting tex and using context menu to prepare."""
@@ -2857,10 +2915,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.app.delete_backup = False
         except Exception as e:
             print(e)
-        print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
-                                                'owner': None, 'memo': None, 'date': None, 'avid': None}
+                                                'owner': None, 'memo': None, 'date': None, 'avid': None}'''
 
     def edit_segment_start(self):
         """ Edit segment start time. """
