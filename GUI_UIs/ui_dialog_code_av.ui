@@ -347,7 +347,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Help</string>
+       <string>Show codings flagged important</string>
       </property>
       <property name="text">
        <string/>
@@ -475,7 +475,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>Show files with selected file attributes</string>
         </property>
         <property name="text">
          <string/>
