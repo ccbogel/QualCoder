@@ -248,11 +248,11 @@ class Ui_Dialog_code_text(object):
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
         self.pushButton_next_file.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Next file</p></body></html>"))
         self.pushButton_document_memo.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File memo</p></body></html>"))
-        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File memo</p></body></html>"))
+        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_text", "Show files with file attributes"))
         self.pushButton_show_all_codings.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show all codings</p></body></html>"))
         self.pushButton_show_codings_prev.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show previous coding of selected code</p></body></html>"))
         self.pushButton_show_codings_next.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show next coding of selected code.</p></body></html>"))
-        self.pushButton_show_important.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show all codings</p></body></html>"))
+        self.pushButton_show_important.setToolTip(_translate("Dialog_code_text", "Show codings flagged important"))
 
 
 if __name__ == "__main__":

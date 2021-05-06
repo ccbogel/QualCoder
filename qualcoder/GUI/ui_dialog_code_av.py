@@ -181,11 +181,11 @@ class Ui_Dialog_code_av(object):
         self.pushButton_rate_up.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Increase play rate</p><p>Ctrl + Shift + &gt; </p></body></html>"))
         self.pushButton_rewind_5.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Rewind 5 seconds</p><p>Alt + R</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_code_av", "Help"))
-        self.pushButton_important.setToolTip(_translate("Dialog_code_av", "Help"))
+        self.pushButton_important.setToolTip(_translate("Dialog_code_av", "Show codings flagged important"))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_next_file.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Next file</p></body></html>"))
         self.pushButton_document_memo.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>File memo</p></body></html>"))
-        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>File memo</p></body></html>"))
+        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_av", "Show files with selected file attributes"))
         self.textEdit.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Transcript</p></body></html>"))
 
 

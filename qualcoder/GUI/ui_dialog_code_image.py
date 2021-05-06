@@ -124,11 +124,11 @@ class Ui_Dialog_code_image(object):
         self.label_code.setText(_translate("Dialog_code_image", "Code:"))
         self.label_coded_area.setText(_translate("Dialog_code_image", "Coded area:"))
         self.label_coded_area_icon.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>This coded area</p></body></html>"))
-        self.pushButton_important.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>File memo</p></body></html>"))
+        self.pushButton_important.setToolTip(_translate("Dialog_code_image", "Show codings flagged important"))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_next_file.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>Next file</p></body></html>"))
         self.pushButton_document_memo.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>File memo</p></body></html>"))
-        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_image", "<html><head/><body><p>File memo</p></body></html>"))
+        self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_image", "Show files using selected file attributes"))
 
 
 if __name__ == "__main__":
