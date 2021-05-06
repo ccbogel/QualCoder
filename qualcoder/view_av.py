@@ -2846,8 +2846,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         cur = self.app.conn.cursor()
         sql = "update code_av set important=?, date=? where avid=?"
         values = [important, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+        cur.execute(sql, values)
         self.app.conn.commit()
         self.app.delete_backup = False
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
         self.set_segment_tooltip()
 
     def link_segment_to_text(self):
@@ -2882,8 +2884,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.app.delete_backup = False
         except Exception as e:
             print(e)
-        print(self.code_av_dialog.text_for_segment)  # tmp
-        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        #print(self.code_av_dialog.text_for_segment)  # tmp
         self.code_av_dialog.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
                                                 'owner': None, 'memo': None, 'date': None, 'avid': None}
         # update codes and filter for tooltip

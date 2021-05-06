@@ -650,6 +650,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
         TODO: Possibly have picture data in base64 so there is no need for a separate folder.
+        TODO: REVIEW HTML EXPORT - some errors with images and a/v
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -847,22 +848,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
         if len(items) == 0:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('No codes'))
             msg = _("No codes have been selected.")
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('No codes'), msg, "warning").exec_()
             return
         if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Nothing selected'))
             msg = _("No files, cases or attributes have been selected.")
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Nothing selected'), msg, "warning").exec_()
             return
 
         # Prepare results table
@@ -882,6 +873,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i in items:
             codes_string += i.text(0) + ". "
         self.ui.textEdit.insertPlainText(codes_string)
+
+        important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
         parameters = ""
@@ -944,6 +937,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and seltext like ? "
                 parameters.append("%" + str(search_text) + "%")
+            if important:
+                sql += " and code_text.important=1 "
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -968,6 +963,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and code_image.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
+            if important:
+                sql += " and code_image.important=1 "
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -991,6 +988,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and code_av.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
+            if important:
+                sql += " and code_av.important=1 "
             if parameters == []:
                 cur.execute(sql)
             else:
