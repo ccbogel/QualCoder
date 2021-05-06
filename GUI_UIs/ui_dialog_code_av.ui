@@ -76,8 +76,8 @@
        <rect>
         <x>187</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -90,7 +90,7 @@
      <widget class="QSlider" name="horizontalSlider_vol">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>667</x>
         <y>19</y>
         <width>160</width>
         <height>18</height>
@@ -109,7 +109,7 @@
      <widget class="QLabel" name="label_volume">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>636</x>
         <y>14</y>
         <width>24</width>
         <height>24</height>
@@ -144,7 +144,7 @@
         <x>0</x>
         <y>10</y>
         <width>181</width>
-        <height>30</height>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -186,7 +186,7 @@
      <widget class="QComboBox" name="comboBox_tracks">
       <property name="geometry">
        <rect>
-        <x>840</x>
+        <x>836</x>
         <y>13</y>
         <width>51</width>
         <height>28</height>
@@ -197,13 +197,16 @@
       <property name="geometry">
        <rect>
         <x>530</x>
-        <y>50</y>
-        <width>541</width>
-        <height>22</height>
+        <y>51</y>
+        <width>301</width>
+        <height>21</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Cannot code text when play transcript box is checked.</string>
+      </property>
       <property name="text">
-       <string>Scroll transcript while playing. (Transcript cannot be coded).</string>
+       <string>Scroll transcript while playing.</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_rate">
@@ -243,8 +246,8 @@
        <rect>
         <x>256</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -259,8 +262,8 @@
        <rect>
         <x>294</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -275,8 +278,8 @@
        <rect>
         <x>510</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -291,8 +294,8 @@
        <rect>
         <x>600</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -307,8 +310,8 @@
        <rect>
         <x>220</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -321,10 +324,26 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>930</x>
-        <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <x>940</x>
+        <y>13</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Help</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_important">
+      <property name="geometry">
+       <rect>
+        <x>900</x>
+        <y>13</y>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -434,6 +453,22 @@
         <property name="geometry">
          <rect>
           <x>80</x>
+          <y>0</y>
+          <width>28</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_file_attributes">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
           <y>0</y>
           <width>28</width>
           <height>28</height>
