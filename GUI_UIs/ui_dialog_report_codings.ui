@@ -55,7 +55,7 @@
        <rect>
         <x>240</x>
         <y>20</y>
-        <width>211</width>
+        <width>171</width>
         <height>21</height>
        </rect>
       </property>
@@ -109,7 +109,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>88</y>
+        <y>81</y>
         <width>211</width>
         <height>30</height>
        </rect>
@@ -173,21 +173,21 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>70</y>
-        <width>451</width>
-        <height>45</height>
+        <y>58</y>
+        <width>521</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>45</height>
+        <height>30</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>45</height>
+        <height>30</height>
        </size>
       </property>
       <property name="text">
@@ -216,10 +216,10 @@
      <widget class="QLabel" name="label_matrix">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>600</x>
         <y>20</y>
-        <width>36</width>
-        <height>36</height>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -232,7 +232,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>640</x>
         <y>20</y>
         <width>151</width>
         <height>30</height>
@@ -240,6 +240,19 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_important">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>20</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Important flag</string>
       </property>
      </widget>
     </widget>
