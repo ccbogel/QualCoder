@@ -101,7 +101,9 @@ class DialogCodeText(QtWidgets.QWidget):
     search_index = 0
     selected_code_index = 0
     eventFilter = None
-    # A list of dictionaries {title, list of dictionary of sql commands}
+    important_flag = False  # Show/hide imporant flagged codes
+    file_attributes = []  # Show selected files in list widget
+    # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
     autocode_history = []
     # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
     code_resize_timer = 0
@@ -120,6 +122,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.codes, self.categories = self.app.get_data()
         self.recent_codes = []
         self.autocode_history = []
+        self.important_flag = False
+        self.file_attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
@@ -248,6 +252,15 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete_all_codes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+        self.ui.pushButton_show_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_important.pressed.connect(self.show_important_coded)
+
         self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
         self.ui.label_codes_count.setEnabled(False)
@@ -320,6 +333,22 @@ class DialogCodeText(QtWidgets.QWidget):
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
 
+    def show_files_from_attributes(self):
+        """ Trim the files list to files identified by attributes. """
+
+        print("File attributes todo")
+        pm = QtGui.QPixmap()
+        if self.file_attributes != []:
+            self.file_attributes = []
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files wit file attributes"))
+            self.get_files()
+            return
+
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+
     def update_sizes(self):
         """ Called by changed splitter size """
 
@@ -329,6 +358,20 @@ class DialogCodeText(QtWidgets.QWidget):
         v_sizes = self.ui.leftsplitter.sizes()
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
+
+    def show_important_coded(self):
+        """ Show codes flagged as important. """
+
+        self.important_flag = not(self.important_flag)
+        pm = QtGui.QPixmap()
+        if self.important_flag:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
+            self.ui.pushButton_show_important.setToolTip(_("Showing important codings"))
+        else:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+            self.ui.pushButton_show_important.setToolTip(_("Show codings flagged important"))
+        self.ui.pushButton_show_important.setIcon(QtGui.QIcon(pm))
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
@@ -775,7 +818,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Importance is denoted using '1'
         params:
             position: textEdit character cursor position
-            add: boolean, default True """
+            important: boolean, default True """
 
         # Need to get coded segments at this position
         if position is None:
@@ -1253,6 +1296,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: pushButton_show_codings_next
         """
 
+        self.important_flag = False
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
@@ -1318,6 +1362,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: pushButton_show_codings_previous
         """
 
+        self.important_flag = False
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
@@ -1374,6 +1419,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
+        self.important_flag = False
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0)
         self.ui.textEdit.setTextCursor(cursor)
@@ -2033,13 +2079,13 @@ class DialogCodeText(QtWidgets.QWidget):
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        coding_sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
-        coding_sql += " where fid=? and owner=? "
-        # for file text segment which is currently loaded
-        coding_sql += " and pos0 >=? and pos1 <=? "
-        coding_sql += "order by length(seltext) desc"
+        sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
+        sql += " where fid=? and owner=? "
+        # For file text segment which is currently loaded
+        sql += " and pos0 >=? and pos1 <=? "
+        sql += "order by length(seltext) desc"
         cur = self.app.conn.cursor()
-        cur.execute(coding_sql, sql_values)
+        cur.execute(sql, sql_values)
         code_results = cur.fetchall()
         keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important'
         for row in code_results:
@@ -2092,10 +2138,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     fmt.setFontItalic(True)
                 else:
                     fmt.setFontItalic(False)
-                #TODO need this ?
-                if id_ > 0 and id_ == item['cid']:
+                # Use important flag
+                if self.important_flag and item['important'] == 1:
                     cursor.setCharFormat(fmt)
-                if id_ == -1:
+                if not self.important_flag:
                     cursor.setCharFormat(fmt)
 
             # Add annotation marks - these are in bold
