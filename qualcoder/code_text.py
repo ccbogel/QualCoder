@@ -101,7 +101,7 @@ class DialogCodeText(QtWidgets.QWidget):
     search_index = 0
     selected_code_index = 0
     eventFilter = None
-    important_flag = False  # Show/hide imporant flagged codes
+    important = False  # Show/hide imporant codes
     file_attributes = []  # Show selected files in list widget
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
     autocode_history = []
@@ -122,7 +122,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.codes, self.categories = self.app.get_data()
         self.recent_codes = []
         self.autocode_history = []
-        self.important_flag = False
+        self.important = False
         self.file_attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
@@ -362,9 +362,9 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_important_coded(self):
         """ Show codes flagged as important. """
 
-        self.important_flag = not(self.important_flag)
+        self.important = not(self.important)
         pm = QtGui.QPixmap()
-        if self.important_flag:
+        if self.important:
             pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
             self.ui.pushButton_show_important.setToolTip(_("Showing important codings"))
         else:
@@ -1296,7 +1296,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: pushButton_show_codings_next
         """
 
-        self.important_flag = False
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
@@ -1362,7 +1361,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: pushButton_show_codings_previous
         """
 
-        self.important_flag = False
         if self.file_ is None:
             return
         item = self.ui.treeWidget.currentItem()
@@ -1419,7 +1417,6 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
-        self.important_flag = False
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0)
         self.ui.textEdit.setTextCursor(cursor)
@@ -2139,9 +2136,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 else:
                     fmt.setFontItalic(False)
                 # Use important flag
-                if self.important_flag and item['important'] == 1:
+                if self.important and item['important'] == 1:
                     cursor.setCharFormat(fmt)
-                if not self.important_flag:
+                if not self.important:
                     cursor.setCharFormat(fmt)
 
             # Add annotation marks - these are in bold

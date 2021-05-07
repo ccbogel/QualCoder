@@ -86,6 +86,8 @@ class DialogCodeImage(QtWidgets.QDialog):
     selection = None  # Initial code rectangle point
     scale = 1.0
     code_areas = []
+    important = False  # Show/hide imporant flagged codes
+    file_attributes = []
 
     def __init__(self, app, parent_textEdit, tab_reports):
         """ Show list of image files.
@@ -106,6 +108,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.log = ""
         self.scale = 1.0
         self.selection = None
+        self.important = False
+        self.file_attributes = []
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -128,7 +132,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.label_code.setStyleSheet(tree_font)  # usually smaller font
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.setWindowTitle(_("Image coding"))
-        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+        self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         # Icon images are 32x32 pixels within 36x36 pixel button
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon.png'))
         pm = QtGui.QPixmap()
@@ -154,12 +158,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_play_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/notepad_2_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
@@ -167,6 +169,15 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_coded_area_icon.setPixmap(pm)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -196,6 +207,20 @@ class DialogCodeImage(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter """
 
         self.codes, self.categories = self.app.get_data()
+
+    def show_important_coded(self):
+        """ Show codes flagged as important. """
+
+        self.important = not self.important
+        pm = QtGui.QPixmap()
+        if self.important:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
+            self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+        else:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+            self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.redraw_scene()
 
     def get_coded_areas(self):
         """ Get the coded area details for the rectangles.
@@ -236,6 +261,22 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
+
+    def show_files_from_attributes(self):
+        """ Trim the files list to files identified by attributes. """
+
+        print("File attributes todo")
+        pm = QtGui.QPixmap()
+        if self.file_attributes != []:
+            self.file_attributes = []
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files wit file attributes"))
+            self.get_files()
+            return
+
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -493,7 +534,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             if slider_value > 100:
                 slider_value = 100
             self.ui.horizontalSlider.setValue(slider_value)
-
         self.draw_coded_areas()
         self.fill_code_counts_in_tree()
 
@@ -511,25 +551,16 @@ class DialogCodeImage(QtWidgets.QDialog):
             for i in reversed(range(contents.count())):
                 c = contents.itemAt(i).widget()
                 if isinstance(c, DialogReportCodes):
-                    #try:
                     c.get_codes_categories_coders()
                     c.fill_tree()
-                    #except RuntimeError as e:
-                    #    pass
                 if isinstance(c, DialogReportCoderComparisons):
-                    #try:
                     c.get_data()
                     c.fill_tree()
-                    #except RuntimeError as e:
-                    #    pass
                 if isinstance(c, DialogReportCodeFrequencies):
-                    #try:
                     c.get_data()
                     c.fill_tree()
-                    #except RuntimeError as e:
-                    #    pass
 
-    def change_scale(self):
+    def redraw_scene(self):
         """ Resize image. Triggered by user change in slider.
         Also called by unmark, as all items need to be redrawn. """
 
@@ -573,7 +604,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
                 rect_item.setToolTip(tooltip)
                 if item['owner'] == self.app.settings['codername']:
-                    self.scene.addItem(rect_item)
+                    if self.important and item['important'] == 1:
+                        self.scene.addItem(rect_item)
+                    if not self.important:
+                        self.scene.addItem(rect_item)
 
     def fill_code_label(self):
         """ Fill code label with currently selected item's code name. """
@@ -690,7 +724,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories()
 
     def show_codes_like(self):
-        """ Show all codes if text is empty.
+        """ Show all codes if text parameter is empty.
          Show selected codes that contain entered text. """
 
         # Input dialog narrow, so code below
@@ -902,7 +936,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute("delete from code_image where imid=?", [item['imid'], ])
         self.app.conn.commit()
         self.get_coded_areas()
-        self.change_scale()
+        self.redraw_scene()
         self.fill_code_counts_in_tree()
 
     def create_code_area(self, p1):
@@ -1038,7 +1072,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             parent : QTreeWidgetItem """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
-        #TODO might need to add font size
+        #TODO might need to add font size, somehow
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
@@ -1373,7 +1407,7 @@ class DialogViewImage(QtWidgets.QDialog):
         self.label.setPixmap(self.pixmap)
         self.ui.scrollArea.setWidget(self.label)
         self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
-        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+        self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.textEdit.setText(self.image_data['memo'])
 
         # Scale initial picture by height to mostly fit inside scroll area
@@ -1387,7 +1421,7 @@ class DialogViewImage(QtWidgets.QDialog):
                 slider_value = 100
             self.ui.horizontalSlider.setValue(slider_value)
 
-    def change_scale(self):
+    def redraw_scene(self):
         """ Resize image based on slider position. """
 
         scale = (self.ui.horizontalSlider.value() + 1) / 100
