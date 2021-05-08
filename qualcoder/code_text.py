@@ -762,10 +762,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if action is None:
             return
         if action == action_important:
-            self.set_coded_importance(cursor.position())
+            self.set_important(cursor.position())
             return
         if action == action_not_important:
-            self.set_coded_importance(cursor.position(), False)
+            self.set_important(cursor.position(), False)
             return
         if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
@@ -813,7 +813,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text)
 
-    def set_coded_importance(self, position, important=True):
+    def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
         params:
@@ -839,7 +839,7 @@ class DialogCodeText(QtWidgets.QWidget):
             text_item = coded_text_list[0]
         # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "single")
             ok = ui.exec_()
             if not ok:
                 return
@@ -1526,7 +1526,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
         # update filter for tooltip
-        self.eventFilterTT.setCodes(self.code_text, self.codes, self.file_['start'])
+        self.eventFilterTT.set_codes(self.code_text, self.codes, self.file_['start'])
 
     def add_code(self, catid=None):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
@@ -2068,7 +2068,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_search_totals.setText("0 / 0")
 
     def get_coded_text_update_eventfilter_tooltips(self):
-        """ Called by load_file, and from other dialogs on update. """
+        """ Called by load_file, and from other dialogs on update.
+        Tooltips are for all coded_text or only for vimportant if important is flagged.
+        """
 
         if self.file_ is None:
             return
@@ -2088,7 +2090,14 @@ class DialogCodeText(QtWidgets.QWidget):
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
-        self.eventFilterTT.setCodes(self.code_text, self.codes, self.file_['start'])
+        if self.important:
+            imp_coded = []
+            for c in self.code_text:
+                if c['important'] == 1:
+                    imp_coded.append(c)
+            self.eventFilterTT.set_codes(imp_coded, self.codes, self.file_['start'])
+        else:
+            self.eventFilterTT.set_codes(self.code_text, self.codes, self.file_['start'])
         self.unlight()
         self.highlight()
 
@@ -2306,7 +2315,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selectedText,
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+        'important': None}
 
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
@@ -2318,15 +2328,15 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         self.code_text.append(coded)
         self.highlight()
-        try:
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
-                coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
-                coded['memo'], coded['date']))
-            self.app.conn.commit()
-            self.app.delete_backup = False
-        except Exception as e:
-            logger.debug(str(e))
+        #try:
+        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
+            coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
+            coded['memo'], coded['date'], coded['important']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        #except Exception as e:
+        #    logger.debug(str(e))
 
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
@@ -2771,7 +2781,7 @@ class ToolTip_EventFilter(QtCore.QObject):
     code_text = None
     offset = 0
 
-    def setCodes(self, code_text, codes, offset):
+    def set_codes(self, code_text, codes, offset):
         """ Code_text contains the coded text to be displayed in a tooptip.
 
         param:
@@ -2792,9 +2802,9 @@ class ToolTip_EventFilter(QtCore.QObject):
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.ToolTip:
-            helpEvent = QHelpEvent(event)
+            help_event = QHelpEvent(event)
             cursor = QtGui.QTextCursor()
-            cursor = receiver.cursorForPosition(helpEvent.pos())
+            cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             text = ""
@@ -2806,23 +2816,22 @@ class ToolTip_EventFilter(QtCore.QObject):
                 return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
                 if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos and item['seltext'] is not None:
-                    # Keep the snippets short
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
                     seltext = seltext.replace("\r", "")
-                    # if selected text is long just show start end snippets with a readable cut off (ie not cut off halway through a word)
+                    # Selected text is long show start end snippets with a readable cut off (ie not cut off halfway through a word)
                     if len(seltext) > 90:
-                        pretext = seltext[0:40].split(' ')
-                        posttext = seltext[len(seltext) - 40:].split(' ')
+                        pre = seltext[0:40].split(' ')
+                        post = seltext[len(seltext) - 40:].split(' ')
                         try:
-                            pretext = pretext[:-1]
+                            pre = pre[:-1]
                         except:
                             pass
                         try:
-                            posttext = posttext[1:]
+                            post = post[1:]
                         except:
                             pass
-                        seltext = " ".join(pretext) + " ... " + " ".join(posttext)
+                        seltext = " ".join(pre) + " ... " + " ".join(post)
                     try:
                         color = TextColor(item['color']).recommendation
                         text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
@@ -2841,6 +2850,5 @@ class ToolTip_EventFilter(QtCore.QObject):
                 if multiple > 1:
                     text = multiple_msg + text
                 receiver.setToolTip(text)
-
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
