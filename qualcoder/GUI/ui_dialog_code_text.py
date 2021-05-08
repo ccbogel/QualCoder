@@ -200,10 +200,10 @@ class Ui_Dialog_code_text(object):
         self.pushButton_show_codings_next.setGeometry(QtCore.QRect(50, 0, 28, 28))
         self.pushButton_show_codings_next.setText("")
         self.pushButton_show_codings_next.setObjectName("pushButton_show_codings_next")
-        self.pushButton_show_important = QtWidgets.QPushButton(self.groupBox_coding_buttons)
-        self.pushButton_show_important.setGeometry(QtCore.QRect(130, 0, 28, 28))
-        self.pushButton_show_important.setText("")
-        self.pushButton_show_important.setObjectName("pushButton_show_important")
+        self.pushButton_important = QtWidgets.QPushButton(self.groupBox_coding_buttons)
+        self.pushButton_important.setGeometry(QtCore.QRect(130, 0, 28, 28))
+        self.pushButton_important.setText("")
+        self.pushButton_important.setObjectName("pushButton_important")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
@@ -252,7 +252,7 @@ class Ui_Dialog_code_text(object):
         self.pushButton_show_all_codings.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show all codings</p></body></html>"))
         self.pushButton_show_codings_prev.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show previous coding of selected code</p></body></html>"))
         self.pushButton_show_codings_next.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show next coding of selected code.</p></body></html>"))
-        self.pushButton_show_important.setToolTip(_translate("Dialog_code_text", "Show codings flagged important"))
+        self.pushButton_important.setToolTip(_translate("Dialog_code_text", "Show codings flagged important"))
 
 
 if __name__ == "__main__":
