@@ -258,8 +258,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-        self.ui.pushButton_show_important.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_important.pressed.connect(self.show_important_coded)
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
 
         self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
         self.ui.comboBox_codes_in_text.setEnabled(False)
@@ -342,12 +342,13 @@ class DialogCodeText(QtWidgets.QWidget):
             self.file_attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files wit file attributes"))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
 
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        #TODO
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -366,11 +367,11 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         if self.important:
             pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
-            self.ui.pushButton_show_important.setToolTip(_("Showing important codings"))
+            self.ui.pushButton_important.setToolTip(_("Showing important codings"))
         else:
             pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-            self.ui.pushButton_show_important.setToolTip(_("Show codings flagged important"))
-        self.ui.pushButton_show_important.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.get_coded_text_update_eventfilter_tooltips()
 
     def fill_code_label_undo_show_selected_code(self):

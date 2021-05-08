@@ -139,6 +139,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     transcription = None  # A tuple of id, fulltext, name
     # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
+    important = False  # Flag to show or hide important coded text and segments
+    file_attributes = []  # Show selected files in list widget
 
     # Overlapping codes in text index
     overlap_code_index = 0
@@ -164,6 +166,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.annotations = []
         self.code_text = []
         self.time_positions = []
+        self.important = False
+        self.file_attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.transcription = None
@@ -245,6 +249,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
 
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
@@ -401,6 +413,50 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
+
+    def show_files_from_attributes(self):
+        """ Trim the files list to files identified by attributes. """
+
+        print("File attributes todo")
+        pm = QtGui.QPixmap()
+        if self.file_attributes != []:
+            self.file_attributes = []
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
+            self.get_files()
+            return
+
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        #TODO
+
+
+    def show_important_coded(self):
+        """ Show codes flagged as important.
+         Hide the remaining coded text and segments. """
+
+        self.important = not(self.important)
+        pm = QtGui.QPixmap()
+        if self.important:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
+            self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+        else:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+            self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.get_coded_text_update_eventfilter_tooltips()
+
+        # Draw coded segments in scene
+        scaler = self.scene_width / self.media.get_duration()
+        self.scene.clear()
+        for s in self.segments:
+            if not self.important:
+                self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
+            if self.important and s['important'] == 1:
+                self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
+        # Set te scene to the top
+        self.ui.graphicsView.verticalScrollBar().setValue(0)
 
     def assign_selected_text_to_code(self):
         """ Assign selected text on left-click on code in tree. """
@@ -882,7 +938,14 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.code_text.append(dict(zip(keys, row)))
 
         # Update filter for tooltip and redo formatting
-        self.eventFilterTT.setCodes(self.code_text, self.codes)
+        if self.important:
+            imp_coded = []
+            for c in self.code_text:
+                if c['important'] == 1:
+                    imp_coded.append(c)
+            self.eventFilterTT.set_codes(imp_coded, self.codes)
+        else:
+            self.eventFilterTT.set_codes(self.code_text, self.codes)
         self.unlight()
         self.highlight()
 
@@ -2088,7 +2151,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             else:
                 fmt.setFontItalic(False)
                 fmt.setFontWeight(QtGui.QFont.Normal)
-            cursor.setCharFormat(fmt)
+            # Use important flag
+            if self.important and item['important'] == 1:
+                cursor.setCharFormat(fmt)
+            if not self.important:
+                cursor.setCharFormat(fmt)
 
         # add annotation marks - these are in bold
         for note in self.annotations:
@@ -2191,10 +2258,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.mark()
             return
         if action == action_important:
-            self.set_coded_importance(cursor.position())
+            self.set_important(cursor.position())
             return
         if action == action_not_important:
-            self.set_coded_importance(cursor.position(), False)
+            self.set_important(cursor.position(), False)
             return
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
@@ -2231,7 +2298,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def set_coded_importance(self, position, important=True):
+    def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
         params:
@@ -2258,7 +2325,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             text_item = coded_text_list[0]
         # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to memo"), "single")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "single")
             ok = ui.exec_()
             if not ok:
                 return
@@ -2641,7 +2708,7 @@ class ToolTip_EventFilter(QtCore.QObject):
     codes = None
     code_text = None
 
-    def setCodes(self, code_text, codes):
+    def set_codes(self, code_text, codes):
         self.code_text = code_text
         self.codes = codes
         for item in self.code_text:
