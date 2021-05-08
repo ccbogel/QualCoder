@@ -676,7 +676,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_show_important">
+       <widget class="QPushButton" name="pushButton_important">
         <property name="geometry">
          <rect>
           <x>130</x>
