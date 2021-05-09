@@ -257,6 +257,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        self.ui.pushButton_file_attributes.hide()  # Temporary
 
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)

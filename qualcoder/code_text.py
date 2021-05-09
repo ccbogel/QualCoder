@@ -51,6 +51,7 @@ from information import DialogInformation
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
+from report_attributes import DialogSelectAttributeParameters
 from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from report_codes import DialogReportCodes
 from report_code_summary import DialogReportCodeSummary  # for isinstance()
@@ -256,6 +257,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        self.ui.pushButton_file_attributes.hide()  # Temporary
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -305,7 +307,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def get_files(self):
         """ Get files with additional details and fill list widget.
-         Called by: init """
+         Called by: init, show_files_from_attributes """
 
         self.ui.listWidget.clear()
         self.filenames = self.app.get_text_filenames()
@@ -336,7 +338,6 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_files_from_attributes(self):
         """ Trim the files list to files identified by attributes. """
 
-        print("File attributes todo")
         pm = QtGui.QPixmap()
         if self.file_attributes != []:
             self.file_attributes = []
@@ -345,10 +346,22 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
-
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        #TODO
+        ui = DialogSelectAttributeParameters(self.app, "file")
+        ok = ui.exec_()
+        if not ok:
+            self.files_attributes = []
+            return
+        self.file_attributes = ui.parameters
+        if self.file_attributes == []:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
+            self.get_files()
+            return
+        for f in self.file_attributes:
+            print(f)
 
     def update_sizes(self):
         """ Called by changed splitter size """

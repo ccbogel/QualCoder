@@ -173,6 +173,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        self.ui.pushButton_file_attributes.hide()  # Temporary
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
