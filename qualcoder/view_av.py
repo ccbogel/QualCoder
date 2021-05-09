@@ -437,6 +437,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Show codes flagged as important.
          Hide the remaining coded text and segments. """
 
+        if self.media is None:
+            return
         self.important = not(self.important)
         pm = QtGui.QPixmap()
         if self.important:
