@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtCore, QtWidgets
 import logging
@@ -52,10 +52,10 @@ def exception_handler(exception_type, value, tb_obj):
     
 
 class DialogSelectAttributeParameters(QtWidgets.QDialog):
-    ''' Select parameters for attributes to limit coding report results.
+    """ Select parameters for attributes to limit coding report results.
     Parameters are either case-based or file-based.
     The English SQL operators: not, between, etc. cannot be exchanged for another language.
-    '''
+    """
 
     NAME_COLUMN = 0
     CASE_OR_FILE_COLUMN = 1
@@ -66,15 +66,20 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     app = None
     attribute_type = []
     parameters = []
+    limiter = "all"  # all for cases and files, file = file attributes, case = case attributes
 
-    def __init__(self, app, parent=None):
+    def __init__(self, app, limiter="all", parent=None):
 
-        super(DialogSelectAttributeParameters, self).__init__(parent)  # overrride accept method
+        super(DialogSelectAttributeParameters, self).__init__(parent)
         sys.excepthook = exception_handler
         self.app = app
         self.parameters = []
         cur = self.app.conn.cursor()
         sql = "select name, valuetype, memo, caseOrFile from attribute_type"
+        if limiter == "case":
+            sql = "select name, valuetype, memo, 'case' from attribute_type where caseOrFile='case'"
+        if limiter == "file":
+            sql = "select name, valuetype, memo, 'file' from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         result = cur.fetchall()
         self.attribute_type = []

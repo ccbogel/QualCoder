@@ -99,6 +99,9 @@ class DialogJournals(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font += '"' + self.app.settings['font'] + '";'
+        self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         try:
             s0 = int(self.app.settings['dialogjournals_splitter0'])

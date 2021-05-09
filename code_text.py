@@ -257,7 +257,6 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
-        self.ui.pushButton_file_attributes.hide()  # Temporary
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -307,7 +306,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def get_files(self):
         """ Get files with additional details and fill list widget.
-         Called by: init, show_files_from_attributes """
+         Called by: init """
 
         self.ui.listWidget.clear()
         self.filenames = self.app.get_text_filenames()
@@ -338,6 +337,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_files_from_attributes(self):
         """ Trim the files list to files identified by attributes. """
 
+        print("File attributes todo")
         pm = QtGui.QPixmap()
         if self.file_attributes != []:
             self.file_attributes = []
@@ -348,20 +348,12 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        ui = DialogSelectAttributeParameters(self.app, "file")
+        ui = DialogSelectAttributeParameters(self.app)
         ok = ui.exec_()
         if not ok:
-            self.files_attributes = []
+            self.attribute_selection = []
             return
         self.file_attributes = ui.parameters
-        if self.file_attributes == []:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
-            self.get_files()
-            return
-        for f in self.file_attributes:
-            print(f)
 
     def update_sizes(self):
         """ Called by changed splitter size """
