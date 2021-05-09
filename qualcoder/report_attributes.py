@@ -86,6 +86,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         for row in result:
             self.attribute_type.append({'name': row[0], 'valuetype': row[1],
                 'memo': row[2], 'caseOrFile': row[3]})
+        #Add case name option to files attributes
+        if limiter == "file":
+            casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
+            self.attribute_type.append(casenames)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_report_attribute_parameters()
         self.ui.setupUi(self)
