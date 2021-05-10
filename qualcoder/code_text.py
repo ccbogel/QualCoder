@@ -103,7 +103,7 @@ class DialogCodeText(QtWidgets.QWidget):
     selected_code_index = 0
     eventFilter = None
     important = False  # Show/hide imporant codes
-    file_attributes = []  # Show selected files in list widget
+    attributes = []  # Show selected files using these attributes in list widget
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
     autocode_history = []
     # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
@@ -124,7 +124,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []
         self.autocode_history = []
         self.important = False
-        self.file_attributes = []
+        self.attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
@@ -257,7 +257,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
-        self.ui.pushButton_file_attributes.hide()  # Temporary
+        self.ui.pushButton_file_attributes.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -305,12 +305,15 @@ class DialogCodeText(QtWidgets.QWidget):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(font)
 
-    def get_files(self):
+    def get_files(self, ids=[]):
         """ Get files with additional details and fill list widget.
-         Called by: init, show_files_from_attributes """
+         Called by: init, show_files_from_attributes
+         param:
+         ids: list, fill with ids to limit file selection.
+         """
 
         self.ui.listWidget.clear()
-        self.filenames = self.app.get_text_filenames()
+        self.filenames = self.app.get_text_filenames(ids)
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), fulltext from source where id=?"
@@ -336,11 +339,23 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.listWidget.addItem(item)
 
     def show_files_from_attributes(self):
-        """ Trim the files list to files identified by attributes. """
+        """ Trim the files list to files identified by attributes.
+        Attribute dialing results are a dictionary of:
+        [0] attribute name, or 'case name'
+        [1] attribute type: character, numeric
+        [2] modifier: > < == != like between
+        [3] comparison value as list, one item or two items for between
+
+        DialogSelectAttributeParameters returns:
+        ['source', 'file', 'character', '==', ["'interview'"]]
+        ['case name', 'case', 'character', '==', ["'ID1'"]]
+
+        Note, sqls are NOT parameterised.
+        """
 
         pm = QtGui.QPixmap()
-        if self.file_attributes != []:
-            self.file_attributes = []
+        if self.attributes != []:
+            self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
@@ -351,17 +366,50 @@ class DialogCodeText(QtWidgets.QWidget):
         ui = DialogSelectAttributeParameters(self.app, "file")
         ok = ui.exec_()
         if not ok:
-            self.files_attributes = []
+            self.attributes = []
             return
-        self.file_attributes = ui.parameters
-        if self.file_attributes == []:
+        self.attributes = ui.parameters
+        if self.attributes == []:
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
-        for f in self.file_attributes:
-            print(f)
+
+        res = []
+        cur = self.app.conn.cursor()
+        for a in self.attributes:
+            #print(a)
+            # File attributes
+            if a[1] == 'file':
+                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
+                sql += " and attribute.value " + a[3] + " "
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += "("
+                sql += ','.join(a[4])  # if one item the comma is skipped
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += ")"
+                if a[2] == 'numeric':
+                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                sql += " and attribute.attr_type='file' "
+                #sqls.append(sql)
+                cur.execute(sql)
+                res.append(cur.fetchall())
+            # Case names
+            if a[1] == "case":
+                # Case text table also links av and images
+                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
+                sql += "join source on source.id=case_text.fid where cases.name " +a[3]
+                sql += a[4][0]
+                print(sql)
+                #sqls.append(sql)
+                cur.execute(sql)
+                res.append(cur.fetchall())
+        print(res)
+
+
+
+
 
     def update_sizes(self):
         """ Called by changed splitter size """
