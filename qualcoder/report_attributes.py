@@ -73,6 +73,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         super(DialogSelectAttributeParameters, self).__init__(parent)
         sys.excepthook = exception_handler
         self.app = app
+        self.limiter = limiter
         self.parameters = []
         cur = self.app.conn.cursor()
         sql = "select name, valuetype, memo, caseOrFile from attribute_type"
@@ -87,7 +88,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.attribute_type.append({'name': row[0], 'valuetype': row[1],
                 'memo': row[2], 'caseOrFile': row[3]})
         #Add case name option to files attributes
-        if limiter == "file":
+        if self.limiter == "file":
             casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
             self.attribute_type.append(casenames)
         QtWidgets.QDialog.__init__(self)
@@ -217,7 +218,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.TYPE_COLUMN, item)
             item = QtWidgets.QComboBox()
-            item.addItems(['', '<', '>', '<=', '>=', '==', '!=', 'in', 'not in', 'between', 'like'])
+            items = ['', '<', '>', '<=', '>=', '==', '!=', 'in', 'not in', 'between', 'like']
+            if self.limiter == "file" and a['caseOrFile'] == "case":
+                items = ['', '==', '!=', 'in', 'not in', 'like']
+            item.addItems(items)
             self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, item)
             item = QtWidgets.QTableWidgetItem('')
             #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
