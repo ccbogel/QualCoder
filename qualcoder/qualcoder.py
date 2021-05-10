@@ -274,33 +274,54 @@ class App(object):
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_text_filenames(self):
-        """ Get filenames of text files. """
-
+    def get_text_filenames(self, ids=[]):
+        """ Get filenames of text files.
+        param:
+            ids: list of Integer ids for a restricted list of files. """
+        sql = "select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') "
+        if ids != []:
+            str_ids = list(map(str, ids))
+            sql += " and id in (" + ",".join(str_ids) + ")"
+        sql += "order by lower(name)"
         cur = self.conn.cursor()
-        cur.execute("select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') order by lower(name)")
+        cur.execute(sql)
         result = cur.fetchall()
         res = []
         for row in result:
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_image_filenames(self):
-        """ Get filenames of image files only. """
+    def get_image_filenames(self, ids=[]):
+        """ Get filenames of image files only.
+        param:
+            ids: list of Integer ids for a restricted list of files. """
 
+        sql = "select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%'"
+        if ids != []:
+            str_ids = list(map(str, ids))
+            sql += " and id in (" + ",".join(str_ids) + ")"
+        sql += " order by lower(name)"
         cur = self.conn.cursor()
-        cur.execute("select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%' order by lower(name)")
+        cur.execute(sql)
         result = cur.fetchall()
         res = []
         for row in result:
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_av_filenames(self):
-        """ Get filenames of audio video files only. """
+    def get_av_filenames(self, ids=[]):
+        """ Get filenames of audio video files only.
+        param:
+            ids: list of Integer ids for a restricted list of files. """
 
+        sql = "select id, name, memo from source where "
+        sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
+        if ids != []:
+            str_ids = list(map(str, ids))
+            sql += " and id in (" + ",".join(str_ids) + ")"
+        sql += " order by lower(name)"
         cur = self.conn.cursor()
-        cur.execute("select id, name, memo from source where (mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') order by lower(name)")
+        cur.execute(sql)
         result = cur.fetchall()
         res = []
         for row in result:
