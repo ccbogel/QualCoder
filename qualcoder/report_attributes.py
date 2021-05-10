@@ -220,7 +220,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             item = QtWidgets.QComboBox()
             items = ['', '<', '>', '<=', '>=', '==', '!=', 'in', 'not in', 'between', 'like']
             if self.limiter == "file" and a['caseOrFile'] == "case":
-                items = ['', '==', '!=', 'in', 'not in', 'like']
+                items = ['', '==', '!=', 'like']
             item.addItems(items)
             self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, item)
             item = QtWidgets.QTableWidgetItem('')
