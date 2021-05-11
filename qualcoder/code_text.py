@@ -445,7 +445,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_important_coded(self):
         """ Show codes flagged as important. """
 
-        self.important = not(self.important)
+        self.important = not self.important
         pm = QtGui.QPixmap()
         if self.important:
             pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
@@ -464,19 +464,15 @@ class DialogCodeText(QtWidgets.QWidget):
 
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
-            self.ui.label_code.setText(_("NO CODE SELECTED"))
-            self.ui.label_code.setStyleSheet("QLabel { background-color : None; }");
+            self.ui.label_code.hide()
             return
+        self.ui.label_code.show()
         self.ui.label_code.setText("Code: " + current.text(0))
         # update background colour of label and store current code for underlining
         code_for_underlining = None
         for c in self.codes:
             if current.text(0) == c['name']:
-                #palette = self.ui.label_code.palette()
-                #code_color = QColor(c['color'])
                 fg_color = TextColor(c['color']).recommendation
-                #palette.setColor(QtGui.QPalette.Window, code_color)
-                #self.ui.label_code.setPalette(palette)
                 style = "QLabel {background-color :" + c['color'] + "; color : "+ fg_color +";}"
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
