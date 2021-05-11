@@ -505,7 +505,9 @@ class App(object):
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
-        QHeaderView::section {background-color: #505050; color: #ffce42}\n\
+        QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
+        QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
+        QTreeWidget::item:selected {border-left: 2px solid red; color: #eeeeee;}\n\
         QTreeWidget {font-size: 12px;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
@@ -516,7 +518,9 @@ class App(object):
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
+        QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QTreeWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTreeWidget {font-size: 12px;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
