@@ -257,7 +257,6 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
-        self.ui.pushButton_file_attributes.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -346,15 +345,18 @@ class DialogCodeText(QtWidgets.QWidget):
         [2] modifier: > < == != like between
         [3] comparison value as list, one item or two items for between
 
-        DialogSelectAttributeParameters returns:
+        DialogSelectAttributeParameters returns lists for each parameter selected of:
+        attribute name, file or case, character or numeric, operator, list of one or two comparator values
+        two comparator values are used with the 'between' operator
         ['source', 'file', 'character', '==', ["'interview'"]]
         ['case name', 'case', 'character', '==', ["'ID1'"]]
 
         Note, sqls are NOT parameterised.
+        results from multiple parameters are intersected, an AND boolean function.
         """
 
         pm = QtGui.QPixmap()
-        if self.attributes != []:
+        if self.attributes:
             self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
@@ -369,7 +371,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.attributes = []
             return
         self.attributes = ui.parameters
-        if self.attributes == []:
+        if not self.attributes:
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
@@ -392,24 +394,43 @@ class DialogCodeText(QtWidgets.QWidget):
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
                 sql += " and attribute.attr_type='file' "
-                #sqls.append(sql)
+                #print(sql)
                 cur.execute(sql)
-                res.append(cur.fetchall())
+                result = cur.fetchall()
+                ids = []
+                for i in result:
+                    if i:
+                        ids.append(i[0])
+                #print("file", ids)
+                if ids:
+                    res.append(ids)
             # Case names
             if a[1] == "case":
                 # Case text table also links av and images
                 sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
                 sql += "join source on source.id=case_text.fid where cases.name " +a[3]
                 sql += a[4][0]
-                print(sql)
-                #sqls.append(sql)
+                #print(sql)
                 cur.execute(sql)
-                res.append(cur.fetchall())
-        print(res)
-
-
-
-
+                result = cur.fetchall()
+                ids = []
+                for i in result:
+                    if i:
+                        ids.append(i[0])
+                #print("case",  ids)
+                if ids:
+                    res.append(ids)
+        #print("res, list of lists", res)
+        # Converts each list to a set, then applies the set.intersection function
+        res_set = set.intersection(*[set(x) for x in res])
+        #print(res_set, type(res_set))
+        res_list = list(res_set)
+        self.get_files(res_list)
+        msg = ""
+        for a in self.attributes:
+            msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        msg = msg[4:]
+        self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
 
     def update_sizes(self):
         """ Called by changed splitter size """
