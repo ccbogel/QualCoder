@@ -88,6 +88,7 @@ from GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from helpers import msecs_to_hours_mins_secs, Message, DialogCodeInAllFiles
 from information import DialogInformation
 from memo import DialogMemo
+from report_attributes import DialogSelectAttributeParameters
 from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from report_codes import DialogReportCodes
 from select_items import DialogSelectItems
@@ -140,7 +141,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     # transcribed time positions as list of [text_pos0, text_pos1, milliseconds]
     time_positions = []
     important = False  # Flag to show or hide important coded text and segments
-    file_attributes = []  # Show selected files in list widget
+    attributes = []  # Show selected files in list widget
 
     # Overlapping codes in text index
     overlap_code_index = 0
@@ -167,7 +168,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.code_text = []
         self.time_positions = []
         self.important = False
-        self.file_attributes = []
+        self.attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.transcription = None
@@ -257,7 +258,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
-        self.ui.pushButton_file_attributes.hide()  # Temporary
 
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
@@ -388,9 +388,11 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_data()
 
-    def get_files(self):
+    def get_files(self, ids=[]):
         """ Get AV files and exclude those with bad links.
-        Fill list widget with file names. """
+        Fill list widget with file names.
+        param:
+            ids : list of Integer ids to restrict files """
 
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
@@ -398,11 +400,15 @@ class DialogCodeAV(QtWidgets.QDialog):
             bl_sql += "," + str(bl['id'])
         if len(bl_sql) > 0:
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
-
         self.files = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, id, memo, owner, date, mediapath from source where \
-            substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " order by name")
+        sql = "select name, id, memo, owner, date, mediapath from source where "
+        sql += "substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " "
+        if ids:
+            str_ids = list(map(str, ids))
+            sql += " and id in (" + ",".join(str_ids) + ")"
+        sql += " order by name"
+        cur.execute(sql)
         result = cur.fetchall()
         self.files = []
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
@@ -418,19 +424,82 @@ class DialogCodeAV(QtWidgets.QDialog):
     def show_files_from_attributes(self):
         """ Trim the files list to files identified by attributes. """
 
-        print("File attributes todo")
         pm = QtGui.QPixmap()
-        if self.file_attributes != []:
-            self.file_attributes = []
+        if self.attributes:
+            self.attributes = []
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
+            self.get_files()
+            return
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        ui = DialogSelectAttributeParameters(self.app, "file")
+        ok = ui.exec_()
+        if not ok:
+            self.attributes = []
+            return
+        self.attributes = ui.parameters
+        if not self.attributes:
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
 
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        #TODO
+        res = []
+        cur = self.app.conn.cursor()
+        for a in self.attributes:
+            # print(a)
+            # File attributes
+            if a[1] == 'file':
+                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
+                sql += " and attribute.value " + a[3] + " "
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += "("
+                sql += ','.join(a[4])  # if one item the comma is skipped
+                if a[3] in ('in', 'not in', 'between'):
+                    sql += ")"
+                if a[2] == 'numeric':
+                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                sql += " and attribute.attr_type='file' "
+                # print(sql)
+                cur.execute(sql)
+                result = cur.fetchall()
+                ids = []
+                for i in result:
+                    if i:
+                        ids.append(i[0])
+                # print("file", ids)
+                if ids:
+                    res.append(ids)
+            # Case names
+            if a[1] == "case":
+                # Case text table also links av and images
+                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
+                sql += "join source on source.id=case_text.fid where cases.name " + a[3]
+                sql += a[4][0]
+                # print(sql)
+                cur.execute(sql)
+                result = cur.fetchall()
+                ids = []
+                for i in result:
+                    if i:
+                        ids.append(i[0])
+                # print("case",  ids)
+                if ids:
+                    res.append(ids)
+        # print("res, list of lists", res)
+        # Converts each list to a set, then applies the set.intersection function
+        res_set = set.intersection(*[set(x) for x in res])
+        # print(res_set, type(res_set))
+        res_list = list(res_set)
+        self.get_files(res_list)
+        msg = ""
+        for a in self.attributes:
+            msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        msg = msg[4:]
+        self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
 
 
     def show_important_coded(self):
