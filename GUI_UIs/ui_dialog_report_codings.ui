@@ -251,8 +251,11 @@
         <height>23</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Filter results for those marked Important</string>
+      </property>
       <property name="text">
-       <string>Important flag</string>
+       <string>Important</string>
       </property>
      </widget>
     </widget>
