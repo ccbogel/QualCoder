@@ -33,6 +33,7 @@ import sys
 import traceback
 
 from GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
+from helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -87,7 +88,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         for row in result:
             self.attribute_type.append({'name': row[0], 'valuetype': row[1],
                 'memo': row[2], 'caseOrFile': row[3]})
-        #Add case name option to files attributes
+        # Add case name option to files attributes
         if self.limiter == "file":
             casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
             self.attribute_type.append(casenames)
@@ -114,7 +115,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
             if operator == '':
                 values = []
-            if operator in ('<','<=','>','>=','==','like') and len(values) > 1:
+            if operator in ('<', '<=', '>', '>=', '==', 'like') and len(values) > 1:
                values = [values[0]]
             if operator == 'between' and len(values) > 2:
                 values = values[:2]
@@ -157,50 +158,31 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         if y != self.VALUE_LIST_COLUMN:
             return
+        self.ui.tableWidget.blockSignals(True)  # Prevent double opening of Messages on widget changes
         values = self.ui.tableWidget.item(x, y).text()
         values = values.split(';')
         tmp = [i for i in values if i != '']
         values = tmp
         operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
         if operator == '':
+            Message(self.app, _('Warning'), _("No operator was selected"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText('')
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("No operator was selected"))
-            mb.exec_()
-            return
         # enforce that value list is only one item for selected operators
         if operator in ('<','<=','>','>=','==','like') and len(values) > 1:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("Too many values given for this operator"))
-            mb.exec_()
+            Message(self.app, _('Warning'), _("Too many values given for this operator"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning'))
-            mb.setText(_("Need 2 values for between"))
-            mb.exec_()
-        # check numeric type
+            Message(self.app, _('Warning'), _("Need 2 values for between"), "warning").exec()
+        # Check numeric type
         type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
         if type_ == "numeric":
             for v in values:
                 try:
                     float(v)
                 except ValueError:
-                    mb = QtWidgets.QMessageBox()
-                    mb.setIcon(QtWidgets.QMessageBox.Warning)
-                    mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-                    mb.setWindowTitle(_('Warning'))
-                    mb.setText(v + _(" is not a number"))
-                    mb.exec_()
+                    Message(self.app, _('Warning'), v + _(" is not a number"), "warning").exec_()
                     self.ui.tableWidget.item(x, y).setText("")
+        self.ui.tableWidget.blockSignals(False)
 
     def fill_tableWidget(self):
         """ Fill the table widget with attribute name and type. """
