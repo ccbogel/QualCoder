@@ -132,7 +132,8 @@ class Ui_Dialog_reportCodings(object):
         self.label_title.setText(_translate("Dialog_reportCodings", "Coding report"))
         self.label_matrix.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Matrix options</p></body></html>"))
         self.comboBox_matrix.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Case matrix options</p></body></html>"))
-        self.checkBox_important.setText(_translate("Dialog_reportCodings", "Important flag"))
+        self.checkBox_important.setToolTip(_translate("Dialog_reportCodings", "Filter results for those marked Important"))
+        self.checkBox_important.setText(_translate("Dialog_reportCodings", "Important"))
 
 
 if __name__ == "__main__":
