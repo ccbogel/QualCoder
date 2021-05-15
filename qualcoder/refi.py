@@ -84,6 +84,7 @@ class Refi_import():
     cases = []
     sources = []
     variables = []  # Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    file_vars = []  # Values for each variable for each file Found within Cases Case tag
     parent_textEdit = None
     app = None
     tree = None
@@ -105,6 +106,7 @@ class Refi_import():
         self.codes = []
         self.users = []
         self.cases = []
+        # Sources: name id fulltext mediapath memo owner date
         self.sources = []
         self.variables = []
         self.base_path = ""
@@ -334,7 +336,7 @@ class Refi_import():
         self.pd.setWindowModality(QtCore.Qt.WindowModal)
         self.pd_value = 0
 
-        # Parse xml
+        # Parse xml for users, codebook, sources, journals, project description, variable names
         with open(self.folder_name + "/project.qde", "r") as xml_file:
             self.xml = xml_file.read()
         result = self.xml_validation("project")
@@ -359,53 +361,147 @@ class Refi_import():
                 self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Variables":
                 count = self.parse_variables(c)
-                self.parent_textEdit.append(_("Parse file variables. Loaded: ") + str(count[0]))
-                self.parent_textEdit.append(_("Parse case variables. Loaded: ") + str(count[1]))
+                self.parent_textEdit.append(_("Parse variables. Loaded: ") + str(count))
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
                 self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Description":
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
 
-        # Parse cases and sources after the variables components parsed
-        # Need to fill placeholders and values for variables for sources and cases
+        # Parse cases for any file variable values (No case name and only one sourceref)
+        # Fill a list of dictionaries of these variable values
+        self.parse_cases_for_file_variables(root)
+        self.parent_textEdit.append(_("Parsed cases for file variables. Loaded: ") + str(len(self.file_vars)))
+
+        # Parse sources after the variables components parsed
+        # Variables caseOrFile will be 'file' for ALL variables, to change later if needed
+        children = root.getchildren()
+        for c in children:
+            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
+                count = self.parse_sources(c)
+                self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
+
+        # Fill attributes table for File variables drawn fom Cases.Case tags
+        # After Sources are loaded
+        self.fill_file_attribute_values()
+
+        # Parse cases and update variables already assigned as 'file' if needed
         children = root.getchildren()
         for c in children:
             # print(c.tag)
             if c.tag == "{urn:QDA-XML:project:1.0}Cases":
                 count = self.parse_cases(c)
                 self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
-            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
-                '''pd_value += 1
-                pd.setLabelText(_("Sources"))
-                pd.setValue(pd_value)'''
-                count = self.parse_sources(c)
-                self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
         self.clean_up_case_codes_and_case_text()
-        self.parent_textEdit.append(self.file_path + _(" loaded."))
 
+        # Wrap up
+        self.parent_textEdit.append(self.file_path + _(" loaded."))
         # Remove temporary extract folder
         try:
             shutil.rmtree(self.folder_name)
         except OSError as e:
             logger.debug(str(e) + " " + self.folder_name)
-
         # Change the user name to an owner name from the import
         if len(self.users) > 0:
             self.app.settings['codername'] = self.users[0]['name']
             self.app.write_config_ini(self.app.settings)
-
+        self.pd.close()
         msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
         msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")
         msg += _("Sets and Graphs not imported as QualCoder does not have this functionality.\n")
         msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
         msg += _("All variables are stored as text, but cast as text or float during operations.\n")
+        msg += _("Variable import is not correct for now - to fix")
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
 
+    def parse_cases_for_file_variables(self, root):
+        """ Parse cases for each canse. Look for any file variables (No case name and only one sourceref).
+        Fill out file_vars list """
+
+        self.file_vars = []
+        children = root.getchildren()
+        #count = 0
+        for el in children:
+            if el.tag == "{urn:QDA-XML:project:1.0}Cases":
+                print(el.tag)
+                for c in el.getchildren():
+                    self.parse_case_for_file_variables(c)
+
+        print("file vars\n", self.file_vars)
+
+    def parse_case_for_file_variables(self, e_case):
+        """ File variables and their values can be stored in the Case element
+        Variables for files stored in Case have one SourceRef and no Case name.
+        This approach is used by MAXQDA and Quirkos and ?
+
+        <Case guid="d9001bcb-0803-4b06-b4d4-be0accd558a9">
+        <VariableValue>
+        <VariableRef targetGUID="3ba84074-e1af-4234-9773-1a71bb5c54de"/>
+        <TextValue>0</TextValue>
+        </VariableValue>
+        <VariableValue>
+        <VariableRef targetGUID="96868d37-d832-4d19-bf5e-9bd0792ab8e2"/>
+        <TextValue>1</TextValue>
+        </VariableValue>
+        <SourceRef targetGUID="e92903a3-0fdb-473d-9ae2-58b8d1d68014"/>
+        </Case>
+        """
+
+        if e_case.get("name") is not None:
+            return
+        ec = e_case.getchildren()
+        count = 0
+        file_guid = None
+        for el in ec:
+            # A variable assigned to a source
+            if el.tag == "{urn:QDA-XML:project:1.0}SourceRef":
+                #print("el source ref tag ", el.tag, el.get(("targetGUID")))
+                count += 1
+                file_guid = el.get("targetGUID")
+        if file_guid is None or count != 1:
+            return
+        # Get variable details from tags
+        ec = e_case.getchildren()
+        for el in ec:
+            var_guid = None
+            value = None
+            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                for v_element in el.getchildren():
+                    if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                        var_guid = v_element.get("targetGUID")
+                    if v_element.tag in (
+                    "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
+                    "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                    "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                        value = v_element.text
+                attr_val = {'file_guid': file_guid, 'var_guid': var_guid, 'value': value}
+                # Get attribute name by linking guids
+                for attr in self.variables:
+                    if attr['guid'] == var_guid:
+                        attr_val['name'] = attr['name']
+                        break
+                self.file_vars.append(attr_val)
+
+    def fill_file_attribute_values(self):
+        """ Fill file attributes from file_vars which were extracted from Cases.Case tag.
+         Prepared with: parse_cases_for_file_variables. """
+
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur = self.app.conn.cursor()
+        sql = "insert into attribute(name, attr_type, value,id,date,owner) values (?,?,?,?,?,?)"
+        for s in self.sources:
+            for v in self.file_vars:
+                if v['file_guid'] == s['guid']:
+                    cur.execute(sql, (v['name'], "file", v['value'], s['id'], now_date, self.app.settings['codername']))
+        self.app.conn.commit()
+
     def parse_variables(self, element):
         """ Parse the Variables element.
+        Assign 'file'' to the variable caseOrFile as a default position.
+        NOTE: This is overwritten when it is later checked to be a case or file variable.
+        In Cases Case element the SourceRef may refer to a file
         Example format:
         <Variable guid="51dc3bcd-5454-47ff-a4d6-ea699144410d" name="Cases:Age group" typeOfVariable="Text">
         <Description />
@@ -420,55 +516,43 @@ class Refi_import():
 
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
-        casevarcount = 0
-        filevarcount = 0
+        var_count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
+            print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
             # <Variable name="Cases:something"> or ?
-            name = ""
-            caseOrFile = "file"
-            try:
-                name = e.get("name").split(':')[1]
-                caseOrFile = e.get("name").split(':')[0]
-                if caseOrFile == "Cases":
-                    caseOrFile = "case"
-                else:
-                    caseOrFile = "file"
-            except IndexError:
-                name = e.get("name")
-
-            valuetype = e.get("typeOfVariable")  # may need to tweak Text
+            name = e.get("name")
+            valuetype = e.get("typeOfVariable")
             if valuetype in("Text", "Boolean", "Date", "DateTime"):
                 valuetype = "character"
             if valuetype in ("Integer", "Float"):
                 valuetype = "numeric"
-            variable = {"name": name, "caseOrFile": caseOrFile, "guid": e.get("guid"), "id": None, "memo": "", "valuetype": valuetype}
+            # Default variable type to "file"
+            variable = {"name": name, "caseOrFile": "file", "guid": e.get("guid"), "id": None, "memo": "", "valuetype": valuetype}
             # Get the description text
             d_elements = e.getchildren()
             for d in d_elements:
                 memo = ""
                 #print("Memo ", d.tag)
-                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
+                if e.tag != "{urn:QDA-XML:project:1:0}Description":
                     memo = d.text
                 variable["memo"] = memo
 
-            # insert variable type into database
+            # Insert variable type into database
+            # CaseOrFile is designated 'file'' - to be updated
             try:
                 cur.execute(
                     "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-                    , (name, now_date, self.app.settings['codername'], variable["memo"], caseOrFile, valuetype))
+                    , (name, now_date, self.app.settings['codername'], variable["memo"], "file", valuetype))
                 self.app.conn.commit()
-                if caseOrFile == "case":
-                    casevarcount += 1
-                else:
-                    filevarcount += 1
-
+                var_count += 1
+                cur.execute("select last_insert_rowid()")
+                variable['id'] = cur.fetchone()[0]
             except sqlite3.IntegrityError as e:
-                QtWidgets.QMessageBox.warning(None, _("Variable import error"), _("Variable name already exists: ") + name)
-
-            # refer to the variables later
+                Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
+            # Refer to the variables later
+            # To update caseOrFile and to assign attributes
             self.variables.append(variable)
-        return [filevarcount, casevarcount]
+        return [var_count]
 
     def parse_cases(self, element):
         """ Parse the Cases element.
@@ -477,7 +561,7 @@ class Refi_import():
         Enter empty values for Variables for each Case.
         Second parse: read variable values and update in attributes table.
 
-        Quirkos - Cases have no name attribute , so use the case count  as a name
+        Quirkos - Case has no name attribute. Case is used to link variables to files
 
         Note: some Codes in CodeBook are Cases - they use the same guid
 
@@ -503,61 +587,79 @@ class Refi_import():
         for e in element.getchildren():
             #print("CASE TAG", e.tag, "CASE NAME", e.get("name"), "GUID", e.get("guid"))  # tmp
             item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.app.settings['codername'], "memo": "", "caseid": None}
-            # Quirkos: Cases have no name attribute
+
+            # Quirkos, MAXQDA: Cases have no name attribute
             if item['name'] is None:
-                item['name'] = str(count)
-            # Get the description text
-            d_elements = e.getchildren()
-            item['memo'] = ""
-            for d in d_elements:
-                #print("Memo ", d.tag)
-                if e.tag != "{urn:QDA-XML:codebook:1:0}Description":
-                    item['memo'] = d.text
+                pass  # File variable, see parse_cases_for_file_variables
+            else:
+                # Get the description text
+                d_elements = e.getchildren()
+                item['memo'] = ""
+                for d in d_elements:
+                    #print("Memo ", d.tag)
+                    if d.tag == "{urn:QDA-XML:project:1:0}Description":
+                        print("case memo")
+                        item['memo'] = d.text
 
-            # Enter Case into sqlite and keep a copy in  a list
-            try:
-                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                    ,(item['name'], item['memo'], item['owner'], now_date))
-                self.app.conn.commit()
-                cur.execute("select last_insert_rowid()")
-                item['caseid'] = cur.fetchone()[0]
-                self.cases.append(item)
-                count += 1
-            except Exception as e:
-                self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e))
-                logger.error("item:" + str(item) + ", " + str(e))
-
-            # Create an empty attribute entry for each Case and variable in the attributes table
-            sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            for v in self.variables:
-                print(v)  # tmp
-                if v['caseOrFile'] == 'case':
-                    cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.app.settings['codername']))
+                # Enter Case into sqlite and keep a copy in  a list
+                try:
+                    cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                        ,(item['name'], item['memo'], item['owner'], now_date))
                     self.app.conn.commit()
+                    cur.execute("select last_insert_rowid()")
+                    item['caseid'] = cur.fetchone()[0]
+                    self.cases.append(item)
+                    count += 1
+                except Exception as e:
+                    self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e))
+                    logger.error("item:" + str(item) + ", " + str(e))
 
-            # look for VariableValue tag, extract and enter into
-            for vv in d_elements:
-                guid = None
-                value = None
-                if vv.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                    for v_element in vv.getchildren():
-                        if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
-                            guid = v_element.get("targetGUID")
-                        if v_element.tag in ("{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
-                        "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                        "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
-                            value = v_element.text
-                    print(item, guid, value)  # tmp
-                    # Get attribute name by linking guids
-                    attr_name = ""
+                #TODO revise after further testing
+                '''# Create an empty attribute entry for each Case and variable in the attributes table
+                sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                for v in self.variables:
+                    print(v)  # tmp
+                    if v['caseOrFile'] == 'case':
+                        cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.app.settings['codername']))
+                        self.app.conn.commit()'''
+
+                # Use case_vars to update attribute-type from 'file' to 'case'
+                case_vars = []
+                # look for VariableValue tag, extract and enter into
+                for vv in d_elements:
+                    guid = None
+                    value = None
+                    if vv.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                        for v_element in vv.getchildren():
+                            if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                                guid = v_element.get("targetGUID")
+                                case_vars.append(guid)
+                            if v_element.tag in ("{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
+                            "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                            "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                                value = v_element.text
+                        print(item, guid, value)  # tmp
+                        # Get attribute name by linking guids
+                        attr_name = ""
+                        for attr in self.variables:
+                            if attr['guid'] == guid:
+                                attr_name = attr['name']
+                        # Insert into the attribute table
+                        '''sql = "update attribute set value=? where name=? and attr_type='case'and id=?"
+                        cur.execute(sql, (value, attr_name, item['caseid']))'''
+                        sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                        cur.execute(sql,
+                            (attr_name, value, item['caseid'], 'case', now_date, self.app.settings['codername']))
+                        self.app.conn.commit()
+
+                # Update attribute_type replace 'file' with 'case'
+                case_vars = list(set(case_vars))
+                sql = "update attribute_type set caseOrFile='case' where attribute_type.name=?"
+                for c in case_vars:
                     for attr in self.variables:
                         if attr['guid'] == guid:
-                            attr_name = attr['name']
-
-                    # Update the attribute table
-                    sql = "update attribute set value=? where name=? and attr_type='case'and id=?"
-                    cur.execute(sql, (value, attr_name, item['caseid']))
-                    self.app.conn.commit()
+                            cur.execute(sql, [attr['name']])
+                self.app.conn.commit()
         return count
 
     def clean_up_case_codes_and_case_text(self):
@@ -635,6 +737,7 @@ class Refi_import():
          MAXQDA uses sources, NVIVO uses Sources
          """
 
+        #guid = element.get("guid")
         name = element.get("name")
         creating_user_guid = element.get("creatingUser")
         if creating_user_guid is None:
@@ -710,13 +813,15 @@ class Refi_import():
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
-
+        source = {'name': name, 'id': id_, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
+                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+        self.sources.append(source)
         # Parse PictureSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
                 self._load_codings_for_picture(id_, e)
-            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)
+            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)'''
 
     def _load_codings_for_picture(self, id_, element):
         """ Load coded rectangles for pictures
@@ -799,6 +904,9 @@ class Refi_import():
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
+        source = {'name': name, 'id': id_, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
+                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+        self.sources.append(source)
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
@@ -808,8 +916,8 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
                 self.load_codings_for_audio_video(id_, e)
-            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)
+            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)'''
 
     def load_video_source(self, element):
         """ Load this video source into .
@@ -846,6 +954,9 @@ class Refi_import():
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         av_id = cur.fetchone()[0]
+        source = {'name': name, 'id': av_id, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
+                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+        self.sources.append(source)
 
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
@@ -855,8 +966,8 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
                 self.load_codings_for_audio_video(av_id, e)
-            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, av_id, creating_user)
+            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, av_id, creating_user)'''
 
     def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, creating_user, element):
         """ Load the transcript plain text file into source table.
@@ -1136,7 +1247,7 @@ class Refi_import():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = e.text
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
-                 'owner': self.app.settings['codername'], 'date': create_date}
+                 'owner': self.app.settings['codername'], 'date': create_date, 'guid': element.get('guid')}
 
         # Check plain text file line endings for Windows 2 character \r\n
         add_ending = False
@@ -1189,17 +1300,24 @@ class Refi_import():
             except Exception as e:
                 self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
 
-        # Parse forPlainTextSelection elements for Coding elements and VariableValues
+        # Parse PlainTextSelection elements for Coding elements
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
                 self._load_codings_for_text(source, e)
+
+        '''# Parse elements for VariableValues
+        #TODO does this occur ?
+        for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)
+                print("FOUND VARIABLE VALUE FOR TEXT SOURCE")
+                self.parse_variable_value(e, id_, creating_user)'''
 
     def parse_variable_value(self, element, id_, creating_user):
         """ Parse VariableValue element.
         Needs two parses - one to get the variable name and one to get the value.
         Enter details into attributes table.
+        This is for when variables are stored within the Source element.
+
         Called from load_picture_source, load_text_source, load_audio_source, load_video_source
 
         Params:
@@ -1207,6 +1325,8 @@ class Refi_import():
             id_ : File id of source, Integer
             creating_user : The user who created this source, String
         """
+
+        #TODO revise
 
         value_types = ["{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}TextValue",
                 "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}FloatValue",
@@ -1226,7 +1346,7 @@ class Refi_import():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        #print("varname:", var_name, " value:",value)  # tmp
+        print("Text attribute:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
@@ -1275,7 +1395,7 @@ class Refi_import():
             # Treat description text as an annotation
             if e.tag == "{urn:QDA-XML:project:1.0}Description" and e.text is not None:
                 cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
-                values(?,?,?,?,?,?)" ,(source['id'], pos0, pos1,
+                values(?,?,?,?,?,?)", (source['id'], pos0, pos1,
                 e.text, creating_user, create_date))
                 self.app.conn.commit()
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
@@ -1479,6 +1599,8 @@ class Refi_export(QtWidgets.QDialog):
 
         Create an unzipped folder with a /Sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
+
+        #TODO put file variables inside Cases.Case elements
         """
 
         project_name = self.app.project_name[:-4]
