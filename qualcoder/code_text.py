@@ -1602,7 +1602,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Merge code or category with another code or category.
         Called by item_moved_update_data when a code is moved onto another code. """
 
-        msg = _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0)
+        msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">' 
+        msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
         msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
