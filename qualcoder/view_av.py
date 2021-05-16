@@ -1527,6 +1527,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
             TextEdit:
             A annotate - for current selection
+            I mark coded as important
             M memo code - at clicked position
             O Shortcut to cycle through overlapping codes - at clicked position
             Q Quick Mark with code - for current selection
@@ -1581,6 +1582,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate(self.ui.textEdit.textCursor().position())
+                return True
+            # Important  for coded text
+            if key == QtCore.Qt.Key_I:
+                self.set_important(cursor_pos)
                 return True
             # Memo for current code
             if key == QtCore.Qt.Key_M:

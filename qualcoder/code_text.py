@@ -1208,6 +1208,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Q Quick Mark with code - for current selection
         B Create bookmark - at clicked position
         H Hide / Unhide top groupbox
+        I Tag important
         M memo code - at clicked position
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
@@ -1266,6 +1267,10 @@ class DialogCodeText(QtWidgets.QWidget):
             # Hide unHide top groupbox
             if key == QtCore.Qt.Key_H:
                 self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
+                return True
+            # Important  for coded text
+            if key == QtCore.Qt.Key_I:
+                self.set_important(cursor_pos)
                 return True
             # Memo for current code
             if key == QtCore.Qt.Key_M:
