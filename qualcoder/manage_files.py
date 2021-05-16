@@ -682,10 +682,12 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def get_cases_by_filename(self, name):
         """ Called by get_icon_and_metadata, get_file_data
-        """
+        param: name String of filename """
+
         cur = self.app.conn.cursor()
+        # Case_text is the table, but this also links av and images
         sql = "select distinct cases.name from cases join case_text on case_text.caseid=cases.caseid "
-        sql += "join source on source.id=case_text.fid where source.name=?"
+        sql += "join source on source.id=case_text.fid where source.name=? "
         text = ""
         cur.execute(sql, [name,])
         res = cur.fetchall()
@@ -1211,7 +1213,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon, metadata = self.get_icon_and_metadata(name, filetext, None)
         entry = {'name': name, 'id': -1, 'fulltext': filetext, 'memo': "",
         'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'mediapath': None, 'icon': icon, 'metadata': metadata}
+        'mediapath': None, 'icon': icon, 'metadata': metadata, 'case': ""}
 
         # Update database
         cur = self.app.conn.cursor()
