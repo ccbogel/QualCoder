@@ -820,8 +820,8 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
                 self._load_codings_for_picture(id_, e)
-            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)'''
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
 
     def _load_codings_for_picture(self, id_, element):
         """ Load coded rectangles for pictures
@@ -916,8 +916,8 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
                 self.load_codings_for_audio_video(id_, e)
-            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, id_, creating_user)'''
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, id_, creating_user)
 
     def load_video_source(self, element):
         """ Load this video source into .
@@ -966,8 +966,8 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
                 self.load_codings_for_audio_video(av_id, e)
-            '''if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                self.parse_variable_value(e, av_id, creating_user)'''
+            if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                self.parse_variable_value(e, av_id, creating_user)
 
     def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, creating_user, element):
         """ Load the transcript plain text file into source table.
@@ -1305,12 +1305,11 @@ class Refi_import():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
                 self._load_codings_for_text(source, e)
 
-        '''# Parse elements for VariableValues
-        #TODO does this occur ?
+        # Parse elements for VariableValues
+        # THis approach used by MAXQDA but nt by QUIRKOS
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
-                print("FOUND VARIABLE VALUE FOR TEXT SOURCE")
-                self.parse_variable_value(e, id_, creating_user)'''
+                self.parse_variable_value(e, id_, creating_user)
 
     def parse_variable_value(self, element, id_, creating_user):
         """ Parse VariableValue element.
