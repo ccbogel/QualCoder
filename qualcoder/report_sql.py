@@ -596,5 +596,18 @@ where \n\
 -- code_name.cid in ( code_ids ) -- provide your code ids \n\
 -- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
 -- and \n\
-(code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)'
- ]
+(code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
+'-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\
+annotation.fid as "File ID" , source.name as "File name", annotation.pos0 as "Start position", \n\
+annotation.pos1 as "End position", annotation.owner as "Coder name", annotation.date as "Date" from annotation \n\
+left join source on source.id = annotation.fid \n\
+-- DISPLAY ANNOTATIONS FOR SELECTED FILE, UNCOMMENT THE FOLLOWING: \n\
+-- AND source.name = "FILE NAME"',
+'-- ALL OR SELECTED CODINGS MEMOS\nselect code_text.memo as "Coding memo", code_text.cid as "Code ID", code_name.name as "Code name", \n\
+code_text.fid as "File ID", source.name as "File name", code_text.owner as "Coder name", code_text.date as "Date", \n\
+code_text.important as "Important(yes=1, no=0)" from source left join code_text on code_text.fid = source.id \n\
+left join code_name on code_name.cid = code_text.cid where code_text.memo != "" \n\
+-- TO DISPLAY CODING FOR SELECTED CODE OR FILE, UNCOMMENT THE FOLLOWING:\n\
+-- AND code_name.name = "CODE NAME"  -- TO SELECT SPECIFIC CODE\n\
+-- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE'
+]
