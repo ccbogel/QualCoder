@@ -2571,7 +2571,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.parent_textEdit.append(_("Annotation added at position: ") \
                     + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_['name'])
                 self.get_coded_text_update_eventfilter_tooltips()
-                return
+            return
 
         # Edit existing annotation
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])

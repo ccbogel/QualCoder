@@ -2687,46 +2687,61 @@ class DialogCodeAV(QtWidgets.QDialog):
         item = None
         details = ""
         annotation = ""
-        # find existing annotation at this position for this file
+        # Find existing annotation at this position for this file
         for note in self.annotations:
             if cursor_pos >= note['pos0'] and cursor_pos <= note['pos1'] and note['fid'] == self.transcription[0]:
                 item = note  # use existing annotation
                 details = item['owner'] + " " + item['date']
                 break
-        # exit method if no text selected and there is no annotation at this position
+        # Exit if no text selected and there is no annotation at this position
         if pos0 == pos1 and item is None:
             return
-        # add new item to annotations, add to database and update GUI
+        # Add new item to annotations, add to database and update GUI
         if item is None:
             item = {'fid': self.transcription[0], 'pos0': pos0, 'pos1': pos1,
                     'memo': str(annotation), 'owner': self.app.settings['codername'],
                     'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+            ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
+            ui.exec_()
+            item['memo'] = ui.memo
+            if item['memo'] != "":
+                cur = self.app.conn.cursor()
+                cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
+                    values(?,?,?,?,?,?)", (item['fid'], item['pos0'], item['pos1'],
+                                           item['memo'], item['owner'], item['date']))
+                self.app.conn.commit()
+                self.app.delete_backup = False
+                cur.execute("select last_insert_rowid()")
+                anid = cur.fetchone()[0]
+                item['anid'] = anid
+                self.annotations = self.app.get_annotations()
+                self.parent_textEdit.append(_("Annotation added at position: ") \
+                                            + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") +
+                                            self.transcription[2])
+                self.get_coded_text_update_eventfilter_tooltips()
+            return
+
+        # Edit existing annotation
         ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
         ui.exec_()
         item['memo'] = ui.memo
         if item['memo'] != "":
+            item['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             cur = self.app.conn.cursor()
-            cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
-                values(?,?,?,?,?,?)", (item['fid'], item['pos0'], item['pos1'],
-                                       item['memo'], item['owner'], item['date']))
+            sql = "update annotation set memo=?, date=? where anid=?"
+            cur.execute(sql, (item['memo'], item['date'], item['anid']))
             self.app.conn.commit()
             self.app.delete_backup = False
-            cur.execute("select last_insert_rowid()")
-            anid = cur.fetchone()[0]
-            item['anid'] = anid
-            self.annotations.append(item)
-            self.highlight()
-            self.parent_textEdit.append(_("Annotation added at position: ") \
-                                        + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") +
-                                        self.transcription[2])
-        # if blank delete the annotation
+            self.annotations = self.app.get_annotations()
+            self.get_coded_text_update_eventfilter_tooltips()
+            return
+
+        # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
             cur.execute("delete from annotation where pos0 = ?", (item['pos0'],))
             self.app.conn.commit()
-            for note in self.annotations:
-                if note['pos0'] == item['pos0'] and note['fid'] == item['fid']:
-                    self.annotations.remove(note)
+            self.annotations = self.app.get_annotations()
             self.parent_textEdit.append(_("Annotation removed from position ") \
                                         + str(item['pos0']) + _(" for: ") + self.transcription[2])
         self.get_coded_text_update_eventfilter_tooltips()
