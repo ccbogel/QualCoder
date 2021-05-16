@@ -1616,10 +1616,12 @@ class DialogCodeText(QtWidgets.QWidget):
             cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
             self.app.conn.commit()
         except Exception as e:
-            e = str(e)
+            '''e = str(e)
             msg = _("Cannot merge codes, unmark overlapping text first. ") + "\n" + str(e)
             Message(self.app, _("Cannot merge"), msg, "warning").exec_()
-            return
+            return'''
+            ''' Instead of a confusing warning, delete the duplicate coded text. '''
+            pass
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
         self.app.delete_backup = False

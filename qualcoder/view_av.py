@@ -1936,10 +1936,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
-            e = str(e)
-            msg = _("Cannot merge codes, unmark overlapping text.") + "\n" + e
-            QtWidgets.QInformationDialog(None, _("Cannot merge"), msg)
-            return
+            '''e = str(e)
+            msg = _("Cannot merge codes, unmark overlapping text first. ") + "\n" + str(e)
+            Message(self.app, _("Cannot merge"), msg, "warning").exec_()
+            return'''
+            ''' Instead of a confusing warning, delete the duplicate coded text. '''
+            pass
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
