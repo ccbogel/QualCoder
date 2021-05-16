@@ -985,7 +985,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if text_item is None:
             return
         # Dictionary with cid fid seltext owner date name color memo
-        #TODO maybe highlight section to be memoed
         msg = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
         ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
         ui.exec_()
@@ -1000,8 +999,8 @@ class DialogCodeText(QtWidgets.QWidget):
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
                 and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
                 i['memo'] = memo
-                #print(i)
         self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def change_code_pos(self, location, start_or_end):
         """  Called via textedit_menu. """
@@ -2210,7 +2209,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.source_text is not None:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.textEdit.textCursor()
-
             # Add coding highlights
             codes = {x['cid']:x for x in self.codes}
             for item in self.code_text:
@@ -2223,18 +2221,23 @@ class DialogCodeText(QtWidgets.QWidget):
                 text_brush = QBrush(QColor(TextColor(color).recommendation))
                 fmt.setForeground(text_brush)
                 # Highlight codes with memos - these are italicised
-                # Italics alsp used for overlapping codes
+                # Italics also used for overlapping codes
                 if item['memo'] is not None and item['memo'] != "":
                     fmt.setFontItalic(True)
                 else:
                     fmt.setFontItalic(False)
-                # Use important flag
+
+                # Bold important codes
+                if item['important']:
+                    fmt.setFontWeight(QtGui.QFont.Bold)
+                # Use important flag for ONLY showing important codes (button selected)
                 if self.important and item['important'] == 1:
                     cursor.setCharFormat(fmt)
+                # Show all codes, as important button not selected
                 if not self.important:
                     cursor.setCharFormat(fmt)
 
-            # Add annotation marks - these are in bold
+            # Add annotation marks - these are in bold, important codings are also bold
             for note in self.annotations:
                 if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
                     # Cursor pos could be negative if annotation was for an earlier text portion
