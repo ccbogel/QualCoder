@@ -2296,6 +2296,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         play_text_avid = None
         action_important = None
         action_not_important = None
+        action_annotate = None
+        action_edit_annotate = None
         for item in self.code_text:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 if item['avid'] is not None:
@@ -2321,10 +2323,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                     submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-            '''if self.segment_for_text is None:
-                action_link_text_to_segment = menu.addAction(_("Prepare text_link to segment"))'''
-            '''if self.segment_for_text is not None:
-                action_link_segment_to_text = menu.addAction(_("Link to segment to text"))'''
+        if selected_text == "" and self.is_annotated(cursor.position()):
+            action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_video_position_timestamp = -1
         for ts in self.time_positions:
             # print(ts, cursor.position())
@@ -2357,18 +2357,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         if selected_text != "" and action == action_annotate:
             self.annotate(cursor.position())
             return
+        if action == action_edit_annotate:
+            # Used fora point text press rather than a selected text
+            self.annotate(cursor.position())
+            return
         try:
             if action == action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
                 return
         except:
             pass
-        '''if self.segment_for_text is None and selectedText != "" and action == action_link_text_to_segment:
-            self.prepare_link_text_to_segment()
-            return
-        if self.segment_for_text is not None and selectedText != "" and action == action_link_segment_to_text:
-            self.link_segment_to_text()
-            return'''
         if action == action_start_pos:
             self.change_text_code_pos(cursor.position(), "start")
             return
@@ -2379,6 +2377,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
+
+    def is_annotated(self, position):
+        """ Check if position is annotated to provide annotation menu option.
+        Returns True or False """
+
+        for note in self.annotations:
+            #if (position + self.file_['start'] >= note['pos0'] and position + self.file_['start'] <= note['pos1']) \
+            if (position >= note['pos0'] and position <= note['pos1']) \
+                    and note['fid'] == self.transcription[0]:
+                return True
+        return False
 
     def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
@@ -2430,9 +2439,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         param:
             position : textEdit cursor position """
 
-        '''if position is None:
-            # Called via button
-            position = self.ui.textEdit.textCursor().position()'''
         if self.transcription is None:
             return
         coded_text_list = []
@@ -2546,61 +2552,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
         self.play_segment_end = segment['pos1']
         self.timer.start()
-
-    '''def link_segment_to_text(self):
-        """ Link selected segment to selected text. """
-
-        item = {}
-        item['cid'] = self.segment_for_text['cid']
-        item['fid'] = self.transcription[0]
-        item['seltext'] = self.ui.textEdit.textCursor().selectedText()
-        if item['seltext'] is None:
-            item['seltext'] = ""  # Strange
-        item['pos0'] = self.ui.textEdit.textCursor().selectionStart()
-        item['pos1'] = self.ui.textEdit.textCursor().selectionEnd()
-        item['owner'] = self.app.settings['codername']
-        item['memo'] = ""
-        item['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        item['avid'] = self.segment_for_text['avid']
-        cur = self.app.conn.cursor()
-        # check for an existing duplicated marking first
-        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-                    (item['cid'], item['fid'], item['pos0'], item['pos1'], item['owner']))
-        result = cur.fetchall()
-        if len(result) > 0:
-            Message(self.app, _('Already Coded'), _("This segment has already been coded with this code by ") + item['owner'],"warning").exec_()
-            return
-        # Should not get sqlite3.IntegrityError:
-        # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
-        try:
-            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-            memo,date,avid) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
-                                                         item['seltext'], item['pos0'], item['pos1'], item['owner'],
-                                                         item['memo'], item['date'], item['avid']))
-            self.app.conn.commit()
-            self.app.delete_backup = False
-        except Exception as e:
-            logger.debug(str(e))
-        # update codes and filter for tooltip
-        self.get_coded_text_update_eventfilter_tooltips()'''
-
-    '''def prepare_link_text_to_segment(self):
-        """ Select text in transcription and prepare variable to be linked to a/v segment. """
-
-        selected_text = self.ui.textEdit.textCursor().selectedText()
-        pos0 = self.ui.textEdit.textCursor().selectionStart()
-        pos1 = self.ui.textEdit.textCursor().selectionEnd()
-        if pos0 == pos1:
-            return
-        self.text_for_segment['cid'] = None
-        self.text_for_segment['fid'] = self.transcription[0]
-        self.text_for_segment['seltext'] = selected_text
-        self.text_for_segment['pos0'] = pos0
-        self.text_for_segment['pos1'] = pos1
-        self.text_for_segment['owner'] = self.app.settings['codername']
-        self.text_for_segment['memo'] = ""
-        self.text_for_segment['date'] = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        self.text_for_segment['avid'] = None'''
 
     def set_video_to_timestamp_position(self, position):
         """ Set the video position to this time stamp.
@@ -2716,11 +2667,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-    def annotate(self, location):
+    def annotate(self, cursor_pos):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         params:
-            location : textCursor currept position
+            location : textCursor current position
         """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
@@ -2736,10 +2687,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         annotation = ""
         # find existing annotation at this position for this file
         for note in self.annotations:
-            if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.transcription[0]:
+            if cursor_pos >= note['pos0'] and cursor_pos <= note['pos1'] and note['fid'] == self.transcription[0]:
                 item = note  # use existing annotation
                 details = item['owner'] + " " + item['date']
-        # exit method if no text selected and there is not annotation at this position
+                break
+        # exit method if no text selected and there is no annotation at this position
         if pos0 == pos1 and item is None:
             return
         # add new item to annotations, add to database and update GUI
@@ -2775,8 +2727,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.annotations.remove(note)
             self.parent_textEdit.append(_("Annotation removed from position ") \
                                         + str(item['pos0']) + _(" for: ") + self.transcription[2])
-        self.unlight()
-        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
 
 
 class ToolTip_EventFilter(QtCore.QObject):

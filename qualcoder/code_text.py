@@ -815,6 +815,8 @@ class DialogCodeText(QtWidgets.QWidget):
         action_end_pos = None
         action_important = None
         action_not_important = None
+        action_annotate = None
+        action_edit_annotate = None
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
@@ -836,6 +838,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
+        if selected_text == "" and self.is_annotated(cursor.position()):
+            action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
         if action is None:
@@ -852,8 +856,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected_text != "" and self.ui.treeWidget.currentItem() is not None and action == action_mark:
             self.mark()
             return
-        if selected_text != "" and action == action_annotate:
+        if action == action_annotate:
             self.annotate()
+            return
+        if action == action_edit_annotate:
+            # Used fora point text press rather than a selected text
+            self.annotate(cursor.position())
             return
         if action == action_unmark:
             self.unmark(cursor.position())
@@ -891,6 +899,16 @@ class DialogCodeText(QtWidgets.QWidget):
             if item.child(i).text(0) == text and item.child(i).text(1)[0:3] == "cid":
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text)
+
+    def is_annotated(self, position):
+        """ Check if position is annotated to provide annotation menu option.
+        Returns True or False """
+
+        for note in self.annotations:
+            if (position + self.file_['start'] >= note['pos0'] and position + self.file_['start'] <= note['pos1']) \
+                    and note['fid'] == self.file_['id']:
+                return True
+        return False
 
     def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
@@ -2487,7 +2505,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-    def annotate(self):
+    def annotate(self, cursor_pos=None):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
@@ -2507,13 +2525,24 @@ class DialogCodeText(QtWidgets.QWidget):
         details = ""
         annotation = ""
         # Find annotation at this position for this file
-        for note in self.annotations:
-            #if location >= note['pos0'] and location <= note['pos1'] and note['fid'] == self.file_['id']:
-            if ((pos0 + self.file_['start'] >= note['pos0'] and pos0 + self.file_['start'] <= note['pos1']) or \
-                    (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
-                    and note['fid'] == self.file_['id']:
-                item = note  # use existing annotation
-                details = item['owner'] + " " + item['date']
+        if cursor_pos is None:
+            for note in self.annotations:
+                if ((pos0 + self.file_['start'] >= note['pos0'] and pos0 + self.file_['start'] <= note['pos1']) or \
+                        (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
+                        and note['fid'] == self.file_['id']:
+                    item = note  # use existing annotation
+                    details = item['owner'] + " " + item['date']
+                    break
+        if cursor_pos is not None:  # Try point position, if cursor is on an annotation, but no text selected
+            for note in self.annotations:
+                if cursor_pos + self.file_['start'] >= note['pos0'] and cursor_pos <= note['pos1'] + self.file_['start'] \
+                        and note['fid'] == self.file_['id']:
+                    item = note  # use existing annotation
+                    details = item['owner'] + " " + item['date']
+                    pos0 = cursor_pos
+                    pos1 = cursor_pos
+                    break
+
         # Exit this method if no text selected and there is no annotation at this position
         if pos0 == pos1 and item is None:
             return
@@ -2550,8 +2579,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.annotations.remove(note)
             self.parent_textEdit.append(_("Annotation removed from position ") \
                 + str(item['pos0']) + _(" for: ") + self.file_['name'])
-        self.unlight()
-        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def button_autocode_sentences_this_file(self):
         """ Flag to autocode sentences in one file """
