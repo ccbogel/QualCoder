@@ -824,7 +824,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 if item['important'] is None or item['important'] > 1:
-                    action_important = menu.addAction(_("Add important mark"))
+                    action_important = menu.addAction(_("Add important mark (I)"))
                 if item['important'] == 1:
                     action_not_important = menu.addAction(_("Remove important mark"))
                 break
@@ -2198,9 +2198,9 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes(imp_coded, self.codes, self.file_['start'])
+            self.eventFilterTT.set_codes_and_annotations(imp_coded, self.codes, self.annotations, self.file_['start'])
         else:
-            self.eventFilterTT.set_codes(self.code_text, self.codes, self.file_['start'])
+            self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations, self.file_['start'])
         self.unlight()
         self.highlight()
 
@@ -2891,24 +2891,28 @@ class DialogCodeText(QtWidgets.QWidget):
 class ToolTip_EventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
     The tool top text is changed according to its position in the text.
-    If over a coded section the codename(s) are displayed in the tooltip.
+    If over a coded section the codename(s) or Annotation note are displayed in the tooltip.
     """
 
     codes = None
     code_text = None
+    annotations = None
     offset = 0
 
-    def set_codes(self, code_text, codes, offset):
+    def set_codes_and_annotations(self, code_text, codes, annotations, offset):
         """ Code_text contains the coded text to be displayed in a tooptip.
+        Annotations - a mention is made if current position is annotated
 
         param:
             code_text: List of dictionaries of the coded text contains: pos0, pos1, seltext, cid, memo
             codes: List of dictionaries contains id, name, color
+            annotations: List of dictionaries of
             offset: integer 0 if all the text is loaded, other numbers mean a portion of the text is loaded, beginning at the offset
         """
 
         self.code_text = code_text
         self.codes = codes
+        self.annotations = annotations
         self.offset = offset
         for item in self.code_text:
             for c in self.codes:
@@ -2963,9 +2967,14 @@ class ToolTip_EventFilter(QtCore.QObject):
                         msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
                         msg += str(item)
                         logger.error(msg)
+            if multiple > 1:
+                text = multiple_msg + text
+
+            # Check annotations
+            for item in self.annotations:
+                if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
+                    text += "<p>" + _("ANNOTATED") + "</p>"
             if text != "":
-                if multiple > 1:
-                    text = multiple_msg + text
                 receiver.setToolTip(text)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)

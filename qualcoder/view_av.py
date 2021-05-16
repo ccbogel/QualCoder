@@ -1015,9 +1015,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes(imp_coded, self.codes)
+            self.eventFilterTT.set_codes_and_annotations(imp_coded, self.codes, self.annotations)
         else:
-            self.eventFilterTT.set_codes(self.code_text, self.codes)
+            self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations)
         self.unlight()
         self.highlight()
 
@@ -2311,7 +2311,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 if item['important'] is None or item['important'] > 1:
-                    action_important = menu.addAction(_("Add important mark"))
+                    action_important = menu.addAction(_("Add important mark (I)"))
                 if item['important'] == 1:
                     action_not_important = menu.addAction(_("Remove important mark"))
                 break
@@ -2741,10 +2741,12 @@ class ToolTip_EventFilter(QtCore.QObject):
 
     codes = None
     code_text = None
+    annotations = None
 
-    def set_codes(self, code_text, codes):
+    def set_codes_and_annotations(self, code_text, codes, annotations):
         self.code_text = code_text
         self.codes = codes
+        self.annotations = annotations
         for item in self.code_text:
             for c in self.codes:
                 if item['cid'] == c['cid']:
@@ -2784,9 +2786,15 @@ class ToolTip_EventFilter(QtCore.QObject):
                         msg = "Codes ToolTipEventFilter " + str(e) + ". Possible key error: "
                         msg += str(item) + "\n" + str(self.code_text)
                         logger.error(msg)
+            if multiple > 1:
+                text = multiple_msg + text
+            # Check annotations
+            for item in self.annotations:
+                #if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
+                if item['pos0'] <= pos and item['pos1'] >= pos:
+                    text += "<p>" + _("ANNOTATED") + "</p>"
+                    break
             if text != "":
-                if multiple > 1:
-                    text = multiple_msg + text    
                 receiver.setToolTip(text)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
