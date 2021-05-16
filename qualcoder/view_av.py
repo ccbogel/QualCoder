@@ -257,7 +257,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
         # until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
@@ -421,7 +421,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
 
-    def show_files_from_attributes(self):
+    def get_files_from_attributes(self):
         """ Trim the files list to files identified by attributes. """
 
         pm = QtGui.QPixmap()
@@ -432,8 +432,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         ui = DialogSelectAttributeParameters(self.app, "file")
         ok = ui.exec_()
         if not ok:
@@ -500,7 +498,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
         msg = msg[4:]
         self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
-
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
 
     def show_important_coded(self):
         """ Show codes flagged as important.
@@ -2208,11 +2207,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
         name, owner. """
 
-        fmt = QtGui.QTextCharFormat()
-        cursor = self.ui.textEdit.textCursor()
-
-        # add coding highlights
         for item in self.code_text:
+            fmt = QtGui.QTextCharFormat()
+            cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
             color = "#F8E0E0"  # default light red

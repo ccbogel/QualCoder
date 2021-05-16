@@ -256,7 +256,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_file_attributes.pressed.connect(self.show_files_from_attributes)
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -306,7 +306,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def get_files(self, ids=[]):
         """ Get files with additional details and fill list widget.
-         Called by: init, show_files_from_attributes
+         Called by: init, get_files_from_attributes
          param:
          ids: list, fill with ids to limit file selection.
          """
@@ -337,7 +337,7 @@ class DialogCodeText(QtWidgets.QWidget):
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
 
-    def show_files_from_attributes(self):
+    def get_files_from_attributes(self):
         """ Trim the files list to files identified by attributes.
         Attribute dialing results are a dictionary of:
         [0] attribute name, or 'case name'
@@ -363,8 +363,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
             return
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         ui = DialogSelectAttributeParameters(self.app, "file")
         ok = ui.exec_()
         if not ok:
@@ -431,6 +429,8 @@ class DialogCodeText(QtWidgets.QWidget):
             msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
         msg = msg[4:]
         self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -2182,15 +2182,16 @@ class DialogCodeText(QtWidgets.QWidget):
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        sql = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
-        sql += " where fid=? and owner=? "
+        sql = "select code_text.cid, fid, seltext, pos0, pos1, code_text.owner, code_text.date, code_text.memo, important, name"
+        sql += " from code_text join code_name on code_text.cid = code_name.cid"
+        sql += " where fid=? and code_text.owner=? "
         # For file text segment which is currently loaded
         sql += " and pos0 >=? and pos1 <=? "
         sql += "order by length(seltext) desc"
         cur = self.app.conn.cursor()
         cur.execute(sql, sql_values)
         code_results = cur.fetchall()
-        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important'
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important', 'name'
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
@@ -2228,14 +2229,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             return
         if self.source_text is not None:
-            fmt = QtGui.QTextCharFormat()
-            cursor = self.ui.textEdit.textCursor()
             # Add coding highlights
             codes = {x['cid']:x for x in self.codes}
             for item in self.code_text:
+                fmt = QtGui.QTextCharFormat()
+                cursor = self.ui.textEdit.textCursor()
                 cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
-                color = codes.get(item['cid'],{}).get('color', "#777777")  # default gray
+                color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
                 brush = QBrush(QColor(color))
                 fmt.setBackground(brush)
                 # Foreground depends on the defined need_white_text color in color_selector
