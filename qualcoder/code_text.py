@@ -2263,10 +2263,11 @@ class DialogCodeText(QtWidgets.QWidget):
             for note in self.annotations:
                 if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
                     # Cursor pos could be negative if annotation was for an earlier text portion
+                    cursor = self.ui.textEdit.textCursor()
                     if note['fid'] == self.file_['id'] and \
                             int(note['pos0']) - self.file_['start'] >= 0 and \
                             int(note['pos1']) - self.file_['start'] > 0 and \
-                            int(note['pos1']) - self.file_['start']< len(self.ui.textEdit.toPlainText()):
+                            int(note['pos1']) - self.file_['start']<= len(self.ui.textEdit.toPlainText()):
                         cursor.setPosition(int(note['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
                         cursor.setPosition(int(note['pos1']) - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
                         formatB = QtGui.QTextCharFormat()
@@ -2523,7 +2524,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         text_length = len(self.ui.textEdit.toPlainText())
-        if pos0 >= text_length or pos1 >= text_length:
+        if pos0 >= text_length or pos1 > text_length:
             return
         item = None
         details = ""

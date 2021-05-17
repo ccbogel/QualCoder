@@ -2241,6 +2241,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # add annotation marks - these are in bold
         for note in self.annotations:
             if note['fid'] == self.transcription[0]:
+                cursor = self.ui.textEdit.textCursor()
                 cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
                 formatB = QtGui.QTextCharFormat()
@@ -2679,7 +2680,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         text_length = len(self.ui.textEdit.toPlainText())
-        if pos0 >= text_length or pos1 >= text_length:
+        if pos0 >= text_length or pos1 > text_length:
             return
         item = None
         details = ""
