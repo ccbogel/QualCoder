@@ -57,7 +57,7 @@ from journals import DialogJournals
 from manage_files import DialogManageFiles
 from manage_links import DialogManageLinks
 from memo import DialogMemo
-from refi import Refi_export, Refi_import
+from refi import RefiExport, RefiImport
 from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from report_code_summary import DialogReportCodeSummary
 from report_codes import DialogReportCodes
@@ -1172,7 +1172,7 @@ class MainWindow(QtWidgets.QMainWindow):
          NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
         """
 
-        Refi_export(self.app, self.ui.textEdit, "project")
+        RefiExport(self.app, self.ui.textEdit, "project")
         msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
         Message(self.app, _("REFI QDA Project export"), msg, "warning").exec_()
 
@@ -1181,14 +1181,14 @@ class MainWindow(QtWidgets.QMainWindow):
         Follows the REFI standard version 1.0. https://www.qdasoftware.org/
         """
         #
-        Refi_export(self.app, self.ui.textEdit, "codebook")
+        RefiExport(self.app, self.ui.textEdit, "codebook")
 
     def REFI_codebook_import(self):
         """ Import a codebook .qdc into an opened project.
         Follows the REFI-QDA standard version 1.0. https://www.qdasoftware.org/
          """
 
-        Refi_import(self.app, self.ui.textEdit, "qdc")
+        RefiImport(self.app, self.ui.textEdit, "qdc")
 
     def REFI_project_import(self):
         """ Import a qpdx QDA project into a new project space.
@@ -1208,7 +1208,7 @@ class MainWindow(QtWidgets.QMainWindow):
             Message(self.app, _("Project creation"), _("Project not successfully created"), "warning").exec_()
             return
 
-        Refi_import(self.app, self.ui.textEdit, "qdpx")
+        RefiImport(self.app, self.ui.textEdit, "qdpx")
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -1294,7 +1294,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
         cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
-        cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text);")
+        cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner));")
         cur.execute("CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
         cur.execute("CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
         cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")

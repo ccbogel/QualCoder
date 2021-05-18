@@ -66,7 +66,7 @@ def exception_handler(exception_type, value, tb_obj):
     #QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class Refi_import():
+class RefiImport():
     """     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml
     and project.xml
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
@@ -85,6 +85,7 @@ class Refi_import():
     sources = []
     variables = []  # Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
+    annotations = []  # Text source annotation references
     parent_textEdit = None
     app = None
     tree = None
@@ -362,8 +363,6 @@ class Refi_import():
             if c.tag == "{urn:QDA-XML:project:1.0}Variables":
                 count = self.parse_variables(c)
                 self.parent_textEdit.append(_("Parse variables. Loaded: ") + str(count))
-            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Description":
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
@@ -373,13 +372,18 @@ class Refi_import():
         self.parse_cases_for_file_variables(root)
         self.parent_textEdit.append(_("Parsed cases for file variables. Loaded: ") + str(len(self.file_vars)))
 
-        # Parse sources after the variables components parsed
+        # Parse Sources after the variables components parsed
         # Variables caseOrFile will be 'file' for ALL variables, to change later if needed
         children = root.getchildren()
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Sources":
                 count = self.parse_sources(c)
                 self.parent_textEdit.append(_("Parsing sources. Loaded: " + str(count)))
+
+        # Parse Notes after sources. Some Notes are text annotations
+        for c in children:
+            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
+                self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
 
         # Fill attributes table for File variables drawn fom Cases.Case tags
         # After Sources are loaded
@@ -1304,9 +1308,12 @@ class Refi_import():
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
                 self._load_codings_for_text(source, e)
-
+        # Parse PlainTextSelection elements for NoteRef (annotation) elements
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}NoteRef":
+                self.annotations.append({"NoteRef": e.get("targetGUID"), "TextSource": source["guid"]})
         # Parse elements for VariableValues
-        # THis approach used by MAXQDA but nt by QUIRKOS
+        # This approach used by MAXQDA but not by QUIRKOS
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, id_, creating_user)
@@ -1324,8 +1331,6 @@ class Refi_import():
             id_ : File id of source, Integer
             creating_user : The user who created this source, String
         """
-
-        #TODO revise
 
         value_types = ["{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}TextValue",
                 "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}FloatValue",
@@ -1370,7 +1375,7 @@ class Refi_import():
         < / Coding >
         < / PlainTextSelection >
 
-        :param entry - the source text dictionary
+        :param source - the source text dictionary
         :param element - the PlainTextSelection element
         """
 
@@ -1441,8 +1446,16 @@ class Refi_import():
             for u in self.users:
                 if u['guid'] == creating_user_guid:
                     creating_user = u['name']
+            # Check if the Note is a TextSource Annotation
+            annotation = False
+            for a in self.annotations:
+                if a['NoteRef'] == e.get("guid"):
+                    annotation = True
+                    print("Found Annotation in notes")
+                    break
+
             # journal paths starts with internal://
-            if e.get("plainTextPath") is not None:
+            if e.get("plainTextPath") is not None and not annotation:
                 path = e.get("plainTextPath").split('internal:/')[1]
                 path = self.folder_name + '/Sources' + path
                 #print(path)
@@ -1450,14 +1463,14 @@ class Refi_import():
                 try:
                     with open(path) as f:
                         jentry = f.read()
-                except Exception as e:
-                    self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(e))
+                except Exception as err:
+                    self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(err))
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
                 (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
             else:
                 #TODO
-                print(_("Note element is not a journal."))
+                print(_("Note element is not a journal. Probably an annotation") + str(e.get("guid")))
             count += 1
         return count
 
@@ -1532,7 +1545,7 @@ class Refi_import():
             return False
 
 
-class Refi_line_endings(QtWidgets.QDialog):
+class RefiLineEndings(QtWidgets.QDialog):
     """Refi line endings dialog."""
 
     def __init__(self, app, parent=None):
@@ -1545,7 +1558,7 @@ class Refi_line_endings(QtWidgets.QDialog):
         self.setStyleSheet(font)
 
 
-class Refi_export(QtWidgets.QDialog):
+class RefiExport(QtWidgets.QDialog):
     """ Create Rotterdam Exchange Format Initiative (refi) xml documents for
     codebook.xml and project.xml
     NOTES:
