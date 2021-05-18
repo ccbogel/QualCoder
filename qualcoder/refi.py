@@ -433,8 +433,6 @@ class RefiImport():
                 for c in el.getchildren():
                     self.parse_case_for_file_variables(c)
 
-        print("file vars\n", self.file_vars)
-
     def parse_case_for_file_variables(self, e_case):
         """ File variables and their values can be stored in the Case element
         Variables for files stored in Case have one SourceRef and no Case name.
@@ -1310,6 +1308,7 @@ class RefiImport():
                 self._load_codings_for_text(source, e)
         # Parse PlainTextSelection elements for NoteRef (annotation) elements
         for e in element.getchildren():
+            print("TEXTSOURCE", e.tag)
             if e.tag == "{urn:QDA-XML:project:1.0}NoteRef":
                 self.annotations.append({"NoteRef": e.get("targetGUID"), "TextSource": source["guid"]})
         # Parse elements for VariableValues
@@ -1638,7 +1637,7 @@ class RefiExport(QtWidgets.QDialog):
 
         add_line_ending_for_maxqda = False
         add_line_ending_for_atlas = False
-        ui = Refi_line_endings(self.app)
+        ui = RefLineEndings(self.app)
         ui.exec_()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
