@@ -383,7 +383,8 @@ class RefiImport():
         # Parse Notes after sources. Some Notes are text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                self.parent_textEdit.append(_("Parsing journal notes. Loaded: " + str(count)))
+                self.parse_notes(c)
+                self.parent_textEdit.append(_("Parsing Notes. Loaded: " + str(count)))
 
         # Fill attributes table for File variables drawn fom Cases.Case tags
         # After Sources are loaded
@@ -1308,7 +1309,6 @@ class RefiImport():
                 self._load_codings_for_text(source, e)
         # Parse PlainTextSelection elements for NoteRef (annotation) elements
         for e in element.getchildren():
-            print("TEXTSOURCE", e.tag)
             if e.tag == "{urn:QDA-XML:project:1.0}NoteRef":
                 self.annotations.append({"NoteRef": e.get("targetGUID"), "TextSource": source["guid"]})
         # Parse elements for VariableValues
@@ -1417,10 +1417,23 @@ class RefiImport():
 
     def parse_notes(self, element):
         """ Parse the Notes element.
-        Notes are possibly journal entries.
-        Example format:
-        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
+        Notes may be journal entries or annotations.
+        Example journal format:
+        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo"
+        richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx"
+        plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt"
+        creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        creationDateTime="2019-06-04T06:11:56Z"
+        modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        modifiedDateTime="2019-06-17T08:00:58Z">
         <Description>Steps towards completing the assignment</Description>
+        </Note>
+
+        Annotation Note:
+        <Note guid="0f758eeb-d61d-4e91-b250-79861c3869a6" modifyingUser="df241da2-bca0-4ad9-83c1-b89c98d83567"
+        modifiedDateTime="2021-01-15T23:37:54Z" >
+        <PlainTextContent>Memo for only title coding in regulation</PlainTextContent>
+        <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
 
         :param element Notes
@@ -1445,15 +1458,16 @@ class RefiImport():
             for u in self.users:
                 if u['guid'] == creating_user_guid:
                     creating_user = u['name']
+
             # Check if the Note is a TextSource Annotation
             annotation = False
             for a in self.annotations:
                 if a['NoteRef'] == e.get("guid"):
                     annotation = True
-                    print("Found Annotation in notes")
+                    self.insert_annotation(a['TextSource'], e)
                     break
 
-            # journal paths starts with internal://
+            # Journal paths starts with internal://
             if e.get("plainTextPath") is not None and not annotation:
                 path = e.get("plainTextPath").split('internal:/')[1]
                 path = self.folder_name + '/Sources' + path
@@ -1467,11 +1481,17 @@ class RefiImport():
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
                 (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
-            else:
-                #TODO
-                print(_("Note element is not a journal. Probably an annotation") + str(e.get("guid")))
             count += 1
         return count
+
+    def insert_annotation(self, source_guid, element):
+        """ Insert annotation into database
+        param: source_guid : guid of the Text source
+        param: element The Note element
+        """
+
+        print("TODO insert annotation ", source_guid, element)
+        #TODO
 
     def parse_project_description(self, element):
         """ Parse the Description element
