@@ -1668,7 +1668,7 @@ class RefiExport(QtWidgets.QDialog):
         Create an unzipped folder with a /Sources folder and project.qde xml document
         Then create zip wih suffix .qdpx
 
-        #TODO put file variables inside Cases.Case elements
+        #TODO put file variables inside Cases.Case elements as with Quirkos
         """
 
         project_name = self.app.project_name[:-4]
@@ -1694,7 +1694,7 @@ class RefiExport(QtWidgets.QDialog):
 
         add_line_ending_for_maxqda = False
         add_line_ending_for_atlas = False
-        ui = RefLineEndings(self.app)
+        ui = RefiLineEndings(self.app)
         ui.exec_()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
@@ -1900,7 +1900,7 @@ class RefiExport(QtWidgets.QDialog):
         xml = '<Description>' + self.convert_xml_predefined_entities(memo) + '</Description>\n'
         return xml
 
-    def create_note_xml(self, journal):
+    def create_journal_note_xml(self, journal):
         """ Create a Note xml for journal entries
         Appends xml in notes list.
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
@@ -1953,7 +1953,10 @@ class RefiExport(QtWidgets.QDialog):
             return ''
         xml = '<Notes>\n'
         for j in j_results:
-            xml += self.create_note_xml(j)
+            xml += self.create_journal_note_xml(j)
+
+        #TODO Annotation Note xml
+
         xml += '</Notes>\n'
         return xml
 
