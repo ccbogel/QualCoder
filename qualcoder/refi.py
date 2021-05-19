@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ import zipfile
 
 from PyQt5 import QtWidgets, QtCore
 
-from confirm_delete import DialogConfirmDelete  # REFI export questin about line endings
+from confirm_delete import DialogConfirmDelete  # REFI export question about line endings
 from GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from helpers import Message
 
@@ -82,8 +82,8 @@ class RefiImport():
     codes = []
     users = []
     cases = []
-    sources = []
-    variables = []  # Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
+    variables = []  # List of Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
     annotations = []  # Text source annotation references
     parent_textEdit = None
@@ -601,7 +601,7 @@ class RefiImport():
                 for d in d_elements:
                     #print("Memo ", d.tag)
                     if d.tag == "{urn:QDA-XML:project:1:0}Description":
-                        print("case memo")
+                        #print("case memo")
                         item['memo'] = d.text
 
                 # Enter Case into sqlite and keep a copy in  a list
@@ -641,7 +641,7 @@ class RefiImport():
                             "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
                             "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
                                 value = v_element.text
-                        print(item, guid, value)  # tmp
+                        #print(item, guid, value)  # tmp
                         # Get attribute name by linking guids
                         attr_name = ""
                         for attr in self.variables:
@@ -805,7 +805,7 @@ class RefiImport():
         if path_type == "relative":
             #TODO check this works
             media_path = "images:" + self.base_path + source_path
-            print(source_path, media_path)
+            print("relative path", source_path, media_path)
         memo = ""
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
@@ -1199,7 +1199,7 @@ class RefiImport():
             destination = self.app.project_path + "/documents/" + name
             try:
                 shutil.copyfile(source_path, destination)
-                print("PDF IMPORT", source_path, destination)
+                #print("PDF IMPORT", source_path, destination)
             except Exception as e:
                 self.parent_textEdit.append(_('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         if path_type == "absolute":
@@ -1349,7 +1349,7 @@ class RefiImport():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        print("Text attribute:", var_name, " value:",value)  # tmp
+        #print("Text attribute:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
@@ -1486,12 +1486,49 @@ class RefiImport():
 
     def insert_annotation(self, source_guid, element):
         """ Insert annotation into database
+        Annotation Note:
+        <Note guid="0f758eeb-d61d-4e91-b250-79861c3869a6" modifyingUser="df241da2-bca0-4ad9-83c1-b89c98d83567"
+        modifiedDateTime="2021-01-15T23:37:54Z" >
+        <PlainTextContent>Memo for only title coding in regulation</PlainTextContent>
+        <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
+        </Note>
+
         param: source_guid : guid of the Text source
         param: element The Note element
         """
 
-        print("TODO insert annotation ", source_guid, element)
-        #TODO
+        user_guid = element.get("modifyingUser")
+        owner = None
+        for u in self.users:
+            if u['guid'] == user_guid:
+                owner = u['name']
+        if owner is None:
+            owner = self.app.settings['codername']
+        date = element.get("modifiedDateTime")
+        if date is not None:
+            date = date.replace('T', ' ')
+            date = date.replace('Z', '')
+        else:
+            date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        for el in element:
+            if el.tag == "{urn:QDA-XML:project:1.0}PlainTextContent":
+                memo = el.text
+            if el.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
+                pos0 = el.get("startPosition")
+                pos1 = el.get("endPosition")
+        if pos0 is None or pos1 is None or memo is None:
+            #print("None values ", pos0, pos1, memo)
+            return
+        fid = None
+        for s in self.sources:
+            if source_guid == s['guid']:
+                fid = s['id']
+        if fid is None:
+            return
+        cur = self.app.conn.cursor()
+        sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
+        cur.execute(sql, [fid, int(pos0), int(pos1), memo, owner, date])
+        self.app.conn.commit()
 
     def parse_project_description(self, element):
         """ Parse the Description element
