@@ -416,7 +416,6 @@ class RefiImport():
         msg += _("Sets and Graphs not imported as QualCoder does not have this functionality.\n")
         msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
         msg += _("All variables are stored as text, but cast as text or float during operations.\n")
-        msg += _("Variable import is not correct for now - to fix")
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
@@ -1503,6 +1502,11 @@ class RefiImport():
             if u['guid'] == user_guid:
                 owner = u['name']
         if owner is None:
+            user_guid = element.get("creatingUser")
+            for u in self.users:
+                if u['guid'] == user_guid:
+                    owner = u['name']
+        if owner is None:
             owner = self.app.settings['codername']
         date = element.get("modifiedDateTime")
         if date is not None:
@@ -1627,8 +1631,9 @@ class RefiExport(QtWidgets.QDialog):
     users = []
     sources = []
     guids = []
-    note_files = []  # contains guid.txt name and note text
-    variables = []  # contains dictionary of variable xml, guid, name
+    note_files = []  # List of Dictionaries of guid.txt name and note text
+    annotations = []  # List of Dictionaries of anid, fid, pos0, pos1, memo, owner, date
+    variables = []  # List of Dictionaries of variable xml, guid, name
     xml = ""
     parent_textEdit = None
     app = None
@@ -1647,6 +1652,7 @@ class RefiExport(QtWidgets.QDialog):
         self.get_codes()
         self.get_users()
         self.get_sources()
+        self.annotations = self.app.get_annotations()
         if self.export_type == "codebook":
             self.codebook_exchange_xml()
             self.xml_validation("codebook")
@@ -1902,7 +1908,7 @@ class RefiExport(QtWidgets.QDialog):
 
     def create_journal_note_xml(self, journal):
         """ Create a Note xml for journal entries
-        Appends xml in notes list.
+        To be appended to the in notes list. To add to the Notes element
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
         Called by: notes_xml
         Format:
@@ -1933,6 +1939,42 @@ class RefiExport(QtWidgets.QDialog):
         self.note_files.append([guid + '.txt', journal[1]])
         return xml
 
+    def create_annotation_note_xml(self, ann):
+        """ Create a Note xml for text source annotations
+        Appends xml in notes list.
+        Appends to the annotations list
+        Called by: ??? notes_xml
+
+        Format:
+        Annotation Note:
+        <Note guid="0f758eeb-d61d-4e91-b250-79861c3869a6" modifyingUser="df241da2-bca0-4ad9-83c1-b89c98d83567"
+        modifiedDateTime="2021-01-15T23:37:54Z" >
+        <PlainTextContent>Memo for only title coding in regulation</PlainTextContent>
+        <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
+        </Note>
+
+        Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>  Liks to the annotation detail.
+
+        :param ann: Dictionaries of anid, fid, pos0, pos1, memo, owner, date,  NoteRef_guid
+        :returns a guid for a NoteRef
+        """
+
+        xml = '<Note guid="' + ann['NoteRef_guid'] + '" '
+        user = ""
+        for u in self.users:
+            if u['name'] == ann['owner']:
+                user = u['guid']
+                break
+        xml += 'creatingUser="' + user + '" '
+        xml += 'creationDateTime="' + self.convert_timestamp(ann['date']) + '" '
+        xml += '>\n'
+        xml += '<PlainTextContent>' + ann['memo'] + '</PlainTextContent>\n'
+        guid = self.create_guid()
+        xml += '<PlainTextSelection guid="' + guid + '" startPosition="' + str(ann['pos0'])
+        xml += '" endPosition="' + str(ann['pos1']) + '" />\n'
+        xml += '</Note>\n'
+        return xml
+
     def notes_xml(self):
         """ Get journal entries and store them as Notes.
         Collate note_xml list into final xml
@@ -1943,20 +1985,18 @@ class RefiExport(QtWidgets.QDialog):
         :returns xml
         """
 
-        self.note_files = []
         # Get journal entries
         cur = self.app.conn.cursor()
         sql = "select name, jentry, date, owner from journal where jentry is not null"
         cur.execute(sql)
         j_results = cur.fetchall()
-        if j_results == []:
+        if j_results == [] and self.annotations is None:
             return ''
         xml = '<Notes>\n'
         for j in j_results:
             xml += self.create_journal_note_xml(j)
-
-        #TODO Annotation Note xml
-
+        for ann in self.annotations:
+            xml += self.create_annotation_note_xml(ann)
         xml += '</Notes>\n'
         return xml
 
@@ -2148,6 +2188,11 @@ class RefiExport(QtWidgets.QDialog):
                     xml += '<Description>' + memo + '</Description>\n'
                 xml += self.text_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
+                for a in self.annotations:
+                    if a['fid'] == s['id']:
+                        a['NoteRef_guid'] = self.create_guid()
+                        xml += '<NoteRef targetGUID="'+ a['NoteRef_guid'] + '" />\n'
+                        break
                 xml += '</TextSource>\n'
             # PDF document
             if (s['mediapath'] is None and s['name'][-4:].lower() == '.pdf') or \
@@ -2171,6 +2216,10 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'creatingUser="' + self.user_guid(s['owner']) + '" '
                 xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '">\n'
                 xml += self.text_selection_xml(s['id'])
+                for a in self.annotations:
+                    if a['fid'] == s['id']:
+                        a['NoteRef_guid'] = self.create_guid()
+                        break
                 xml += '</Representation>'
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PDFSource>\n'
