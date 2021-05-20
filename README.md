@@ -62,32 +62,24 @@ This will install QualCoder in the /usr/share directory and create a launcher. A
 
 ### Windows: 
 
-Install [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. On Windows, the bit version of VLC, 32 or 64 must match the bit version of python 3. Minumum version python 3.6.
+Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
-Install dependencies in the command prompt:
+Download the software from: https://github.com/ccbogel/QualCoder. This is the newest, but not yet officially released, version of code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
+
+Open the unpacked folder "QualCoder-master", then open the folder "qualcoder" and make a shortcut of the file "qualcoder.py" on the desktop - for easier access. This file is the starting file for running software.
+    [Python3](https://www.python.org/downloads/) and
+    
+The software is written in Python and does not have an exe file for Windows. Download and install the Python programming language. The minimum version is 3.6. Newer is better, e.g. 3.8.7 (https://www.python.org/downloads/release/python-387/). Download the file (at the bottom of the web site) "Windows installer (64-bit)" (or 32-bit if you have an older system) and install Python.
+
+IMORTANT: in the first window of the installation mark the option "Add Python 3.8 to PATH" - it makes the last step easier.
+
+The final step, install modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctr+v does not work) the following:
 
 `python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
-or:
+Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
-
-To launch, you can create a shortcut to the qualcoder.py file to start QualCoder.
-
-Alternatively move to the qualcoder directory and run the qualcoder.py file in from command prompt: 
-
-`python qualcoder.py`  or `py qualcoder.py`
-
-you might need to install modules and run the program by typing python3 rather than python or py, it seems different on different Winows versions.
-
-Run QualCoder and hide the black DOS box:
-
-`C:\Windows\pyw.exe "C:\the location of your Qualcoder folder\QualCoder-master\qualcoder\qualcoder.py"`
-
-Sometimes there are problems recognising the audio/video VLC library file: libvlc.dll  
-Some solutions are to add the path of the file here: [https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1](https://stackoverflow.com/questions/42045887/python-vlc-install-problems?noredirect=1)
-
-The log file on Windows does not make use of the rotating file handler, so the log file may become large. If so, delete the log file. It will be re-created automatically.
+Now, you should be able to run QualCoder by double-clicking the desktop shortcut.
 
 
 ### MacOS
