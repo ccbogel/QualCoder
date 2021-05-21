@@ -83,6 +83,7 @@ class RefiImport():
     users = []
     cases = []
     sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
+    sources_name = "/Sources"  # Sources folder can be named Sources or sources
     variables = []  # List of Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
     annotations = []  # Text source annotation references
@@ -328,11 +329,11 @@ class RefiImport():
         # Source loading can be slow, so use this for he progress dialog
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
-        sources_name = "/Sources"
+        self.sources_name = "/Sources"
         for i in contents:
             if i == "sources":
-                sources_name = "/sources"
-        num_sources = len(os.listdir(self.folder_name + sources_name))
+                self.sources_name = "/sources"
+        num_sources = len(os.listdir(self.folder_name + self.sources_name))
         self.pd = QtWidgets.QProgressDialog(_("Project Import"), "", 0, num_sources, None)
         self.pd.setWindowModality(QtCore.Qt.WindowModal)
         self.pd_value = 0
@@ -421,12 +422,11 @@ class RefiImport():
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
 
     def parse_cases_for_file_variables(self, root):
-        """ Parse cases for each canse. Look for any file variables (No case name and only one sourceref).
+        """ Parse Cases element for each Case. Look for any file variables (No case name and only one sourceref).
         Fill out file_vars list """
 
         self.file_vars = []
         children = root.getchildren()
-        #count = 0
         for el in children:
             if el.tag == "{urn:QDA-XML:project:1.0}Cases":
                 print(el.tag)
@@ -757,20 +757,20 @@ class RefiImport():
         path = element.get("path")
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
-        sources_name = "/Sources"
+        self.sources_name = "/Sources"
         for i in contents:
             if i == "sources":
-                sources_name = "/sources"
+                self.sources_name = "/sources"
         # Determine internal or external path
         source_path = ""
         path_type = ""
         if path is None:
             source_path = element.get("plainTextPath").split('internal:/')[1]
-            source_path = self.folder_name + sources_name + source_path
+            source_path = self.folder_name + self.sources_name + source_path
             path_type = "internal"
         if path is not None and path.find("internal://") == 0:
             path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + sources_name + path
+            source_path = self.folder_name + self.sources_name + path
             path_type = "internal"
         if path is not None and path.find("relative://") == 0:
             source_path = self.base_path + path.split('relative://')[1]
@@ -1030,11 +1030,7 @@ class RefiImport():
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
-        sources_name = "/Sources/"
-        for i in contents:
-            if i == "sources":
-                sources_name = "/sources/"
-        source_path = self.folder_name + sources_name + plain_text_path
+        source_path = self.folder_name + self.sources_name + plain_text_path
         #print("Source path: ", source_path)
         #print("Destination: ", destination)
         try:
@@ -1358,15 +1354,15 @@ class RefiImport():
     def _load_codings_for_text(self, source, element):
         """ These are PlainTextSelection elements.
         These elements contain a Coding element and a Description element.
-        The Description element is treated as an Annotation.
+        The Description element is treated as a coding memo.
 
-        Some Coding guids withh match a Case guid. This is Case text.
+        Some Coding guids match a Case guid. This is Case text.
 
         Example format:
         < PlainTextSelection guid = "08cbced0-d736-44c8-8fd6-eb4d29fe46c5" name = "" startPosition = "1967"
         endPosition = "2207" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime = "2019-06-07T03:36:36Z"
         modifyingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime = "2019-06-07T03:36:36Z" >
-        < Description / >
+        < Description / > or <Description>some text</Description>
         < Coding guid = "76414714-63c4-4a25-a47e-66fef80bd52e" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
         creationDateTime = "2019-06-06T06:27:01Z" >
         < CodeRef targetGUID = "2dfba8c9-59f5-4424-99d6-ea9bce18134b" / >
@@ -1393,16 +1389,14 @@ class RefiImport():
             if u['guid'] == creating_user_guid:
                 creating_user = u['name']
         seltext = source['fulltext'][pos0:pos1]
+
+        # The Description element text inside a PlainTextSelection is a coding memo
+        memo = ""
         for e in element:
-            # Treat description text as an annotation
             if e.tag == "{urn:QDA-XML:project:1.0}Description" and e.text is not None:
-                cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
-                values(?,?,?,?,?,?)", (source['id'], pos0, pos1,
-                e.text, creating_user, create_date))
-                self.app.conn.commit()
+                memo = e.text
+        for e in element:
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
-                memo = ""
-                #TODO can coded text be memoed?
                 # Get the code id from the CodeRef guid
                 cid = None
                 codeRef = e.getchildren()[0]
@@ -1469,8 +1463,8 @@ class RefiImport():
             # Journal paths starts with internal://
             if e.get("plainTextPath") is not None and not annotation:
                 path = e.get("plainTextPath").split('internal:/')[1]
-                path = self.folder_name + '/Sources' + path
-                #print(path)
+                # sources or Sources folder
+                path = self.folder_name + self.sources_name + path
                 jentry = ""
                 try:
                     with open(path) as f:
