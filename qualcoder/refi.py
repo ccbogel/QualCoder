@@ -358,7 +358,7 @@ class RefiImport():
                 codes = c.getchildren()[0]  # <Codes> tag is only element
                 count = 0
                 for code in codes:
-                    # recursive search through each Code in Codes
+                    # Recursive search through each Code in Codes
                     count += self.sub_codes(code, None)
                 self.parent_textEdit.append(_("Parse codes and categories. Loaded: " + str(count)))
             if c.tag == "{urn:QDA-XML:project:1.0}Variables":
@@ -368,12 +368,12 @@ class RefiImport():
                 self.parent_textEdit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
 
-        # Parse cases for any file variable values (No case name and only one sourceref)
+        # Parse Cases element for any file variable values (No case name and only one sourceref)
         # Fill a list of dictionaries of these variable values
         self.parse_cases_for_file_variables(root)
         self.parent_textEdit.append(_("Parsed cases for file variables. Loaded: ") + str(len(self.file_vars)))
 
-        # Parse Sources after the variables components parsed
+        # Parse Sources element after the variables components parsed
         # Variables caseOrFile will be 'file' for ALL variables, to change later if needed
         children = root.getchildren()
         for c in children:
@@ -391,7 +391,7 @@ class RefiImport():
         # After Sources are loaded
         self.fill_file_attribute_values()
 
-        # Parse cases and update variables already assigned as 'file' if needed
+        # Parse Cases element and update variables already assigned as 'file' if needed
         children = root.getchildren()
         for c in children:
             # print(c.tag)
@@ -399,6 +399,14 @@ class RefiImport():
                 count = self.parse_cases(c)
                 self.parent_textEdit.append(_("Parsing cases. Loaded: " + str(count)))
         self.clean_up_case_codes_and_case_text()
+
+        # Parse Sets element and update variables
+        children = root.getchildren()
+        for c in children:
+            # print(c.tag)
+            if c.tag == "{urn:QDA-XML:project:1.0}Sets":
+                self.parse_sets(c)
+                self.parent_textEdit.append(_("Parsing sets."))
 
         # Wrap up
         self.parent_textEdit.append(self.file_path + _(" loaded."))
@@ -1527,6 +1535,75 @@ class RefiImport():
         sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
         cur.execute(sql, [fid, int(pos0), int(pos1), memo, owner, date])
         self.app.conn.commit()
+
+    def parse_sets(self, element):
+        """ Parse the Sets element
+
+        <Sets>
+        <Set name="Document group 1" guid="46467993-B426-49DD-9707-B5958EBA9870">
+        <Description>Memo to document group</Description>
+        <MemberSource targetGUID="631251CC-9FB4-4131-BEA8-35947084C409"/>
+        <MemberSource targetGUID="9DDD19C4-168C-4103-BBAD-08D4BD10A145"/>
+        </Set>
+        </Sets>
+        """
+
+        for e in element.getchildren():
+            if e.tag == "{urn:QDA-XML:project:1.0}Set":
+                self.parse_set(e)
+
+    def parse_set(self, element):
+        """ Parse the Set element
+
+        <Set name="Document group 1" guid="46467993-B426-49DD-9707-B5958EBA9870">
+        <Description>Memo to document group</Description>
+        <MemberSource targetGUID="631251CC-9FB4-4131-BEA8-35947084C409"/>
+        <MemberSource targetGUID="9DDD19C4-168C-4103-BBAD-08D4BD10A145"/>
+        </Set>
+        """
+
+        name = element.get("name")
+        memo = ""
+        for el in element.getchildren():
+            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = el.text
+                if memo is None:
+                    memo = ""
+                break
+        set_sources = []  # List of sources associated with this Set
+        for el in element.getchildren():
+            if el.tag == "{urn:QDA-XML:project:1.0}MemberSource":
+                target_guid = el.get("targetGUID")
+                for s in self.sources:
+                    if target_guid == s['guid']:
+                        set_sources.append(s['id'])
+        if set_sources:
+            self.insert_set_source_variables(name, memo, set_sources)
+
+    def insert_set_source_variables(self, name, memo, set_sources):
+        """ Insert the variable name and values for the set source.
+        Assume the variable is a character type
+        param: name : the variable name
+        param: memo : variable memo
+        param: set_sources : list of source ids """
+
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur = self.app.conn.cursor()
+        try:
+            cur.execute(
+                "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
+                , (name, now_date, self.app.settings['codername'], memo, "file", "character"))
+            self.app.conn.commit()
+            cur.execute("select last_insert_rowid()")
+        except sqlite3.IntegrityError as e:
+            Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
+            return
+
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
+        for id_ in set_sources:
+            placeholders = [name, name, id_, now_date, self.app.settings['codername']]
+            cur.execute(insert_sql, placeholders)
+            self.app.conn.commit()
 
     def parse_project_description(self, element):
         """ Parse the Description element
