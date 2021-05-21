@@ -422,7 +422,8 @@ class RefiImport():
         self.pd.close()
         msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
         msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")
-        msg += _("Sets and Graphs not imported as QualCoder does not have this functionality.\n")
+        msg += _("Set components may be imported as file attributes.\n")
+        msg += _("Graphs not imported as QualCoder does not have this functionality.\n")
         msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
         msg += _("All variables are stored as text, but cast as text or float during operations.\n")
         msg += _("Relative paths to external files are untested.\n")
@@ -1364,6 +1365,9 @@ class RefiImport():
         These elements contain a Coding element and a Description element.
         The Description element is treated as a coding memo.
 
+        NOTE: MAXQDA. Some PlainTextSelection elements DO NOT have a Coding element, but DO HAVE a Description element.
+        For these, load the Description text as an annotation.
+
         Some Coding guids match a Case guid. This is Case text.
 
         Example format:
@@ -1403,8 +1407,10 @@ class RefiImport():
         for e in element:
             if e.tag == "{urn:QDA-XML:project:1.0}Description" and e.text is not None:
                 memo = e.text
+        annotation = True
         for e in element:
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
+                annotation = False
                 # Get the code id from the CodeRef guid
                 cid = None
                 codeRef = e.getchildren()[0]
@@ -1415,6 +1421,10 @@ class RefiImport():
                     memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
                     seltext, pos0, pos1, creating_user, memo, create_date))
                 self.app.conn.commit()
+        if annotation:
+            sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
+            cur.execute(sql, [source['id'], int(pos0), int(pos1), memo, creating_user, create_date])
+            self.app.conn.commit()
 
     def parse_notes(self, element):
         """ Parse the Notes element.
