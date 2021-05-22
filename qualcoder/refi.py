@@ -75,7 +75,7 @@ class RefiImport():
     #TODO parse_sources PDF - WORKS BUT FULLY WORKS ?
     #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
-    #TODO check imports from different vendors
+    #TODO check imports from different vendors, tried Quirkos, Maxqda
     #TODO reference external sources - relative or absolute paths
 
     file_path = None
@@ -1847,6 +1847,16 @@ class RefiExport(QtWidgets.QDialog):
         export_path = self.app.project_path[:-4]
         shutil.make_archive(prep_path, 'zip', prep_path)
         os.rename(prep_path + ".zip", prep_path + ".qdpx")
+
+        # Add suffix to project name if it already exists
+        counter = 0
+        while os.path.exists(export_path + ".qdpx"):
+            extension = ""
+            if counter > 0:
+                extension = "_" + str(counter)
+            export_path = export_path + extension
+            counter += 1
+
         shutil.copyfile(prep_path + ".qdpx", export_path + ".qdpx")
         try:
             shutil.rmtree(prep_path)
