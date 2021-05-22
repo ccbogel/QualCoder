@@ -425,7 +425,7 @@ class RefiImport():
         msg += _("Set components may be imported as file attributes.\n")
         msg += _("Graphs not imported as QualCoder does not have this functionality.\n")
         msg += _("Boolean variables treated as character (text). Integer variables treated as floating point. \n")
-        msg += _("All variables are stored as text, but cast as text or float during operations.\n")
+        msg += _("All variables are stored as text. Cast as text or float for SQL operations.\n")
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
@@ -969,9 +969,18 @@ class RefiImport():
                  'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
         self.sources.append(source)
 
+        no_transcript = True
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                no_transcript = False
                 self.parse_transcript_with_codings_and_syncpoints(name, av_id, creating_user, e)
+        if no_transcript:
+            # Create an empty transcription file
+            now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            txt_name = name + ".transcribed"
+            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
+                        (txt_name, creating_user, now_date))
+            self.app.conn.commit()
 
         # Parse VideoSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
