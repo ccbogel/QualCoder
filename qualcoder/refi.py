@@ -919,9 +919,18 @@ class RefiImport():
                  'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
         self.sources.append(source)
 
+        no_transcript = True
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                no_transcript = False
                 self.parse_transcript_with_codings_and_syncpoints(name, id_, creating_user, e)
+        if no_transcript:
+            # Create an empty transcription file
+            now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            txt_name = name + ".transcribed"
+            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
+                        (txt_name, creating_user, now_date))
+            self.app.conn.commit()
 
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
