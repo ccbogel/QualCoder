@@ -488,7 +488,8 @@ class App(object):
         QLineEdit {border: 1px solid #808080;}\n\
         QMenuBar::item:selected {background-color: #3498db; }\n\
         QMenu {border: 1px solid #808080;}\n\
-        QMenu::item:selected {background-color:  #3498db ;}\n\
+        QMenu::item:selected {background-color:  #3498db;}\n\
+        QMenu::item:disabled {color: #777777;}\n\
         QToolTip {background-color: #2a2a2a; color:#eeeeee; border: 1px solid #f89407; }\n\
         QPushButton {background-color: #808080;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
@@ -1205,7 +1206,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            Message(self.app, _("Project creation"), _("Project not successfully created"), "warning").exec_()
+            Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec_()
             return
 
         RefiImport(self.app, self.ui.textEdit, "qdpx")
@@ -1268,13 +1269,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
-        self.app.project_path = QtWidgets.QFileDialog.getSaveFileName(self,
+        project_path = QtWidgets.QFileDialog.getSaveFileName(self,
             _("Enter project name"), self.app.settings['directory'], ".qda")[0]
-        if self.app.project_path == "":
+        if project_path == "":
             Message(self.app, _("Project"), _("No project created."), "critical").exec_()
             return
-        if self.app.project_path.find(".qda") == -1:
-            self.app.project_path = self.app.project_path + ".qda"
+
+        # Add suffix to project name if it already exists
+        counter = 0
+        extension = ""
+        while os.path.exists(project_path + extension + ".qda"):
+            print("C", counter, project_path + extension + ".qda")
+            if counter > 0:
+                extension = "_" + str(counter)
+            counter += 1
+        self.app.project_path = project_path + extension + ".qda"
         try:
             os.mkdir(self.app.project_path)
             os.mkdir(self.app.project_path + "/images")
@@ -1283,7 +1292,7 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.app.project_path + "/documents")
         except Exception as e:
             logger.critical(_("Project creation error ") + str(e))
-            Message(self.app, _("Project"), _("Project not successfully created"), "critical").exec_()
+            Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec_()
             self.app = App()
             return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
@@ -1345,7 +1354,7 @@ class MainWindow(QtWidgets.QMainWindow):
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
         ui.exec_()
-        ss = self.app.merge_settings_with_default_stylesheet(self.app.settings)
+        #ss = self.app.merge_settings_with_default_stylesheet(self.app.settings)
         #self.setStyleSheet(ss)
         self.settings_report()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
