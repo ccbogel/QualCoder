@@ -1174,8 +1174,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
 
         RefiExport(self.app, self.ui.textEdit, "project")
-        msg = "NOT FULLY TESTED - EXPERIMENTAL\n"
-        Message(self.app, _("REFI QDA Project export"), msg, "warning").exec_()
 
     def REFI_codebook_export(self):
         """ Export the codebook as .qdc

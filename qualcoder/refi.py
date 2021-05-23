@@ -1926,7 +1926,6 @@ class RefiExport(QtWidgets.QDialog):
 
         if text is None:
             return ""
-
         text = text.replace('&', '&#038;')  # &#x26; &amp;
         text = text.replace('"', '&#034;')  # &#x22; &quot;
         text = text.replace("'", '&#039;')  # &#x27; &apos;
@@ -2125,7 +2124,7 @@ class RefiExport(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name, memo, owner, date from cases")
         result = cur.fetchall()
-        if result == []:
+        if not result:
             return xml
         xml = '<Cases>\n'
         for r in result:
@@ -2410,7 +2409,7 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         xml = ""
-        sql = "select cid, seltext, pos0, pos1, owner, date from code_text "
+        sql = "select cid, seltext, pos0, pos1, owner, date, memo from code_text "
         sql += "where fid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [id_, ])
@@ -2419,16 +2418,16 @@ class RefiExport(QtWidgets.QDialog):
             xml += '<PlainTextSelection guid="' + self.create_guid() + '" '
             xml += 'startPosition="' + str(r[2]) + '" '
             xml += 'endPosition="' + str(r[3]) + '" '
-            xml += 'name="'
-            # Replace predefined entities in XML
-            name = self.convert_xml_predefined_entities(r[1])
-            xml += name + '" '
+            xml += 'name="' + self.convert_xml_predefined_entities(r[1]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
             xml += '</Coding>\n'
+            if r[6] != "":
+                memo = self.convert_xml_predefined_entities(r[6])
+                xml += '<Description>' + memo + '</Description>\n'
             xml += '</PlainTextSelection>\n'
         return xml
 
@@ -2453,13 +2452,16 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'firstY="' + str(int(r[3])) + '" '
             xml += 'secondX="' + str(int(r[2] + r[4])) + '" '
             xml += 'secondY="' + str(int(r[3] + r[5])) + '" '
-            xml += 'name="' + str(r[8]) + '" '
+            xml += 'name="' + self.convert_xml_predefined_entities(r[8]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[7]) + '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" >'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
+            if r[8] is not None and r[8] != "":
+                memo = self.convert_xml_predefined_entities(r[8])
+                xml += '<Description>' + memo + '</Description>\n'
             xml += '</PictureSelection>\n'
         return xml
 
@@ -2478,8 +2480,8 @@ class RefiExport(QtWidgets.QDialog):
         </VideoSelection>
 
         :param id_ is the source id Integer
-
-        :returns xml String
+        :param mediatype : is the String of
+        :returns xml String Audio or Video
         """
 
         xml = ""
@@ -2492,13 +2494,16 @@ class RefiExport(QtWidgets.QDialog):
             xml += '<' + mediatype + 'Selection guid="' + self.create_guid() + '" '
             xml += 'begin="' + str(int(r[2])) + '" '
             xml += 'end="' + str(int(r[3])) + '" '
-            xml += 'name="' + str(r[6]) + '" '
+            xml += 'name="' + self.convert_xml_predefined_entities(r[6]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
+            if r[6] != "":
+                memo = self.convert_xml_predefined_entities(r[6])
+                xml += '<Description>' + memo + '</Description>\n'
             xml += '</' + mediatype + 'Selection>\n'
         return xml
 
