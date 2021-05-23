@@ -1164,6 +1164,7 @@ class RefiImport():
         Example format:
         <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100" guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
         creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z" name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
+        <Description>Memo to video file</Description>
         <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z">
         <CodeRef targetGUID="86392BC1-A364-4904-A406-87A7E025EBF7"/>
         </Coding>
@@ -1172,7 +1173,6 @@ class RefiImport():
 
         seg_start = int(element.get("begin"))
         seg_end = int(element.get("end"))
-        memo = element.get("name")
         create_date = element.get("creationDateTime")
         if create_date is None:
             create_date = element.get("modifiedDateTime")
@@ -1192,6 +1192,12 @@ class RefiImport():
                 creating_user = u['name']
 
         cur = self.app.conn.cursor()
+        memo = ""
+        for e in element:
+            if e.tag == "{urn:QDA-XML:project:1.0}Description":
+                memo = e.text
+                if memo is None:
+                    memo = ""
         for e in element:
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
                 # Get the code id from the CodeRef guid
