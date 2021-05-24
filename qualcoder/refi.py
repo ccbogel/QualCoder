@@ -2104,8 +2104,8 @@ class RefiExport(QtWidgets.QDialog):
         sql = "select name, jentry, date, owner from journal where jentry is not null"
         cur.execute(sql)
         j_results = cur.fetchall()
-        if j_results == [] and self.annotations is None:
-            return ''
+        if j_results == [] and self.annotations == []:
+            return ""
         xml = '<Notes>\n'
         for j in j_results:
             xml += self.create_journal_note_xml(j)
@@ -2400,7 +2400,7 @@ class RefiExport(QtWidgets.QDialog):
     def text_selection_xml(self, id_):
         """ Get and complete text selection xml.
         xml is in form:
-        <PlainTextSelection><Coding><CodeRef/></Coding></PlainTextSelection>
+        <PlainTextSelection><Description></Description><Coding><CodeRef/></Coding></PlainTextSelection>
         Called by: sources_xml
 
         :param id_ file id integer
@@ -2421,19 +2421,21 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'name="' + self.convert_xml_predefined_entities(r[1]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
-            xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
-            xml += '</Coding>\n'
-            if r[6] != "":
+            if r[6] != "":  # Description element comes before coding element
                 memo = self.convert_xml_predefined_entities(r[6])
                 xml += '<Description>' + memo + '</Description>\n'
+            xml += '<Coding guid="' + self.create_guid() + '" '
+            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
+            xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
+            xml += '</Coding>\n'
+
             xml += '</PlainTextSelection>\n'
         return xml
 
     def picture_selection_xml(self, id_):
         """ Get and complete picture selection xml.
         Called by: sources_xml
+        <PictureSelection><Description></Description><Coding><CodeRef/></Coding></PictureSelection>
 
         :param id_ is the source id
 
@@ -2455,13 +2457,14 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'name="' + self.convert_xml_predefined_entities(r[8]) + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[7]) + '">\n'
-            xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[6]) + '" >'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
-            xml += '</Coding>\n'
             if r[8] is not None and r[8] != "":
                 memo = self.convert_xml_predefined_entities(r[8])
                 xml += '<Description>' + memo + '</Description>\n'
+            xml += '<Coding guid="' + self.create_guid() + '" '
+            xml += 'creatingUser="' + self.user_guid(r[6]) + '" >\n'
+            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
+            xml += '</Coding>\n'
+
             xml += '</PictureSelection>\n'
         return xml
 
@@ -2473,6 +2476,7 @@ class RefiExport(QtWidgets.QDialog):
         begin="14706" creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" creationDateTime="2018‐03‐
         27T19:34:32Z" modifiedDateTime="2018‐03‐27T19:34:55Z" guid="0EF270BA‐47AD‐4107‐B78F‐7697362BCA44"
         name="00:14.70 – 00:17.70">
+        <Description></Description>
         <Coding creatingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB"
         creationDateTime="2018‐03‐27T19:36:01Z" guid="04EBEC7D‐EAB4‐43FC‐8167‐ADB14F921143">
         <CodeRef targetGUID="9F43FE32‐C2CB‐4BA8‐B766‐A0734C826E49"/>
@@ -2499,11 +2503,11 @@ class RefiExport(QtWidgets.QDialog):
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
-            xml += '</Coding>\n'
             if r[6] != "":
                 memo = self.convert_xml_predefined_entities(r[6])
                 xml += '<Description>' + memo + '</Description>\n'
+            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
+            xml += '</Coding>\n'
             xml += '</' + mediatype + 'Selection>\n'
         return xml
 
