@@ -2279,6 +2279,7 @@ class RefiExport(QtWidgets.QDialog):
         :returns xml String
         """
 
+        #TODO after Coding: NoteRef and VariableValue for each Source element
         xml = "<Sources>\n"
         for s in self.sources:
             guid = self.create_guid()
@@ -2514,7 +2515,17 @@ class RefiExport(QtWidgets.QDialog):
     def transcript_xml(self, source):
         """ Find any transcript of media source.
         Need to add timestamp synchpoints.
-        Replace & xml char with &#038;
+
+        Either PlainTextContent or plainTextPath MUST be filled, not both
+
+        <Transcript>
+        <Description></Description>
+            <TranscriptSelection>
+            <Description></Description>
+            <Coding></Coding>
+            <NoteRef></NoteRef>
+            </TranscriptSelection>
+        </Transcript>
 
         Called by: sources_xml
 
@@ -2522,6 +2533,7 @@ class RefiExport(QtWidgets.QDialog):
 
         :returns xml String
         """
+
 
         xml = ""
         for t in self.sources:
