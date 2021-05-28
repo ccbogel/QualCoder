@@ -1944,7 +1944,7 @@ class RefiExport(QtWidgets.QDialog):
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<Project '
         self.xml += 'xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-        self.xml += 'name="' + self.app.project_name + '" '
+        self.xml += 'name="' + self.convert_xml_predefined_entities(self.app.project_name) + '" '
         self.xml += 'origin="' + self.app.version + '" '
         # There is no creating user in QualCoder
         guid = self.create_guid()
@@ -1959,7 +1959,7 @@ class RefiExport(QtWidgets.QDialog):
         # add users
         self.xml += "<Users>\n"
         for row in self.users:
-            self.xml += '<User guid="' + row['guid'] + '" name="' + row['name'] + '" />\n'
+            self.xml += '<User guid="' + row['guid'] + '" name="' + self.convert_xml_predefined_entities(row['name']) + '" />\n'
         self.xml += "</Users>\n"
         self.xml += self.codebook_xml()
         self.xml += self.variables_xml()
@@ -1982,7 +1982,7 @@ class RefiExport(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name, memo, caseOrFile,valuetype from attribute_type")
         results = cur.fetchall()
-        if results == []:
+        if not results:
             return xml
         xml = '<Variables>\n'
         for r in results:
@@ -2347,9 +2347,9 @@ class RefiExport(QtWidgets.QDialog):
                     # Internal filename is a guid identifier
                     xml += 'path="internal://' + s['filename'] + '" '
                 else:
-                    xml += 'path="absolute://' + s['external'].replace('&', '&#038;') + '" '
+                    xml += 'path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'guid="' + guid + '" '
-                xml += 'name="' + s['name'].replace('&', '&#038;') + '" >\n'
+                xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '" >\n'
                 memo = self.convert_xml_predefined_entities(s['memo'])
                 if memo != '':
                     xml += '<Description>' + memo + '</Description>\n'
@@ -2388,7 +2388,7 @@ class RefiExport(QtWidgets.QDialog):
                     xml +='path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '" >\n'
-                memo = self.code_guid(s['memo'])
+                memo = self.convert_xml_predefined_entities(self.code_guid(s['memo']))
                 if memo != '':
                     xml += '<Description>' + memo + '</Description>\n'
                 xml += self.transcript_xml(s)
@@ -2500,13 +2500,13 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'begin="' + str(int(r[2])) + '" '
             xml += 'end="' + str(int(r[3])) + '" '
             xml += 'name="' + self.convert_xml_predefined_entities(r[6]) + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >'
-            xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
+            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
             if r[6] != "":
                 memo = self.convert_xml_predefined_entities(r[6])
                 xml += '<Description>' + memo + '</Description>\n'
+            xml += '<Coding guid="' + self.create_guid() + '" '
+            xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
+            xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
             xml += '</' + mediatype + 'Selection>\n'
@@ -2539,7 +2539,8 @@ class RefiExport(QtWidgets.QDialog):
         for t in self.sources:
             if t['name'] == source['name'] + '.transcribed':
                 # Internal filename is a guid identfier
-                xml = '<Transcript plainTextPath="internal://' + t['plaintext_filename'] + '" '
+                xml = '<Transcript plainTextPath="internal://'
+                xml += self.convert_xml_predefined_entities(t['plaintext_filename']) + '" '
                 xml += 'creatingUser="' + self.user_guid(t['owner']) + '" '
                 xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
                 xml += 'guid="' + self.create_guid() + '" '
@@ -2587,7 +2588,7 @@ class RefiExport(QtWidgets.QDialog):
         for coded in results:
             #print(coded)
             xml += '<TranscriptSelection guid="' + self.create_guid() + '" '
-            xml += 'name="' + media['name'] + '" '
+            xml += 'name="' + self.convert_xml_predefined_entities(media['name']) + '" '
             xml += 'fromSyncPoint="'
             for sp in sync_list:
                 if sp[2] == coded[0]:
@@ -2887,28 +2888,31 @@ class RefiExport(QtWidgets.QDialog):
         :returns xml string
         """
 
+        if not self.codes:
+            return ""
+
         xml = '<CodeBook>\n'
         xml += '<Codes>\n'
         cats = copy(self.categories)
 
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         for c in self.codes:
             if c['catid'] is None:
                 xml += c['xml']
-        # add top level categories
-        for c in cats:
-            if c['supercatid'] is None and c['examine']:
-                c['examine'] = False
-                xml += '<Code guid="' + c['guid']
-                xml += '" name="' + self.convert_xml_predefined_entities(c['name'])
+        # Add top level categories
+        for ca in cats:
+            if ca['supercatid'] is None and ca['examine']:
+                ca['examine'] = False
+                xml += '<Code guid="' + ca['guid']
+                xml += '" name="' + self.convert_xml_predefined_entities(ca['name'])
                 xml += '" isCodable="false'
                 xml += '">\n'
-                memo = self.convert_xml_predefined_entities(c['memo'])
+                memo = self.convert_xml_predefined_entities(ca['memo'])
                 if memo != "":
                     xml += '<Description>' + memo + '</Description>\n'
-                # add codes in this category
+                # Add codes in this category
                 for co in self.codes:
-                    if co['catid'] == c['catid']:
+                    if co['catid'] == ca['catid']:
                         xml += co['xml']
                 xml += self.add_sub_categories(c['catid'], cats)
                 xml += '</Code>\n'
