@@ -817,17 +817,32 @@ class DialogCodeText(QtWidgets.QWidget):
         action_not_important = None
         action_annotate = None
         action_edit_annotate = None
+
+        # Can have multiple coded text at this position
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
-                action_unmark = menu.addAction(_("Unmark"))
-                action_code_memo = menu.addAction(_("Memo coded text (M)"))
-                action_start_pos = menu.addAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
-                action_end_pos = menu.addAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                action_unmark = QtWidgets.QAction(_("Unmark"))
+                action_code_memo = QtWidgets.QAction(_("Memo coded text (M)"))
+                action_start_pos = QtWidgets.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                action_end_pos = QtWidgets.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 if item['important'] is None or item['important'] > 1:
-                    action_important = menu.addAction(_("Add important mark (I)"))
+                    action_important = QtWidgets.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
-                    action_not_important = menu.addAction(_("Remove important mark"))
-                break
+                    action_not_important = QtWidgets.QAction(_("Remove important mark"))
+                #break
+        if action_unmark:
+            menu.addAction(action_unmark)
+        if action_code_memo:
+            menu.addAction(action_code_memo)
+        if action_start_pos:
+            menu.addAction(action_start_pos)
+        if action_end_pos:
+            menu.addAction(action_end_pos)
+        if action_important:
+            menu.addAction(action_important)
+        if action_not_important:
+            menu.addAction(action_not_important)
+
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
