@@ -917,6 +917,9 @@ class DialogCodeText(QtWidgets.QWidget):
             position: textEdit character cursor position
             important: boolean, default True """
 
+        #TODO if Important AND unimportant codes on same location
+        # See event text filter
+
         # Need to get coded segments at this position
         if position is None:
             # Called via button
@@ -929,27 +932,28 @@ class DialogCodeText(QtWidgets.QWidget):
                     item['owner'] == self.app.settings['codername'] and \
                     ((not important and item['important'] == 1) or (important and item['important'] != 1)):
                 coded_text_list.append(item)
-        if coded_text_list == []:
+        if not coded_text_list:
             return
-        text_item = None
+        text_items = []
         if len(coded_text_list) == 1:
-            text_item = coded_text_list[0]
+            text_items = [coded_text_list[0]]
         # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "single")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "multi")
             ok = ui.exec_()
             if not ok:
                 return
-            text_item = ui.get_selected()
-        if text_item is None:
+            text_items = ui.get_selected()
+        if not text_items:
             return
         importance = None
         if important:
             importance = 1
         cur = self.app.conn.cursor()
-        cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
-            (importance, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
-        self.app.conn.commit()
+        for item in text_items:
+            cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+                (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'], item['owner']))
+            self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
@@ -2484,12 +2488,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 unmarked_list.append(item)
         if unmarked_list == []:
             return
-        to_unmark = None
+        to_unmark = []
         if len(unmarked_list) == 1:
-            to_unmark = unmarked_list[0]
+            to_unmark = [unmarked_list[0]]
         # multiple codes to select from
         if len(unmarked_list) > 1:
-            ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "single")
+            ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "multi")
             ok = ui.exec_()
             if not ok:
                 return
@@ -2499,16 +2503,16 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
-        cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
-            (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername'], to_unmark['fid']))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        if to_unmark in self.code_text:
-            self.code_text.remove(to_unmark)
+        for item in to_unmark:
+            cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
+                (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
+            self.app.conn.commit()
+            self.code_text.remove(item)
 
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.app.delete_backup = False
 
     def annotate(self, cursor_pos=None):
         """ Add view, or remove an annotation for selected text.
