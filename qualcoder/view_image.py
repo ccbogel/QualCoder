@@ -150,6 +150,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.ui.treeWidget.viewport().installEventFilter(self)
+        self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
@@ -843,6 +844,27 @@ class DialogCodeImage(QtWidgets.QDialog):
         H Hide / unHide top groupbox
         """
 
+        # Hide / unHide top groupbox
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            if key == QtCore.Qt.Key_H:
+                self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
+                return True
+            if key == QtCore.Qt.Key_Minus:
+                v = self.ui.horizontalSlider.value()
+                v -= 3
+                if v < self.ui.horizontalSlider.minimum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+            if key == QtCore.Qt.Key_Plus:
+                v = self.ui.horizontalSlider.value()
+                v += 3
+                if v > self.ui.horizontalSlider.maximum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+
         if object is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Drop:
                 item = self.ui.treeWidget.currentItem()
@@ -871,12 +893,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
                     p = event.buttonDownScenePos(2)
                     self.scene_context_menu(p)
-                    return True
-            # Hide / unHide top groupbox
-            if type(event) == QtGui.QKeyEvent:
-                key = event.key()
-                if key == QtCore.Qt.Key_H:
-                    self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                     return True
         return False
 
@@ -1503,5 +1519,40 @@ class DialogViewImage(QtWidgets.QDialog):
         w_h = _("Width: ") + str(self.label.pixmap().size().width()) + _(" Height: ") + str(self.label.pixmap().size().height())
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
+
+    def eventFilter(self, object, event):
+        """ Using this event filter to identify treeWidgetItem drop events.
+        http://doc.qt.io/qt-5/qevent.html#Type-enum
+        QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
+        https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
+        Also use eventFilter for QGraphicsView.
+
+        Key events on scene
+        H Hide / unHide top groupbox
+        """
+
+        # Hide / unHide top groupbox
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            if key == QtCore.Qt.Key_H:
+                self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
+                return True
+            if key == QtCore.Qt.Key_Minus:
+                v = self.ui.horizontalSlider.value()
+                v -= 3
+                if v < self.ui.horizontalSlider.minimum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+            if key == QtCore.Qt.Key_Plus:
+                v = self.ui.horizontalSlider.value()
+                v += 3
+                if v > self.ui.horizontalSlider.maximum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+        return False
+
+
 
 
