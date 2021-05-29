@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
 from PyQt5 import QtCore, QtWidgets
 import os
@@ -63,7 +63,7 @@ class DialogSelectItems(QtWidgets.QDialog):
     selectedname = None
     title = None
 
-    def __init__(self, app, data, title, selectionmode):
+    def __init__(self, app, data, title, selection_mode):
         """ present list of names to user for selection.
 
         params:
@@ -81,7 +81,7 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
-        self.selection_mode = selectionmode
+        self.selection_mode = selection_mode
         # Check data exists
         if len(data) == 0:
             Message(app, _('Dictionary is empty'), _("No data to select from"), "warning")
@@ -106,7 +106,9 @@ class DialogSelectItems(QtWidgets.QDialog):
 
     def get_selected(self):
         """ Get a selected dictionary  or a list of dictionaries depending on the
-        selection mode. """
+        selection mode.
+
+        return: list if Dictionaries of {name, data} """
 
         if self.selection_mode == "single":
             current = self.ui.listView.currentIndex().row()

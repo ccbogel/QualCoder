@@ -2227,7 +2227,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             else:
                 fmt.setFontItalic(False)
                 fmt.setFontWeight(QtGui.QFont.Normal)
-
             # Bold important codes
             if item['important']:
                 fmt.setFontWeight(QtGui.QFont.Bold)
@@ -2409,27 +2408,28 @@ class DialogCodeAV(QtWidgets.QDialog):
                     item['owner'] == self.app.settings['codername'] and \
                     ((not important and item['important'] == 1) or (important and item['important'] != 1)):
                 coded_text_list.append(item)
-        if coded_text_list == []:
+        if not coded_text_list:
             return
-        text_item = None
+        text_items = []
         if len(coded_text_list) == 1:
-            text_item = coded_text_list[0]
+            text_items = [coded_text_list[0]]
         # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "single")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select codes"), "multi")
             ok = ui.exec_()
             if not ok:
                 return
-            text_item = ui.get_selected()
-        if text_item is None:
+            text_items = ui.get_selected()
+        if not text_items:
             return
         importance = None
         if important:
             importance = 1
         cur = self.app.conn.cursor()
-        cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
-            (importance, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'], text_item['owner']))
-        self.app.conn.commit()
+        for item in text_items:
+            cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+                (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'], item['owner']))
+            self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
@@ -2600,7 +2600,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'important': None}
 
         cur = self.app.conn.cursor()
         # check for an existing duplicated marking first
@@ -2617,13 +2617,14 @@ class DialogCodeAV(QtWidgets.QDialog):
         # UNIQUE constraint failed: code_text.cid, code_text.fid, code_text.pos0, code_text.pos1
         try:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                memo,date) values(?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
+                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                       coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
-                                                      coded['memo'], coded['date']))
+                                                      coded['memo'], coded['date'], coded['important']))
             self.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
             logger.debug(str(e))
+            print(e)
         # update coded, filter for tooltip
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2648,24 +2649,38 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
             return
-        to_unmark = None
+        unmarked_list = []
         for item in self.code_text:
-            if location >= item['pos0'] and location <= item['pos1'] and item['owner'] == self.app.settings[
-                'codername']:
-                to_unmark = item
-        if to_unmark is None:
+            if location >= item['pos0'] and location <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                unmarked_list.append(item)
+        if not unmarked_list:
+            return
+        to_unmark = []
+        if len(unmarked_list) == 1:
+            to_unmark = [unmarked_list[0]]
+        # Multiple codes to select from
+        if len(unmarked_list) > 1:
+            ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "multi")
+            ok = ui.exec_()
+            if not ok:
+                return
+            to_unmark = ui.get_selected()
+        if not to_unmark:
             return
 
-        # delete from db, remove from coding and update highlights
+        # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
-        cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
-                    (to_unmark['cid'], to_unmark['pos0'], to_unmark['pos1'], self.app.settings['codername'],
-                     to_unmark['fid']))
+        for item in to_unmark:
+            cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
+                (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
+            self.app.conn.commit()
         self.app.conn.commit()
-        self.app.delete_backup = False
-        # update filter for tooltip and update code colours
+
+        # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.app.delete_backup = False
 
     def annotate(self, cursor_pos):
         """ Add view, or remove an annotation for selected text.
@@ -3177,7 +3192,7 @@ class DialogViewAV(QtWidgets.QDialog):
     """ View Audio and Video using VLC. View and edit displayed memo.
     Mouse events did not work when the vlc play is in this dialog.
     Mouse events do work with the vlc player in a separate modal dialog.
-    Transvribing the text file can be done here also.
+    Transcribing the text file can be done here also.
 
     Linked a/v have 'audio:' or 'video:' at start of mediapath
     """

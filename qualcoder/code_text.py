@@ -939,7 +939,7 @@ class DialogCodeText(QtWidgets.QWidget):
             text_items = [coded_text_list[0]]
         # Multiple codes at this position to select from
         if len(coded_text_list) > 1:
-            ui = DialogSelectItems(self.app, coded_text_list, _("Select code"), "multi")
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select codes"), "multi")
             ok = ui.exec_()
             if not ok:
                 return
@@ -2484,14 +2484,15 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         unmarked_list = []
         for item in self.code_text:
-            if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and item['owner'] == self.app.settings['codername']:
+            if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
                 unmarked_list.append(item)
-        if unmarked_list == []:
+        if not unmarked_list:
             return
         to_unmark = []
         if len(unmarked_list) == 1:
             to_unmark = [unmarked_list[0]]
-        # multiple codes to select from
+        # Multiple codes to select from
         if len(unmarked_list) > 1:
             ui = DialogSelectItems(self.app, unmarked_list, _("Select code to unmark"), "multi")
             ok = ui.exec_()
@@ -2507,7 +2508,6 @@ class DialogCodeText(QtWidgets.QWidget):
             cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
                 (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
             self.app.conn.commit()
-            self.code_text.remove(item)
 
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
