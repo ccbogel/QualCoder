@@ -184,6 +184,27 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, y).setText("")
         self.ui.tableWidget.blockSignals(False)
 
+    def get_tooltip_values(self, name, caseOrFile, valuetype):
+        """ Get values to display in tooltips for the value list column. """
+
+        tt = ""
+        cur = self.app.conn.cursor()
+        if valuetype == "numeric":
+            sql = "select min(cast(value as real)), max(cast(value as real)) from attribute where name=? and attr_type=?"
+            cur.execute(sql, [name, caseOrFile])
+            res = cur.fetchone()
+            tt = _("Minimum: ") + str(res[0]) + "\n"
+            tt += _("Maximum: ") + str(res[1])
+        if valuetype == "character":
+            sql = "select distinct value from attribute where name=? and attr_type=? and length(value)>0 limit 10"
+            cur.execute(sql, [name, caseOrFile])
+            res = cur.fetchall()
+            for r in res:
+                tt += "\n" + r[0]
+            if len(tt) > 1:
+                tt = tt[1:]
+        return tt
+
     def fill_tableWidget(self):
         """ Fill the table widget with attribute name and type. """
 
@@ -207,6 +228,8 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, item)
             item = QtWidgets.QTableWidgetItem('')
             #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            tt = self.get_tooltip_values(a['name'], a['caseOrFile'], a['valuetype'])
+            item.setToolTip(tt)
             self.ui.tableWidget.setItem(row, self.VALUE_LIST_COLUMN, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeColumnsToContents()
