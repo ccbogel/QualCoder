@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""Copyright (c) 2021 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1458,7 +1459,7 @@ class DialogViewImage(QtWidgets.QDialog):
     app = None
     image_data = None
     pixmap = None
-    label = None
+    scene = None
 
     def __init__(self, app, image_data, parent=None):
         """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -1485,15 +1486,18 @@ class DialogViewImage(QtWidgets.QDialog):
             Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
             self.close()
             return
+
+        self.scene = QtWidgets.QGraphicsScene()
+        self.ui.graphicsView.setScene(self.scene)
+        # Need this otherwise small images are centred on screen, and affect context menu position points
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.scene.installEventFilter(self)
         self.pixmap = QtGui.QPixmap.fromImage(image)
-        self.label = QtWidgets.QLabel()
-        self.label.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
-        self.label.setFixedWidth(self.pixmap.width())
-        self.label.setFixedHeight(self.pixmap.height())
-        self.label.setScaledContents(True)
-        self.label.setPixmap(self.pixmap)
-        self.ui.scrollArea.setWidget(self.label)
-        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setPos(0, 0)
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
+        self.scene.addItem(pixmap_item)
+        self.ui.horizontalSlider.setValue(99)
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.textEdit.setText(self.image_data['memo'])
 
@@ -1509,34 +1513,32 @@ class DialogViewImage(QtWidgets.QDialog):
             self.ui.horizontalSlider.setValue(slider_value)
 
     def redraw_scene(self):
-        """ Resize image based on slider position. """
+        """ Resize image. Triggered by user change in slider or + - keys
+        """
 
+        if self.pixmap is None:
+            return
         scale = (self.ui.horizontalSlider.value() + 1) / 100
-        new_label = self.label.resize(scale * self.label.pixmap().size())
-        self.label.setFixedWidth(scale * self.pixmap.width())
-        self.label.setFixedHeight(scale * self.pixmap.height())
-        self.ui.scrollArea.setWidget(new_label)
-        w_h = _("Width: ") + str(self.label.pixmap().size().width()) + _(" Height: ") + str(self.label.pixmap().size().height())
+        height = scale * self.pixmap.height()
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
+        pixmap_item.setPos(0, 0)
+        self.scene.clear()
+        self.scene.addItem(pixmap_item)
+        self.ui.graphicsView.update()
+        w_h = _("Width: ") + str(pixmap.size().width()) + _(" Height: ") + str(pixmap.size().height())
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
     def eventFilter(self, object, event):
-        """ Using this event filter to identify treeWidgetItem drop events.
-        http://doc.qt.io/qt-5/qevent.html#Type-enum
-        QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
-        https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
-        Also use eventFilter for QGraphicsView.
-
+        """ Using this event filter to apply key events.
         Key events on scene
-        H Hide / unHide top groupbox
+        + and- keys
         """
 
         # Hide / unHide top groupbox
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            if key == QtCore.Qt.Key_H:
-                self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
-                return True
             if key == QtCore.Qt.Key_Minus:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
@@ -1552,7 +1554,3 @@ class DialogViewImage(QtWidgets.QDialog):
                 self.ui.horizontalSlider.setValue(v)
                 return True
         return False
-
-
-
-
