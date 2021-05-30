@@ -63,6 +63,11 @@
         <height>583</height>
        </rect>
       </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QGraphicsView" name="graphicsView"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
