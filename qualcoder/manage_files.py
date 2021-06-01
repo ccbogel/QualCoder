@@ -73,6 +73,7 @@ from confirm_delete import DialogConfirmDelete
 from docx import opendocx, getdocumenttext
 from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
+from edit_textfile import DialogEditTextFile
 from helpers import Message, ExportDirectoryPathDialog
 from html_parser import *
 from memo import DialogMemo
@@ -808,6 +809,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def is_caselinked_or_coded_or_annotated(self, fid):
         """ Check for text linked to case, coded or annotated text.
+        Called by view() for checking on restricted text edit.
         param: fid   the text file id
         return: True or False
         """
@@ -875,6 +877,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res is not None:
             fulltext = res[0]
         self.source[x]['fulltext'] = fulltext
+
+        ui = DialogEditTextFile(self.app, self.source[x]['name'], self.source[x]['fulltext'], self.source[x]['id'])
+        ui.exec_()
+        return # TEmp
+
 
         # Checking for limited restricted edit
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
@@ -1140,7 +1147,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.source[x]['mediapath'][0:6] in ('audio:', 'video:'):
             abs_path = self.source[x]['mediapath'][6:]
         if not os.path.exists(abs_path):
-            #TODO update bad links
             self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
 
@@ -1175,7 +1181,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
         if not os.path.exists(abs_path):
-            #TODO update bad links
             self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
         ui = DialogViewImage(self.app, self.source[x])
@@ -1199,22 +1204,16 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-
         ui = DialogAddItemName(self.app, self.source,_('New File'), _('Enter file name'))
         ui.exec_()
         name = ui.get_new_name()
         if name is None:
             return
-        ui = DialogMemo(self.app, _("Creating a new file: ") + name)
-        ui.exec_()
-        filetext = ui.memo
 
         # Create entry details to add to self.source and to database
-        icon, metadata = self.get_icon_and_metadata(name, filetext, None)
-        entry = {'name': name, 'id': -1, 'fulltext': filetext, 'memo': "",
+        entry = {'name': name, 'id': -1, 'fulltext': '', 'memo': "",
         'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'mediapath': None, 'icon': icon, 'metadata': metadata, 'case': ""}
-
+        'mediapath': None, 'icon': None, 'metadata': '', 'case': ""}
         # Update database
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
@@ -1223,6 +1222,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
+
+        ui = DialogEditTextFile(self.app, name, '', id_)
+        ui.exec_()
+        filetext = ui.text
+        icon, metadata = self.get_icon_and_metadata(name, filetext, None)
+        entry['icon'] = icon
+        entry['metadata'] = metadata
 
         # Add file attribute placeholders
         att_sql = 'select name from attribute_type where caseOrFile ="file"'
