@@ -807,7 +807,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             #logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
-    def is_caselinked_or_coded_or_annotated(self, fid):
+    '''def is_caselinked_or_coded_or_annotated(self, fid):
         """ Check for text linked to case, coded or annotated text.
         Called by view() for checking on restricted text edit.
         param: fid   the text file id
@@ -826,7 +826,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         code_linked = cur.fetchall()
         if case_linked != [] or annote_linked != [] or code_linked != []:
             return True
-        return False
+        return False'''
 
     def highlight(self, fid):
         """ Add coding and annotation highlights. """
@@ -880,9 +880,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         ui = DialogEditTextFile(self.app, self.source[x]['name'], self.source[x]['fulltext'], self.source[x]['id'])
         ui.exec_()
-        return # TEmp
-
-
+        text = DialogEditTextFile.text
+        '''
         # Checking for limited restricted edit
         restricted = self.is_caselinked_or_coded_or_annotated(self.source[x]['id'])
         title = _("View file: ") + self.source[x]['name'] + " (ID:" + str(self.source[x]['id']) + ") "
@@ -900,15 +899,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.text_view.ui.textEdit.customContextMenuRequested.connect(self.textEdit_unrestricted_menu)
             self.text_view.ui.textEdit.currentCharFormatChanged.connect(self.text_view_remove_formatting)
         self.highlight(self.source[x]['id'])
-        self.text_view.exec_()
-        text = self.text_view.ui.textEdit.toPlainText()
+        self.text_view.exec_()'''
+
+        #text = self.text_view.ui.textEdit.toPlainText()
         if text == self.source[x]['fulltext']:
             return
         self.source[x]['fulltext'] = text
-        cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
-        self.app.conn.commit()
+        '''cur.execute("update source set fulltext=? where id=?", (text, self.source[x]['id']))
+        self.app.conn.commit()'''
 
-    def text_view_remove_formatting(self):
+    '''def text_view_remove_formatting(self):
         """ Remove formatting from text edit on changed text.
          Useful when pasting mime data (rich text or html) from clipboard. """
 
@@ -918,9 +918,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         cursor = self.text_view.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(len(self.text_view.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
-        cursor.setCharFormat(format_)
+        cursor.setCharFormat(format_)'''
 
-    def textEdit_unrestricted_menu(self, position):
+    '''def textEdit_unrestricted_menu(self, position):
         """ Context menu for select all and copy of text.
          Used in the 'unrestricted' i.e. no coded text file. """
 
@@ -937,9 +937,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             cb.clear(mode=cb.Clipboard)
             cb.setText(selected_text, mode=cb.Clipboard)
         if action == action_select_all:
-            self.text_view.ui.textEdit.selectAll()
+            self.text_view.ui.textEdit.selectAll()'''
 
-    def textEdit_restricted_menu(self, position):
+    '''def textEdit_restricted_menu(self, position):
         """ Context menu for selection of small sections of text to be edited.
         The section of text must be only non-annotated and non-coded or
         only annotated or coded.
@@ -970,9 +970,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             cb.clear(mode=cb.Clipboard)
             cb.setText(selected_text, mode=cb.Clipboard)
         if action == action_select_all:
-            self.text_view.ui.textEdit.selectAll()
+            self.text_view.ui.textEdit.selectAll()'''
 
-    def crossover_check(self, x, text_cursor):
+    '''def crossover_check(self, x, text_cursor):
         """ Check text selection for codes and annotations that cross over with non-coded
         and non-annotated sections. User can only select coded or non-coded text, this makes
         updating changes much simpler.
@@ -1018,9 +1018,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.source[x]['id'], selstart, selend])
         response['cased_section'] = cur.fetchall()
         response['crossover'] = False
-        return response
+        return response'''
 
-    def restricted_edit_text(self, x, text_cursor):
+    '''def restricted_edit_text(self, x, text_cursor):
         """ Restricted edit of small sections of text. selected text can be replaced.
         Mainly used for fixing spelling mistakes.
         original text is here: self.source[x]['fulltext']
@@ -1129,7 +1129,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
         self.app.conn.commit()
 
-        self.app.delete_backup = False
+        self.app.delete_backup = False'''
 
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
