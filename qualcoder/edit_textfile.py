@@ -214,6 +214,12 @@ class DialogEditTextFile(QtWidgets.QDialog):
 
         self.ui.textEdit.blockSignals(True)
         cursor = self.ui.textEdit.textCursor()
+        for item in self.casetext:
+            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
+            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+            format_.setFontUnderline(True)
+            format_.setUnderlineColor(QtCore.Qt.green)
+            cursor.setCharFormat(format_)
         for item in self.annotations:
             cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
@@ -226,7 +232,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
             format_.setFontUnderline(True)
             format_.setUnderlineColor(QtCore.Qt.red)
             cursor.setCharFormat(format_)
-        #TODO casetext
 
         self.ui.textEdit.blockSignals(False)
 
@@ -243,6 +248,184 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
+
+    '''def textEdit_unrestricted_menu(self, position):
+        """ Context menu for select all and copy of text.
+        """
+
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_select_all = menu.addAction(_("Select all"))
+        action_copy = menu.addAction(_("Copy"))
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action == action_copy:
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_select_all:
+            self.ui.textEdit.selectAll()'''
+
+    '''def restricted_edit_text(self, x, text_cursor):
+        """ Restricted edit of small sections of text. selected text can be replaced.
+        Mainly used for fixing spelling mistakes.
+        original text is here: self.source[x]['fulltext']
+
+        param: x the current table row
+        param: text_cursor  - the document cursor
+        """
+
+        txt = text_cursor.selectedText()
+        selstart = text_cursor.selectionStart()
+        selend = text_cursor.selectionEnd()
+
+        if len(txt) > 20:
+            msg = _("Can only edit small selections of text, up to 20 characters in length.") + "\n"
+            msg += _("You selected " + str(len(txt)) + _(" characters"))
+            Message(self.app, _('Too much text selected'), msg, "warning").exec_()
+            return
+
+        #TODO maybe use DialogMemo again
+        edit_dialog = QtWidgets.QDialog()
+        edit_ui = Ui_Dialog_memo()
+        edit_ui.setupUi(edit_dialog)
+        edit_dialog.resize(400, 60)
+        edit_dialog.setWindowTitle(_("Edit text: start") +str(selstart) + _(" end:") + str(selend))
+        edit_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
+        edit_ui.textEdit.setPlainText(txt)
+        ok = edit_dialog.exec_()
+        if not ok:
+            return
+        new_text = edit_ui.textEdit.toPlainText()
+
+        # split original text and fix
+        #original_text = self.source[x]['fulltext']
+        before = self.source[x]['fulltext'][0:text_cursor.selectionStart()]
+        after = self.source[x]['fulltext'][text_cursor.selectionEnd():len(self.source[x]['fulltext'])]
+        fulltext = before + new_text + after
+
+        # update database with the new fulltext
+        self.source[x]['fulltext'] = fulltext
+        cur = self.app.conn.cursor()
+        sql = "update source set fulltext=? where id=?"
+        cur.execute(sql, [fulltext, self.source[x]['id']])
+        self.app.conn.commit()
+        length_diff = len(new_text) - len(txt)
+        if length_diff == 0:
+            return
+        """ UPDATE CODES//CASES/ANNOTATIONS located after the selected text
+        Update database for codings, annotations and case linkages.
+        Find affected codings annotations and case linkages.
+        All codes, annotations and case linkages that occur after this text selection can be easily updated
+        by adding the length diff to the pos0 and pos1 fields. """
+        cur = self.app.conn.cursor()
+        # find cases after this text section
+        sql = "select id, pos0,pos1 from case_text where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_case_linked = cur.fetchall()
+        # find annotations after this text selection
+        sql = "select anid,pos0,pos1 from annotation where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_annote_linked = cur.fetchall()
+        # find codes after this text selection section
+        sql = "select pos0,pos1 from code_text where fid=? and pos1>? "
+        sql += "and not(?>=pos0 and ?<=pos1)"
+        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
+        post_code_linked = cur.fetchall()
+        txt = text_cursor.selectedText()
+        #print("cursor selstart", text_cursor.selectionStart())
+        #print("cursor selend", text_cursor.selectionEnd())
+        #print("length_diff", length_diff, "\n")
+
+        for i in post_case_linked:
+            #print(i)
+            #print(i[0], i[1] + length_diff, i[2] + length_diff)
+            #print("lengths ", len(original_text), i[2] - i[1])
+            sql = "update case_text set pos0=?, pos1=? where id=?"
+            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
+        for i in post_annote_linked:
+            sql = "update annotation set pos0=?, pos1=? where anid=?"
+            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
+        for i in post_code_linked:
+            sql = "update code_text set pos0=?,pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[0] + length_diff, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        self.app.conn.commit()
+
+        # UPDATE THE CODED AND/OR ANNOTATED SECTION
+        # The crossover dictionary contains annotations and codes for this section
+        # need to extend or reduce the code or annotation length
+        # the coded text stored in code_text also need to be updated
+        crossovers = self.crossover_check(x, text_cursor)
+        # Codes in this selection
+        for i in crossovers['coded_section']:
+            #print("selected text coded: ", i)
+            sql = "update code_text set seltext=?,pos1=? where fid=? and pos0=? and pos1=?"
+            newtext = fulltext[i[0]:i[1] + length_diff]
+            cur.execute(sql, [newtext, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        # Annotations in this selection
+        for i in crossovers['annoted_section']:
+            #print("selected text annoted: ", i)
+            sql = "update annotation set pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        for i in crossovers['cased_section']:
+            #print("selected text as case: ", i)
+            sql = "update case_text set pos1=? where fid=? and pos0=? and pos1=?"
+            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
+        self.app.conn.commit()
+
+        self.app.delete_backup = False'''
+
+    '''def crossover_check(self, x, text_cursor):
+        """ Check text selection for codes and annotations that cross over with non-coded
+        and non-annotated sections. User can only select coded or non-coded text, this makes
+        updating changes much simpler.
+
+        param: x the current table row
+        param: text_cursor  - the document cursor
+        return: dictionary of crossover indication and of whether selection is entirely coded annotated or neither """
+
+        response = {"crossover": True, "coded_section":[], "annoted_section":[], "cased_section":[]}
+        msg = _("Please select text that does not have a combination of coded and uncoded text.")
+        msg += _(" Nor a combination of annotated and un-annotated text.\n")
+        selstart = text_cursor.selectionStart()
+        selend = text_cursor.selectionEnd()
+        msg += _("Selection start: ") + str(selstart) + _(" Selection end: ") + str(selend) + "\n"
+        cur = self.app.conn.cursor()
+        sql = "select pos0,pos1 from code_text where fid=? and "
+        sql += "((pos0>? and pos0<?)  or (pos1>? and pos1<?)) "
+        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
+        code_crossover = cur.fetchall()
+        if code_crossover != []:
+            msg += _("Code crossover: ") + str(code_crossover)
+            Message(self.app, _('Codes cross over text'), msg, "warning").exec_()
+            return response
+        # find if the selected text is coded
+        sql = "select pos0,pos1 from code_text where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['coded_section'] = cur.fetchall()
+        sql = "select pos0,pos1 from annotation where fid=? and "
+        sql += "((pos0>? and pos0<?) or (pos1>? and pos1<?))"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
+        annote_crossover = cur.fetchall()
+        if annote_crossover != []:
+            msg += _("Annotation crossover: ") + str(annote_crossover)
+            Message(self.app, _('Annotations cross over text'), msg, "warning").exec_()
+            return response
+        # find if the selected text is annotated
+        sql = "select pos0,pos1 from annotation where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['annoted_section'] = cur.fetchall()
+        response['crossover'] = False
+        # find if the selected text is assigned to case
+        sql = "select pos0,pos1, id from case_text where fid=? and ?>=pos0 and ?<=pos1"
+        cur.execute(sql, [self.source[x]['id'], selstart, selend])
+        response['cased_section'] = cur.fetchall()
+        response['crossover'] = False
+        return response'''
 
     def accept(self):
         """ Accepted button overridden method. """
