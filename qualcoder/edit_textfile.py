@@ -35,7 +35,6 @@ import logging
 import traceback
 
 from GUI.ui_dialog_memo import Ui_Dialog_memo
-from memo import DialogMemo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -57,25 +56,31 @@ class DialogEditTextFile(QtWidgets.QDialog):
     """
 
     app = None
-    title = ""
     text = ""
     fid = -1
     codetext = []
     annotations = []
     casetext = []
     prev_text = ""
-    all_is_case_text = False
+    all_is_case_text = False  # may not use
     no_codes_annotes_cases = True
+    change = False
 
-    def __init__(self, app, title="", text="", fid=-1, clear_button="show"):
-        """ This is based on memo DialogMemo """
+    def __init__(self, app, fid, clear_button="show"):
+        """ """
 
         super(DialogEditTextFile, self).__init__(parent=None)  # overrride accept method
 
         sys.excepthook = exception_handler
         self.app = app
-        self.text = text
         self.fid = fid
+        cur = self.app.conn.cursor()
+        cur.execute("select fulltext, name from source where id=?", [self.fid])
+        res = cur.fetchone()
+        self.text = ""
+        if res[0] is not None:
+            self.text = res[0]
+        title = res[1]
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -97,6 +102,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if self.codetext:
             print("CODETEXT\n", self.codetext)
         self.prev_text = copy(self.text)
+        self.change = False
         self.highlight()
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.ui.textEdit.installEventFilter(self)
@@ -156,6 +162,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if self.no_codes_annotes_cases:
             return
 
+        self.change = True
+
         cursor = self.ui.textEdit.textCursor()
         self.text = self.ui.textEdit.toPlainText()
         #print("cursor", cursor.position())
@@ -191,6 +199,14 @@ class DialogEditTextFile(QtWidgets.QDialog):
         Replacing 'way' with 'the' start position 13
         -w  previous 13 3  post 13 3
         
+        Replacing 's' with 'T'  (highlight s and replace with T
+        -s  previous 4 None  post 4 None
+        """
+        # No additions or deletions
+        if pre_start == post_start and pre_chars == post_chars:
+            return
+
+        """
         Adding 'X' at inserted position 5, note: None as no number is provided from difflib
         +X  previous 4 0  post 5 None
         
@@ -199,6 +215,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         
         Removing 'the' from position 13
         -t  previous 13 3  post 12 0
+        
+
         """
 
         self.highlight()
@@ -249,72 +267,59 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
 
-    '''def textEdit_unrestricted_menu(self, position):
-        """ Context menu for select all and copy of text.
-        """
+    def accept(self):
+        """ Accepted button overridden method. """
 
-        if self.ui.textEdit.toPlainText() == "":
-            return
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_select_all = menu.addAction(_("Select all"))
-        action_copy = menu.addAction(_("Copy"))
-        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-        if action == action_copy:
-            selected_text = self.ui.textEdit.textCursor().selectedText()
-            cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
-            cb.setText(selected_text, mode=cb.Clipboard)
-        if action == action_select_all:
-            self.ui.textEdit.selectAll()'''
-
-    '''def restricted_edit_text(self, x, text_cursor):
-        """ Restricted edit of small sections of text. selected text can be replaced.
-        Mainly used for fixing spelling mistakes.
-        original text is here: self.source[x]['fulltext']
-
-        param: x the current table row
-        param: text_cursor  - the document cursor
-        """
-
-        txt = text_cursor.selectedText()
-        selstart = text_cursor.selectionStart()
-        selend = text_cursor.selectionEnd()
-
-        if len(txt) > 20:
-            msg = _("Can only edit small selections of text, up to 20 characters in length.") + "\n"
-            msg += _("You selected " + str(len(txt)) + _(" characters"))
-            Message(self.app, _('Too much text selected'), msg, "warning").exec_()
-            return
-
-        #TODO maybe use DialogMemo again
-        edit_dialog = QtWidgets.QDialog()
-        edit_ui = Ui_Dialog_memo()
-        edit_ui.setupUi(edit_dialog)
-        edit_dialog.resize(400, 60)
-        edit_dialog.setWindowTitle(_("Edit text: start") +str(selstart) + _(" end:") + str(selend))
-        edit_ui.textEdit.setFontPointSize(self.app.settings['fontsize'])
-        edit_ui.textEdit.setPlainText(txt)
-        ok = edit_dialog.exec_()
-        if not ok:
-            return
-        new_text = edit_ui.textEdit.toPlainText()
-
-        # split original text and fix
-        #original_text = self.source[x]['fulltext']
-        before = self.source[x]['fulltext'][0:text_cursor.selectionStart()]
-        after = self.source[x]['fulltext'][text_cursor.selectionEnd():len(self.source[x]['fulltext'])]
-        fulltext = before + new_text + after
-
-        # update database with the new fulltext
-        self.source[x]['fulltext'] = fulltext
+        self.text = self.ui.textEdit.toPlainText()
         cur = self.app.conn.cursor()
-        sql = "update source set fulltext=? where id=?"
-        cur.execute(sql, [fulltext, self.source[x]['id']])
+        cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
+
+        # Update codings
+        #self.update_codings()
+
+        # Update annotations
+        sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
+        for a in self.annotations:
+            #if a['pos0'] != a['npos0'] or a['pos1'] != a['npos1']:
+            cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
         self.app.conn.commit()
-        length_diff = len(new_text) - len(txt)
-        if length_diff == 0:
-            return
+
+        #  Update linked cases
+        sql = "update case_text set"
+        for c in self.casetext:
+            pass
+
+        self.app.conn.commit()
+        super(DialogEditTextFile, self).accept()
+
+    def update_codings(self):
+        """ Update coding positions and seltext. """
+
+        sql = "update code_text set pos0=?, pos1=? where pos0=? and pos1=? and fid=?"
+        sqltext = ""
+        for c in self.codetext:
+            pass
+
+    '''def textEdit_unrestricted_menu(self, position):
+            """ Context menu for select all and copy of text.
+            """
+
+            if self.ui.textEdit.toPlainText() == "":
+                return
+            menu = QtWidgets.QMenu()
+            menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            action_select_all = menu.addAction(_("Select all"))
+            action_copy = menu.addAction(_("Copy"))
+            action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+            if action == action_copy:
+                selected_text = self.ui.textEdit.textCursor().selectedText()
+                cb = QtWidgets.QApplication.clipboard()
+                cb.clear(mode=cb.Clipboard)
+                cb.setText(selected_text, mode=cb.Clipboard)
+            if action == action_select_all:
+                self.ui.textEdit.selectAll()'''
+
+    '''def restricted_edit_text:
         """ UPDATE CODES//CASES/ANNOTATIONS located after the selected text
         Update database for codings, annotations and case linkages.
         Find affected codings annotations and case linkages.
@@ -426,33 +431,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
         response['cased_section'] = cur.fetchall()
         response['crossover'] = False
         return response'''
-
-    def accept(self):
-        """ Accepted button overridden method. """
-
-        self.text = self.ui.textEdit.toPlainText()
-        cur = self.app.conn.cursor()
-        cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
-
-        # Update codings
-        sql = "update case_text set"
-        for c in self.codetext:
-            pass
-
-        # Update annotations
-        sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
-        for a in self.annotations:
-            #if a['pos0'] != a['npos0'] or a['pos1'] != a['npos1']:
-            cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
-        self.app.conn.commit()
-
-        #  Update linked cases
-        sql = "update case_text set"
-        for c in self.casetext:
-            pass
-
-        self.app.conn.commit()
-        super(DialogEditTextFile, self).accept()
 
 
 if __name__ == "__main__":

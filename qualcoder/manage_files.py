@@ -826,8 +826,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
-
-        # Important. Fulltext may need to be updated, if a transcribed files have been edited via viewAV
+        '''# Important. Fulltext may need to be updated, if a transcribed files have been edited via viewAV
+        cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
+        res = cur.fetchone()
+        fulltext = ""
+        if res is not None:
+            fulltext = res[0]
+        self.source[x]['fulltext'] = fulltext'''
+        ui = DialogEditTextFile(self.app, self.source[x]['id'])
+        ui.exec_()
+        # Get fulltext if changed (for metadata)
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
         res = cur.fetchone()
@@ -835,12 +843,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res is not None:
             fulltext = res[0]
         self.source[x]['fulltext'] = fulltext
-        ui = DialogEditTextFile(self.app, self.source[x]['name'], self.source[x]['fulltext'], self.source[x]['id'])
-        ui.exec_()
-        text = DialogEditTextFile.text
-        if text == self.source[x]['fulltext']:
-            return
-        self.source[x]['fulltext'] = text
 
     def view_av(self, x):
         """ View an audio or video file. Edit the memo. Edit the transcribed file.
@@ -934,7 +936,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         id_ = cur.fetchone()[0]
         entry['id'] = id_
 
-        ui = DialogEditTextFile(self.app, name, '', id_)
+        ui = DialogEditTextFile(self.app, id_)
         ui.exec_()
         filetext = ui.text
         icon, metadata = self.get_icon_and_metadata(name, filetext, None)
