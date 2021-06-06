@@ -102,7 +102,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         """ Called from init, delete category/code.
         Also called on other coding dialogs in the dialog_list. """
 
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.

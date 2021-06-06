@@ -120,7 +120,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.search_indices = []
         self.search_index = 0
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
         self.recent_codes = []
         self.autocode_history = []
         self.important = False
@@ -657,7 +657,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Called from init, delete category/code.
         Also called on other coding dialogs in the dialog_list. """
 
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
 
     def delete_all_codes_from_file(self):
         """ Delete all codes from this file by this coder. """
