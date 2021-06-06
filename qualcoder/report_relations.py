@@ -108,7 +108,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         """
 
         self.coder_names = self.app.get_coder_names_in_project()
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
 
     def coder_code_relations(self):
         """ Calculate the relations for selected codes for THIS coder or ALL coders.

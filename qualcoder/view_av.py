@@ -386,7 +386,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter. """
 
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
 
     def get_files(self, ids=[]):
         """ Get AV files and exclude those with bad links.

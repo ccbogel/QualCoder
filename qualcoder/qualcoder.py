@@ -341,7 +341,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_data(self):
+    def get_codes_categories(self):
         """ Gets all the codes, categories.
         Called from code_text, code_av, code_image, reports, report_relations """
 
@@ -1307,10 +1307,11 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
         cur.execute("CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
         cur.execute("CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
-        cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
+        #cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
+        cur.execute("CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v3', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v4', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0))
         self.app.conn.commit()
         try:
             # get and display some project details
@@ -1513,6 +1514,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.app.conn.commit()
             except Exception as e:
                 logger.debug(str(e))
+        # database version v4
+        try:
+            cur.execute("select ctid from code_text")
+        except:  # sqlite3.OperationalError as e:
+            cur.execute(
+                "CREATE TABLE code_text2 (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner))")
+            self.app.conn.commit()
+            sql = "insert into code_text2 (cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important) "
+            sql += "select cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important from code_text"
+            cur.execute(sql)
+            self.app.conn.commit()
+            cur.execute("drop table code_text")
+            cur.execute("alter table code_text2 rename to code_text")
+            self.app.conn.commit()
 
         # Save a date and 24hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":

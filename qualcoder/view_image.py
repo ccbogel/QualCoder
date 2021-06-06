@@ -209,7 +209,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
 
-        self.codes, self.categories = self.app.get_data()
+        self.codes, self.categories = self.app.get_codes_categories()
 
     def show_important_coded(self):
         """ Show codes flagged as important. """

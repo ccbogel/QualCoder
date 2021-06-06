@@ -137,7 +137,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         Calls calculate_code_frequency - for each code.
         Adds a list item that is ready to be used by the treeWidget to display multiple
         columns with the coder frequencies.
-        Not using  app.get_data method as this adds extra columns for each end user
+        Not using  app.get_codes_categories method as this adds extra columns for each end user
         """
 
         cur = self.app.conn.cursor()
@@ -471,7 +471,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """ Called from init. gets coders, code_names, categories, file_summaries.
         Images are not loaded. """
 
-        self.code_names, self.categories = self.app.get_data()
+        self.code_names, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         cur.execute(sql)
