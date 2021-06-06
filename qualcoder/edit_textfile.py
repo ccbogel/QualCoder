@@ -64,7 +64,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
     prev_text = ""
     all_is_case_text = False  # may not use
     no_codes_annotes_cases = True
-    change = False
+
+    code_deletions = []
 
     def __init__(self, app, fid, clear_button="show"):
         """ """
@@ -81,6 +82,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if res[0] is not None:
             self.text = res[0]
         title = res[1]
+        self.code_deletions= []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -94,16 +96,18 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.get_cases_codings_annotations()
         self.ui.textEdit.setPlainText(self.text)
         self.ui.textEdit.setFocus()
-        print("FILE:", title)
+        '''print("FILE:", title)
         if self.casetext:
             print("CASE\n", self.casetext)
         if self.annotations:
             print("ANNOTE\n", self.annotations)
         if self.codetext:
-            print("CODETEXT\n", self.codetext)
+            print("CODETEXT\n", self.codetext)'''
         self.prev_text = copy(self.text)
         self.change = False
         self.highlight()
+        self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.ui.textEdit.installEventFilter(self)
 
@@ -111,13 +115,13 @@ class DialogEditTextFile(QtWidgets.QDialog):
         """ Get all linked cases, coded text and annotations for this file """
 
         cur = self.app.conn.cursor()
-        sql = "select cid, pos0, pos1, seltext, owner from code_text where fid=?"
+        sql = "select ctid, cid, pos0, pos1, seltext, owner from code_text where fid=?"
         cur.execute(sql, [self.fid])
         res = cur.fetchall()
         self.codetext = []
         for r in res:
-            self.codetext.append({'cid': r[0], 'pos0': r[1], 'pos1': r[2], 'seltext': r[3],
-                'owner': r[4], 'npos0': r[1], 'npos1': r[2]})
+            self.codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
+                'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
         sql = "select anid, pos0, pos1 from annotation where fid=?"
         cur.execute(sql, [self.fid])
         res = cur.fetchall()
@@ -162,8 +166,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if self.no_codes_annotes_cases:
             return
 
-        self.change = True
-
         cursor = self.ui.textEdit.textCursor()
         self.text = self.ui.textEdit.toPlainText()
         #print("cursor", cursor.position())
@@ -174,13 +176,13 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if len(d) < 4:
             #print("D", d)
             return
-        characters = d[3]
+        char = d[3]
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
-        print("position", position)
+        #print("position", position)
 
         previous = position.split(" ")[0]
-        pre_start = previous.split(",")[0]
+        pre_start = int(previous.split(",")[0])
         pre_chars = None
         try:
             pre_chars = previous.split(",")[1]
@@ -194,7 +196,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         except:
             pass
 
-        print(characters, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        #print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         """
         Replacing 'way' with 'the' start position 13
         -w  previous 13 3  post 13 3
@@ -204,20 +206,101 @@ class DialogEditTextFile(QtWidgets.QDialog):
         """
         # No additions or deletions
         if pre_start == post_start and pre_chars == post_chars:
+            self.highlight()
+            self.prev_text = copy(self.text)
             return
 
         """
         Adding 'X' at inserted position 5, note: None as no number is provided from difflib
         +X  previous 4 0  post 5 None
         
+        Adding 'qda' at inserted position 5 (After 'This')
+        +q  previous 4 0  post 5 3
+        
         Removing 'X' from position 5, note None
         -X  previous 5 None  post 4 0
         
         Removing 'the' from position 13
         -t  previous 13 3  post 12 0
-        
-
         """
+        if pre_chars is None:
+            pre_chars = 1
+        pre_chars = -1 * int(pre_chars)  # String if not None
+        if post_chars is None:
+            post_chars = 1
+        post_chars = int(post_chars)  # String if not None
+        #print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        # Adding characters
+        if char[0] == "+":
+            for c in self.codetext:
+                changed = False
+                #print("npos0", c['npos0'], "pre start", pre_start)
+                if c['npos0'] >= pre_start:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > c['npos0'] and pre_start < c['npos1'] and not changed:
+                    c['npos1'] += pre_chars + post_chars
+            for a in self.annotations:
+                changed = False
+                if a['npos0'] >= pre_start:
+                    a['npos0'] += pre_chars + post_chars
+                    a['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > a['npos0'] and pre_start < a['npos1'] and not changed:
+                    a['npos1'] += pre_chars + post_chars
+            for c in self.casetext:
+                changed = False
+                # print("npos0", c['npos0'], "pre start", pre_start)
+                if c['npos0'] >= pre_start:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > c['npos0'] and pre_start < c['npos1'] and not changed:
+                    c['npos1'] += pre_chars + post_chars
+            self.highlight()
+            self.prev_text = copy(self.text)
+            return
+
+        # Removing characters
+        if char[0] == "-":
+            remove = False
+            for c in self.codetext:
+                changed = False
+                #print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
+                if c['npos0'] >= pre_start:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > c['npos0']  and pre_start <= c['npos1'] and not changed:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from code_text where ctid=" +str(c['ctid']))
+                        c['npos0'] = None
+            for a in self.annotations:
+                changed = False
+                if a['npos0'] >= pre_start:
+                    a['npos0'] += pre_chars + post_chars
+                    a['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > a['npos0'] and pre_start <= a['npos1'] and not changed:
+                    a['npos1'] += pre_chars + post_chars
+                    if a['npos1'] < a['npos0']:
+                        self.code_deletions.append("delete from annotation where anid=" +str(a['anid']))
+                        a['npos0'] = None
+            for c in self.casetext:
+                changed = False
+                if c['npos0'] >= pre_start:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                elif pre_start > c['npos0'] and pre_start <= c['npos1'] and not changed:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from case_text where id=" +str(c['id']))
+                        c['npos0'] = None
+            if remove:
+                self.get_cases_codings_annotations()
 
         self.highlight()
         self.prev_text = copy(self.text)
@@ -233,24 +316,26 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.ui.textEdit.blockSignals(True)
         cursor = self.ui.textEdit.textCursor()
         for item in self.casetext:
-            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
-            format_.setFontUnderline(True)
-            format_.setUnderlineColor(QtCore.Qt.green)
-            cursor.setCharFormat(format_)
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.green)
+                cursor.setCharFormat(format_)
         for item in self.annotations:
-            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
-            format_.setFontUnderline(True)
-            format_.setUnderlineColor(QtCore.Qt.yellow)
-            cursor.setCharFormat(format_)
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.yellow)
+                cursor.setCharFormat(format_)
         for item in self.codetext:
-            cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
-            format_.setFontUnderline(True)
-            format_.setUnderlineColor(QtCore.Qt.red)
-            cursor.setCharFormat(format_)
-
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.red)
+                cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
 
     def remove_formatting(self):
@@ -273,36 +358,42 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.text = self.ui.textEdit.toPlainText()
         cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
+        self.app.conn.commit()
+        self.update_codings()
+        self.update_annotations()
+        self.update_casetext()
+        super(DialogEditTextFile, self).accept()
 
-        # Update codings
-        #self.update_codings()
+    def update_casetext(self):
+        """ Update linked case text positions. """
 
-        # Update annotations
+        sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
+        cur = self.app.conn.cursor()
+        for c in self.casetext:
+            cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
+        self.app.conn.commit()
+
+    def update_annotations(self):
+        """ Update annotation positions. """
+
         sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
+        cur = self.app.conn.cursor()
         for a in self.annotations:
-            #if a['pos0'] != a['npos0'] or a['pos1'] != a['npos1']:
             cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
         self.app.conn.commit()
-
-        #  Update linked cases
-        sql = "update case_text set"
-        for c in self.casetext:
-            pass
-
-        self.app.conn.commit()
-        super(DialogEditTextFile, self).accept()
 
     def update_codings(self):
         """ Update coding positions and seltext. """
 
-        sql = "update code_text set pos0=?, pos1=? where pos0=? and pos1=? and fid=?"
-        sqltext = ""
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         for c in self.codetext:
-            pass
+            seltext = self.text[c['npos0']:c['npos1']]
+            cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
+        self.app.conn.commit()
 
-    '''def textEdit_unrestricted_menu(self, position):
-            """ Context menu for select all and copy of text.
-            """
+    def textEdit_menu(self, position):
+            """ Context menu for select all and copy of text. """
 
             if self.ui.textEdit.toPlainText() == "":
                 return
@@ -317,120 +408,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 cb.clear(mode=cb.Clipboard)
                 cb.setText(selected_text, mode=cb.Clipboard)
             if action == action_select_all:
-                self.ui.textEdit.selectAll()'''
-
-    '''def restricted_edit_text:
-        """ UPDATE CODES//CASES/ANNOTATIONS located after the selected text
-        Update database for codings, annotations and case linkages.
-        Find affected codings annotations and case linkages.
-        All codes, annotations and case linkages that occur after this text selection can be easily updated
-        by adding the length diff to the pos0 and pos1 fields. """
-        cur = self.app.conn.cursor()
-        # find cases after this text section
-        sql = "select id, pos0,pos1 from case_text where fid=? and pos1>? "
-        sql += "and not(?>=pos0 and ?<=pos1)"
-        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
-        post_case_linked = cur.fetchall()
-        # find annotations after this text selection
-        sql = "select anid,pos0,pos1 from annotation where fid=? and pos1>? "
-        sql += "and not(?>=pos0 and ?<=pos1)"
-        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
-        post_annote_linked = cur.fetchall()
-        # find codes after this text selection section
-        sql = "select pos0,pos1 from code_text where fid=? and pos1>? "
-        sql += "and not(?>=pos0 and ?<=pos1)"
-        cur.execute(sql, [self.source[x]['id'], selend, selstart, selend])
-        post_code_linked = cur.fetchall()
-        txt = text_cursor.selectedText()
-        #print("cursor selstart", text_cursor.selectionStart())
-        #print("cursor selend", text_cursor.selectionEnd())
-        #print("length_diff", length_diff, "\n")
-
-        for i in post_case_linked:
-            #print(i)
-            #print(i[0], i[1] + length_diff, i[2] + length_diff)
-            #print("lengths ", len(original_text), i[2] - i[1])
-            sql = "update case_text set pos0=?, pos1=? where id=?"
-            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
-        for i in post_annote_linked:
-            sql = "update annotation set pos0=?, pos1=? where anid=?"
-            cur.execute(sql, [i[1] + length_diff, i[2] + length_diff, i[0]])
-        for i in post_code_linked:
-            sql = "update code_text set pos0=?,pos1=? where fid=? and pos0=? and pos1=?"
-            cur.execute(sql, [i[0] + length_diff, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
-        self.app.conn.commit()
-
-        # UPDATE THE CODED AND/OR ANNOTATED SECTION
-        # The crossover dictionary contains annotations and codes for this section
-        # need to extend or reduce the code or annotation length
-        # the coded text stored in code_text also need to be updated
-        crossovers = self.crossover_check(x, text_cursor)
-        # Codes in this selection
-        for i in crossovers['coded_section']:
-            #print("selected text coded: ", i)
-            sql = "update code_text set seltext=?,pos1=? where fid=? and pos0=? and pos1=?"
-            newtext = fulltext[i[0]:i[1] + length_diff]
-            cur.execute(sql, [newtext, i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
-        # Annotations in this selection
-        for i in crossovers['annoted_section']:
-            #print("selected text annoted: ", i)
-            sql = "update annotation set pos1=? where fid=? and pos0=? and pos1=?"
-            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
-        for i in crossovers['cased_section']:
-            #print("selected text as case: ", i)
-            sql = "update case_text set pos1=? where fid=? and pos0=? and pos1=?"
-            cur.execute(sql, [i[1] + length_diff, self.source[x]['id'], i[0], i[1]])
-        self.app.conn.commit()
-
-        self.app.delete_backup = False'''
-
-    '''def crossover_check(self, x, text_cursor):
-        """ Check text selection for codes and annotations that cross over with non-coded
-        and non-annotated sections. User can only select coded or non-coded text, this makes
-        updating changes much simpler.
-
-        param: x the current table row
-        param: text_cursor  - the document cursor
-        return: dictionary of crossover indication and of whether selection is entirely coded annotated or neither """
-
-        response = {"crossover": True, "coded_section":[], "annoted_section":[], "cased_section":[]}
-        msg = _("Please select text that does not have a combination of coded and uncoded text.")
-        msg += _(" Nor a combination of annotated and un-annotated text.\n")
-        selstart = text_cursor.selectionStart()
-        selend = text_cursor.selectionEnd()
-        msg += _("Selection start: ") + str(selstart) + _(" Selection end: ") + str(selend) + "\n"
-        cur = self.app.conn.cursor()
-        sql = "select pos0,pos1 from code_text where fid=? and "
-        sql += "((pos0>? and pos0<?)  or (pos1>? and pos1<?)) "
-        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
-        code_crossover = cur.fetchall()
-        if code_crossover != []:
-            msg += _("Code crossover: ") + str(code_crossover)
-            Message(self.app, _('Codes cross over text'), msg, "warning").exec_()
-            return response
-        # find if the selected text is coded
-        sql = "select pos0,pos1 from code_text where fid=? and ?>=pos0 and ?<=pos1"
-        cur.execute(sql, [self.source[x]['id'], selstart, selend])
-        response['coded_section'] = cur.fetchall()
-        sql = "select pos0,pos1 from annotation where fid=? and "
-        sql += "((pos0>? and pos0<?) or (pos1>? and pos1<?))"
-        cur.execute(sql, [self.source[x]['id'], selstart, selend, selstart, selend])
-        annote_crossover = cur.fetchall()
-        if annote_crossover != []:
-            msg += _("Annotation crossover: ") + str(annote_crossover)
-            Message(self.app, _('Annotations cross over text'), msg, "warning").exec_()
-            return response
-        # find if the selected text is annotated
-        sql = "select pos0,pos1 from annotation where fid=? and ?>=pos0 and ?<=pos1"
-        cur.execute(sql, [self.source[x]['id'], selstart, selend])
-        response['annoted_section'] = cur.fetchall()
-        response['crossover'] = False
-        # find if the selected text is assigned to case
-        sql = "select pos0,pos1, id from case_text where fid=? and ?>=pos0 and ?<=pos1"
-        cur.execute(sql, [self.source[x]['id'], selstart, selend])
-        response['cased_section'] = cur.fetchall()
-        response['crossover'] = False
-        return response'''
+                self.ui.textEdit.selectAll()
 
 
 if __name__ == "__main__":
