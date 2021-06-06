@@ -90,6 +90,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
+        msg = _("Avoid pasting text across selected text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
+        label = QtWidgets.QLabel(msg)
+        label.setWordWrap(True)
+        self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
         if clear_button == "hide":
             self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
@@ -179,7 +183,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         char = d[3]
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
-        #print("position", position)
+        #print("position", position, "char", char)
 
         previous = position.split(" ")[0]
         pre_start = int(previous.split(",")[0])
@@ -234,74 +238,102 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if char[0] == "+":
             for c in self.codetext:
                 changed = False
-                #print("npos0", c['npos0'], "pre start", pre_start)
-                if c['npos0'] >= pre_start:
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                elif pre_start > c['npos0'] and pre_start < c['npos1'] and not changed:
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
-            for a in self.annotations:
-                changed = False
-                if a['npos0'] >= pre_start:
-                    a['npos0'] += pre_chars + post_chars
-                    a['npos1'] += pre_chars + post_chars
                     changed = True
-                elif pre_start > a['npos0'] and pre_start < a['npos1'] and not changed:
-                    a['npos1'] += pre_chars + post_chars
+            for c in self.annotations:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
             for c in self.casetext:
                 changed = False
                 # print("npos0", c['npos0'], "pre start", pre_start)
-                if c['npos0'] >= pre_start:
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                elif pre_start > c['npos0'] and pre_start < c['npos1'] and not changed:
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
+                    changed=True
             self.highlight()
             self.prev_text = copy(self.text)
             return
 
         # Removing characters
         if char[0] == "-":
-            remove = False
             for c in self.codetext:
                 changed = False
                 #print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
-                if c['npos0'] >= pre_start:
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                elif pre_start > c['npos0']  and pre_start <= c['npos1'] and not changed:
+                # Remove, as entire text is being removed (e.g. copy replace)
+                #print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                #print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1*pre_chars + post_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                    self.code_deletions.append("delete from codetext where ctid=" + str(c['ctid']))
+                    c['npos0'] = None
+                if not changed and pre_start > c['npos0']  and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from code_text where ctid=" +str(c['ctid']))
                         c['npos0'] = None
-            for a in self.annotations:
+                        changed = True
+            for c in self.annotations:
                 changed = False
-                if a['npos0'] >= pre_start:
-                    a['npos0'] += pre_chars + post_chars
-                    a['npos1'] += pre_chars + post_chars
-                    changed = True
-                elif pre_start > a['npos0'] and pre_start <= a['npos1'] and not changed:
-                    a['npos1'] += pre_chars + post_chars
-                    if a['npos1'] < a['npos0']:
-                        self.code_deletions.append("delete from annotation where anid=" +str(a['anid']))
-                        a['npos0'] = None
-            for c in self.casetext:
-                changed = False
-                if c['npos0'] >= pre_start:
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                elif pre_start > c['npos0'] and pre_start <= c['npos1'] and not changed:
+                    # Remove, as entire text is being removed (e.g. copy replace)
+                    # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                    # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                    if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                        c['npos0'] += pre_chars + post_chars
+                        c['npos1'] += pre_chars + post_chars
+                        changed = True
+                        self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
+                        c['npos0'] = None
+                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from annotation where anid=" +str(c['anid']))
+                        c['npos0'] = None
+                        changed = True
+            for c in self.casetext:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                # Remove, as entire text is being removed (e.g. copy replace)
+                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                    self.code_deletions.append("delete from case_text where id=" + str(c['id']))
+                    c['npos0'] = None
+                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from case_text where id=" +str(c['id']))
                         c['npos0'] = None
-            if remove:
-                self.get_cases_codings_annotations()
-
+                        changed = True
         self.highlight()
         self.prev_text = copy(self.text)
 
