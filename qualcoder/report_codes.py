@@ -255,7 +255,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def get_codes_categories_coders(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
 
-        self.code_names, self.categories = self.app.get_data()
+        self.code_names, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
         self.coders = []
         cur.execute("select distinct owner from code_text")
@@ -1111,7 +1111,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     sql += " and attribute.attr_type='case' "
                     case_sql.append(sql)
 
-            # find file_ids matching criteria, nested sqls for each parameter
+            # Find file_ids matching criteria, nested sqls for each parameter
             sql = ""
             if len(file_sql) > 0:
                 sql = file_sql[0]
@@ -1129,8 +1129,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 file_ids = file_ids[1:]
             logger.debug("file_ids: " + file_ids)
 
-            # find case_ids matching criteria, nested sqls for each parameter
-            # can get multiple case ids
+            # Find case_ids matching criteria, nested sqls for each parameter
+            # Can get multiple case ids
             sql = ""
             if len(case_sql) > 0:
                 sql = case_sql[0]

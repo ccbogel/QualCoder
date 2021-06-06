@@ -100,7 +100,7 @@ class ViewGraphOriginal(QDialog):
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
         self.ui.comboBox_fontsize.currentIndexChanged.connect(self.show_graph_type)
-        self.code_names, self.categories = app.get_data()
+        self.code_names, self.categories = app.get_codes_categories()
 
         self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
         combobox_list = ['All']

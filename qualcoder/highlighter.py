@@ -61,22 +61,22 @@ class Highlighter(QSyntaxHighlighter):
          param: dark = True - changes some text coloring """
 
         # Keywords
-        keywords = ["ABORT", "ACTION", "ADD", "AFTER", "ALL", "ALTER", "ANALYZE", "AND", "AS",
-                    "ASC", "ATTACH", "AUTOINCREMENT", "BEFORE", "BEGIN", "BETWEEN", "BY", "CASCADE", "CASE", "CAST",
+        keywords = ["ABORT", "ACTION", "ADD", "AFTER", "ALL", "ALTER", "ANALYZE", "AND", " AS",
+                    "ASC", "ATTACH", "AUTOINCREMENT", "BEFORE", "BEGIN", "BETWEEN", " BY", "CASCADE", "CASE", "CAST",
                     "CHECK", "COLLATE", "COLUMN",
                     "COMMIT", "CONFLICT", "CONSTRAINT", "CREATE", "CROSS", "CURRENT_DATE", "CURRENT_TIME",
                     "CURRENT_TIMESTAMP", "DATABASE", "DEFAULT",
                     "DEFERRABLE", "DEFERRED", "DELETE", "DESC", "DETACH", "DISTINCT", "DROP", "EACH", "ELSE", "END",
                     "ESCAPE", "EXCEPT", "EXCLUSIVE",
                     "EXISTS", "EXPLAIN", "FAIL", "FOR", "FOREIGN", "FROM", "FULL", "GLOB", "GROUP", "HAVING", "IF",
-                    "IGNORE", "IMMEDIATE", "IN", "INDEX",
-                    "INDEXED", "INITIALLY", "INNER", "INSERT", "INSTEAD", "INTERSECT", "INTO", "IS", "ISNULL", "JOIN",
-                    "KEY", "LEFT", "LIKE", "LIMIT", "LOWER"
-                                                    "MATCH", "NATURAL", "NO", "NOT", "NOTNULL", "NULL", "OF", "OFFSET",
-                    "ON", "OR", "ORDER", "OUTER", "PLAN", "PRAGMA", "PRIMARY", "QUERY",
+                    "IGNORE", "IMMEDIATE", " IN", "INDEX",
+                    "INDEXED", "INITIALLY", "INNER", "INSERT", "INSTEAD", "INTERSECT", "INTO", " IS", "ISNULL", "JOIN",
+                    "KEY", "LEFT", "LIKE", "LIMIT", "LOWER",
+                    "MATCH", "NATURAL", "NO", "NOT", "NOTNULL", "NULL", "OF", "OFFSET",
+                    " ON", " OR", "ORDER", "OUTER", "PLAN", "PRAGMA", "PRIMARY", "QUERY",
                     "RAISE", "RECURSIVE", "REFERENCES", "REGEXP", "REINDEX", "RELEASE", "RENAME", "REPLACE", "RESTRICT",
                     "RIGHT", "ROLLBACK", "ROW",
-                    "SAVEPOINT", "SELECT", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", "TO", "TRANSACTION", "TRIGGER",
+                    "SAVEPOINT", "SELECT ", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", " TO", "TRANSACTION", "TRIGGER",
                     "UNION", "UNIQUE", "UPDATE",
                     "USING", "VACUUM", "VALUES", "VIEW", "VIRTUAL", "WHEN", "WHERE", "WITH", "WITHOUT"]
         tmp = []

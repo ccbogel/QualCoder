@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Copyright (c) 2019 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ class Codebook():
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textEdit
-        self.code_names, self.categories = self.app.get_data()
+        self.code_names, self.categories = self.app.get_codes_categories()
         self.get_code_frequencies()
         self.tree = QtWidgets.QTreeWidget()
         self.fill_tree()
