@@ -26,8 +26,9 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import deepcopy
+from copy import copy, deepcopy
 import datetime
+import difflib
 import logging
 import os
 import platform
@@ -3221,14 +3222,21 @@ class DialogViewAV(QtWidgets.QDialog):
     instance = None
     mediaplayer = None
     media = None
+
+    # Variables for searching through journal(s)
+    search_indices = []   # A list of tuples of (journal name, match.start, match length)
+    search_index = 0
+
+    # Variables used for editing the transcribed text file
     transcription = None
     time_positions = []
     speaker_list = []
-    can_transcribe = True
-
-    # variables for searching through journal(s)
-    search_indices = []   # A list of tuples of (journal name, match.start, match length)
-    search_index = 0
+    codetext = []
+    annotations = []
+    casetext = []
+    prev_text = ""
+    no_codes_annotes_cases = True
+    code_deletions = []
 
     def __init__(self, app, file_, parent=None):
 
@@ -3249,7 +3257,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
-        self.can_transcribe = True
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
@@ -3271,42 +3278,37 @@ class DialogViewAV(QtWidgets.QDialog):
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
+        self.ui.label_note.setText(_("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+        tt = _("Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
+        tt += _("Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
+        self.ui.label_note.setToolTip(tt)
+
+        self.ui.textEdit.installEventFilter(self)
+        self.installEventFilter(self)  # for rewind, play/stop
 
         # Get the transcription text and fill textedit
         cur = self.app.conn.cursor()
         cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
         self.transcription = cur.fetchone()
         if self.transcription is not None:
-            self.ui.textEdit.installEventFilter(self)
-            self.installEventFilter(self)  # for rewind, play/stop
-            cur.execute("select cid from  code_text where fid=?", [self.transcription[0], ])
-            coded = cur.fetchall()
-            cur.execute("select anid from  annotation where fid=?", [self.transcription[0], ])
-            annoted = cur.fetchall()
-            if coded != [] or annoted != []:
-                self.ui.textEdit.setReadOnly(True)
-                self.can_transcribe = False
-                self.ui.label_speakers.setVisible(False)
-                self.ui.label_transcription.setToolTip("")
-                self.ui.label_note.setText(_("Cannot edit transcript. It is coded or annotated."))
-            else:
-                self.ui.label_note.setText(
-                    _("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
             self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
-            # Commented ut as auto-filling speaker names annoys users
+            # Commented out as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
         if self.transcription is None:
-            entry = {'name': file_['name'] + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
-                     'owner': self.app.settings['codername'],
-                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                        (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
-                         entry['date']))
+                    (file_['name'] + ".transcribed", "", None, "", self.app.settings['codername'],
+                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
             self.app.conn.commit()
             cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
             self.transcription = cur.fetchone()
+        self.get_cases_codings_annotations()
+        self.text = self.transcription[1]
+        self.ui.textEdit.setPlainText(self.text)
+        self.prev_text = copy(self.text)
+        self.highlight()
+
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
         self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
@@ -3460,6 +3462,35 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
+
+    def get_cases_codings_annotations(self):
+        """ Get all linked cases, coded text and annotations for this file """
+
+        cur = self.app.conn.cursor()
+        sql = "select ctid, cid, pos0, pos1, seltext, owner from code_text where fid=?"
+        cur.execute(sql, [self.transcription[0]])
+        res = cur.fetchall()
+        self.codetext = []
+        for r in res:
+            self.codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
+                'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
+        sql = "select anid, pos0, pos1 from annotation where fid=?"
+        cur.execute(sql, [self.transcription[0]])
+        res = cur.fetchall()
+        self.annotations = []
+        for r in res:
+            self.annotations.append({'anid': r[0], 'pos0': r[1], 'pos1': r[2],
+                'npos0': r[1], 'npos1': r[2]})
+        sql = "select id, pos0, pos1 from case_text where fid=?"
+        cur.execute(sql, [self.transcription[0]])
+        res = cur.fetchall()
+        self.casetext = []
+        for r in res:
+            self.casetext.append({'id': r[0], 'pos0': r[1], 'pos1': r[2],
+                'npos0': r[1], 'npos1': r[2]})
+        self.no_codes_annotes_cases = True
+        if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
+            self.no_codes_annotes_cases = False
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -4100,3 +4131,231 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
+    # Text edit editing and formatting functions
+    def update_positions(self):
+        """ Update positions for code text, annotations and case text as each character changes
+        via adding or deleting.
+
+        Output: adding an e at pos 4:
+        ---
+
+        +++
+
+        @@ -4,0 +5 @@
+
+        +e
+        """
+
+        # No need to update positions (unless entire file is a case)
+        if self.no_codes_annotes_cases:
+            return
+        cursor = self.ui.textEdit.textCursor()
+        self.text = self.ui.textEdit.toPlainText()
+        # print("cursor", cursor.position())
+        # for d in difflib.unified_diff(self.prev_text, self.text):
+        # n is how many context lines to show
+        d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
+        # print(d)  # 4 items
+        if len(d) < 4:
+            # print("D", d)
+            return
+        char = d[3]
+        position = d[2][4:]  # Removes prefix @@ -
+        position = position[:-4]  # Removes suffix space@@\n
+        # print("position", position, "char", char)
+        previous = position.split(" ")[0]
+        pre_start = int(previous.split(",")[0])
+        pre_chars = None
+        try:
+            pre_chars = previous.split(",")[1]
+        except:
+            pass
+        post = position.split(" ")[1]
+        post_start = int(post.split(",")[0])
+        post_chars = None
+        try:
+            post_chars = post.split(",")[1]
+        except:
+            pass
+        # print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        """
+        Replacing 'way' with 'the' start position 13
+        -w  previous 13 3  post 13 3
+
+        Replacing 's' with 'T'  (highlight s and replace with T
+        -s  previous 4 None  post 4 None
+        """
+        # No additions or deletions
+        if pre_start == post_start and pre_chars == post_chars:
+            self.highlight()
+            self.prev_text = copy(self.text)
+            return
+        """
+        Adding 'X' at inserted position 5, note: None as no number is provided from difflib
+        +X  previous 4 0  post 5 None
+
+        Adding 'qda' at inserted position 5 (After 'This')
+        +q  previous 4 0  post 5 3
+
+        Removing 'X' from position 5, note None
+        -X  previous 5 None  post 4 0
+
+        Removing 'the' from position 13
+        -t  previous 13 3  post 12 0
+        """
+        if pre_chars is None:
+            pre_chars = 1
+        pre_chars = -1 * int(pre_chars)  # String if not None
+        if post_chars is None:
+            post_chars = 1
+        post_chars = int(post_chars)  # String if not None
+        # print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        # Adding characters
+        if char[0] == "+":
+            for c in self.codetext:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+            for c in self.annotations:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+            for c in self.casetext:
+                changed = False
+                # print("npos0", c['npos0'], "pre start", pre_start)
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+            self.highlight()
+            self.prev_text = copy(self.text)
+            return
+
+        # Removing characters
+        if char[0] == "-":
+            for c in self.codetext:
+                changed = False
+                # print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                # Remove, as entire text is being removed (e.g. copy replace)
+                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                    self.code_deletions.append("delete from codetext where ctid=" + str(c['ctid']))
+                    c['npos0'] = None
+                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
+                        c['npos0'] = None
+                        changed = True
+            for c in self.annotations:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                    # Remove, as entire text is being removed (e.g. copy replace)
+                    # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                    # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                    if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                        c['npos0'] += pre_chars + post_chars
+                        c['npos1'] += pre_chars + post_chars
+                        changed = True
+                        self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
+                        c['npos0'] = None
+                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
+                        c['npos0'] = None
+                        changed = True
+            for c in self.casetext:
+                changed = False
+                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                # Remove, as entire text is being removed (e.g. copy replace)
+                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                    c['npos0'] += pre_chars + post_chars
+                    c['npos1'] += pre_chars + post_chars
+                    changed = True
+                    self.code_deletions.append("delete from case_text where id=" + str(c['id']))
+                    c['npos0'] = None
+                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                    c['npos1'] += pre_chars + post_chars
+                    if c['npos1'] < c['npos0']:
+                        self.code_deletions.append("delete from case_text where id=" + str(c['id']))
+                        c['npos0'] = None
+                        changed = True
+        self.highlight()
+        self.prev_text = copy(self.text)
+
+    def highlight(self):
+        """ Add coding and annotation highlights. """
+
+        self.remove_formatting()
+        format_ = QtGui.QTextCharFormat()
+        format_.setFontFamily(self.app.settings['font'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
+
+        self.ui.textEdit.blockSignals(True)
+        cursor = self.ui.textEdit.textCursor()
+        for item in self.casetext:
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.green)
+                cursor.setCharFormat(format_)
+        for item in self.annotations:
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.yellow)
+                cursor.setCharFormat(format_)
+        for item in self.codetext:
+            if item['npos0'] is not None:
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                format_.setFontUnderline(True)
+                format_.setUnderlineColor(QtCore.Qt.red)
+                cursor.setCharFormat(format_)
+        self.ui.textEdit.blockSignals(False)
+
+    def remove_formatting(self):
+        """ Remove formatting from text edit on changed text.
+         Useful when pasting mime data (rich text or html) from clipboard. """
+
+        self.ui.textEdit.blockSignals(True)
+        format_ = QtGui.QTextCharFormat()
+        format_.setFontFamily(self.app.settings['font'])
+        format_.setFontPointSize(self.app.settings['docfontsize'])
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(format_)
+        self.ui.textEdit.blockSignals(False)
