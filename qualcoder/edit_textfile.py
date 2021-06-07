@@ -90,9 +90,12 @@ class DialogEditTextFile(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
-        msg = _("Avoid pasting text across selected text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
+        msg = _("Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
         label = QtWidgets.QLabel(msg)
         label.setWordWrap(True)
+        tt = _("Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned)." )
+        tt += _("Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
+        label.setToolTip(tt)
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
         if clear_button == "hide":
             self.ui.pushButton_clear.hide()
