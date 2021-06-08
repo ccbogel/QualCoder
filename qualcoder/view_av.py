@@ -3578,17 +3578,17 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key_F and mods == QtCore.Qt.AltModifier:
             self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
-        if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
+        if key == QtCore.Qt.Key_T and mods == QtCore.Qt.ControlModifier:
             self.insert_timestamp()
         # Insert speaker  Ctrl 1 .. 8
-        if key in range(49, 57) and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
+        if key in range(49, 57) and mods == QtCore.Qt.ControlModifier:
             self.insert_speakername(key)
         # Add new speaker to list  Ctrl n
-        if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
+        if key == QtCore.Qt.Key_N and mods == QtCore.Qt.ControlModifier:
             self.pause()
             self.add_speakername()
         # Delete speaker name(s) from list
-        if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier and self.can_transcribe:
+        if key == QtCore.Qt.Key_D and mods == QtCore.Qt.ControlModifier:
             self.pause()
             self.delete_speakernames()
         # Increase play rate  Ctrl + Shift + >
@@ -3807,9 +3807,6 @@ class DialogViewAV(QtWidgets.QDialog):
     def scroll_transcribed_checkbox_changed(self):
         """ If checked, then cannot edit the textEdit_transcribed. """
 
-        if not self.can_transcribe:
-            # occurs if there is coded or annotated text.
-            return
         if self.ui.checkBox_scroll_transcript.isChecked():
             self.ui.textEdit.setReadOnly(True)
         else:
@@ -4312,6 +4309,15 @@ class DialogViewAV(QtWidgets.QDialog):
                         changed = True
         self.highlight()
         self.prev_text = copy(self.text)
+        cur = self.app.conn.cursor()
+        cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
+        self.app.conn.commit()
+        for item in self.code_deletions:
+            cur.execute(item)
+        self.code_deletions = []
+        self.update_codings()
+        self.update_annotations()
+        self.update_casetext()
 
     def highlight(self):
         """ Add coding and annotation highlights. """
@@ -4359,3 +4365,34 @@ class DialogViewAV(QtWidgets.QDialog):
         cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
+
+    def update_casetext(self):
+        """ Update linked case text positions. """
+
+        sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
+        cur = self.app.conn.cursor()
+        for c in self.casetext:
+            if c['npos0'] is not None:
+                cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
+        self.app.conn.commit()
+
+    def update_annotations(self):
+        """ Update annotation positions. """
+
+        sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
+        cur = self.app.conn.cursor()
+        for a in self.annotations:
+            if a['npos0'] is not None:
+                cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
+        self.app.conn.commit()
+
+    def update_codings(self):
+        """ Update coding positions and seltext. """
+
+        cur = self.app.conn.cursor()
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+        for c in self.codetext:
+            if c['npos0'] is not None:
+                seltext = self.text[c['npos0']:c['npos1']]
+                cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
+        self.app.conn.commit()

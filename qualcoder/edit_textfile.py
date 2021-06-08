@@ -387,6 +387,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
         self.app.conn.commit()
+        for item in self.code_deletions:
+            cur.execute(item)
+        self.app.conn.commit()
+        self.code_deletions = []
         self.update_codings()
         self.update_annotations()
         self.update_casetext()
@@ -398,7 +402,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for c in self.casetext:
-            cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
+            if c['npos0'] is not None:
+                cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
         self.app.conn.commit()
 
     def update_annotations(self):
@@ -407,7 +412,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for a in self.annotations:
-            cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
+            if a['npos0'] is not None:
+                cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
         self.app.conn.commit()
 
     def update_codings(self):
@@ -416,8 +422,9 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         for c in self.codetext:
-            seltext = self.text[c['npos0']:c['npos1']]
-            cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
+            if c['npos0'] is not None:
+                seltext = self.text[c['npos0']:c['npos1']]
+                cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
         self.app.conn.commit()
 
     def textEdit_menu(self, position):
