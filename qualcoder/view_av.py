@@ -4214,16 +4214,16 @@ class DialogViewAV(QtWidgets.QDialog):
         if char[0] == "+":
             for c in self.codetext:
                 changed = False
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     changed = True
             for c in self.annotations:
                 changed = False
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
@@ -4233,11 +4233,11 @@ class DialogViewAV(QtWidgets.QDialog):
             for c in self.casetext:
                 changed = False
                 # print("npos0", c['npos0'], "pre start", pre_start)
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     changed = True
             self.highlight()
@@ -4249,20 +4249,20 @@ class DialogViewAV(QtWidgets.QDialog):
             for c in self.codetext:
                 changed = False
                 # print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
                 # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                 # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                     self.code_deletions.append("delete from codetext where ctid=" + str(c['ctid']))
                     c['npos0'] = None
-                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
@@ -4270,20 +4270,20 @@ class DialogViewAV(QtWidgets.QDialog):
                         changed = True
             for c in self.annotations:
                 changed = False
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                     # Remove, as entire text is being removed (e.g. copy replace)
                     # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                     # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                    if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                    if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
                         c['npos0'] += pre_chars + post_chars
                         c['npos1'] += pre_chars + post_chars
                         changed = True
                         self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
                         c['npos0'] = None
-                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
@@ -4291,20 +4291,20 @@ class DialogViewAV(QtWidgets.QDialog):
                         changed = True
             for c in self.casetext:
                 changed = False
-                if c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
+                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
                 # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                 # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                     self.code_deletions.append("delete from case_text where id=" + str(c['id']))
                     c['npos0'] = None
-                if not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from case_text where id=" + str(c['id']))
