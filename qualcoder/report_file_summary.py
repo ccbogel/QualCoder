@@ -54,33 +54,6 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-'''meta_keys = {vlc.Meta.Actors: None,
-        vlc.Meta.Album: None,
-        vlc.Meta.AlbumArtist: None,
-        vlc.Meta.Artist: None,
-        vlc.Meta.ArtworkURL: None,
-        vlc.Meta.Copyright: None,
-        vlc.Meta.Date: None,
-        vlc.Meta.Description: None,
-        vlc.Meta.Director: None,
-        vlc.Meta.DiscNumber: None,
-        vlc.Meta.DiscTotal: None,
-        vlc.Meta.EncodedBy: None,
-        vlc.Meta.Episode: None,
-        vlc.Meta.Genre: None,
-        vlc.Meta.Language: None,
-        vlc.Meta.NowPlaying: None,
-        vlc.Meta.Publisher: None,
-        vlc.Meta.Rating: None,
-        vlc.Meta.Season: None,
-        vlc.Meta.Setting: None,
-        vlc.Meta.ShowName: None,
-        vlc.Meta.Title: None,
-        vlc.Meta.TrackID: None,
-        vlc.Meta.TrackNumber: None,
-        vlc.Meta.TrackTotal: None,
-        vlc.Meta.URL: None}'''
-
 meta_keys = [vlc.Meta.Actors, vlc.Meta.Album, vlc.Meta.AlbumArtist, vlc.Meta.Artist,
         vlc.Meta.ArtworkURL, vlc.Meta.Copyright, vlc.Meta.Date, vlc.Meta.Description,
         vlc.Meta.Director, vlc.Meta.DiscTotal, vlc.Meta.EncodedBy,
