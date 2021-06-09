@@ -3150,7 +3150,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                    self.code_deletions.append("delete from codetext where ctid=" + str(c['ctid']))
+                    self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
                     c['npos0'] = None
                 if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
