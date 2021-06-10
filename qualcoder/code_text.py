@@ -117,6 +117,7 @@ class DialogCodeText(QtWidgets.QWidget):
     prev_text = ""
     code_deletions = []
     edit_mode = False
+    edit_pos = 0
 
     def __init__(self, app, parent_textEdit, tab_reports):
 
@@ -144,6 +145,8 @@ class DialogCodeText(QtWidgets.QWidget):
         ee += " " + _(
             "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
         self.ui.label_editing.setText(ee)
+        self.edit_pos = 0
+        self.edit_mode = False
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -1241,6 +1244,90 @@ class DialogCodeText(QtWidgets.QWidget):
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text)
 
+    def keyPressEvent(self, event):
+        """ This works best without the modifiers.
+         As pressing Ctrl + E give the Ctrl but not the E.
+         These key presses are not used in edi mode.
+
+        A annotate - for current selection
+        Q Quick Mark with code - for current selection
+        B Create bookmark - at clicked position
+        H Hide / Unhide top groupbox
+        I Tag important
+        M memo code - at clicked position
+        O Shortcut to cycle through overlapping codes - at clicked position
+        S search text - may include current selection
+        R opens a context menu for recently used codes for marking text
+        """
+
+        if not self.ui.textEdit.hasFocus():
+            return
+        # Ignore all other key events if edit mode is active
+        if self.edit_mode:
+            return
+
+        key = event.key()
+        mod = QtGui.QGuiApplication.keyboardModifiers()
+
+        cursor_pos = self.ui.textEdit.textCursor().position()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        codes_here = []
+        for item in self.code_text:
+            if cursor_pos + self.file_['start'] >= item['pos0'] and \
+                    cursor_pos + self.file_['start'] <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                codes_here.append(item)
+
+        # Annotate selected
+        if key == QtCore.Qt.Key_A and selected_text != "":
+            self.annotate()
+            return
+        # Bookmark
+        if key == QtCore.Qt.Key_B and self.file_ is not None:
+            text_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
+            cur = self.app.conn.cursor()
+            cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
+            self.app.conn.commit()
+            return
+        # Hide unHide top groupbox
+        if key == QtCore.Qt.Key_H:
+            self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+            return
+        # Important  for coded text
+        if key == QtCore.Qt.Key_I:
+            self.set_important(cursor_pos)
+            return
+        # Memo for current code
+        if key == QtCore.Qt.Key_M:
+            self.coded_text_memo(cursor_pos)
+            return
+        # Overlapping codes cycle
+        now = datetime.datetime.now()
+        overlap_diff = now - self.overlap_timer
+        if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled() and overlap_diff.microseconds > 150000:
+            self.overlap_timer = datetime.datetime.now()
+            i = self.ui.comboBox_codes_in_text.currentIndex()
+            self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
+            if self.ui.comboBox_codes_in_text.currentIndex() < 1:
+                self.ui.comboBox_codes_in_text.setCurrentIndex(1)
+            return
+        # Quick mark selected
+        if key == QtCore.Qt.Key_Q and selected_text != "":
+            self.mark()
+            return
+        # Recent codes context menu
+        if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
+            self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+            return
+        # Search, with or without selected
+        if key == QtCore.Qt.Key_S and self.file_ is not None:
+            if selected_text == "":
+                self.ui.lineEdit_search.setFocus()
+            else:
+                self.ui.lineEdit_search.setText(selected_text)
+                self.search_for_text()
+                self.ui.pushButton_next.setFocus()
+
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
@@ -1252,15 +1339,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
-        A annotate - for current selection
-        Q Quick Mark with code - for current selection
-        B Create bookmark - at clicked position
-        H Hide / Unhide top groupbox
-        I Tag important
-        M memo code - at clicked position
-        O Shortcut to cycle through overlapping codes - at clicked position
-        S search text - may include current selection
-        R opens a context menu for recently used codes for marking text
+
         Ctrl + E Turn Edit mode on or off
         """
 
@@ -1270,7 +1349,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
                 return True
-        # change start and end code positions using alt arrow left and alt arrow right
+        # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
         if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
@@ -1290,10 +1369,8 @@ class DialogCodeText(QtWidgets.QWidget):
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
                 return False
-
             if diff.microseconds < 150000:
                 return False
-
             cursor_pos = self.ui.textEdit.textCursor().position()
             selected_text = self.ui.textEdit.textCursor().selectedText()
             codes_here = []
@@ -1318,7 +1395,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
                     return True
-
+            '''
             # Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate()
@@ -1368,7 +1445,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.lineEdit_search.setText(selected_text)
                     self.search_for_text()
                     self.ui.pushButton_next.setFocus()
-                return True
+                return True'''
         return False
 
     def extend_left(self, code_):
@@ -2972,10 +3049,16 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Hide most widgets, remove tooltips, remove text edit menu.
         Need to load entire file """
 
+        temp_edit_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
+        if temp_edit_pos > 0:
+            self.edit_pos = temp_edit_pos
         self.ui.groupBox.hide()
         self.ui.label_editing.show()
         self.ui.listWidget.setEnabled(False)
+        self.ui.listWidget.hide()
+        self.ui.treeWidget.hide()
         self.ui.groupBox_file_buttons.setEnabled(False)
+        self.ui.groupBox_file_buttons.setMaximumSize(4000, 4000)
         self.ui.groupBox_coding_buttons.setEnabled(False)
         self.ui.treeWidget.setEnabled(False)
         file_result = self.app.get_file_texts([self.file_['id']])[0]
@@ -2987,6 +3070,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.removeEventFilter(self.eventFilterTT)
         self.get_cases_codings_annotations()
         self.ui.textEdit.setReadOnly(False)
+        self.ui.textEdit.setText(self.text)
+        new_cursor = self.ui.textEdit.textCursor()
+        if self.edit_pos >= len(self.text):
+            self.edit_pos = len(self.text)
+        new_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveAnchor)
+        self.ui.textEdit.setTextCursor(new_cursor)
+
         self.ed_highlight()
         self.ui.textEdit.textChanged.connect(self.update_positions)
 
@@ -2997,8 +3087,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_editing.hide()
         self.ui.listWidget.setEnabled(True)
         self.ui.groupBox_file_buttons.setEnabled(True)
+        self.ui.groupBox_file_buttons.setMaximumSize(4000, 30)
         self.ui.groupBox_coding_buttons.setEnabled(True)
         self.ui.treeWidget.setEnabled(True)
+        self.ui.listWidget.show()
+        self.ui.treeWidget.show()
         self.prev_text = ""
         self.text = self.ui.textEdit.toPlainText()
         self.file_['fulltext'] = self.text
