@@ -404,6 +404,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         for c in self.casetext:
             if c['npos0'] is not None:
                 cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
+            if c['npos1'] >= len(self.text):
+                cur.execute("delete from case_text where id=?", [c['id']])
         self.app.conn.commit()
 
     def update_annotations(self):
@@ -414,6 +416,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         for a in self.annotations:
             if a['npos0'] is not None:
                 cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
+            if a['npos1'] >= len(self.text):
+                cur.execute("delete from annotation where anid=?", [a['anid']])
         self.app.conn.commit()
 
     def update_codings(self):
@@ -425,6 +429,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
             if c['npos0'] is not None:
                 seltext = self.text[c['npos0']:c['npos1']]
                 cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
+            if c['npos1'] >= len(self.text):
+                cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
 
     def textEdit_menu(self, position):
