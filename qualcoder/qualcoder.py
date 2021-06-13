@@ -1340,9 +1340,25 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(str(e))
             self.close_project()
             return
-        # new project, so tell open project NOT to backup, as there will be nothing in there to backup
+        # New project, so tell open project NOT to backup, as there will be nothing in there to backup
         self.open_project(self.app.project_path, "yes")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        # Remove widgets from each tab
+        contents = self.ui.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+        contents = self.ui.tab_manage.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
 
     def change_settings(self):
         """ Change default settings - the coder name, font, font size.

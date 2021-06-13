@@ -31,7 +31,6 @@ import  difflib
 import logging
 from operator import itemgetter
 import os
-#import platform
 from random import randint
 import re
 import sys
@@ -48,7 +47,6 @@ from color_selector import DialogColorSelect
 from color_selector import colors, TextColor
 from confirm_delete import DialogConfirmDelete
 from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
-#from information import DialogInformation
 from GUI.base64_helper import *
 from GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from memo import DialogMemo
@@ -1135,9 +1133,11 @@ class DialogCodeText(QtWidgets.QWidget):
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
+        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
+            action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_rename = menu.addAction(_("Rename"))
@@ -1162,6 +1162,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.add_category()
             if action == action_add_code:
                 self.add_code()
+            if action == action_merge_category:
+                catid = int(selected.text(1).split(":")[1])
+                self.merge_category(catid)
             if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
@@ -1186,6 +1189,68 @@ class DialogCodeText(QtWidgets.QWidget):
                 if found_code:
                     self.coded_media_dialog(found_code)
 
+    def recursive_non_merge_item(self, item, no_merge_list):
+        """ Find matching item to be the current selected item.
+        Recurse through any child categories.
+        Tried to use QTreeWidget.finditems - but this did not find matching item text
+        Called by: textEdit recent codes menu option
+        Required for: merge_category()
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cat":
+                no_merge_list.append(item.child(i).text(1)[6:])
+            self.recursive_non_merge_item(item.child(i), no_merge_list)
+        return no_merge_list
+
+    def merge_category(self, catid):
+        """ Select another category to merge this category into. """
+
+        #print(self.ui.treeWidget.currentItem())
+        nons = []
+        nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
+        nons.append(str(catid))
+        non_str = "(" + ",".join(nons) + ")"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += non_str + " order by name"
+        #print(sql)
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            #print(r)
+            category_list.append({'name':r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        #print("MERGING", catid, " INTO ", category)
+        for c in self.codes:
+            if c['catid'] == catid:
+                cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
+                #print(c)
+        cur.execute("delete from code_cat where catid=?", [catid])
+        self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
+        for cat in self.categories:
+            if cat['supercatid'] == catid:
+                cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
+                #print(cat)
+        self.app.conn.commit()
+        # Clear any orphan supercatids
+        sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
+        cur.execute(sql)
+        orphans = cur.fetchall()
+        sql = "update code_cat set supercatid=Null where supercatid=?"
+        for i in orphans:
+            cur.execute(sql, [i[0]])
+        self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
+
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
@@ -1199,13 +1264,14 @@ class DialogCodeText(QtWidgets.QWidget):
         res = cur.fetchall()
         category_list = [{'name':"", 'catid': None}]
         for r in res:
-            category_list.append({'name':r[0], 'catid': r[1]})
+            category_list.append({'name': r[0], 'catid': r[1]})
         ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
         ok = ui.exec_()
         if not ok:
             return
         category = ui.get_selected()
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
+        self.app.conn.commit()
         self.update_dialog_codes_and_categories()
 
     def show_codes_like(self):
@@ -2274,6 +2340,7 @@ class DialogCodeText(QtWidgets.QWidget):
         param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
 
+        self.edit_pos = 0
         items = []
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
@@ -3039,6 +3106,8 @@ class DialogCodeText(QtWidgets.QWidget):
         When activated, hide most widgets, remove tooltips, remove text edit menu.
         Called: event filter Ctrl+E """
 
+        if self.file_ is None:
+            return
         self.edit_mode = not self.edit_mode
         if self.edit_mode:
             self.edit_mode_on()

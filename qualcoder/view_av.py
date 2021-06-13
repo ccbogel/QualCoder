@@ -1351,9 +1351,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_assignSegment = menu.addAction("Assign segment to code")
         action_addCodeToCategory = None
         action_addCategoryToCategory = None
+        action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_addCodeToCategory = menu.addAction(_("Add new code to category"))
             action_addCategoryToCategory = menu.addAction(_("Add a new category to category"))
+            action_merge_category = menu.addAction(_("Merge category into category"))
         action_addCode = menu.addAction(_("Add a new code"))
         action_addCategory = menu.addAction(_("Add a new category"))
         action_rename = menu.addAction(_("Rename"))
@@ -1381,6 +1383,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.add_category()
         if action == action_addCode:
             self.add_code()
+        if action == action_merge_category:
+            catid = int(selected.text(1).split(":")[1])
+            self.merge_category(catid)
         if action == action_addCodeToCategory:
             catid = int(selected.text(1).split(":")[1])
             self.add_code(catid)
@@ -1915,6 +1920,68 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
+
+    def recursive_non_merge_item(self, item, no_merge_list):
+        """ Find matching item to be the current selected item.
+        Recurse through any child categories.
+        Tried to use QTreeWidget.finditems - but this did not find matching item text
+        Called by: textEdit recent codes menu option
+        Required for: merge_category()
+        """
+
+        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cat":
+                no_merge_list.append(item.child(i).text(1)[6:])
+            self.recursive_non_merge_item(item.child(i), no_merge_list)
+        return no_merge_list
+
+    def merge_category(self, catid):
+        """ Select another category to merge this category into. """
+
+        #print(self.ui.treeWidget.currentItem())
+        nons = []
+        nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
+        nons.append(str(catid))
+        non_str = "(" + ",".join(nons) + ")"
+        sql = "select name, catid, supercatid from code_cat where catid not in "
+        sql += non_str + " order by name"
+        #print(sql)
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        res = cur.fetchall()
+        category_list = [{'name': "", 'catid': None, 'supercatid': None}]
+        for r in res:
+            #print(r)
+            category_list.append({'name':r[0], 'catid': r[1], "supercatid": r[2]})
+        ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        category = ui.get_selected()
+        #print("MERGING", catid, " INTO ", category)
+        for c in self.codes:
+            if c['catid'] == catid:
+                cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
+                #print(c)
+        cur.execute("delete from code_cat where catid=?", [catid])
+        self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
+        for cat in self.categories:
+            if cat['supercatid'] == catid:
+                cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
+                #print(cat)
+        self.app.conn.commit()
+        # Clear any orphan supercatids
+        sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
+        cur.execute(sql)
+        orphans = cur.fetchall()
+        sql = "update code_cat set supercatid=Null where supercatid=?"
+        for i in orphans:
+            cur.execute(sql, [i[0]])
+        self.app.conn.commit()
+        self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
