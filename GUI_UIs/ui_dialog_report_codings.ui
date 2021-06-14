@@ -281,7 +281,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Memo reporting options</string>
       </property>
       <property name="text">
        <string/>
