@@ -142,7 +142,7 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_important.setToolTip(_translate("Dialog_reportCodings", "Filter results for those marked Important"))
         self.checkBox_important.setText(_translate("Dialog_reportCodings", "Important"))
         self.comboBox_memos.setToolTip(_translate("Dialog_reportCodings", "Memo reporting options"))
-        self.label_memos.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Matrix options</p></body></html>"))
+        self.label_memos.setToolTip(_translate("Dialog_reportCodings", "Memo reporting options"))
 
 
 if __name__ == "__main__":
