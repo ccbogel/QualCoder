@@ -141,6 +141,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.label_matrix.setPixmap(pm)
         options = [_("Top categories"), _("Categories"), _("Codes")]
         self.ui.comboBox_matrix.addItems(options)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
+        self.ui.label_memos.setPixmap(pm)
+        options = [_("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")]
+        self.ui.comboBox_memos.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
