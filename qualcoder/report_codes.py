@@ -932,7 +932,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid from code_text join code_name "
+            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo "
+            sql += " from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
@@ -957,7 +958,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
+            sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
+            sql += "code_name.memo, source.memo "
             sql += " from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -983,7 +985,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-            sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
+            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo "
+            sql += " from code_av join code_name "
             sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and source.id in (" + self.file_ids + ") "
@@ -1010,9 +1013,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.case_ids != "":
             # Coded text
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
-            sql += "code_text join code_name on code_name.cid = code_text.cid "
+            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid "
+            sql += "cases.memo, code_text.memo, code_name.memo, source.memo "
+            sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+            sql += "join source on source.id=code_text.fid "
             sql += "code_text.fid = case_text.fid "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
@@ -1037,7 +1042,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "code_image.memo from "
+            sql += "code_image.memo, cases.memo, code_name.memo, source.memo from "
             sql += "code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1066,8 +1071,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,source.mediapath, "
-            sql += "source.id from "
-            sql += "code_av join code_name on code_name.cid = code_av.cid "
+            sql += "source.id, cases.memo, code_name.memo, source.memo "
+            sql += " from code_av join code_name on code_name.cid = code_av.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_av.id = case_text.fid "
             sql += " join source on case_text.fid = source.id "
@@ -1158,8 +1163,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid from "
-                sql += "code_text join code_name on code_name.cid = code_text.cid "
+                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
+                sql += "code_text.memo, cases.memo, code_name.memo, source.memo "
+                sql += "from code_text join code_name on code_name.cid = code_text.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_text.fid = case_text.fid "
                 sql += "where code_name.cid in (" + code_ids + ") "
@@ -1170,7 +1176,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-                sql += "code_text.owner, fid from code_text join code_name "
+                sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo "
+                sql += "from code_text join code_name "
                 sql += "on code_name.cid = code_text.cid join source on fid = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
@@ -1193,7 +1200,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # first sql is for cases with/without file parameters
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
-                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, code_image.memo "
+                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, code_image.memo, "
+                sql += " code_name.memo, source.memo "
                 sql += "from code_image join code_name on code_name.cid = code_image.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_image.id = case_text.fid "
@@ -1205,7 +1213,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-                sql += "code_image.owner, source.mediapath, source.id, code_image.memo "
+                sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
+                sql += " code_name.memo, source.memo "
                 sql += " from code_image join code_name "
                 sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
@@ -1232,8 +1241,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
                 sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,"
-                sql += "source.mediapath, source.id from "
-                sql += "code_av join code_name on code_name.cid = code_av.cid "
+                sql += "source.mediapath, source.id, cases.memo, code_name.memo, source.memo "
+                sql += "from code_av join code_name on code_name.cid = code_av.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_av.id = case_text.fid "
                 sql += " join source on case_text.fid = source.id "
@@ -1245,7 +1254,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 # This sql is for file parameters only
                 sql = "select code_name.name, color, source.name, code_av.pos0, "
                 sql += "code_av.pos1, code_av.memo,"
-                sql += "code_av.owner, source.mediapath, source.id from code_av join code_name "
+                sql += "code_av.owner, source.mediapath, source.id,  code_name.memo, source.memo "
+                sql += "from code_av join code_name "
                 sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
                 sql += "where code_name.cid in (" + code_ids + ") "
                 sql += "and source.id in (" + file_ids + ") "
@@ -1281,6 +1291,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         As results are added to the textEdit, positions for the headings (code, file, codername) are recorded for
         right-click context menu to display contextualised coding in another dialog.
         """
+
+        #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")
 
         file_or_case = ""  # Default for attributes selection
         if self.file_ids != "":
