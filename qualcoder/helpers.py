@@ -536,7 +536,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
-        msg += "\n" + _("Memo: ") + self.data['memo']
+        msg += "\n" + _("Memo: ") + self.data['coded_memo']
         self.setToolTip(msg)
         if self.data['pos1'] < msecs:
             self.mediaplayer.stop()
@@ -620,7 +620,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         """ Draw the coded rectangle in the scene """
 
         tooltip = self.data['codename']   #+ " (" + self.data['coder'] + ")"
-        tooltip += "\nMemo: " + self.data['memo']
+        tooltip += "\nMemo: " + self.data['coded_memo']
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
         width = self.data['width'] * self.scale

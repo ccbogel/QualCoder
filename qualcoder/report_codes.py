@@ -47,7 +47,7 @@ from GUI.base64_helper import *
 from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from helpers import Message, msecs_to_hours_mins_secs, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
 from report_attributes import DialogSelectAttributeParameters
 from select_items import DialogSelectItems
 
@@ -861,10 +861,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('Nothing selected'), msg, "warning").exec_()
             return
 
-        # Prepare results table
+        # Prepare results table and results lists
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
+        self.text_results = []
+        self.image_results = []
+        self.av_results = []
+
+        file_or_case = ""  # Default for attributes selection
+        if self.file_ids != "":
+            file_or_case = "File"
+        if self.case_ids != "":
+            file_or_case = "Case"
 
         # Add search terms to textEdit
         self.ui.comboBox_export.setEnabled(True)
@@ -878,7 +887,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i in items:
             codes_string += i.text(0) + ". "
         self.ui.textEdit.insertPlainText(codes_string)
-
         important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
@@ -926,6 +934,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.text_results = []
         self.image_results = []
         self.av_results = []
+        self.html_links = []
 
         # FILES ONLY SEARCH
         parameters = []
@@ -952,8 +961,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.text_results.append(row)
+                self.text_results.append(dict(zip(keys, row)))
+            for r in self.text_results:
+                r['file_or_case'] = file_or_case
 
             # Coded images
             parameters = []
@@ -979,8 +991,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
+            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
+                   'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.image_results.append(row)
+                self.image_results.append(dict(zip(keys, row)))
+            for r in self.image_results:
+                r['file_or_case'] = file_or_case
 
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
@@ -1005,20 +1021,35 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid',\
+                   'codename_memo', 'source_memo'
             for row in result:
-                self.av_results.append(row)
+                self.av_results.append(dict(zip(keys, row)))
+            for r in self.av_results:
+                r['file_or_case'] = file_or_case
+                if r['file_or_casename'] is None:
+                    msg = _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
+                    Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
+                    logger.error("None value for a/v media name in AV results\n" + str(i))
+                text = str(r['file_or_casename']) + " "
+                if len(r['coded_memo']) > 0:
+                    text += "\nMemo: " + r['coded_memo']
+                text += " " + msecs_to_hours_mins_secs(r['pos0']) +" - " + msecs_to_hours_mins_secs(r['pos1'])
+                r['text'] = text
+                self.html_links.append({'imagename': None, 'image': None,
+                    'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)), 'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
 
         # CASES AND FILES SEARCH
         # Default to all files if none are selected, otherwise limit to the selected files
         if self.case_ids != "":
             # Coded text
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid "
+            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
             sql += "cases.memo, code_text.memo, code_name.memo, source.memo "
             sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "join source on source.id=code_text.fid "
             sql += "code_text.fid = case_text.fid "
+            sql += "join source on source.id=code_text.fid "
             sql += "where code_name.cid in (" + code_ids + ") "
             sql += "and case_text.caseid in (" + self.case_ids + ") "
             if self.file_ids != "":
@@ -1035,8 +1066,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 cur.execute(sql, parameters)
             result = cur.fetchall()
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
+                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.text_results.append(row)
+                self.text_results.append(dict(zip(keys, row)))
+            for r in self.text_results:
+                r['file_or_case'] = file_or_case
 
             # Coded images
             parameters = []
@@ -1064,14 +1099,19 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
+            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
+                   'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.image_results.append(row)
+                self.image_results.append(dict(zip(keys, row)))
+            for r in self.image_results:
+                r['file_or_case'] = file_or_case
 
             # Coded audio and video
             parameters = []
-            sql = "select code_name.name, color, cases.name, "
-            sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,source.mediapath, "
-            sql += "source.id, cases.memo, code_name.memo, source.memo "
+            #TODO FIX THIS
+            sql = "select distinct code_name.name, color, cases.name as case_name, "
+            sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
+            sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo "
             sql += " from code_av join code_name on code_name.cid = code_av.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_av.id = case_text.fid "
@@ -1089,12 +1129,31 @@ class DialogReportCodes(QtWidgets.QDialog):
             if parameters == []:
                 cur.execute(sql)
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
+                #logger.info("SQL:" + sql + "\nParameters:" + str(parameters))
                 cur.execute(sql, parameters)
-            result = cur.fetchall()
+            print(sql)
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', 'fid', \
+                   'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.av_results.append(row)
+                self.av_results.append(dict(zip(keys, row)))
+            for r in self.av_results:
+                r['file_or_case'] = file_or_case
+                # TODO revise this bit
+                if r['file_or_casename'] is None:
+                    msg = _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
+                    Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
+                    logger.error("None value for a/v media name in AV results\n" + str(i))
+                text = str(r['file_or_casename']) + " "
+                print(r)  # tmp
+                if len(r['coded_memo']) > 0:
+                    text += "\nMemo: " + r['coded_memo']
+                text += " " + msecs_to_hours_mins_secs(r['pos0']) + " - " + msecs_to_hours_mins_secs(r['pos1'])
+                r['text'] = text
+                self.html_links.append({'imagename': None, 'image': None,
+                                        'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)),
+                                        'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
+
+
 
         # ATTRIBUTES ONLY SEARCH
         # get coded text and images from attribute selection
@@ -1293,58 +1352,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")
-
-        file_or_case = ""  # Default for attributes selection
-        if self.file_ids != "":
-            file_or_case = "File"
-        if self.case_ids != "":
-            file_or_case = "Case"
         self.text_links = []
         self.matrix_links = []
-
-        # Convert results to dictionaries for ease of use
-        tmp = []
-        for i in self.text_results:
-            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'pos0': i[3],
-                'pos1': i[4], 'text': i[5], 'coder': i[6], 'fid': i[7], 'file_or_case': file_or_case})
-        self.text_results = tmp
-        tmp = []
-        for i in self.image_results:
-            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2], 'x1': i[3],
-                'y1': i[4], 'width': i[5], 'height': i[6], 'coder': i[7], 'mediapath': i[8],
-                'fid': i[9], 'memo': i[10], 'file_or_case': file_or_case})
-        self.image_results = tmp
-        tmp = []
-        for i in self.av_results:
-            # Prepare additional text describing coded segment
-            text = ""
-            if i[7] is None:
-                msg = _("Should not have a None value for a/v media name.") + "\n" + str(i) + "\n"
-                msg += _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
-                Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
-                logger.error("None value for a/v media name in AV results\n" + str(i))
-            if i[7] is not None:
-                text = i[7] + ": "
-            secs0 = int(i[3] / 1000)
-            mins = int(secs0 / 60)
-            remainder_secs = str(secs0 - mins * 60)
-            if len(remainder_secs) == 1:
-                remainder_secs = "0" + remainder_secs
-            text += " [" + str(mins) + ":" + remainder_secs
-            secs1 = int(i[4] / 1000)
-            mins = int(secs1 / 60)
-            remainder_secs = str(secs1 - mins * 60)
-            if len(remainder_secs) == 1:
-                remainder_secs = "0" + remainder_secs
-            text += " - " + str(mins) + ":" + remainder_secs + "]"
-            self.html_links.append({'imagename': None, 'image': None,
-                'avname': i[7], 'av0': str(secs0), 'av1': str(secs1), 'avtext': text})
-            if len(i[5]) > 0:
-                text += "\nMemo: " + i[5]
-            tmp.append({'codename': i[0], 'color': i[1], 'file_or_casename': i[2],
-            'pos0': i[3], 'pos1': i[4], 'memo': i[5], 'coder': i[6], 'mediapath': i[7],
-                'fid': i[8], 'file_or_case': file_or_case, 'text': text})
-        self.av_results = tmp
 
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
@@ -1422,8 +1431,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         text_edit.insertHtml("<br />")
         self.html_links.append({'imagename': imagename, 'image': image,
             'avname': None, 'av0': None, 'av1': None, 'avtext': None})
-        if img['memo'] != "":
-            text_edit.insertPlainText(_("Memo: ") + img['memo'] + "\n")
+        if img['coded_memo'] != "":
+            text_edit.insertPlainText(_("Memo: ") + img['coded_memo'] + "\n")
 
     def heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
