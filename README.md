@@ -123,10 +123,10 @@ brew install qpdf
 ```
 
 
-Assuming you downloaded the2.4 version. You can now run with:
+Assuming you downloaded the 2.5 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.4/qualcoder/qualcoder.py
+python3 /applications/QualCoder-2.5/qualcoder/qualcoder.py
 ```
 
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
@@ -185,8 +185,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2021) QualCoder 2.4 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/2.4
+Curtain, C. (2021) QualCoder 2.5 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/2.5
 
 
 ## Leave a review
