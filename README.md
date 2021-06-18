@@ -81,7 +81,7 @@ Then click enter. Wait, until all modules are installed (the command phrase shou
 
 Now, you should be able to run QualCoder by double-clicking the desktop shortcut.
 
-The `python` command may open a different version of python (e.g. a python2 version). You might need to replace `python` with `py` or `python3` or a specific version `python3.8`
+The `python` command may open a different version of python (e.g. a python2 version). You might need to replace `python` with `py` or `python3` or a specific version `python3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 You can run the cmd.exe as described above, and type python and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
 
