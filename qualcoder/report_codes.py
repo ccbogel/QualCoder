@@ -125,6 +125,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.ui.listWidget_cases.itemSelectionChanged.connect(self.case_selection_changed)
+        self.ui.label_matrix.hide()
+        self.ui.comboBox_matrix.setEnabled(False)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
@@ -834,6 +837,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         attributes = _("Attributes: ") + str(attribute_count) + "/" + str(result[0])
         msg = codes + "  " + files+ "  " + cases + "  " + attributes
         self.ui.label_counts.setText(msg)
+
+    def case_selection_changed(self):
+        """ Show or hide the case matrix options.
+         Show if cases are selected. """
+
+        self.ui.label_matrix.hide()
+        self.ui.comboBox_matrix.setEnabled(False)
+        for item in self.ui.listWidget_cases.selectedItems():
+            if item.text() != "":
+                self.ui.label_matrix.show()
+                self.ui.comboBox_matrix.setEnabled(True)
+
 
     def search(self):
         """ Search for selected codings.
