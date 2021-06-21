@@ -1477,7 +1477,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         cur = self.app.conn.cursor()
-        #print(item)
         cur.execute("select name from source where id=?", [item['fid']])
         filename = ""
         try:  # In case no filename results, rare possibility
@@ -1634,7 +1633,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             case_ids : list of case ids
         """
 
-        # Do not overwrite positions in orinial text_links object
+        # Do not overwrite positions in original text_links object
         text_results = deepcopy(text_results)
         image_results = deepcopy(image_results)
         av_results = deepcopy(av_results)
@@ -1677,27 +1676,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.matrix_links = []
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
-                for i in text_results:
-                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].insertPlainText(i['text'] + "\n")
-                for a in av_results:
-                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].insertPlainText(i['text'] + "\n")
+                for t in text_results:
+                    if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
+                        t['row'] = row
+                        t['col'] = col
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        self.matrix_links.append(t)
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
+                for av in av_results:
+                    if av['file_or_casename'] == vertical_labels[row] and av['codename'] == horizontal_labels[col]:
+                        av['row'] = row
+                        av['col'] = col
+                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
+                        self.matrix_links.append(av)
+                        self.te[row][col].insertPlainText(av['text'] + "\n")
                 for counter, im in enumerate(image_results):
-                    if i['file_or_casename'] == vertical_labels[row] and i['codename'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.put_image_into_textedit(i, counter, self.te[row][col])
+                    if im['file_or_casename'] == vertical_labels[row] and im['codename'] == horizontal_labels[col]:
+                        im['row'] = row
+                        im['col'] = col
+                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
+                        self.matrix_links.append(im)
+                        self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1720,7 +1719,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             case_ids : list of case ids
         """
 
-        # Do not overwrite positions in orinial text_links object
+        # Do not overwrite positions in original text_links object
         text_results = deepcopy(text_results)
         image_results = deepcopy(image_results)
         av_results = deepcopy(av_results)
@@ -1744,6 +1743,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if item.parent() is not None:
                     sub_code['top'] = item.parent().text(0)
                     sub_codes.append(sub_code)
+                    add_cat = True
+                    for tl in top_level:
+                        if tl['name'] == item.parent().text(0):
+                            add_cat = False
+                    if add_cat:
+                        top_level.append({'name': item.parent().text(0), 'cat': item.parent().text(1)})
+                        horizontal_labels.append(item.parent().text(0))
 
         # Add category name - which will match the tableWidget column category name
         res_text_categories = []
@@ -1804,27 +1810,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for i in res_text_categories:
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].insertPlainText(i['text'] + "\n")
-                for i in res_av_categories:
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].append(i['text'] + "\n")
-                for counter, i in enumerate(res_image_categories):
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.put_image_into_textedit(i, counter, self.te[row][col])
+                for t in res_text_categories:
+                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
+                        t['row'] = row
+                        t['col'] = col
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        self.matrix_links.append(t)
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
+                for av in res_av_categories:
+                    if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
+                        av['row'] = row
+                        av['col'] = col
+                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
+                        self.matrix_links.append(av)
+                        self.te[row][col].append(av['text'] + "\n")
+                for counter, im in enumerate(res_image_categories):
+                    if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
+                        im['row'] = row
+                        im['col'] = col
+                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
+                        self.matrix_links.append(im)
+                        self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1848,7 +1854,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             case_ids : list of case ids
         """
 
-        # Do not overwrite positions in orinial text_links object
+        # Do not overwrite positions in original text_links object
         text_results = deepcopy(text_results)
         image_results = deepcopy(image_results)
         av_results = deepcopy(av_results)
@@ -1869,12 +1875,23 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #print("sub", item.text(0), item.text(1))
                 not_top = True
                 sub_code = {'codename': item.text(0), 'cid': item.text(1)}
+                top_id = None
                 while not_top:
                     item = item.parent()
                     if self.ui.treeWidget.indexOfTopLevelItem(item) > -1:
                         not_top = False
                         sub_code['top'] = item.text(0)
+                        top_id = item.text(1)
                         sub_codes.append(sub_code)
+                add_cat = True
+                for tl in top_level:
+                    if tl['name'] == sub_code['top']:  #item.parent().text(0):
+                        add_cat = False
+                if add_cat and top_id is not None:
+                    top_level.append({'name': sub_code['top'], 'cat': top_id})
+                    horizontal_labels.append(sub_code['top'])
+
+
 
         # Add the top-level name - which will match the tableWidget column category name
         res_text_categories = []
@@ -1935,27 +1952,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for i in res_text_categories:
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
+                for t in res_text_categories:
+                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
+                        t['row'] = row
+                        t['col'] = col
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        self.matrix_links.append(t)
+                        self.te[row][col].append(t['text'] + "\n")
+                for av in res_av_categories:
+                    if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
+                        av['row'] = row
+                        av['col'] = col
                         self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].append(i['text'] + "\n")
-                for i in res_av_categories:
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.te[row][col].append(i['text'] + "\n")  # The time duration
-                for counter, i in enumerate(res_image_categories):
-                    if i['file_or_casename'] == vertical_labels[row] and i['top'] == horizontal_labels[col]:
-                        i['row'] = row
-                        i['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(i)
-                        self.put_image_into_textedit(i, counter, self.te[row][col])
+                        self.matrix_links.append(av)
+                        self.te[row][col].append(av['text'] + "\n")  # The time duration
+                for counter, im in enumerate(res_image_categories):
+                    if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
+                        im['row'] = row
+                        im['col'] = col
+                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
+                        self.matrix_links.append(im)
+                        self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
