@@ -147,7 +147,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.label_memos.setPixmap(pm)
-        options = [_("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")]
+        options = [_("None"), _("Code text memos"), _("All memos"), _("Annotations")]
         self.ui.comboBox_memos.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
@@ -849,7 +849,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_matrix.show()
                 self.ui.comboBox_matrix.setEnabled(True)
 
-
     def search(self):
         """ Search for selected codings.
         There are three main search pathways.
@@ -1319,7 +1318,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if case_ids != "":
                 sql = "select code_name.name, color, cases.name, "
                 sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,"
-                sql += "source.mediapath, source.id, cases.memo, code_name.memo, source.memo "
+                sql += "source.mediapath, source.id, code_name.memo, source.memo "
                 sql += "from code_av join code_name on code_name.cid = code_av.cid "
                 sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
                 sql += "code_av.id = case_text.fid "
@@ -1386,15 +1385,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")
+        #self.ui.comboBox_memos
+
         self.text_links = []
         self.matrix_links = []
 
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
-
+        choice = self.ui.comboBox_memos.currentText()
         for row in self.text_results:
             self.heading(row)
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
+                self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
             self.text_links.append(row)
         for i, row in enumerate(self.image_results):
             self.heading(row)
@@ -1486,10 +1489,21 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
+        choice = self.ui.comboBox_memos.currentText()
+        if choice == "All memos" and item['codename_memo'] != "":
+            head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if item['file_or_case'] == 'Case:':
-            head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
-        head += item['coder'] + "\n"
+        if choice == "All memos" and item['source_memo'] != "":
+            head += _(" File memo: ") + item['source_memo']
+        if item['file_or_case'] == 'Case':
+            head += " " + _("Case: " ) + item['file_or_casename']
+            if choice == "All memos":
+                cur = self.app.conn.cursor()
+                cur.execute("select memo from cases where name=?", [item['file_or_casename']])
+                res = cur.fetchone()
+                if res is not None and res != "":
+                    head += ", " + _("Case memo: ") + res[0]
+        head += ", " + _("Coder: ") + item['coder'] + "<br />"
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1597,12 +1611,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             filename = cur.fetchone()[0]
         except:
             pass
-
+        choice = self.ui.comboBox_memos.currentText()
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
+        if choice == "All memos" and item['codename_memo'] != "":
+            head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
+        if choice == "All memos" and item['source_memo'] != "":
+            head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case:':
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
+            if choice == "All memos":
+                cur = self.app.conn.cursor()
+                cur.execute("select memo from cases where name=?", [item['file_or_casename']])
+                res = cur.fetchone()
+                if res is not None and res != "":
+                    head += ", " + _("Case memo: ") + res[0]
         head += item['coder'] + "\n"
 
         cursor = textEdit.textCursor()
@@ -1674,6 +1698,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
+        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 for t in text_results:
@@ -1681,8 +1706,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                         t['row'] = row
                         t['col'] = col
                         self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
+                            self.ui.textEdit.insertPlainText("\n" + _("Coded memo: ") + row['coded_memo'] + "\n")
                         self.matrix_links.append(t)
-                        self.te[row][col].insertPlainText(t['text'] + "\n")
+                        self.te[row][col].insertPlainText(t['text'] + "\n" + _("Coded memo: ") + row['coded_memo'] + "\n")
                 for av in av_results:
                     if av['file_or_casename'] == vertical_labels[row] and av['codename'] == horizontal_labels[col]:
                         av['row'] = row
@@ -1797,6 +1824,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
+        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             column_list = []
             for col, colname in enumerate(horizontal_labels):
@@ -1891,8 +1919,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     top_level.append({'name': sub_code['top'], 'cat': top_id})
                     horizontal_labels.append(sub_code['top'])
 
-
-
         # Add the top-level name - which will match the tableWidget column category name
         res_text_categories = []
         for i in text_results:
@@ -1949,6 +1975,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
+        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
