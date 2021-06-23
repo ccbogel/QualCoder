@@ -45,8 +45,8 @@ import sqlite3
 import sys
 import traceback
 
-from GUI.ui_dialog_import import Ui_Dialog_Import
-from helpers import Message
+from .GUI.ui_dialog_import import Ui_Dialog_Import
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

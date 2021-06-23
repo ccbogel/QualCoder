@@ -43,7 +43,7 @@ import zipfile
 
 from PyQt5 import QtWidgets
 
-from color_selector import colors
+from .color_selector import colors
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

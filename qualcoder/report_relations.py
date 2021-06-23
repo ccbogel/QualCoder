@@ -37,10 +37,10 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-from color_selector import TextColor
-from GUI.base64_helper import *
-from GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
-from helpers import ExportDirectoryPathDialog, Message
+from .color_selector import TextColor
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
+from .helpers import ExportDirectoryPathDialog, Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

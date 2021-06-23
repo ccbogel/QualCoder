@@ -32,8 +32,8 @@ import os
 import sys
 import traceback
 
-from GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
-from helpers import Message
+from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

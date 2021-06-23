@@ -31,7 +31,9 @@ else:
      extra_options = dict(
          # Normally unix-like platforms will use "setup.py install"
          # and install the main script as such
-         scripts=[mainscript],
+         entry_points={
+            'console_scripts': ['qualcoder=qualcoder.qualcoder:gui']
+         },
      )
 
 
@@ -50,7 +52,7 @@ setup(
         'Development Status :: 3 - Alpha'
     ],
     keywords='qualitative data analysis',
-    package_dir={'': 'qualcoder'},
+    packages=find_packages(include=['qualcoder','qualcoder.*']),
     python_requires='>=3.5',
     install_requires=[
         'pyqt5',
@@ -62,7 +64,6 @@ setup(
         'chardet',
         'openpyxl'
     ],
-    data_files=['qualcoder/locale'],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
         'GUI/*.html', 'GUI/NotoSans-hinted/*.ttf',
@@ -72,5 +73,6 @@ setup(
         'locale/en/LC_MESSAGES/en,mo',]
     },
     zip_safe=False,
+    include_package_data=True
     **extra_options
 )
