@@ -37,11 +37,11 @@ import traceback
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 
-from color_selector import TextColor
-from GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
-from helpers import msecs_to_mins_and_secs, DialogCodeInAllFiles
-from information import DialogInformation
-from memo import DialogMemo
+from .color_selector import TextColor
+from .GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
+from .helpers import msecs_to_mins_and_secs, DialogCodeInAllFiles
+from .information import DialogInformation
+from .memo import DialogMemo
 
 
 path = os.path.abspath(os.path.dirname(__file__))

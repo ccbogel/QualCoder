@@ -36,11 +36,11 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
 
-from GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
-from confirm_delete import DialogConfirmDelete
-from helpers import DialogGetStartAndEndMarks, Message
-from view_av import DialogViewAV
-from view_image import DialogViewImage
+from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
+from .confirm_delete import DialogConfirmDelete
+from .helpers import DialogGetStartAndEndMarks, Message
+from .view_av import DialogViewAV
+from .view_image import DialogViewImage
 
 ID = 0
 NAME = 1

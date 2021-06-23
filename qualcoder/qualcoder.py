@@ -41,36 +41,36 @@ import sqlite3
 import traceback
 import urllib.request
 import webbrowser
+from copy import copy
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from attributes import DialogManageAttributes
-from cases import DialogCases
-from codebook import Codebook
-from code_text import DialogCodeText
-from copy import copy
-from GUI.ui_main import Ui_MainWindow
-from helpers import Message
-from import_survey import DialogImportSurvey
-from information import DialogInformation
-from journals import DialogJournals
-from manage_files import DialogManageFiles
-from manage_links import DialogManageLinks
-from memo import DialogMemo
-from refi import RefiExport, RefiImport
-from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
-from report_code_summary import DialogReportCodeSummary
-from report_codes import DialogReportCodes
-from report_file_summary import DialogReportFileSummary
-from report_relations import DialogReportRelations
-from report_sql import DialogSQL
-from rqda import Rqda_import
-from settings import DialogSettings
-from special_functions import DialogSpecialFunctions
+from .attributes import DialogManageAttributes
+from .cases import DialogCases
+from .codebook import Codebook
+from .code_text import DialogCodeText
+from .GUI.ui_main import Ui_MainWindow
+from .helpers import Message
+from .import_survey import DialogImportSurvey
+from .information import DialogInformation
+from .journals import DialogJournals
+from .manage_files import DialogManageFiles
+from .manage_links import DialogManageLinks
+from .memo import DialogMemo
+from .refi import RefiExport, RefiImport
+from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
+from .report_code_summary import DialogReportCodeSummary
+from .report_codes import DialogReportCodes
+from .report_file_summary import DialogReportFileSummary
+from .report_relations import DialogReportRelations
+from .report_sql import DialogSQL
+from .rqda import Rqda_import
+from .settings import DialogSettings
+from .special_functions import DialogSpecialFunctions
 #from text_mining import DialogTextMining
-from view_av import DialogCodeAV
-from view_graph_original import ViewGraphOriginal
-from view_image import DialogCodeImage
+from .view_av import DialogCodeAV
+from .view_graph_original import ViewGraphOriginal
+from .view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 2.5"
 

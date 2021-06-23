@@ -32,7 +32,7 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_attribute import Ui_DialogAddAttribute
+from .GUI.ui_attribute import Ui_DialogAddAttribute
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

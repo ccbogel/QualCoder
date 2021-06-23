@@ -35,21 +35,21 @@ import platform
 from shutil import copyfile
 import sys
 import traceback
-import vlc
+import qualcoder.vlc as vlc
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
-from color_selector import TextColor
-from GUI.base64_helper import *
-from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
-from report_attributes import DialogSelectAttributeParameters
-from select_items import DialogSelectItems
+from .color_selector import TextColor
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
+from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from .report_attributes import DialogSelectAttributeParameters
+from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

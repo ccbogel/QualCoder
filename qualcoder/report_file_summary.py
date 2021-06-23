@@ -33,11 +33,11 @@ from PIL.ExifTags import TAGS
 import platform
 import sys
 import traceback
-import vlc
+import qualcoder.vlc as vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
+from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 
 
 path = os.path.abspath(os.path.dirname(__file__))

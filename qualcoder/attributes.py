@@ -34,12 +34,12 @@ import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from add_attribute import DialogAddAttribute
-from confirm_delete import DialogConfirmDelete
-from memo import DialogMemo
-from GUI.base64_helper import *
-from GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
-from GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
+from .add_attribute import DialogAddAttribute
+from .confirm_delete import DialogConfirmDelete
+from .memo import DialogMemo
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
+from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 
 path = os.path.abspath(os.path.dirname(__file__))

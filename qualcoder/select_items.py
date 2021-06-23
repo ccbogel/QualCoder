@@ -32,8 +32,8 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_select_items import Ui_Dialog_selectitems
-from helpers import Message
+from .GUI.ui_dialog_select_items import Ui_Dialog_selectitems
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

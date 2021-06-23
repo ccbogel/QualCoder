@@ -32,8 +32,8 @@ import sys
 import logging
 import traceback
 
-from GUI.ui_dialog_settings import Ui_Dialog_settings
-from helpers import Message
+from .GUI.ui_dialog_settings import Ui_Dialog_settings
+from .helpers import Message
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))

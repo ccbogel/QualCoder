@@ -42,19 +42,19 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush, QColor
 
-from add_item_name import DialogAddItemName
-from color_selector import DialogColorSelect
-from color_selector import colors, TextColor
-from confirm_delete import DialogConfirmDelete
-from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
-from GUI.base64_helper import *
-from GUI.ui_dialog_code_text import Ui_Dialog_code_text
-from memo import DialogMemo
-from report_attributes import DialogSelectAttributeParameters
-from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from report_codes import DialogReportCodes
-from report_code_summary import DialogReportCodeSummary  # for isinstance()
-from select_items import DialogSelectItems  # for isinstance()
+from .add_item_name import DialogAddItemName
+from .color_selector import DialogColorSelect
+from .color_selector import colors, TextColor
+from .confirm_delete import DialogConfirmDelete
+from .helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
+from .memo import DialogMemo
+from .report_attributes import DialogSelectAttributeParameters
+from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from .report_codes import DialogReportCodes
+from .report_code_summary import DialogReportCodeSummary  # for isinstance()
+from .select_items import DialogSelectItems  # for isinstance()
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

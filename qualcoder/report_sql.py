@@ -35,10 +35,10 @@ from datetime import datetime
 import logging
 import traceback
 
-from GUI.base64_helper import *
-from GUI.ui_dialog_SQL import Ui_Dialog_sql
-from helpers import ExportDirectoryPathDialog, Message
-from highlighter import Highlighter
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_SQL import Ui_Dialog_sql
+from .helpers import ExportDirectoryPathDialog, Message
+from .highlighter import Highlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
