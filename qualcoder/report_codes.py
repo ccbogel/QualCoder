@@ -849,6 +849,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_matrix.show()
                 self.ui.comboBox_matrix.setEnabled(True)
 
+    def annotation_search(self):
+        """ Find and display annotations from selected text files. """
+        # Get variables for search: search text, coders, codes, files,cases, attributes
+        coder = self.ui.comboBox_coders.currentText()
+        self.html_links = []  # For html file output with media
+        search_text = self.ui.lineEdit.text()
+        self.get_selected_files_and_cases()
+        #TODO
+
     def search(self):
         """ Search for selected codings.
         There are three main search pathways.
@@ -856,6 +865,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         2: case selection combined with files selection. (No files selected presumes ALL files)
         3: attribute selection, which may include files or cases.
         """
+
+        # If Annotations is selected only look at selected text file annotations. Separate search and report method.
+        choice = self.ui.comboBox_memos.currentText()
+        if choice == "Annotations":
+            self.annotation_search()
+            return
 
         # Get variables for search: search text, coders, codes, files,cases, attributes
         coder = self.ui.comboBox_coders.currentText()
