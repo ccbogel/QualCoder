@@ -1627,7 +1627,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res is not None and res != "":
                     head += ", " + _("Case memo: ") + res[0]
-        head += item['coder'] + "\n"
+        head += item['coder'] + "<br />"  # Break is very mportant with the image insertion
 
         cursor = textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1705,23 +1705,24 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
-                        if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
-                            self.ui.textEdit.insertPlainText("\n" + _("Coded memo: ") + row['coded_memo'] + "\n")
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
+                        self.te[row][col].append(t['text'])
+                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
+                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
+                        self.te[row][col].insertPlainText("\n")
                         self.matrix_links.append(t)
-                        self.te[row][col].insertPlainText(t['text'] + "\n" + _("Coded memo: ") + row['coded_memo'] + "\n")
                 for av in av_results:
                     if av['file_or_casename'] == vertical_labels[row] and av['codename'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].insertPlainText(av['text'] + "\n")
                 for counter, im in enumerate(image_results):
                     if im['file_or_casename'] == vertical_labels[row] and im['codename'] == horizontal_labels[col]:
                         im['row'] = row
                         im['col'] = col
-                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
                         self.matrix_links.append(im)
                         self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
@@ -1842,14 +1843,17 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
                         self.matrix_links.append(t)
-                        self.te[row][col].insertPlainText(t['text'] + "\n")
+                        self.te[row][col].append(t['text'])
+                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
+                            self.te.append(_("Coded memo: ") + t['coded_memo'])
+                        self.te[row][col].insertPlainText("\n")
                 for av in res_av_categories:
                     if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].append(av['text'] + "\n")
                 for counter, im in enumerate(res_image_categories):
@@ -1983,21 +1987,24 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
                         self.matrix_links.append(t)
-                        self.te[row][col].append(t['text'] + "\n")
+                        self.te[row][col].append(t['text'])
+                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
+                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
+                        self.te[row][col].insertPlainText("\n")
                 for av in res_av_categories:
                     if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].append(av['text'] + "\n")  # The time duration
                 for counter, im in enumerate(res_image_categories):
                     if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
                         im['row'] = row
                         im['col'] = col
-                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
+                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
                         self.matrix_links.append(im)
                         self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
