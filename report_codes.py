@@ -35,21 +35,21 @@ import platform
 from shutil import copyfile
 import sys
 import traceback
-import qualcoder.vlc as vlc
+import vlc
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush
 
-from .color_selector import TextColor
-from .GUI.base64_helper import *
-from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from .helpers import Message, msecs_to_hours_mins_secs, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
-from .report_attributes import DialogSelectAttributeParameters
-from .select_items import DialogSelectItems
+from color_selector import TextColor
+from GUI.base64_helper import *
+from GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
+from GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
+from GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from helpers import Message, msecs_to_hours_mins_secs, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from report_attributes import DialogSelectAttributeParameters
+from select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -849,67 +849,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_matrix.show()
                 self.ui.comboBox_matrix.setEnabled(True)
 
-    def search_annotations(self):
-        """ Find and display annotations from selected text files. """
-
-        # Get variables for search: search text, coders, codes, files,cases, attributes
-        coder = self.ui.comboBox_coders.currentText()
-        self.html_links = []  # For html file output with media
-        search_text = self.ui.lineEdit.text()
-        self.get_selected_files_and_cases()
-        if self.file_ids == "":
-            Message(self.app, _("Warning"), _("No files selected for annotations")).exec_()
-            return
-        self.ui.treeWidget.clearSelection()
-        self.ui.listWidget_cases.clearSelection()
-
-        cur = self.app.conn.cursor()
-        sql = "select anid, fid, pos0, pos1, annotation.memo, annotation.owner, annotation.date, substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
-        sql += "from annotation join source on source.id=annotation.fid "
-        sql += "where source.fulltext is not null and fid in (" + self.file_ids + ") "
-        # Coder limiter
-        values = []
-        if coder != "":
-            sql += " and annotation.owner=?"
-            values.append(coder)
-        if search_text != "":
-            sql += " and instr(subtext, ?) is not null"
-            values.append(search_text)
-        if values == []:
-            cur.execute(sql)
-        else:
-            cur.execute(sql, values)
-        res = cur.fetchall()
-        annotes = []
-        keys = "anid", "fid", "pos0", "pos1", "annotation", "owner", "date", "text"
-        for row in res:
-            annotes.append(dict(zip(keys, row)))
-
-        self.ui.textEdit.clear()
-        # Display search parameters
-        self.ui.textEdit.append(_("Annotation search parameters") + "\n==========")
-        if coder == "":
-            self.ui.textEdit.append(_("Coder: All coders"))
-        else:
-            self.ui.textEdit.append(_("Coder: ") + coder)
-        if search_text != "":
-            self.ui.textEdit.append(_("Search text: ") + search_text)
-        self.ui.textEdit.append(_("Files:"))
-        cur.execute("select name from source where id in (" + self.file_ids + ") and source.fulltext is not null order by name")
-        res = cur.fetchall()
-        file_txt = ""
-        for r in res:
-            file_txt += r[0] + ", "
-        self.ui.textEdit.append(file_txt)
-        self.ui.textEdit.append("==========")
-        for a in annotes:
-            txt = "\n" + "anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
-            txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
-            txt += _("TEXT") + ": " + a['text'] + "\n"
-            txt += _("ANNOTATION") + ": " + a['annotation']
-            self.ui.textEdit.append(txt)
-        self.ui.comboBox_export.setEnabled(True)
-
     def search(self):
         """ Search for selected codings.
         There are three main search pathways.
@@ -917,12 +856,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         2: case selection combined with files selection. (No files selected presumes ALL files)
         3: attribute selection, which may include files or cases.
         """
-
-        # If Annotations is selected only look at selected text file annotations. Separate search and report method.
-        choice = self.ui.comboBox_memos.currentText()
-        if choice == "Annotations":
-            self.search_annotations()
-            return
 
         # Get variables for search: search text, coders, codes, files,cases, attributes
         coder = self.ui.comboBox_coders.currentText()
@@ -1451,17 +1384,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         right-click context menu to display contextualised coding in another dialog.
         """
 
+        #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")
+        #self.ui.comboBox_memos
+
         self.text_links = []
         self.matrix_links = []
 
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
-        choice = self.ui.comboBox_memos.currentText()
+
         for row in self.text_results:
             self.heading(row)
             self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
-                self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
             self.text_links.append(row)
         for i, row in enumerate(self.image_results):
             self.heading(row)
@@ -1583,7 +1517,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
+        #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), )
+
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
+
+
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
@@ -1675,23 +1613,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             filename = cur.fetchone()[0]
         except:
             pass
-        choice = self.ui.comboBox_memos.currentText()
+
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
-        if choice == "All memos" and item['codename_memo'] != "":
-            head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if choice == "All memos" and item['source_memo'] != "":
-            head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case:':
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
-            if choice == "All memos":
-                cur = self.app.conn.cursor()
-                cur.execute("select memo from cases where name=?", [item['file_or_casename']])
-                res = cur.fetchone()
-                if res is not None and res != "":
-                    head += ", " + _("Case memo: ") + res[0]
-        head += item['coder'] + "<br />"  # Break is very mportant with the image insertion
+        head += item['coder'] + "\n"
 
         cursor = textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1762,31 +1690,27 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
-        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 for t in text_results:
                     if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
-                        self.te[row][col].insertPlainText("\n")
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
                         self.matrix_links.append(t)
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
                 for av in av_results:
                     if av['file_or_casename'] == vertical_labels[row] and av['codename'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].insertPlainText(av['text'] + "\n")
                 for counter, im in enumerate(image_results):
                     if im['file_or_casename'] == vertical_labels[row] and im['codename'] == horizontal_labels[col]:
                         im['row'] = row
                         im['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
                         self.matrix_links.append(im)
                         self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
@@ -1889,7 +1813,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             column_list = []
             for col, colname in enumerate(horizontal_labels):
@@ -1907,17 +1830,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
                         self.matrix_links.append(t)
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te.append(_("Coded memo: ") + t['coded_memo'])
-                        self.te[row][col].insertPlainText("\n")
+                        self.te[row][col].insertPlainText(t['text'] + "\n")
                 for av in res_av_categories:
                     if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(av, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].append(av['text'] + "\n")
                 for counter, im in enumerate(res_image_categories):
@@ -2043,7 +1963,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
-        choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
@@ -2051,24 +1970,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
                         t['row'] = row
                         t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(t, self.te[row][col]))
                         self.matrix_links.append(t)
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
-                        self.te[row][col].insertPlainText("\n")
+                        self.te[row][col].append(t['text'] + "\n")
                 for av in res_av_categories:
                     if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(i, self.te[row][col]))
                         self.matrix_links.append(av)
                         self.te[row][col].append(av['text'] + "\n")  # The time duration
                 for counter, im in enumerate(res_image_categories):
                     if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
                         im['row'] = row
                         im['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
+                        self.te[row][col].append(self.matrix_heading(im, self.te[row][col]))
                         self.matrix_links.append(im)
                         self.put_image_into_textedit(im, counter, self.te[row][col])
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
