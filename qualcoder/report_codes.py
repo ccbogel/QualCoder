@@ -851,12 +851,51 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def annotation_search(self):
         """ Find and display annotations from selected text files. """
+
         # Get variables for search: search text, coders, codes, files,cases, attributes
         coder = self.ui.comboBox_coders.currentText()
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
         self.get_selected_files_and_cases()
-        #TODO
+        if self.file_ids == "":
+            Message(self.app, _("Warning"), _("No files selected for annotations")).exec_()
+            return
+        self.ui.treeWidget.clearSelection()
+        self.ui.listWidget_cases.clearSelection()
+
+        cur = self.app.conn.cursor()
+        sql = "select anid, fid, pos0, pos1, annotation.memo, annotation.owner, annotation.date, substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
+        sql += "from annotation join source on source.id=annotation.fid "
+        sql += "where source.fulltext is not null and fid in (" + self.file_ids + ") "
+        # Coder limiter
+        values = []
+        if coder != "":
+            sql += " and annotation.owner=?"
+            values.append(coder)
+        if search_text != "":
+            sql += " and instr(subtext, ?) is not null"
+            values.append(search_text)
+        if values == []:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, values)
+        res = cur.fetchall()
+        annotes = []
+        keys = "anid", "fid", "pos0", "pos1", "annotation", "owner", "date", "text"
+        for row in res:
+            annotes.append(dict(zip(keys, row)))
+
+        self.ui.textEdit.clear()
+        # TODO display delimiters
+
+        for a in annotes:
+            txt = "\n" + "anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
+            txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
+            txt += _("TEXT") + ": " + a['text'] + "\n"
+            txt += _("ANNOTATION") + ": " + a['annotation']
+            self.ui.textEdit.append(txt)
+
+        # TODO export functions
 
     def search(self):
         """ Search for selected codings.
@@ -1398,9 +1437,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         As results are added to the textEdit, positions for the headings (code, file, codername) are recorded for
         right-click context menu to display contextualised coding in another dialog.
         """
-
-        #TODO memo choices = _("None"), _("Coding memos"), _("All memos"), _("Annotations"), _("All")
-        #self.ui.comboBox_memos
 
         self.text_links = []
         self.matrix_links = []
