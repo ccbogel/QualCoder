@@ -849,7 +849,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.label_matrix.show()
                 self.ui.comboBox_matrix.setEnabled(True)
 
-    def annotation_search(self):
+    def search_annotations(self):
         """ Find and display annotations from selected text files. """
 
         # Get variables for search: search text, coders, codes, files,cases, attributes
@@ -886,16 +886,29 @@ class DialogReportCodes(QtWidgets.QDialog):
             annotes.append(dict(zip(keys, row)))
 
         self.ui.textEdit.clear()
-        # TODO display delimiters
-
+        # Display search parameters
+        self.ui.textEdit.append(_("Annotation search parameters") + "\n==========")
+        if coder == "":
+            self.ui.textEdit.append(_("Coder: All coders"))
+        else:
+            self.ui.textEdit.append(_("Coder: ") + coder)
+        if search_text != "":
+            self.ui.textEdit.append(_("Search text: ") + search_text)
+        self.ui.textEdit.append(_("Files:"))
+        cur.execute("select name from source where id in (" + self.file_ids + ") and source.fulltext is not null order by name")
+        res = cur.fetchall()
+        file_txt = ""
+        for r in res:
+            file_txt += r[0] + ", "
+        self.ui.textEdit.append(file_txt)
+        self.ui.textEdit.append("==========")
         for a in annotes:
             txt = "\n" + "anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
             txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
             txt += _("TEXT") + ": " + a['text'] + "\n"
             txt += _("ANNOTATION") + ": " + a['annotation']
             self.ui.textEdit.append(txt)
-
-        # TODO export functions
+        self.ui.comboBox_export.setEnabled(True)
 
     def search(self):
         """ Search for selected codings.
@@ -908,7 +921,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # If Annotations is selected only look at selected text file annotations. Separate search and report method.
         choice = self.ui.comboBox_memos.currentText()
         if choice == "Annotations":
-            self.annotation_search()
+            self.search_annotations()
             return
 
         # Get variables for search: search text, coders, codes, files,cases, attributes
