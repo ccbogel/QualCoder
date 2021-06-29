@@ -32,7 +32,7 @@ else:
          # Normally unix-like platforms will use "setup.py install"
          # and install the main script as such
          entry_points={
-            'console_scripts': ['qualcoder=qualcoder.qualcoder:gui']
+            'console_scripts': ['qualcoder=qualcoder.__main__:gui']
          },
      )
 
