@@ -8,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-mainscript = 'qualcoder/qualcoder.py'
+mainscript = 'qualcoder/__main__.py'
 OPTIONS = {
     'argv_emulation': True,
     'iconfile': 'qualcoder/GUI/qualcoder.icns'
@@ -32,7 +32,7 @@ else:
          # Normally unix-like platforms will use "setup.py install"
          # and install the main script as such
          entry_points={
-            'console_scripts': ['qualcoder=qualcoder.qualcoder:gui']
+            'console_scripts': ['qualcoder=qualcoder.__main__:gui']
          },
      )
 

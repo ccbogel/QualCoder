@@ -45,32 +45,32 @@ from copy import copy
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .attributes import DialogManageAttributes
-from .cases import DialogCases
-from .codebook import Codebook
-from .code_text import DialogCodeText
-from .GUI.ui_main import Ui_MainWindow
-from .helpers import Message
-from .import_survey import DialogImportSurvey
-from .information import DialogInformation
-from .journals import DialogJournals
-from .manage_files import DialogManageFiles
-from .manage_links import DialogManageLinks
-from .memo import DialogMemo
-from .refi import RefiExport, RefiImport
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
-from .report_code_summary import DialogReportCodeSummary
-from .report_codes import DialogReportCodes
-from .report_file_summary import DialogReportFileSummary
-from .report_relations import DialogReportRelations
-from .report_sql import DialogSQL
-from .rqda import Rqda_import
-from .settings import DialogSettings
-from .special_functions import DialogSpecialFunctions
+from qualcoder.attributes import DialogManageAttributes
+from qualcoder.cases import DialogCases
+from qualcoder.codebook import Codebook
+from qualcoder.code_text import DialogCodeText
+from qualcoder.GUI.ui_main import Ui_MainWindow
+from qualcoder.helpers import Message
+from qualcoder.import_survey import DialogImportSurvey
+from qualcoder.information import DialogInformation
+from qualcoder.journals import DialogJournals
+from qualcoder.manage_files import DialogManageFiles
+from qualcoder.manage_links import DialogManageLinks
+from qualcoder.memo import DialogMemo
+from qualcoder.refi import RefiExport, RefiImport
+from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
+from qualcoder.report_code_summary import DialogReportCodeSummary
+from qualcoder.report_codes import DialogReportCodes
+from qualcoder.report_file_summary import DialogReportFileSummary
+from qualcoder.report_relations import DialogReportRelations
+from qualcoder.report_sql import DialogSQL
+from qualcoder.rqda import Rqda_import
+from qualcoder.settings import DialogSettings
+from qualcoder.special_functions import DialogSpecialFunctions
 #from text_mining import DialogTextMining
-from .view_av import DialogCodeAV
-from .view_graph_original import ViewGraphOriginal
-from .view_image import DialogCodeImage
+from qualcoder.view_av import DialogCodeAV
+from qualcoder.view_graph_original import ViewGraphOriginal
+from qualcoder.view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 2.5"
 
@@ -1827,7 +1827,6 @@ def gui():
             proj_path = split_[1]
         ex.open_project(path=proj_path)
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     gui()
