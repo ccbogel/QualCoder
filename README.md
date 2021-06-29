@@ -1,13 +1,12 @@
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt5.
 
-QualCoder projects are stored in a Sqlite database. Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
+Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
 This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on Linux Mint 18.04 Lubuntu 18.04, Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
 ## INSTALLATION 
-
 
 ### Linux
 
@@ -34,7 +33,7 @@ You also need to run this command from the terminal for pdf importing:
 
 `sudo python3 -m pip install pdfminer.six openpyxl ebooklib`
 
-If not using the debian package:
+If your are not using the debian package:
 
 Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
 
@@ -57,7 +56,9 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 The qualcoder folder should be in the same directory as the install.sh script.
 
-This will install QualCoder in the /usr/share directory and create a launcher. Alternatively go to the qualcoder directory and run the qualcoder.py file in a terminal: `python3 qualcoder.py`
+This will install QualCoder in the /usr/share directory and create a launcher. 
+
+Alternatively go to the qualcoder directory and run in a terminal: `python3 __main__.py`
 
 
 ### Windows: 
@@ -66,23 +67,24 @@ Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the W
 
 Download the QualCoder software from: https://github.com/ccbogel/QualCoder. This is the newest, but not yet officially released, version of code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
-Open the unpacked folder "QualCoder-master", then open the folder "qualcoder" and make a shortcut of the file "qualcoder.py" on the desktop - for easier access. This file is the starting file for running software.
-    [Python3](https://www.python.org/downloads/) and
+Open the unpacked folder "QualCoder-master", then open the folder "qualcoder" and make a shortcut of the file "__main__.py" on the desktop - for easier access. This file is the starting file for running software.
     
-The software is written in Python and does not have an exe file for Windows. Download and install the Python programming language. The minimum version is 3.6. Newer is better, e.g. 3.8.7 (https://www.python.org/downloads/release/python-387/). Download the file (at the bottom of the web site) "Windows installer (64-bit)" (or 32-bit if you have an older system) and install Python.
+The software is written in Python and does not have an exe file for Windows. Download and install the Python programming language. The minimum version that works for QualCoder is 3.6.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)" (or 32-bit if you have an older system) and install Python.
 
 IMORTANT: in the first window of the installation mark the option "Add Python to PATH" - it makes the last step easier.
 
 The final step, install extra modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`python -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
 Now, you should be able to run QualCoder by double-clicking the desktop shortcut.
 
-The `python` command may open a different version of python (e.g. a python2 version). You might need to replace `python` with `py` for the most recent installed version, or a specific version that is installed on your Windows, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
-You can run the cmd.exe as described above, and type `python` or `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+
+You can run QualCoder from cmd.exe. You need to Move to the qualcoder folder (using the cd command) and then type `py __main__.py`
 
 
 ### MacOS
@@ -126,7 +128,7 @@ brew install qpdf
 Assuming you downloaded the 2.5 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.5/qualcoder/qualcoder.py
+python3 /applications/QualCoder-2.5/qualcoder/__main__.py
 ```
 
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
