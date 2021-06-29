@@ -8,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-mainscript = 'qualcoder/qualcoder.py'
+mainscript = 'qualcoder/__main__.py'
 OPTIONS = {
     'argv_emulation': True,
     'iconfile': 'qualcoder/GUI/qualcoder.icns'
