@@ -71,7 +71,7 @@ Open the unpacked folder "QualCoder-master", then open the folder "qualcoder" an
     
 The software is written in Python and does not have an exe file for Windows. Download and install the Python programming language. The minimum version is 3.6. Newer is better, e.g. 3.8.7 (https://www.python.org/downloads/release/python-387/). Download the file (at the bottom of the web site) "Windows installer (64-bit)" (or 32-bit if you have an older system) and install Python.
 
-IMORTANT: in the first window of the installation mark the option "Add Python 3.8 to PATH" - it makes the last step easier.
+IMORTANT: in the first window of the installation mark the option "Add Python to PATH" - it makes the last step easier.
 
 The final step, install extra modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctrl+v does not work) the following:
 
@@ -81,8 +81,8 @@ Then click enter. Wait, until all modules are installed (the command phrase shou
 
 Now, you should be able to run QualCoder by double-clicking the desktop shortcut.
 
-The `python` command may open a different version of python (e.g. a python2 version). You might need to replace `python` with `py` or `python3` or a specific version `python3.8`
-You can run the cmd.exe as described above, and type python and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+The `python` command may open a different version of python (e.g. a python2 version). You might need to replace `python` with `py` for the most recent installed version, or a specific version that is installed on your Windows, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+You can run the cmd.exe as described above, and type `python` or `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
 
 ### MacOS
@@ -123,10 +123,10 @@ brew install qpdf
 ```
 
 
-Assuming you downloaded the2.4 version. You can now run with:
+Assuming you downloaded the 2.5 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.4/qualcoder/qualcoder.py
+python3 /applications/QualCoder-2.5/qualcoder/qualcoder.py
 ```
 
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
@@ -185,8 +185,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2021) QualCoder 2.4 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/2.4
+Curtain, C. (2021) QualCoder 2.5 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/2.5
 
 
 ## Leave a review

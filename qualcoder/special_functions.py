@@ -32,9 +32,9 @@ import traceback
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 
-from code_text import DialogCodeText  # for isinstance()
-from confirm_delete import DialogConfirmDelete
-from GUI.ui_dialog_special_functions import Ui_Dialog_special_functions
+from .code_text import DialogCodeText  # for isinstance()
+from .confirm_delete import DialogConfirmDelete
+from .GUI.ui_dialog_special_functions import Ui_Dialog_special_functions
 
 
 path = os.path.abspath(os.path.dirname(__file__))

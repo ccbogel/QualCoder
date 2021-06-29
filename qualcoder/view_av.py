@@ -65,7 +65,7 @@ if sys.platform.startswith("win"):
         logger.debug(str(e))
 vlc_msg = ""
 try:
-    import vlc
+    import qualcoder.vlc as vlc
 except Exception as e:
     vlc_msg = str(e) + "\n"
     if sys.platform.startswith("win"):
@@ -79,20 +79,20 @@ except Exception as e:
         vlc_msg = msg
     QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
 
-from add_item_name import DialogAddItemName
-from color_selector import DialogColorSelect
-from color_selector import colors, TextColor
-from confirm_delete import DialogConfirmDelete
-from GUI.base64_helper import *
-from GUI.ui_dialog_code_av import Ui_Dialog_code_av
-from GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from helpers import msecs_to_hours_mins_secs, Message, DialogCodeInAllFiles
-from information import DialogInformation
-from memo import DialogMemo
-from report_attributes import DialogSelectAttributeParameters
-from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from report_codes import DialogReportCodes
-from select_items import DialogSelectItems
+from .add_item_name import DialogAddItemName
+from .color_selector import DialogColorSelect
+from .color_selector import colors, TextColor
+from .confirm_delete import DialogConfirmDelete
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
+from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
+from .helpers import msecs_to_hours_mins_secs, Message, DialogCodeInAllFiles
+from .information import DialogInformation
+from .memo import DialogMemo
+from .report_attributes import DialogSelectAttributeParameters
+from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from .report_codes import DialogReportCodes
+from .select_items import DialogSelectItems
 
 
 def exception_handler(exception_type, value, tb_obj):

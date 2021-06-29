@@ -39,18 +39,17 @@ import sys
 import traceback
 import uuid
 try:
-    import vlc
+    import qualcoder.vlc as vlc
 except:
     pass
-from xsd import codebook, project
 import zipfile
 
 from PyQt5 import QtWidgets, QtCore
 
-from confirm_delete import DialogConfirmDelete  # REFI export question about line endings
-from GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
-from helpers import Message
-
+from .xsd import codebook, project
+from .confirm_delete import DialogConfirmDelete  # REFI export question about line endings
+from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

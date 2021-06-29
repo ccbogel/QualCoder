@@ -40,20 +40,20 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-from add_item_name import DialogAddItemName
-from color_selector import DialogColorSelect
-from color_selector import colors
-from confirm_delete import DialogConfirmDelete
-from GUI.base64_helper import *
-from GUI.ui_dialog_code_image import Ui_Dialog_code_image
-from GUI.ui_dialog_view_image import Ui_Dialog_view_image
-from helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
-from information import DialogInformation
-from memo import DialogMemo
-from report_attributes import DialogSelectAttributeParameters
-from reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from report_codes import DialogReportCodes
-from select_items import DialogSelectItems
+from .add_item_name import DialogAddItemName
+from .color_selector import DialogColorSelect
+from .color_selector import colors
+from .confirm_delete import DialogConfirmDelete
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
+from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
+from .helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles
+from .information import DialogInformation
+from .memo import DialogMemo
+from .report_attributes import DialogSelectAttributeParameters
+from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from .report_codes import DialogReportCodes
+from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

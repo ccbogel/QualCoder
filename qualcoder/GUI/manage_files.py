@@ -40,7 +40,7 @@ import zipfile
 
 vlc_msg = ""
 try:
-    import vlc
+    import qualcoder.vlc as vlc
 except Exception as e:
     vlc_msg = str(e)
 
@@ -63,18 +63,18 @@ except:  # ModuleNotFoundError
 import ebooklib
 from ebooklib import epub
 
-from add_attribute import DialogAddAttribute
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from docx import opendocx, getdocumenttext
-from GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
-from GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
-from helpers import Message
-from html_parser import *
-from memo import DialogMemo
-from select_items import DialogSelectItems
-from view_image import DialogViewImage
-from view_av import DialogViewAV
+from .add_attribute import DialogAddAttribute
+from .add_item_name import DialogAddItemName
+from .confirm_delete import DialogConfirmDelete
+from .docx import opendocx, getdocumenttext
+from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
+from .GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
+from .helpers import Message
+from .html_parser import *
+from .memo import DialogMemo
+from .select_items import DialogSelectItems
+from .view_image import DialogViewImage
+from .view_av import DialogViewAV
 
 
 path = os.path.abspath(os.path.dirname(__file__))

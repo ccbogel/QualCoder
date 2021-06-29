@@ -30,13 +30,13 @@ import logging
 import os
 import platform
 import sys
-import vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from color_selector import TextColor
-from GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
-from GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+import qualcoder.vlc as vlc
+from .color_selector import TextColor
+from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
+from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
 
 
 path = os.path.abspath(os.path.dirname(__file__))

@@ -36,11 +36,11 @@ import logging
 import traceback
 import webbrowser
 
-from add_item_name import DialogAddItemName
-from confirm_delete import DialogConfirmDelete
-from GUI.base64_helper import *
-from GUI.ui_dialog_journals import Ui_Dialog_journals
-from helpers import Message, ExportDirectoryPathDialog
+from .add_item_name import DialogAddItemName
+from .confirm_delete import DialogConfirmDelete
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_journals import Ui_Dialog_journals
+from .helpers import Message, ExportDirectoryPathDialog
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)

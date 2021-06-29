@@ -44,17 +44,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.Qt import QHelpEvent
 
-from add_attribute import DialogAddAttribute
-from add_item_name import DialogAddItemName
-from case_file_manager import DialogCaseFileManager
-from confirm_delete import DialogConfirmDelete
-from GUI.base64_helper import *
-from GUI.ui_dialog_cases import Ui_Dialog_cases
-from helpers import Message, ExportDirectoryPathDialog
+from .add_attribute import DialogAddAttribute
+from .add_item_name import DialogAddItemName
+from .case_file_manager import DialogCaseFileManager
+from .confirm_delete import DialogConfirmDelete
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_cases import Ui_Dialog_cases
+from .helpers import Message, ExportDirectoryPathDialog
 
-from memo import DialogMemo
-from view_av import DialogViewAV
-from view_image import DialogViewImage
+from .memo import DialogMemo
+from .view_av import DialogViewAV
+from .view_image import DialogViewImage
 
 
 path = os.path.abspath(os.path.dirname(__file__))

@@ -31,13 +31,13 @@ import os
 from PIL import Image
 import sys
 import traceback
-import vlc
+import qualcoder.vlc as vlc
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
-from GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
-from color_selector import TextColor
+from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
+from .color_selector import TextColor
 
 
 path = os.path.abspath(os.path.dirname(__file__))
