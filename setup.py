@@ -39,7 +39,7 @@ else:
 
 setup(
     name='Qualcoder',
-    version='2.2',
+    version='2.5',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
     author_email='ccbogel@hotmail.com',
@@ -53,7 +53,7 @@ setup(
     ],
     keywords='qualitative data analysis',
     packages=find_packages(include=['qualcoder','qualcoder.*']),
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=[
         'pyqt5',
         'lxml',
