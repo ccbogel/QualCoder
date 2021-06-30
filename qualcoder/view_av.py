@@ -1515,6 +1515,80 @@ class DialogCodeAV(QtWidgets.QDialog):
                     #except RuntimeError as e:
                     #    pass
 
+    def keyPressEvent(self, event):
+        """ This works best without the modifiers.
+         As pressing Ctrl + E give the Ctrl but not the E.
+         These key presses are not used in edi mode.
+
+        A annotate - for current selection
+        Q Quick Mark with code - for current selection
+        I Tag important
+        M memo code - at clicked position
+        O Shortcut to cycle through overlapping codes - at clicked position
+        #S search text - may include current selection
+        R opens a context menu for recently used codes for marking text
+        """
+
+        if not self.ui.textEdit.hasFocus():
+            return
+        # Ignore all other key events if edit mode is active
+        if self.edit_mode:
+            return
+
+        key = event.key()
+        mod = QtGui.QGuiApplication.keyboardModifiers()
+
+        print("EVENT KEY PRESS")
+        cursor_pos = self.ui.textEdit.textCursor().position()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
+        codes_here = []
+        print("CT", self.code_text)
+        for item in self.code_text:
+            print(self.file_['start'], self.file_['end'])
+            if cursor_pos + self.file_['start'] >= item['pos0'] and \
+                    cursor_pos + self.file_['start'] <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                codes_here.append(item)
+
+        # Annotate selected
+        if key == QtCore.Qt.Key_A and selected_text != "":
+            self.annotate()
+            return
+        # Important  for coded text
+        if key == QtCore.Qt.Key_I:
+            self.set_important(cursor_pos)
+            return
+        # Memo for current code
+        if key == QtCore.Qt.Key_M:
+            self.coded_text_memo(cursor_pos)
+            return
+        # Overlapping codes cycle
+        now = datetime.datetime.now()
+        overlap_diff = now - self.overlap_timer
+        if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled() and overlap_diff.microseconds > 150000:
+            self.overlap_timer = datetime.datetime.now()
+            i = self.ui.comboBox_codes_in_text.currentIndex()
+            self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
+            if self.ui.comboBox_codes_in_text.currentIndex() < 1:
+                self.ui.comboBox_codes_in_text.setCurrentIndex(1)
+            return
+        # Quick mark selected
+        if key == QtCore.Qt.Key_Q and selected_text != "":
+            self.mark()
+            return
+        # Recent codes context menu
+        if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
+            self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+            return
+        '''# Search, with or without selected
+        if key == QtCore.Qt.Key_S and self.file_ is not None:
+            if selected_text == "":
+                self.ui.lineEdit_search.setFocus()
+            else:
+                self.ui.lineEdit_search.setText(selected_text)
+                self.search_for_text()
+                self.ui.pushButton_next.setFocus()'''
+
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
@@ -1584,7 +1658,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Annotate selected
+            '''# Annotate selected
             if key == QtCore.Qt.Key_A and selected_text != "":
                 self.annotate(self.ui.textEdit.textCursor().position())
                 return True
@@ -1609,7 +1683,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             # Recent codes menu
             if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
                 self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
-                return True
+                return True'''
 
         #  Ctrl S or Ctrl + P pause/play toggle
         if (key == QtCore.Qt.Key_S or key == QtCore.Qt.Key_P) and mods == QtCore.Qt.ControlModifier:
