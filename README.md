@@ -8,7 +8,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 
 ## INSTALLATION 
 
-### Linux
+### Linux installation
 
 ### Prerequisites
 You will need to have a `python3.6` or newer version installed.
@@ -35,9 +35,19 @@ You also need to run this command from the terminal for pdf importing:
 
 If your are not using the debian package:
 
-Make the install.sh executable and run the install.sh script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). 
+In the terminal, Go to the QualCoder-master folder, type:
 
-#### Fedora/CentOS/RHEL Linuxes
+`sudo python3 setup.py install`
+
+To run type:
+
+`qualcoder`
+
+Alternatively, go to the qualcoder directory and type:
+
+`python3 __main__.py`
+
+#### Fedora/CentOS/RHEL installation
 
 Retrieve the current package code from this repository
 
@@ -48,17 +58,6 @@ Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and run the `
 This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
 Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
-
-
-### Linux Use 
-
-`./install.sh`
-
-The qualcoder folder should be in the same directory as the install.sh script.
-
-This will install QualCoder in the /usr/share directory and create a launcher. 
-
-Alternatively go to the qualcoder directory and run in a terminal: `python3 __main__.py`
 
 
 ### Windows: 
@@ -77,14 +76,11 @@ The final step, install extra modules to Python. Type the letters "cmd" in the W
 
 `py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl py2exe`
 
-You can skip the py2exe instruction above, as of 30 June 2021. It is not actively used right now, but will be used in the future.
+(You can skip the py2exe instruction above. It is not actively used right now, but will be used in the future)
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
-Now, you should be able to run QualCoder by double-clicking the desktop shortcut.
-
-The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
-You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)  You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
 Run QualCoder from cmd.exe
 Move to the correct Drive.  e.g. C:  or P: or whatever the letter for the drive where qualcoder is stored.
