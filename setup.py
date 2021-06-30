@@ -25,8 +25,10 @@ if sys.platform == 'darwin':
 elif sys.platform == 'win32':
      extra_options = dict(
          setup_requires=['py2exe'],
-         app=[mainscript],
+         options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
+         windows = [{'script': mainscript}],
      )
+# older code above the bracket:  app=[mainscript],
 else:
      extra_options = dict(
          # Normally unix-like platforms will use "setup.py install"
