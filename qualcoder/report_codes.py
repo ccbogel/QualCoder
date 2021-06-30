@@ -864,24 +864,25 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.clearSelection()
 
         cur = self.app.conn.cursor()
-        sql = "select anid, fid, pos0, pos1, annotation.memo, annotation.owner, annotation.date, substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
+        sql = "select anid, fid, source.name, pos0, pos1, annotation.memo, annotation.owner, annotation.date, substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
         sql += "from annotation join source on source.id=annotation.fid "
         sql += "where source.fulltext is not null and fid in (" + self.file_ids + ") "
         # Coder limiter
         values = []
         if coder != "":
-            sql += " and annotation.owner=?"
+            sql += " and annotation.owner=? "
             values.append(coder)
         if search_text != "":
-            sql += " and instr(subtext, ?) is not null"
+            sql += " and instr(subtext, ?) is not null "
             values.append(search_text)
+        sql += " order by source.name, anid asc"
         if values == []:
             cur.execute(sql)
         else:
             cur.execute(sql, values)
         res = cur.fetchall()
         annotes = []
-        keys = "anid", "fid", "pos0", "pos1", "annotation", "owner", "date", "text"
+        keys = "anid", "fid", "filename", "pos0", "pos1", "annotation", "owner", "date", "text"
         for row in res:
             annotes.append(dict(zip(keys, row)))
 
@@ -903,7 +904,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.append(file_txt)
         self.ui.textEdit.append("==========")
         for a in annotes:
-            txt = "\n" + "anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
+            txt = "\n" + _("File") + ": " + a['filename'] + " anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
             txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
             txt += _("TEXT") + ": " + a['text'] + "\n"
             txt += _("ANNOTATION") + ": " + a['annotation']
