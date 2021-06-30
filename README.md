@@ -84,7 +84,9 @@ Now, you should be able to run QualCoder by double-clicking the desktop shortcut
 The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
-You can run QualCoder from cmd.exe. You need to Move to the qualcoder folder (using the cd command) and then type `py __main__.py`
+Run QualCoder from cmd.exe
+Move to the correct Drive.  e.g. C:  or P: or whatever the letter for the drive where qualcoder is stored.
+Then type `py -m qualcoder`
 
 
 ### MacOS
