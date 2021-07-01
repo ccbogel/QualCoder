@@ -286,7 +286,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.text_results:
             row['file_or_case'] = case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            title = '<span style=\"background-color:' + row['color'] + '\">'
+            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
+            title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
             if case_or_file == "File":
                 title += _(" File: ") + row['file_or_casename']
             else:
@@ -323,7 +324,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for counter, row in enumerate(self.image_results):
             row['file_or_case'] = case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            title = '<p><span style=\"background-color:' + row['color'] + '\">'
+            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
+            title = '<p><span style=\"background-color:' + row['color'] + fgc + '\">'
             if case_or_file == "Case":
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
@@ -361,7 +363,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.av_results:
             row['file_or_case'] = case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            title = '<span style=\"background-color:' + row['color'] + '\">'
+            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
+            title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
             if case_or_file == "Case":
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
