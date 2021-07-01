@@ -20,7 +20,6 @@ ui_dialog_refi_export_endings.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_comparisons.py \
-ui_dialog_report_code_summary.py \
 ui_dialog_report_file_summary.py \
 ui_dialog_select_items.py \
 ui_dialog_settings.py \
