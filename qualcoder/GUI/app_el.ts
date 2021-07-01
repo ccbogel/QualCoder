@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="el_GR" sourcelanguage="en">
+<!DOCTYPE TS>
+<TS version="2.1" language="el_GR" sourcelanguage="en">
+<context>
+    <name>DialogAddAttribute</name>
+    <message>
+        <location filename="ui_attribute.py" line="42"/>
+        <source>Add Attribute</source>
+        <translation>Προσθήκη χαρακτηριστικού</translation>
+    </message>
+    <message>
+        <location filename="ui_attribute.py" line="43"/>
+        <source>Attribute name:</source>
+        <translation>Όνομα χαρακτηριστικού:</translation>
+    </message>
+    <message>
+        <location filename="ui_attribute.py" line="44"/>
+        <source>Character</source>
+        <translation>Χαρακτήρας</translation>
+    </message>
+    <message>
+        <location filename="ui_attribute.py" line="45"/>
+        <source>Numeric</source>
+        <translation>Αριθμητικό</translation>
+    </message>
+</context>
 <context>
     <name>Dialog_CodeRelations</name>
     <message>
@@ -137,38 +161,43 @@
 <context>
     <name>Dialog_StartAndEndMarks</name>
     <message>
-        <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
+        <location filename="ui_dialog_start_and_end_marks.py" line="62"/>
         <source>Define start and end marks for auto assigning</source>
         <translation>Ορίστε τα σημάδια έναρξης και λήξης για αυτόματη εκχώρηση</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>Define the start and end text marks.This allows parts of files to be allocated to the selected case.</source>
-        <translation>Ορίστε τα σημάδια κειμένου έναρξης και λήξης. Αυτό επιτρέπει την κατανομή τμημάτων αρχείων στην επιλεγμένη περίπτωση.</translation>
+        <translation type="obsolete">Ορίστε τα σημάδια κειμένου έναρξης και λήξης. Αυτό επιτρέπει την κατανομή τμημάτων αρχείων στην επιλεγμένη περίπτωση.</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
         <source>Case:</source>
-        <translation>Υπόθεση:</translation>
+        <translation type="obsolete">Υπόθεση:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_start_and_end_marks.py" line="68"/>
+        <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>Start mark</source>
         <translation>Έναρξη σήματος</translation>
     </message>
     <message>
-        <location filename="ui_dialog_start_and_end_marks.py" line="69"/>
+        <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
         <source>End mark</source>
         <translation>Τέλος</translation>
     </message>
     <message>
-        <location filename="ui_dialog_start_and_end_marks.py" line="70"/>
+        <location filename="ui_dialog_start_and_end_marks.py" line="67"/>
         <source>File(s):</source>
         <translation>Αρχεία:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_start_and_end_marks.py" line="67"/>
+        <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
         <source>.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_start_and_end_marks.py" line="63"/>
+        <source>Define the start and end text marks.</source>
         <translation></translation>
     </message>
 </context>
@@ -264,17 +293,17 @@
 <context>
     <name>Dialog_cases</name>
     <message>
-        <location filename="ui_dialog_cases.py" line="98"/>
+        <location filename="ui_dialog_cases.py" line="102"/>
         <source>Cases</source>
         <translation>Διαγραφή περίπτωση</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="99"/>
+        <location filename="ui_dialog_cases.py" line="103"/>
         <source>Click on a case name to view the case. Double click the name to edit the case name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
         <translation>Κάντε κλικ σε ένα όνομα περίπτωσης για να δείτε την υπόθεση. Κάντε διπλό κλικ στο όνομα για να επεξεργαστείτε το όνομα της υπόθεσης. Κάντε κλικ στο Memo για να επεξεργαστείτε ένα σημείωμα για την υπόθεση. Κάντε κλικ στο Files για να συνδέσετε αρχεία και να υποβάλετε κείμενο στη θήκη</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="100"/>
+        <location filename="ui_dialog_cases.py" line="104"/>
         <source>Cases: </source>
         <translation>Διαγραφή περίπτωση:</translation>
     </message>
@@ -294,12 +323,12 @@
         <translation type="obsolete">Προσθήκη χαρακτηριστικών</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="101"/>
+        <location filename="ui_dialog_cases.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προσθήκη περίπτωση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="102"/>
+        <location filename="ui_dialog_cases.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Διαγραφή θήκης&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -309,40 +338,45 @@
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εισαγωγές&lt;/p&gt;&lt;p&gt;Εισαγωγή από ένα &lt;span style=&quot; font-weight:600;&quot;&gt;οριοθετημένο με κόμμα&lt;/span&gt; csv αρχείο.&lt;/p&gt;&lt;p&gt;Το αρχείο πρέπει να έχει μια γραμμή κεφαλίδας και η πρώτη στήλη πρέπει να έχει τα μοναδικά ονόματα πεζών ή αναγνωριστικά. Οι επόμενες στήλες είναι χαρακτηριστικά για κάθε περίπτωση.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="104"/>
+        <location filename="ui_dialog_cases.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προσθήκη χαρακτηριστικού&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cases.py" line="103"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_cases.py" line="105"/>
-        <source>.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_cases.py" line="106"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="ui_dialog_cases.py" line="107"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εισαγωγή υποθέσεων&lt;/p&gt;&lt;p&gt;Εισαγωγή από αρχείο csv ή xlsx.&lt;/p&gt;&lt;p&gt;Το αρχείο πρέπει να έχει μια γραμμή κεφαλίδας και η πρώτη στήλη πρέπει να περιέχει τα μοναδικά ονόματα ή αναγνωριστικά υποθέσεων. Οι επόμενες στήλες είναι χαρακτηριστικά για κάθε υπόθεση.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_cases.py" line="109"/>
+        <source>.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_cases.py" line="110"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Διαχειριστής αρχείων υποθέσεων</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_cases.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Εξαγωγή χαρακτηριστικών ως αρχείο csv</translation>
+        <translation>Εξαγωγή χαρακτηριστικών ως αρχείο csv</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_cases.py" line="112"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
     </message>
 </context>
 <context>
     <name>Dialog_code_av</name>
     <message>
-        <location filename="ui_dialog_code_av.py" line="155"/>
+        <location filename="ui_dialog_code_av.py" line="164"/>
         <source>Code Audio Video</source>
         <translation>Κωδικός ήχου βίντεο</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="177"/>
+        <location filename="ui_dialog_code_av.py" line="189"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transcript&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αντίγραφο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -372,27 +406,27 @@
         <translation type="obsolete">Διάρκεια:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="159"/>
+        <location filename="ui_dialog_code_av.py" line="168"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πατήστε το κουμπί Έναρξη τμήματος για να ξεκινήσετε την κωδικοποίηση του τμήματος ήχου / βίντεο. Πατήστε το κουμπί Τερματισμός τμήματος για να τερματίσετε το κωδικοποιημένο τμήμα.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="160"/>
+        <location filename="ui_dialog_code_av.py" line="169"/>
         <source>Start segment</source>
         <translation>Έναρξη τμήματος</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="161"/>
+        <location filename="ui_dialog_code_av.py" line="170"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Όταν δημιουργείται ένα τμήμα ήχου ή βίντεο, επιλέξτε έναν κωδικό από το δέντρο κωδικών, κάντε δεξί κλικ στον κώδικα και αντιστοιχίστε το τμήμα στον κώδικα.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="162"/>
+        <location filename="ui_dialog_code_av.py" line="171"/>
         <source>Segment:</source>
         <translation>Τμήμα:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="163"/>
+        <location filename="ui_dialog_code_av.py" line="172"/>
         <source>Coder:</source>
         <translation>Κωδικοποιητής:</translation>
     </message>
@@ -404,15 +438,15 @@
     <message>
         <location filename="ui_dialog_code_av.py" line="164"/>
         <source>Audio:</source>
-        <translation>Ήχος:</translation>
+        <translation type="obsolete">Ήχος:</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="165"/>
         <source>Scroll transcript while playing. (Transcript cannot be coded).</source>
-        <translation>Μετακινηθείτε μεταγραφή κατά την αναπαραγωγή. (Η μεταγραφή δεν μπορεί να κωδικοποιηθεί).</translation>
+        <translation type="obsolete">Μετακινηθείτε μεταγραφή κατά την αναπαραγωγή. (Η μεταγραφή δεν μπορεί να κωδικοποιηθεί).</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="166"/>
+        <location filename="ui_dialog_code_av.py" line="175"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;    Αυξήστε το ρυθμό αναπαραγωγής στο μέγιστο 2x&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Ο ρυθμός αναπαραγωγής της ασθένειας στο ελάχιστο 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -422,22 +456,22 @@
         <translation type="obsolete">Τιμή:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="156"/>
+        <location filename="ui_dialog_code_av.py" line="165"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Κάντε αριστερό κλικ στο ρυθμιστικό και σύρετε αριστερά ή δεξιά για να αλλάξετε τη θέση του βίντεο.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="157"/>
+        <location filename="ui_dialog_code_av.py" line="166"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Παίζω / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S Παίζω/pause&lt;/p&gt;&lt;p&gt;Ctrl + P Παίζω/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="158"/>
+        <location filename="ui_dialog_code_av.py" line="167"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;τόμος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="168"/>
+        <location filename="ui_dialog_code_av.py" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Χρόνος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -452,12 +486,12 @@
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προώθηση 30 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Alt + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="171"/>
+        <location filename="ui_dialog_code_av.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Μειώστε το ρυθμό αναπαραγωγής&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="172"/>
+        <location filename="ui_dialog_code_av.py" line="181"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αυξήστε το ρυθμό παιχνιδιού&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -467,39 +501,64 @@
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πίσω 5 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="167"/>
+        <location filename="ui_dialog_code_av.py" line="176"/>
         <source>1.0x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="169"/>
+        <location filename="ui_dialog_code_av.py" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Επανάληψη 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Επανάληψη 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="170"/>
+        <location filename="ui_dialog_code_av.py" line="179"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Shift + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Προώθηση 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + F &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Προώθηση 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + F &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="173"/>
+        <location filename="ui_dialog_code_av.py" line="182"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; 5 δευτερόλεπτα προς τα πίσω &lt;/p&gt; &lt;p&gt; Alt + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; 5 δευτερόλεπτα προς τα πίσω &lt;/p&gt; &lt;p&gt; Alt + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="185"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αρχείο με την τελευταία κωδικοποίηση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="186"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="187"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Υπόμνημα αρχείου</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="174"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αρχείο με την τελευταία κωδικοποίηση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>Scroll transcript while playing.</source>
+        <translation>Κείμενο κύλισης κατά την αναπαραγωγή.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="175"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <location filename="ui_dialog_code_av.py" line="183"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="176"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="ui_dialog_code_av.py" line="184"/>
+        <source>Show codings flagged important</source>
+        <translation>Εμφάνιση κωδικοποιήσεων επισημασμένων ως σημαντικών</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="188"/>
+        <source>Show files with selected file attributes</source>
+        <translation>Εμφάνιση αρχείων με επιλεγμένα χαρακτηριστικά αρχείου</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_av.py" line="173"/>
+        <source>Cannot code text when play transcript box is checked.</source>
+        <translation>Δεν είναι δυνατή η κωδικοποίηση κειμένου όταν είναι επιλεγμένο το πλαίσιο μεταγραφής αναπαραγωγής.</translation>
     </message>
 </context>
 <context>
@@ -513,7 +572,7 @@
 <context>
     <name>Dialog_code_image</name>
     <message>
-        <location filename="ui_dialog_code_image.py" line="113"/>
+        <location filename="ui_dialog_code_image.py" line="121"/>
         <source>View Image</source>
         <translation>Προβολή εικόνας</translation>
     </message>
@@ -528,7 +587,7 @@
         <translation type="obsolete">Επιλέξτε εικόνα</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="115"/>
+        <location filename="ui_dialog_code_image.py" line="123"/>
         <source>Coder:</source>
         <translation>Κωδικοποιητής:</translation>
     </message>
@@ -543,34 +602,44 @@
         <translation type="obsolete">Εμφάνιση άλλων κωδικοποιητών</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="116"/>
+        <location filename="ui_dialog_code_image.py" line="124"/>
         <source>Code:</source>
         <translation>Κώδικας:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="121"/>
+        <location filename="ui_dialog_code_image.py" line="130"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Σημείωμα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="117"/>
+        <location filename="ui_dialog_code_image.py" line="125"/>
         <source>Coded area:</source>
-        <translation type="unfinished">Κωδικοποιημένη περιοχή: </translation>
+        <translation>Κωδικοποιημένη περιοχή: </translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="118"/>
+        <location filename="ui_dialog_code_image.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Αυτή η κωδικοποιημένη περιοχή</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="119"/>
+        <location filename="ui_dialog_code_image.py" line="128"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αρχείο με την τελευταία κωδικοποίηση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="120"/>
+        <location filename="ui_dialog_code_image.py" line="129"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_image.py" line="127"/>
+        <source>Show codings flagged important</source>
+        <translation>Εμφάνιση κωδικοποιήσεων επισημασμένων ως σημαντικών</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_image.py" line="131"/>
+        <source>Show files using selected file attributes</source>
+        <translation>Εμφάνιση αρχείων που χρησιμοποιούν επιλεγμένα χαρακτηριστικά αρχείου</translation>
     </message>
 </context>
 <context>
@@ -578,18 +647,18 @@
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="47"/>
         <source>Code summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Περίληψη κώδικα</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="48"/>
         <source>Code summary report</source>
-        <translation type="unfinished"></translation>
+        <translation>Συνοπτική έκθεση κώδικα</translation>
     </message>
 </context>
 <context>
     <name>Dialog_code_text</name>
     <message>
-        <location filename="ui_dialog_code_text.py" line="206"/>
+        <location filename="ui_dialog_code_text.py" line="230"/>
         <source>Code Text</source>
         <translation>Κείμενο κώδικα</translation>
     </message>
@@ -609,12 +678,12 @@
         <translation type="obsolete">Αυτόματος κωδικός</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="208"/>
+        <location filename="ui_dialog_code_text.py" line="232"/>
         <source>Coder:</source>
         <translation>Κωδικοποιητής:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="209"/>
+        <location filename="ui_dialog_code_text.py" line="233"/>
         <source>Right click below to create new codes and categories</source>
         <translation>Κάντε δεξί κλικ παρακάτω για να δημιουργήσετε νέους κωδικούς και κατηγορίες</translation>
     </message>
@@ -624,12 +693,12 @@
         <translation type="obsolete">Αναζήτηση κειμένου:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="210"/>
+        <location filename="ui_dialog_code_text.py" line="234"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναζήτηση κειμένου.&lt;/p&gt;&lt;p&gt;έλεγχος &lt;span style=&quot; font-weight:600;&quot;&gt;τη υπόθεση&lt;/span&gt; για αναζήτηση με κεφαλαία γράμματα&lt;/p&gt;&lt;p&gt;έλεγχος &lt;span style=&quot; font-weight:600;&quot;&gt;Ολα τα αρχεία&lt;/span&gt; για αναζήτηση σε όλα τα αρχεία&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="211"/>
+        <location filename="ui_dialog_code_text.py" line="235"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ευαίσθητη υπόθεση αναζήτησης&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -639,7 +708,7 @@
         <translation type="obsolete">Ευαίσθητη υπόθεση</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="212"/>
+        <location filename="ui_dialog_code_text.py" line="236"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;αναζήτηση σε όλα τα αρχεία&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -649,119 +718,139 @@
         <translation type="obsolete">Ολα τα αρχεία</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="214"/>
+        <location filename="ui_dialog_code_text.py" line="238"/>
         <source>No overlapping codes</source>
         <translation>Δεν υπάρχουν αλληλεπικαλυπτόμενοι κωδικοί</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="207"/>
+        <location filename="ui_dialog_code_text.py" line="231"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αυτόματος κωδικός με ακριβές κείμενο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="216"/>
+        <location filename="ui_dialog_code_text.py" line="239"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προηγούμενος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="217"/>
+        <location filename="ui_dialog_code_text.py" line="240"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="218"/>
+        <location filename="ui_dialog_code_text.py" line="241"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναζήτηση κειμένου. Όλα τα αρχεία κειμένου.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="219"/>
+        <location filename="ui_dialog_code_text.py" line="242"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναζήτηση κειμένου. Ευαίσθητη υπόθεση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="220"/>
+        <location filename="ui_dialog_code_text.py" line="243"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Τμήμα κειμένου σε αυτόματες προτάσεις κώδικα. Αυτό το αρχείο.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="221"/>
+        <location filename="ui_dialog_code_text.py" line="244"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Τμήμα κειμένου σε αυτόματες προτάσεις κώδικα. Ολα τα αρχεία.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="222"/>
+        <location filename="ui_dialog_code_text.py" line="245"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναίρεση αυτόματης κωδικοποίησης&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="231"/>
+        <location filename="ui_dialog_code_text.py" line="256"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="229"/>
+        <location filename="ui_dialog_code_text.py" line="254"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αρχείο με την τελευταία κωδικοποίηση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="230"/>
+        <location filename="ui_dialog_code_text.py" line="255"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Μετάβαση στο σελιδοδείκτη&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="223"/>
+        <location filename="ui_dialog_code_text.py" line="246"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Διαγράψτε όλους τους κωδικούς από αυτόν τον κωδικοποιητή από αυτό το αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="235"/>
+        <location filename="ui_dialog_code_text.py" line="261"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εμφάνιση επόμενης κωδικοποίησης επιλεγμένου κώδικα.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="234"/>
+        <location filename="ui_dialog_code_text.py" line="260"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εμφάνιση προηγούμενης κωδικοποίησης επιλεγμένου κώδικα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="233"/>
+        <location filename="ui_dialog_code_text.py" line="259"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εμφάνιση όλων των κωδικοποιήσεων&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="232"/>
+        <location filename="ui_dialog_code_text.py" line="257"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Υπόμνημα αρχείου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="224"/>
+        <location filename="ui_dialog_code_text.py" line="247"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επιλογή σχολιασμού&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="225"/>
+        <location filename="ui_dialog_code_text.py" line="248"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Υπόμνημα για αυτήν την κωδικοποιημένη ενότητα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="213"/>
+        <location filename="ui_dialog_code_text.py" line="237"/>
         <source>0 / 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="215"/>
-        <source>.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="227"/>
+        <location filename="ui_dialog_code_text.py" line="250"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Μέγεθος γραμματοσειράς κειμένου</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="228"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Η αναζήτηση χρησιμοποιεί συναρτήσεις Regex. &lt;/p&gt; &lt;p&gt; Μια κουκκίδα &quot;.&quot; χρησιμοποιείται ως μπαλαντέρ, π.χ. Τα «.ears» θα ταιριάζουν με «αρκούδες» και «χρόνια». &lt;/p&gt; &lt;p&gt; A &apos;?&apos; αφού ένας χαρακτήρας ταιριάζει με μία ή καμία φορά με αυτόν τον χαρακτήρα, π.χ. Οι «αρκούδες;» ταιριάζουν με τις «αρκούδες» και τις «αρκούδες» &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;background-color: transparent;&quot;&gt; A &apos;* &quot;αφού ένας χαρακτήρας ταιριάζει με μηδέν ή περισσότερες φορές. &lt;/span&gt;&lt;/p&gt; &lt;p&gt; &lt;span style = &quot;background-color: transparent;&quot;&gt; ‘&lt;/span&gt; \. θα ταιριάζει με το σύμβολο κουκκίδων, το σύμβολο \ \? Το &quot;\ n&quot; θα ταιριάζει με το σύμβολο λήξης γραμμής. &lt;/p&gt; &lt;p&gt; Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;text-decoration: underline; color: # 000080;&quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt;&lt;/body&gt; &lt;/html&gt;</translation>
+        <location filename="ui_dialog_code_text.py" line="251"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Η αναζήτηση χρησιμοποιεί συναρτήσεις Regex. &lt;/p&gt; &lt;p&gt; Μια κουκκίδα &quot;.&quot; χρησιμοποιείται ως μπαλαντέρ, π.χ. Τα «.ears» θα ταιριάζουν με «αρκούδες» και «χρόνια». &lt;/p&gt; &lt;p&gt; A &apos;?&apos; αφού ένας χαρακτήρας ταιριάζει με μία ή καμία φορά με αυτόν τον χαρακτήρα, π.χ. Οι «αρκούδες;» ταιριάζουν με τις «αρκούδες» και τις «αρκούδες» &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;background-color: transparent;&quot;&gt; A &apos;* &quot;αφού ένας χαρακτήρας ταιριάζει με μηδέν ή περισσότερες φορές. &lt;/span&gt;&lt;/p&gt; &lt;p&gt; &lt;span style = &quot;background-color: transparent;&quot;&gt; ‘&lt;/span&gt; \. θα ταιριάζει με το σύμβολο κουκκίδων, το σύμβολο \ \? Το &quot;\ n&quot; θα ταιριάζει με το σύμβολο λήξης γραμμής. &lt;/p&gt; &lt;p&gt; Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;text-decoration: underline; color: # 000080;&quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt;&lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="249"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Μέγεθος γραμματοσειράς κειμένου.&lt;/p&gt;&lt;p&gt;Ένα προεπιλεγμένο μέγεθος μπορεί να οριστεί στις Ρυθμίσεις.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="252"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Αυτόματη κωδικοποίηση με χρήση σημείων αρχής και τέλους.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="253"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="258"/>
+        <source>Show files with file attributes</source>
+        <translation>Εμφάνιση αρχείων με χαρακτηριστικά αρχείου</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="262"/>
+        <source>Show codings flagged important</source>
+        <translation>Εμφάνιση κωδικοποιήσεων επισημασμένων ως σημαντικών</translation>
     </message>
 </context>
 <context>
@@ -805,12 +894,12 @@
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="47"/>
         <source>File summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Περίληψη αρχείου</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="48"/>
         <source>File summary report</source>
-        <translation type="unfinished"></translation>
+        <translation>Συνοπτική αναφορά αρχείου</translation>
     </message>
 </context>
 <context>
@@ -824,7 +913,7 @@
 <context>
     <name>Dialog_journals</name>
     <message>
-        <location filename="ui_dialog_journals.py" line="65"/>
+        <location filename="ui_dialog_journals.py" line="112"/>
         <source>Journals</source>
         <translation>Περιοδικά</translation>
     </message>
@@ -844,44 +933,94 @@
         <translation type="obsolete">Διαγράφω</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="69"/>
+        <location filename="ui_dialog_journals.py" line="116"/>
         <source>Journal:</source>
         <translation>Εφημερίδα:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="70"/>
+        <location filename="ui_dialog_journals.py" line="117"/>
         <source>Journals: </source>
         <translation>Περιοδικά:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="72"/>
+        <location filename="ui_dialog_journals.py" line="128"/>
         <source>Name</source>
         <translation>Ονομα</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="74"/>
+        <location filename="ui_dialog_journals.py" line="130"/>
         <source>Date</source>
         <translation>Ημερομηνία</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="76"/>
+        <location filename="ui_dialog_journals.py" line="132"/>
         <source>Coder</source>
         <translation>Κωδικοποιητής</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="66"/>
+        <location filename="ui_dialog_journals.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Δημιουργώ&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="67"/>
+        <location filename="ui_dialog_journals.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εξαγωγή&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="68"/>
+        <location filename="ui_dialog_journals.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Διαγράφω&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="118"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all journals as single text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Εξαγωγή όλων των περιοδικών ως ενιαίο αρχείο κειμένου.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="119"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="120"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="121"/>
+        <source>0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="122"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναζήτηση για κείμενο.&lt;/p&gt;&lt;p&gt;επιλέξτε &lt;span style=&quot; font-weight:600;&quot;&gt;Όλα τα περιοδικά&lt;/span&gt; για αναζήτηση σε όλα τα περιοδικά&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="123"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>αναζήτηση σε όλα τα περιοδικά</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="124"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προηγούμενος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="125"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>αναζήτηση σε όλα τα περιοδικά</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="126"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_journals.py" line="134"/>
+        <source>jid</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -920,7 +1059,7 @@
 <context>
     <name>Dialog_manage_files</name>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="79"/>
+        <location filename="ui_dialog_manage_files.py" line="83"/>
         <source>Files</source>
         <translation>Αρχεία</translation>
     </message>
@@ -960,59 +1099,64 @@
         <translation type="obsolete">Προσθήκη χαρακτηριστικού</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="90"/>
+        <location filename="ui_dialog_manage_files.py" line="95"/>
         <source>Files:</source>
         <translation>Αρχεία:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="80"/>
+        <location filename="ui_dialog_manage_files.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προβολή αρχείου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="81"/>
+        <location filename="ui_dialog_manage_files.py" line="85"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Δημιουργήστε ένα αρχείο κειμένου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="82"/>
+        <location filename="ui_dialog_manage_files.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export selected file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εξαγωγή επιλεγμένου αρχείου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="83"/>
+        <location filename="ui_dialog_manage_files.py" line="87"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επιλέξτε αρχεία για διαγραφή&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="84"/>
+        <location filename="ui_dialog_manage_files.py" line="88"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εισαγωγή αρχείου στο φάκελο έργου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="85"/>
+        <location filename="ui_dialog_manage_files.py" line="89"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προσθήκη χαρακτηριστικού&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="86"/>
+        <location filename="ui_dialog_manage_files.py" line="90"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Σύνδεση με ένα αρχείο που βρίσκεται εκτός του φακέλου έργου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="87"/>
+        <location filename="ui_dialog_manage_files.py" line="91"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εισαγωγή συνδεδεμένου αρχείου στο φάκελο έργου&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="88"/>
+        <location filename="ui_dialog_manage_files.py" line="92"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file from project folder as a linked file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εξαγωγή αρχείου από φάκελο έργου ως συνδεδεμένο αρχείο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="89"/>
+        <location filename="ui_dialog_manage_files.py" line="93"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes as csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Εξαγωγή χαρακτηριστικών ως αρχείο csv</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_manage_files.py" line="94"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
     </message>
 </context>
 <context>
@@ -1105,7 +1249,7 @@
 <context>
     <name>Dialog_reportCodings</name>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="118"/>
+        <location filename="ui_dialog_report_codings.py" line="128"/>
         <source>Reports</source>
         <translation>Αναφορές</translation>
     </message>
@@ -1120,7 +1264,7 @@
         <translation type="obsolete">Αρχεία</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="119"/>
+        <location filename="ui_dialog_report_codings.py" line="129"/>
         <source>Text limiter:</source>
         <translation>Περιοριστής κειμένου:</translation>
     </message>
@@ -1130,12 +1274,12 @@
         <translation type="obsolete">αζήτηση</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="121"/>
+        <location filename="ui_dialog_report_codings.py" line="131"/>
         <source>Coder:</source>
         <translation>ωδικοποιητής:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="122"/>
+        <location filename="ui_dialog_report_codings.py" line="132"/>
         <source>Attributes</source>
         <translation>Γνωρίσματα:</translation>
     </message>
@@ -1145,7 +1289,7 @@
         <translation type="obsolete">Εξαγωγή:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="128"/>
+        <location filename="ui_dialog_report_codings.py" line="138"/>
         <source>Counts:</source>
         <translation>Μετράει:</translation>
     </message>
@@ -1155,49 +1299,64 @@
         <translation type="obsolete">Επιλογές αναζήτησης:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="120"/>
+        <location filename="ui_dialog_report_codings.py" line="130"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Αναζήτηση</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="123"/>
+        <location filename="ui_dialog_report_codings.py" line="133"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εξαγωγή&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="124"/>
+        <location filename="ui_dialog_report_codings.py" line="134"/>
         <source>html</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="125"/>
+        <location filename="ui_dialog_report_codings.py" line="135"/>
         <source>txt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="126"/>
+        <location filename="ui_dialog_report_codings.py" line="136"/>
         <source>odt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="127"/>
+        <location filename="ui_dialog_report_codings.py" line="137"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="129"/>
+        <location filename="ui_dialog_report_codings.py" line="139"/>
         <source>Coding report</source>
         <translation>Αναφορά κωδικοποίησης</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="130"/>
+        <location filename="ui_dialog_report_codings.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Επιλογές Matrix</translation>
+        <translation>Επιλογές Matrix</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="131"/>
+        <location filename="ui_dialog_report_codings.py" line="141"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Επιλογές μήτρας υπόθεσης</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_report_codings.py" line="142"/>
+        <source>Filter results for those marked Important</source>
+        <translation>Φιλτράρετε τα αποτελέσματα για εκείνα που επισημαίνονται ως Σημαντικά</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_report_codings.py" line="143"/>
+        <source>Important</source>
+        <translation>Σημαντικό</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_report_codings.py" line="145"/>
+        <source>Memo reporting options</source>
+        <translation>Επιλογές αναφοράς υπομνήματος</translation>
     </message>
 </context>
 <context>
@@ -1306,57 +1465,57 @@ Wildcards for &apos;like&apos; are % and _</source>
 <context>
     <name>Dialog_settings</name>
     <message>
-        <location filename="ui_dialog_settings.py" line="125"/>
+        <location filename="ui_dialog_settings.py" line="128"/>
         <source>Settings</source>
         <translation>Ρυθμίσεις</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="126"/>
+        <location filename="ui_dialog_settings.py" line="129"/>
         <source>This Coder Name</source>
         <translation>Αυτό το όνομα κωδικοποιητή</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="127"/>
+        <location filename="ui_dialog_settings.py" line="130"/>
         <source>General font and size</source>
         <translation>Γενική γραμματοσειρά και μέγεθος</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="129"/>
+        <location filename="ui_dialog_settings.py" line="132"/>
         <source>Show IDs</source>
         <translation>Εμφάνιση αναγνωριστικών</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="131"/>
+        <location filename="ui_dialog_settings.py" line="134"/>
         <source>Default project directory</source>
         <translation>Προεπιλεγμένος κατάλογος έργου</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="132"/>
+        <location filename="ui_dialog_settings.py" line="135"/>
         <source>Coders</source>
         <translation>Κωδικοποιητές</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="133"/>
+        <location filename="ui_dialog_settings.py" line="136"/>
         <source>Font size for categories and codes tree</source>
         <translation>Μέγεθος γραμματοσειράς για δέντρα κατηγοριών και κωδικών</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="134"/>
+        <location filename="ui_dialog_settings.py" line="137"/>
         <source>Language</source>
         <translation>Γλώσσα</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="135"/>
+        <location filename="ui_dialog_settings.py" line="138"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Κλείστε και ανοίξτε το λογισμικό για την αλλαγή της γλώσσας.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="136"/>
+        <location filename="ui_dialog_settings.py" line="139"/>
         <source>Backup project folder every time project is opened</source>
         <translation>Εφεδρικός φάκελος έργου κάθε φορά που ανοίγετε το έργο</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="137"/>
+        <location filename="ui_dialog_settings.py" line="140"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.
 You must store these files elsewhere.</source>
@@ -1365,39 +1524,44 @@ You must store these files elsewhere.</source>
 Πρέπει να αποθηκεύσετε αυτά τα αρχεία αλλού.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="141"/>
+        <location filename="ui_dialog_settings.py" line="144"/>
         <source>Time format</source>
         <translation>Μορφή ώρας</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="143"/>
+        <location filename="ui_dialog_settings.py" line="146"/>
         <source>Speaker format</source>
         <translation>Μορφή ηχείου</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="128"/>
+        <location filename="ui_dialog_settings.py" line="131"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Εμφάνιση των αναγνωριστικών αριθμών για αρχεία, θήκες, κωδικούς κ.λπ.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="140"/>
+        <location filename="ui_dialog_settings.py" line="143"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Χρησιμοποιείται κατά την εισαγωγή της θέσης ώρας στη μεταγραφή&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="142"/>
+        <location filename="ui_dialog_settings.py" line="145"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Χρησιμοποιείται κατά την εισαγωγή του ονόματος του ηχείου στη μεταγραφή&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="130"/>
+        <location filename="ui_dialog_settings.py" line="133"/>
         <source>/</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="144"/>
+        <location filename="ui_dialog_settings.py" line="147"/>
         <source>Font size for documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Μέγεθος γραμματοσειράς για έγγραφα</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_settings.py" line="148"/>
+        <source>Dark mode</source>
+        <translation>Σκοτεινή λειτουργία</translation>
     </message>
 </context>
 <context>
@@ -1547,19 +1711,19 @@ You must store these files elsewhere.</source>
 <context>
     <name>Dialog_view_av</name>
     <message>
-        <location filename="ui_dialog_view_av.py" line="126"/>
+        <location filename="ui_dialog_view_av.py" line="154"/>
         <source>View Audio Video</source>
         <translation>Προβολή ήχου βίντεο</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="127"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Σημείωμα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Σημείωμα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="128"/>
         <source>Memo:</source>
-        <translation>Σημείωμα:</translation>
+        <translation type="obsolete">Σημείωμα:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1567,17 +1731,17 @@ You must store these files elsewhere.</source>
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Για επαναφορά 3 δευτερολέπτων. Στο πλαίσιο εισαγωγής κειμένου, πατήστε Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="130"/>
+        <location filename="ui_dialog_view_av.py" line="170"/>
         <source>Transcription:</source>
         <translation>Μεταγραφή:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="131"/>
+        <location filename="ui_dialog_view_av.py" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προσθέστε ένα όνομα ηχείου στις συντομεύσεις. Στο πλαίσιο εισαγωγής κειμένου πατήστε Ctrl + N&lt;/p&gt;&lt;p&gt;Εισαγάγετε ένα ηχείο σε μεταγραφή. Στο πλαίσιο εισαγωγής κειμένου, πατήστε Ctrl + 1 έως Ctrl + 8 για το όνομα των ηχείων.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="132"/>
+        <location filename="ui_dialog_view_av.py" line="172"/>
         <source>Speakers:</source>
         <translation>Ηχεία:</translation>
     </message>
@@ -1607,17 +1771,17 @@ You must store these files elsewhere.</source>
         <translation type="obsolete">Διάρκεια:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="135"/>
+        <location filename="ui_dialog_view_av.py" line="158"/>
         <source>Audio:</source>
         <translation>Ήχος:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="136"/>
+        <location filename="ui_dialog_view_av.py" line="159"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
         <translation>Μετακινηθείτε μεταγραφή κατά την αναπαραγωγή. (Η μεταγραφή είναι μόνο για ανάγνωση)</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="137"/>
+        <location filename="ui_dialog_view_av.py" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; αύξηση του ρυθμού παιχνιδιού, μέγιστο 2,0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; μείωση του ποσοστού παιχνιδιού, ελάχιστο 0,1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -1629,83 +1793,118 @@ You must store these files elsewhere.</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="145"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Κάντε αριστερό κλικ στο ρυθμιστικό και σύρετε αριστερά ή δεξιά για να αλλάξετε τη θέση του βίντεο.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Κάντε αριστερό κλικ στο ρυθμιστικό και σύρετε αριστερά ή δεξιά για να αλλάξετε τη θέση του βίντεο.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="133"/>
+        <location filename="ui_dialog_view_av.py" line="156"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Αναπαραγωγή / Παύση&lt;/p&gt;&lt;p&gt;Ctrl + S Αναπαραγωγή / Παύση&lt;/p&gt;&lt;p&gt;Ctrl + P Αναπαραγωγή / Παύση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="134"/>
+        <location filename="ui_dialog_view_av.py" line="157"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ενταση&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="139"/>
+        <location filename="ui_dialog_view_av.py" line="162"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Χρόνος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="140"/>
+        <location filename="ui_dialog_view_av.py" line="163"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Μειώστε το ρυθμό αναπαραγωγής&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="141"/>
+        <location filename="ui_dialog_view_av.py" line="164"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;αύξηση του ποσοστού παιχνιδιού&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="." line="7274595"/>
+        <location filename="ui_dialog_view_av.py" line="165"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πίσω 5 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πίσω 5 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="." line="7274595"/>
+        <location filename="ui_dialog_view_av.py" line="166"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πίσω 30 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Πίσω 30 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="." line="7274595"/>
+        <location filename="ui_dialog_view_av.py" line="167"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Alt + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προώθηση 30 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Alt + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προώθηση 30 δευτερόλεπτα&lt;/p&gt;&lt;p&gt;Alt + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="129"/>
+        <location filename="ui_dialog_view_av.py" line="169"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_av.py" line="138"/>
+        <location filename="ui_dialog_view_av.py" line="161"/>
         <source>1.0x</source>
         <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="142"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; 5 δευτερόλεπτα προς τα πίσω &lt;/p&gt; &lt;p&gt; Alt + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; 5 δευτερόλεπτα προς τα πίσω &lt;/p&gt; &lt;p&gt; Alt + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="143"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Επανάληψη 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Επανάληψη 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + R &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="144"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Shift + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Προώθηση 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + F &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt; &lt;p&gt; Προώθηση 30 δευτερολέπτων &lt;/p&gt; &lt;p&gt; Shift + F &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="155"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Κάντε αριστερό κλικ στο κουμπί του ρυθμιστικού και σύρετε αριστερά ή δεξιά για να αλλάξετε τη θέση ήχου/βίντεο.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="168"/>
+        <source>Help</source>
+        <translation>Βοήθεια</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="173"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Αναζήτηση κειμένου.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="174"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Επόμενο&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="175"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="176"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Προηγούμενος&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="177"/>
+        <source>0 / 0</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>Dialog_view_image</name>
     <message>
-        <location filename="ui_dialog_view_image.py" line="46"/>
+        <location filename="ui_dialog_view_image.py" line="51"/>
         <source>View Image</source>
         <translation>Προβολή εικόνας</translation>
     </message>
     <message>
-        <location filename="ui_dialog_view_image.py" line="47"/>
+        <location filename="ui_dialog_view_image.py" line="52"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Σημείωμα&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -2033,12 +2232,12 @@ You must store these files elsewhere.</source>
     <message>
         <location filename="ui_main.py" line="279"/>
         <source>File summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Περίληψη αρχείου</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="280"/>
         <source>Code summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Περίληψη κώδικα</translation>
     </message>
 </context>
 </TS>
