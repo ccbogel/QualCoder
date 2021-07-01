@@ -1645,8 +1645,9 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color)
+        fgc = TextColor(color).recommendation
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
@@ -1703,8 +1704,9 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color)
+        fgc = TextColor(color).recommendation
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
 
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
