@@ -249,6 +249,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.resize(550, 580)
         # enable custom window hint - must be set to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+
         title = _("Coded files: ") + self.code_dict['name']
         if case_or_file == "Case":
             title = _("Coded cases: ") + self.code_dict['name']
