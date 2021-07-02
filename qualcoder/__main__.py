@@ -67,12 +67,12 @@ from qualcoder.report_sql import DialogSQL
 from qualcoder.rqda import Rqda_import
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
-#from text_mining import DialogTextMining
+#from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_graph_original import ViewGraphOriginal
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.5"
+qualcoder_version = "QualCoder 2.6"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1307,7 +1307,6 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
         cur.execute("CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
         cur.execute("CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
-        #cur.execute("CREATE TABLE code_text (cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
@@ -1543,6 +1542,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
             cur.execute("drop table code_text")
             cur.execute("alter table code_text2 rename to code_text")
+            cur.execute('update project set databaseversion="v4", about=?', [qualcoder_version])
             self.app.conn.commit()
 
         # Save a date and 24hour stamped backup
