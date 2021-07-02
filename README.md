@@ -83,8 +83,9 @@ Then click enter. Wait, until all modules are installed (the command phrase shou
 The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)  You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
 Run QualCoder from cmd.exe
-Move to the correct Drive.  e.g. C:  or P: or whatever the letter for the drive where qualcoder is stored.
-Then type `py -m qualcoder`
+Move to the QualCoder-master folder, then type 
+
+`py -m qualcoder`
 
 Run by double-click
 Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
