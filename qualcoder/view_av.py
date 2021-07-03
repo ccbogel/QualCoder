@@ -1531,22 +1531,17 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if not self.ui.textEdit.hasFocus():
             return
-        # Ignore all other key events if edit mode is active
+        '''# Ignore all other key events if edit mode is active  # Edit mode not used here yet
         if self.edit_mode:
-            return
-
+            return'''
         key = event.key()
         mod = QtGui.QGuiApplication.keyboardModifiers()
-
-        print("EVENT KEY PRESS")
         cursor_pos = self.ui.textEdit.textCursor().position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
-        print("CT", self.code_text)
         for item in self.code_text:
-            print(self.file_['start'], self.file_['end'])
-            if cursor_pos + self.file_['start'] >= item['pos0'] and \
-                    cursor_pos + self.file_['start'] <= item['pos1'] and \
+            if cursor_pos >= item['pos0'] and \
+                    cursor_pos <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 codes_here.append(item)
 
