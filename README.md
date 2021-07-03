@@ -33,8 +33,6 @@ You also need to run this command from the terminal for pdf importing:
 
 `sudo python3 -m pip install pdfminer.six openpyxl ebooklib`
 
-If your are not using the debian package:
-
 In the terminal, Go to the QualCoder-master folder, type:
 
 `sudo python3 setup.py install`
