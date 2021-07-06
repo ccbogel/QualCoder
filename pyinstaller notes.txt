@@ -1,8 +1,24 @@
+Standard command:
+
 pyinstaller --onefile qualcoder/__main__.py
+
+Add spec file identifying .mo files:
+
+pyinstaller --onefile qualcoder/__main__.spec
+
+
+Create a spec file using this command:
+
+pyi-makespec options name.py [other scripts …]
+
+
+TODO:
+add language files to spec data import
+https://stackoverflow.com/questions/61718298/compiling-gettext-locales-with-pyinstaller-in-python-3-x
+
 
 PyInstaller: 4.2
 Python: 3.8.0
 Platform: Windows-10-10.0.19041-SP0
 
-TODO:
-add language files to spec data import
+
