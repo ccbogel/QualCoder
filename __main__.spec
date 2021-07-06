@@ -6,7 +6,7 @@ block_cipher = None
 a = Analysis(['qualcoder\\__main__.py'],
              pathex=['C:\\Users\\ccurtain\\Downloads\\QualCoder-2.7'],
              binaries=[],
-             datas=[],
+             datas=get_locales_data(),
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -31,3 +31,12 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True )
+
+def get_locales_data():
+    locales_data = []
+    for locale in os.listdir(os.path.join('./locales')):
+        locales_data.append((
+            os.path.join('./locales', locale, 'LC_MESSAGES/*.mo'),
+            os.path.join('locales', locale, 'LC_MESSAGES')
+        ))
+    return locales_data
