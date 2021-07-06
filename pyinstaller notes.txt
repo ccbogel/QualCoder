@@ -1,0 +1,8 @@
+pyinstaller --onefile qualcoder/__main__.py
+
+PyInstaller: 4.2
+Python: 3.8.0
+Platform: Windows-10-10.0.19041-SP0
+
+TODO:
+add language files to spec data import
