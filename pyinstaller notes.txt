@@ -3,18 +3,17 @@ Standard command:
 pyinstaller --onefile qualcoder/__main__.py
 
 Add spec file identifying .mo files:
+Run from QualCoder-master directory
 
-pyinstaller --onefile qualcoder/__main__.spec
-
-
-Create a spec file using this command:
-
-pyi-makespec options name.py [other scripts …]
+pyinstaller --onefile __main__.spec
 
 
 TODO:
 add language files to spec data import
 https://stackoverflow.com/questions/61718298/compiling-gettext-locales-with-pyinstaller-in-python-3-x
+
+https://stackoverflow.com/questions/7674790/bundling-data-files-with-pyinstaller-onefile/13790741#13790741
+
 
 
 PyInstaller: 4.2
