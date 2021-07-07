@@ -1807,7 +1807,8 @@ def gui():
     # Try and load language settings from file stored in home/.qualcoder/
     # translator applies to ui designed GUI widgets only
     lang = settings.get('language', 'en')
-    getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
+    #getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
+    getlang = gettext.translation(domain='default', localedir=path +'/locale', fallback=True)
     #if lang != "en":
     if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
         translator = QtCore.QTranslator()
