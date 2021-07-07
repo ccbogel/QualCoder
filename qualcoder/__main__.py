@@ -1804,18 +1804,15 @@ def gui():
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
-    # Try and load language settings from file stored in home/.qualcoder/
-    # Translator applies to ui designed GUI widgets only
-
-    # Test for pyinstall data files
+    # Identify language settings from file stored in home/.qualcoder/
+    lang = settings.get('language', 'en')
+    '''# Test for pyinstall data files
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         print('Running in a PyInstaller bundle')
     else:
-        print('Running in a normal Python process')
-    
+        print('Running in a normal Python process')'''
     locale_dir = os.path.join(path, 'locale')
     # Important to get the external data directory for PyInstaller
-    lang = settings.get('language', 'en')
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
         print("ext data dir: ", ext_data_dir)
@@ -1824,16 +1821,15 @@ def gui():
         #locale_dir = os.path.join(locale_dir, lang)
         #locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
         #print("LISTDIR", os.listdir(ext_data_dir))
-        #print("======================")
-    print("LD 2: ", locale_dir)
-    #print("LISTDIR locale ", os.listdir(locale_dir))
-    #print("======================")
+    #print("Locale directory: ", locale_dir)
+    #print("LISTDIR: ", os.listdir(locale_dir))
     #getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     getlang = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
-        translator = QtCore.QTranslator()
-        translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
-        app.installTranslator(translator)
+        # qt_translator applies to ui designed GUI widgets only
+        qt_translator = QtCore.QTranslator()
+        qt_translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
+        app.installTranslator(qt_translator)
         try:
             getlang = gettext.translation(lang, localedir=locale_dir, languages=[lang])
         except Exception as e:
