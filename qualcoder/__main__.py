@@ -109,10 +109,10 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error(_("Uncaught exception : ") + text)
+    #logger.error(_("Uncaught exception : ") + text)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
+    #mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
 
@@ -1805,16 +1805,41 @@ def gui():
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     # Try and load language settings from file stored in home/.qualcoder/
-    # translator applies to ui designed GUI widgets only
+    # Translator applies to ui designed GUI widgets only
+
+    # Test for pyinstall data files
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        print('Running in a PyInstaller bundle')
+    else:
+        print('Running in a normal Python process')
+    
+    locale_dir = os.path.join(path, 'locale')
+    # Important to get the external data directory for PyInstaller
     lang = settings.get('language', 'en')
-    #getlang = gettext.translation('en', localedir=path +'/locale', languages=['en'])
-    getlang = gettext.translation(domain='default', localedir=path +'/locale', fallback=True)
-    #if lang != "en":
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        ext_data_dir = sys._MEIPASS
+        print("ext data dir: ", ext_data_dir)
+        locale_dir = os.path.join(ext_data_dir, 'qualcoder')
+        locale_dir = os.path.join(locale_dir, 'locale')
+        #locale_dir = os.path.join(locale_dir, lang)
+        #locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+        #print("LISTDIR", os.listdir(ext_data_dir))
+        #print("======================")
+    print("LD 2: ", locale_dir)
+    #print("LISTDIR locale ", os.listdir(locale_dir))
+    #print("======================")
+    #getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
+    getlang = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
         translator = QtCore.QTranslator()
         translator.load(path + "/locale/" + lang + "/app_" + lang + ".qm")
-        getlang = gettext.translation(lang, localedir=path + '/locale', languages=[lang])
         app.installTranslator(translator)
+        try:
+            getlang = gettext.translation(lang, localedir=locale_dir, languages=[lang])
+        except Exception as e:
+            print(e)
+            print(locale_dir)
+            # [Errno 13] Permission denied: 'C:\\Users\\user\\AppData\\Local\\Temp\\_MEI112802\\qualcoder\\locale\\de\\LC_MESSAGES\\de.mo'
     getlang.install()
     ex = MainWindow(qual_app)
     if project_path:
