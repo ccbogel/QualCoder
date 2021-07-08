@@ -1815,7 +1815,7 @@ def gui():
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
-        print("ext data dir: ", ext_data_dir)
+        #print("ext data dir: ", ext_data_dir)
         locale_dir = os.path.join(ext_data_dir, 'qualcoder')
         locale_dir = os.path.join(locale_dir, 'locale')
         #locale_dir = os.path.join(locale_dir, lang)
@@ -1828,10 +1828,29 @@ def gui():
         # qt translator applies to ui designed GUI widgets only
         qt_locale_dir = os.path.join(locale_dir, lang)
         qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-        print("qt qm translation file: ", qt_locale_file)
+        #print("qt qm translation file: ", qt_locale_file)
         qt_translator = QtCore.QTranslator()
         qt_translator.load(qt_locale_file)
+        ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
+        A solution to this error [Errno 13] Permission denied:
+        Replace 'lang' with the short language name, e.g. app_de.qm '''
+        if qt_translator.isEmpty():
+            print("trying to load translation qm file from .qualcoder folder")
+            qm = os.path.join(home, '.qualcoder')
+            qm = os.path.join(qm, 'app_' + lang + '.qm')
+            print("qm file located at: ", qm)
+            qt_translator.load(qm)
+            print("Success")
+            if qt_translator.isEmpty():
+                print("No .qm translation file loaded")
+                msg = "Copy app_" + lang + ".qm file from downloaded QualCoder-Master/qualcoder/locale folder into the home/.qualcoder folder"
+                Message(qual_app,"No .qm file", msg).exec_()
         app.installTranslator(qt_translator)
+        '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
+        A solution to this [Errno 13] Permission denied:
+        Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
+        Replace 'lang' with the language short name e.g. de, el, es ...
+        '''
         try:
             translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
             print("locale directory for python translations: ", locale_dir)
@@ -1839,7 +1858,15 @@ def gui():
             print("Error accessing python translations mo file")
             print(e)
             print("locale directory for python translations: ", locale_dir)
-            # [Errno 13] Permission denied: 'C:\\Users\\user\\AppData\\Local\\Temp\\_MEI112802\\qualcoder\\locale\\de\\LC_MESSAGES\\de.mo'
+            try:
+                print("trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
+                mo_dir = os.path.join(home, '.qualcoder')
+                translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
+                print("Success")
+            except:
+                print("No .mo translation file loaded")
+                msg = "Copy folder path with " + lang + ".mo file from downloaded QualCoder-Master/qualcoder/locale folder into home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo"
+                Message(qual_app,"No .qm file", msg).exec_()
     translator.install()
     ex = MainWindow(qual_app)
     if project_path:
