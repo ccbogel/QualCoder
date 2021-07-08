@@ -70,13 +70,11 @@ IMORTANT: in the first window of the installation mark the option "Add Python to
 
 The final step, install extra modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl py2exe`
-
-(You can skip the py2exe instruction above. It is not actively used right now, but will be used in the future)
+`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
-The `py` command uses the most recent installed versionof python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)  You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)  You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
 
 Run QualCoder from cmd.exe
 Move to the QualCoder-master folder, then type 
