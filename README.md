@@ -58,6 +58,8 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
+NEW - the 2.7 Release contains an exe file (created on Windows 10, 64 bit).
+
 Download the QualCoder software from: https://github.com/ccbogel/QualCoder. This is the newest, but not yet officially released, version of code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
 Open the unpacked folder "QualCoder-master", then open the folder "qualcoder" and make a shortcut of the file "__main__.py" on the desktop - for easier access. This file is the starting file for running software.
