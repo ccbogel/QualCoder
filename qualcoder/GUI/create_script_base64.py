@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ https://qualcoder.wordpress.com/
 Create an output python file with converted pngs into base64
 The output file is used as a helper file in QualCoder
 
-This helps to get around icon data failing to load depending on where qualcoder.py is called from.
 """
 
 import base64
@@ -37,6 +36,9 @@ import os
 
 
 class CreateHelperFile():
+    """ This helps to get around icon data failing to load depending on where qualcoder
+     is called from.  Important for use with pyinstaller as accessing data files does not work well.
+    """
 
     def __init__(self):
         #super(CreateHellpderFile, self).__init__()
