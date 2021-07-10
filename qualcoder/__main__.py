@@ -52,6 +52,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
+from qualcoder.GUI.base64_helper import qualcoder32
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
@@ -1808,7 +1809,7 @@ def gui():
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     pm = QtGui.QPixmap()
-    pm.loadFromData(QtCore.QByteArray.fromBase64(qc_icon), "png")
+    pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
     app.setWindowIcon(QtGui.QIcon(pm))
     
     # Use two character language setting
