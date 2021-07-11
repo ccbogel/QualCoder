@@ -57,6 +57,7 @@ from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.information import DialogInformation
+from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
@@ -1798,7 +1799,6 @@ class MainWindow(QtWidgets.QMainWindow):
             logger.debug(str(e))
             #self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
 
-
 def gui():
     qual_app = App()
     settings = qual_app.load_settings()
@@ -1853,6 +1853,8 @@ def gui():
                 print("No .qm translation file loaded")
                 msg = "Copy app_" + lang + ".qm file from downloaded QualCoder-Master/qualcoder/locale folder into the home/.qualcoder folder"
                 Message(qual_app,"No .qm file", msg).exec_()
+                install_language(lang, "qm")
+
         app.installTranslator(qt_translator)
         '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
         A solution to this [Errno 13] Permission denied:
@@ -1875,6 +1877,8 @@ def gui():
                 print("No .mo translation file loaded")
                 msg = "Copy folder path with " + lang + ".mo file from downloaded QualCoder-Master/qualcoder/locale folder into home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo"
                 Message(qual_app,"No .qm file", msg).exec_()
+                install_language(lang, "mo")
+
     translator.install()
     ex = MainWindow(qual_app)
     if project_path:
@@ -1888,6 +1892,37 @@ def gui():
             proj_path = split_[1]
         ex.open_project(path=proj_path)
     sys.exit(app.exec_())
+
+def install_language(lang, type):
+    """ Mainly for pyinstaller on Windows. Cannot access language ddta files.
+     So, recreate them from base64 data into home/.qualcoder folder. """
+
+    # Install Qt translation file into folder .qualcoder
+    if type == "qm":
+        qm = os.path.join(home, '.qualcoder')
+        qm = os.path.join(qm, 'app_' + lang + '.qm')
+        data = None
+        if lang == "de":
+            data = de_qm
+        if lang == "el":
+            data = el_qm
+        if lang == "es":
+            data = es_qm
+        if lang == "fr":
+            data = fr_qm
+        if lang == "it":
+            data = it_qm
+        if lang == "jp":
+            data = jp_qm
+        if lang == "pt":
+            data = pt_qm
+        if data is None:
+            return
+        with open(qm, 'wb') as file_:
+            decoded_data = base64.decodebytes(data)
+            file_.write(decoded_data)
+
+
 
 if __name__ == "__main__":
     gui()
