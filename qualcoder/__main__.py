@@ -211,30 +211,33 @@ class App(object):
         if path == "":
             return
         nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
+        # result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
         if result == []:
+            result = [str(nowdate) + "|" + path]
             with open(self.persist_path, 'w') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
             return
 
         proj_path = ""
-        splt = result[0].split("|") #open_menu
+        splt = result[0].split("|")
         if len(splt) == 1:
             proj_path = splt[0]
         if len(splt) == 2:
             proj_path = splt[1]
-        #print("PATH:", path, "PPATH:", proj_path)  # tmp
-        if path != proj_path:
+        #print("PATH:", path, "ProjPATH:", proj_path)  # tmp
+        # Compare first persisted project path to the currently open project path
+        if result[0].split("|")[1] != path:
             result.append(dated_path)
             result.sort()
-            with open(self.persist_path, 'w') as f:
-                for i, line in enumerate(result):
-                    f.write(line)
-                    f.write(os.linesep)
-                    if i > 8:
-                        break
+            if len(result) > 8:
+                result = result[0:8]
+        with open(self.persist_path, 'w') as f:
+            for i, line in enumerate(result):
+                f.write(line)
+                f.write(os.linesep)
 
     def get_most_recent_projectpath(self):
         """ Get most recent project path from .qualcoder/recent_projects.txt """
@@ -1851,7 +1854,7 @@ def gui():
             qt_translator.load(qm)
             if qt_translator.isEmpty():
                 print("Installing app_" + lang + ".qm to .qualcoder folder")
-                install_language(lang, "qm")
+                install_language(lang)
                 qt_translator.load(qm)
 
         app.installTranslator(qt_translator)
@@ -1871,13 +1874,8 @@ def gui():
                 print("trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
                 mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-                print("Success")
             except:
-                print("No .mo translation file loaded")
-                msg = "Copy folder path with " + lang + ".mo file from downloaded QualCoder-Master/qualcoder/locale folder into home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo"
-                Message(qual_app,"No .qm file", msg).exec_()
-                install_language(lang, "mo")
-
+                print("No " + lang + ".mo translation file loaded")
     translator.install()
     ex = MainWindow(qual_app)
     if project_path:
@@ -1901,27 +1899,45 @@ def install_language(lang):
 
     qm = os.path.join(home, '.qualcoder')
     qm = os.path.join(qm, 'app_' + lang + '.qm')
-    data = None
+    qm_data = None
+    mo_data = None
     if lang == "de":
         qm_data = de_qm
+        mo_data = de_mo
     if lang == "el":
         qm_data = el_qm
+        mo_data = el_mo
     if lang == "es":
         qm_data = es_qm
+        mo_data = es_mo
     if lang == "fr":
         qm_data = fr_qm
+        mo_data = fr_mo
     if lang == "it":
         qm_data = it_qm
+        mo_data = it_mo
     if lang == "jp":
         qm_data = jp_qm
+        mo_data = jp_mo
     if lang == "pt":
         qm_data = pt_qm
-    if qm_data is None:
+        mo_data = pt_mo
+    if qm_data is None or mo_data is None:
         return
     with open(qm, 'wb') as file_:
         decoded_data = base64.decodebytes(qm_data)
         file_.write(decoded_data)
-        
+    mo_path = os.path.join(home, '.qualcoder')
+    mo_path = os.path.join(mo_path, lang)
+    if not os.path.exists(mo_path):
+        os.mkdir(mo_path)
+        mo_path = os.path.join(mo_path, "LC_MESSAGES")
+        os.mkdir(mo_path)
+        mo = os.path.join(mo_path, lang + ".mo")
+        with open(mo, 'wb') as file_:
+            decoded_data = base64.decodebytes(mo_data)
+            file_.write(decoded_data)
+
 
 if __name__ == "__main__":
     gui()
