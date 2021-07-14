@@ -53,7 +53,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
-from qualcoder.GUI.base64_helper import qualcoder32
+from qualcoder.GUI.base64_helper import *  # qualcoder32
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
@@ -229,11 +229,12 @@ class App(object):
             proj_path = splt[1]
         #print("PATH:", path, "ProjPATH:", proj_path)  # tmp
         # Compare first persisted project path to the currently open project path
-        if result[0].split("|")[1] != path:
-            result.append(dated_path)
-            result.sort()
-            if len(result) > 8:
-                result = result[0:8]
+        if "|" in result[0]:  # safety check
+            if result[0].split("|")[1] != path:
+                result.append(dated_path)
+                result.sort()
+                if len(result) > 8:
+                    result = result[0:8]
         with open(self.persist_path, 'w') as f:
             for i, line in enumerate(result):
                 f.write(line)
