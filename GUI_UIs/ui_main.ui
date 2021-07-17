@@ -167,6 +167,7 @@
     </property>
     <addaction name="actionCoding_reports"/>
     <addaction name="actionCoding_comparison"/>
+    <addaction name="actionCoding_comparison_by_file"/>
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionView_Graph"/>
     <addaction name="actionCode_relations"/>
@@ -420,6 +421,11 @@
   <action name="actionCode_summary">
    <property name="text">
     <string>Code summary</string>
+   </property>
+  </action>
+  <action name="actionCoding_comparison_by_file">
+   <property name="text">
+    <string>Coding comparison by file</string>
    </property>
   </action>
  </widget>
