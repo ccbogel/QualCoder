@@ -163,6 +163,8 @@ class Ui_MainWindow(object):
         self.actionFile_summary.setObjectName("actionFile_summary")
         self.actionCode_summary = QtWidgets.QAction(MainWindow)
         self.actionCode_summary.setObjectName("actionCode_summary")
+        self.actionCoding_comparison_by_file = QtWidgets.QAction(MainWindow)
+        self.actionCoding_comparison_by_file.setObjectName("actionCoding_comparison_by_file")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -193,6 +195,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionCode_audio_video)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
+        self.menuReports.addAction(self.actionCoding_comparison_by_file)
         self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionView_Graph)
         self.menuReports.addAction(self.actionCode_relations)
@@ -278,6 +281,7 @@ class Ui_MainWindow(object):
         self.actionSpecial_functions.setText(_translate("MainWindow", "Special functions"))
         self.actionFile_summary.setText(_translate("MainWindow", "File summary"))
         self.actionCode_summary.setText(_translate("MainWindow", "Code summary"))
+        self.actionCoding_comparison_by_file.setText(_translate("MainWindow", "Coding comparison by file"))
 
 
 if __name__ == "__main__":
