@@ -44,12 +44,10 @@ from PyQt5.QtGui import QBrush
 import qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.base64_helper import *
-from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
+from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
 from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
-from .report_attributes import DialogSelectAttributeParameters
-from .select_items import DialogSelectItems
+#from .report_attributes import DialogSelectAttributeParameters
+#from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -76,9 +74,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     coders = []
     selected_coders = []
     categories = []
-    code_ = None
-    file_ = None
-    file_summaries = []
+    code_ = None  # Selected code
+    file_ = None  # Selected file
+    files = []
     comparisons = ""
 
     def __init__(self, app, parent_textEdit):
@@ -87,11 +85,11 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textEdit
         self.comparisons = ""
-        self.get_data()
         QtWidgets.QDialog.__init__(self)
-        self.ui = Ui_Dialog_reportComparisons()
+        self.ui = Ui_Dialog_reportCompareCoderFile()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.get_data()
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
@@ -112,13 +110,14 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
+        self.ui.listWidget_files.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SingleSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         self.fill_tree()
 
     def get_data(self):
-        """ Called from init. gets coders, code_names, categories, file_summaries.
+        """ Called from init. gets coders, code_names, categories, files.
         Images are not loaded. """
 
         self.code_names, self.categories = self.app.get_codes_categories()
@@ -131,6 +130,53 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.coders.append(row[0])
         cur.execute('select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
         self.file_summaries = cur.fetchall()
+        self.get_files()
+
+    def get_files(self):
+        """ Get source files with additional details and fill list widget.
+        """
+
+        self.ui.listWidget_files.clear()
+        self.files = self.app.get_filenames()
+        # Fill additional details about each file in the memo
+        cur = self.app.conn.cursor()
+        sql = "select length(fulltext), mediapath from source where id=?"
+        sql_text_codings = "select count(cid) from code_text where fid=?"
+        sql_av_codings = "select count(cid) from code_av where id=?"
+        sql_image_codings = "select count(cid) from code_image where id=?"
+        for f in self.files:
+            cur.execute(sql, [f['id'], ])
+            res = cur.fetchone()
+            if res is None:  # safety catch
+                res = [0]
+            tt = ""
+            if res[1] is None or res[1][0:5] == "docs:":
+                tt += _("Text file\n")
+                tt += _("Characters: ") + str(res[0])
+            if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
+                tt += _("Image")
+            if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
+                tt += _("Audio")
+            if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
+                tt += _("Video")
+            cur.execute(sql_text_codings, [f['id']])
+            txt_res = cur.fetchone()
+            cur.execute(sql_av_codings, [f['id']])
+            av_res = cur.fetchone()
+            cur.execute(sql_image_codings, [f['id']])
+            img_res = cur.fetchone()
+            tt += _("\nCodings: ")
+            if txt_res[0] > 0:
+                tt += str(txt_res[0])
+            if av_res[0] > 0:
+                tt += str(av_res[0])
+            if img_res[0] > 0:
+                tt += str(img_res[0])
+            item = QtWidgets.QListWidgetItem(f['name'])
+            if f['memo'] is not None and f['memo'] != "":
+                tt += _("\nMemo: ") + f['memo']
+            item.setToolTip(tt)
+            self.ui.listWidget_files.addItem(item)
 
     def coder_selected(self):
         """ Select coders for comparison - only two coders can be selected. """
