@@ -46,8 +46,6 @@ from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
 from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
-#from .report_attributes import DialogSelectAttributeParameters
-#from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -77,6 +75,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     code_ = None  # Selected code
     file_ = None  # Selected file
     files = []
+    codes = []
     comparisons = ""
 
     def __init__(self, app, parent_textEdit):
@@ -91,7 +90,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.get_data()
         self.ui.pushButton_run.setEnabled(False)
-        self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
+        self.ui.pushButton_run.pressed.connect(self.calculate)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
@@ -115,12 +114,14 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         self.fill_tree()
+        self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
+        self.ui.listWidget_files.itemClicked.connect(self.file_selected)
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, files.
         Images are not loaded. """
 
-        self.code_names, self.categories = self.app.get_codes_categories()
+        self.codes, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         cur.execute(sql)
@@ -191,7 +192,32 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.selected_coders.append(coder)
             coder1 = self.ui.label_selections.text()
             self.ui.label_selections.setText(coder1 + " , " + coder)
-        if len(self.selected_coders) == 2:
+        if len(self.selected_coders) == 2 and self.file_ is not None and self.code_ is not None:
+            self.ui.pushButton_run.setEnabled(True)
+
+    def file_selected(self):
+        """ May activate run button if file, code and coders selected """
+
+        itemname = self.ui.listWidget_files.currentItem().text()
+        for f in self.files:
+            if f['name'] == itemname:
+                self.file_ = f
+        if len(self.selected_coders) == 2 and self.file_ is not None and self.code_ is not None:
+            self.ui.pushButton_run.setEnabled(True)
+
+    def code_selected(self):
+        """ May activate run button if file, code and coders selected """
+
+        current = self.ui.treeWidget.currentItem()
+        if current.text(1)[0:3] != 'cid':
+            return
+        code_= None
+        for c in self.codes:
+            if c['name'] == current.text(0):
+                self.code_ = c
+        if self.code_ is None:
+            return
+        if len(self.selected_coders) == 2 and self.file_ is not None and self.code_ is not None:
             self.ui.pushButton_run.setEnabled(True)
 
     def clear_selection(self):
@@ -229,15 +255,30 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         Message(self.app, _('Text file export'), msg, "information").exec_()
         self.parent_textEdit.append(msg)
 
-    def calculate_statistics(self):
+    def calculate(self):
         """ Iterate through tree widget, for all cids
-        For each code_name calculate the two-coder comparison statistics. """
+        For each code_name calculate the two-coder comparison statistics.
 
+        {'id': 7, 'name': 'Brighton_Storm.mp4.transcribed', 'memo': 'A transcription of the Optus video'}
+        {'name': 'enthusiastic', 'memo': 'very entuistic suggeses', 'owner': 'colin', 'date': '2019-08-05 08:20:48', 'cid': 12, 'catid': -1, 'color': '#F781F3'}
+        ['colin', 'jemima']
+        """
 
-        #TODO REDO
+        #TMP
+        print(self.file_)
+        print(self.code_)
+        print(self.selected_coders)
 
-        self.comparisons = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
-        self.comparisons += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
+        txt = _("CODER COMPARISON FOR FILE") + "====\n" + _("CODERS: ")
+        txt += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
+        txt += _("FILE: ") + self.file_['name'] + "\n"
+        txt += _("CODE: ") + self.code_['name'] + "\n"
+        self.ui.textEdit.setText(txt)
+
+        agreement = self.overall_agreement_text_file()
+        print(agreement)
+
+        return
 
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
@@ -260,7 +301,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             it += 1
             item = it.value()
 
-    def calculate_agreement_for_code_name(self):
+    def overall_agreement_text_file(self):
         """ Calculate the two-coder statistics for this code_
         Percentage agreement.
         Get the start and end positions in all files (source table) for this cid
@@ -270,49 +311,50 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
 
-        #TODO REDO
-
-        cid = self.code['cid']
+        cid = self.code_['cid']
         #logger.debug("Code id: " + str(cid))
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
-        # loop through each source file
         cur = self.app.conn.cursor()
+        sql = "select fulltext from source where id=?"
+        cur.execute(sql, [self.file_['id']])
+        fulltext = cur.fetchone()
+        if fulltext[0] is None or fulltext[0] == "":
+            return None
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
-        for f in self.file_summaries:
-            #logger.debug("file summary ", f)
-            cur.execute(sql, [f[0], cid, self.selected_coders[0]])
-            result0 = cur.fetchall()
-            cur.execute(sql, [f[0], cid, self.selected_coders[1]])
-            result1 = cur.fetchall()
-            #logger.debug("result0: " + str(result0))
-            #logger.debug("result1: " + str(result1))
-            # determine the same characters coded by both coders, by adding 1 to each coded character
-            char_list = [0] * f[1]
-            for coded in result0:
-                #print(coded[0], coded[1])  # tmp
-                for char in range(coded[0], coded[1]):
-                    char_list[char] += 1
-                    total['coded0'] += 1
-            for coded in result1:
-                for char in range(coded[0], coded[1]):
-                    char_list[char] += 1
-                    total['coded1'] += 1
-            uncoded = 0
-            single_coded = 0
-            dual_coded = 0
-            for char in char_list:
-                if char == 0:
-                    uncoded += 1
-                if char == 1:
-                    single_coded += 1
-                if char == 2:
-                    dual_coded += 1
-            #logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
-            total['dual_coded'] += dual_coded
-            total['single_coded'] += single_coded
-            total['uncoded'] += uncoded
-            total['characters'] += f[1]
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
+        result0 = cur.fetchall()
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
+        result1 = cur.fetchall()
+        #logger.debug("result0: " + str(result0))
+        #logger.debug("result1: " + str(result1))
+        # Determine the same characters coded by both coders, by adding 1 to each coded character
+        char_list = [0] * len(fulltext[0])
+        for coded in result0:
+            #print(coded[0], coded[1])  # tmp
+            for char in range(coded[0], coded[1]):
+                char_list[char] += 1
+                total['coded0'] += 1
+        for coded in result1:
+            for char in range(coded[0], coded[1]):
+                char_list[char] += 1
+                total['coded1'] += 1
+        uncoded = 0
+        single_coded = 0
+        dual_coded = 0
+        for char in char_list:
+            if char == 0:
+                uncoded += 1
+            if char == 1:
+                single_coded += 1
+            if char == 2:
+                dual_coded += 1
+        #logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
+        total['dual_coded'] += dual_coded
+        total['single_coded'] += single_coded
+        total['uncoded'] += uncoded
+        total['characters'] += len(fulltext[0])
+
         total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['characters'], 2)
         total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
         total['uncoded_percent'] = round(100 * total['uncoded'] / total['characters'], 2)
@@ -358,7 +400,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         cats = copy(self.categories)
-        codes = copy(self.code_names)
+        codes = copy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
         self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
