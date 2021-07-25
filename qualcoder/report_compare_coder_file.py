@@ -269,7 +269,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         print(self.code_)
         print(self.selected_coders)
 
-        txt = _("CODER COMPARISON FOR FILE") + "====\n" + _("CODERS: ")
+        txt = "UNDER DEVELOPMENT\n"
+        txt += _("CODER COMPARISON FOR FILE") + "====\n" + _("CODERS: ")
         txt += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
         txt += _("FILE: ") + self.file_['name'] + "\n"
         txt += _("CODE: ") + self.code_['name'] + "\n"
