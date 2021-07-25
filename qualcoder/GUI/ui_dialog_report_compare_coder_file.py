@@ -107,6 +107,8 @@ class Ui_Dialog_reportCompareCoderFile(object):
         Dialog_reportCompareCoderFile.setWindowTitle(_translate("Dialog_reportCompareCoderFile", "Reports"))
         self.label_2.setText(_translate("Dialog_reportCompareCoderFile", "Coders:"))
         self.label_exports.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Export</p></body></html>"))
+        self.label_title.setToolTip(_translate("Dialog_reportCompareCoderFile", "To compare coding.\n"
+"Select two coders, one file, one code."))
         self.label_title.setText(_translate("Dialog_reportCompareCoderFile", "Coder comparisons by file"))
         self.label_matrix.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Matrix options</p></body></html>"))
         self.label_memos.setToolTip(_translate("Dialog_reportCompareCoderFile", "Memo reporting options"))
