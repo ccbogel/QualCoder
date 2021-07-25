@@ -103,6 +103,10 @@
         <height>22</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>To compare coding.
+Select two coders, one file, one code.</string>
+      </property>
       <property name="text">
        <string>Coder comparisons by file</string>
       </property>
