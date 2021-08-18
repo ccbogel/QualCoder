@@ -62,9 +62,11 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogCompareCoderByFile(QtWidgets.QDialog):
-    """ Compare coded text sequences between coders for one code and one file
-    Apply Cohen's Kappa for text files.
-    Can select one code and one file at a time.
+    """ Compare two coders for:
+    Coded text sequences for one code and one text file. Apply Cohen's Kappa for text files.
+    Coded image areas for one code and one text file.
+
+    Used to help advise coders / second coder on howto improve accuracy of coding.
     """
 
     app = None
@@ -90,8 +92,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.get_data()
         self.ui.pushButton_run.setEnabled(False)
-        self.ui.pushButton_run.pressed.connect(self.calculate)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
+        self.ui.pushButton_run.pressed.connect(self.results)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
@@ -100,6 +101,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
         self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        # TODO temoprarioly hide this button
+        self.ui.pushButton_exporttext.hide(True)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
@@ -129,12 +132,11 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
-        cur.execute('select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
-        self.file_summaries = cur.fetchall()
         self.get_files()
 
     def get_files(self):
         """ Get source files with additional details and fill list widget.
+        Add file type to dictionarty for each file.
         """
 
         self.ui.listWidget_files.clear()
@@ -154,12 +156,16 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             if res[1] is None or res[1][0:5] == "docs:":
                 tt += _("Text file\n")
                 tt += _("Characters: ") + str(res[0])
+                f['type'] = 'text'
             if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
                 tt += _("Image")
+                f['type'] = 'image'
             if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
                 tt += _("Audio")
+                f['type'] = 'audio'
             if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
                 tt += _("Video")
+                f['type'] = 'video'
             cur.execute(sql_text_codings, [f['id']])
             txt_res = cur.fetchone()
             cur.execute(sql_av_codings, [f['id']])
@@ -255,7 +261,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         Message(self.app, _('Text file export'), msg, "information").exec_()
         self.parent_textEdit.append(msg)
 
-    def calculate(self):
+    def results(self):
         """ Iterate through tree widget, for all cids
         For each code_name calculate the two-coder comparison statistics.
 
@@ -269,42 +275,44 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         print(self.code_)
         print(self.selected_coders)
 
-        txt = "UNDER DEVELOPMENT\n"
-        txt += _("CODER COMPARISON FOR FILE") + "====\n" + _("CODERS: ")
-        txt += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
+        txt = _("CODER COMPARISON FOR FILE") + "\n====\n" + _("CODERS: ")
+        c1_pos0 = len(txt)
+        txt += self.selected_coders[0] + " " + _("(YELLOW)")
+        c1_pos1 = len(txt)
+        txt += ", " + self.selected_coders[1] + " " + _("(BLUE)") + "\n"
+        c2_pos1 = len(txt)
         txt += _("FILE: ") + self.file_['name'] + "\n"
         txt += _("CODE: ") + self.code_['name'] + "\n"
         self.ui.textEdit.setText(txt)
+        # Format the first coder color, yellow
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        cursor.setPosition(c1_pos0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(c1_pos1, QtGui.QTextCursor.KeepAnchor)
+        color = "#F4FA58"
+        brush = QBrush(QtGui.QColor(color))
+        fmt.setBackground(brush)
+        text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.setCharFormat(fmt)
+        # Format the second coder color, blue
+        cursor.setPosition(c1_pos1, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(c2_pos1, QtGui.QTextCursor.KeepAnchor)
+        color = "#81BEF7"
+        brush = QBrush(QtGui.QColor(color))
+        fmt.setBackground(brush)
+        text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.setCharFormat(fmt)
 
-        agreement = self.overall_agreement_text_file()
-        print(agreement)
+        if self.file_['type'] == 'text':
+            self.ui.textEdit.append(self.agreement_text_file())
+        if self.file_['type'] == 'image':
+            self.ui.textEdit.append(self.agreement_image_file())
 
-        return
-
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        while item:  # while there is an item in the list
-            #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
-            if item.text(1)[0:4] == 'cid:':
-                #logger.debug(item.text(0), item.text(1))
-                agreement = self.calculate_agreement_for_code_name(int(item.text(1)[4:]))
-                item.setText(2, str(agreement['agreement']) + "%")
-                item.setText(3, str(agreement['dual_percent']) + "%")
-                item.setText(4, str(agreement['uncoded_percent']) + "%")
-                item.setText(5, str(agreement['disagreement']) + "%")
-                item.setText(6, str(agreement['kappa']))
-                self.comparisons += "\n" + item.text(0) + " (" + item.text(1) + ")\n"
-                self.comparisons += _("agreement: ") + str(agreement['agreement']) + "%"
-                self.comparisons += _(", dual coded: ") + str(agreement['dual_percent']) + "%"
-                self.comparisons += _(", uncoded: ") + str(agreement['uncoded_percent']) + "%"
-                self.comparisons += _(", disagreement: ") + str(agreement['disagreement']) + "%"
-                self.comparisons += ", Kappa: " + str(agreement['kappa'])
-            it += 1
-            item = it.value()
-
-    def overall_agreement_text_file(self):
+    def agreement_image_file(self):
         """ Calculate the two-coder statistics for this code_
-        Percentage agreement.
+        Percentage agreement, disgreement and kappa.
         Get the start and end positions in all files (source table) for this cid
         Look at each file separately to ge the commonly coded text.
         Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
@@ -313,7 +321,22 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         """
 
         cid = self.code_['cid']
-        #logger.debug("Code id: " + str(cid))
+        # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
+        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
+        cur = self.app.conn.cursor()
+        print("Image agreement")
+
+    def agreement_text_file(self):
+        """ Calculate the two-coder statistics for this code_
+        Percentage agreement, disgreement and kappa.
+        Get the start and end positions in all files (source table) for this cid
+        Look at each file separately to ge the commonly coded text.
+        Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
+        where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
+        'Disagree%':'','A not B':'','B not A':'','K':''
+        """
+
+        cid = self.code_['cid']
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
@@ -324,22 +347,27 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             return None
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
-        result0 = cur.fetchall()
+        res0 = cur.fetchall()
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
-        result1 = cur.fetchall()
-        #logger.debug("result0: " + str(result0))
-        #logger.debug("result1: " + str(result1))
+        res1 = cur.fetchall()
         # Determine the same characters coded by both coders, by adding 1 to each coded character
         char_list = [0] * len(fulltext[0])
-        for coded in result0:
+        # List of which coders coded this char: 1 = coder 1, 2= coder2, 12 = coders 1 and 2
+        char_list_coders = [''] * len(fulltext[0])
+        for coded in res0:
             #print(coded[0], coded[1])  # tmp
             for char in range(coded[0], coded[1]):
                 char_list[char] += 1
                 total['coded0'] += 1
-        for coded in result1:
+                char_list_coders[char] = 'y'
+        for coded in res1:
             for char in range(coded[0], coded[1]):
                 char_list[char] += 1
                 total['coded1'] += 1
+                if char_list_coders[char] == 'y':
+                    char_list_coders[char] = 'g'
+                else:
+                    char_list_coders[char] = 'b'
         uncoded = 0
         single_coded = 0
         dual_coded = 0
@@ -395,7 +423,59 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         except ZeroDivisionError:
             msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
             logger.debug(msg)
-        return total
+
+        overall = "\nOVERALL SUMMARY\n"
+        overall += _("Total characters: ") + str(total['characters']) + ", "
+        overall += _("Dual coded: ") + str(total['dual_coded']) + ", "
+        overall += _("Single coded: ") + str(total['single_coded']) + ", "
+        overall += _("Uncoded: ") + str(total['uncoded']) + ", "
+        overall += _("Coder 0: ") + str(total['coded0']) + ", "
+        overall += _("Coder 1: ") + str(total['coded1']) + "\n"
+        overall += _("Agreement between coders: ") + str(total['agreement']) + "%\n"
+        overall += _("Total text dual coded: ") + str(total['dual_percent']) + "%, "
+        overall += _("Total text uncoded: ") + str(total['uncoded_percent']) + "%, "
+        overall += _("Total text disagreement (single coded): ") + str(total['disagreement']) + "%\n"
+        overall += _("Kappa: ") + str(total['kappa']) + "\n\n"
+        overall += "FULLTEXT"
+        self.ui.textEdit.append(overall)
+
+        cursor = self.ui.textEdit.textCursor()
+        cursor.movePosition(QtGui.QTextCursor.End)
+        pos = cursor.position()
+        self.ui.textEdit.append(fulltext[0])
+        # Apply brush, yellow for coder 1, blue for coder 2 and green for dual coded
+        #print("\nCHARLIST CODERS\n", char_list_coders)  # tmp
+        cursor = self.ui.textEdit.textCursor()
+        fmt = QtGui.QTextCharFormat()
+        # Foreground depends on the defined need_white_text color in color_selector
+        for i, c in enumerate(char_list_coders):
+            if c == 'b':
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                color = "#81BEF7"
+                brush = QBrush(QtGui.QColor(color))
+                fmt.setBackground(brush)
+                text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
+                cursor.setCharFormat(fmt)
+            if c == 'g':
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                color = "#81F781"
+                brush = QBrush(QtGui.QColor(color))
+                fmt.setBackground(brush)
+                text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
+                cursor.setCharFormat(fmt)
+            if c == 'y':
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                color = "#F4FA58"
+                brush = QBrush(QtGui.QColor(color))
+                fmt.setBackground(brush)
+                text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
+                fmt.setForeground(text_brush)
+                cursor.setCharFormat(fmt)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -403,8 +483,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(7)
-        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.setColumnCount(2)
+        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id"])
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
