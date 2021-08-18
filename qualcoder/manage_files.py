@@ -213,7 +213,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         id_ = None
         mediapath = None
-        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        try:
+            id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        except AttributeError as e:
+            # Occurs if a table cell is not clicked, but click occurs elsewhere in container
+            return
         for s in self.source:
             if s['id'] == id_:
                 mediapath = s['mediapath']

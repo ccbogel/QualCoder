@@ -1068,6 +1068,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         y_unscaled = y / self.scale
         width_unscaled = width / self.scale
         height_unscaled = height / self.scale
+        if width_unscaled == 0 or height_unscaled == 0:
+            return
         #print("UNSCALED x", x, "y", y, "w", width, "h", height)
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
         'width': width_unscaled, 'height':height_unscaled, 'owner': self.app.settings['codername'],
