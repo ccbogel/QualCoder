@@ -24,8 +24,36 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
+      <widget class="QWidget" name="tab_action_log">
+       <attribute name="title">
+        <string>Action Log</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QTextEdit" name="textEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_manage">
+       <attribute name="title">
+        <string>Manage</string>
+       </attribute>
+       <widget class="QLabel" name="label_manage">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>511</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Files and Cases menu</string>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_coding">
        <attribute name="title">
         <string>Coding</string>
@@ -61,34 +89,6 @@
          <string>Select an option in the Reports menu</string>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab_manage">
-       <attribute name="title">
-        <string>Manage</string>
-       </attribute>
-       <widget class="QLabel" name="label_manage">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>511</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Select an option in the Files and Cases menu</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_action_log">
-       <attribute name="title">
-        <string>Action Log</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="textEdit"/>
-        </item>
-       </layout>
       </widget>
      </widget>
     </item>
