@@ -102,7 +102,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         # TODO temoprarioly hide this button
-        self.ui.pushButton_exporttext.hide(True)
+        self.ui.pushButton_exporttext.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
