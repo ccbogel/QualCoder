@@ -425,7 +425,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
-        while len(cats) > 0 or count < 10000:
+        while not(len(cats) < 1 or count > 10000):
             remove_list = []
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)

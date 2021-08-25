@@ -175,12 +175,14 @@ class ViewGraphOriginal(QDialog):
             depth = 0
             supercatid = c['supercatid']
             supercatid_list.append(c['supercatid'])
-            while supercatid is not None:
+            count = 0
+            while not (supercatid is None or count > 10000):
                 for s in cats:
                     if supercatid == s['catid']:
                         depth += 1
                         supercatid = s['supercatid']
                 c['depth'] = depth
+                count += 1
         catid_counts = Counter(supercatid_list)
 
         return catid_counts, model

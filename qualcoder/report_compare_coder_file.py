@@ -153,6 +153,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             if res is None:  # safety catch
                 res = [0]
             tt = ""
+            f['mediapath'] = res[1]
             if res[1] is None or res[1][0:5] == "docs:":
                 tt += _("Text file\n")
                 tt += _("Characters: ") + str(res[0])
@@ -247,6 +248,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
+        #TODO revise thise code for this Class
+
         filename = "Coder_comparison.txt"
         e = ExportDirectoryPathDialog(self.app, filename)
         filepath = e.filepath
@@ -311,26 +314,127 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.ui.textEdit.append(self.agreement_image_file())
 
     def agreement_image_file(self):
-        """ Calculate the two-coder statistics for this code_
+        """ Calculate the two-coder statistics for this code (cid) and in this imae file.
         Percentage agreement, disgreement and kappa.
-        Get the start and end positions in all files (source table) for this cid
-        Look at each file separately to ge the commonly coded text.
-        Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
-        where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
+        # Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
+        # where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
+
+        print(self.file_)
+        source = self.app.project_path + self.file_['mediapath']
+        if self.file_['mediapath'][0:7] == "images:":
+            source = self.file_['mediapath'][7:]
+        image = QtGui.QImage(source)
+        if image.isNull():
+            self.clear_file()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
+            logger.warning("Cannot open image: " + source)
+            return
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        width, height = self.pixmap.width(), self.pixmap.height()
 
         cid = self.code_['cid']
         # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
-        print("Image agreement")
+        print("Image agreement, w, h", width, height)
+
+        sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int) from code_image where id=? and cid=? and owner=?"
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
+        res0 = cur.fetchall()
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
+        res1 = cur.fetchall()
+
+        for r in res0:
+            print("res0 x1 y1 width height", r)
+        for r in res1:
+            print("res1 x1 y1 width height", r)
+
+        # Determine the same pixels coded by both coders
+        '''for w in range(0, width):
+            for h in range(0, height):
+                print (w,h)'''
+
+        return
+        #TODO HERE
+
+        uncoded = 0
+        single_coded = 0
+        dual_coded = 0
+        for char in char_list:
+            if char == 0:
+                uncoded += 1
+            if char == 1:
+                single_coded += 1
+            if char == 2:
+                dual_coded += 1
+        # logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
+        total['dual_coded'] += dual_coded
+        total['single_coded'] += single_coded
+        total['uncoded'] += uncoded
+        total['pixels'] += width * height
+
+        total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['pixels'], 2)
+        total['dual_percent'] = round(100 * total['dual_coded'] / total['pixels'], 2)
+        total['uncoded_percent'] = round(100 * total['uncoded'] / total['pixels'], 2)
+        total['disagreement'] = round(100 - total['agreement'], 2)
+        # Cohen's Kappa
+        '''
+        https://en.wikipedia.org/wiki/Cohen%27s_kappa
+
+        k = Po - Pe     Po is proportionate agreement (both coders coded this text / all coded text))
+            -------     Pe is probability of random agreement
+            1  - Pe
+
+            Pe = Pyes + Pno
+            Pyes = proportion Yes by A multiplied by proportion Yes by B
+                 = total['coded0']/total_coded * total['coded1]/total_coded
+
+            Pno = proportion No by A multiplied by proportion No by B
+                = (total_coded - total['coded0']) / total_coded * (total_coded - total['coded1]) / total_coded
+
+        IMMEDIATE BELOW IS INCORRECT - RESULTS IN THE TOTAL AGREEMENT SCORE
+        Po = total['agreement'] / 100
+        Pyes = total['coded0'] / total['pixels'] * total['coded1'] / total['pixels']
+        Pno = (total['pixels'] - total['coded0']) / total['pixels'] * (total['pixels'] - total['coded1']) / total['pixels']
+
+        BELOW IS BETTER - ONLY LOOKS AT PROPORTIONS OF CODED CHARACTERS
+        NEED TO CONFIRM THIS IS THE CORRECT APPROACH
+        '''
+        total['kappa'] = "zerodiv"
+        try:
+            unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
+            Po = total['dual_coded'] / unique_codings
+            Pyes = total['coded0'] / unique_codings * total['coded1'] / unique_codings
+            Pno = (unique_codings - total['coded0']) / unique_codings * (
+                        unique_codings - total['coded1']) / unique_codings
+            Pe = Pyes * Pno
+            kappa = round((Po - Pe) / (1 - Pe), 4)
+            total['kappa'] = kappa
+        except ZeroDivisionError:
+            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
+            logger.debug(msg)
+
+        overall = "\nOVERALL SUMMARY\n"
+        overall += _("Total pixels: ") + str(total['pixels']) + ", "
+        overall += _("Dual coded: ") + str(total['dual_coded']) + ", "
+        overall += _("Single coded: ") + str(total['single_coded']) + ", "
+        overall += _("Uncoded: ") + str(total['uncoded']) + ", "
+        overall += _("Coder 0: ") + str(total['coded0']) + ", "
+        overall += _("Coder 1: ") + str(total['coded1']) + "\n"
+        overall += _("Agreement between coders: ") + str(total['agreement']) + "%\n"
+        overall += _("Total text dual coded: ") + str(total['dual_percent']) + "%, "
+        overall += _("Total text uncoded: ") + str(total['uncoded_percent']) + "%, "
+        overall += _("Total text disagreement (single coded): ") + str(total['disagreement']) + "%\n"
+        overall += _("Kappa: ") + str(total['kappa']) + "\n\n"
+        # overall += "FULLTEXT"
+        self.ui.textEdit.append(overall)
 
     def agreement_text_file(self):
         """ Calculate the two-coder statistics for this code_
         Percentage agreement, disgreement and kappa.
-        Get the start and end positions in all files (source table) for this cid
-        Look at each file separately to ge the commonly coded text.
+        Get the start and end position the text file for this cid
         Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
         where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
         'Disagree%':'','A not B':'','B not A':'','K':''
@@ -506,7 +610,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
-        while len(cats) > 0 or count < 10000:
+        while not(len(cats) < 1 or count > 10000):
             remove_list = []
             #logger.debug("cats:" + str(cats))
             for c in cats:
