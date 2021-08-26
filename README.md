@@ -170,23 +170,19 @@ Required:
 
 ## Future plans
 
-* Improve packaging for easier installation: currently investigating use of pyinstaller - without success so far.
+* Improve packaging for easier installation: currently using pyinstaller for a Windows exe.
 * Change from pdfminer.six to pdfminer3
 * Possibly look at use with R.
-* Reports:
-        Word count report maybe
-* Text mining - maybe 
-    * word cloud, word visualisations - maybe
-* General
-    * Translations for GUI.
+* Reportsand other functions suggested in issues. 
+* Translations for GUI.
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2021) QualCoder 2.5 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/2.5
+Curtain, C. (2021) QualCoder 2.7 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/2.7
 
 
 ## Leave a review
