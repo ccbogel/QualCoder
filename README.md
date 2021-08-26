@@ -123,10 +123,10 @@ brew install qpdf
 ```
 
 
-Assuming you downloaded the 2.5 version. You can now run with:
+Assuming you downloaded the 2.7 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.5/qualcoder/__main__.py
+python3 /applications/QualCoder-2.7/qualcoder/__main__.py
 ```
 
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
