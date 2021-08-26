@@ -89,7 +89,7 @@ Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releasesDownload and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/2.7 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
