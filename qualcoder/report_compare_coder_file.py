@@ -610,7 +610,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
-        while not(len(cats) < 1 or count > 10000):
+        while len(cats) > 0 and count < 10000:
             remove_list = []
             #logger.debug("cats:" + str(cats))
             for c in cats:
