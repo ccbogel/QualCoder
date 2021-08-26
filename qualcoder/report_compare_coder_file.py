@@ -313,6 +313,15 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         if self.file_['type'] == 'image':
             self.ui.textEdit.append(self.agreement_image_file())
 
+    def intersect(self, r0, r1):
+        """ Calculation intersection area of two rectangles """
+
+        x1 = max(r0['x1'], r1['x1'])
+        y1 = max(r0['y1'], r1['y1'])
+        x2 = min(r0['x1'] + r0['width'], r1['x1'] + r1['width'])
+        y2 = min(r0['y1'] + r0['height'], r1['y1'] + r1['height'])
+        return max(0, x2 - x1 + 1) * max(0, y2 - y1 + 1)
+
     def agreement_image_file(self):
         """ Calculate the two-coder statistics for this code (cid) and in this imae file.
         Percentage agreement, disgreement and kappa.
@@ -338,43 +347,41 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
-        print("Image agreement, w, h", width, height)
+        print("Image agreement method, width, height ", width, height)
 
-        sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int) from code_image where id=? and cid=? and owner=?"
+        sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int), " \
+              "cast(width as int) * cast(height as int) from code_image where id=? and cid=? and owner=?"
+        keys = 'x1', 'y1', 'width', 'height', 'area'
+        res0 = []
+        res1 = []
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
-        res0 = cur.fetchall()
+        results0 = cur.fetchall()
+        total_area_res0 = 0
+        for row in results0:
+            res0.append(dict(zip(keys, row)))
+            total_area_res0 += row[4]
+            total['coded0'] += row[4]
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
-        res1 = cur.fetchall()
+        results1 = cur.fetchall()
+        total_area_res1 = 0
+        for row in results1:
+            res1.append(dict(zip(keys, row)))
+            total_area_res1 += row[4]
+            total['coded1'] += row[4]
+        print ("=================")
+        print(res0)
+        print ("=================")
+        print(res1)
+        print ("=================")
 
-        for r in res0:
-            print("res0 x1 y1 width height", r)
-        for r in res1:
-            print("res1 x1 y1 width height", r)
-
-        # Determine the same pixels coded by both coders
-        '''for w in range(0, width):
-            for h in range(0, height):
-                print (w,h)'''
-
-        return
-        #TODO HERE
-
-        uncoded = 0
-        single_coded = 0
-        dual_coded = 0
-        for char in char_list:
-            if char == 0:
-                uncoded += 1
-            if char == 1:
-                single_coded += 1
-            if char == 2:
-                dual_coded += 1
-        # logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
-        total['dual_coded'] += dual_coded
-        total['single_coded'] += single_coded
-        total['uncoded'] += uncoded
+        # calculate total intersections
+        total['dual_coded'] = 0
+        for r0 in res0:
+            for r1 in res1:
+                total['dual_coded'] += self.intersect(r0, r1)
+        total['single_coded'] = total_area_res1 + total_area_res1 - total['dual_coded']
+        total['uncoded'] = height * width - total['single_coded'] - total['dual_coded']
         total['pixels'] += width * height
-
         total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['pixels'], 2)
         total['dual_percent'] = round(100 * total['dual_coded'] / total['pixels'], 2)
         total['uncoded_percent'] = round(100 * total['uncoded'] / total['pixels'], 2)
@@ -424,9 +431,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         overall += _("Coder 0: ") + str(total['coded0']) + ", "
         overall += _("Coder 1: ") + str(total['coded1']) + "\n"
         overall += _("Agreement between coders: ") + str(total['agreement']) + "%\n"
-        overall += _("Total text dual coded: ") + str(total['dual_percent']) + "%, "
-        overall += _("Total text uncoded: ") + str(total['uncoded_percent']) + "%, "
-        overall += _("Total text disagreement (single coded): ") + str(total['disagreement']) + "%\n"
+        overall += _("Total pixels dual coded: ") + str(total['dual_percent']) + "%, "
+        overall += _("Total pixels uncoded: ") + str(total['uncoded_percent']) + "%, "
+        overall += _("Total pixels disagreement (single coded): ") + str(total['disagreement']) + "%\n"
         overall += _("Kappa: ") + str(total['kappa']) + "\n\n"
         # overall += "FULLTEXT"
         self.ui.textEdit.append(overall)
