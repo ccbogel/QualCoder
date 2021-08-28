@@ -203,6 +203,38 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
+        self.fill_code_counts_in_tree()
+
+    def fill_code_counts_in_tree(self):
+        """ Count instances of each code.
+        Called by: fill_tree
+        """
+
+        cur = self.app.conn.cursor()
+        sql = "select count(cid) from code_text where cid=?"
+        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = it.value()
+        count = 0
+        while item and count < 10000:
+            #print("fill code counts in tree", item.text(0), item.text(1), item.text(2), item.text(3))
+            if item.text(1)[0:4] == "cid:":
+                cid = str(item.text(1)[4:])
+                try:
+                    cur.execute(sql, [cid])
+                    result = cur.fetchone()
+                    if result[0] > 0:
+                        item.setText(3, str(result[0]))
+                    else:
+                        item.setText(3, "")
+                except Exception as e:
+                    msg = "Fill code counts error\n" + str(e) + "\n"
+                    msg += sql + "\n"
+                    msg += "cid " + str(cid) + "\n"
+                    logger.debug(msg)
+                    item.setText(3, "")
+            it += 1
+            item = it.value()
+            count += 1
 
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
