@@ -19,7 +19,7 @@ You will also need to have a `vlc` player installed - for audio and video.
 
 Install these modules from the command line
 
-`sudo apt install python3-lxml python3-ply python3-six python3-pdfminer python3-chardet python3-qt5 python3-pillow`
+`sudo apt install python3-lxml python3-ply python3-six python3-pdfminer python3-chardet python3-pyqt5 python3-pillow`
 
 On some Linux versions you will need to install pip
 
