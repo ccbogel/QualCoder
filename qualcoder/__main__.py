@@ -528,6 +528,7 @@ class App(object):
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
+        QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}\n\
@@ -1386,8 +1387,6 @@ class MainWindow(QtWidgets.QMainWindow):
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
         ui.exec_()
-        #ss = self.app.merge_settings_with_default_stylesheet(self.app.settings)
-        #self.setStyleSheet(ss)
         self.settings_report()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
