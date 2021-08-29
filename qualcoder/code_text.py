@@ -419,23 +419,33 @@ class DialogCodeText(QtWidgets.QWidget):
                 if ids:
                     res.append(ids)
             # Case names
+            #print("a", a)
             if a[1] == "case":
                 # Case text table also links av and images
                 sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
                 sql += "join source on source.id=case_text.fid where cases.name " +a[3]
-                sql += a[4][0]
-                #print(sql)
+                if a[3] != "like":
+                    sql += a[4][0]
+                else:
+                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
+                #print("sql:", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 ids = []
                 for i in result:
                     if i:
                         ids.append(i[0])
-                #print("case",  ids)
+                #print("case",  ids)  # tmp
                 if ids:
                     res.append(ids)
+
         #print("res, list of lists", res)
         # Converts each list to a set, then applies the set.intersection function
+        # TypeError: descriptor 'intersection' of 'set' object needs an argument
+
+        if res == []:
+            Message(self.app, "Nothing found", "Nothing found").exec_()
+            return
         res_set = set.intersection(*[set(x) for x in res])
         #print(res_set, type(res_set))
         res_list = list(res_set)
