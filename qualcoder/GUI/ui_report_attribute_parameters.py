@@ -2,12 +2,13 @@
 
 # Form implementation generated from reading ui file 'ui_report_attribute_parameters.ui'
 #
-# Created: Tue Jan 22 12:10:03 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_report_attribute_parameters(object):
     def setupUi(self, Dialog_report_attribute_parameters):
@@ -59,7 +60,7 @@ class Ui_Dialog_report_attribute_parameters(object):
         item.setText(_translate("Dialog_report_attribute_parameters", "Operator"))
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("Dialog_report_attribute_parameters", "Value list"))
-        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters to restrict reports for the attributes below. \n"
+        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters to select for the attributes below. \n"
 "The value list can be a single value  or a list where each list item is separated by a semi-colon \';\'.\n"
 "Wildcards for \'like\' are % and _"))
 
@@ -72,4 +73,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_report_attribute_parameters)
     Dialog_report_attribute_parameters.show()
     sys.exit(app.exec_())
-
