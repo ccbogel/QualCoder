@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
+    <width>380</width>
     <height>148</height>
    </rect>
   </property>
@@ -16,9 +16,9 @@
   <widget class="QRadioButton" name="radioButton_cases">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>19</y>
-     <width>81</width>
+     <x>20</x>
+     <y>42</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -35,8 +35,8 @@
   <widget class="QRadioButton" name="radioButton_files">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>19</y>
+     <x>160</x>
+     <y>42</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -64,9 +64,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>80</y>
-     <width>221</width>
+     <x>70</x>
+     <y>90</y>
+     <width>171</width>
      <height>27</height>
     </rect>
    </property>
