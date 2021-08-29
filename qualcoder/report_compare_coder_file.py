@@ -44,6 +44,7 @@ from PyQt5.QtGui import QBrush
 import qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
 from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
 
@@ -116,6 +117,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SingleSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
+        if len(self.coders) == 3:  # includes empty slot
+            self.ui.comboBox_coders.setCurrentIndex(1)
+            self.ui.comboBox_coders.setCurrentIndex(2)
         self.fill_tree()
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
@@ -136,7 +140,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
     def get_files(self):
         """ Get source files with additional details and fill list widget.
-        Add file type to dictionarty for each file.
+        Add file type to dictionary for each file.
         """
 
         self.ui.listWidget_files.clear()
@@ -273,16 +277,15 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         ['colin', 'jemima']
         """
 
-        #TMP
-        print(self.file_)
-        print(self.code_)
-        print(self.selected_coders)
+        #TODO
+        print(self.file_)  # tmp
+        print(self.code_)  # tmp
 
         txt = _("CODER COMPARISON FOR FILE") + "\n====\n" + _("CODERS: ")
         c1_pos0 = len(txt)
-        txt += self.selected_coders[0] + " " + _("(YELLOW)")
+        txt += self.selected_coders[0] + " " + _("(YELLOW CODER 0)")
         c1_pos1 = len(txt)
-        txt += ", " + self.selected_coders[1] + " " + _("(BLUE)") + "\n"
+        txt += ", " + self.selected_coders[1] + " " + _("(BLUE CODER 1)") + "\n"
         c2_pos1 = len(txt)
         txt += _("FILE: ") + self.file_['name'] + "\n"
         txt += _("CODE: ") + self.code_['name'] + "\n"
@@ -312,6 +315,33 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.ui.textEdit.append(self.agreement_text_file())
         if self.file_['type'] == 'image':
             self.ui.textEdit.append(self.agreement_image_file())
+        if self.file_['type'] in ('audio', 'video'):
+            self.ui.textEdit.append(self.agreement_av_file())
+
+    def agreement_av_file(self):
+        """ Calculate the two-coder statistics for this code (cid) and in this A/V file.
+        Percentage agreement, disgreement and kappa.
+        'Disagree%':'','A not B':'','B not A':'','K':''
+        """
+
+        source = self.app.project_path + self.file_['mediapath']
+        if self.file_['mediapath'][0:6] in("audio:", "video:"):
+            source = self.file_['mediapath'][7:]
+        #TODO may not need the orignal a/v file
+        '''image = QtGui.QImage(source)
+        if image.isNull():
+            self.clear_file()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
+            logger.warning("Cannot open image: " + source)
+            return
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        width, height = self.pixmap.width(), self.pixmap.height()'''
+
+        cid = self.code_['cid']
+        # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
+        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
+        #TODO get res0 and res1 a/v segments
+        '''cur = self.app.conn.cursor()'''
 
     def intersect(self, r0, r1):
         """ Calculation intersection area of two rectangles """
@@ -323,14 +353,11 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         return max(0, x2 - x1 + 1) * max(0, y2 - y1 + 1)
 
     def agreement_image_file(self):
-        """ Calculate the two-coder statistics for this code (cid) and in this imae file.
+        """ Calculate the two-coder statistics for this code (cid) and in this image file.
         Percentage agreement, disgreement and kappa.
-        # Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
-        # where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
 
-        print(self.file_)
         source = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:7] == "images:":
             source = self.file_['mediapath'][7:]
@@ -347,38 +374,40 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
-        print("Image agreement method, width, height ", width, height)
-
+        #print("Image agreement method, width, height ", width, height)
         sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int), " \
-              "cast(width as int) * cast(height as int) from code_image where id=? and cid=? and owner=?"
-        keys = 'x1', 'y1', 'width', 'height', 'area'
+              "cast(width as int) * cast(height as int), memo, owner from code_image where id=? and cid=? and owner=?"
+        keys = 'x1', 'y1', 'width', 'height', 'area', 'memo', 'owner'
         res0 = []
         res1 = []
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
         results0 = cur.fetchall()
         total_area_res0 = 0
         for row in results0:
-            res0.append(dict(zip(keys, row)))
+            tmp0 = dict(zip(keys, row))
+            tmp0['intersections'] = []
+            res0.append(tmp0)
             total_area_res0 += row[4]
             total['coded0'] += row[4]
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
         results1 = cur.fetchall()
         total_area_res1 = 0
         for row in results1:
-            res1.append(dict(zip(keys, row)))
+            tmp1 = dict(zip(keys, row))
+            tmp1['intersections'] = []
+            res1.append(tmp1)
             total_area_res1 += row[4]
             total['coded1'] += row[4]
-        print ("=================")
-        print(res0)
-        print ("=================")
-        print(res1)
-        print ("=================")
-
-        # calculate total intersections
+        # Calculate intersection pixels and total intersections
         total['dual_coded'] = 0
         for r0 in res0:
             for r1 in res1:
                 total['dual_coded'] += self.intersect(r0, r1)
+                intersecting_pixels = self.intersect(r0, r1)
+                if intersecting_pixels > 0:
+                    r1['intersections'].append(intersecting_pixels)
+                    r0['intersections'].append(intersecting_pixels)
+        # Summary results
         total['single_coded'] = total_area_res1 + total_area_res1 - total['dual_coded']
         total['uncoded'] = height * width - total['single_coded'] - total['dual_coded']
         total['pixels'] += width * height
@@ -434,9 +463,28 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         overall += _("Total pixels dual coded: ") + str(total['dual_percent']) + "%, "
         overall += _("Total pixels uncoded: ") + str(total['uncoded_percent']) + "%, "
         overall += _("Total pixels disagreement (single coded): ") + str(total['disagreement']) + "%\n"
-        overall += _("Kappa: ") + str(total['kappa']) + "\n\n"
-        # overall += "FULLTEXT"
+        overall += _("Kappa: ") + str(total['kappa']) + "\n"
         self.ui.textEdit.append(overall)
+        self.ui.textEdit.append(_("Intersections Coder: ") + self.selected_coders[0])
+        for r in res0:
+            txt = "\n" + "x: " + str(r['x1']) + " y: " + str(r['y1']) + " w: " + str(r['width']) + " h: " + str(r['height'])
+            if len(r['intersections']) == 0:
+                txt += " " + _("No intersections")
+            else:
+                txt += "\n" + _("Count of intersections: ") + str(len(r['intersections'])) + "\n"
+                txt += str(r['intersections']) + " " + _("Total: ") + str(sum(r['intersections'])) + " " + _("pixels")
+            self.ui.textEdit.append(txt)
+
+        self.ui.textEdit.append( "\n" + _("Intersections Coder: ") + self.selected_coders[1])
+        for r in res1:
+            txt = "\n" + "x: " + str(r['x1']) + " y: " + str(r['y1']) + " w: " + str(r['width']) + " h: " + str(r['height'])
+            if len(r['intersections']) == 0:
+                txt += " " + _("No intersections")
+            else:
+                txt += "\n" + _("Count of intersections: ") + str(len(r['intersections'])) + "\n"
+                txt += str(r['intersections']) + " " + _("Total: ") + str(sum(r['intersections'])) + " " + _("pixels")
+            self.ui.textEdit.append(txt)
+        DialogDualCodedImage(self.app, self.file_, res0, res1).exec_()
 
     def agreement_text_file(self):
         """ Calculate the two-coder statistics for this code_
@@ -668,4 +716,125 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
+
+class DialogDualCodedImage(QtWidgets.QDialog):
+    """ View two coders coded sections for one code in original image.
+
+    Called by: report_compare_coder_file.DialogCompareCoderByFile.
+    """
+
+    app = None
+    img = None
+    coded0 = None
+    coded1 = None
+    pixmap = None
+    label = None
+    scale = None
+    scene = None
+
+    def __init__(self, app, img, coded0, coded1, parent=None):
+        """ Displays dialog with two coders image codings for selected code.
+
+        param:
+            app : class containing app details such as database connection
+            img contains {id, name, memo, mediapath, type:image}
+            coded0 and coded1 contain: {x1, y1, width, height, area}
+            mediapath may be a link as: 'images:path'
+        """
+
+        sys.excepthook = exception_handler
+        self.app = app
+        self.img = img
+        self.coded0 = coded0
+        self.coded1 = coded1
+        self.scale = 1
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_Dialog_code_context_image()
+        self.ui.setupUi(self)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        abs_path = ""
+        if "images:" in self.img['mediapath']:
+            abs_path = self.img['mediapath'].split(':')[1]
+        else:
+            abs_path = self.app.project_path + self.img['mediapath']
+        self.setWindowTitle(abs_path)
+        image = QtGui.QImage(abs_path)
+        if image.isNull():
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
+            self.close()
+            return
+        self.scene = QtWidgets.QGraphicsScene()
+        self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setPos(0, 0)
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
+        self.scene.addItem(pixmap_item)
+        self.ui.horizontalSlider.setValue(99)
+        self.ui.scrollArea.setWidget(self.label)
+        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
+        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 80  # slider and textedit heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 80:
+            self.scale = (self.height() - 30 - 80) / self.pixmap.height()
+            slider_value = int(self.scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
+        self.draw_coded_areas()
+
+    def draw_coded_areas(self):
+        """ Draw coded areas for both coders """
+
+        for c in self.coded0:
+            self.draw_coded_area(c, "Coder0", "#F4FA58")
+        for c in self.coded1:
+            self.draw_coded_area(c, "Coder1", "#81BEf7")
+
+    def draw_coded_area(self, coded, coder, color):
+        """ Draw the coded rectangle in the scene.
+         Provide detailed tooltip. """
+
+        tooltip = coded['owner']
+        tooltip += "\n x: " + str(coded['x1']) + " y: " + str(coded['y1'])
+        tooltip += " w: " + str(coded['width']) + " h: " + str(coded['height']) + " "
+        tooltip += _("Area: ") + str(coded['area']) + _(" pixels")
+        if len(coded['intersections']) > 0:
+            tooltip += "\n " + _("Intersections: ") + str(len(coded['intersections'])) + " "
+            tooltip += _("Intersecting: ") + str(sum(coded['intersections'])) + _(" pixels")
+            tooltip += " \n" + _("Proportion: ") + str(int(sum(coded['intersections'])/ coded['area'] * 100)) + "%"
+        if coded['memo'] != "":
+            tooltip += "\nMemo: " + coded['memo']
+        x = coded['x1'] * self.scale
+        y = coded['y1'] * self.scale
+        width = coded['width'] * self.scale
+        height = coded['height'] * self.scale
+        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
+        rect_item.setPen(QtGui.QPen(QtGui.QColor(color), 2, QtCore.Qt.DashLine))
+        rect_item.setToolTip(tooltip)
+        self.scene.addItem(rect_item)
+
+    def change_scale(self):
+        """ Resize image. Triggered by user change in slider.
+        Also called by unmark, as all items need to be redrawn. """
+
+        if self.pixmap is None:
+            return
+        self.scale = (self.ui.horizontalSlider.value() + 1) / 100
+        height = self.scale * self.pixmap.height()
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
+        pixmap_item.setPos(0, 0)
+        self.scene.clear()
+        self.scene.addItem(pixmap_item)
+        self.draw_coded_areas()
+        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+
 
