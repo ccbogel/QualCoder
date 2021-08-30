@@ -58,7 +58,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Select parameters to select for the attributes below. 
+      <string>Select parameters for the attributes below. 
 The value list can be a single value  or a list where each list item is separated by a semi-colon ';'.
 Wildcards for 'like' are % and _</string>
      </property>
