@@ -60,7 +60,7 @@ class Ui_Dialog_report_attribute_parameters(object):
         item.setText(_translate("Dialog_report_attribute_parameters", "Operator"))
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("Dialog_report_attribute_parameters", "Value list"))
-        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters to select for the attributes below. \n"
+        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters for the attributes below. \n"
 "The value list can be a single value  or a list where each list item is separated by a semi-colon \';\'.\n"
 "Wildcards for \'like\' are % and _"))
 
