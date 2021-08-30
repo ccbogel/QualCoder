@@ -884,7 +884,7 @@ class ToolTip_EventFilter(QtCore.QObject):
     media_data = None
 
     def set_positions(self, media_data):
-        """ Code_text contains the positionsfor the tooltip to be displayed.
+        """ Code_text contains the positions for the tooltip to be displayed.
 
         param:
             media_data: List of dictionaries of the text contains: pos0, pos1
@@ -894,7 +894,8 @@ class ToolTip_EventFilter(QtCore.QObject):
 
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        if event.type() == QtCore.QEvent.ToolTip:
+        # Added chack for media_data, it may be None
+        if event.type() == QtCore.QEvent.ToolTip and self.media_data:
             helpEvent = QHelpEvent(event)
             cursor = QtGui.QTextCursor()
             cursor = receiver.cursorForPosition(helpEvent.pos())
