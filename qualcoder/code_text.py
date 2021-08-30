@@ -2391,9 +2391,9 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "select code_text.ctid, code_text.cid, fid, seltext, pos0, pos1, code_text.owner, code_text.date, code_text.memo, important, name"
         sql += " from code_text join code_name on code_text.cid = code_name.cid"
         sql += " where fid=? and code_text.owner=? "
-        # For file text segment which is currently loaded
+        # For file text which is currently loaded
         sql += " and pos0 >=? and pos1 <=? "
-        sql += "order by length(seltext) desc"
+        sql += "order by length(seltext) desc, important asc"
         cur = self.app.conn.cursor()
         cur.execute(sql, sql_values)
         code_results = cur.fetchall()
