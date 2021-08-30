@@ -336,8 +336,8 @@ class DialogCodeText(QtWidgets.QWidget):
         for f in self.filenames:
             cur.execute(sql, [f['id'], ])
             res = cur.fetchone()
-            if res is None:  # safety catch
-                res = [0]
+            if res is None:  # Safety catch
+                res = [0, ""]
             tt = _("Characters: ") + str(res[0])
             f['characters'] = res[0]
             f['start'] = 0
@@ -352,6 +352,39 @@ class DialogCodeText(QtWidgets.QWidget):
                 tt += "\nMemo: " + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
+
+    def update_file_tooltip(self):
+        """ Create tooltip for file containing characters, codings and from: to: if partially loaded.
+        Called by get_files, updates to add, remove codings, text edits.
+        Requires self.file_ """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        sql = "select length(fulltext), fulltext from source where id=?"
+        cur.execute(sql, [self.file_['id'], ])
+        res = cur.fetchone()
+        if res is None:  # Safety catch
+            res = [0, ""]
+        tt = _("Characters: ") + str(res[0])
+        f = {}
+        f['characters'] = res[0]
+        f['start'] = 0
+        f['end'] = res[0]
+        f['fulltext'] = res[1]
+        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
+        cur.execute(sql_codings, [self.file_['id'], self.app.settings['codername']])
+        res = cur.fetchone()
+        tt += "\n" + _("Codings: ") + str(res[0])
+        tt += "\n" + _("From: ") + str(f['start']) + _(" to ") + str(f['end'])
+        if self.file_['memo'] is not None and self.file_['memo'] != "":
+            tt += "\nMemo: " + self.file_['memo']
+        # Find item to update tooltip
+        self.ui.listWidget
+        items = self.ui.listWidget.findItems(self.file_['name'], Qt.MatchExactly)
+        if len(items) == 0:
+            return
+        items[0].setToolTip(tt)
 
     def get_files_from_attributes(self):
         """ Trim the files list to files identified by attributes.
@@ -2673,6 +2706,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes.insert(0, tmp_code)
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
+        self.update_file_tooltip()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
@@ -2714,6 +2748,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.update_file_tooltip()
         self.app.delete_backup = False
 
     def annotate(self, cursor_pos=None):
@@ -3191,6 +3226,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.annotations = self.app.get_annotations()
         self.load_file(self.file_)
+        self.update_file_tooltip()
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
