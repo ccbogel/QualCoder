@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -114,7 +114,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
                 'memo': row[3], 'caseOrFile': row[4], 'valuetype': row[5]})
 
     def count_selected_items(self):
-        """ Update label with the count of selected items """
+        """ Update label with the count of selected items. """
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = []
         for i in indexes:
@@ -125,7 +125,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
     def add_attribute(self):
         """ When add button pressed, open addItem dialog to get new attribute text.
         AddItem dialog checks for duplicate attribute name.
-        New attribute is added to the model and database """
+        New attribute is added to the model and database. """
 
         check_names = self.attributes + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
         ui = DialogAddAttribute(self.app, check_names)
@@ -184,20 +184,20 @@ class DialogManageAttributes(QtWidgets.QDialog):
         ok = ui.exec_()
         if not ok:
             return
+        cur = self.app.conn.cursor()
         for name in names_to_delete:
             for attr in self.attributes:
                 if attr['name'] == name:
                     self.parent_textEdit.append(_("Attribute deleted: ") + attr['name'])
-                    cur = self.app.conn.cursor()
                     cur.execute("delete from attribute where name = ?", (name,))
                     cur.execute("delete from attribute_type where name = ?", (name,))
         self.app.conn.commit()
         self.attributes = []
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
+        keys = 'name', 'date', 'owner', 'memo', 'caseOrFile', 'valuetype'
         for row in result:
-            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
-            'memo': row[3], 'caseOrFile': row[4],'valuetype': row[5]})
+            self.attributes.append(dict(zip(keys, row)))
         self.fill_tableWidget()
         self.parent_textEdit.append(_("Attributes deleted: ") + ",".join(names_to_delete))
 
