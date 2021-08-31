@@ -101,7 +101,7 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
 <p>Mike MacCana for the source code for the docx module.</p>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
-<p>ebooklib: Aleksandar Erkalović (<a href="https://github.com/aerkalov">https://github.com/aerkalov</a>)</p>\
+<p>ebooklib: Aleksandar Erkalović https://github.com/aerkalov</p>\
 <p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
 <p>To various members on github for supporting this project. Greek translations from staff and students of the University of Macedonia.</p>\
 <h2 class="western">Other details</h2\
