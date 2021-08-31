@@ -46,7 +46,23 @@ from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
-from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+
+vlc_msg = ""
+try:
+    import qualcoder.vlc as vlc
+except Exception as e:
+    vlc_msg = str(e) + "\n"
+    if sys.platform.startswith("win"):
+        imp = False
+    if not imp:
+        msg = str(e) + "\n"
+        msg = "view_av. Cannot import vlc\n"
+        msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
+        msg += "32 bit python AND 32 bit VLC installed."
+        print(msg)
+        vlc_msg = msg
+    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -252,7 +268,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     def export_text_file(self):
         """ Export coding comparison statistics to text file. """
 
-        #TODO revise thise code for this Class
+        #TODO revise this code for this Class
 
         filename = "Coder_comparison.txt"
         e = ExportDirectoryPathDialog(self.app, filename)
@@ -277,7 +293,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         ['colin', 'jemima']
         """
 
-        #TODO
+        #TODO  # tmp
         print(self.file_)  # tmp
         print(self.code_)  # tmp
 
@@ -327,24 +343,79 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         source = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in("audio:", "video:"):
             source = self.file_['mediapath'][7:]
-        #TODO may not need the orignal a/v file
-        '''image = QtGui.QImage(source)
-        if image.isNull():
-            self.clear_file()
-            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
-            logger.warning("Cannot open image: " + source)
+        instance = vlc.Instance()
+        mediaplayer = instance.media_player_new()
+        msecs = 0
+        duration_txt = ""
+        try:
+            media = instance.media_new(source)
+            media.parse()
+            msecs = media.get_duration()
+            duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
+        except Exception as e:
+            logger.debug(str(e))
+            msg = _("Cannot open: ") + source
+            Message(self.app, _("A/V Error"), msg, "warning").exec_()
+            logger.warning("Cannot open A/V media: " + source)
             return
-        self.pixmap = QtGui.QPixmap.fromImage(image)
-        width, height = self.pixmap.width(), self.pixmap.height()'''
-
+        self.ui.textEdit.append(duration_txt)
         cid = self.code_['cid']
-        # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
-        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
+        # coded0 and coded1 are the total segment lengths coded by coder 0 and coder 1
+        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'duration': msecs, 'coded0': 0, 'coded1': 0}
+        print("av 1")
         #TODO get res0 and res1 a/v segments
-        '''cur = self.app.conn.cursor()'''
+        cur = self.app.conn.cursor()
+        sql = "select pos0, pos1, pos1 - pos0, memo, owner from code_av where id=? and cid=? and owner=?"
+        keys = 'pos0', 'pos1', 'seg_len', 'memo', 'owner'
+        res0 = []
+        res1 = []
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
+        results0 = cur.fetchall()
+        total_seg_len_res0 = 0
+        for row in results0:
+            tmp0 = dict(zip(keys, row))
+            tmp0['overlaps'] = []
+            res0.append(tmp0)
+            #total_seg_len_res0 += row[2]
+            total['coded0'] += row[2]
+        cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
+        results1 = cur.fetchall()
+        total_seg_len_res1 = 0
+        for row in results1:
+            tmp1 = dict(zip(keys, row))
+            tmp1['overlaps'] = []
+            res1.append(tmp1)
+            #total_seg_len_res1 += row[2]
+            total['coded1'] += row[2]
+        print(res0)  # tmp
+        print(res1)  # tmp
+
+        #TODO - copied from image calcuations
+        # Calculate overlaps and total intersections
+        for r0 in res0:
+            for r1 in res1:
+                total['dual_coded'] += self.segment_overlap(r0, r1)
+                overlap = self.segment_overlap(r0, r1)
+                if overlap > 0:
+                    r1['overlaps'].append(overlap)
+                    r0['overlaps'].append(overlap)
+        # Summary results
+        '''total['single_coded'] = total_area_res1 + total_area_res1 - total['dual_coded']
+        total['uncoded'] = height * width - total['single_coded'] - total['dual_coded']
+        total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['pixels'], 2)
+        total['dual_percent'] = round(100 * total['dual_coded'] / total['pixels'], 2)
+        total['uncoded_percent'] = round(100 * total['uncoded'] / total['pixels'], 2)
+        total['disagreement'] = round(100 - total['agreement'], 2)'''
+
+    def segment_overlap(self, r0, r1):
+        """ Calcuate overlap of two A/V segments. """
+
+        #TODO
+        return 0
+
 
     def intersect(self, r0, r1):
-        """ Calculation intersection area of two rectangles """
+        """ Calculation intersection area of two rectangles in image coding. """
 
         x1 = max(r0['x1'], r1['x1'])
         y1 = max(r0['y1'], r1['y1'])
@@ -363,7 +434,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
-            self.clear_file()
             Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
             logger.warning("Cannot open image: " + source)
             return
@@ -399,7 +469,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             total_area_res1 += row[4]
             total['coded1'] += row[4]
         # Calculate intersection pixels and total intersections
-        total['dual_coded'] = 0
         for r0 in res0:
             for r1 in res1:
                 total['dual_coded'] += self.intersect(r0, r1)

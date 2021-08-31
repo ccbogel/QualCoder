@@ -74,7 +74,7 @@ from .docx import opendocx, getdocumenttext
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from .edit_textfile import DialogEditTextFile
-from .helpers import Message, ExportDirectoryPathDialog
+from .helpers import Message, ExportDirectoryPathDialog, msecs_to_hours_mins_secs
 from .html_parser import *
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
@@ -659,12 +659,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 media = instance.media_new(abs_path)
                 media.parse()
                 msecs = media.get_duration()
-                secs = int(msecs / 1000)
-                mins = int(secs / 60)
-                remainder_secs = str(secs - mins * 60)
-                if len(remainder_secs) == 1:
-                    remainder_secs = "0" + remainder_secs
-                metadata += _("Duration: ") + str(mins) + ":" + remainder_secs
+                duration_txt = msecs_to_hours_mins_secs(msecs)
+                metadata += _("Duration: ") + duration_txt
             except Exception as e:
                 logger.debug(str(e))
                 metadata += _("Cannot locate media. ") + abs_path
