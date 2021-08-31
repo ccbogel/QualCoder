@@ -1688,9 +1688,16 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
+        # Also need to reload arrow iconsas theydissapear on Windows
         fgc = TextColor(color).recommendation
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
+        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
+        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
@@ -1747,9 +1754,16 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
+        # Also need to reload arrow iconsas theydissapear on Windows
         fgc = TextColor(color).recommendation
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
+        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
+        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
 
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
@@ -1764,6 +1778,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
         self.ui.pushButton_show_codings_next.setStyleSheet("")
+        #TODO to check - may need to reload arrow icons - for Windows
         self.unlight()
         self.highlight()
 
