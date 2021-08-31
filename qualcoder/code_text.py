@@ -2533,8 +2533,11 @@ class DialogCodeText(QtWidgets.QWidget):
     def apply_overline_to_overlaps(self):
         """ Apply overline format to coded text sections which are overlapping.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
+        Do not appyply overline when showing only important codes, as this causes user confusion.
         """
 
+        if self.important:
+            return
         overlapping = []
         overlaps = []
         for i in self.code_text:
