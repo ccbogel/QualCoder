@@ -118,7 +118,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
         self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        # TODO temoprarioly hide this button
+        # TODO temporarily hide this button
         self.ui.pushButton_exporttext.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
@@ -293,10 +293,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         ['colin', 'jemima']
         """
 
-        #TODO  # tmp
-        print(self.file_)  # tmp
-        print(self.code_)  # tmp
-
         txt = _("CODER COMPARISON FOR FILE") + "\n====\n" + _("CODERS: ")
         c1_pos0 = len(txt)
         txt += self.selected_coders[0] + " " + _("(YELLOW CODER 0)")
@@ -362,8 +358,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         cid = self.code_['cid']
         # coded0 and coded1 are the total segment lengths coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'duration': msecs, 'coded0': 0, 'coded1': 0}
-        print("av 1")
-        #TODO get res0 and res1 a/v segments
+        # Get res0 and res1 a/v segments
         cur = self.app.conn.cursor()
         sql = "select pos0, pos1, pos1 - pos0, memo, owner from code_av where id=? and cid=? and owner=?"
         keys = 'pos0', 'pos1', 'seg_len', 'memo', 'owner'
@@ -376,7 +371,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             tmp0 = dict(zip(keys, row))
             tmp0['overlaps'] = []
             res0.append(tmp0)
-            #total_seg_len_res0 += row[2]
             total['coded0'] += row[2]
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
         results1 = cur.fetchall()
@@ -385,12 +379,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             tmp1 = dict(zip(keys, row))
             tmp1['overlaps'] = []
             res1.append(tmp1)
-            #total_seg_len_res1 += row[2]
             total['coded1'] += row[2]
-        print(res0)  # tmp
-        print(res1)  # tmp
 
-        #TODO - copied from image calcuations
         # Calculate overlaps and total intersections
         for r0 in res0:
             for r1 in res1:
@@ -400,19 +390,66 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                     r1['overlaps'].append(overlap)
                     r0['overlaps'].append(overlap)
         # Summary results
-        '''total['single_coded'] = total_area_res1 + total_area_res1 - total['dual_coded']
-        total['uncoded'] = height * width - total['single_coded'] - total['dual_coded']
-        total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['pixels'], 2)
-        total['dual_percent'] = round(100 * total['dual_coded'] / total['pixels'], 2)
-        total['uncoded_percent'] = round(100 * total['uncoded'] / total['pixels'], 2)
-        total['disagreement'] = round(100 - total['agreement'], 2)'''
+        total['single_coded'] = total['coded1'] + total['coded0'] - total['dual_coded']
+        total['uncoded'] = msecs - total['single_coded'] - total['dual_coded']
+        total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / msecs, 2)
+        total['dual_percent'] = round(100 * total['dual_coded'] / msecs, 2)
+        total['uncoded_percent'] = round(100 * total['uncoded'] / msecs, 2)
+        total['disagreement'] = round(100 - total['agreement'], 2)
+        total['kappa'] = "zerodiv"
+        # Calculate kappa
+        try:
+            unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
+            Po = total['dual_coded'] / unique_codings
+            Pyes = total['coded0'] / unique_codings * total['coded1'] / unique_codings
+            Pno = (unique_codings - total['coded0']) / unique_codings * (
+                        unique_codings - total['coded1']) / unique_codings
+            Pe = Pyes * Pno
+            kappa = round((Po - Pe) / (1 - Pe), 4)
+            total['kappa'] = kappa
+        except ZeroDivisionError:
+            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
+            logger.debug(msg)
+        overall = "\nOVERALL SUMMARY\n"
+        overall += _("Total msecs: ") + str(msecs) + ", "
+        overall += _("Dual coded: ") + str(total['dual_coded']) + ", "
+        overall += _("Single coded: ") + str(total['single_coded']) + ", "
+        overall += _("Uncoded: ") + str(total['uncoded']) + ", "
+        overall += _("Coder 0: ") + str(total['coded0']) + ", "
+        overall += _("Coder 1: ") + str(total['coded1']) + "\n"
+        overall += _("Agreement between coders: ") + str(total['agreement']) + "%\n"
+        overall += _("Total msecs dual coded: ") + str(total['dual_percent']) + "%, "
+        overall += _("Total msecs uncoded: ") + str(total['uncoded_percent']) + "%, "
+        overall += _("Total msecs disagreement (single coded): ") + str(total['disagreement']) + "%\n"
+        overall += _("Kappa: ") + str(total['kappa']) + "\n"
+        self.ui.textEdit.append(overall)
+
+        self.ui.textEdit.append(_("Overlaps Coder: ") + self.selected_coders[0])
+        for r in res0:
+            txt = "\n" + "pos0: " + str(r['pos0']) + " pos1: " + str(r['pos1'])
+            if len(r['overlaps']) == 0:
+                txt += " " + _("No overlap")
+            else:
+                txt += "\n" + _("Count of overlaps: ") + str(len(r['overlaps'])) + "\n"
+                txt += str(r['overlaps']) + " " + _("Total: ") + str(sum(r['overlaps'])) + " " + _("msecs") + "\n"
+            self.ui.textEdit.append(txt)
+
+        self.ui.textEdit.append(_("Overlaps Coder: ") + self.selected_coders[1])
+        for r in res1:
+            txt = "\n" + "pos0: " + str(r['pos0']) + " pos1: " + str(r['pos1'])
+            if len(r['overlaps']) == 0:
+                txt += " " + _("No overlap")
+            else:
+                txt += "\n" + _("Count of overlaps: ") + str(len(r['overlaps'])) + "\n"
+                txt += str(r['overlaps']) + " " + _("Total: ") + str(sum(r['overlaps'])) + " " + _("msecs")
+            self.ui.textEdit.append(txt)
 
     def segment_overlap(self, r0, r1):
         """ Calcuate overlap of two A/V segments. """
 
-        #TODO
-        return 0
-
+        result = max(0, min(r0['pos1'], r1['pos1']) - max(r0['pos0'], r1['pos0']))
+        #print("r0", r0['pos0'], r0['pos1'], "r1", r1['pos0'], r1['pos1'], "result", result)
+        return result
 
     def intersect(self, r0, r1):
         """ Calculation intersection area of two rectangles in image coding. """
@@ -477,7 +514,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                     r1['intersections'].append(intersecting_pixels)
                     r0['intersections'].append(intersecting_pixels)
         # Summary results
-        total['single_coded'] = total_area_res1 + total_area_res1 - total['dual_coded']
+        total['single_coded'] = total_area_res1 + total_area_res0 - total['dual_coded']
         total['uncoded'] = height * width - total['single_coded'] - total['dual_coded']
         total['pixels'] += width * height
         total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['pixels'], 2)
