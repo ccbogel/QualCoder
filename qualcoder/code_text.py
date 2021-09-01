@@ -2274,7 +2274,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.load_file(file_)
 
     def go_to_next_file(self):
-        """ Go to next file in list. """
+        """ Go to next file in list. Button. """
 
         if self.file_ is None:
             self.load_file(self.filenames[0])
@@ -2285,10 +2285,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 found = self.filenames[i + 1]
                 self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_file(found)
+                self.search_term = ""
                 return
 
     def go_to_latest_coded_file(self):
-        """ Go and open file with the latest coding. """
+        """ Go and open file with the latest coding. Button. """
 
         sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
         cur = self.app.conn.cursor()
@@ -2300,6 +2301,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if f['id'] == result[0]:
                 self.ui.listWidget.setCurrentRow(i)
                 self.load_file(f)
+                self.search_term = ""
                 break
 
     def go_to_bookmark(self):
@@ -2308,7 +2310,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         The currently loaded text portion may not contain the bookmark.
         Solution - reset the file start and end marks to the entire file length and
-        load the entire text file, and
+        load the entire text file.
         """
 
         cur = self.app.conn.cursor()
@@ -2324,6 +2326,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 try:
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
+                    self.search_term = ""
                     # set text cursor position and also highlight one character, to show location.
                     textCursor = self.ui.textEdit.textCursor()
                     textCursor.setPosition(result[1])
@@ -2339,7 +2342,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.
         The selected file is then displayed for coding.
-        Note: file segment is also loaded from listWidget context menu"""
+        Note: file segment is also loaded from listWidget context menu """
 
         if len(self.filenames) == 0:
             return
@@ -2348,6 +2351,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if f['name'] == itemname:
                 self.file_ = f
                 self.load_file(self.file_)
+                self.search_term = ""
                 break
 
     def load_file(self, file_):
