@@ -543,12 +543,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.underline_text_of_this_code(code_for_underlining)
         # When a code is selected undo the show selected code features
         self.highlight()
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
-        self.ui.pushButton_show_all_codings.setIcon(icon)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_left_icon_24.png'))
-        self.ui.pushButton_show_codings_prev.setIcon(icon)
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/round_arrow_right_icon_24.png'))
-        self.ui.pushButton_show_codings_next.setIcon(icon)
+        # Reload button icons as they dissapear on Windows
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
+        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
+        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
 
     def underline_text_of_this_code(self, code_for_underlining):
         """ User interface, highlight coded text selections for the currently selected code.
@@ -1504,57 +1505,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
                     return True
-            '''
-            # Annotate selected
-            if key == QtCore.Qt.Key_A and selected_text != "":
-                self.annotate()
-                return True
-            # Bookmark
-            if key == QtCore.Qt.Key_B and self.file_ is not None:
-                text_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
-                cur = self.app.conn.cursor()
-                cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
-                self.app.conn.commit()
-                return True
-            # Hide unHide top groupbox
-            if key == QtCore.Qt.Key_H:
-                self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
-                return True
-            # Important  for coded text
-            if key == QtCore.Qt.Key_I:
-                self.set_important(cursor_pos)
-                return True
-            # Memo for current code
-            if key == QtCore.Qt.Key_M:
-                self.coded_text_memo(cursor_pos)
-                return True
-            # Overlapping codes cycle
-            now = datetime.datetime.now()
-            overlap_diff = now - self.overlap_timer
-            if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled() and overlap_diff.microseconds > 150000:
-                self.overlap_timer = datetime.datetime.now()
-                i = self.ui.comboBox_codes_in_text.currentIndex()
-                self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
-                if self.ui.comboBox_codes_in_text.currentIndex() < 1:
-                    self.ui.comboBox_codes_in_text.setCurrentIndex(1)
-                return True
-            # Quick mark selected
-            if key == QtCore.Qt.Key_Q and selected_text != "":
-                self.mark()
-                return True
-            # Recent codes context menu
-            if key == QtCore.Qt.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
-                self.textEdit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
-                return True
-            # Search, with or without selected
-            if key == QtCore.Qt.Key_S and self.file_ is not None:
-                if selected_text == "":
-                    self.ui.lineEdit_search.setFocus()
-                else:
-                    self.ui.lineEdit_search.setText(selected_text)
-                    self.search_for_text()
-                    self.ui.pushButton_next.setFocus()
-                return True'''
         return False
 
     def extend_left(self, code_):
@@ -1750,11 +1700,10 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
+        # Also need to reload arrow icons as they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        # Also need to reload arrow iconsas theydissapear on Windows
         fgc = TextColor(color).recommendation
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
         pm = QtGui.QPixmap()
@@ -1778,7 +1727,15 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
         self.ui.pushButton_show_codings_next.setStyleSheet("")
-        #TODO to check - may need to reload arrow icons - for Windows
+        #fgc = TextColor(color).recommendation
+        #self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
+        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        #self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
+        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
         self.unlight()
         self.highlight()
 
