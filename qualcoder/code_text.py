@@ -97,6 +97,7 @@ class DialogCodeText(QtWidgets.QWidget):
     annotations = []
     search_indices = []
     search_index = 0
+    search_term = ""
     selected_code_index = 0
     eventFilter = None
     important = False  # Show/hide important codes
@@ -754,23 +755,23 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_previous.setEnabled(False)
         self.search_indices = []
         self.search_index = -1
-        search_term = self.ui.lineEdit_search.text()
+        self.search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(search_term) < 3:
+        if len(self.search_term) < 3:
             return
         pattern = None
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
             flags |= re.IGNORECASE
         '''if self.ui.checkBox_search_escaped.isChecked():
-            pattern = re.compile(re.escape(search_term), flags)
+            pattern = re.compile(re.escape(self.search_term), flags)
         else:
             try:
-                pattern = re.compile(search_term, flags)
+                pattern = re.compile(self.search_term, flags)
             except:
                 logger.warning('Bad escape')'''
         try:
-            pattern = re.compile(search_term, flags)
+            pattern = re.compile(self.search_term, flags)
         except:
             logger.warning('Bad escape')
         if pattern is None:
@@ -784,7 +785,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     for match in pattern.finditer(text):
                         self.search_indices.append((filedata, match.start(), len(match.group(0))))
                 except:
-                    logger.exception('Failed searching text %s for %s',filedata['name'],search_term)
+                    logger.exception('Failed searching text %s for %s',filedata['name'],self.search_term)
         else:
             try:
                 if self.text:
@@ -793,7 +794,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         source_name = self.app.get_file_texts([self.file_['id'], ])[0]
                         self.search_indices.append((source_name, match.start(), len(match.group(0))))
             except:
-                logger.exception('Failed searching current file for %s',search_term)
+                logger.exception('Failed searching current file for %s',self.search_term)
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
@@ -813,6 +814,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # (name, id, fullltext, memo, owner, date) and char position and search string length
         if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
             self.load_file(prev_result[0])
+            self.ui.lineEdit_search.setText(self.search_term)
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
@@ -832,6 +834,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # (name, id, fullltext, memo, owner, date) and char position and search string length
         if self.file_ is None or self.file_['id'] != next_result[0]['id']:
             self.load_file(next_result[0])
+            self.ui.lineEdit_search.setText(self.search_term)
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
