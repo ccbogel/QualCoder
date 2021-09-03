@@ -403,7 +403,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
         self.files = []
         cur = self.app.conn.cursor()
-        sql = "select name, id, memo, owner, date, mediapath from source where "
+        sql = "select name, id, memo, owner, date, mediapath, av_text_id from source where "
         sql += "substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " "
         if ids:
             str_ids = list(map(str, ids))
@@ -412,7 +412,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql)
         result = cur.fetchall()
         self.files = []
-        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
+        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath', 'av_text_id'
         for row in result:
             self.files.append(dict(zip(keys, row)))
 
@@ -957,20 +957,27 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.pause()
         self.mediaplayer.audio_set_volume(100)
 
-        # Get the transcribed text and fill textedit
+        # Get the transcription text and fill textedit
+        self.transcription = None
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext, name from source where name = ?", [self.file_['name'] + ".transcribed"])
-        self.transcription = cur.fetchone()
+        if self.file_['av_text_id'] is not None:
+            cur.execute("select id, fulltext, name from source where id=?", [self.file_['av_text_id']])
+            self.transcription = cur.fetchone()
         if self.transcription is None:
-            # Create a new empty transcription file
-            entry = {'name': self.file['name'] + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+            # Create a blank transcription file
+            entry = {'name': self.file['name'] + ".txt", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
                      'owner': self.app.settings['codername'],
                      'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                         (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
                          entry['date']))
             self.app.conn.commit()
-            cur.execute("select id, fulltext from source where name=?", [self.file['name'] + ".transcribed"])
+            cur.execute("select last_insert_rowid()")
+            tr_id_ = cur.fetchone()[0]
+            self.file_['av_text_id'] = tr_id
+            cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
+            self.app.conn.conmmit()
+            cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.ui.textEdit.setText(self.transcription[1])
         self.ui.textEdit.ensureCursorVisible()
@@ -1286,12 +1293,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.app.settings['video_h'] = size.height()
             else:
                 self.app.settings['video_h'] = 80
-        '''# Get absolute video dialog position
-        self.app.settings['codeav_video_pos_x'] = self.ddialog.pos().x()
-        self.app.settings['codeav_video_pos_y'] = self.ddialog.pos().y()
-        #To change below ?
-        self.app.settings['codeav_abs_pos_x'] = self.pos().x()
-        self.app.settings['codeav_abs_pos_y'] = self.pos().y()'''
 
     def create_or_clear_segment(self):
         """ Make the start end end points of the segment of time.
@@ -1937,9 +1938,12 @@ class DialogCodeAV(QtWidgets.QDialog):
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
-        Also merge codes if one code is dropped on another code. """
+        Also merge codes if one code is dropped on another code.
+        param:
+            item: QTreeWidgetItem
+            parent: QTreeWidgetItem """
 
-        # find the category in the list
+        # Find the category in the list
         if item.text(1)[0:3] == 'cat':
             found = -1
             for i in range(0, len(self.categories)):
@@ -1996,6 +2000,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: merge_category()
+        param:
+            item: QTreeWidgetItem
+            no_merge_list: list of ?
         """
 
         #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
@@ -2007,7 +2014,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         return no_merge_list
 
     def merge_category(self, catid):
-        """ Select another category to merge this category into. """
+        """ Select another category to merge this category into.
+        param:
+            catid: integer """
 
         #print(self.ui.treeWidget.currentItem())
         nons = []
@@ -2054,7 +2063,10 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def merge_codes(self, item, parent):
         """ Merge code or category with another code or category.
-        Called by item_moved_update_data when a code is moved onto another code. """
+        Called by item_moved_update_data when a code is moved onto another code.
+        param:
+            item: QTreeWidgetItem
+            parent: QTreeWidgetItem """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         # TODO font size in message box
@@ -2072,11 +2084,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             self.app.delete_backup = False
         except Exception as e:
-            '''e = str(e)
-            msg = _("Cannot merge codes, unmark overlapping text first. ") + "\n" + str(e)
-            Message(self.app, _("Cannot merge"), msg, "warning").exec_()
-            return'''
-            ''' Instead of a confusing warning, delete the duplicate coded text. '''
             pass
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
@@ -2111,7 +2118,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Add a new category.
         Note: the addItem dialog does the checking for duplicate category names
         param:
-            suoercatid : None to add without category, supercatid to add to category. """
+            supercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
@@ -2130,7 +2137,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def delete_category_or_code(self, selected):
-        """ Determine if category or code is to be deleted. """
+        """ Determine if category or code is to be deleted.
+        param:
+            selected: QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
@@ -2140,7 +2149,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code_name data and fill
-        treeWidget. """
+        treeWidget.
+        param:
+            selected: QTreeWidgetItem """
 
         # find the code_in the list, check to delete
         found = -1
@@ -2167,7 +2178,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. """
+        and fill treeWidget.
+        param:
+            selected: QTreeWidgetItem """
 
         found = -1
         for i in range(0, len(self.categories)):
@@ -2191,7 +2204,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
-        """ View and edit a memo to a code. """
+        """ View and edit a memo to a code.
+        param:
+            selected: QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
             # find the code in the list
@@ -2244,7 +2259,9 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category. Checks that the proposed code or category name is
-        not currently in use. """
+        not currently in use.
+        param:
+            selected: QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
@@ -2301,7 +2318,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.delete_backup = False
 
     def change_code_color(self, selected):
-        """ Change the color of the currently selected code. """
+        """ Change the color of the currently selected code.
+        param:
+            selected: QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
         found = -1
@@ -2629,6 +2648,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def change_text_code_pos(self, location, start_or_end):
+        """ Change code start or end character postion in text.
+        param:
+            location: integer
+            start_or_end: 'start' or 'end' """
+
         if self.file_ is None:
             return
         code_list = []
@@ -2796,7 +2820,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.recent_codes = self.recent_codes[:5]
 
     def unmark(self, location):
-        """ Remove code marking by this coder from selected text in current file. """
+        """ Remove code marking by this coder from selected text in current file.
+        param:
+            location: integer """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
             return
@@ -2837,7 +2863,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         params:
-            location : textCursor current position
+            cursor_pos : textCursor current position
         """
 
         if self.transcription is None or self.ui.textEdit.toPlainText() == "":
@@ -3423,21 +3449,33 @@ class DialogViewAV(QtWidgets.QDialog):
         self.installEventFilter(self)  # for rewind, play/stop
 
         # Get the transcription text and fill textedit
+        self.transcription = None
+        print("line 1")
         cur = self.app.conn.cursor()
-        cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
-        self.transcription = cur.fetchone()
+        if self.file_['av_text_id'] is not None:
+            print("2")
+            cur.execute("select id, fulltext from source where id=?", [file_['av_text_id']])
+            self.transcription = cur.fetchone()
         if self.transcription is not None:
+            print("l 3")
             self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             # Commented out as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
+        print("l 4")
         if self.transcription is None:
+            print("l 5")
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                    (file_['name'] + ".transcribed", "", None, "", self.app.settings['codername'],
+                    (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
                     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
             self.app.conn.commit()
-            cur.execute("select id, fulltext from source where name=?", [file_['name'] + ".transcribed"])
+            cur.execute("select last_insert_rowid()")
+            tr_id_ = cur.fetchone()[0]
+            self.file_['av_text_id'] = tr_id
+            cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
+            self.app.conn.conmmit()
+            cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.get_cases_codings_annotations()
         self.text = self.transcription[1]
@@ -3836,7 +3874,9 @@ class DialogViewAV(QtWidgets.QDialog):
             self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
-        """ Insert speaker name using settings format of {} or [] """
+        """ Insert speaker name using settings format of {} or []
+        param:
+            key: """
 
         list_pos = key - 49
         speaker = ""

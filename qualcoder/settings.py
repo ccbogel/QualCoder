@@ -158,6 +158,9 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['codername'] = self.ui.lineEdit_coderName.text()
         if self.settings['codername'] == "":
             self.settings['codername'] = "default"
+        cur = self.app.conn.cursor()
+        cur.execute('update project set codername=?', [self.settings['codername']])
+        self.app.conn.commit()
         self.settings['font'] = self.ui.fontComboBox.currentText()
         self.settings['fontsize'] = self.ui.spinBox.value()
         self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()

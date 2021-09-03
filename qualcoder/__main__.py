@@ -77,7 +77,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_graph_original import ViewGraphOriginal
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.7"
+qualcoder_version = "QualCoder 2.8"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -517,8 +517,8 @@ class App(object):
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
-        QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}\n\
-        QTreeWidget {font-size: 12px;}"
+        QTreeWidget {font-size: 12px;}\n\
+        QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
@@ -531,8 +531,8 @@ class App(object):
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
-        QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}\n\
-        QTreeWidget {font-size: 12px;}"
+        QTreeWidget {font-size: 12px;}\n\
+        QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
@@ -672,10 +672,21 @@ class App(object):
 
     def get_coder_names_in_project(self):
         """ Get all coder names from all tables and from the config.ini file
-        Possible design flaw is that codernames are not stored in a specific table in the database.
+        Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
+        Coder name is stored in Database version 5.
+        Current coder name is in position 0.
         """
 
-        # The coder name may be stored in the config.ini file, so need to add it here as it may not be obtained from the sql
+        # Try except, as there may not be an open project, and might be an older <= v4 database
+        try:
+            cur = self.conn.cursor()
+            cur.execute("select codername from project")
+            res = cur.fetchone()
+            if res[0] is not None:
+                self.settings['codername'] = res[0]
+        except:
+            pass
+        # For versions 1 to 4, current coder name stored in the config.ini file, so is added here.
         coder_names = [self.settings['codername']]
         # Try except, as there may not be an open project
         try:
@@ -815,10 +826,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.recent_projects = self.app.read_previous_project_paths()
         if len(self.recent_projects) == 0:
             return
-        # removes the qtdesigner default action. Also clears the section when a proect is closed
+        # Removes the qtdesigner default action. Also clears the section when a proect is closed
         # so that the options for recent projects can be updated
         self.ui.menuOpen_Recent_Project.clear()
-        #TODO must be a better way to do this
         for i, r in enumerate(self.recent_projects):
             display_name = r
             if len(r.split("|")) == 2:
@@ -910,7 +920,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Project opened, show most menu options.
          Disable project import options. """
 
-        # project menu
+        # Project menu
         self.ui.actionClose_Project.setEnabled(True)
         self.ui.actionProject_Memo.setEnabled(True)
         self.ui.actionProject_Exchange_Export.setEnabled(True)
@@ -919,19 +929,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(False)
         self.ui.actionRQDA_Project_import.setEnabled(False)
         self.ui.actionExport_codebook.setEnabled(True)
-        # files cases journals menu
+        # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
         self.ui.actionManage_cases.setEnabled(True)
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey.setEnabled(True)
-        # codes menu
+        # Codes menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
-        # reports menu
+        # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCoding_comparison_by_file.setEnabled(True)
@@ -940,7 +950,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
         self.ui.actionCode_summary.setEnabled(True)
-        # help menu
+        # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
         #TODO FOR FUTURE EXPANSION text mining
@@ -985,14 +995,14 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.show()"""
 
     def report_coding_comparison(self):
-        """ Compare two or more coders using Cohens Kappa. """
+        """ Compare two or more coders across all text files using Cohens Kappa. """
 
         self.ui.label_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_compare_coders_by_file(self):
-        """ Compare two coders selection by  file. """
+        """ Compare two coders selection by file - text, A/V or image. """
 
         self.ui.label_reports.hide()
         ui = DialogCompareCoderByFile(self.app, self.ui.textEdit)
@@ -1279,8 +1289,11 @@ class MainWindow(QtWidgets.QMainWindow):
         Note the database does not keep a table specifically for users (coders), instead
         usernames can be freely entered through the settings dialog and are collated from
         coded text, images and a/v.
-        v2 ha added column in code_text table to link to avid in code_av table.
+        v2 has added column in code_text table to link to avid in code_av table.
         v3 has added columns in code_text, code_image, code_av for important - to mark particular important codings.
+        v4 has added column ctid (autonumber) in code_text.
+        v5 had added column for codername in project. added column for av_text_id in source to link A/V with text file.
+            And a stored_sql table.
         """
 
         self.app = App()
@@ -1316,8 +1329,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
         self.app.create_connection(self.app.project_path)
         cur = self.app.conn.cursor()
-        cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer);")
-        cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name));")
+        cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer, codername text);")
+        cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, av_text_id integer, unique(name));")
         cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
         cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
         cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner));")
@@ -1329,7 +1342,9 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
         cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?)", ('v4', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0))
+        cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
+                    ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
             # get and display some project details
@@ -1391,9 +1406,9 @@ class MainWindow(QtWidgets.QMainWindow):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
             self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
-            # Close all opened dialogs as coder name needs to change everywhere
             # Remove widgets from each tab
             contents = self.ui.tab_reports.layout()
             if contents:
@@ -1434,6 +1449,8 @@ class MainWindow(QtWidgets.QMainWindow):
         The backup is deleted, if no changes occured.
         Backups are created using the date and 24 hour suffix: _BKUP_yyyymmdd_hh
         Backups are not replaced within the same hour.
+        Update older databases to current version mainly by adding columns and tables.
+        Table constraints are not updated (code_text dupliated codings).
         param:
             path: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
@@ -1484,21 +1501,22 @@ class MainWindow(QtWidgets.QMainWindow):
             self.close_project()
             return
 
-        #TODO Potential design flaw to have the current coders name in the config.ini file
-        #TODO as is would change when opening different projects
+        # Potential design flaw to have the current coders name in the config.ini file
+        # as it would change to this coder when opening different projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
+        # Datbase version 5 (QualCoder 2.8 and newer) stores the current coder in the project table
         names = self.app.get_coder_names_in_project()
         if self.app.settings['codername'] not in names and len(names) > 0:
             self.app.settings['codername'] = names[0]
             self.app.write_config_ini(self.app.settings)
             self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
-        # get and display some project details
+        # Display some project details
         self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
         self.setWindowTitle("QualCoder " + self.app.project_name)
 
-        # Check avid column in code_text table, v2
+        # Check avid column in code_text table, Database version v2
         cur = self.app.conn.cursor()
         try:
             cur.execute("select avid from code_text")
@@ -1516,9 +1534,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.app.conn.commit()
                 cur.execute("ALTER TABLE project ADD bookmarkpos integer")
                 self.app.conn.commit()
+                self.ui.textEdit.append(_("Updating database to version") + " v2")
             except Exception as e:
                 logger.debug(str(e))
-        # Check important column in code_text, code_image, code_av v3
+        # Database version v3
         cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_text")
@@ -1544,9 +1563,10 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_image ADD important integer")
                 self.app.conn.commit()
+                self.ui.textEdit.append(_("Updating database to version") + " v3")
             except Exception as e:
                 logger.debug(str(e))
-        # database version v4
+        # Database version v4
         try:
             cur.execute("select ctid from code_text")
         except:  # sqlite3.OperationalError as e:
@@ -1561,15 +1581,43 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("alter table code_text2 rename to code_text")
             cur.execute('update project set databaseversion="v4", about=?', [qualcoder_version])
             self.app.conn.commit()
-
-        # Save a date and 24hour stamped backup
+            self.ui.textEdit.append(_("Updating database to version") + " v4")
+        # Database version v5
+        # Add codername to project, add av_text_id to source, add stored sql table
+        try:
+            cur.execute("select codername from project")
+        except:  # sqlite3.OperationalError as e:
+            print(self.app.settings['codername'])
+            cur.execute("ALTER TABLE project ADD codername text")
+            self.app.conn.commit()
+            cur.execute('update project set databaseversion="v5", about=?, codername=?', [qualcoder_version], self.app.settings['codername'])
+            self.app.conn.commit()
+        try:
+            cur.execute("select av_text_id from source")
+        except:  # sqlite3.OperationalError as e:
+            cur.execute('ALTER TABLE source ADD av_text_id integer')
+            self.app.conn.commit()
+            # Add id link from AV file to text file.
+            av_files = self.app.get_av_filenames()  # id, name, memo
+            text_files = self.app.get_text_filenames()  # id, name, memo
+            for av in av_files:
+                for t in text_files:
+                    if av['name'] + ".transcribed" == t['name']:
+                        cur.execute('update source set av_text_id =? where id=?', [t['id'], av['id']])
+                        self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v5")
+        try:
+            cur.execute("select title from stored_sql")
+        except:  # sqlite3.OperationalError as e:
+            cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
+            self.app.conn.commit()
+        # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
         msg = "\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
-
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
@@ -1593,6 +1641,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for r in res:
             cur.execute("delete from code_av where id=?", [r[0]])
         self.app.conn.commit()
+
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()

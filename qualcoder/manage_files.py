@@ -502,8 +502,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Documents images and audio contain the filetype suffix.
         No suffix implies the 'file' was imported from a survey question or created internally.
         This also fills out the table header labels with file attribute names.
-        Files with the '.transcribed' suffix mean they are associated with audio and
+        Db versions < 5: Files with the '.transcribed' suffix mean they are associated with audio and
         video files.
+        Db version 5+: av_text_id links the text file to the audio/video
         Obtain some file metadata to use in table tooltip.
         param:
             order_by: string ""= name, "date" = date, "filetype" = mediapath,
@@ -517,14 +518,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         placeholders = None
         # default alphabetic order
-        sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by upper(name)"
+        sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by upper(name)"
         if order_by == "date":
-            sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by date, upper(name)"
+            sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by date, upper(name)"
         if order_by == "filetype":
-            sql = "select name, id, fulltext, mediapath, memo, owner, date from source order by mediapath"
+            sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by mediapath"
         if order_by == "casename":
             sql = 'select distinct source.name, source.id, source.fulltext, source.mediapath, source.memo, source.owner, \
-                    source.date \
+                    source.date, , av_text_id \
                     from source left join case_text on source.id=case_text.fid \
                     left join cases on cases.caseid=case_text.caseid \
                    order by cases.name, source.name '
@@ -534,7 +535,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             # two types of ordering character or numeric
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
-            sql = 'select source.name, source.id, fulltext, mediapath, source.memo, source.owner, source.date \
+            sql = 'select source.name, source.id, fulltext, mediapath, source.memo, source.owner, source.date, av_text_id \
                 from source  join attribute on attribute.id = source.id \
                 where attribute.attr_type = "file" and attribute.name=? '
             if attr_type == "character":
@@ -548,10 +549,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql)
         result = cur.fetchall()
         for row in result:
-            icon, metadata = self.get_icon_and_metadata(row[0], row[2], row[3])
+            icon, metadata = self.get_icon_and_metadata(row[1])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
             'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
-            'metadata': metadata, 'icon': icon, 'case': self.get_cases_by_filename(row[0])})
+            'av_text_id': row[7], 'metadata': metadata, 'icon': icon,
+            'case': self.get_cases_by_filename(row[0])})
         # attributes
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         sql = "select name from attribute_type where caseOrFile='file'"
@@ -570,43 +572,49 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.attributes.append(row)
         self.fill_table()
 
-    def get_icon_and_metadata(self, name, fulltext, mediapath):
+    def get_icon_and_metadata(self, id_):
         """ Get metadata used in table tooltip.
         Called by: create, load_file_data
         param:
-            name: string
-            fulltext: None or string
-            mediapath: None or string
+            id_  : integer source.id
         """
 
-        metadata = name + "\n"
+        cur = self.app.conn.cursor()
+        cur.execute("select name, fulltext, mediapath from source where id=?", [id_])
+        res = cur.fetchone()
+        metadata = res[0] + "\n"
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(text), "png")
         icon = QtGui.QIcon(pm)
-        if fulltext is not None and len(fulltext) > 0 and mediapath is None:
-            metadata += _("Characters: ") + str(len(fulltext))
+        # Check if text file is a transcription and add details
+        cur.execute("select name from source where av_text_id=?", [id_])
+        tr_res = cur.fetchone()
+        if tr_res is not None:
+            metadata += _("Transcript for: ") + tr_res[0] + "\n"
+        if res[1] is not None and len(res[1]) > 0 and res[2] is None:
+            metadata += _("Characters: ") + str(len(res[1]))
             return icon, metadata
-        if mediapath is None:
+        if res[2] is None:
             logger.debug("empty media path error")
             return icon, metadata
-        if fulltext is not None and len(fulltext) > 0 and mediapath[0:5] == 'docs:':
-            metadata += _("Characters: ") + str(len(fulltext))
+        if res[1] is not None and len(res[1]) > 0 and res[2][0:5] == 'docs:':
+            metadata += _("Characters: ") + str(len([res[1]]))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
             icon = QtGui.QIcon(pm)
             return icon, metadata
 
         abs_path = ""
-        if 'audio:' == mediapath[0:6]:
-            abs_path = mediapath[6:]
-        elif 'video:' == mediapath[0:6]:
-            abs_path = mediapath[6:]
-        elif 'images:' == mediapath[0:7]:
-            abs_path = mediapath[7:]
+        if 'audio:' == res[2][0:6]:
+            abs_path = res[2][6:]
+        elif 'video:' == res[2][0:6]:
+            abs_path = res[2][6:]
+        elif 'images:' == res[2][0:7]:
+            abs_path = res[2][7:]
         else:
-            abs_path = self.app.project_path + mediapath
+            abs_path = self.app.project_path + res[2]
 
-        if mediapath[:8] == "/images/":
+        if res[2][:8] == "/images/":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
             icon = QtGui.QIcon(pm)
@@ -619,7 +627,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
-        if mediapath[:7] == "images:":
+        if res[2][:7] == "images:":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(picture_link), "png")
             icon = QtGui.QIcon(pm)
@@ -632,23 +640,23 @@ class DialogManageFiles(QtWidgets.QDialog):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += "W: " + str(w) + " x H: " + str(h)
-        if mediapath[:7] == "/video/":
+        if res[2][:7] == "/video/":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play), "png")
             icon = QtGui.QIcon(pm)
-        if mediapath[:6] == "video:":
+        if res[2][:6] == "video:":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play_link), "png")
             icon = QtGui.QIcon(pm)
-        if mediapath[:7] == "/audio/":
+        if res[2][:7] == "/audio/":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(sound), "png")
             icon = QtGui.QIcon(pm)
-        if mediapath[:6] == "audio:":
+        if res[2][:6] == "audio:":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(sound_link), "png")
             icon = QtGui.QIcon(pm)
-        if mediapath[:6] in ("/audio", "audio:", "/video", "video:"):
+        if res[2][:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
@@ -676,7 +684,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if bytes > 1024 * 1024:
             metadata += "  " + str(int(bytes / 1024 / 1024)) + "MB"
         # Get case names linked to the file
-        txt = self.get_cases_by_filename(name)
+        txt = self.get_cases_by_filename(res[0])
         if txt != "":
             metadata += "\n" + _("Case linked:") + "\n" + txt
         return icon, metadata
@@ -826,7 +834,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
-        '''# Important. Fulltext may need to be updated, if a transcribed files have been edited via viewAV
+        '''# Important. Fulltext may need to be updated, if transcribed files have been edited via viewAV
         cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
         res = cur.fetchone()
         fulltext = ""
@@ -845,7 +853,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source[x]['fulltext'] = fulltext
 
     def view_av(self, x):
-        """ View an audio or video file. Edit the memo. Edit the transcribed file.
+        """ View an audio or video file. Edit the memo. Edit the transcript file.
         Added try block in case VLC bindings do not work.
         Uses a non-modal dialog.
 
@@ -862,7 +870,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not os.path.exists(abs_path):
             self.parent_textEdit.append(_("Bad link or non-existent file ") + abs_path)
             return
-
         try:
             ui = DialogViewAV(self.app, self.source[x])
             #ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
@@ -939,7 +946,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         ui = DialogEditTextFile(self.app, id_)
         ui.exec_()
         filetext = ui.text
-        icon, metadata = self.get_icon_and_metadata(name, filetext, None)
+        icon, metadata = self.get_icon_and_metadata(id_)
         entry['icon'] = icon
         entry['metadata'] = metadata
 
@@ -1126,7 +1133,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(None, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
-        'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'av_text_id': None}
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
             (entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'], entry['fulltext']))
@@ -1144,15 +1152,19 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Create an empty transcription file for audio and video
         if mediapath[:6] in("/audio", "audio:", "/video", "video:"):
-            entry = {'name': filename + ".transcribed", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
-            'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+            entry = {'name': filename + ".txt", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+            'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'av_text_id': None}
             cur = self.app.conn.cursor()
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                 (entry['name'],  entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'], entry['date']))
             self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
-            id_ = cur.fetchone()[0]
-            entry['id'] = id_
+            tr_id = cur.fetchone()[0]
+            entry['id'] = tr_id
+            # Update av file entry with av_text_id link to this text file
+            cur.execute("update source set av_text_id=? where id=?", [tr_id, id_])
+            self.app.conn.commit()
 
             # Add file attribute placeholders
             att_sql = 'select name from attribute_type where caseOrFile ="file"'
@@ -1160,7 +1172,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             attr_types = cur.fetchall()
             insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
             for a in attr_types:
-                placeholders = [a[0], id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                placeholders = [a[0], tr_id, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     self.app.settings['codername']]
                 cur.execute(insert_sql, placeholders)
                 self.app.conn.commit()
@@ -1469,6 +1481,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.app.conn.commit()
             # Delete image, audio or video source
             if s['mediapath'] is not None and 'docs:' not in s['mediapath']:
+                # Get linked transcript file id
+                cur.execute("select av_text_id from source where id=?")
+                res = cur.fetchone()
+                av_text_id = res[0]
                 # Remove avid links in code_text
                 sql = "select avid from code_av where id=?"
                 cur.execute(sql, [s['id']])
@@ -1493,12 +1509,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 self.app.conn.commit()
 
-                # Delete the .transcribed text file
-                transcribed = s['name'] + ".transcribed"
-                print("transcribed ", transcribed)
-                cur.execute("select id from source where name=?", [transcribed])
-                res = cur.fetchone()
-                if res is not None:
+                # Delete linked transcription text file
+                if av_text_id is not None:
                     cur.execute("delete from source where id = ?", [res[0]])
                     cur.execute("delete from code_text where fid = ?", [res[0]])
                     cur.execute("delete from annotation where fid = ?", [res[0]])
@@ -1557,6 +1569,10 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
+            # Get linked transcript file id
+            cur.execute("select av_text_id from source where id=?")
+            res = cur.fetchone()
+            av_text_id = res[0]
             # Remove avid links in code_text
             sql = "select avid from code_av where id=?"
             cur.execute(sql, [file_id])
@@ -1579,12 +1595,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
 
-            # Delete the .transcribed text file
-            transcribed = self.source[row]['name'] + ".transcribed"
-            print("transcribed ", transcribed)
-            cur.execute("select id from source where name=?", [transcribed])
-            res = cur.fetchone()
-            if res is not None:
+            # Delete transcription text file
+            if av_text_id is not None:
                 cur.execute("delete from source where id = ?", [res[0]])
                 cur.execute("delete from code_text where fid = ?", [res[0]])
                 cur.execute("delete from annotation where fid = ?", [res[0]])
