@@ -6,7 +6,7 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, ep
 This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on Linux Mint 18.04 Lubuntu 18.04, Mac OS.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-## IMPORTANT NOTE Current2.8 version with database version v5
+### IMPORTANT NOTE The current in development QualCoder 2.8 version with database version v5 (downloaded with the above green button)
 Due to changes made, transcriptions created with QualCoder 2.8 will have a .txt file ending. These transcription files will not be recoginsed as such in older QualCoder versions (2.7 and earlier). You will have to change the transcription filename to change the '.txt' ending to '.transcribed'
 An Example: in Sql Statements run this sql to have older versions recognise transcriptions: 
 
