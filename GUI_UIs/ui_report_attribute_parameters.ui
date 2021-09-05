@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>758</width>
-    <height>527</height>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,7 +48,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>85</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -58,8 +58,9 @@
       </size>
      </property>
      <property name="text">
-      <string>Select parameters for the attributes below. 
-The value list can be a single value  or a list where each list item is separated by a semi-colon ';'.
+      <string>Select parameters for the attributes. 
+between requires 2 values separated by ; e.g. 1;100
+ in and not in require 1 or more values separated by ;
 Wildcards for 'like' are % and _</string>
      </property>
      <property name="wordWrap">
