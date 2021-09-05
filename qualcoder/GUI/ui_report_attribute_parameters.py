@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_report_attribute_parameters(object):
     def setupUi(self, Dialog_report_attribute_parameters):
         Dialog_report_attribute_parameters.setObjectName("Dialog_report_attribute_parameters")
-        Dialog_report_attribute_parameters.resize(758, 527)
+        Dialog_report_attribute_parameters.resize(758, 509)
         self.gridLayout = QtWidgets.QGridLayout(Dialog_report_attribute_parameters)
         self.gridLayout.setObjectName("gridLayout")
         self.tableWidget = QtWidgets.QTableWidget(Dialog_report_attribute_parameters)
@@ -32,7 +32,7 @@ class Ui_Dialog_report_attribute_parameters(object):
         self.tableWidget.setHorizontalHeaderItem(4, item)
         self.gridLayout.addWidget(self.tableWidget, 1, 0, 1, 2)
         self.label = QtWidgets.QLabel(Dialog_report_attribute_parameters)
-        self.label.setMinimumSize(QtCore.QSize(0, 80))
+        self.label.setMinimumSize(QtCore.QSize(0, 85))
         self.label.setMaximumSize(QtCore.QSize(16777215, 80))
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
@@ -60,8 +60,9 @@ class Ui_Dialog_report_attribute_parameters(object):
         item.setText(_translate("Dialog_report_attribute_parameters", "Operator"))
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("Dialog_report_attribute_parameters", "Value list"))
-        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters for the attributes below. \n"
-"The value list can be a single value  or a list where each list item is separated by a semi-colon \';\'.\n"
+        self.label.setText(_translate("Dialog_report_attribute_parameters", "Select parameters for the attributes. \n"
+"between requires 2 values separated by ; e.g. 1;100\n"
+" in and not in require 1 or more values separated by ;\n"
 "Wildcards for \'like\' are % and _"))
 
 
