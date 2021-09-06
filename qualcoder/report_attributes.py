@@ -115,7 +115,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             operator = self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).currentText()
             if operator == '':
                 values = []
-            if operator in ('<', '<=', '>', '>=', '==', 'like') and len(values) > 1:
+            if operator in ('<', '<=', '>', '>=', '=', 'like') and len(values) > 1:
                values = [values[0]]
             if operator == 'between' and len(values) > 2:
                 values = values[:2]
@@ -142,7 +142,6 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
                 self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
                 operator, values])
-
         super(DialogSelectAttributeParameters, self).accept()
 
     def reject(self):
@@ -168,7 +167,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             Message(self.app, _('Warning'), _("No operator was selected"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText('')
         # enforce that value list is only one item for selected operators
-        if operator in ('<','<=','>','>=','==','like') and len(values) > 1:
+        if operator in ('<','<=','>','>=','=','like') and len(values) > 1:
             Message(self.app, _('Warning'), _("Too many values given for this operator"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
@@ -220,12 +219,13 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(a['valuetype'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.TYPE_COLUMN, item)
-            item = QtWidgets.QComboBox()
-            items = ['', '<', '>', '<=', '>=', '==', '!=', 'in', 'not in', 'between', 'like']
+            cb = QtWidgets.QComboBox()
+            cb.setMinimumWidth(100)  # To show 'between' wording
+            items = ['', '<', '>', '<=', '>=', '=', '!=', 'in', 'not in', 'between', 'like']
             if self.limiter == "file" and a['caseOrFile'] == "case":
-                items = ['', '==', '!=', 'like']
-            item.addItems(items)
-            self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, item)
+                items = ['', '=', '!=', 'like']
+            cb.addItems(items)
+            self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, cb)
             item = QtWidgets.QTableWidgetItem('')
             #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             tt = self.get_tooltip_values(a['name'], a['caseOrFile'], a['valuetype'])
