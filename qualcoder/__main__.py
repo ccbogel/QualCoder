@@ -1590,7 +1590,7 @@ class MainWindow(QtWidgets.QMainWindow):
             print(self.app.settings['codername'])
             cur.execute("ALTER TABLE project ADD codername text")
             self.app.conn.commit()
-            cur.execute('update project set databaseversion="v5", about=?, codername=?', [qualcoder_version], self.app.settings['codername'])
+            cur.execute('update project set databaseversion="v5", about=?, codername=?', [qualcoder_version, self.app.settings['codername']])
             self.app.conn.commit()
         try:
             cur.execute("select av_text_id from source")
