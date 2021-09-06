@@ -18,6 +18,7 @@ ui_dialog_manage_links.py \
 ui_dialog_memo.py \
 ui_dialog_refi_export_endings.py \
 ui_dialog_report_code_frequencies.py \
+ui_dialog_report_compare_coder_file.py \
 ui_dialog_report_codings.py \
 ui_dialog_report_comparisons.py \
 ui_dialog_report_file_summary.py \
@@ -32,6 +33,7 @@ ui_dialog_view_image.py \
 ui_main.py \
 ui_queryDetails.py \
 ui_report_attribute_parameters.py \
+ui_save_query.py \
 ui_visualise_graph_original.py
 TRANSLATIONS    = app_de.ts \
                   app_el.ts \
