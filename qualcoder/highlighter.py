@@ -96,9 +96,12 @@ class Highlighter(QSyntaxHighlighter):
         # Data types
         data_types = ["TEXT", "NUMERIC", "INTEGER", "REAL", "INT", "TINYINT", "SMALLINT",
                       "MEDIUMINT", "BIGINT", "CHARACTER", "VARCHAR", "NCHAR", "NVARCHAR", "CLOB", "DOUBLE",
-                      "FLOAT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME", "NONE", "text", "numeric", "integer",
-                      "real", "int", "tinyint", "smallint", "mediumint", "bigint", "character", "varchar", "nchar",
-                      "nvarchar", "clob", "double", "float", "decimal", "boolean", "date", "datetime", "none"]
+                      "FLOAT", "DECIMAL", "BOOLEAN", "DATE", "DATETIME", "NONE"]
+        tmp = []
+        for k in data_types:
+            tmp.append(" " + k)
+            tmp.append(" " + k.lower())
+        data_types = tmp    
         data_types_format = QTextCharFormat()
         brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
         data_types_format.setForeground(brush)
@@ -107,9 +110,13 @@ class Highlighter(QSyntaxHighlighter):
                                     for word in data_types]
 
         # Functions
-        function_words = ["count", "max", "min", "avg", "sum", "random", "abs", "upper",
-                          "lower", "length", "sqlite_version", "COUNT", "MAX", "MIN", "AVG", "SUM", "RANDOM", "ABS",
+        function_words = ["COUNT", "MAX", "MIN", "AVG", "SUM", "RANDOM", "ABS",
                           "UPPER", "LOWER", "LENGTH", "SQLITE_VERSION", ]
+        tmp = []
+        for k in function_words:
+            tmp.append(" " + k)
+            tmp.append(" " + k.lower())
+        function_words = tmp    
         functions_format = QTextCharFormat()
         brush = QBrush(Qt.darkBlue, Qt.SolidPattern)
         if dark:
