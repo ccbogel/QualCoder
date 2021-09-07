@@ -70,16 +70,16 @@ class DialogSaveSql(QtWidgets.QDialog):
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
 
-    def accepted(self):
-        """ Accepted button overridden method """
-        
+    def accept(self):
+        """ Accept button overridden method """
+
         self.name = self.ui.lineEdit_name.text()
         self.grouper = self.ui.lineEdit_group.text()
         self.description = self.ui.textEdit.toPlainText()
-        self.ui.Dialog_information.accept()
+        super().accept()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ui = DialogInformation(None, "a title", "")
+    ui = DialogSaveSql(None, "a title", "")
     ui.show()
     sys.exit(app.exec_())

@@ -85,10 +85,10 @@ class DialogInformation(QtWidgets.QDialog):
         self.text = html
         self.ui.textEdit.setHtml(self.text)
 
-    def accepted(self):
+    def accept(self):
         """ Accepted button overridden method """
         self.information = self.ui.textEdit.toPlainText()
-        self.ui.Dialog_information.accept()
+        super().accept()
 
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
