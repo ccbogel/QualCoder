@@ -13,8 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_DialogSaveQuery(object):
     def setupUi(self, DialogSaveQuery):
         DialogSaveQuery.setObjectName("DialogSaveQuery")
-        DialogSaveQuery.resize(379, 172)
-        DialogSaveQuery.setMaximumSize(QtCore.QSize(16777215, 180))
+        DialogSaveQuery.resize(587, 443)
+        DialogSaveQuery.setMaximumSize(QtCore.QSize(16777215, 1000))
         self.verticalLayout = QtWidgets.QVBoxLayout(DialogSaveQuery)
         self.verticalLayout.setObjectName("verticalLayout")
         self.label_name = QtWidgets.QLabel(DialogSaveQuery)
@@ -29,6 +29,14 @@ class Ui_DialogSaveQuery(object):
         self.lineEdit_group = QtWidgets.QLineEdit(DialogSaveQuery)
         self.lineEdit_group.setObjectName("lineEdit_group")
         self.verticalLayout.addWidget(self.lineEdit_group)
+        self.label_2 = QtWidgets.QLabel(DialogSaveQuery)
+        self.label_2.setObjectName("label_2")
+        self.verticalLayout.addWidget(self.label_2)
+        self.textEdit = QtWidgets.QTextEdit(DialogSaveQuery)
+        self.textEdit.setMinimumSize(QtCore.QSize(0, 60))
+        self.textEdit.setMaximumSize(QtCore.QSize(16777215, 800))
+        self.textEdit.setObjectName("textEdit")
+        self.verticalLayout.addWidget(self.textEdit)
         self.buttonBox = QtWidgets.QDialogButtonBox(DialogSaveQuery)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
@@ -45,6 +53,7 @@ class Ui_DialogSaveQuery(object):
         DialogSaveQuery.setWindowTitle(_translate("DialogSaveQuery", "Save Query"))
         self.label_name.setText(_translate("DialogSaveQuery", "Query name:"))
         self.label.setText(_translate("DialogSaveQuery", "Query Group"))
+        self.label_2.setText(_translate("DialogSaveQuery", "Description"))
 
 
 if __name__ == "__main__":
