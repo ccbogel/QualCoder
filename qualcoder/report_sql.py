@@ -37,6 +37,7 @@ import traceback
 
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_SQL import Ui_Dialog_sql
+from .save_sql_query import DialogSaveSql
 from .helpers import ExportDirectoryPathDialog, Message
 from .highlighter import Highlighter
 
@@ -65,6 +66,7 @@ class DialogSQL(QtWidgets.QDialog):
     schema = None
     parent_textEdit = None
     sql = ""
+    stored_sqls = []  # a list of dictionaries of user created sql
     delimiter = "\t"  # default delimiter for file exports
     file_data = []  # for file exports
     results = None  # SQL results
@@ -192,17 +194,27 @@ class DialogSQL(QtWidgets.QDialog):
     def get_item(self):
         """ Get the selected table name or tablename.fieldname and add to the sql text
         at the current cursor position.
-        Also get a prepared query and replace sql text in the text edit. """
+        Get a default query and replace sql text in text edit.
+        Get a stored query and replace sql text in text edit """
 
         item_text = self.ui.treeWidget.currentItem().text(0)
         index = self.ui.treeWidget.currentIndex()
+        # Check use stored sql to fill corect text for sql
+        for s in self.stored_sqls:
+            if index == s['index']:
+                self.ui.textEdit_sql.clear()
+                self.ui.textEdit_sql.setText(s['ssql'])
+                return
+
         if index.parent().row() != -1:  # there is a parent if not -1
             item_parent = self.ui.treeWidget.itemFromIndex(index.parent())
             item_parent_text = item_parent.text(0)
-            if item_parent_text != "-- Query --":
-                item_text = item_parent_text + "." + item_text
-            if item_parent_text == "-- Query --":
+            if item_parent_text == "Default Queries":
                 self.ui.textEdit_sql.clear()
+                self.ui.textEdit_sql.setText(item_text)
+                return
+            if item_parent_text != "Default Queries":
+                item_text = item_parent_text + "." + item_text
         cursor = self.ui.textEdit_sql.textCursor()
         cursor.insertText(" " + item_text + " ")
 
@@ -278,6 +290,7 @@ class DialogSQL(QtWidgets.QDialog):
         """ Get table schema from database, and update the tables_an_views tree widget.
         The schema needs to be updated when drop table or create queries are run. """
 
+        self.stored_sqls = []
         self.schema = []
         table_dict = {}
         cur = self.app.conn.cursor()
@@ -319,12 +332,28 @@ class DialogSQL(QtWidgets.QDialog):
 
         # Add prepared query sqls
         query_item = QtWidgets.QTreeWidgetItem()
-        query_item.setText(0, "-- Query --")
+        query_item.setText(0, _("Default Queries"))
         self.ui.treeWidget.addTopLevelItem(query_item)
         for query in EXTRA_SQL:
             item = QtWidgets.QTreeWidgetItem()
             item.setText(0, query)
             query_item.addChild(item)
+
+        # Add user stored queries
+        sql = "select title, description, grouper, ssql from stored_sql"
+        cur.execute(sql)
+        res = cur.fetchall()
+        if res == []:
+            return
+        ssql_item = QtWidgets.QTreeWidgetItem()
+        ssql_item.setText(0, _("Saved Queries"))
+        self.ui.treeWidget.addTopLevelItem(ssql_item)
+        for r in res:
+            item = QtWidgets.QTreeWidgetItem()
+            item.setText(0, r[0])
+            item.setToolTip(0,r[1])
+            ssql_item.addChild(item)
+            self.stored_sqls.append({'index': self.ui.treeWidget.indexFromItem(item), 'ssql': r[3]})
 
     def sql_menu(self, position):
         """ Context menu to textedit_sql
@@ -337,9 +366,13 @@ class DialogSQL(QtWidgets.QDialog):
         action_paste = menu.addAction(_("Paste"))
         action_delete = menu.addAction(_("Delete"))
         action_select_all_from = menu.addAction("SELECT * FROM ")
+        action_save_query = None
+        if len(self.ui.textEdit_sql.toPlainText()) > 2:
+            action_save_query = menu.addAction(_("Save query"))
         action = menu.exec_(self.ui.textEdit_sql.mapToGlobal(position))
         cursor = self.ui.textEdit_sql.textCursor()
-
+        if action is None:
+            return
         if action == action_delete:
             text = cursor.selectedText()
             if text is None or text == "":
@@ -370,6 +403,26 @@ class DialogSQL(QtWidgets.QDialog):
             self.ui.textEdit_sql.setTextCursor(cursor)
         if action == action_select_all_from:
             cursor.insertText("SELECT * FROM ")
+        if action == action_save_query:
+            self.save_query()
+
+    def save_query(self):
+        """ Save query in stored_sql table. """
+
+        ssql = self.ui.textEdit_sql.toPlainText()
+        ui = DialogSaveSql(self.app)
+        ui.exec_()
+        title = ui.name
+        grouper = ui.grouper
+        description = ui.description
+        cur = self.app.conn.cursor()
+        sql = "insert into stored_sql (title, description, grouper, ssql) values (?,?,?,?)"
+        try:
+            cur.execute(sql, [title, description, grouper, ssql])
+            self.app.conn.commit()
+        except Exception as e:
+            Message(self.app, "Cannot save", str(e)).exec_()
+        self.get_schema_update_treeWidget()
 
     # Start of table results context menu section
     def table_menu(self, position):
