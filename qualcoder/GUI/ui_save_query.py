@@ -13,7 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_DialogSaveQuery(object):
     def setupUi(self, DialogSaveQuery):
         DialogSaveQuery.setObjectName("DialogSaveQuery")
-        DialogSaveQuery.resize(379, 227)
+        DialogSaveQuery.resize(379, 172)
+        DialogSaveQuery.setMaximumSize(QtCore.QSize(16777215, 180))
         self.verticalLayout = QtWidgets.QVBoxLayout(DialogSaveQuery)
         self.verticalLayout.setObjectName("verticalLayout")
         self.label_name = QtWidgets.QLabel(DialogSaveQuery)
@@ -28,10 +29,6 @@ class Ui_DialogSaveQuery(object):
         self.lineEdit_group = QtWidgets.QLineEdit(DialogSaveQuery)
         self.lineEdit_group.setObjectName("lineEdit_group")
         self.verticalLayout.addWidget(self.lineEdit_group)
-        self.textEdit = QtWidgets.QTextEdit(DialogSaveQuery)
-        self.textEdit.setReadOnly(True)
-        self.textEdit.setObjectName("textEdit")
-        self.verticalLayout.addWidget(self.textEdit)
         self.buttonBox = QtWidgets.QDialogButtonBox(DialogSaveQuery)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
