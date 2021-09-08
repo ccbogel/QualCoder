@@ -98,6 +98,7 @@ class DialogCodeText(QtWidgets.QWidget):
     search_indices = []
     search_index = 0
     search_term = ""
+    search_type = "3"  # 3 or 5 or 1 for Enter
     selected_code_index = 0
     eventFilter = None
     important = False  # Show/hide important codes
@@ -171,6 +172,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
+        self.ui.lineEdit_search.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
@@ -434,10 +437,12 @@ class DialogCodeText(QtWidgets.QWidget):
             if a[1] == 'file':
                 sql = " select id from attribute where attribute.name = '" + a[0] + "' "
                 sql += " and attribute.value " + a[3] + " "
-                if a[3] in ('in', 'not in', 'between'):
+                if a[3] == 'between':
+                    sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
                     sql += "("
-                sql += ','.join(a[4])  # if one item the comma is skipped
-                if a[3] in ('in', 'not in', 'between'):
+                    sql += ','.join(a[4])  # One item the comma is skipped
+                if a[3] in ('in', 'not in'):
                     sql += ")"
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
@@ -740,8 +745,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
 
     def search_for_text(self):
-        """ On text changed in lineEdit_search, find indices of matching text.
-        Only where text is three or more characters long.
+        """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
+        Only where text is >=3 OR 5 characters long. Or Enter is pressed (search_type==1).
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
@@ -757,7 +762,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(self.search_term) < 3:
+        if len(self.search_term) < self.search_type:
             return
         pattern = None
         flags = 0
@@ -839,6 +844,41 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
+    def lineedit_search_menu(self, position):
+        """ Option to change from automatic search on 3 characters or more to press Enter to search """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_char3 = QtWidgets.QAction(_("Automatic search 3 or more characters"))
+        action_char5 = QtWidgets.QAction(_("Automatic search 5 or more characters"))
+        action_enter = QtWidgets.QAction(_("Press Enter to search"))
+        if self.search_type != "3":
+            menu.addAction(action_char3)
+        if self.search_type != "5":
+            menu.addAction(action_char5)
+        if self.search_type != "Enter":
+            menu.addAction(action_enter)
+        action = menu.exec_(self.ui.lineEdit_search.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_char3:
+            self.search_type = 3
+            self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+            self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
+
+            return
+        if action == action_char5:
+            self.search_type = 5
+            self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+            self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
+
+            return
+        if action == action_enter:
+            self.search_type = 1
+            self.ui.lineEdit_search.textEdited.disconnect(self.search_for_text)
+            self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+            return
 
     def textEdit_recent_codes_menu(self, position):
         """ Alternative context menu.
