@@ -446,8 +446,14 @@ class DialogSQL(QtWidgets.QDialog):
 
         ssql = self.ui.textEdit_sql.toPlainText()
         ui = DialogSaveSql(self.app)
+        ui.ui.label.hide()
+        ui.ui.lineEdit_group.hide()
         ui.exec_()
         title = ui.name
+        if title == "":
+            msg = _("The query must have a name")
+            Message(self.app, _("Cannot save"), msg).exec_()
+            return
         grouper = ui.grouper
         description = ui.description
         cur = self.app.conn.cursor()
@@ -456,7 +462,7 @@ class DialogSQL(QtWidgets.QDialog):
             cur.execute(sql, [title, description, grouper, ssql])
             self.app.conn.commit()
         except Exception as e:
-            Message(self.app, "Cannot save", str(e)).exec_()
+            Message(self.app, _("Cannot save"), str(e)).exec_()
         self.get_schema_update_treeWidget()
 
     # Start of table results context menu section
