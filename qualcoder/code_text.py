@@ -530,10 +530,11 @@ class DialogCodeText(QtWidgets.QWidget):
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.hide()
+            self.ui.label_code.setToolTip("")
             return
         self.ui.label_code.show()
-        self.ui.label_code.setText("Code: " + current.text(0))
-        # update background colour of label and store current code for underlining
+        self.ui.label_code.setToolTip(current.text(0))
+        # Set background colour of label to code color, and store current code for underlining
         code_for_underlining = None
         for c in self.codes:
             if current.text(0) == c['name']:
@@ -1674,7 +1675,6 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
-        fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
@@ -1740,7 +1740,6 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
-        fmt.setFontOverline(True)
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
         # Also need to reload arrow icons as they dissapear on Windows
@@ -2532,10 +2531,10 @@ class DialogCodeText(QtWidgets.QWidget):
                         formatB.setFontWeight(QtGui.QFont.Bold)
                         cursor.mergeCharFormat(formatB)
         if id_ == -1:
-            self.apply_overline_to_overlaps()
+            self.apply_italic_to_overlaps()
 
-    def apply_overline_to_overlaps(self):
-        """ Apply overline format to coded text sections which are overlapping.
+    def apply_italic_to_overlaps(self):
+        """ Apply italic format to coded text sections which are overlapping.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
         Do not appyply overline when showing only important codes, as this causes user confusion.
         """
@@ -2563,7 +2562,6 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt = QtGui.QTextCharFormat()
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
-            fmt.setFontOverline(True)
             fmt.setFontItalic(True)
             cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
@@ -2602,7 +2600,7 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setBackground(brush)
         fmt.setForeground(QBrush(QColor(TextColor(current_code['color']).recommendation)))
         cursor.setCharFormat(fmt)
-        self.apply_overline_to_overlaps()
+        self.apply_italic_to_overlaps()
 
     def overlapping_codes_in_text(self):
         """ When coded text is clicked on, the code names at this location are
