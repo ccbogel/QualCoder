@@ -231,7 +231,8 @@ class Ui_Dialog_code_text(object):
         self.pushButton_auto_code.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Auto code with exact text</p></body></html>"))
         self.label_coder.setText(_translate("Dialog_code_text", "Coder:"))
         self.label_code.setText(_translate("Dialog_code_text", "Right click below to create new codes and categories"))
-        self.lineEdit_search.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search for text.</p><p>check <span style=\" font-weight:600;\">Case sensitive</span> for case sensitive search</p><p>check <span style=\" font-weight:600;\">All files</span> for searching all files search</p></body></html>"))
+        self.lineEdit_search.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search for text.</p><p>check <span style=\" font-weight:600;\">Case sensitive</span> for case sensitive search</p><p>check <span style=\" font-weight:600;\">All files</span> for searching all files search</p>\n"
+"<p>Right-click to change automatic searching options</p></body></html>"))
         self.checkBox_search_case.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search case sensitive</p></body></html>"))
         self.checkBox_search_all_files.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search all files</p></body></html>"))
         self.label_search_totals.setText(_translate("Dialog_code_text", "0 / 0"))
