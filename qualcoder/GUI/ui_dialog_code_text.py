@@ -29,7 +29,8 @@ class Ui_Dialog_code_text(object):
         self.label_coder.setGeometry(QtCore.QRect(10, 0, 281, 28))
         self.label_coder.setObjectName("label_coder")
         self.label_code = QtWidgets.QLabel(self.groupBox)
-        self.label_code.setGeometry(QtCore.QRect(10, 87, 411, 31))
+        self.label_code.setGeometry(QtCore.QRect(10, 81, 32, 32))
+        self.label_code.setText("")
         self.label_code.setWordWrap(True)
         self.label_code.setObjectName("label_code")
         self.lineEdit_search = QtWidgets.QLineEdit(self.groupBox)
@@ -230,7 +231,7 @@ class Ui_Dialog_code_text(object):
         Dialog_code_text.setWindowTitle(_translate("Dialog_code_text", "Code Text"))
         self.pushButton_auto_code.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Auto code with exact text</p></body></html>"))
         self.label_coder.setText(_translate("Dialog_code_text", "Coder:"))
-        self.label_code.setText(_translate("Dialog_code_text", "Right click below to create new codes and categories"))
+        self.label_code.setToolTip(_translate("Dialog_code_text", "Right click below to create new codes and categories"))
         self.lineEdit_search.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search for text.</p><p>check <span style=\" font-weight:600;\">Case sensitive</span> for case sensitive search</p><p>check <span style=\" font-weight:600;\">All files</span> for searching all files search</p>\n"
 "<p>Right-click to change automatic searching options</p></body></html>"))
         self.checkBox_search_case.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>search case sensitive</p></body></html>"))
