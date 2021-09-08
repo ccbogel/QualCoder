@@ -66,7 +66,8 @@ class DialogSQL(QtWidgets.QDialog):
     schema = None
     parent_textEdit = None
     sql = ""
-    stored_sqls = []  # a list of dictionaries of user created sql
+    stored_sqls = []  # a list of dictionaries of user created sql, as {index, sql}
+    default_sqls = []  # a list of dictionaries of default sql, as {index, sql}
     delimiter = "\t"  # default delimiter for file exports
     file_data = []  # for file exports
     results = None  # SQL results
@@ -105,6 +106,9 @@ class DialogSQL(QtWidgets.QDialog):
         # Add tables and fields to treeWidget
         self.get_schema_update_treeWidget()
         self.ui.treeWidget.itemClicked.connect(self.get_item)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+
         self.ui.pushButton_runSQL.clicked.connect(self.run_SQL)
         #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
         pm = QtGui.QPixmap()
@@ -203,18 +207,24 @@ class DialogSQL(QtWidgets.QDialog):
         for s in self.stored_sqls:
             if index == s['index']:
                 self.ui.textEdit_sql.clear()
-                self.ui.textEdit_sql.setText(s['ssql'])
+                self.ui.textEdit_sql.setText(s['sql'])
+                return
+
+        for d in self.default_sqls:
+            if index == d['index']:
+                self.ui.textEdit_sql.clear()
+                self.ui.textEdit_sql.setText(d['sql'])
                 return
 
         if index.parent().row() != -1:  # there is a parent if not -1
             item_parent = self.ui.treeWidget.itemFromIndex(index.parent())
             item_parent_text = item_parent.text(0)
-            if item_parent_text == "Default Queries":
+            '''if item_parent_text == "Default Queries":
                 self.ui.textEdit_sql.clear()
                 self.ui.textEdit_sql.setText(item_text)
                 return
-            if item_parent_text != "Default Queries":
-                item_text = item_parent_text + "." + item_text
+            if item_parent_text != "Default Queries":'''
+            item_text = item_parent_text + "." + item_text
         cursor = self.ui.textEdit_sql.textCursor()
         cursor.insertText(" " + item_text + " ")
 
@@ -330,17 +340,19 @@ class DialogSQL(QtWidgets.QDialog):
                 field_item.setText(0, field[1])
                 top_item.addChild(field_item)
 
-        # Add prepared query sqls
-        query_item = QtWidgets.QTreeWidgetItem()
-        query_item.setText(0, _("Default Queries"))
-        self.ui.treeWidget.addTopLevelItem(query_item)
+        # Add default sqls
+        default_item = QtWidgets.QTreeWidgetItem()
+        default_item.setText(0, _("Default Queries"))
+        self.ui.treeWidget.addTopLevelItem(default_item)
         for query in EXTRA_SQL:
             item = QtWidgets.QTreeWidgetItem()
-            item.setText(0, query)
-            query_item.addChild(item)
+            title = query.split('\n')[0]
+            item.setText(0, title)
+            default_item.addChild(item)
+            self.default_sqls.append({'index': self.ui.treeWidget.indexFromItem(item), 'sql': query})
 
         # Add user stored queries
-        sql = "select title, description, grouper, ssql from stored_sql"
+        sql = "select title, description, grouper, ssql from stored_sql order by grouper, title"
         cur.execute(sql)
         res = cur.fetchall()
         if res == []:
@@ -353,7 +365,29 @@ class DialogSQL(QtWidgets.QDialog):
             item.setText(0, r[0])
             item.setToolTip(0,r[1])
             ssql_item.addChild(item)
-            self.stored_sqls.append({'index': self.ui.treeWidget.indexFromItem(item), 'ssql': r[3]})
+            self.stored_sqls.append({'index': self.ui.treeWidget.indexFromItem(item), 'sql': r[3]})
+
+    def tree_menu(self, position):
+        """ Context menu for treewidget stored sql items. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        index = self.ui.treeWidget.currentIndex()
+        delete_sql = None
+        for i in self.stored_sqls:
+            if i['index'] == index:
+                delete_sql = menu.addAction(_("Delete stored sql"))
+        action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        if action is not None and action == delete_sql:
+            for i in range(len(self.stored_sqls)):
+                if self.stored_sqls[i]['index'] == index:
+                    title = self.ui.treeWidget.currentItem().text(0)
+                    cur = self.app.conn.cursor()
+                    cur.execute("delete from stored_sql where title=?", [title])
+                    self.app.conn.commit()
+                    del self.stored_sqls[i]
+                    break
+            self.get_schema_update_treeWidget()
 
     def sql_menu(self, position):
         """ Context menu to textedit_sql
@@ -407,7 +441,8 @@ class DialogSQL(QtWidgets.QDialog):
             self.save_query()
 
     def save_query(self):
-        """ Save query in stored_sql table. """
+        """ Save query in stored_sql table.
+        The grouper is not really used, apart from ordering the queries. """
 
         ssql = self.ui.textEdit_sql.toPlainText()
         ui = DialogSaveSql(self.app)
