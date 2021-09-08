@@ -64,13 +64,16 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>87</y>
-        <width>411</width>
-        <height>31</height>
+        <y>81</y>
+        <width>32</width>
+        <height>32</height>
        </rect>
       </property>
-      <property name="text">
+      <property name="toolTip">
        <string>Right click below to create new codes and categories</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
