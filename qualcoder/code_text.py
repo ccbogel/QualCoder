@@ -1633,10 +1633,13 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cid = int(item.text(1)[4:])
         # Index list has to be dynamic, as a new code_text item could be created before this method is called again
+        # Develop indexs and tooltip coded text list
         indexes = []
+        tt_code_text = []
         for ct in self.code_text:
             if ct['cid'] == cid:
                 indexes.append(ct)
+                tt_code_text.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'))
         cursor = self.ui.textEdit.textCursor()
         cur_pos = cursor.position()
@@ -1665,6 +1668,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.textEdit.setTextCursor(cursor)
             #return
         self.unlight()
+        msg = " " + _("Code:") + " " + msg
         # Highlight the code in the text
         color = ""
         for c in self.codes:
@@ -1679,20 +1683,21 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setBackground(brush)
         foregroundcol = TextColor(color).recommendation
         fmt.setForeground(QBrush(QColor(foregroundcol)))
-        fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
+        # Update tooltips to show only this code
+        self.eventFilterTT.set_codes_and_annotations(tt_code_text, self.codes, self.annotations, self.file_['start'])
+        # Need to reload arrow iconsas they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        # Also need to reload arrow iconsas theydissapear on Windows
         self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        tt = _("Show previous coding of selected code") + " " + msg
+        tt = _("Show previous coding of selected code")  + msg
         self.ui.pushButton_show_codings_prev.setToolTip(tt)
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
-        tt = _("Show next coding of selected code") + " " + msg
+        tt = _("Show next coding of selected code")  + msg
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
@@ -1711,10 +1716,13 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cid = int(item.text(1)[4:])
         # Index list has to be dynamic, as a new code_text item could be created before this method is called again
+        # Develop indexs and tooltip coded text list
         indexes = []
+        tt_code_text = []
         for ct in self.code_text:
             if ct['cid'] == cid:
                 indexes.append(ct)
+                tt_code_text.append(ct)
         indexes = sorted(indexes, key=itemgetter('pos0'), reverse=True)
         cursor = self.ui.textEdit.textCursor()
         cur_pos = cursor.position()
@@ -1730,11 +1738,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
         if not found_smaller and indexes == []:
             return
-        # loop around to highest index
+        # Loop around to highest index
         if not found_smaller and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
             msg = str(len(indexes)) + msg
+        msg += " " + _("Code:") + " " + msg
         self.unlight()
         # Highlight the code in the text
         color = ""
@@ -1750,9 +1759,10 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setBackground(brush)
         foregroundcol = TextColor(color).recommendation
         fmt.setForeground(QBrush(QColor(foregroundcol)))
-        fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        # Also need to reload arrow icons as they dissapear on Windows
+        # Update tooltips to show only this code
+        self.eventFilterTT.set_codes_and_annotations(tt_code_text, self.codes, self.annotations, self.file_['start'])
+        # Need to reload arrow icons as they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
@@ -1761,13 +1771,13 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        tt = _("Show previous coding of selected code") + " " + msg
+        tt = _("Show previous coding of selected code") + msg
         self.ui.pushButton_show_codings_prev.setToolTip(tt)
         self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-        tt = _("Show next coding of selected code") + " " + msg
+        tt = _("Show next coding of selected code") + msg
         self.ui.pushButton_show_codings_next.setToolTip(tt)
 
     def show_all_codes_in_text(self):
@@ -1791,6 +1801,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.unlight()
         self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
