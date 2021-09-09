@@ -1244,10 +1244,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 #print(a)
                 sql = " select id from attribute where attribute.name = '" + a[0] + "' "
                 sql += " and attribute.value " + a[3] + " "
-                if a[3] in ('in', 'not in', 'between'):
+                if a[3] == 'between':
+                    sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
                     sql += "("
-                sql += ','.join(a[4])
-                if a[3] in ('in', 'not in', 'between'):
+                    sql += ','.join(a[4])
+                if a[3] in ('in', 'not in'):
                     sql += ")"
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
@@ -1286,6 +1288,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     sql += " and id in ( " + case_sql[0] + ") "
                     del case_sql[0]
             #logger.debug(sql)
+            print(sql) # tmp
             cur.execute(sql)
             results = cur.fetchall()
             case_ids = ""
@@ -1555,10 +1558,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         choice = self.ui.comboBox_memos.currentText()
-        if choice == "All memos" and item['codename_memo'] != "":
+        if choice == "All memos" and item['codename_memo'] != "" and item['codename_memo'] is not None:
             head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if choice == "All memos" and item['source_memo'] != "":
+        if choice == "All memos" and item['source_memo'] != "" and item['source_memo'] is not None:
             head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: " ) + item['file_or_casename']
@@ -1566,7 +1569,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
-                if res is not None and res != "":
+                if res is not None and res[0] != "" and res[0] is not None:
                     head += ", " + _("Case memo: ") + res[0]
         head += ", " + _("Coder: ") + item['coder'] + "<br />"
 
