@@ -1642,11 +1642,13 @@ class DialogCodeText(QtWidgets.QWidget):
         cur_pos = cursor.position()
         end_pos = 0
         found_larger = False
-        for index in indexes:
+        msg = "/" + str(len(indexes))
+        for i, index in enumerate(indexes):
             if index['pos0'] - self.file_['start'] > cur_pos:
                 cur_pos = index['pos0'] - self.file_['start']
                 end_pos = index['pos1'] - self.file_['start']
                 found_larger = True
+                msg = str(i + 1) + msg
                 break
         if not found_larger and indexes == []:
             #print("if not found_larger and indexes == [] move to next file")
@@ -1656,14 +1658,14 @@ class DialogCodeText(QtWidgets.QWidget):
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
             #print("if not found_larger and indexes != [] move to next file")
+            msg = "1" + msg
         if not found_larger:
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(0)
             self.ui.textEdit.setTextCursor(cursor)
-            return
+            #return
         self.unlight()
-        self.highlight(cid)
-
+        # Highlight the code in the text
         color = ""
         for c in self.codes:
             if c['cid'] == cid:
@@ -1675,19 +1677,23 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
+        foregroundcol = TextColor(color).recommendation
+        fmt.setForeground(QBrush(QColor(foregroundcol)))
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_color_grid_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         # Also need to reload arrow iconsas theydissapear on Windows
-        fgc = TextColor(color).recommendation
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        tt = _("Show previous coding of selected code") + " " + msg
+        self.ui.pushButton_show_codings_prev.setToolTip(tt)
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
+        tt = _("Show next coding of selected code") + " " + msg
+        self.ui.pushButton_show_codings_next.setToolTip(tt)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
@@ -1714,11 +1720,13 @@ class DialogCodeText(QtWidgets.QWidget):
         cur_pos = cursor.position()
         end_pos = 0
         found_smaller = False
-        for index in indexes:
+        msg = "/" + str(len(indexes))
+        for i, index in enumerate(indexes):
             if index['pos0'] - self.file_['start'] < cur_pos - 1:
                 cur_pos = index['pos0'] - self.file_['start']
                 end_pos = index['pos1'] - self.file_['start']
                 found_smaller = True
+                msg = str(len(indexes) - i) + msg
                 break
         if not found_smaller and indexes == []:
             return
@@ -1726,9 +1734,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if not found_smaller and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
+            msg = str(len(indexes)) + msg
         self.unlight()
-        self.highlight(cid)
-
+        # Highlight the code in the text
         color = ""
         for c in self.codes:
             if c['cid'] == cid:
@@ -1740,6 +1748,8 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
+        foregroundcol = TextColor(color).recommendation
+        fmt.setForeground(QBrush(QColor(foregroundcol)))
         fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
         cursor.mergeCharFormat(fmt)
         # Also need to reload arrow icons as they dissapear on Windows
@@ -1747,37 +1757,38 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         fgc = TextColor(color).recommendation
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        tt = _("Show previous coding of selected code") + " " + msg
+        self.ui.pushButton_show_codings_prev.setToolTip(tt)
+        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        tt = _("Show next coding of selected code") + " " + msg
+        self.ui.pushButton_show_codings_next.setToolTip(tt)
 
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
-        cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(0)
-        self.ui.textEdit.setTextCursor(cursor)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/2x2_grid_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
         self.ui.pushButton_show_codings_next.setStyleSheet("")
-        #fgc = TextColor(color).recommendation
-        #self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + fgc)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        #self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + fgc)
+        tt = _("Show previous coding of selected code")
+        self.ui.pushButton_show_codings_prev.setToolTip(tt)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        tt = _("Show next coding of selected code")
+        self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.unlight()
         self.highlight()
 
@@ -2473,14 +2484,12 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(len(self.text) - 1, QtGui.QTextCursor.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
-    def highlight(self, id_=-1):
+    def highlight(self):
         """ Apply text highlighting to current file.
         If no colour has been assigned to a code, those coded text fragments are coloured gray.
         Each code text item contains: fid, date, pos0, pos1, seltext, cid, status, memo,
         name, owner.
         For defined colours in color_selector, make text light on dark, and conversely dark on light
-        params:
-            id_  : code identifier. .-1 for all or a specific code id to highlight. Integer
         """
 
         if self.file_ is None:
@@ -2505,7 +2514,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     fmt.setFontItalic(True)
                 else:
                     fmt.setFontItalic(False)
-
                 # Bold important codes
                 if item['important']:
                     fmt.setFontWeight(QtGui.QFont.Bold)
@@ -2530,8 +2538,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         formatB = QtGui.QTextCharFormat()
                         formatB.setFontWeight(QtGui.QFont.Bold)
                         cursor.mergeCharFormat(formatB)
-        if id_ == -1:
-            self.apply_italic_to_overlaps()
+        self.apply_italic_to_overlaps()
 
     def apply_italic_to_overlaps(self):
         """ Apply italic format to coded text sections which are overlapping.
