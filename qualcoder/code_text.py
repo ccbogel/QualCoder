@@ -761,7 +761,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
         self.ui.label_search_totals.setText("0 / 0")
-        if len(self.search_term) < self.search_type:
+        print( "Stype,", self.search_type)
+        if len(self.search_term) < int(self.search_type):
             return
         pattern = None
         flags = 0
