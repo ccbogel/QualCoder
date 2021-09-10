@@ -168,7 +168,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
-        self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -281,11 +280,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-
-        self.ui.comboBox_codes_in_text.currentIndexChanged.connect(self.combo_code_selected)
-        self.ui.comboBox_codes_in_text.setEnabled(False)
         self.ui.label_codes_count.setEnabled(False)
-        self.ui.label_codes_clicked_in_text.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -533,7 +528,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.label_code.setToolTip("")
             return
         self.ui.label_code.show()
-        self.ui.label_code.setToolTip(current.text(0))
         # Set background colour of label to code color, and store current code for underlining
         code_for_underlining = None
         for c in self.codes:
@@ -543,6 +537,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
                 code_for_underlining = c
+                tt = c['name'] + "\n"
+                if c['memo'] is not None and c['memo'] != "":
+                    tt += _("Memo: ") + c['memo']
+                self.ui.label_code.setToolTip(tt)
                 break
         selected_text = self.ui.textEdit.textCursor().selectedText()
         if len(selected_text) > 0:
@@ -2443,6 +2441,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setPlainText(self.text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active
         self.setWindowTitle(_("Code text: ") + self.file_['name'])
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
@@ -2619,46 +2618,6 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setForeground(QBrush(QColor(TextColor(current_code['color']).recommendation)))
         cursor.setCharFormat(fmt)
         self.apply_italic_to_overlaps()
-
-    def overlapping_codes_in_text(self):
-        """ When coded text is clicked on, the code names at this location are
-        displayed in the combobox above the text edit widget.
-        Only enabled if two or more codes are here.
-        Adjust for when portion of full text file loaded.
-        Called by: textEdit cursor position changed. """
-
-        self.ui.comboBox_codes_in_text.setEnabled(False)
-        self.ui.label_codes_count.setEnabled(False)
-        self.ui.label_codes_clicked_in_text.setEnabled(False)
-        pos = self.ui.textEdit.textCursor().position()
-        codes_here = []
-        for item in self.code_text:
-            if item['pos0'] <= pos + self.file_['start'] and item['pos1'] >= pos + self.file_['start']:
-                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
-                for code in self.codes:
-                    if code['cid'] == item['cid']:
-                        codes_here.append(code)
-        # Can show multiple codes for this location
-        fontsize = "font-size:" + str(self.app.settings['treefontsize']) + "pt; "
-        self.ui.comboBox_codes_in_text.clear()
-        code_names = [""]
-        for c in codes_here:
-            code_names.append(c['name'])
-        #print(codes_here)
-        if len(codes_here) < 2:
-            self.ui.label_codes_count.setText("")
-            self.ui.label_codes_clicked_in_text.setText(_("No overlapping codes"))
-        if len(codes_here) > 1:
-            self.ui.comboBox_codes_in_text.setEnabled(True)
-            self.ui.label_codes_count.setEnabled(True)
-            self.ui.label_codes_clicked_in_text.setEnabled(True)
-            self.ui.label_codes_clicked_in_text.setText(_("overlapping codes. Select to highlight."))
-
-        self.ui.label_codes_count.setText(str(len(code_names) - 1))
-        self.ui.comboBox_codes_in_text.addItems(code_names)
-        for i in range(1, len(code_names)):
-            self.ui.comboBox_codes_in_text.setItemData(i, code_names[i], QtCore.Qt.ToolTipRole)
-            self.ui.comboBox_codes_in_text.setItemData(i, QColor(codes_here[i - 1]['color']), QtCore.Qt.BackgroundRole)
 
     def select_tree_item_by_code_name(self, codename):
         """ Set a tree item code. This still call fill_code_label and
