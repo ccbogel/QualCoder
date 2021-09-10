@@ -19,13 +19,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>80</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>80</height>
       </size>
      </property>
      <property name="title">
@@ -58,25 +58,6 @@
       </property>
       <property name="text">
        <string>Coder:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_code">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>81</y>
-        <width>32</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Right click below to create new codes and categories</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_search">
@@ -141,19 +122,6 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="label_codes_clicked_in_text">
-      <property name="geometry">
-       <rect>
-        <x>620</x>
-        <y>46</y>
-        <width>431</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>No overlapping codes</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_codes_count">
       <property name="geometry">
        <rect>
@@ -168,42 +136,6 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="Line" name="line">
-      <property name="geometry">
-       <rect>
-        <x>540</x>
-        <y>30</y>
-        <width>531</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="Line" name="line_2">
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>40</y>
-        <width>16</width>
-        <height>91</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_codes_in_text">
-      <property name="geometry">
-       <rect>
-        <x>550</x>
-        <y>80</y>
-        <width>431</width>
-        <height>31</height>
-       </rect>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_previous">
@@ -696,6 +628,25 @@
          <string/>
         </property>
        </widget>
+       <widget class="QLabel" name="label_code">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>0</y>
+          <width>28</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Right click below to create new codes and categories</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QTextEdit" name="textEdit"/>
@@ -729,7 +680,6 @@
   <tabstop>checkBox_search_case</tabstop>
   <tabstop>checkBox_search_all_files</tabstop>
   <tabstop>pushButton_auto_code</tabstop>
-  <tabstop>comboBox_codes_in_text</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>
  <resources/>
