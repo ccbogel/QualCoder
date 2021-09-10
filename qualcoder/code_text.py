@@ -424,36 +424,32 @@ class DialogCodeText(QtWidgets.QWidget):
             self.get_files()
             return
 
-        res = []
+        file_ids = []
+        case_file_ids = []
         cur = self.app.conn.cursor()
+        # Run a series of sql based on each selected attribute
+        # Apply a set to the resulting ids to determine the final list of ids
         for a in self.attributes:
-            #print(a)
+            sql = "select id from attribute where "
             # File attributes
             if a[1] == 'file':
-                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
+                sql += "attribute.name = '" + a[0] + "' "
                 sql += " and attribute.value " + a[3] + " "
                 if a[3] == 'between':
                     sql += a[4][0] + " and " + a[4][1] + " "
                 if a[3] in ('in', 'not in'):
-                    sql += "("
-                    sql += ','.join(a[4])  # One item the comma is skipped
-                if a[3] in ('in', 'not in'):
-                    sql += ")"
+                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    sql += a[4][0]
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                sql += " and attribute.attr_type='file' "
-                #print(sql)
+                sql += " and attribute.attr_type='file'"
+                print("Attribute selected: ", a)
                 cur.execute(sql)
                 result = cur.fetchall()
-                ids = []
                 for i in result:
-                    if i:
-                        ids.append(i[0])
-                #print("file", ids)
-                if ids:
-                    res.append(ids)
+                    file_ids.append(i[0])
             # Case names
-            #print("a", a)
             if a[1] == "case":
                 # Case text table also links av and images
                 sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
@@ -462,28 +458,24 @@ class DialogCodeText(QtWidgets.QWidget):
                     sql += a[4][0]
                 else:
                     sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
-                #print("sql:", sql)
                 cur.execute(sql)
-                result = cur.fetchall()
-                ids = []
-                for i in result:
-                    if i:
-                        ids.append(i[0])
-                #print("case",  ids)  # tmp
-                if ids:
-                    res.append(ids)
-
-        #print("res, list of lists", res)
-        # Converts each list to a set, then applies the set.intersection function
-        # TypeError: descriptor 'intersection' of 'set' object needs an argument
-
-        if res == []:
+                case_result = cur.fetchall()
+                for i in case_result:
+                    case_file_ids.append(i[0])
+        if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec_()
             return
-        res_set = set.intersection(*[set(x) for x in res])
-        #print(res_set, type(res_set))
-        res_list = list(res_set)
-        self.get_files(res_list)
+        set_ids = {}
+        set_file_ids = set(file_ids)
+        set_case_file_ids = set(case_file_ids)
+        # Need to intersect case file ids and file ids
+        if file_ids != [] and case_file_ids != []:
+            set_ids = set_file_ids.intersection(set_case_file_ids)
+        elif set_file_ids != {}:
+            set_ids = set_file_ids
+        else:
+            set_ids = set_case_file_ids
+        self.get_files(list(set_ids))
         msg = ""
         for a in self.attributes:
             msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
