@@ -423,7 +423,22 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.listWidget.addItem(item)
 
     def get_files_from_attributes(self):
-        """ Trim the files list to files identified by attributes. """
+        """ Trim the files list to files identified by attributes.
+        Attribute dialing results are a dictionary of:
+        [0] attribute name, or 'case name'
+        [1] attribute type: character, numeric
+        [2] modifier: > < == != like between
+        [3] comparison value as list, one item or two items for between
+
+        DialogSelectAttributeParameters returns lists for each parameter selected of:
+        attribute name, file or case, character or numeric, operator, list of one or two comparator values
+        two comparator values are used with the 'between' operator
+        ['source', 'file', 'character', '==', ["'interview'"]]
+        ['case name', 'case', 'character', '==', ["'ID1'"]]
+
+        Note, sqls are NOT parameterised.
+        results from multiple parameters are intersected, an AND boolean function.
+        """
 
         pm = QtGui.QPixmap()
         if self.attributes:
@@ -446,58 +461,67 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.get_files()
             return
 
-        res = []
+        file_ids = []
+        case_file_ids = []
         cur = self.app.conn.cursor()
+        # Run a series of sql based on each selected attribute
+        # Apply a set to the resulting ids to determine the final list of ids
         for a in self.attributes:
-            # print(a)
+            sql = "select id from attribute where "
             # File attributes
             if a[1] == 'file':
-                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
+                sql += "attribute.name = '" + a[0] + "' "
                 sql += " and attribute.value " + a[3] + " "
-                if a[3] in ('in', 'not in', 'between'):
-                    sql += "("
-                sql += ','.join(a[4])  # if one item the comma is skipped
-                if a[3] in ('in', 'not in', 'between'):
-                    sql += ")"
+                if a[3] == 'between':
+                    sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    sql += a[4][0]
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                sql += " and attribute.attr_type='file' "
-                # print(sql)
+                sql += " and attribute.attr_type='file'"
+                #print("Attribute selected: ", a)
                 cur.execute(sql)
                 result = cur.fetchall()
-                ids = []
                 for i in result:
-                    if i:
-                        ids.append(i[0])
-                # print("file", ids)
-                if ids:
-                    res.append(ids)
+                    file_ids.append(i[0])
             # Case names
             if a[1] == "case":
                 # Case text table also links av and images
                 sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
-                sql += "join source on source.id=case_text.fid where cases.name " + a[3]
-                sql += a[4][0]
-                # print(sql)
+                sql += "join source on source.id=case_text.fid where cases.name " +a[3]
+                if a[3] != "like":
+                    sql += a[4][0]
+                else:
+                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
                 cur.execute(sql)
-                result = cur.fetchall()
-                ids = []
-                for i in result:
-                    if i:
-                        ids.append(i[0])
-                # print("case",  ids)
-                if ids:
-                    res.append(ids)
-        # print("res, list of lists", res)
-        # Converts each list to a set, then applies the set.intersection function
-        res_set = set.intersection(*[set(x) for x in res])
-        # print(res_set, type(res_set))
-        res_list = list(res_set)
-        self.get_files(res_list)
+                case_result = cur.fetchall()
+                for i in case_result:
+                    case_file_ids.append(i[0])
+        if file_ids == [] and case_file_ids == []:
+            Message(self.app, "Nothing found", "Nothing found").exec_()
+            return
+        set_ids = {}
+        set_file_ids = set(file_ids)
+        set_case_file_ids = set(case_file_ids)
+        # Need to intersect case file ids and file ids
+        if file_ids != [] and case_file_ids != []:
+            set_ids = set_file_ids.intersection(set_case_file_ids)
+        elif set_file_ids != {}:
+            set_ids = set_file_ids
+        else:
+            set_ids = set_case_file_ids
+        self.get_files(list(set_ids))
+        # Prepare message for label tooltop
         msg = ""
         for a in self.attributes:
-            msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        msg = msg[4:]
+            if a[1] == 'file':
+                msg += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        msg = msg[3:]
+        for a in self.attributes:
+            if a[1] == 'case':
+                msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
         self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
