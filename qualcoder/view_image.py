@@ -367,7 +367,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         for a in self.attributes:
             if a[1] == 'file':
                 msg += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        msg = msg[3:]
+        if len(msg) > 3:
+            msg = msg[3:]
         for a in self.attributes:
             if a[1] == 'case':
                 msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
