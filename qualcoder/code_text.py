@@ -471,9 +471,9 @@ class DialogCodeText(QtWidgets.QWidget):
         # Need to intersect case file ids and file ids
         if file_ids != [] and case_file_ids != []:
             set_ids = set_file_ids.intersection(set_case_file_ids)
-        elif set_file_ids != {}:
+        if file_ids != [] and case_file_ids == []:
             set_ids = set_file_ids
-        else:
+        if file_ids == [] and case_file_ids != []:
             set_ids = set_case_file_ids
         self.get_files(list(set_ids))
         # Prepare message for label tooltop
