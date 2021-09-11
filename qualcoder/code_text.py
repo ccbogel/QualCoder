@@ -444,7 +444,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
                 sql += " and attribute.attr_type='file'"
-                print("Attribute selected: ", a)
+                #print("Attribute selected: ", a)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for i in result:
@@ -476,10 +476,15 @@ class DialogCodeText(QtWidgets.QWidget):
         else:
             set_ids = set_case_file_ids
         self.get_files(list(set_ids))
+        # Prepare message for label tooltop
         msg = ""
         for a in self.attributes:
-            msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        msg = msg[4:]
+            if a[1] == 'file':
+                msg += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        msg = msg[3:]
+        for a in self.attributes:
+            if a[1] == 'case':
+                msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
         self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
