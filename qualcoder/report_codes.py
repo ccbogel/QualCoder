@@ -91,7 +91,9 @@ class DialogReportCodes(QtWidgets.QDialog):
     # Variables for search restrictions
     file_ids = ""
     case_ids = ""
-    attribute_selection = []
+    attributes = []
+    attribute_file_ids = []
+    attributes_msg = ""
     # Text positions in the main textEdit for right-click context menu to View original file
     text_links = []
     # Text positions in the matrix textEdits for right-click context menu to View original file
@@ -184,6 +186,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        #TODO remove this counts label
+        self.ui.label_counts.hide()  # tmp
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -807,8 +811,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
 
+    #TODO remove this method and the gui label
     def display_counts(self):
         """ Fill counts label with counts of selected codes/files/cases attributes. """
+
+        return
 
         self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
         items = self.ui.treeWidget.selectedItems()
@@ -827,7 +834,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cases_count = 0
         casenames = self.app.get_casenames()
         cases = _("Cases: ") + str(cases_count) + "/" + str(len(casenames))
-        attribute_count = len(self.attribute_selection)
+        attribute_count = len(self.attributes)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
@@ -911,6 +918,119 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.append(txt)
         self.ui.comboBox_export.setEnabled(True)
 
+    def select_attributes(self):
+        """ Trim the files list to files identified by attributes.
+        Attribute dialing results are a dictionary of:
+        [0] attribute name, or 'case name'
+        [1] attribute type: character, numeric
+        [2] modifier: > < == != like between
+        [3] comparison value as list, one item or two items for between
+
+        DialogSelectAttributeParameters returns lists for each parameter selected of:
+        attribute name, file or case, character or numeric, operator, list of one or two comparator values
+        two comparator values are used with the 'between' operator
+        ['source', 'file', 'character', '==', ["'interview'"]]
+        ['case name', 'case', 'character', '==', ["'ID1'"]]
+
+        Note, sqls are NOT parameterised.
+        results from multiple parameters are intersected, an AND boolean function.
+        """
+
+        # Clear ui
+        self.attributes_msg = ""
+        self.attribute_file_ids = []
+        self.attributes = []
+        self.ui.pushButton_attributeselect.setToolTip("")
+        self.ui.splitter.setSizes([300, 300, 0])
+        self.file_ids = ""
+        for i in range(self.ui.listWidget_files.count()):
+            self.ui.listWidget_files.item(i).setSelected(False)
+        self.case_ids = ""
+        for i in range(self.ui.listWidget_cases.count()):
+            self.ui.listWidget_cases.item(i).setSelected(False)
+
+        ui = DialogSelectAttributeParameters(self.app)
+        ok = ui.exec_()
+        if not ok:
+            self.attributes = []
+            return
+        self.attributes = ui.parameters
+        if not self.attributes:
+            return
+
+        file_ids = []
+        case_file_ids = []
+        cur = self.app.conn.cursor()
+        # Run a series of sql based on each selected attribute
+        # Apply a set to the resulting ids to determine the final list of ids
+        for a in self.attributes:
+            sql = "select id from attribute where "
+            # File attributes
+            if a[1] == 'file':
+                sql += "attribute.name = '" + a[0] + "' "
+                sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    sql += a[4][0]
+                if a[2] == 'numeric':
+                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                sql += " and attribute.attr_type='file'"
+                #print("Attribute selected: ", a)
+                cur.execute(sql)
+                result = cur.fetchall()
+                for i in result:
+                    file_ids.append(i[0])
+            # Case names
+            if a[1] == "case":
+                # Case text table also links av and images
+                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
+                sql += "join source on source.id=case_text.fid where cases.name " +a[3]
+                if a[3] != "like":
+                    sql += a[4][0]
+                else:
+                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
+                cur.execute(sql)
+                case_result = cur.fetchall()
+                for i in case_result:
+                    case_file_ids.append(i[0])
+        if file_ids == [] and case_file_ids == []:
+            Message(self.app, "Nothing found", "Nothing found").exec_()
+            return
+        set_ids = {}
+        set_file_ids = set(file_ids)
+        set_case_file_ids = set(case_file_ids)
+        # Need to intersect case file ids and file ids
+        if file_ids != [] and case_file_ids != []:
+            set_ids = set_file_ids.intersection(set_case_file_ids)
+        if file_ids != [] and case_file_ids == []:
+            set_ids = set_file_ids
+        if file_ids == [] and case_file_ids != []:
+            set_ids = set_case_file_ids
+        self.attribute_file_ids = list(set_ids)
+        #print("Attribute file ids", self.attribute_file_ids)
+        # Prepare message for label tooltop
+        self.attributes_msg = ""
+        file_msg = ""
+        case_msg = ""
+        for a in self.attributes:
+            if a[1] == 'file':
+                file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        if len(file_msg) > 4:
+            file_msg = "(" + file_msg[3:] + ")"
+        for a in self.attributes:
+            if a[1] == 'case':
+                case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        if len(case_msg) > 5:
+            case_msg = "(" + case_msg[4:] + ")"
+        if file_msg != "" and case_msg != "":
+            self.attributes_msg = file_msg + " and " + case_msg
+        else:
+            self.attributes_msg = file_msg + case_msg
+        self.ui.pushButton_attributeselect.setToolTip(_("Attributes: ") + self.attributes_msg)
+
     def search(self):
         """ Search for selected codings.
         There are three main search pathways.
@@ -925,7 +1045,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.search_annotations()
             return
 
-        # Get variables for search: search text, coders, codes, files,cases, attributes
+        # Get variables for search: search text, coders, codes, files,cases, attribute file ids
         coder = self.ui.comboBox_coders.currentText()
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
@@ -938,7 +1058,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             msg = _("No codes have been selected.")
             Message(self.app, _('No codes'), msg, "warning").exec_()
             return
-        if self.file_ids == "" and self.case_ids == "" and self.attribute_selection == []:
+        if self.file_ids == "" and self.case_ids == "" and self.attributes == []:
             msg = _("No files, cases or attributes have been selected.")
             Message(self.app, _('Nothing selected'), msg, "warning").exec_()
             return
@@ -968,38 +1088,37 @@ class DialogReportCodes(QtWidgets.QDialog):
         codes_string = _("Codes: ") + "\n"
         for i in items:
             codes_string += i.text(0) + ". "
+        codes_string +=  _("Codes: ") + str(len(items)) + " / " + str(len(self.code_names))
         self.ui.textEdit.insertPlainText(codes_string)
         important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
         parameters = ""
-        if self.attribute_selection != []:
+        if self.attribute_file_ids != []:
             self.file_ids = ""
+            for a in self.attribute_file_ids:
+                self.file_ids += "," + str(a)
+            self.file_ids = self.file_ids[1:]
             for i in range(self.ui.listWidget_files.count()):
                 self.ui.listWidget_files.item(i).setSelected(False)
             self.case_ids = ""
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
             self.display_counts()
-            parameters += _("\nAttributes:\n")
-            for a in self.attribute_selection:
-                parameters += a[0] + " " + a[3] + " "
-                for b in a[4]:  # a[4] is a list
-                    parameters += b + ","
-                parameters += "\n"
-        if self.file_ids != "" and self.attribute_selection == []:
+            parameters += _("\nAttributes:\n") + self.attributes_msg + "\n"
+        if self.file_ids != "":
             parameters += _("\nFiles:\n")
             cur.execute("select name from source where id in (" + self.file_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
                 parameters += r[0] + ", "
+            parameters += _(" Files: ") + str(len(res)) + " / " + str(len(self.files))
         if self.case_ids != "":
             parameters += _("\nCases:\n")
             cur.execute("select name from cases where caseid in (" + self.case_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
                 parameters += r[0] + ", "
-
         self.ui.textEdit.insertPlainText(parameters + "\n")
         if search_text != "":
             self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
@@ -1017,9 +1136,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.image_results = []
         self.av_results = []
         self.html_links = []
-
-        # FILES ONLY SEARCH
         parameters = []
+        # FILES ONLY SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
@@ -1234,13 +1352,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                                         'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
 
         # ATTRIBUTES ONLY SEARCH
-        # get coded text and images from attribute selection
-        if self.attribute_selection != []:
-            logger.debug("attributes:" + str(self.attribute_selection))
+        '''if self.attributes != []:
+            logger.debug("attributes:" + str(self.attributes))
             # convert each row into sql and add to case or file lists
             file_sql = []
             case_sql = []
-            for a in self.attribute_selection:
+            for a in self.attributes:
                 #print(a)
                 sql = " select id from attribute where attribute.name = '" + a[0] + "' "
                 sql += " and attribute.value " + a[3] + " "
@@ -1288,7 +1405,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     sql += " and id in ( " + case_sql[0] + ") "
                     del case_sql[0]
             #logger.debug(sql)
-            print(sql) # tmp
+            print("SEARCH SQL", sql) # tmp
             cur.execute(sql)
             results = cur.fetchall()
             case_ids = ""
@@ -1442,8 +1559,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                 text += " " + msecs_to_hours_mins_secs(r['pos0']) +" - " + msecs_to_hours_mins_secs(r['pos1'])
                 r['text'] = text
                 self.html_links.append({'imagename': None, 'image': None,
-                    'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)), 'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
+                    'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)), 'av1': str(int(r['pos1'] / 1000)), 'avtext': text})'''
         self.fill_text_edit_with_search_results()
+        # Clean up for next search
+        self.attribute_file_ids = []
+        self.attributes = []
+        self.file_ids = ""
+        self.case_ids = ""
+        self.attributes_msg = ""
+        self.ui.pushButton_attributeselect.setToolTip("")
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
@@ -2141,33 +2265,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                         ui = DialogCodeInAV(self.app, m)
                         ui.exec_()
                         return
-
-    def select_attributes(self):
-        """ Select attributes from case or file attributes for search method.
-        Text values will be quoted.print("i[7]:  ", i[7])  # tmp
-        """
-
-        self.ui.splitter.setSizes([300, 300, 0])
-        self.file_ids = ""
-        for i in range(self.ui.listWidget_files.count()):
-            self.ui.listWidget_files.item(i).setSelected(False)
-        self.case_ids = ""
-        for i in range(self.ui.listWidget_cases.count()):
-            self.ui.listWidget_cases.item(i).setSelected(False)
-        self.display_counts()
-        ui = DialogSelectAttributeParameters(self.app)
-        ok = ui.exec_()
-        if not ok:
-            self.attribute_selection = []
-            return
-        self.attribute_selection = ui.parameters
-        label = _("Attributes: ")
-        logger.debug("Attributes selected:" + str(self.attribute_selection))
-        for att in self.attribute_selection:
-            label += att[0] + " " + att[3] + " "
-            label += ','.join(att[4])
-            label += "| "
-        self.display_counts()
 
 
 class ToolTip_EventFilter(QtCore.QObject):
