@@ -1137,7 +1137,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.av_results = []
         self.html_links = []
         parameters = []
-        # FILES ONLY SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
+        # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
@@ -1154,6 +1154,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 parameters.append("%" + str(search_text) + "%")
             if important:
                 sql += " and code_text.important=1 "
+            sql += " order by code_name.name, source.name, pos0"
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1184,6 +1185,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 parameters.append("%" + str(search_text) + "%")
             if important:
                 sql += " and code_image.important=1 "
+            sql += " order by code_name.name, source.name, x1"
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1214,6 +1216,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 parameters.append("%" + str(search_text) + "%")
             if important:
                 sql += " and code_av.important=1 "
+            sql += " order by code_name.name, source.name, pos0"
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1261,6 +1264,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and seltext like ? "
                 parameters.append("%" + str(search_text) + "%")
+            sql += " order by code_name.name, cases.name"
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1292,6 +1296,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 sql += " and code_image.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
+            sql += " order by code_name.name, cases.name"
             if parameters == []:
                 cur.execute(sql)
             else:
@@ -1326,6 +1331,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if search_text != "":
                 av_sql += " and code_av.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
+            sql += " order by code_name.name, cases.name"
             if parameters == []:
                 cur.execute(av_sql)
             else:
