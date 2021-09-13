@@ -1509,17 +1509,14 @@ class DialogCodeText(QtWidgets.QWidget):
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
-            if diff.microseconds < 150000:
+            if diff.microseconds < 180000:
                 return False
-
             # Ctrl + E Edit mode
             if key == QtCore.Qt.Key_E and mod == QtCore.Qt.ControlModifier:
                 self.edit_mode_toggle()
                 return True
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
-                return False
-            if diff.microseconds < 150000:
                 return False
             cursor_pos = self.ui.textEdit.textCursor().position()
             selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -2421,7 +2418,6 @@ class DialogCodeText(QtWidgets.QWidget):
         param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
 
-        self.edit_pos = 0
         items = []
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
@@ -3146,7 +3142,9 @@ class DialogCodeText(QtWidgets.QWidget):
     def edit_mode_toggle(self):
         """ Activate or deactivate edit mode.
         When activated, hide most widgets, remove tooltips, remove text edit menu.
-        Called: event filter Ctrl+E """
+        Called: event filter Ctrl+E
+        The edit mode toggle fires multiple times. so the initial edit_pos changes from the corect pos to 0
+        """
 
         if self.file_ is None:
             return
@@ -3160,6 +3158,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Hide most widgets, remove tooltips, remove text edit menu.
         Need to load entire file """
 
+        #TODO
         temp_edit_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
         if temp_edit_pos > 0:
             self.edit_pos = temp_edit_pos
@@ -3182,17 +3181,18 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_cases_codings_annotations()
         self.ui.textEdit.setReadOnly(False)
         self.ui.textEdit.setText(self.text)
-        new_cursor = self.ui.textEdit.textCursor()
-        if self.edit_pos >= len(self.text):
-            self.edit_pos = len(self.text)
-        new_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveAnchor)
-        self.ui.textEdit.setTextCursor(new_cursor)
-
         self.ed_highlight()
         self.ui.textEdit.textChanged.connect(self.update_positions)
+        text_cursor = self.ui.textEdit.textCursor()
+        if self.edit_pos >= len(self.text):
+            self.edit_pos = len(self.text) - 1
+        text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveAnchor)
+        self.ui.textEdit.setTextCursor(text_cursor)
 
     def edit_mode_off(self):
-        """ Show widgets """
+        """ Show widgets.
+        Try and set cursor positon to 'current text' position.
+        but this may have changed a lot. """
 
         self.ui.groupBox.show()
         self.ui.label_editing.hide()
@@ -3222,6 +3222,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.load_file(self.file_)
         self.update_file_tooltip()
+        text_cursor = self.ui.textEdit.textCursor()
+        if self.edit_pos > len(self.ui.textEdit.toPlainText()):
+            self.edit_pos = len(self.ui.textEdit.toPlainText()) -1
+        text_cursor.setPosition(self.edit_pos, QtGui.QTextCursor.MoveAnchor)
+        self.ui.textEdit.setTextCursor(text_cursor)
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
