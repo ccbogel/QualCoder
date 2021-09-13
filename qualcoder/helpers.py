@@ -213,7 +213,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_cursor = te.textCursor()
         cur_pos = data['pos1'] + 180
         if cur_pos > len(file_text['fulltext']):
-            cur_pos = len(file_text['fulltext'] - 1)
+            cur_pos = len(file_text['fulltext']) - 1
         text_cursor.setPosition(cur_pos)
         te.setTextCursor(text_cursor)
         te.setReadOnly(True)
