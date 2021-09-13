@@ -209,9 +209,12 @@ class DialogCodeInText(QtWidgets.QDialog):
         gridLayout = QtWidgets.QGridLayout(self)
         gridLayout.addWidget(te, 1, 0)
         self.resize(400, 300)
-        # Make marked text visible in the textEdit and not ned to scroll to it
+        # Make marked text visible, roughly centrally, with extra lines, and no need to scroll to the text.
         text_cursor = te.textCursor()
-        text_cursor.setPosition(data['pos0'])
+        cur_pos = data['pos1'] + 180
+        if cur_pos > len(file_text['fulltext']):
+            cur_pos = len(file_text['fulltext'] - 1)
+        text_cursor.setPosition(cur_pos)
         te.setTextCursor(text_cursor)
         te.setReadOnly(True)
 
