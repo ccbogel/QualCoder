@@ -837,6 +837,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None or self.file_['id'] != next_result[0]['id']:
             self.load_file(next_result[0])
             self.ui.lineEdit_search.setText(self.search_term)
+        # Adjust scroll bar so that the term term is not at the very bottom of screen.
+        try:
+            cursor.setPosition(cursor.position() + next_result[2] + 300)
+            self.ui.textEdit.setTextCursor(cursor)
+        except:
+            pass
+        # Highlight selected text
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
