@@ -76,7 +76,12 @@ The final step, install extra modules to Python. Type the letters "cmd" in the W
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
+Finally run the setup.py script:
+
+`py setup.py install`
+
 The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many pythons installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)  You can run the cmd.exe as described above, and type `py` and Enter. The first line will tell you which version of python that command runs. To exit, press Ctrl Z.
+
 
 Run QualCoder from cmd.exe
 Move to the QualCoder-master folder, then type 
