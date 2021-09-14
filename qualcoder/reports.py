@@ -107,6 +107,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
+        self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
+        self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
 
     def select_files(self):
         """ Report code frequencies for all files or selected files. """
@@ -197,7 +199,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 c['display_list'].append(count)
             c['display_list'].append(total)
 
-        # add the number of codes directly under each category to the category
+        # Add the number of codes directly under each category to the category
         for cat in self.categories:
             # magic 3 = cat name, cat id and total columns
             cat_list = [0] * (len(self.coders) + 3)
@@ -223,7 +225,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for cat in sub_cats:
                 if cat not in branch_list:
                     leaf_list.append(cat)
-            # add totals for each coder and overall total to higher category
+            # Add totals for each coder and overall total to higher category
             for leaf_cat in leaf_list:
                 for cat in self.categories:
                     if cat['catid'] == leaf_cat['supercatid']:
@@ -232,12 +234,28 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 sub_cats.remove(leaf_cat)
             counter += 1
 
-        # temp
-        # header
         header = ["Code Tree", "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
+
+    def sort_by_totals(self, ):
+        """ Sort by totals descending. """
+
+        self.get_data()
+        self.calculate_code_frequencies()
+        self.categories = sorted(self.categories, key=lambda i: (i['display_list'][-1]), reverse=True)
+        self.codes = sorted(self.codes, key=lambda i: (i['display_list'][-1]), reverse=True)
+        self.fill_tree()
+
+    def sort_by_alphabet(self, ):
+        """ Sort alphabtically ascending. """
+
+        self.get_data()
+        self.calculate_code_frequencies()
+        self.categories = sorted(self.categories, key=lambda i: (i['display_list'][0]))
+        self.codes = sorted(self.codes, key=lambda i: (i['display_list'][0]))
+        self.fill_tree()
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """

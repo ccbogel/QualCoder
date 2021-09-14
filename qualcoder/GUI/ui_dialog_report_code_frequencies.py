@@ -43,6 +43,13 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.pushButton_select_files = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_select_files.setGeometry(QtCore.QRect(10, 30, 271, 32))
         self.pushButton_select_files.setObjectName("pushButton_select_files")
+        self.radioButton = QtWidgets.QRadioButton(self.groupBox)
+        self.radioButton.setGeometry(QtCore.QRect(380, 20, 251, 23))
+        self.radioButton.setChecked(True)
+        self.radioButton.setObjectName("radioButton")
+        self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox)
+        self.radioButton_2.setGeometry(QtCore.QRect(380, 50, 241, 23))
+        self.radioButton_2.setObjectName("radioButton_2")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodeFrequencies)
         self.groupBox_2.setTitle("")
@@ -65,6 +72,8 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.pushButton_exporttext.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Export text file</p></body></html>"))
         self.pushButton_exportcsv.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Export csv file</p></body></html>"))
         self.pushButton_select_files.setText(_translate("Dialog_reportCodeFrequencies", "Select files"))
+        self.radioButton.setText(_translate("Dialog_reportCodeFrequencies", "Alphabetic ascending"))
+        self.radioButton_2.setText(_translate("Dialog_reportCodeFrequencies", "Totals descending"))
 
 
 if __name__ == "__main__":
