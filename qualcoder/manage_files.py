@@ -328,6 +328,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def export_file_as_linked_file(self, id_, mediapath):
         """ Move an internal project file into an external location as a linked file.
+        #TODO Do not export text files as linked files. e.g. internally created in database, or
+        docx, txt, md, odt files.
 
         params:
             id_ : the file id, Integer
@@ -337,6 +339,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
+
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.last_export_directory, options)
@@ -356,6 +359,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             file_directory = "documents"
             mediapath = "/documents/" + name
             destination = directory + "/" + name
+
+            #TODO text files stored in database
+
         msg = _("Export to ") + destination + "\n"
         try:
             move(self.app.project_path + mediapath, destination)
@@ -999,6 +1005,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         name_split = imports[0].split("/")
         temp_filename = name_split[-1]
         self.default_import_directory = imports[0][0:-len(temp_filename)]
+        pdf_msg = ""
         for f in imports:
             link_path = ""
             if link:
@@ -1026,7 +1033,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     Message(self.app, _("pdf miner is not installed"), _(text) + str(e),"critical").exec_()
                     return
                 destination += "/documents/" + filename
-                # remove encryption from pdf if possible, for Linux
+                # Try and remove encryption from pdf if a siple encryption, for Linux
                 if platform.system() == "Linux":
                     process = subprocess.Popen(["qpdf", "--decrypt", f, destination],
                         stdout=subprocess.PIPE)
@@ -1041,8 +1048,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                             logger.debug("Remove decrypted pdf linked file from /documents\n" + destination + "\n" + str(e))
                 else:
                     # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
-                    msg = _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf") + ":\n" + f
-                    Message(self.app, _('If import error occurs'), msg, "warning").exec_()
+                    pdf_msg = _("Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf")  # + ":\n" + f
+                    #Message(self.app, _('If import error occurs'), msg, "warning").exec_()
                     if link_path == "":
                         copyfile(f, destination)
                         self.load_file_text(f)
@@ -1091,6 +1098,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                         self.load_file_text(f, "docs:" + link_path)
                     except Exception as e:
                         Message(self.app, _('Unknown file type'),  _("Cannot import file") + ":\n" + f, "warning")
+        if pdf_msg != "":
+            self.parent_textEdit.append(pdf_msg)
         self.load_file_data()
         self.fill_table()
         self.app.delete_backup = False
