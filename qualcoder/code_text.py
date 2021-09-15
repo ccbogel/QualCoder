@@ -837,12 +837,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None or self.file_['id'] != next_result[0]['id']:
             self.load_file(next_result[0])
             self.ui.lineEdit_search.setText(self.search_term)
-        # Adjust scroll bar so that the term term is not at the very bottom of screen.
-        try:
-            cursor.setPosition(cursor.position() + next_result[2] + 300)
-            self.ui.textEdit.setTextCursor(cursor)
-        except:
-            pass
+        cursor.setPosition(cursor.position() + next_result[2])
+        self.ui.textEdit.setTextCursor(cursor)
+
         # Highlight selected text
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
@@ -3163,9 +3160,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def edit_mode_on(self):
         """ Hide most widgets, remove tooltips, remove text edit menu.
-        Need to load entire file """
+        Need to load entire file, if only a section is currently loaded. """
 
-        #TODO
         temp_edit_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
         if temp_edit_pos > 0:
             self.edit_pos = temp_edit_pos
@@ -3183,11 +3179,11 @@ class DialogCodeText(QtWidgets.QWidget):
             self.file_['start'] = 0
             self.file_['end'] = len(file_result['fulltext'])
             self.text = file_result['fulltext']
+            self.ui.textEdit.setText(self.text)
         self.prev_text = copy(self.text)
         self.ui.textEdit.removeEventFilter(self.eventFilterTT)
         self.get_cases_codings_annotations()
         self.ui.textEdit.setReadOnly(False)
-        self.ui.textEdit.setText(self.text)
         self.ed_highlight()
         self.ui.textEdit.textChanged.connect(self.update_positions)
         text_cursor = self.ui.textEdit.textCursor()

@@ -193,6 +193,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         te = QtWidgets.QTextEdit()
         te.setStyleSheet(font)
         te.setPlainText(file_text['fulltext'])
+        te.ensureCursorVisible()
         cursor = te.textCursor()
         cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
@@ -211,9 +212,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.resize(400, 300)
         # Make marked text visible, roughly centrally, with extra lines, and no need to scroll to the text.
         text_cursor = te.textCursor()
-        cur_pos = data['pos1'] + 180
-        if cur_pos > len(file_text['fulltext']):
-            cur_pos = len(file_text['fulltext']) - 1
+        cur_pos = data['pos1']
         text_cursor.setPosition(cur_pos)
         te.setTextCursor(text_cursor)
         te.setReadOnly(True)
