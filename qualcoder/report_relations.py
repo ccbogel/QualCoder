@@ -94,7 +94,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_csv_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
@@ -223,13 +222,18 @@ class DialogReportRelations(QtWidgets.QDialog):
         Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
+        actual text as before, overlap, after
         """
 
+        FID = 0
         CID = 1
         POS0 = 2
         POS1 = 3
-        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None, "whichmax": None,
-            "overlapindex": None, "unionindex": None, "distance": None}
+        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None,
+            "whichmax": None, "overlapindex": None, "unionindex": None, "distance": None,
+            "text_before": "TODO", "text_overlap": "TODO", "text_after": "TODO"}
+
+        cur = self.app.conn.cursor()
 
         # whichmin
         if c0[POS0] < c1[POS0]:
@@ -248,6 +252,10 @@ class DialogReportRelations(QtWidgets.QDialog):
             result['relation'] = "E"
             result['overlapindex'] = [c0[POS0], c0[POS1]]
             result['unionindex'] = [c0[POS0], c0[POS1]]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            txt = cur.fetchone()
+            if txt is not None:
+                result['text_overlap'] = txt[0]
             return result
 
         # Check for Proximity
@@ -267,12 +275,23 @@ class DialogReportRelations(QtWidgets.QDialog):
             result['relation'] = "I"
             result['overlapindex'] = [c0[POS0], c0[POS1]]
             result['unionindex'] = [c0[POS0], c0[POS1]]
+            #TODO text_overlap
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c1[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            txt = cur.fetchone()
+            if txt is not None:
+                result['text_overlap'] = txt[0]'''
             return result
+
         # c1 inside c0
         if c1[POS0] >= c0[POS0] and c1[POS1] <= c0[POS1]:
             result['relation'] = "I"
             result['overlapindex'] = [c1[POS0], c1[POS1]]
             result['unionindex'] = [c1[POS0], c1[POS1]]
+            #TODO text_overlap
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            txt = cur.fetchone()
+            if txt is not None:
+                result['text_overlap'] = txt[0]'''
             return result
 
         # Check for Overlap
@@ -283,6 +302,11 @@ class DialogReportRelations(QtWidgets.QDialog):
             # Reorder lowest to highest
             result['overlapindex'] = sorted([c0[POS0], c1[POS1]])
             result['unionindex'] = sorted([c0[POS1], c1[POS0]])
+            #TODO text_overlap
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            txt = cur.fetchone()
+            if txt is not None:
+                result['text_overlap'] = txt[0]'''
             return result
 
         # c1 overlaps from the right, left is not overlapping
@@ -290,11 +314,16 @@ class DialogReportRelations(QtWidgets.QDialog):
             result['relation'] = "O"
             result['overlapindex'] = sorted([c1[POS0], c0[POS1]])
             result['unionindex'] = sorted([c1[POS1], c0[POS0]])
+            #TODO text_overlap
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            txt = cur.fetchone()
+            if txt is not None:
+                result['text_overlap'] = txt[0]'''
             return result
 
     def display_relations(self):
-        """ Perhaps as table of:
-        Tooltips with codenames on id1,id2, relation,fid
+        """ A table of:
+        Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is: inclusion, overlap, exact, proximity
         """
@@ -310,9 +339,14 @@ class DialogReportRelations(QtWidgets.QDialog):
         U0 = 8
         U1 = 9
         DIST = 10
-        OWNER = 11
+        TEXT_BEFORE = 11
+        TEXT_OVERLAP = 12
+        TEXT_AFTER = 13
+        OWNER = 14
 
-        col_names = ["FID", "Code0", "Code1", "Rel", "Min", "Max", "Overlap0", "Overlap1", "Union0", "Union1", "Distance", "Owner"]
+        #TODO internationalisation
+        col_names = ["FID", "Code 0", "Code 1", "Rel", "Min", "Max", "Overlap 0", "Overlap 1", "Union 0", "Union 1",
+                     "Distance", "Text 0", "Overlap", "Text 1", "Owner"]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -389,6 +423,15 @@ class DialogReportRelations(QtWidgets.QDialog):
             #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, OWNER, item)
 
+            item = QtWidgets.QTableWidgetItem(i['text_before'])
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, TEXT_BEFORE, item)
+            item = QtWidgets.QTableWidgetItem(i['text_overlap'])
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, TEXT_OVERLAP, item)
+            item = QtWidgets.QTableWidgetItem(i['text_after'])
+            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, TEXT_AFTER, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
     def fill_tree(self):
