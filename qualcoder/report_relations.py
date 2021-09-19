@@ -220,7 +220,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
 
         Returns:
-        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
+        id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
         actual text as before, overlap, after
         """
@@ -229,8 +229,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         CID = 1
         POS0 = 2
         POS1 = 3
-        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None,
-            "whichmax": None, "overlapindex": None, "unionindex": None, "distance": None,
+        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None, "min": 0,
+            "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
             "text_before": "TODO", "text_overlap": "TODO", "text_after": "TODO"}
 
         cur = self.app.conn.cursor()
@@ -238,48 +238,71 @@ class DialogReportRelations(QtWidgets.QDialog):
         # whichmin
         if c0[POS0] < c1[POS0]:
             result['whichmin'] = c0[CID]
+            result['min'] = c0[POS0]
         if c1[POS0] < c0[POS0]:
             result['whichmin'] = c1[CID]
+            result['min'] = c1[POS0]
 
         # whichmax
         if c0[POS1] > c1[POS1]:
             result['whichmax'] = c0[CID]
+            result['max'] = c0[POS1]
         if c1[POS1] > c0[POS1]:
             result['whichmax'] = c1[CID]
+            result['max'] = c1[POS1]
 
         # Check for Exact
         if c0[POS0] == c1[POS0] and c0[POS1] == c1[POS1]:
             result['relation'] = "E"
             result['overlapindex'] = [c0[POS0], c0[POS1]]
             result['unionindex'] = [c0[POS0], c0[POS1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
+                result['text_before'] = ""
+                result['text_after'] = ""
             return result
 
         # Check for Proximity
         if c0[POS1] < c1[POS0]:
             result['relation'] = "P"
             result['distance'] = c1[POS0] - c0[POS1]
+            result['text_overlap'] = ""
+            result['text_before'] = ""
+            result['text_after'] = ""
             return result
         if c0[POS0] > c1[POS1]:
             result['relation'] = "P"
             result['distance'] = c0[POS0] - c1[POS1]
+            result['text_overlap'] = ""
+            result['text_before'] = ""
+            result['text_after'] = ""
             return result
 
         # Check for Inclusion
-        # Note Exact has been resolved already
+        # Exact has been resolved above
         # c0 inside c1
         if c0[POS0] >= c1[POS0] and c0[POS1] <= c1[POS1]:
             result['relation'] = "I"
             result['overlapindex'] = [c0[POS0], c0[POS1]]
             result['unionindex'] = [c0[POS0], c0[POS1]]
-            #TODO text_overlap
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c1[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
-                result['text_overlap'] = txt[0]'''
+                result['text_overlap'] = txt[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+            txt_before = cur.fetchone()
+            if txt_before is not None:
+                result['text_before'] = txt_before[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+            txt_after = cur.fetchone()
+            if txt_after is not None:
+                result['text_after'] = txt_after[0]
             return result
 
         # c1 inside c0
@@ -287,38 +310,78 @@ class DialogReportRelations(QtWidgets.QDialog):
             result['relation'] = "I"
             result['overlapindex'] = [c1[POS0], c1[POS1]]
             result['unionindex'] = [c1[POS0], c1[POS1]]
-            #TODO text_overlap
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c1[POS0] + 1, c1[POS1] - c1[POS0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
-                result['text_overlap'] = txt[0]'''
+                result['text_overlap'] = txt[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS0] + 1, c1[POS0] - c0[POS0], c0[0]])
+            txt_before = cur.fetchone()
+            if txt_before is not None:
+                result['text_before'] = txt_before[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c1[POS1] + 1, c0[POS1] - c1[POS1], c0[0]])
+            txt_after = cur.fetchone()
+            if txt_after is not None:
+                result['text_after'] = txt_after[0]
             return result
 
         # Check for Overlap
         # Should be all that is remaining
-        # c0 overlaps from the right, left is not overlapping
+        # c0 overlaps from the left to the right, untrue=left is not overlapping
         if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
+            print("c0 overlaps from the right, left is not overlapping")
+            print("c0", c0)
+            print("C1", c1)
             result['relation'] = "O"
             # Reorder lowest to highest
             result['overlapindex'] = sorted([c0[POS0], c1[POS1]])
             result['unionindex'] = sorted([c0[POS1], c1[POS0]])
-            #TODO text_overlap
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            overlap_length = result['unionindex'][1] - result['unionindex'][0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                    [c1[POS0] + 1, overlap_length, c0[0]])
             txt = cur.fetchone()
             if txt is not None:
-                result['text_overlap'] = txt[0]'''
+                result['text_overlap'] = txt[0]
+            #TODO
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+            txt_before = cur.fetchone()
+            if txt_before is not None:
+                result['text_before'] = txt_before[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+            txt_after = cur.fetchone()
+            if txt_after is not None:
+                result['text_after'] = txt_after[0]'''
             return result
 
-        # c1 overlaps from the right, left is not overlapping
+        # c1 overlaps from the left to the right, # untrue=left is not overlapping
         if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
             result['relation'] = "O"
             result['overlapindex'] = sorted([c1[POS0], c0[POS1]])
             result['unionindex'] = sorted([c1[POS1], c0[POS0]])
-            #TODO text_overlap
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?", [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+            overlap_length = result['unionindex'][1] - result['unionindex'][0]
+            print("c1 overlaps from the right, left is not overlapping")
+            print("C0", c0)
+            print("C1", c1)
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                    [c0[POS0] + 1, overlap_length, c0[0]])
             txt = cur.fetchone()
             if txt is not None:
-                result['text_overlap'] = txt[0]'''
+                result['text_overlap'] = txt[0]
+            #TODO
+            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+            txt_before = cur.fetchone()
+            if txt_before is not None:
+                result['text_before'] = txt_before[0]
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+            txt_after = cur.fetchone()
+            if txt_after is not None:
+                result['text_after'] = txt_after[0]'''
             return result
 
     def display_relations(self):
