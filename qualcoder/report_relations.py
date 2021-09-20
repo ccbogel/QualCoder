@@ -93,10 +93,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.label_codes.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.fill_tree()
-        self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
         self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
@@ -231,7 +231,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         POS1 = 3
         result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None, "min": 0,
             "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
-            "text_before": "TODO", "text_overlap": "TODO", "text_after": "TODO"}
+            "text_before": "", "text_overlap": "", "text_after": ""}
 
         cur = self.app.conn.cursor()
 
@@ -329,11 +329,11 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         # Check for Overlap
         # Should be all that is remaining
-        # c0 overlaps from the left to the right, untrue=left is not overlapping
+        # c0 overlaps on the right side, left side is not overlapping
         if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
-            print("c0 overlaps from the right, left is not overlapping")
+            '''print("c0 overlaps on the right side, left side is not overlapping")
             print("c0", c0)
-            print("C1", c1)
+            print("C1", c1)'''
             result['relation'] = "O"
             # Reorder lowest to highest
             result['overlapindex'] = sorted([c0[POS0], c1[POS1]])
@@ -344,44 +344,42 @@ class DialogReportRelations(QtWidgets.QDialog):
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
-            #TODO
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                    [c0[POS0] + 1, c1[POS0] - c0[POS0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+                    [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
-                result['text_after'] = txt_after[0]'''
+                result['text_after'] = txt_after[0]
             return result
 
-        # c1 overlaps from the left to the right, # untrue=left is not overlapping
+        # c1 overlaps on the right side, left side is not overlapping
         if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
             result['relation'] = "O"
             result['overlapindex'] = sorted([c1[POS0], c0[POS1]])
             result['unionindex'] = sorted([c1[POS1], c0[POS0]])
             overlap_length = result['unionindex'][1] - result['unionindex'][0]
-            print("c1 overlaps from the right, left is not overlapping")
+            '''print("TODO c1 overlaps on the right, the left side is not overlapping")
             print("C0", c0)
-            print("C1", c1)
+            print("C1", c1)'''
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
                     [c0[POS0] + 1, overlap_length, c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
-            #TODO
-            '''cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
+                    [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+                    [c1[POS1] + 1, c0[POS1] - c1[POS1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
-                result['text_after'] = txt_after[0]'''
+                result['text_after'] = txt_after[0]
             return result
 
     def display_relations(self):
@@ -593,10 +591,13 @@ class DialogReportRelations(QtWidgets.QDialog):
         if filepath is None:
             return
 
-        col_names = ["Fid", "Filename", "Code0","Code0_name", "Code0_pos0", "Code0_pos1", "Code1", "Code1_name", "Code1_pos0", "Code1_pos1",
-            "Relation", "Minimum", "Maximum", "Overlap0", "Overlap1", "Union0", "Union1", "Distance", "Owner"]
+        col_names = ["Fid", "Filename", "Code0","Code0_name", "Code0_pos0", "Code0_pos1", "Code1", "Code1_name",
+                     "Code1_pos0", "Code1_pos1", "Relation", "Minimum", "Maximum", "Overlap0", "Overlap1", "Union0",
+                     "Union1", "Distance","Text 0", "Text overlap", "Text 1", "Owner"]
         data = ""
         data += ",".join(col_names) + "\n"
+
+        #TODO  commas in text, currently replacing with underscore
 
         for row in self.result_relations:
             line = str(row['fid']) + ","
@@ -623,6 +624,9 @@ class DialogReportRelations(QtWidgets.QDialog):
             else:
                 line += ",,"
             line += str(row['distance']).replace('None', '') + ","
+            line += row['text_before'].replace(',', '_') + ","
+            line += row['text_overlap'].replace(',', '_') + ","
+            line += row['text1_after'].replace(',', '_') + ","
             line += row['owner'].replace(',', '_')
             data += line + "\n"
         f = open(filepath, 'w')
