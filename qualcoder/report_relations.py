@@ -27,6 +27,7 @@ https://qualcoder.wordpress.com/
 """
 
 from copy import copy
+import csv
 import datetime
 import logging
 import os
@@ -405,9 +406,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         TEXT_AFTER = 13
         OWNER = 14
 
-        #TODO internationalisation
-        col_names = ["FID", "Code 0", "Code 1", "Rel", "Min", "Max", "Overlap 0", "Overlap 1", "Union 0", "Union 1",
-                     "Distance", "Text 0", "Overlap", "Text 1", "Owner"]
+        col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0", _("Overlap") + " 1",
+                     _("Union") + " 0", _("Union") + " 1",
+                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner")]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -579,7 +580,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_csv_file(self):
-        """ Export data as csv, called projectname_relations.csv. """
+        """ Export data as csv, called projectname_relations.csv.
+        The csv is comma delimited and all fields quoted. """
 
         if not self.result_relations:
             return
@@ -590,48 +592,48 @@ class DialogReportRelations(QtWidgets.QDialog):
         filepath = e.filepath
         if filepath is None:
             return
+        col_names = ["Fid", _("Filename"), "Code0","Code0 " +_("name"), "Code0_pos0", "Code0_pos1",
+                     "Code1", "Code1 " + _("name"),
+                     "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
+                     _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
+                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner")]
+        with open(filepath, 'w', encoding='UTF8') as f:
+            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+            writer.writerow(col_names)
+            for r in self.result_relations:
+                row = []
+                row.append(r['fid'])
+                row.append(r['file_name'])
+                row.append(r['cid0'])
+                row.append(r['c0_name'])
+                row.append(r['c0_pos0'])
+                row.append(r['c0_pos1'])
+                row.append(r['cid1'])
+                row.append(r['c1_name'])
+                row.append(r['c1_pos0'])
+                row.append(r['c1_pos1'])
+                row.append(r['relation'] )
+                row.append(str(r['whichmin']).replace('None', ''))
+                row.append(str(r['whichmax']).replace('None', ''))
+                if r['overlapindex']:
+                    row.append(r['overlapindex'][0])
+                    row.append(r['overlapindex'][1])
+                else:
+                    row.append('')
+                    row.append('')
+                if r['unionindex']:
+                    row.append(r['unionindex'][0])
+                    row.append(r['unionindex'][1])
+                else:
+                    row.append('')
+                    row.append('')
+                row.append(str(r['distance']).replace('None', ''))
+                row.append(r['text_before'])
+                row.append(r['text_overlap'])
+                row.append(r['text_after'])
+                row.append(r['owner'])
+                writer.writerow(row)
 
-        col_names = ["Fid", "Filename", "Code0","Code0_name", "Code0_pos0", "Code0_pos1", "Code1", "Code1_name",
-                     "Code1_pos0", "Code1_pos1", "Relation", "Minimum", "Maximum", "Overlap0", "Overlap1", "Union0",
-                     "Union1", "Distance","Text 0", "Text overlap", "Text 1", "Owner"]
-        data = ""
-        data += ",".join(col_names) + "\n"
-
-        #TODO  commas in text, currently replacing with underscore
-
-        for row in self.result_relations:
-            line = str(row['fid']) + ","
-            line += row['file_name'].replace(',', '_') + ","
-            line += str(row['cid0']) + ","
-            line += row['c0_name'].replace(',', '_') + ","
-            line += str(row['c0_pos0']) + ","
-            line += str(row['c0_pos1']) + ","
-            line += str(row['cid1']) + ","
-            line += row['c1_name'].replace(',', '_') + ","
-            line += str(row['c1_pos0']) + ","
-            line += str(row['c1_pos1']) + ","
-            line += row['relation'] + ","
-            line += str(row['whichmin']).replace('None', '') + ","
-            line += str(row['whichmax']).replace('None', '') + ","
-            if row['overlapindex']:
-                line += str(row['overlapindex'][0]) + ","
-                line += str(row['overlapindex'][1]) + ","
-            else:
-                line += ",,"
-            if row['unionindex']:
-                line += str(row['unionindex'][0]) + ","
-                line += str(row['unionindex'][1]) + ","
-            else:
-                line += ",,"
-            line += str(row['distance']).replace('None', '') + ","
-            line += row['text_before'].replace(',', '_') + ","
-            line += row['text_overlap'].replace(',', '_') + ","
-            line += row['text1_after'].replace(',', '_') + ","
-            line += row['owner'].replace(',', '_')
-            data += line + "\n"
-        f = open(filepath, 'w')
-        f.write(data)
-        f.close()
         msg = _("Code relations csv file exported to: ") + filepath
         Message(self.app, _('Csv file Export'), msg, "information").exec_()
         self.parent_textEdit.append(msg)
