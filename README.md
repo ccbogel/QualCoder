@@ -140,6 +140,20 @@ Assuming you downloaded the 2.7 version. You can now run with:
 python3 /applications/QualCoder-2.7/qualcoder/__main__.py
 ```
 
+Alternative command to to run:
+
+From any directory:
+
+`qualcoder`
+
+From the QualCoder-Master directory:
+
+`python -m qualcoder`
+
+or
+
+`python qualcoder/__main__.py`
+
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
