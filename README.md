@@ -130,6 +130,7 @@ brew install qpdf
 ```
 
 From the QualCoder-Master directory run the setup script:
+
 'python3 setup.py install`
 
 
