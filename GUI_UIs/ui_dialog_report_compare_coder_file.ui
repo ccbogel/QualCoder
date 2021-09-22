@@ -78,22 +78,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_exports">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>84</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_title">
       <property name="geometry">
        <rect>
@@ -172,7 +156,7 @@ Select two coders, one file, one code.</string>
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_exporttext">
+     <widget class="QPushButton" name="pushButton_export_odt">
       <property name="geometry">
        <rect>
         <x>90</x>
@@ -182,7 +166,7 @@ Select two coders, one file, one code.</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export ODT file</string>
       </property>
       <property name="text">
        <string/>
@@ -202,38 +186,6 @@ Select two coders, one file, one code.</string>
       </property>
       <property name="text">
        <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>328</x>
-        <y>53</y>
-        <width>101</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Statistics:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_stats">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>53</y>
-        <width>511</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>statistics</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
       </property>
      </widget>
     </widget>
