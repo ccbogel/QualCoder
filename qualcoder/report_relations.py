@@ -41,7 +41,8 @@ from PyQt5.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
-from .helpers import ExportDirectoryPathDialog, Message
+from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -102,6 +103,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
+        self.ui.tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_code_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -383,6 +386,53 @@ class DialogReportRelations(QtWidgets.QDialog):
                 result['text_after'] = txt_after[0]
             return result
 
+    def table_menu(self, position):
+        """ Context menu to show row text in original context. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        try:
+            row = self.ui.tableWidget.currentRow()
+            #col = self.ui.tableWidget.currentColumn()
+            #cell_value = str(self.ui.tableWidget.item(self.row, self.col).text())
+        except AttributeError as e:
+            logger.warning("No table for table menu: " + str(e))
+            return
+        action_show_context = menu.addAction(_("View in context"))
+        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_show_context:
+            self.show_context()
+
+    def show_context(self):
+        """ Show context of coding in dialog.
+        Called by table_menu.
+        """
+
+        row = self.ui.tableWidget.currentRow()
+        d = self.result_relations[row]
+        codename0 = ""
+        codename1 = ""
+        color0 = ""
+        color1 = ""
+        for c in self.codes:
+            if c['cid'] == d['cid0']:
+                codename0 = c['name']
+                color0 = c['color']
+            if c['cid'] == d['cid1']:
+                codename1 = c['name']
+                color1 = c['color']
+        # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
+        data0 = {'codename': codename0, 'color': color0, 'file_or_casename': d['file_name'],
+            'pos0': d['c0_pos0'], 'pos1': d['c0_pos1'],
+            'text':'', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File' }
+        data1 = {'codename': codename1, 'color': color1, 'file_or_casename': d['file_name'],
+                 'pos0': d['c1_pos0'], 'pos1': d['c1_pos1'],
+                 'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
+        ui = DialogCodeInText(self.app, data0)
+        ui.add_coded_text(data1)
+        ui.exec_()
+        return
+
     def display_relations(self):
         """ A table of:
         Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
@@ -417,22 +467,22 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r, i in enumerate(self.result_relations):
             self.ui.tableWidget.insertRow(r)
             item = QtWidgets.QTableWidgetItem(str(i['fid']))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['file_name'])
             self.ui.tableWidget.setItem(r, FID, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['cid0']))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
             self.ui.tableWidget.setItem(r, C0, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['cid1']))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
             self.ui.tableWidget.setItem(r, C1, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['relation']))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             ttip = _("Proximity")
             if i['relation'] == "O":
                 ttip = _("Overlap")
@@ -444,7 +494,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(r, REL, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['whichmin']).replace("None", ""))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             if i['whichmin'] is not None:
                 ttip = i['c0_name']
                 if i['whichmin'] == i['cid1']:
@@ -453,46 +503,44 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(r, MIN, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['whichmax']).replace("None", ""))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             if i['whichmax'] is not None:
                 ttip = i['c0_name']
                 if i['whichmax'] == i['cid1']:
                     ttip = i['c1_name']
                 item.setToolTip(ttip)
             self.ui.tableWidget.setItem(r, MAX, item)
-
             if i['overlapindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
-                #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, O0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
-                # item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, O1, item)
-
             if i['unionindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][0]))
-                # item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, U0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
-                #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, U1, item)
-
             item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, DIST, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['owner']))
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, OWNER, item)
 
             item = QtWidgets.QTableWidgetItem(i['text_before'])
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, TEXT_BEFORE, item)
+
             item = QtWidgets.QTableWidgetItem(i['text_overlap'])
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, TEXT_OVERLAP, item)
             item = QtWidgets.QTableWidgetItem(i['text_after'])
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(r, TEXT_AFTER, item)
         self.ui.tableWidget.resizeColumnsToContents()
 

@@ -166,6 +166,7 @@ class DialogCodeInText(QtWidgets.QDialog):
 
     app = None
     data = None
+    te = None
 
     def __init__(self, app, data, parent=None):
         """ Prepare QDialog window.
@@ -190,11 +191,15 @@ class DialogCodeInText(QtWidgets.QDialog):
             title = _("File: ") + data['file_or_casename']
         if data['file_or_case'] == "Case":
             title = _("Case: ") + data['file_or_casename'] + ", " + file_text['name']
-        te = QtWidgets.QTextEdit()
-        te.setStyleSheet(font)
-        te.setPlainText(file_text['fulltext'])
-        te.ensureCursorVisible()
-        cursor = te.textCursor()
+        self.setWindowTitle(title)
+        self.te = QtWidgets.QTextEdit()
+        self.te.setStyleSheet(font)
+        self.te.setPlainText(file_text['fulltext'])
+        self.te.ensureCursorVisible()
+        gridLayout = QtWidgets.QGridLayout(self)
+        gridLayout.addWidget(self.te, 1, 0)
+        self.resize(400, 300)
+        cursor = self.te.textCursor()
         cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
         cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
@@ -202,20 +207,34 @@ class DialogCodeInText(QtWidgets.QDialog):
         fmt.setBackground(brush)
         text_brush = QtGui.QBrush(QtGui.QColor(TextColor(data['color']).recommendation))
         fmt.setForeground(text_brush)
+        fmt.setFontUnderline(True)
+        fmt.setUnderlineColor(QtGui.QColor(data['color']))
         cursor.setCharFormat(fmt)
-        self.setWindowTitle(title)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(font)
-        gridLayout = QtWidgets.QGridLayout(self)
-        gridLayout.addWidget(te, 1, 0)
-        self.resize(400, 300)
-        # Make marked text visible, roughly centrally, with extra lines, and no need to scroll to the text.
-        text_cursor = te.textCursor()
+        # Make marked text visible in view.
+        text_cursor = self.te.textCursor()
         cur_pos = data['pos1']
         text_cursor.setPosition(cur_pos)
-        te.setTextCursor(text_cursor)
-        te.setReadOnly(True)
+        self.te.setTextCursor(text_cursor)
+        self.te.setReadOnly(True)
+
+    def add_coded_text(self, data):
+        """ Add a second coded segment to the text.
+        Merge with the original. The original has an underline which is merged into this new format.
+        Called in report_relations.show_context """
+
+        cursor = self.te.textCursor()
+        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(data['color']))
+        fmt.setBackground(brush)
+        text_brush = QtGui.QBrush(QtGui.QColor(TextColor(data['color']).recommendation))
+        fmt.setForeground(text_brush)
+        cursor.mergeCharFormat(fmt)
+        # Make marked text visible, in view.
+        text_cursor = self.te.textCursor()
+        cur_pos = data['pos1']
+        text_cursor.setPosition(cur_pos)
 
 
 class DialogCodeInAllFiles(QtWidgets.QDialog):
