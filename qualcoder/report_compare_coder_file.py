@@ -117,12 +117,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
         self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        # TODO temporarily hide this button
-        self.ui.pushButton_exporttext.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_odt.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_odt.pressed.connect(self.export_odt_file)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -265,24 +263,23 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             item = it.value()
         self.ui.label_selections.setText(_("No coders selected"))
 
-    def export_text_file(self):
-        """ Export coding comparison statistics to text file. """
+    def export_odt_file(self):
+        """ Export coding comparison statistics and text to ODT file. """
 
-        #TODO revise this code for this Class
-
-        filename = "Coder_comparison.txt"
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
+        filename = "Coder_comparison_by_file.odt"
         e = ExportDirectoryPathDialog(self.app, filename)
         filepath = e.filepath
         if filepath is None:
             return
-        f = open(filepath, 'w', encoding="'utf-8-sig'")
-        f.write(self.app.project_name + "\n")
-        f.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-        f.write(self.comparisons)
-        f.close()
-        msg = _("Coder comparison text file exported to: ") + filepath
-        Message(self.app, _('Text file export'), msg, "information").exec_()
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filepath)
+        tw.setFormat(b'ODF')  # byte array needed for Windows 10
+        tw.write(self.ui.textEdit.document())
+        msg = _("Report exported: ") + filepath
         self.parent_textEdit.append(msg)
+        Message(self.app, _('Report exported'), msg, "information").exec_()
 
     def results(self):
         """ Iterate through tree widget, for all cids
