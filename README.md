@@ -140,7 +140,7 @@ Assuming you downloaded the 2.7 version. You can now run with:
 python3 /applications/QualCoder-2.7/qualcoder/__main__.py
 ```
 
-Alternative command to to run:
+Alternative commands to run QualCoder (Suggestions):
 
 From any directory:
 
