@@ -131,7 +131,7 @@ brew install qpdf
 
 From the QualCoder-Master directory run the setup script:
 
-'python3 setup.py install`
+`python3 setup.py install`
 
 
 Assuming you downloaded the 2.7 version. You can now run with:
