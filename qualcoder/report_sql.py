@@ -479,20 +479,19 @@ class DialogSQL(QtWidgets.QDialog):
             logger.warning("No table for table menu: " + str(e))
             return
 
-        ActionShowAllRows = menu.addAction(_("Clear filter"))
-        ActionShowAllRows.triggered.connect(self.show_all_rows)
-        ActionFilterOnCellValue = menu.addAction(_("Filter equals: ") + str(self.cell_value))
-        ActionFilterOnCellValue.triggered.connect(self.filter_cell_value)
-        ActionFilterOnTextLike = menu.addAction(_("Filter on text like"))
-        ActionFilterOnTextLike.triggered.connect(self.filter_text_like)
-        ActionFilterOnTextStartsWith = menu.addAction(_("Filter on text starts with"))
-        ActionFilterOnTextStartsWith.triggered.connect(self.filter_text_starts_with)
-        ActionSortAscending = menu.addAction(_("Sort ascending"))
-        ActionSortAscending.triggered.connect(self.sort_ascending)
-        ActionSortDescending = menu.addAction(_("Sort descending"))
-        ActionSortDescending.triggered.connect(self.sort_descending)
+        action_show_all_rows = menu.addAction(_("Clear filter"))
+        action_show_all_rows.triggered.connect(self.show_all_rows)
+        action_filter_on_cell_value = menu.addAction(_("Filter equals: ") + str(self.cell_value))
+        action_filter_on_cell_value.triggered.connect(self.filter_cell_value)
+        action_filter_on_text_like = menu.addAction(_("Filter on text like"))
+        action_filter_on_text_like.triggered.connect(self.filter_text_like)
+        action_filter_on_text_starts_with = menu.addAction(_("Filter on text starts with"))
+        action_filter_on_text_starts_with.triggered.connect(self.filter_text_starts_with)
+        action_sort_ascending = menu.addAction(_("Sort ascending"))
+        action_sort_ascending.triggered.connect(self.sort_ascending)
+        action_sort_descending = menu.addAction(_("Sort descending"))
+        action_sort_descending.triggered.connect(self.sort_descending)
         action = menu.exec_(self.ui.tableWidget_results.mapToGlobal(position))
-
     #TODO need to add numerical filters
     #TODO need to store or determine type of data to do this
 
