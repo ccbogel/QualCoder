@@ -51,6 +51,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
+from qualcoder.code_text_by_case import DialogCodeTextByCase
 from qualcoder.GUI.base64_helper import *  # qualcoder32
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
@@ -197,10 +198,9 @@ class App(object):
         # Write the latest projects file in order of most recently opened and without duplicate projects
         with open(self.persist_path, 'w') as f:
             for i, line in enumerate(result):
-                f.write(line)
-                f.write(os.linesep)
-                if i > 8:
-                    break
+                if i < 8:
+                    f.write(line)
+                    f.write(os.linesep)
         return result
 
     def append_recent_project(self, path):
@@ -546,10 +546,11 @@ class App(object):
             self.write_config_ini(self.default_settings)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
+        # codername is alo legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
-        #TODO TEMPORARY delete in 2022
+        #TODO TEMPORARY delete in 2022, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
@@ -785,6 +786,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
+        self.ui.actionCode_text_by_case.triggered.connect(self.code_by_case)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
         # reports menu
@@ -901,8 +903,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
         self.ui.actionCode_audio_video.setEnabled(False)
-        self.ui.actionCategories.setEnabled(False)
-        self.ui.actionView_Graph.setEnabled(False)
+        self.ui.actionCode_text_by_case.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -913,6 +914,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(False)
         self.ui.actionFile_summary.setEnabled(False)
         self.ui.actionCode_summary.setEnabled(False)
+        self.ui.actionCategories.setEnabled(False)
+        self.ui.actionView_Graph.setEnabled(False)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(False)
 
@@ -939,8 +942,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
-        self.ui.actionCategories.setEnabled(True)
-        self.ui.actionView_Graph.setEnabled(True)
+        self.ui.actionCode_text_by_case.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -950,6 +952,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
         self.ui.actionCode_summary.setEnabled(True)
+        self.ui.actionCategories.setEnabled(True)
+        self.ui.actionView_Graph.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
@@ -1134,6 +1138,23 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec_()
+
+    def code_by_case(self):
+        """ Create edit and delete codes. Apply and remove codes and annotations to the
+        text in imported text files. Organised by Case. Useful for an imported survey. """
+
+        cases = self.app.get_casenames()
+        files = self.app.get_text_filenames()
+        if len(files) > 0 and len(cases) > 0:
+            self.ui.label_coding.hide()
+            ui = DialogCodeTextByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
+            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            self.tab_layout_helper(self.ui.tab_coding, ui)
+        else:
+            msg = _("This project contains no text files.")
+            if len(cases) == 0:
+                    msg = _("This project contains no cases.")
+            Message(self.app, _('No cases or files'), msg).exec_()
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
