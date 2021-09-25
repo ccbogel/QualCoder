@@ -146,10 +146,12 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
+
+        #TODO
+        '''doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -159,26 +161,26 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)'''
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.viewcase_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_case)
         #icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_case)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_2.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_next_2.pressed.connect(self.go_to_next_file)
-        pm = QtGui.QPixmap()
+        self.ui.pushButton_next_2.pressed.connect(self.go_to_next_case)
+        '''pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
@@ -189,7 +191,7 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
+        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)'''
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_icon), "png")
         self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
@@ -880,28 +882,6 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def file_memo(self):
-        """ Open file memo to view or edit. """
-
-        if self.file_ is None:
-            return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
-        ui.exec_()
-        memo = ui.memo
-        if memo == self.file_['memo']:
-            return
-        self.file_['memo'] = memo
-        cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
-        self.app.conn.commit()
-        self.filenames = self.app.get_text_filenames()
-        self.ui.listWidget.clear()
-        for f in self.filenames:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
-        self.app.delete_backup = False
-
     def coded_text_memo(self, position=None):
         """ Add or edit a memo for this coded text. """
 
@@ -1169,7 +1149,7 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
 
-    def show_codes_like(self):
+    '''def show_codes_like(self):
         """ Show all codes if text is empty.
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created. """
@@ -1203,7 +1183,7 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
                 item.child(i).setHidden(True)
             if "cid:" in item.child(i).text(1) and text == "":
                 item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), text)
+            self.recursive_traverse(item.child(i), text)'''
 
     def keyPressEvent(self, event):
         """ This works best without the modifiers.
@@ -1423,7 +1403,7 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def show_selected_code_in_text_next(self):
+    '''def show_selected_code_in_text_next(self):
         """ Highlight only the selected code in the text. Move to next instance in text
         from the current textEdit cursor position.
         Adjust for a portion of text loaded.
@@ -1605,9 +1585,9 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.unlight()
         self.highlight()
-        self.get_coded_text_update_eventfilter_tooltips()
+        self.get_coded_text_update_eventfilter_tooltips()'''
 
-    def coded_media_dialog(self, code_dict):
+    '''def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
@@ -1616,7 +1596,7 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
             code_dict : code dictionary
         """
 
-        DialogCodeInAllFiles(self.app, code_dict)
+        DialogCodeInAllFiles(self.app, code_dict)'''
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -2008,7 +1988,8 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
 
-    def viewfile_menu(self, position):
+    #TODO
+    def viewcase_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder.
         Each file dictionary item in self.filenames contains:
@@ -2052,94 +2033,9 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
         if action == action_prev_chars:
             self.prev_chars(file_, selected)
 
-    def prev_chars(self, file_, selected):
-        """ Load previous CHAR_LIMIT chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # Already at start
-        if file_['start'] == 0:
-            return
-        file_['end'] = file_['start']
-        file_['start'] = file_['start'] - CHAR_LIMIT
-        # Forward track to the first line ending for a better start of text chunk
-        line_ending = False
-        i = 0
-        while file_['start'] + i < file_['end'] and not line_ending:
-            if file_['fulltext'][file_['start'] + i] == "\n":
-                line_ending = True
-            else:
-                i += 1
-        file_['start'] += i
-        # Check displayed text not going before start of characters
-        if file_['start'] < 0:
-            file_['start'] = 0
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)
-
-    def next_chars(self, file_, selected):
-        """ Load next CHAR_LIMIT chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # First time
-        if file_['start'] == 0 and file_['end'] == file_['characters']:
-            # Backtrack to the first line ending for a better end of text chunk
-            i = CHAR_LIMIT
-            line_ending = False
-            print("HERE")
-            while i > 0 and not line_ending:
-                if file_['fulltext'][i] == "\n":
-                   line_ending = True
-                else:
-                    i -= 1
-            if i <= 0:
-                file_['end'] = CHAR_LIMIT
-            else:
-                file_['end'] = i
-        else:
-            file_['start'] = file_['start'] + CHAR_LIMIT
-            # Backtrack from start to next line ending for a better start of text chunk
-            i = file_['start']
-            line_ending = False
-            while file_['start'] > 0 and not line_ending:
-                if file_['fulltext'][file_['start']] == "\n":
-                   line_ending = True
-                else:
-                    file_['start'] -= 1
-            # Backtrack from end to next line ending for a better end of text chunk
-            i = CHAR_LIMIT
-            if file_['start'] + i >= file_['characters']:
-                i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
-            line_ending = False
-            while i > 0 and not line_ending:
-                if file_['fulltext'][file_['start'] + i] == "\n":
-                   line_ending = True
-                else:
-                    i -= 1
-            file_['end'] = file_['start'] + i
-            # Check displayed text going past end of characters
-            if file_['end'] >= file_['characters']:
-                file_['end'] = file_['characters'] - 1
-        #print("Next chars method ", file_['start'], file_['end'])
-
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)
-
-    def go_to_next_file(self):
-        """ Go to next file in list. Button. """
+    #TODO
+    def go_to_next_case(self):
+        """ Go to next case in list. Button. """
 
         if self.file_ is None:
             self.load_file(self.filenames[0])
@@ -2153,9 +2049,11 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
                 self.search_term = ""
                 return
 
-    def go_to_latest_coded_file(self):
-        """ Go and open file with the latest coding. Button. """
+    #TODO
+    def go_to_latest_coded_case(self):
+        """ Go and open case with the latest coding. Button. """
 
+        #TODO
         sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
         cur = self.app.conn.cursor()
         cur.execute(sql, [self.app.settings['codername'], ])
@@ -2169,46 +2067,12 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
                 self.search_term = ""
                 break
 
-    def go_to_bookmark(self):
-        """ Find bookmark, open the file and highlight the bookmarked character.
-        Adjust for start of text file, as this may be a smaller portion of the full text file.
-
-        The currently loaded text portion may not contain the bookmark.
-        Solution - reset the file start and end marks to the entire file length and
-        load the entire text file.
+    #TODO
+    def listwidgetitem_view_case(self):
+        """ When listwidget item is pressed load the case.
+        The selected caae texts are then displayed for coding.
         """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select bookmarkfile, bookmarkpos from project")
-        result = cur.fetchone()
-        for i, f in enumerate(self.filenames):
-            if f['id'] == result[0]:
-                f['start'] = 0
-                if f['end'] != f['characters']:
-                    msg = _("Entire text file will be loaded")
-                    Message(self.app, _('Information'), msg).exec_()
-                f['end'] = f['characters']
-                try:
-                    self.ui.listWidget.setCurrentRow(i)
-                    self.load_file(f)
-                    self.search_term = ""
-                    # set text cursor position and also highlight one character, to show location.
-                    textCursor = self.ui.textEdit.textCursor()
-                    textCursor.setPosition(result[1])
-                    endpos = result[1] - 1
-                    if endpos < 0:
-                        endpos = 0
-                    textCursor.setPosition(endpos, QtGui.QTextCursor.KeepAnchor)
-                    self.ui.textEdit.setTextCursor(textCursor)
-                except Exception as e:
-                    logger.debug(str(e))
-                break
-
-    def listwidgetitem_view_file(self):
-        """ When listwidget item is pressed load the file.
-        The selected file is then displayed for coding.
-        Note: file segment is also loaded from listWidget context menu """
-
+        #TODO
         if len(self.filenames) == 0:
             return
         itemname = self.ui.listWidget.currentItem().text()
@@ -2218,6 +2082,14 @@ class DialogCodeTextByCase(QtWidgets.QWidget):
                 self.load_file(self.file_)
                 self.search_term = ""
                 break
+
+    #TODO
+    def load_case(self, case_):
+        """ Load and display file text for this case.
+            Get and display coding highlights.
+        """
+
+        print("TODO")
 
     def load_file(self, file_):
         """ Load and display file text for this file.
