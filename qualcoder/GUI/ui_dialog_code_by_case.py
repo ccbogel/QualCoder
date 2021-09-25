@@ -146,8 +146,8 @@ class Ui_Dialog_code_by_case(object):
         self.label_code.setText("")
         self.label_code.setWordWrap(True)
         self.label_code.setObjectName("label_code")
-        self.textEdit = QtWidgets.QTextEdit(self.splitter)
-        self.textEdit.setObjectName("textEdit")
+        self.listWidget_2 = QtWidgets.QListWidget(self.splitter)
+        self.listWidget_2.setObjectName("listWidget_2")
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
 
         self.retranslateUi(Dialog_code_by_case)
@@ -156,7 +156,6 @@ class Ui_Dialog_code_by_case(object):
         Dialog_code_by_case.setTabOrder(self.pushButton_previous, self.pushButton_next)
         Dialog_code_by_case.setTabOrder(self.pushButton_next, self.checkBox_search_case)
         Dialog_code_by_case.setTabOrder(self.checkBox_search_case, self.checkBox_search_all_files)
-        Dialog_code_by_case.setTabOrder(self.checkBox_search_all_files, self.textEdit)
 
     def retranslateUi(self, Dialog_code_by_case):
         _translate = QtCore.QCoreApplication.translate
