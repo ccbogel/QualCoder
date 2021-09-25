@@ -484,7 +484,7 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QTextEdit" name="textEdit"/>
+     <widget class="QListWidget" name="listWidget_2"/>
     </widget>
    </item>
   </layout>
@@ -495,7 +495,6 @@
   <tabstop>pushButton_next</tabstop>
   <tabstop>checkBox_search_case</tabstop>
   <tabstop>checkBox_search_all_files</tabstop>
-  <tabstop>textEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
