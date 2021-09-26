@@ -484,7 +484,8 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QListWidget" name="listWidget_2"/>
+     <widget class="QTableWidget" name="tableWidget"/>
+     <widget class="QListWidget" name="listWidget_vars"/>
     </widget>
    </item>
   </layout>
