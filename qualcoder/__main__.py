@@ -51,7 +51,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
-from qualcoder.code_text_by_case import DialogCodeTextByCase
+from qualcoder.code_by_case import DialogCodeByCase
 from qualcoder.GUI.base64_helper import *  # qualcoder32
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
@@ -434,6 +434,8 @@ class App(object):
         'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
         'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
         'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
+        'dialogcodebycase_splitter0','dialogcodebycase_splitter1',
+        'dialogcodebycase_splitter_v0', 'dialogcodebycase_splitter_v1',
         'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
         'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
         'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
@@ -579,6 +581,10 @@ class App(object):
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
             'dialogcodetext_splitter_v1': 1,
+            'dialogcodebycase_splitter0': 1,
+            'dialogcodebycase_splitter1': 1,
+            'dialogcodebycase_splitter_v0': 1,
+            'dialogcodebycase_splitter_v1': 1,
             'dialogcodeimage_splitter0': 1,
             'dialogcodeimage_splitter1': 1,
             'dialogcodeimage_splitter_h0': 1,
@@ -1140,14 +1146,14 @@ class MainWindow(QtWidgets.QMainWindow):
             Message(self.app, _('No text files'), msg).exec_()
 
     def code_by_case(self):
-        """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. Organised by Case. Useful for an imported survey. """
+        """ Create edit and delete codes. Apply and remove codes and annotations to
+         files. Organised by Case. Useful for an imported survey. """
 
         cases = self.app.get_casenames()
         files = self.app.get_text_filenames()
         if len(files) > 0 and len(cases) > 0:
             self.ui.label_coding.hide()
-            ui = DialogCodeTextByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
+            ui = DialogCodeByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
