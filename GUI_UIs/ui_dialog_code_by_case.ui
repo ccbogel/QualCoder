@@ -296,7 +296,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>0 / 0</string>
+       <string>Case selection. Code case segments.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
