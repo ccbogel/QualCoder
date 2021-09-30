@@ -286,7 +286,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_file_totals">
+     <widget class="QLabel" name="label_segment">
       <property name="geometry">
        <rect>
         <x>93</x>
@@ -302,7 +302,7 @@
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_next_file">
+     <widget class="QPushButton" name="pushButton_next_segment">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -318,7 +318,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_previous_file">
+     <widget class="QPushButton" name="pushButton_previous_segment">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -378,7 +378,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_next_2">
+       <widget class="QPushButton" name="pushButton_next_case">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -394,20 +394,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="label_case">
-        <property name="geometry">
-         <rect>
-          <x>140</x>
-          <y>5</y>
-          <width>221</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>.</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_goto_id">
+       <widget class="QPushButton" name="pushButton_goto">
         <property name="geometry">
          <rect>
           <x>80</x>
