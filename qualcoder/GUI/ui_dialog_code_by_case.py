@@ -208,7 +208,7 @@ class Ui_Dialog_code_by_case(object):
         self.pushButton_coding_memo.setToolTip(_translate("Dialog_code_by_case", "<html><head/><body><p>Memo for this coded section</p></body></html>"))
         self.label_search_regex.setToolTip(_translate("Dialog_code_by_case", "<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style=\" background-color:transparent;\">A ‘*’ after a character will match zero or more times. </span></p><p><span style=\" background-color:transparent;\">‘</span>\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol. </p><p>Regex cheatsheet: www.rexegg.com/regex-quickstart.html</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_code_by_case", "Help"))
-        self.label_segment.setText(_translate("Dialog_code_by_case", "0 / 0"))
+        self.label_segment.setText(_translate("Dialog_code_by_case", "Case selection. Code case segments."))
         self.pushButton_next_segment.setToolTip(_translate("Dialog_code_by_case", "Next file segment for this case"))
         self.pushButton_previous_segment.setToolTip(_translate("Dialog_code_by_case", "Previous file segment for this case"))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_by_case", "Case with latest coding"))
