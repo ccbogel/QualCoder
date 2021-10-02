@@ -95,6 +95,10 @@ class DialogCodeText(QtWidgets.QWidget):
     file_ = None  # contains filename and file id returned from SelectItems
     code_text = []
     annotations = []
+    # Overlapping coded text details
+    overlaps_at_pos = []
+    overlaps_at_pos_idx = 0
+    # Search text variables
     search_indices = []
     search_index = 0
     search_term = ""
@@ -168,15 +172,16 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
+        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         #icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
@@ -1458,12 +1463,9 @@ class DialogCodeText(QtWidgets.QWidget):
         # Overlapping codes cycle
         now = datetime.datetime.now()
         overlap_diff = now - self.overlap_timer
-        if key == QtCore.Qt.Key_O and self.ui.comboBox_codes_in_text.isEnabled() and overlap_diff.microseconds > 150000:
+        if key == QtCore.Qt.Key_O and len(self.overlaps_at_pos) > 0 and overlap_diff.microseconds > 150000:
             self.overlap_timer = datetime.datetime.now()
-            i = self.ui.comboBox_codes_in_text.currentIndex()
-            self.ui.comboBox_codes_in_text.setCurrentIndex(i + 1)
-            if self.ui.comboBox_codes_in_text.currentIndex() < 1:
-                self.ui.comboBox_codes_in_text.setCurrentIndex(1)
+            self.highlight_selected_overlap()
             return
         # Quick mark selected
         if key == QtCore.Qt.Key_Q and selected_text != "":
@@ -1481,6 +1483,52 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.lineEdit_search.setText(selected_text)
                 self.search_for_text()
                 self.ui.pushButton_next.setFocus()
+
+    def highlight_selected_overlap(self):
+        """ Hightlight the current overlapping text code, by placing formatting on top. """
+
+        self.overlaps_at_pos_idx += 1
+        if self.overlaps_at_pos_idx >= len(self.overlaps_at_pos):
+            self.overlaps_at_pos_idx = 0
+        #print("overlaps idx", self.overlaps_at_pos_idx)
+        item = self.overlaps_at_pos[self.overlaps_at_pos_idx]
+        #print("item", item)
+        # Remove formatting
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+        # Reapply formatting
+        color = ""
+        for code in self.codes:
+            if code['cid'] == item['cid']:
+                color = code['color']
+        fmt = QtGui.QTextCharFormat()
+        brush = QBrush(QColor(color))
+        fmt.setBackground(brush)
+        if item['important']:
+            fmt.setFontWeight(QtGui.QFont.Bold)
+        fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
+        cursor.setCharFormat(fmt)
+        self.apply_italic_to_overlaps()
+
+    def overlapping_codes_in_text(self):
+        """ When coded text is clicked on.
+        Only enabled if two or more codes are here.
+        Adjust for when portion of full text file loaded.
+        Called by: textEdit cursor position changed. """
+
+        self.overlaps_at_pos = []
+        self.overlaps_at_pos_idx = 0
+        pos = self.ui.textEdit.textCursor().position()
+        for item in self.code_text:
+            if item['pos0'] <= pos + self.file_['start'] and item['pos1'] >= pos + self.file_['start']:
+                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
+                self.overlaps_at_pos.append(item)
+        if len(self.overlaps_at_pos) < 2:
+            self.overlaps_at_pos = []
+            self.overlaps_at_pos_idx = 0
+        #print("Overlaps", self.overlaps_at_pos)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -2582,6 +2630,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
+    #TODO delete later afer O is fixed
     def combo_code_selected(self):
         """ Combobox code item clicked on.
         Highlight this coded text.
