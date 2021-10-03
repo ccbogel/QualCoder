@@ -74,22 +74,6 @@
        <string/>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_search_all_files">
-      <property name="geometry">
-       <rect>
-        <x>727</x>
-        <y>1</y>
-        <width>21</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
@@ -152,34 +136,6 @@
       </property>
       <property name="text">
        <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_search_all_files">
-      <property name="geometry">
-       <rect>
-        <x>753</x>
-        <y>4</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_case_sensitive">
@@ -568,7 +524,6 @@
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
   <tabstop>checkBox_search_case</tabstop>
-  <tabstop>checkBox_search_all_files</tabstop>
  </tabstops>
  <resources/>
  <connections/>
