@@ -449,7 +449,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 if a[2] == 'numeric':
                     sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
                 sql += " and attribute.attr_type='file'"
-                #print("Attribute selected: ", a)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for i in result:
@@ -699,7 +698,6 @@ class DialogCodeText(QtWidgets.QWidget):
         item = it.value()
         count = 0
         while item and count < 10000:
-            #print(item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 try:
@@ -1180,14 +1178,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if start_or_end == "start":
             max = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min = -1 * code_to_edit['pos0']
-            #print("start", min, max)
             changed_start, ok = int_dialog.getInt(self, _("Change start position"), _("Change start character position. Positive or negative number:"), 0,min,max,1)
             if not ok:
                 return
         if start_or_end == "end":
             max = txt_len - code_to_edit['pos1']
             min = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
-            #print("end", min, max)
             changed_end, ok = int_dialog.getInt(self, _("Change end position"), _("Change end character position. Positive or negative number:"), 0,min,max,1)
             if not ok:
                 return
@@ -1301,38 +1297,32 @@ class DialogCodeText(QtWidgets.QWidget):
     def merge_category(self, catid):
         """ Select another category to merge this category into. """
 
-        #print(self.ui.treeWidget.currentItem())
         nons = []
         nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
         nons.append(str(catid))
         non_str = "(" + ",".join(nons) + ")"
         sql = "select name, catid, supercatid from code_cat where catid not in "
         sql += non_str + " order by name"
-        #print(sql)
         cur = self.app.conn.cursor()
         cur.execute(sql)
         res = cur.fetchall()
         category_list = [{'name': "", 'catid': None, 'supercatid': None}]
         for r in res:
-            #print(r)
             category_list.append({'name':r[0], 'catid': r[1], "supercatid": r[2]})
         ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
         ok = ui.exec_()
         if not ok:
             return
         category = ui.get_selected()
-        #print("MERGING", catid, " INTO ", category)
         for c in self.codes:
             if c['catid'] == catid:
                 cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
-                #print(c)
         cur.execute("delete from code_cat where catid=?", [catid])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         for cat in self.categories:
             if cat['supercatid'] == catid:
                 cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
-                #print(cat)
         self.app.conn.commit()
         # Clear any orphan supercatids
         sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
@@ -1490,9 +1480,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlaps_at_pos_idx += 1
         if self.overlaps_at_pos_idx >= len(self.overlaps_at_pos):
             self.overlaps_at_pos_idx = 0
-        #print("overlaps idx", self.overlaps_at_pos_idx)
         item = self.overlaps_at_pos[self.overlaps_at_pos_idx]
-        #print("item", item)
         # Remove formatting
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
@@ -1528,7 +1516,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.overlaps_at_pos) < 2:
             self.overlaps_at_pos = []
             self.overlaps_at_pos_idx = 0
-        #print("Overlaps", self.overlaps_at_pos)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -1699,13 +1686,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 msg = str(i + 1) + msg
                 break
         if not found_larger and indexes == []:
-            #print("if not found_larger and indexes == [] move to next file")
             return
         # loop around to highest index
         if not found_larger and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
-            #print("if not found_larger and indexes != [] move to next file")
             msg = "1" + msg
         if not found_larger:
             cursor = self.ui.textEdit.textCursor()
@@ -2335,7 +2320,6 @@ class DialogCodeText(QtWidgets.QWidget):
             # Backtrack to the first line ending for a better end of text chunk
             i = CHAR_LIMIT
             line_ending = False
-            print("HERE")
             while i > 0 and not line_ending:
                 if file_['fulltext'][i] == "\n":
                    line_ending = True
@@ -2369,7 +2353,6 @@ class DialogCodeText(QtWidgets.QWidget):
             # Check displayed text going past end of characters
             if file_['end'] >= file_['characters']:
                 file_['end'] = file_['characters'] - 1
-        #print("Next chars method ", file_['start'], file_['end'])
 
         # Update tooltip for listItem
         tt = selected.toolTip()
@@ -2607,11 +2590,9 @@ class DialogCodeText(QtWidgets.QWidget):
         overlapping = []
         overlaps = []
         for i in self.code_text:
-            #print(item['pos0'], type(item['pos0']), item['pos1'], type(item['pos1']))
             for j in self.code_text:
                 if j != i:
                     if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
-                        #print("overlapping: j0", j['pos0'], j['pos1'],"- i0", i['pos0'], i['pos1'])
                         if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
                             overlaps.append([j['pos0'], j['pos1']])
                         elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
@@ -2620,7 +2601,6 @@ class DialogCodeText(QtWidgets.QWidget):
                             overlaps.append([j['pos0'], i['pos1']])
                         else:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
-        #print(overlaps)
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
         for o in overlaps:
@@ -2629,42 +2609,6 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
-
-    #TODO delete later afer O is fixed
-    def combo_code_selected(self):
-        """ Combobox code item clicked on.
-        Highlight this coded text.
-        Account for start of text file, as this may be a smaller portion of the full text file."""
-
-        current_codename = self.ui.comboBox_codes_in_text.currentText()
-        current_code = None
-        for code in self.codes:
-            if code['name'] == current_codename:
-                current_code = code
-                break
-        if current_code is None:
-            return
-        pos = self.ui.textEdit.textCursor().position() + self.file_['start']
-        current_item = None
-        for item in self.code_text:
-            if item['pos0'] <= pos and item['pos1'] >= pos and item['cid'] == current_code['cid']:
-                current_item = item
-                break
-        #print("current item", current_item)  # tmp
-        if current_item is None:
-            return
-        # Remove formatting
-        cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(int(current_item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(int(current_item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
-        cursor.setCharFormat(QtGui.QTextCharFormat())
-        # Reapply formatting
-        fmt = QtGui.QTextCharFormat()
-        brush = QBrush(QColor(current_code['color']))
-        fmt.setBackground(brush)
-        fmt.setForeground(QBrush(QColor(TextColor(current_code['color']).recommendation)))
-        cursor.setCharFormat(fmt)
-        self.apply_italic_to_overlaps()
 
     def select_tree_item_by_code_name(self, codename):
         """ Set a tree item code. This still call fill_code_label and
@@ -2929,7 +2873,6 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('Warning'), _("Cannot have blank text marks"), "warning").exec_()
             return
 
-        #print("end mark: " + end_mark)
         msg = _("Code text using start and end marks: ") + self.file_['name']
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
 
@@ -3300,19 +3243,13 @@ class DialogCodeText(QtWidgets.QWidget):
 
         cursor = self.ui.textEdit.textCursor()
         self.text = self.ui.textEdit.toPlainText()
-        # print("cursor", cursor.position())
-        # for d in difflib.unified_diff(self.prev_text, self.text):
         # n is how many context lines to show
         d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
-        # print(d)  # 4 items
         if len(d) < 4:
-            # print("D", d)
             return
         char = d[3]
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
-        # print("position", position, "char", char)
-
         previous = position.split(" ")[0]
         pre_start = int(previous.split(",")[0])
         pre_chars = None

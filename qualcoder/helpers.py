@@ -84,6 +84,28 @@ def msecs_to_hours_mins_secs(msecs):
     res = hours + "." + remainder_mins + "." + remainder_secs
     return res
 
+def file_typer(mediapath):
+    """ Take the source mediapath and return type as: text, audio, video, image
+    Required function as this is a historical quirk of development
+    param:
+        mediapath: String containing the mediapath
+    """
+
+    if mediapath is None:
+        return "text"
+    if len(mediapath) < 3:
+        return "text"
+    mediapath = mediapath.lower()
+    if mediapath[-3:] in ('jpg', 'png'):
+        return "image"
+    if len(mediapath) > 4 and mediapath[-4:] == 'jpeg':
+        return "image"
+    if mediapath[-3:] in ('mp3', 'wav', 'm4a'):
+        return "audio"
+    if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
+        return "video"
+    return "text"
+
 
 class Message(QtWidgets.QMessageBox):
     """ This is called a lot , but is styled to font size """
