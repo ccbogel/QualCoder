@@ -46,7 +46,7 @@ from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .helpers import msecs_to_mins_and_secs, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
+from .helpers import msecs_to_mins_and_secs, file_typer, Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_by_case import Ui_Dialog_code_by_case
 from .memo import DialogMemo
@@ -106,6 +106,13 @@ class DialogCodeByCase(QtWidgets.QWidget):
     important = False  # Show/hide important codes
     #attributes = []  # Show selected files using these attributes in list widget
 
+    # Image related varaibles
+    code_areas = []
+    img_selection = None
+    img_scale = 1.0
+    scene = None
+    pixmap = None
+
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
     # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
     code_resize_timer = 0
@@ -161,10 +168,12 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.horizontalSlider.hide()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        pm = QtGui.QPixmap()
+        '''pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_case_and_file)
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_case_and_file)'''
+        self.ui.pushButton_latest.hide()  # too hard to implement
+        self.ui.pushButton_goto.hide()  # not implemented yet
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_case.setIcon(QtGui.QIcon(pm))
@@ -275,8 +284,19 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.setAttribute(Qt.WA_QuitOnClose, False)
 
+        # Image related
+        self.scene = QtWidgets.QGraphicsScene()
+        self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
+        # Need this otherwise small images are centred on screen, and affect context menu position points
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.scene.installEventFilter(self)
+        self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
+
+        # Data
         self.get_cases()
         self.codes, self.categories = self.app.get_codes_categories()
+        self.get_coded_areas()
         self.annotations = self.app.get_annotations()
         self.fill_tree()
 
@@ -309,18 +329,21 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.cases.append(dict(zip(keys, row)))
         # Fill additional data
         for c in self.cases:
-            sql_texts = "select fid, pos0, pos1, substr(source.fulltext, pos0 + 1, pos1-pos0), " \
-                  "source.name " \
+            sql_sources = "select fid, pos0, pos1, substr(source.fulltext, pos0 + 1, pos1-pos0), " \
+                  "source.name, source.mediapath, source.memo " \
                   "from case_text join source on source.id=case_text.fid " \
-                  "where pos1 !=0 and caseid=?"
-            cur.execute(sql_texts, [c['caseid']])
-            result_texts = cur.fetchall()
-            texts = []
-            for t_res in result_texts:
-                text_keys = "fid", "pos0", "pos1", "text", "filename"
-                text_res = dict(zip(text_keys, t_res))
-                texts.append(text_res)
-            c['files'] = texts
+                  "where caseid=?"
+           #       "where pos1 !=0 and caseid=?"
+            cur.execute(sql_sources, [c['caseid']])
+            result_sources = cur.fetchall()
+            sources = []
+            for s_res in result_sources:
+                keys_ = "fid", "pos0", "pos1", "text", "filename", "mediapath", "memo"
+                res = dict(zip(keys_, s_res))
+                res['filetype'] = file_typer(res['mediapath'])
+                if res['filetype'] not in ('audio', 'video'):
+                    sources.append(res)
+            c['files'] = sources
             sql_vars = "select attribute.name, value, valuetype from attribute " \
                    "join attribute_type on attribute_type.name=attribute.name " \
                    "where attr_type='case' and id=? order by attribute.name"
@@ -335,7 +358,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         for c in self.cases:
             item = QtWidgets.QListWidgetItem(c['name'])
-            tt = _("Text segments for case: ") + str(len(texts))
+            tt = _("Text segments for case: ") + str(len(sources))
             if c['memo'] is not None and c['memo'] != "":
                 tt += "\nMemo: " + c['memo']
             item.setToolTip(tt)
@@ -349,26 +372,30 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if self.case_ is None:
             return
         fid = self.case_['files'][self.case_['file_index']]['fid']
+        ftype = self.case_['files'][self.case_['file_index']]['filetype']
+        fmemo = self.case_['files'][self.case_['file_index']]['memo']
         tt = ""
         cur = self.app.conn.cursor()
-        sql = "select length(fulltext), memo from source where id=?"
-        cur.execute(sql, [fid])
-        res_file = cur.fetchone()
-        if res_file is not None and res_file[0] > 0:
-            tt += _("Characters: ") + str(res_file[0])
+        if ftype == 'text':
+            sql = "select length(fulltext), memo from source where id=?"
+            cur.execute(sql, [fid])
+            res = cur.fetchone()
+            if res is not None and res[0] > 0:
+                tt += _("Characters: ") + str(res[0])
+            sql_tx_codings = "select count(cid) from code_text where fid=? and owner=?"
+            cur.execute(sql_tx_codings, [fid, self.app.settings['codername']])
+            res_txt = cur.fetchone()
+            if res_txt is not None and res_txt[0] > 0:
+                tt += "\n" + _("Text codings: ") + str(res_txt[0])
+        if ftype == 'image':
+            sql_img_codings = "select count(cid) from code_image where id=? and owner=?"
+            cur.execute(sql_img_codings, [fid, self.app.settings['codername']])
+            res = cur.fetchone()
+            if res is not None and res[0] > 0:
+                tt += "\n" + _("Image codings: ") + str(res[0])
 
-        sql_tx_codings = "select count(cid) from code_text where fid=? and owner=?"
-        cur.execute(sql_tx_codings, [fid, self.app.settings['codername']])
-        res_txt = cur.fetchone()
-        if res_txt is not None and res_txt[0] > 0:
-            tt += "\n" + _("Codings: ") + str(res_txt[0])
-        sql_img_codings = "select count(cid) from code_image where id=? and owner=?"
-        cur.execute(sql_img_codings, [fid, self.app.settings['codername']])
-        res_img = cur.fetchone()
-        if res_img is not None and res_img[0] > 0:
-            tt += "\n" + _("Codings: ") + str(res_img[0])
-        if res_file[1] is not None and res_file[1] != "":
-            tt += "\nMemo: " + res_file[1]
+        if fmemo is not None and fmemo != "":
+            tt += "\nMemo: " + fmemo
         # Find item to update tooltip
         self.ui.label_segment.setToolTip(tt)
 
@@ -501,7 +528,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.get_coded_text_update_eventfilter_tooltips()
 
-    #TODO
     def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
          Also, if text is highlighted, assign the text to this code.
@@ -584,7 +610,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -626,7 +652,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
             for item in remove_list:
                 cats.remove(item)
             count += 1
-
         # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
@@ -644,7 +669,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
-
         # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
@@ -669,17 +693,20 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
-    #TODO
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file.
+        """ Count instances of each code for current coder and in the selected file or file segment.
         Called by: fill_tree
         """
-        return
 
-        if self.file_ is None:
+        if self.case_ is None:
             return
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
+        end_pos = len(self.ui.textEdit.toPlainText()) + text_pos0
+        ftype = self.case_['files'][self.case_['file_index']]['filetype']
+        sql_txt = "select count(cid) from code_text where cid=? and fid=? and owner=? and pos0>=? and pos1<=?"
+        sql_img = "select count(cid) from code_image where cid=? and id=? and owner=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
@@ -688,7 +715,10 @@ class DialogCodeByCase(QtWidgets.QWidget):
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 try:
-                    cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
+                    if ftype == 'text':
+                        cur.execute(sql_txt, [cid, fid, self.app.settings['codername'], text_pos0, end_pos])
+                    if ftype == 'image':
+                        cur.execute(sql_img, [cid, fid, self.app.settings['codername']])
                     result = cur.fetchone()
                     if result[0] > 0:
                         item.setText(3, str(result[0]))
@@ -699,7 +729,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     msg = "Fill code counts error\n" + str(e) + "\n"
                     msg += sql + "\n"
                     msg += "cid " + str(cid) + "\n"
-                    msg += "self.file_['id'] " + str(self.file_['id']) + "\n"
+                    msg += "self.file_['id'] " + str(fid) + "\n"
                     logger.debug(msg)
                     item.setText(3, "")
             it += 1
@@ -712,7 +742,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
-    #TODO
     def search_for_text(self):
         """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
         Only where text is >=3 OR 5 characters long. Or Enter is pressed (search_type==1).
@@ -737,13 +766,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
             flags |= re.IGNORECASE
-        '''if self.ui.checkBox_search_escaped.isChecked():
-            pattern = re.compile(re.escape(self.search_term), flags)
-        else:
-            try:
-                pattern = re.compile(self.search_term, flags)
-            except:
-                logger.warning('Bad escape')'''
         try:
             pattern = re.compile(self.search_term, flags)
         except:
@@ -751,67 +773,48 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if pattern is None:
             return
         self.search_indices = []
-
-        try:
-            if self.text:
-                for match in pattern.finditer(self.text):
-                    # Get result as first dictionary item
-                    source_name = self.app.get_file_texts([self.file_['id'], ])[0]
-                    self.search_indices.append((source_name, match.start(), len(match.group(0))))
-        except:
-            logger.exception('Failed searching current file for %s',self.search_term)
+        for match in pattern.finditer(self.ui.textEdit.toPlainText()):
+            # Get result as first dictionary item
+            #source_name = self.app.get_file_texts([fid])[0]
+            self.search_indices.append({'match_start': match.start(), 'match_len': len(match.group(0))})
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
         self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
 
-    #TODO
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.file_ is None or self.search_indices == []:
+        if self.case_ is None or self.search_indices == []:
             return
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
-        # prev_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date) and char position and search string length
-        if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
-            self.load_file(prev_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(prev_result['match_start'])
+        cursor.setPosition(cursor.position() + prev_result['match_len'], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
-    #TODO
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
 
-        if self.file_ is None or self.search_indices == []:
+        if self.case_ is None or self.search_indices == []:
             return
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
         cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date) and char position and search string length
-        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
-            self.load_file(next_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(cursor.position() + next_result[2])
+        cursor.setPosition(cursor.position() + next_result['match_len'])
         self.ui.textEdit.setTextCursor(cursor)
-
         # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(next_result['match_start'])
+        cursor.setPosition(cursor.position() + next_result['match_len'], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
-    #TODO
     def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
 
@@ -833,13 +836,11 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.search_type = 3
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
-
             return
         if action == action_char5:
             self.search_type = 5
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
             self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
-
             return
         if action == action_enter:
             self.search_type = 1
@@ -992,7 +993,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 return True
         return False
 
-    #TODO"
     def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
@@ -1086,6 +1086,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
     def change_code_pos(self, location, start_or_end):
         """  Called via textedit_menu. """
+
         if self.case_ is None:
             return
         text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
@@ -1158,7 +1159,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         cb.clear(mode=cb.Clipboard)
         cb.setText(selected_text, mode=cb.Clipboard)
 
-    #TODO
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.
         Add, rename, memo, move or delete code or category. Change code color.
@@ -1413,7 +1413,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 self.ui.pushButton_next.setFocus()
 
     def highlight_selected_overlap(self):
-        """ Hightlight the current overlapping text code, by placing formatting on top. """
+        """ Highlight the current overlapping text code, by placing formatting on top. """
 
         self.overlaps_at_pos_idx += 1
         if self.overlaps_at_pos_idx >= len(self.overlaps_at_pos):
@@ -1440,7 +1440,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.apply_italic_to_overlaps()
 
     def overlapping_codes_in_text(self):
-        """ When coded text is clicked on.
+        """ When coded text is clicked on find overlapping codes at this character position.
         Only enabled if two or more codes are here.
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
@@ -1898,6 +1898,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
 
+    #TODO add more
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
         Using try except blocks for each instance, as instance may have been deleted. """
@@ -2169,133 +2170,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
 
-    #TODO remove =- have buttons
-    '''def view_case_menu(self, position):
-        """ Context menu for listWidget cases to get to the next case and
-        to go to the case with the latest codings by this coder.
-        Each file dictionary item in self.filenames contains:
-        {'id', 'name', 'memo', 'characters'= number of characters in the file,
-        'start' = showing characters from this position, 'end' = showing characters to this position}
-
-        param:
-            position : """
-
-        selected = self.ui.listWidget.currentItem()
-        file_ = None
-        for f in self.filenames:
-            if selected.text() == f['name']:
-                file_ = f
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_next = None
-        action_latest = None
-        action_next_chars = None
-        action_prev_chars = None
-        if len(self.filenames) > 1:
-            action_next = menu.addAction(_("Next file"))
-            action_latest = menu.addAction(_("File with latest coding"))
-        if f['characters'] > CHAR_LIMIT:
-            action_next_chars = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
-            if file_['start'] > 0:
-                action_prev_chars = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
-        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
-        if action is None:
-            return
-        if action == action_next:
-            self.go_to_next_file()
-        if action == action_latest:
-            self.go_to_latest_coded_file()
-        if action == action_next_chars:
-            self.next_chars(file_, selected)
-        if action == action_prev_chars:
-            self.prev_chars(file_, selected)'''
-
-    '''def prev_chars(self, file_, selected):
-        """ Load previous CHAR_LIMIT chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # Already at start
-        if file_['start'] == 0:
-            return
-        file_['end'] = file_['start']
-        file_['start'] = file_['start'] - CHAR_LIMIT
-        # Forward track to the first line ending for a better start of text chunk
-        line_ending = False
-        i = 0
-        while file_['start'] + i < file_['end'] and not line_ending:
-            if file_['fulltext'][file_['start'] + i] == "\n":
-                line_ending = True
-            else:
-                i += 1
-        file_['start'] += i
-        # Check displayed text not going before start of characters
-        if file_['start'] < 0:
-            file_['start'] = 0
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)
-
-    def next_chars(self, file_, selected):
-        """ Load next CHAR_LIMIT chunk of the text file.
-        params:
-            file_  : selected file, Dictionary
-            selected:  list widget item """
-
-        # First time
-        if file_['start'] == 0 and file_['end'] == file_['characters']:
-            # Backtrack to the first line ending for a better end of text chunk
-            i = CHAR_LIMIT
-            line_ending = False
-            print("HERE")
-            while i > 0 and not line_ending:
-                if file_['fulltext'][i] == "\n":
-                   line_ending = True
-                else:
-                    i -= 1
-            if i <= 0:
-                file_['end'] = CHAR_LIMIT
-            else:
-                file_['end'] = i
-        else:
-            file_['start'] = file_['start'] + CHAR_LIMIT
-            # Backtrack from start to next line ending for a better start of text chunk
-            i = file_['start']
-            line_ending = False
-            while file_['start'] > 0 and not line_ending:
-                if file_['fulltext'][file_['start']] == "\n":
-                   line_ending = True
-                else:
-                    file_['start'] -= 1
-            # Backtrack from end to next line ending for a better end of text chunk
-            i = CHAR_LIMIT
-            if file_['start'] + i >= file_['characters']:
-                i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
-            line_ending = False
-            while i > 0 and not line_ending:
-                if file_['fulltext'][file_['start'] + i] == "\n":
-                   line_ending = True
-                else:
-                    i -= 1
-            file_['end'] = file_['start'] + i
-            # Check displayed text going past end of characters
-            if file_['end'] >= file_['characters']:
-                file_['end'] = file_['characters'] - 1
-        #print("Next chars method ", file_['start'], file_['end'])
-
-        # Update tooltip for listItem
-        tt = selected.toolTip()
-        tt2 = tt.split("From: ")[0]
-        tt2 += "\n" + _("From: ") + str(file_['start']) + _(" to ") + str(file_['end'])
-        selected.setToolTip(tt2)
-        # Load file section into textEdit
-        self.load_file(file_)'''
-
     def go_to_next_case(self):
         """ Go to next case in list. Button: pushButton_next_file. """
 
@@ -2313,17 +2187,13 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 return
 
     #TODO
-    def go_to_latest_coded_case_and_file(self):
+    '''def go_to_latest_coded_case_and_file(self):
         """ Go to the case with the most recent coding
         and open file with the latest coding. Button. """
 
-        #TODO
         print("To implement, go_to_latest_coded_case_and_file")
-        print("May e too hard to implement ?")
-
-        return
-
-        '''sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
+        print("May be too hard to implement ?")
+        sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
         cur = self.app.conn.cursor()
         cur.execute(sql, [self.app.settings['codername'], ])
         result = cur.fetchone()
@@ -2362,26 +2232,50 @@ class DialogCodeByCase(QtWidgets.QWidget):
         """
 
         self.ui.lineEdit_search.setText("")
+        self.search_indices = []
+        self.search_index = 0
+        ftype = self.case_['files'][self.case_['file_index']]['filetype']
         files_msg = str(self.case_['file_index'] + 1) + " / " + str(len(self.case_['files'])) + " "
         files_msg += self.case_['files'][self.case_['file_index']]['filename']
-        files_msg += " [" + str(self.case_['files'][self.case_['file_index']]['pos0']) + " - "
-        files_msg += str(self.case_['files'][self.case_['file_index']]['pos1']) + "]"
+        if ftype == 'text':
+            files_msg += " [" + str(self.case_['files'][self.case_['file_index']]['pos0']) + " - "
+            files_msg += str(self.case_['files'][self.case_['file_index']]['pos1']) + "]"
         self.ui.label_segment.setText(files_msg)
-        if self.case_['files'][self.case_['file_index']]['text'] != "":
+        if ftype == 'text':
             self.ui.textEdit.show()
             self.ui.scrollArea.hide()
             self.ui.horizontalSlider.hide()
             self.ui.textEdit.setPlainText(self.case_['files'][self.case_['file_index']]['text'])
-            self.ui.lineEdit_search.setEnabled(True)
-            self.ui.checkBox_search_case.setEnabled(True)
-        else:
+            self.ui.lineEdit_search.show()
+            self.ui.checkBox_search_case.show()
+            self.ui.pushButton_annotate.show()
+            self.ui.pushButton_coding_memo.show()
+            self.ui.label_search_regex.show()
+            self.ui.label_search_totals.show()
+            self.ui.label_search_case_sensitive.show()
+            self.ui.pushButton_next.show()
+            self.ui.pushButton_previous.show()
+            self.img_selection = None
+            self.img_scale = 1.0
+            self.pixmap = None
+        if ftype == 'image':
             self.ui.textEdit.hide()
             self.ui.scrollArea.show()
             self.ui.horizontalSlider.show()
-            self.ui.lineEdit_search.setEnabled(False)
-            self.ui.checkBox_search_case.setEnabled(False)
+            self.ui.lineEdit_search.hide()
+            self.ui.checkBox_search_case.hide()
+            self.ui.pushButton_annotate.hide()
+            self.ui.pushButton_coding_memo.hide()
+            self.ui.label_search_regex.hide()
+            self.ui.label_search_totals.hide()
+            self.ui.label_search_case_sensitive.hide()
+            self.ui.pushButton_next.hide()
+            self.ui.pushButton_previous.hide()
+            self.load_image()
+
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_file_tooltip()
+        self.fill_code_counts_in_tree()
 
     def next_segment(self):
         """ Move to previous file segment for this case. """
@@ -2562,42 +2456,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
             cursor.setPosition(o[1] - text_pos0, QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
-    #TODO delete after fixing O overlaps
-    def combo_code_selected(self):
-        """ Combobox code item clicked on.
-        Highlight this coded text.
-        Account for start of text file, as this may be a smaller portion of the full text file."""
-
-        current_codename = self.ui.comboBox_codes_in_text.currentText()
-        current_code = None
-        for code in self.codes:
-            if code['name'] == current_codename:
-                current_code = code
-                break
-        if current_code is None:
-            return
-        pos = self.ui.textEdit.textCursor().position() + self.file_['start']
-        current_item = None
-        for item in self.code_text:
-            if item['pos0'] <= pos and item['pos1'] >= pos and item['cid'] == current_code['cid']:
-                current_item = item
-                break
-        #print("current item", current_item)  # tmp
-        if current_item is None:
-            return
-        # Remove formatting
-        cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(int(current_item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(int(current_item['pos1'] - self.file_['start']), QtGui.QTextCursor.KeepAnchor)
-        cursor.setCharFormat(QtGui.QTextCharFormat())
-        # Reapply formatting
-        fmt = QtGui.QTextCharFormat()
-        brush = QBrush(QColor(current_code['color']))
-        fmt.setBackground(brush)
-        fmt.setForeground(QBrush(QColor(TextColor(current_code['color']).recommendation)))
-        cursor.setCharFormat(fmt)
-        self.apply_italic_to_overlaps()
-
     def select_tree_item_by_code_name(self, codename):
         """ Set a tree item code. This still call fill_code_label and
          put the selected code in the top left code label and
@@ -2642,7 +2500,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
         'important': None}
-
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
@@ -2653,21 +2510,16 @@ class DialogCodeByCase(QtWidgets.QWidget):
             return
         self.code_text.append(coded)
         self.highlight()
-        #try:
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
             coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
             coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
         self.app.delete_backup = False
-        #except Exception as e:
-        #    logger.debug(str(e))
-
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-
-        # update recent_codes
+        # Update recent_codes
         tmp_code = None
         for c in self.codes:
             if c['cid'] == cid:
@@ -2713,14 +2565,12 @@ class DialogCodeByCase(QtWidgets.QWidget):
             to_unmark = ui.get_selected()
         if to_unmark is None:
             return
-
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         for item in to_unmark:
             cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
                 (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
             self.app.conn.commit()
-
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2822,6 +2672,121 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 + str(item['pos0']) + _(" for: ") + filename)
         self.get_coded_text_update_eventfilter_tooltips()
 
+    # Image related methods
+    def get_coded_areas(self):
+        """ Get the coded area details for the rectangles.
+        Called by init and by unmark. """
+
+        self.code_areas = []
+        sql = "select imid,id,x1, y1, width, height, memo, date, owner, cid, important from code_image"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        results = cur.fetchall()
+        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important'
+        for row in results:
+            self.code_areas.append(dict(zip(keys, row)))
+
+    def load_image(self):
+        """ Add image to scene if image file exists. If not exists clear the GUI and variables.
+        Called by: select_image_menu, listwidgetitem_view_file
+        """
+
+        #fid = self.case_['files'][self.case_['file_index']]['fid']
+        source = self.app.project_path + self.case_['files'][self.case_['file_index']]['mediapath']
+        if self.case_['files'][self.case_['file_index']]['mediapath'][0:7] == "images:":
+            source = self.case_['files'][self.case_['file_index']]['mediapath'][7:]
+        image = QtGui.QImage(source)
+        if image.isNull():
+            self.clear_image()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
+            logger.warning("Cannot open image: " + source)
+            return
+        items = list(self.scene.items())
+        for i in range(items.__len__()):
+            self.scene.removeItem(items[i])
+        #self.ui.pushButton_memo.setEnabled(True)
+        self.pixmap = QtGui.QPixmap.fromImage(image)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
+        pixmap_item.setPos(0, 0)
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
+        self.scene.addItem(pixmap_item)
+        self.ui.horizontalSlider.setValue(99)
+
+        # Scale initial picture by height to mostly fit inside scroll area
+        # Tried other methods e.g. sizes of components, but nothing was correct.
+        self_h = self.height() - 30 - 100  # slider and groupbox approx heights
+        s_w = self.width()
+        if self.pixmap.height() > self.height() - 30 - 100:
+            scale = (self.height() - 30 - 100) / self.pixmap.height()
+            slider_value = int(scale * 100)
+            if slider_value > 100:
+                slider_value = 100
+            self.ui.horizontalSlider.setValue(slider_value)
+        self.draw_coded_areas()
+        self.fill_code_counts_in_tree()
+
+    def clear_image(self):
+        """ When image removed clear all details.
+        Called by null file in load_file, and from ManageFiles.delete. """
+
+        self.img_selection = None
+        self.img_scale = 1.0
+        items = list(self.scene.items())
+        for i in range(items.__len__()):
+            self.scene.removeItem(items[i])
+
+    def redraw_scene(self):
+        """ Resize image. Triggered by user change in slider.
+        Also called by unmark, as all items need to be redrawn. """
+
+        if self.pixmap is None:
+            return
+        self.scale = (self.ui.horizontalSlider.value() + 1) / 100
+        height = self.scale * self.pixmap.height()
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
+        pixmap_item.setPos(0, 0)
+        self.scene.clear()
+        self.scene.addItem(pixmap_item)
+        self.draw_coded_areas()
+        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+
+    def draw_coded_areas(self):
+        """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
+        Other coders are shown via dotline rectangles.
+        Remove items first, as this is called after a coded area is unmarked. """
+
+        if self.case_ is None:
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        for item in self.code_areas:
+            if item['id'] == fid:
+                color = QtGui.QColor('#AA0000')  # Default color
+                color = None
+                tooltip = ""
+                for c in self.codes:
+                    if c['cid'] == item['cid']:
+                        tooltip = c['name'] + " (" + item['owner'] + ")"
+                        if item['memo'] != "":
+                            tooltip += "\nMemo: " + item['memo']
+                        if item['important'] == 1:
+                            tooltip += "\n" + _("IMPORTANT")
+                        color = QtGui.QColor(c['color'])
+                x = item['x1'] * self.scale
+                y = item['y1'] * self.scale
+                width = item['width'] * self.scale
+                height = item['height'] * self.scale
+                rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
+                rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
+                rect_item.setToolTip(tooltip)
+                if item['owner'] == self.app.settings['codername']:
+                    if self.important and item['important'] == 1:
+                        self.scene.addItem(rect_item)
+                    if not self.important:
+                        self.scene.addItem(rect_item)
+
+
+    #TODO remove commented out code - wait for feedback first
     '''def button_autocode_sentences_this_file(self):
         """ Flag to autocode sentences in one file """
         item = self.ui.treeWidget.currentItem()
