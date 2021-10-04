@@ -350,7 +350,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_goto">
+       <widget class="QPushButton" name="pushButton_attributes">
         <property name="geometry">
          <rect>
           <x>80</x>
@@ -360,7 +360,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>Go to case id</string>
+         <string>Select cases by attributes</string>
         </property>
         <property name="text">
          <string/>
