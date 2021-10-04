@@ -85,6 +85,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
     app = None
     parent_textEdit = None
     tab_reports = None  # Tab widget reports, used for updates to codes
+    help_url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
+
     codes = []
     recent_codes = []  # list of recent codes (up to 5) for textedit context menu
     categories = []
@@ -104,7 +106,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
     selected_code_index = 0
     eventFilter = None
     important = False  # Show/hide important codes
-    #attributes = []  # Show selected files using these attributes in list widget
+    attributes = []  # Show selected cases using these attributes in list widget
 
     # Image related varaibles
     code_areas = []
@@ -168,12 +170,15 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.horizontalSlider.hide()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+        self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_attributes.pressed.connect(self.get_cases_from_attributes)
         '''pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_case_and_file)'''
         self.ui.pushButton_latest.hide()  # too hard to implement
-        self.ui.pushButton_goto.hide()  # not implemented yet
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_case.setIcon(QtGui.QIcon(pm))
@@ -250,10 +255,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help.pressed.connect(self.help)
-        '''pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)'''
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -301,22 +302,22 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.fill_tree()
 
     def help(self):
-        """ Open help for transcribe section in browser. """
+        """ Open help for transcribe section in browser.
+        Can be text, or image help. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
-        webbrowser.open(url)
+        webbrowser.open(self.help_url)
 
     def get_cases(self, ids=[]):
         """ Get cases with additional details (file texts and case attributes) and fill list widget.
          Called by: init, get_files_from_attributes
          param:
-         #TODO
-         ids: list, fill with ids to limit case selection.
+         ids: list Integers of case ids. To limit case selection.
 
          Example case data:
-         {'caseid': 3, 'name': 'ID3', 'memo': '',
-        'files': [{'fid': 38, 'pos0': 0, 'pos1': 51, 'text': 'some text'}]
-        'te':[{text_edits: QTextEdit, 'coded': [{'ctid': 110, 'cid': 12, 'fid': 38, 'seltext': '', 'pos0': 15, 'pos1': 20, 'owner': 'colin', 'date': '', 'memo': '', 'important': None, 'name': ''}] }]
+         {'caseid': 1, 'name': 'ID1', 'memo': '',
+         'files': [{'fid': 25, 'pos0': 0, 'pos1': 629, 'text': "Some text.", 'filename': 'id1.docx', 'mediapath': None, 'memo': '', 'filetype': 'text'},
+         {'fid': 20, 'pos0': 0, 'pos1': 0, 'text': None, 'filename': 'DSC_0005.JPG', 'mediapath': '/images/DSC_0005.JPG', 'memo': '', 'filetype': 'image'}],
+         'vars': [{'varname': 'Age', 'value': '45', 'valuetype': 'numeric'}], 'file_index': 0}
          """
 
         self.ui.listWidget.clear()
@@ -356,6 +357,15 @@ class DialogCodeByCase(QtWidgets.QWidget):
             c['vars'] = vars
             c['file_index'] = 0  # Showing this file segment for this case
 
+        # Limited selection of cases
+        if ids != []:
+            tmp_cases = []
+            for c in self.cases:
+                for i in ids:
+                    if c['caseid'] == i:
+                        tmp_cases.append(c)
+            self.cases = tmp_cases
+        # Fill list listWdget
         for c in self.cases:
             item = QtWidgets.QListWidgetItem(c['name'])
             tt = _("Text segments for case: ") + str(len(sources))
@@ -399,7 +409,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         # Find item to update tooltip
         self.ui.label_segment.setToolTip(tt)
 
-    '''def get_files_from_attributes(self):
+    def get_cases_from_attributes(self):
         """ Trim the files list to files identified by attributes.
         Attribute dialing results are a dictionary of:
         [0] attribute name, or 'case name'
@@ -421,10 +431,13 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if self.attributes:
             self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
-            self.get_files()
+            self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_attributes.setToolTip(_("Show cases with selected attributes"))
+            self.get_cases()
             return
+        print("get_cases_by_attributes NOT IMPLEMENTD")
+        return
+
         ui = DialogSelectAttributeParameters(self.app, "file")
         ok = ui.exec_()
         if not ok:
@@ -433,8 +446,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.attributes = ui.parameters
         if not self.attributes:
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
+            self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_attributes.setToolTip(_("Show cases with selected attributes"))
             self.get_files()
             return
 
@@ -489,7 +502,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
             set_ids = set_file_ids
         if file_ids == [] and case_file_ids != []:
             set_ids = set_case_file_ids
-        self.get_files(list(set_ids))
+        self.get_cases(list(set_ids))
         # Prepare message for label tooltop
         msg = ""
         for a in self.attributes:
@@ -500,9 +513,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
         for a in self.attributes:
             if a[1] == 'case':
                 msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
+        self.ui.pushButton_attributes.setToolTip(_("Show cases:") + msg)
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))'''
+        self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -1514,6 +1527,27 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier:
                     self.extend_right(codes_here[0])
                     return True
+        if object is self.scene:
+            #logger.debug(event.type(), type(event))
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
+                #
+                pos = event.buttonDownScenePos(1)
+                #logger.debug(event.type(), type(event))
+                if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
+                    p0 = event.buttonDownScenePos(1)  # left mouse button
+                    #logger.debug("rectangle press:" + str(p0.x()) + ", " + str(p0.y()))
+                    self.selection = p0
+                    return True
+                if event.type() == QtCore.QEvent.GraphicsSceneMouseRelease:
+                    p1 = event.lastScenePos()
+                    #logger.debug("rectangle release: " + str(p1.x()) +", " + str(p1.y()))
+                    self.img_create_coded_area(p1)
+                    return True
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 2:  # right mouse
+                if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
+                    p = event.buttonDownScenePos(2)
+                    self.scene_context_menu(p)
+                    return True
         return False
 
     def extend_left(self, code_):
@@ -2258,6 +2292,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.img_selection = None
             self.img_scale = 1.0
             self.pixmap = None
+            self.help_url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
+
         if ftype == 'image':
             self.ui.textEdit.hide()
             self.ui.scrollArea.show()
@@ -2271,6 +2307,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.ui.label_search_case_sensitive.hide()
             self.ui.pushButton_next.hide()
             self.ui.pushButton_previous.hide()
+            self.help_url = "https://github.com/ccbogel/QualCoder/wiki/08-Coding-Images"
             self.load_image()
 
         self.get_coded_text_update_eventfilter_tooltips()
@@ -2784,6 +2821,181 @@ class DialogCodeByCase(QtWidgets.QWidget):
                         self.scene.addItem(rect_item)
                     if not self.important:
                         self.scene.addItem(rect_item)
+
+    def scene_context_menu(self, pos):
+        """ Scene context menu for setting importance, unmarking coded areas and adding memos. """
+
+        # Outside image area, no context menu
+        for item in self.scene.items():
+            if type(item) == QtWidgets.QGraphicsPixmapItem:
+                if pos.x() > item.boundingRect().width() or pos.y() > item.boundingRect().height():
+                    self.selection = None
+                    return
+        global_pos = QtGui.QCursor.pos()
+        item = self.find_coded_areas_for_pos(pos)
+        # No coded area item in this mouse position
+        if item is None:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_memo = menu.addAction(_('Memo'))
+        action_unmark = menu.addAction(_('Unmark'))
+        action_important = None
+        if item['important'] is None or item['important'] != 1:
+            action_important = menu.addAction(_("Add important mark"))
+        action_not_important = None
+        if item['important'] == 1:
+            action_not_important = menu.addAction(_("Remove important mark"))
+        action = menu.exec_(global_pos)
+        if action is None:
+            return
+        if action == action_memo:
+            self.img_coded_area_memo(item)
+            self.app.delete_backup = False
+            return
+        if action == action_unmark:
+            self.img_unmark(item)
+            self.app.delete_backup = False
+            return
+        if action == action_important:
+            self.img_set_importance(item)
+            return
+        if action == action_not_important:
+            self.img_set_importance(item, False)
+            return
+
+    def find_coded_areas_for_pos(self, pos):
+        """ Find any coded areas for this position AND for this coder.
+
+        param: pos
+        returns: None or coded item
+        """
+
+        if self.case_ is None:
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        for item in self.code_areas:
+            if item['id'] == fid and item['owner'] == self.app.settings['codername']:
+                #print(pos, item['x1'], item['y1'], item['width'], item['height'])
+                if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
+                    and pos.y() >= item['y1'] * self.scale and pos.y() <= (item['y1'] + item['height']) * self.scale:
+                    #print(pos, item['x1'] * self.scale, item['y1'] * self.scale, item['width'] * self.scale, item['height'] * self.scale)
+                    return item
+        return None
+
+    def img_set_importance(self, item, important=True):
+        """ Set or unset importance to coded image item.
+        Importance is denoted using '1'
+        params:
+            item: dictionary of coded area
+            important: boolean, default True """
+
+        importance = None
+        if important:
+            importance = 1
+        item['important'] = importance
+        cur = self.app.conn.cursor()
+        cur.execute('update code_image set important=? where imid=?', (importance, item['imid']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.draw_coded_areas()
+
+    def img_coded_area_memo(self, item):
+        """ Add memo to this coded area.
+        param:
+            item : dictionary of coded area """
+
+        filename = self.case_['files'][self.case_['file_index']]['filename']
+        ui = DialogMemo(self.app, _("Memo for coded area of ") + filename,
+            item['memo'])
+        ui.exec_()
+        memo = ui.memo
+        if memo != item['memo']:
+            item['memo'] = memo
+            cur = self.app.conn.cursor()
+            cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
+            self.app.conn.commit()
+        # re-draw to update memos in tooltips
+        self.draw_coded_areas()
+
+    def img_unmark(self, item):
+        """ Remove coded area.
+        param:
+            item : dictionary of coded area """
+
+        cur = self.app.conn.cursor()
+        cur.execute("delete from code_image where imid=?", [item['imid'], ])
+        self.app.conn.commit()
+        self.get_coded_areas()
+        self.redraw_scene()
+        self.fill_code_counts_in_tree()
+
+    def img_create_coded_area(self, p1):
+        """ Create coded area coordinates from mouse release.
+        The point and width and height must be based on the original image size,
+        so add in scale factor.
+        param:
+            p1 : QPoint of mouse release """
+
+        code_ = self.ui.treeWidget.currentItem()
+        if code_ is None:
+            return
+        if code_.text(1)[0:3] == 'cat':
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        cid = int(code_.text(1)[4:])  # must be integer
+        x = self.selection.x()
+        y = self.selection.y()
+        #print("x", x, "y", y, "scale", self.scale)
+        width = p1.x() - x
+        height = p1.y() - y
+        if width < 0:
+            x = x + width
+            width = abs(width)
+        if height < 0:
+            y = y + height
+            height = abs(height)
+        #print("SCALED x", x, "y", y, "w", width, "h", height)
+        # outside image area, do not code
+        for item in self.scene.items():
+            if type(item) == QtWidgets.QGraphicsPixmapItem:
+                if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
+                    self.selection = None
+                    return
+        x_unscaled = x / self.scale
+        y_unscaled = y / self.scale
+        width_unscaled = width / self.scale
+        height_unscaled = height / self.scale
+        if width_unscaled == 0 or height_unscaled == 0:
+            return
+        #print("UNSCALED x", x, "y", y, "w", width, "h", height)
+        item = {'imid': None, 'id': fid, 'x1': x_unscaled, 'y1': y_unscaled,
+        'width': width_unscaled, 'height':height_unscaled, 'owner': self.app.settings['codername'],
+         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+        'cid': cid, 'memo': '', 'important': None}
+        cur = self.app.conn.cursor()
+        cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,null)"
+            , (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
+            item['date'],item['owner']))
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        imid = cur.fetchone()[0]
+        item['imid'] = imid
+        self.code_areas.append(item)
+        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
+        color = None
+        for i in range(0, len(self.codes)):
+            if self.codes[i]['cid'] == int(cid):
+                color = QtGui.QColor(self.codes[i]['color'])
+        if color is None:
+            print("img_create_coded_area CANNOT FIND COLOR ERROR")
+            return
+        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
+        rect_item.setToolTip(code_.text(0))
+        self.scene.addItem(rect_item)
+        self.selection = None
+        self.app.delete_backup = False
+        self.fill_code_counts_in_tree()
 
 
     #TODO remove commented out code - wait for feedback first
