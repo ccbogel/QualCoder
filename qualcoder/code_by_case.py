@@ -131,7 +131,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.search_index = 0
         self.recent_codes = []
         self.important = False
-        #self.attributes = []
+        self.attributes = []
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_by_case()
@@ -309,7 +309,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
     def get_cases(self, ids=[]):
         """ Get cases with additional details (file texts and case attributes) and fill list widget.
-         Called by: init, get_files_from_attributes
+         Called by: init, get_cases_from_attributes
          param:
          ids: list Integers of case ids. To limit case selection.
 
@@ -435,10 +435,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.ui.pushButton_attributes.setToolTip(_("Show cases with selected attributes"))
             self.get_cases()
             return
-        print("get_cases_by_attributes NOT IMPLEMENTD")
-        return
 
-        ui = DialogSelectAttributeParameters(self.app, "file")
+        ui = DialogSelectAttributeParameters(self.app, "case")
         ok = ui.exec_()
         if not ok:
             self.attributes = []
@@ -448,62 +446,41 @@ class DialogCodeByCase(QtWidgets.QWidget):
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_attributes.setToolTip(_("Show cases with selected attributes"))
-            self.get_files()
+            self.get_cases()
             return
 
-        file_ids = []
-        case_file_ids = []
+        print("Case attributes")
+        for a in self.attributes:
+            print(a)
+
+        case_ids = []
         cur = self.app.conn.cursor()
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
         for a in self.attributes:
             sql = "select id from attribute where "
-            # File attributes
-            if a[1] == 'file':
-                sql += "attribute.name = '" + a[0] + "' "
-                sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    sql += a[4][0]
-                if a[2] == 'numeric':
-                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                sql += " and attribute.attr_type='file'"
-                #print("Attribute selected: ", a)
-                cur.execute(sql)
-                result = cur.fetchall()
-                for i in result:
-                    file_ids.append(i[0])
-            # Case names
-            if a[1] == "case":
-                # Case text table also links av and images
-                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
-                sql += "join source on source.id=case_text.fid where cases.name " +a[3]
-                if a[3] != "like":
-                    sql += a[4][0]
-                else:
-                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
-                cur.execute(sql)
-                case_result = cur.fetchall()
-                for i in case_result:
-                    case_file_ids.append(i[0])
-        if file_ids == [] and case_file_ids == []:
+            sql += "attribute.name = '" + a[0] + "' "
+            sql += " and attribute.value " + a[3] + " "
+            if a[3] == 'between':
+                sql += a[4][0] + " and " + a[4][1] + " "
+            if a[3] in ('in', 'not in'):
+                sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+            if a[3] not in ('between', 'in', 'not in'):
+                sql += a[4][0]
+            if a[2] == 'numeric':
+                sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+            sql += " and attribute.attr_type='case'"
+            #print("attr sql:", sql)
+            cur.execute(sql)
+            result = cur.fetchall()
+            for i in result:
+                case_ids.append(i[0])
+        if case_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec_()
             return
-        set_ids = {}
-        set_file_ids = set(file_ids)
-        set_case_file_ids = set(case_file_ids)
-        # Need to intersect case file ids and file ids
-        if file_ids != [] and case_file_ids != []:
-            set_ids = set_file_ids.intersection(set_case_file_ids)
-        if file_ids != [] and case_file_ids == []:
-            set_ids = set_file_ids
-        if file_ids == [] and case_file_ids != []:
-            set_ids = set_case_file_ids
-        self.get_cases(list(set_ids))
-        # Prepare message for label tooltop
+        set_case_ids = set(case_ids)
+        self.get_cases(list(set_case_ids))
+        # Set message for label tooltip
         msg = ""
         for a in self.attributes:
             if a[1] == 'file':
@@ -2338,7 +2315,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         """ When listwidget item is pressed, find and load the case.
         """
 
-        if len(self.cases) == 0:
+        if self.ui.listWidget.currentItem() is None:
             return
         itemname = self.ui.listWidget.currentItem().text()
         for c in self.cases:

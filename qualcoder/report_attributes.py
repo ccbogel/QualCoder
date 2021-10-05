@@ -70,6 +70,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     limiter = "all"  # all for cases and files, file = file attributes, case = case attributes
 
     def __init__(self, app, limiter="all", parent=None):
+        """ limiter can be 'all', 'file' or 'case' This restricts the attributes to be displayed. """
 
         super(DialogSelectAttributeParameters, self).__init__(parent)
         sys.excepthook = exception_handler
@@ -88,7 +89,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         for row in result:
             self.attribute_type.append({'name': row[0], 'valuetype': row[1],
                 'memo': row[2], 'caseOrFile': row[3]})
-        # Add case name option to files attributes
+        # Add the case name as an 'attribute' to files attributes
         if self.limiter == "file":
             casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
             self.attribute_type.append(casenames)
@@ -122,7 +123,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             if operator == 'between' and len(values) < 2:
                 operator = ''
                 values = []
-            # check numeric type
+            # Check numeric type
             type_ = self.ui.tableWidget.item(x, self.TYPE_COLUMN).text()
             not_numeric = False
             if type_ == "numeric":
@@ -166,7 +167,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         if operator == '':
             Message(self.app, _('Warning'), _("No operator was selected"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText('')
-        # enforce that value list is only one item for selected operators
+        # Enforce that value list is only one item for selected operators
         if operator in ('<','<=','>','>=','=','like') and len(values) > 1:
             Message(self.app, _('Warning'), _("Too many values given for this operator"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText(values[0])
