@@ -159,7 +159,10 @@ class DialogCodeByCase(QtWidgets.QWidget):
     segments = []
     timer = QtCore.QTimer()
     play_segment_end = None
-    media_diration_text = ""
+    media_duration_text = ""
+    av_scene = None
+    av_scene_width = 1000
+    av_scene_height = 90
 
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
     # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
@@ -308,52 +311,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        # AV buttons and labels
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
-        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
-        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        # Buttons need to be 36x36 pixels for 32x32 icons
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
-        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
-        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
-        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
-        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
-        # Mediaplayer setup
-        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
-        # Create a vlc instance with an empty vlc media player
-        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
-        self.instance = vlc.Instance()
-        self.mediaplayer = self.instance.media_player_new()
-        self.mediaplayer.video_set_mouse_input(False)
-        self.mediaplayer.video_set_key_input(False)
-        self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.NoTicks)
-        self.ui.horizontalSlider.setMouseTracking(True)
-        self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
-        self.ui.pushButton_play.clicked.connect(self.play_pause)
-        self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
-        self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
-        self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
-
         # Tree widget and splitter
         self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
@@ -389,8 +346,39 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.scene.installEventFilter(self)
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
-
-        # AV related
+        # AV buttons and labels
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
+        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
+        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        # Buttons need to be 36x36 pixels for 32x32 icons
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
+        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
+        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
+        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
+        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
+        # Mediaplayer setup
+        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
+        # AV variables
         self.segment['start'] = None
         self.segment['end'] = None
         self.segment['start_msecs'] = None
@@ -433,6 +421,15 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
+        # Set the scene for coding stripes
+        # Matches the designer file graphics view size
+        gv_width = self.ui.graphicsView_av.size().width()
+        self.av_scene_width = gv_width
+        self.av_scene_width = 600  # temporary, re-calculated in load_segments
+        self.av_scene_height = 90
+        self.av_scene = GraphicsScene(self.av_scene_width, self.av_scene_height)
+        self.ui.graphicsView_av.setScene(self.av_scene)
+        self.ui.graphicsView_av.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
 
         # Data
         self.get_cases()
@@ -1311,6 +1308,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         cb.clear(mode=cb.Clipboard)
         cb.setText(selected_text, mode=cb.Clipboard)
 
+    #TODO add AV segment allocation
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.
         Add, rename, memo, move or delete code or category. Change code color.
@@ -2477,6 +2475,14 @@ class DialogCodeByCase(QtWidgets.QWidget):
             print(self.case_['files'][self.case_['file_index']])
             self.load_av_media()
 
+            print("TEMP")
+            print("GV VP", self.ui.graphicsView_av.viewport().size())
+            print("SCENE SIZE", self.av_scene_width)
+            print("GV", self.ui.graphicsView_av.size())
+            print("GV RECT", self.ui.graphicsView_av.rect())
+            print("SPLITTER", self.ui.splitter.sizes())
+            print("SPLITTER SIZE", self.ui.horizontalSlider_av.size())
+
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_file_tooltip()
         self.fill_code_counts_in_tree()
@@ -3166,6 +3172,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     # Audio/video methods
+    #TODO load av segments and put into graphics scene av
     def load_av_media(self):
         """ Add av media to media dialog. """
 
@@ -3248,6 +3255,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.pause()
         self.mediaplayer.audio_set_volume(100)
+        self.load_segments()
 
     def rewind_30_seconds(self):
         """ Rewind AV by 30 seconds. Alt + R """
@@ -3341,7 +3349,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.segment['end'] = time
             self.segment['end_msecs'] = time_msecs
             self.ui.pushButton_coding.setText(_("Clear segment"))
-
             # Check and reverse start and end times if start is greater than the end
             # print("start", self.segment['start'], "end", self.segment['end'])
             if self.segment['start_msecs'] > self.segment['end_msecs']:
@@ -3367,6 +3374,61 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.label_segment.setText(_("Segment:"))
         self.ui.pushButton_coding.setText(_("Start segment"))
 
+    def load_segments(self):
+        """ Get coded segments for this file and for this coder.
+        Called from load_av_media, update_ui. """
+
+        if self.case_ is None:
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        # 10 is assigned as an initial default for y values for segments
+        sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
+        sql += " code_av.owner, code_name.name, code_name.color, 10, code_av.important from code_av"
+        sql += " join code_name on code_name.cid=code_av.cid"
+        sql += " where id=? "
+        sql += " and code_av.owner=? "
+        values = [fid]
+        values.append(self.app.settings['codername'])
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        results = cur.fetchall()
+        keys = 'avid', 'id', 'pos0', 'pos1', 'cid', 'memo', 'date', 'owner', 'codename', 'color', 'y', 'important'
+        self.segments = []
+        for row in results:
+            self.segments.append(dict(zip(keys, row)))
+        # Fix overlapping segments by incrementing y values so segment is shown on a different line
+        for i in range(0, len(self.segments) - 1):
+            for j in range(i + 1, len(self.segments)):
+                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and \
+                    self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
+                    self.segments[i]['y'] == self.segments[j]['y']) or \
+                        (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and \
+                         self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
+                         self.segments[i]['y'] == self.segments[j]['y']):
+                    # print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
+                    # print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
+                    # to overcome the overlap, add to the y value of the i segment
+                    self.segments[j]['y'] += 10
+        # Add seltext, the text link to the segment, used in segment tooltip
+        sql = "select seltext from code_text where avid=?"
+        for s in self.segments:
+            cur.execute(sql, [s['avid']])
+            res = cur.fetchall()
+            text = ""
+            for r in res:
+                text += str(r[0]) + "\n"
+            s['seltext'] = text
+
+        # Draw coded segments in scene
+        gv_width = self.ui.graphicsView_av.size().width()
+        self.av_scene_width = gv_width
+        scaler = self.av_scene_width / self.media.get_duration()
+        self.av_scene.clear()
+        for s in self.segments:
+            self.av_scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
+        # Set the scene to the top
+        self.ui.graphicsView_av.verticalScrollBar().setValue(0)
+
     def set_position(self):
         """ Set the movie position according to the position slider.
         The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
@@ -3377,7 +3439,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
             pos = self.ui.horizontalSlider_av.value()
-            #TODO 1000.0 replace with slider length
             self.mediaplayer.set_position(pos / 1000.0)
             self.mediaplayer.play()
             self.timer.start()
@@ -3482,7 +3543,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         # Check if segments need to be reloaded
         # This only updates if the media is playing, not ideal, but works
-        for i in self.scene.items():
+        for i in self.av_scene.items():
             if isinstance(i, SegmentGraphicsItem) and i.reload_segment is True:
                 self.load_segments()
 
