@@ -792,7 +792,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
-        self.ui.actionCode_text_by_case.triggered.connect(self.code_by_case)
+        self.ui.actionCode_by_case.triggered.connect(self.code_by_case)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
         # reports menu
@@ -909,7 +909,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
         self.ui.actionCode_audio_video.setEnabled(False)
-        self.ui.actionCode_text_by_case.setEnabled(False)
+        self.ui.actionCode_by_case.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -948,7 +948,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
-        self.ui.actionCode_text_by_case.setEnabled(True)
+        self.ui.actionCode_by_case.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -1669,6 +1669,11 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("delete from code_av where id=?", [r[0]])
         self.app.conn.commit()
 
+        # Fix 'lost' categories if present.
+        sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in "
+        sql += "(select catid from code_cat)"
+        cur.execute(sql)
+        self.app.conn.commit()
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
