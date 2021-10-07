@@ -1370,60 +1370,60 @@ class DialogCodeAV(QtWidgets.QDialog):
         # logger.debug("selected paremt: " + str(selected.parent()))
         # logger.debug("index: " + str(self.ui.treeWidget.currentIndex()))
         action_color = None
-        action_assignSegment = None
-        action_showCodedMedia = None
-        action_moveCode = None
+        action_assign_segment = None
+        action_show_coded_media = None
+        action_move_code = None
         if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
-            action_assignSegment = menu.addAction("Assign segment to code")
-        action_addCodeToCategory = None
-        action_addCategoryToCategory = None
+            action_assign_segment = menu.addAction("Assign segment to code")
+        action_add_code_to_category = None
+        action_add_category_to_category = None
         action_merge_category = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_addCodeToCategory = menu.addAction(_("Add new code to category"))
-            action_addCategoryToCategory = menu.addAction(_("Add a new category to category"))
+            action_add_code_to_category = menu.addAction(_("Add new code to category"))
+            action_add_category_to_category = menu.addAction(_("Add a new category to category"))
             action_merge_category = menu.addAction(_("Merge category into category"))
-        action_addCode = menu.addAction(_("Add a new code"))
-        action_addCategory = menu.addAction(_("Add a new category"))
+        action_add_code = menu.addAction(_("Add a new code"))
+        action_add_category = menu.addAction(_("Add a new category"))
         action_rename = menu.addAction(_("Rename"))
-        action_editMemo = menu.addAction(_("View or edit memo"))
+        action_edit_memo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = menu.addAction(_("Change code color"))
-            action_moveCode = menu.addAction(_("Move code to"))
-            action_showCodedMedia = menu.addAction(_("Show coded text and media"))
-        action_showCodesLike = menu.addAction(_("Show codes like"))
+            action_move_code = menu.addAction(_("Move code to"))
+            action_show_coded_media = menu.addAction(_("Show coded text and media"))
+        action_show_codes_like = menu.addAction(_("Show codes like"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
-        if action == action_showCodesLike:
+        if action == action_show_codes_like:
             self.show_codes_like()
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
-        if selected is not None and action == action_moveCode:
+        if selected is not None and action == action_move_code:
             self.move_code(selected)
-        if action == action_addCategoryToCategory:
+        if action == action_add_category_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_category(catid)
-        if action == action_addCategory:
+        if action == action_add_category:
             self.add_category()
-        if action == action_addCode:
+        if action == action_add_code:
             self.add_code()
         if action == action_merge_category:
             catid = int(selected.text(1).split(":")[1])
             self.merge_category(catid)
-        if action == action_addCodeToCategory:
+        if action == action_add_code_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_code(catid)
         if selected is not None and action == action_rename:
             self.rename_category_or_code(selected)
-        if selected is not None and action == action_editMemo:
+        if selected is not None and action == action_edit_memo:
             self.add_edit_code_memo(selected)
         if selected is not None and action == action_delete:
             self.delete_category_or_code(selected)
-        if action == action_assignSegment:
+        if action == action_assign_segment:
             self.assign_segment_to_code(selected)
-        if selected is not None and action == action_showCodedMedia:
+        if selected is not None and action == action_show_coded_media:
             found = None
             tofind = int(selected.text(1)[4:])
             for code in self.codes:

@@ -161,7 +161,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
     play_segment_end = None
     media_duration_text = ""
     av_scene = None
-    av_scene_width = 1000
+    av_scene_width = 600
     av_scene_height = 90
 
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
@@ -422,10 +422,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.pushButton_coding.pressed.connect(self.create_or_clear_segment)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
         # Set the scene for coding stripes
-        # Matches the designer file graphics view size
-        gv_width = self.ui.graphicsView_av.size().width()
-        self.av_scene_width = gv_width
-        self.av_scene_width = 600  # temporary, re-calculated in load_segments
+        self.av_scene_width = self.ui.graphicsView_av.viewport().size().width()
+        # Height matches the designer file graphics view size
         self.av_scene_height = 90
         self.av_scene = GraphicsScene(self.av_scene_width, self.av_scene_height)
         self.ui.graphicsView_av.setScene(self.av_scene)
@@ -653,7 +651,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
             if a[2] == 'numeric':
                 sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
             sql += " and attribute.attr_type='case'"
-            print("attr sql:", sql)
+            #print("attr sql:", sql)
             cur.execute(sql)
             result = cur.fetchall()
             for i in result:
@@ -1308,19 +1306,20 @@ class DialogCodeByCase(QtWidgets.QWidget):
         cb.clear(mode=cb.Clipboard)
         cb.setText(selected_text, mode=cb.Clipboard)
 
-    #TODO add AV segment allocation
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.
         Add, rename, memo, move or delete code or category. Change code color.
         Assign selected text to current hovered code. """
 
-        #selected_text = self.ui.textEdit.textCursor().selectedText()  # commented out 24 Apr 2021 not used
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
         action_merge_category = None
+        action_assign_segment = None
+        if self.segment['end_msecs'] is not None and self.segment['start_msecs'] is not None:
+            action_assign_segment = menu.addAction("Assign segment to code")
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
@@ -1338,7 +1337,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = menu.addAction(_("Move code to"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
-
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
             if action == action_show_codes_like:
@@ -1358,6 +1356,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
             if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
+            if action == action_assign_segment:
+                self.assign_segment_to_code(selected)
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
             if selected is not None and action == action_rename:
@@ -1391,6 +1391,28 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 no_merge_list.append(item.child(i).text(1)[6:])
             self.recursive_non_merge_item(item.child(i), no_merge_list)
         return no_merge_list
+
+    def assign_segment_to_code(self, selected):
+        """ Assign time segment to selected code. Insert an entry into the database.
+        Then clear the segment for re-use."""
+
+        if self.case_ is None or self.segment['start_msecs'] is None or self.segment['end_msecs'] is None:
+            self.clear_segment()
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
+        cid = int(selected.text(1).split(':')[1])
+        values = [fid, self.segment['start_msecs'],
+                  self.segment['end_msecs'], cid, self.segment['memo'],
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                  self.app.settings['codername']]
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        self.app.conn.commit()
+        self.load_segments()
+        self.clear_segment()
+        self.app.delete_backup = False
+        self.fill_code_counts_in_tree()
 
     def merge_category(self, catid):
         """ Select another category to merge this category into. """
@@ -2474,15 +2496,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
             self.ui.graphicsView_av.show()
             print(self.case_['files'][self.case_['file_index']])
             self.load_av_media()
-
-            print("TEMP")
-            print("GV VP", self.ui.graphicsView_av.viewport().size())
-            print("SCENE SIZE", self.av_scene_width)
-            print("GV", self.ui.graphicsView_av.size())
-            print("GV RECT", self.ui.graphicsView_av.rect())
-            print("SPLITTER", self.ui.splitter.sizes())
-            print("SPLITTER SIZE", self.ui.horizontalSlider_av.size())
-
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_file_tooltip()
         self.fill_code_counts_in_tree()
@@ -3172,14 +3185,12 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     # Audio/video methods
-    #TODO load av segments and put into graphics scene av
     def load_av_media(self):
         """ Add av media to media dialog. """
 
         mediapath = self.case_['files'][self.case_['file_index']]['mediapath']
         filename = self.case_['files'][self.case_['file_index']]['filename']
         ftype = self.case_['files'][self.case_['file_index']]['filetype']
-
         try:
             if mediapath[0:6] in ('/audio', '/video'):
                 self.media = self.instance.media_new(self.app.project_path + mediapath)
@@ -3188,13 +3199,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
         except Exception as e:
             Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + mediapath, "warning").exec_()
             return
-
         title = filename.split('/')[-1]
         self.ddialog.setWindowTitle(title)
-        '''self.setWindowTitle(_("Media coding: ") + title)
-        self.ui.pushButton_play.setEnabled(True)
-        self.ui.horizontalSlider.setEnabled(True)
-        self.ui.pushButton_coding.setEnabled(True)'''
         if ftype == "video":
             self.ddialog.show()
             try:
@@ -3204,9 +3210,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     w = 100
                     h = 80
                 self.ddialog.resize(w, h)
-                '''x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
-                y = int(self.app.settings['codeav_video_pos_y'])  - int(self.app.settings['codeav_abs_pos_y'])
-                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))'''
             except:
                 self.ddialog.resize(500, 400)
         else:
@@ -3256,6 +3259,62 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.mediaplayer.pause()
         self.mediaplayer.audio_set_volume(100)
         self.load_segments()
+
+    def load_segments(self):
+        """ Get coded segments for this file and for this coder.
+        Called from load_av_media, update_ui. """
+
+        if self.case_ is None:
+            return
+        fid = self.case_['files'][self.case_['file_index']]['fid']
+        # 10 is assigned as an initial default for y values for segments
+        sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
+        sql += " code_av.owner, code_name.name, code_name.color, 10, code_av.important from code_av"
+        sql += " join code_name on code_name.cid=code_av.cid"
+        sql += " where id=? "
+        sql += " and code_av.owner=? "
+        values = [fid]
+        values.append(self.app.settings['codername'])
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        results = cur.fetchall()
+        keys = 'avid', 'id', 'pos0', 'pos1', 'cid', 'memo', 'date', 'owner', 'codename', 'color', 'y', 'important'
+        self.segments = []
+        for row in results:
+            self.segments.append(dict(zip(keys, row)))
+        # Fix overlapping segments by incrementing y values so segment is shown on a different line
+        for i in range(0, len(self.segments) - 1):
+            for j in range(i + 1, len(self.segments)):
+                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and \
+                    self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
+                    self.segments[i]['y'] == self.segments[j]['y']) or \
+                        (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and \
+                         self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
+                         self.segments[i]['y'] == self.segments[j]['y']):
+                    # print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
+                    # print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
+                    # to overcome the overlap, add to the y value of the i segment
+                    self.segments[j]['y'] += 10
+        # Add seltext, the text link to the segment, used in segment tooltip
+        sql = "select seltext from code_text where avid=?"
+        for s in self.segments:
+            cur.execute(sql, [s['avid']])
+            res = cur.fetchall()
+            text = ""
+            for r in res:
+                text += str(r[0]) + "\n"
+            s['seltext'] = text
+
+        # Draw coded segments in scene, scale segments to graphics view witdth
+        self.av_scene_width = self.ui.graphicsView_av.viewport().size().width()
+        self.av_scene = GraphicsScene(self.av_scene_width, self.av_scene_height)
+        self.ui.graphicsView_av.setScene(self.av_scene)
+        scaler = self.av_scene_width / self.media.get_duration()
+        self.av_scene.clear()
+        for s in self.segments:
+            self.av_scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
+        # Set the scene to the top
+        self.ui.graphicsView_av.verticalScrollBar().setValue(0)
 
     def rewind_30_seconds(self):
         """ Rewind AV by 30 seconds. Alt + R """
@@ -3373,61 +3432,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.segment['seltext'] = ""
         self.ui.label_segment.setText(_("Segment:"))
         self.ui.pushButton_coding.setText(_("Start segment"))
-
-    def load_segments(self):
-        """ Get coded segments for this file and for this coder.
-        Called from load_av_media, update_ui. """
-
-        if self.case_ is None:
-            return
-        fid = self.case_['files'][self.case_['file_index']]['fid']
-        # 10 is assigned as an initial default for y values for segments
-        sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
-        sql += " code_av.owner, code_name.name, code_name.color, 10, code_av.important from code_av"
-        sql += " join code_name on code_name.cid=code_av.cid"
-        sql += " where id=? "
-        sql += " and code_av.owner=? "
-        values = [fid]
-        values.append(self.app.settings['codername'])
-        cur = self.app.conn.cursor()
-        cur.execute(sql, values)
-        results = cur.fetchall()
-        keys = 'avid', 'id', 'pos0', 'pos1', 'cid', 'memo', 'date', 'owner', 'codename', 'color', 'y', 'important'
-        self.segments = []
-        for row in results:
-            self.segments.append(dict(zip(keys, row)))
-        # Fix overlapping segments by incrementing y values so segment is shown on a different line
-        for i in range(0, len(self.segments) - 1):
-            for j in range(i + 1, len(self.segments)):
-                if (self.segments[j]['pos0'] >= self.segments[i]['pos0'] and \
-                    self.segments[j]['pos0'] <= self.segments[i]['pos1'] and \
-                    self.segments[i]['y'] == self.segments[j]['y']) or \
-                        (self.segments[j]['pos0'] <= self.segments[i]['pos0'] and \
-                         self.segments[j]['pos1'] >= self.segments[i]['pos0'] and \
-                         self.segments[i]['y'] == self.segments[j]['y']):
-                    # print("\nOVERLAP i:", self.segments[i]['pos0'], self.segments[i]['pos1'], self.segments[i]['y'], self.segments[i]['codename'])
-                    # print("OVERLAP j:", self.segments[j]['pos0'], self.segments[j]['pos1'], self.segments[j]['y'], self.segments[j]['codename'])
-                    # to overcome the overlap, add to the y value of the i segment
-                    self.segments[j]['y'] += 10
-        # Add seltext, the text link to the segment, used in segment tooltip
-        sql = "select seltext from code_text where avid=?"
-        for s in self.segments:
-            cur.execute(sql, [s['avid']])
-            res = cur.fetchall()
-            text = ""
-            for r in res:
-                text += str(r[0]) + "\n"
-            s['seltext'] = text
-
-        # Draw coded segments in scene
-        gv_width = self.ui.graphicsView_av.size().width()
-        self.av_scene_width = gv_width
-        scaler = self.av_scene_width / self.media.get_duration()
-        self.av_scene.clear()
-        for s in self.segments:
-            self.av_scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
-        # Set the scene to the top
-        self.ui.graphicsView_av.verticalScrollBar().setValue(0)
 
     def set_position(self):
         """ Set the movie position according to the position slider.
