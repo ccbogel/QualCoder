@@ -160,7 +160,7 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
-    <addaction name="actionCode_text_by_case"/>
+    <addaction name="actionCode_by_case"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
@@ -429,9 +429,9 @@
     <string>Coding comparison by file</string>
    </property>
   </action>
-  <action name="actionCode_text_by_case">
+  <action name="actionCode_by_case">
    <property name="text">
-    <string>Code text by case</string>
+    <string>Code by case</string>
    </property>
   </action>
  </widget>
