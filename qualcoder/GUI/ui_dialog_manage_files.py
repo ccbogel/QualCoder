@@ -84,7 +84,8 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_view.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>View file</p></body></html>"))
         self.pushButton_create.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Create a text file</p></body></html>"))
         self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "Export selected file.\n"
-"Text files (from any source) are exported from the text stored in the database as .txt files."))
+"Text files (from any source) are exported from the text stored in the database as .txt files.\n"
+"(You can open the project folder and copy/paste the orignal text file if preferred.)"))
         self.pushButton_delete.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Select files for deletion</p></body></html>"))
         self.pushButton_import.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Import file into project folder</p></body></html>"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Add attribute</p></body></html>"))
