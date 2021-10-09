@@ -106,7 +106,6 @@ class DialogManageFiles(QtWidgets.QDialog):
     Files are normally imported into the qda project folder.
     Option to link to external A/V files.
     Notes regards icons in buttons:
-    The buttons are 36x36 pixels and the icons are 32x32 pixels.
     """
 
     source = []
@@ -143,7 +142,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
@@ -339,7 +337,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.last_export_directory, options)
@@ -359,9 +356,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             file_directory = "documents"
             mediapath = "/documents/" + name
             destination = directory + "/" + name
-
-            #TODO text files stored in database
-
         msg = _("Export to ") + destination + "\n"
         try:
             move(self.app.project_path + mediapath, destination)
@@ -560,7 +554,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
             'av_text_id': row[7], 'metadata': metadata, 'icon': icon,
             'case': self.get_cases_by_filename(row[0])})
-        # attributes
+        # Attributes
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
@@ -597,6 +591,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         tr_res = cur.fetchone()
         if tr_res is not None:
             metadata += _("Transcript for: ") + tr_res[0] + "\n"
+            pm.loadFromData(QtCore.QByteArray.fromBase64(transcribed_text_icon), "png")
+            icon = QtGui.QIcon(pm)
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
             return icon, metadata
