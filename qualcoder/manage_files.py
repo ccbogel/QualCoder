@@ -1286,7 +1286,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 logger.warning(import_file + ": " + str(import_errors) + _(" lines not imported"))
         # import of text file did not work
         if text == "":
-            Message(self.app, _("Warning"), _("Cannot import ") + str(import_file) + "\n" + str(e), "warning").exec_()
+            Message(self.app, _("Warning"), _("Cannot import ") + str(import_file) + "\nPlease check if the file is empty.", "warning").exec_()
             return
         # Final checks: check for duplicated filename and update model, widget and database
         name_split = import_file.split("/")
