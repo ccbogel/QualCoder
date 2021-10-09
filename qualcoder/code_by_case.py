@@ -1130,7 +1130,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         """ Check if position is annotated to provide annotation menu option.
         Returns True or False """
 
-        if self.case_ is None:
+        if self.case_ is None  or not self.case_['files']:
             return
         text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
         fid = self.case_['files'][self.case_['file_index']]['fid']
@@ -1151,7 +1151,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if position is None:
             # Called via button
             position = self.ui.textEdit.textCursor().position()
-        if self.case_ is None:
+        if self.case_ is None  or not self.case_['files']:
             return
         text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
         coded_text_list = []
@@ -1191,7 +1191,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if position is None:
             # Called via button
             position = self.ui.textEdit.textCursor().position()
-        if self.case_ is None:
+        if self.case_ is None or not self.case_['files']:
             return
         text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
         coded_text_list = []
@@ -2425,6 +2425,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.lineEdit_search.setText("")
         self.search_indices = []
         self.search_index = 0
+        if not self.case_['files']:
+            return
         ftype = self.case_['files'][self.case_['file_index']]['filetype']
         files_msg = str(self.case_['file_index'] + 1) + " / " + str(len(self.case_['files'])) + " "
         files_msg += self.case_['files'][self.case_['file_index']]['filename']
