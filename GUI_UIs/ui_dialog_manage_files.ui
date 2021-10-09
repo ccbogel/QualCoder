@@ -76,7 +76,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export selected file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export selected file.
+Text files (from any source) are exported from the text stored in the database as .txt files.</string>
       </property>
       <property name="text">
        <string/>
@@ -172,7 +173,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file from project folder as a linked file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export file from project folder as a linked file.
+Cannot export text transcription file associated with an audio or video as a linked file.</string>
       </property>
       <property name="text">
        <string/>
