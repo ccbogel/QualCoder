@@ -83,13 +83,25 @@ class Ui_Dialog_manage_files(object):
         Dialog_manage_files.setWindowTitle(_translate("Dialog_manage_files", "Files"))
         self.pushButton_view.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>View file</p></body></html>"))
         self.pushButton_create.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Create a text file</p></body></html>"))
-        self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export selected file</p></body></html>"))
+        self.pushButton_export.setToolTip(_translate("Dialog_manage_files", "Export selected file.\n"
+"Text files (from any source) are exported from the text stored in the database as .txt files."))
         self.pushButton_delete.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Select files for deletion</p></body></html>"))
         self.pushButton_import.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Import file into project folder</p></body></html>"))
         self.pushButton_add_attribute.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Add attribute</p></body></html>"))
         self.pushButton_link.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Link to a file that is outside the project folder</p></body></html>"))
         self.pushButton_import_from_linked.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Import linked file into project folder</p></body></html>"))
-        self.pushButton_export_to_linked.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export file from project folder as a linked file</p></body></html>"))
+        self.pushButton_export_to_linked.setToolTip(_translate("Dialog_manage_files", "Export file from project folder as a linked file.\n"
+"Cannot export text transcription file associated with an audio or video as a linked file."))
         self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_manage_files", "Help"))
         self.label_fcount.setText(_translate("Dialog_manage_files", "Files:"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_manage_files = QtWidgets.QDialog()
+    ui = Ui_Dialog_manage_files()
+    ui.setupUi(Dialog_manage_files)
+    Dialog_manage_files.show()
+    sys.exit(app.exec_())
