@@ -466,7 +466,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute(att_to_del_sql)
         res = cur.fetchall()
         for r in res:
-            cur.execute("delete from attribute where id=?", [r[0],])
+            cur.execute("delete from attribute where attr_type='file' and id=?", [r[0],])
             self.app.conn.commit()
 
     def export_attributes(self):
