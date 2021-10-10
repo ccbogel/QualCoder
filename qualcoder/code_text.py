@@ -182,7 +182,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        #icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
@@ -216,9 +215,17 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
         pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
+        self.ui.pushButton_show_annotations.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_annotations.pressed.connect(self.show_annotations)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
+        self.ui.pushButton_show_memos.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_memos.pressed.connect(self.show_memos)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
@@ -503,20 +510,6 @@ class DialogCodeText(QtWidgets.QWidget):
         v_sizes = self.ui.leftsplitter.sizes()
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
-
-    def show_important_coded(self):
-        """ Show codes flagged as important. """
-
-        self.important = not self.important
-        pm = QtGui.QPixmap()
-        if self.important:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
-            self.ui.pushButton_important.setToolTip(_("Showing important codings"))
-        else:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-            self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
-        self.get_coded_text_update_eventfilter_tooltips()
 
     def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
@@ -1356,6 +1349,69 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
+
+    def show_memos(self):
+        """ Show all memos for coded text in dialog. """
+
+        if self.file_ is None:
+            return
+        text = ""
+        cur = self.app.conn.cursor()
+        sql = "select code_name.name, pos0,pos1, seltext, code_text.memo "
+        sql += "from code_text join code_name on code_text.cid = code_name.cid "
+        sql += "where length(code_text.memo)>0 and fid=? and code_text.owner=? order by pos0"
+        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        res = cur.fetchall()
+        if res == []:
+            return
+        for r in res:
+            text += '[' + str(r[1]) + '-' + str(r[2]) +'] ' + _("Code: ") + r[0] + "\n"
+            text += _("Text: ") + r[3] + "\n"
+            text += _("Memo: ") + r[4] + "\n\n"
+        ui = DialogMemo(self.app, _("Memos for file: ") + self.file_['name'], text)
+        ui.ui.pushButton_clear.hide()
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec_()
+        memo = ui.memo
+
+    def show_annotations(self):
+        """ Show all annotations for text in dialog. """
+
+        if self.file_ is None:
+            return
+        text = ""
+        cur = self.app.conn.cursor()
+        sql = "select substr(source.fulltext,pos0+1 ,pos1-pos0), pos0, pos1, annotation.memo "
+        sql += "from annotation join source on annotation.fid = source.id "
+        sql += "where fid=? and annotation.owner=? order by pos0"
+        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        res = cur.fetchall()
+        if res == []:
+            return
+        for r in res:
+            text += '[' + str(r[1]) + '-' + str(r[2]) +'] ' + "\n"
+            text += _("Text: ") + r[0] + "\n"
+            text += _("Annotation: ") + r[3] + "\n\n"
+        cur = self.app.conn.cursor()
+        ui = DialogMemo(self.app, _("Annotations for file: ") + self.file_['name'], text)
+        ui.ui.pushButton_clear.hide()
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec_()
+        memo = ui.memo
+
+    def show_important_coded(self):
+        """ Show codes flagged as important. """
+
+        self.important = not self.important
+        pm = QtGui.QPixmap()
+        if self.important:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
+            self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+        else:
+            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
+            self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
+        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def show_codes_like(self):
         """ Show all codes if text is empty.

@@ -36,8 +36,8 @@
        <rect>
         <x>570</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -143,8 +143,8 @@
        <rect>
         <x>360</x>
         <y>38</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -159,8 +159,8 @@
        <rect>
         <x>400</x>
         <y>38</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -231,8 +231,8 @@
        <rect>
         <x>610</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -247,8 +247,8 @@
        <rect>
         <x>650</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -263,8 +263,8 @@
        <rect>
         <x>730</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -279,8 +279,8 @@
        <rect>
         <x>780</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -293,10 +293,10 @@
      <widget class="QPushButton" name="pushButton_annotate">
       <property name="geometry">
        <rect>
-        <x>380</x>
+        <x>310</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -309,10 +309,10 @@
      <widget class="QPushButton" name="pushButton_coding_memo">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>390</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -405,8 +405,8 @@
        <rect>
         <x>690</x>
         <y>0</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -427,6 +427,38 @@
       </property>
       <property name="toolTip">
        <string>Help</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_memos">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>0</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show memos</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_show_annotations">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>0</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show annotations</string>
       </property>
       <property name="text">
        <string/>
