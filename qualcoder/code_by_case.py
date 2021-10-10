@@ -40,7 +40,7 @@ import traceback
 import webbrowser
 
 # https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
-if sys.platform.startswith("win"):
+'''if sys.platform.startswith("win"):
     try:
         # Older x86 32 bit location
         os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
@@ -54,7 +54,7 @@ if sys.platform.startswith("win"):
     except Exception as e:
         # Commented below out, uncomment if desired
         # QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
-        logger.debug(str(e))
+        logger.debug(str(e))'''
 vlc_msg = ""
 try:
     import qualcoder.vlc as vlc
