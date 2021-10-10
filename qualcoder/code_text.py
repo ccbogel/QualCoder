@@ -182,7 +182,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        #icon =  QtGui.QIcon(QtGui.QPixmap('GUI/playback_next_icon_24.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
@@ -216,9 +215,17 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
         pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
+        self.ui.pushButton_show_annotations.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_annotations.pressed.connect(self.show_annotations)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
+        self.ui.pushButton_show_memos.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_memos.pressed.connect(self.show_memos)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
@@ -503,6 +510,12 @@ class DialogCodeText(QtWidgets.QWidget):
         v_sizes = self.ui.leftsplitter.sizes()
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
+
+    def show_memos(self):
+        print("show memos")
+
+    def show_annotations(self):
+        print("show annotations")
 
     def show_important_coded(self):
         """ Show codes flagged as important. """
