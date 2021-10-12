@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Code Text</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="minimumSize">
@@ -34,10 +34,10 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>540</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -109,7 +109,7 @@
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>443</x>
+        <x>430</x>
         <y>44</y>
         <width>81</width>
         <height>22</height>
@@ -143,8 +143,8 @@
        <rect>
         <x>360</x>
         <y>38</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -157,10 +157,10 @@
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>390</x>
         <y>38</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -229,10 +229,10 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>570</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -245,10 +245,10 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
       <property name="geometry">
        <rect>
-        <x>650</x>
+        <x>600</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -261,10 +261,10 @@
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>730</x>
+        <x>660</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -277,10 +277,10 @@
      <widget class="QPushButton" name="pushButton_delete_all_codes">
       <property name="geometry">
        <rect>
-        <x>780</x>
+        <x>740</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -295,8 +295,8 @@
        <rect>
         <x>310</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -309,10 +309,10 @@
      <widget class="QPushButton" name="pushButton_coding_memo">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>370</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -325,7 +325,7 @@
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>440</x>
         <y>2</y>
         <width>24</width>
         <height>24</height>
@@ -353,7 +353,7 @@
      <widget class="QSpinBox" name="spinBox_font_size">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>470</x>
         <y>0</y>
         <width>53</width>
         <height>30</height>
@@ -403,10 +403,10 @@
      <widget class="QPushButton" name="pushButton_auto_code_surround">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>630</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -419,10 +419,10 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>920</x>
+        <x>880</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -435,10 +435,10 @@
      <widget class="QPushButton" name="pushButton_show_memos">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>400</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -451,10 +451,10 @@
      <widget class="QPushButton" name="pushButton_show_annotations">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>340</x>
         <y>0</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -464,6 +464,25 @@
        <string/>
       </property>
      </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_editing">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">
@@ -682,25 +701,102 @@
       </widget>
      </widget>
      <widget class="QTextEdit" name="textEdit"/>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_editing">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>80</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
+     <widget class="QGroupBox" name="groupBox_info">
+      <property name="title">
+       <string/>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <widget class="QPushButton" name="pushButton_code_rule">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>0</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Code rule with examples</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_journal">
+          <property name="geometry">
+           <rect>
+            <x>60</x>
+            <y>0</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Current journal</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_project_memo">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>0</y>
+            <width>28</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Project memo</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_info">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QSplitter" name="splitter_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QTextEdit" name="textEdit_code_rule"/>
+         <widget class="QTextEdit" name="textEdit_info"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
