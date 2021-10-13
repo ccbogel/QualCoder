@@ -113,9 +113,6 @@ class DialogJournals(QtWidgets.QDialog):
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
-
-        self.ui.textEdit.textChanged.connect(self.text_changed)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/pencil_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
@@ -244,6 +241,7 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute("update journal set jentry=? where jid=?", (self.journals[self.ui.tableWidget.currentRow()]['jentry'], self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
+        print("changed")
 
     def closeEvent(self, event):
         """ Save splitter dimensions. """
