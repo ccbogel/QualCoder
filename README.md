@@ -72,7 +72,7 @@ IMORTANT: in the first window of the installation mark the option "Add Python to
 
 The final step, install extra modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`py -m pip install pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
+`py -m pip install wheel pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
