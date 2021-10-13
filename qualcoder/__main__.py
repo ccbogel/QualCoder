@@ -670,7 +670,7 @@ class App(object):
                 jids
             )
         else:
-            cur.execute("select name, jid, jentry, owner, date from journal")
+            cur.execute("select name, jid, jentry, owner, date from journal order by date desc")
         keys = 'name', 'jid', 'jentry', 'owner', 'date'
         result = []
         for row in cur.fetchall():
@@ -1993,9 +1993,9 @@ def install_language(lang):
     if lang == "de":
         qm_data = de_qm
         mo_data = de_mo
-    if lang == "el":
+    '''if lang == "el":
         qm_data = el_qm
-        mo_data = el_mo
+        mo_data = el_mo'''
     if lang == "es":
         qm_data = es_qm
         mo_data = es_mo
@@ -2005,9 +2005,9 @@ def install_language(lang):
     if lang == "it":
         qm_data = it_qm
         mo_data = it_mo
-    if lang == "jp":
+    '''if lang == "jp":
         qm_data = jp_qm
-        mo_data = jp_mo
+        mo_data = jp_mo'''
     if lang == "pt":
         qm_data = pt_qm
         mo_data = pt_mo

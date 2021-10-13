@@ -123,6 +123,11 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_mode = False
     edit_pos = 0
 
+    # Variables associated with right-hand side splitter, for project memo, curent journal, code rule
+    project_memo = False
+    journal_entry = False
+    code_rule = False
+
     def __init__(self, app, parent_textEdit, tab_reports):
 
         super(DialogCodeText, self).__init__()
@@ -136,6 +141,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.recent_codes = []
         self.autocode_history = []
+        self.journal = False
+        self.project_memo = False
+        self.code_rule = False
         self.important = False
         self.attributes = []
         self.code_resize_timer = datetime.datetime.now()
@@ -246,6 +254,21 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
+        # Right hand side splitter buttons
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(coding_icon), "png")
+        self.ui.pushButton_code_rule.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(journal_icon), "png")
+        self.ui.pushButton_journal.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_journal.pressed.connect(self.show_current_journal)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
+        self.ui.pushButton_project_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
+        self.ui.textEdit_info.textChanged.connect(self.rhs_splitter_text_changed)
+
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -518,6 +541,9 @@ class DialogCodeText(QtWidgets.QWidget):
          Called by: treewidgetitem_clicked, select_tree_item_by_code_name """
 
         current = self.ui.treeWidget.currentItem()
+        # Extra to fill right-hand side splitter details
+        self.show_code_rule()
+
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.hide()
             self.ui.label_code.setToolTip("")
@@ -718,6 +744,93 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
+    # RHS splitter details for code rule, curent journal, project memo
+    def show_code_rule(self):
+        """ Show current journal text in right-hand side splitter pane. """
+
+        selected = self.ui.treeWidget.currentItem()
+        if selected is None:
+            return
+        self.project_memo = False
+        self.journal_entry = False
+        self.code_rule = True
+        self.ui.label_info.setText(selected.text(0))
+        txt = ""
+        if selected.text(1)[0:3] == 'cat':
+            for c in self.categories:
+                if c['catid'] == int(selected.text(1)[6:]):
+                    txt += (c['memo'])
+                    break
+            self.ui.textEdit_info.hide()
+        else:  # Code is selected
+            for c in self.codes:
+                if c['cid'] == int(selected.text(1)[4:]):
+                    txt += c['memo']
+                    break
+            self.ui.textEdit_info.show()
+            # Get coded examples
+            txt += "\n\n" + _("Examples:") + "\n"
+            cur = self.app.conn.cursor()
+            cur.execute("select seltext from code_text where length(seltext) > 0 and cid=? order by random() limit 3",
+                        [int(selected.text(1)[4:])])
+            res = cur.fetchall()
+            for i, r in enumerate(res):
+                txt += str(i + 1) + ": " + r[0] + "\n"
+        self.ui.textEdit_info.setReadOnly(True)
+        self.ui.textEdit_info.blockSignals(True)
+        self.ui.textEdit_info.setText(txt)
+
+    def show_current_journal(self):
+        """ Show current journal text in right-hand side splitter pane. """
+
+        journals = self.app.get_journal_texts()
+        if journals == []:
+            self.journal_entry = False
+            return
+        self.project_memo = False
+        self.journal_entry = journals[0]
+        self.code_rule = False
+        self.ui.label_info.setText(self.journal_entry['name'])
+        self.ui.textEdit_info.setReadOnly(False)
+        self.ui.textEdit_info.blockSignals(True)
+        self.ui.textEdit_info.setText(self.journal_entry['jentry'])
+        self.ui.textEdit_info.blockSignals(False)
+
+    def show_project_memo(self):
+        """ Show project memo in right-hand side splitter pane """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select memo from project")
+        res = cur.fetchone()
+        self.project_memo = True
+        self.journal_entry = False
+        self.code_rule = False
+        self.ui.label_info.setText(_("Project memo"))
+
+        self.ui.textEdit_info.setReadOnly(False)
+        self.ui.textEdit_info.blockSignals(True)
+        self.ui.textEdit_info.setText(res[0])
+        self.ui.textEdit_info.blockSignals(False)
+
+    def rhs_splitter_text_changed(self):
+        """ Database is updated as text is changed in textEdit_info.
+        Text is updated for the current journal, or the overall project memo.
+        """
+
+        if self.code_rule:
+            return
+        cur = self.app.conn.cursor()
+        txt = self.ui.textEdit_info.toPlainText()
+        if self.journal_entry is not False:
+            now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("update journal set jentry=?, date=?, owner=? where jid=?",
+                [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])
+        if self.project_memo is not False:
+            cur.execute("update project set memo=?", [txt])
+        self.app.conn.commit()
+        self.app.delete_backup = False
+
+    # Header section widgets
     def delete_all_codes_from_file(self):
         """ Delete all codes from this file by this coder. """
 
@@ -737,6 +850,7 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = _("All codes by ") + self.app.settings['codername'] + _(" deleted from ") + self.file_['name']
         self.parent_textEdit.append(msg)
 
+    # Search for text methods
     def search_for_text(self):
         """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
         Only where text is >=3 OR 5 characters long. Or Enter is pressed (search_type==1).
