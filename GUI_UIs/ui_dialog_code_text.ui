@@ -791,7 +791,6 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QTextEdit" name="textEdit_code_rule"/>
          <widget class="QTextEdit" name="textEdit_info"/>
         </widget>
        </item>
