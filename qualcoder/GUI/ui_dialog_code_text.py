@@ -236,8 +236,6 @@ class Ui_Dialog_code_text(object):
         self.splitter_2 = QtWidgets.QSplitter(self.groupBox_info)
         self.splitter_2.setOrientation(QtCore.Qt.Vertical)
         self.splitter_2.setObjectName("splitter_2")
-        self.textEdit_code_rule = QtWidgets.QTextEdit(self.splitter_2)
-        self.textEdit_code_rule.setObjectName("textEdit_code_rule")
         self.textEdit_info = QtWidgets.QTextEdit(self.splitter_2)
         self.textEdit_info.setObjectName("textEdit_info")
         self.gridLayout.addWidget(self.splitter_2, 2, 0, 1, 1)
