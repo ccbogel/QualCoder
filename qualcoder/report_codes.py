@@ -177,7 +177,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
-        #self.ui.treeWidget.itemSelectionChanged.connect(self.display_counts)
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
@@ -1069,7 +1068,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.case_ids = ""
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
-            self.display_counts()
             parameters += _("\nAttributes:\n") + self.attributes_msg + "\n"
         if self.file_ids != "":
             parameters += _("\nFiles:\n")
