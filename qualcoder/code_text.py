@@ -765,7 +765,8 @@ class DialogCodeText(QtWidgets.QWidget):
         else:  # Code is selected
             for c in self.codes:
                 if c['cid'] == int(selected.text(1)[4:]):
-                    txt += c['memo']
+                    if c['memo'] is not None:
+                        txt += c['memo']
                     break
             self.ui.textEdit_info.show()
             # Get coded examples
