@@ -120,7 +120,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
-        self.ui.label_counts.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
         self.ui.listWidget_files.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
@@ -178,7 +177,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
-        self.ui.treeWidget.itemSelectionChanged.connect(self.display_counts)
+        #self.ui.treeWidget.itemSelectionChanged.connect(self.display_counts)
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
@@ -186,8 +185,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.eventFilterTT = ToolTip_EventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
-        #TODO remove this counts label
-        self.ui.label_counts.hide()  # tmp
 
     def splitter_sizes(self, pos, index):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -299,7 +296,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     self.case_ids += "," + str(c['id'])
         if len(self.case_ids) > 0:
             self.case_ids = self.case_ids[1:]
-        self.display_counts()
 
     def listwidget_files_menu(self, position):
         """ Context menu for file selection. """
@@ -811,40 +807,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
 
-    #TODO remove this method and the gui label
-    def display_counts(self):
-        """ Fill counts label with counts of selected codes/files/cases attributes. """
-
-        return
-
-        self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
-        items = self.ui.treeWidget.selectedItems()
-        codes_count = 0
-        for i in items:
-            if i.text(1)[0:3] == 'cid':
-                codes_count += 1
-        codes = _("Codes: ") + str(codes_count) + "/" + str(len(self.code_names))
-        files_count = len(self.file_ids.split(","))
-        if self.file_ids == "":
-            files_count = 0
-        filenames = self.app.get_filenames()
-        files = _("Files: ") + str(files_count) + "/" + str(len(filenames))
-        cases_count = len(self.case_ids.split(","))
-        if self.case_ids == "":
-            cases_count = 0
-        casenames = self.app.get_casenames()
-        cases = _("Cases: ") + str(cases_count) + "/" + str(len(casenames))
-        attribute_count = len(self.attributes)
-        cur = self.app.conn.cursor()
-        sql = "select count(name) from attribute_type"
-        cur.execute(sql)
-        result = cur.fetchone()
-        if result is None:
-            result = [0]
-        attributes = _("Attributes: ") + str(attribute_count) + "/" + str(result[0])
-        msg = codes + "  " + files+ "  " + cases + "  " + attributes
-        self.ui.label_counts.setText(msg)
-
     def case_selection_changed(self):
         """ Show or hide the case matrix options.
          Show if cases are selected. """
@@ -1086,9 +1048,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             self.ui.textEdit.insertPlainText(_("Coding by: ") + coder + "\n")
         codes_string = _("Codes: ") + "\n"
+        codes_count = 0
         for i in items:
-            codes_string += i.text(0) + ". "
-        codes_string +=  _("Codes: ") + str(len(items)) + " / " + str(len(self.code_names))
+            if i.text(1)[0:3] == 'cid':
+                codes_count += 1
+                codes_string += i.text(0) + ". "
+        codes_string +=  _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
         self.ui.textEdit.insertPlainText(codes_string)
         important = self.ui.checkBox_important.isChecked()
 
@@ -1701,7 +1666,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res is not None and res[0] != "" and res[0] is not None:
                     head += ", " + _("Case memo: ") + res[0]
-        head += ", " + _("Coder: ") + item['coder'] + "<br />"
+        head += " " + _("Coder: ") + item['coder'] + "<br />"
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
