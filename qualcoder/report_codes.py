@@ -84,9 +84,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     files = []
     cases = []
     html_links = []  # For html output with media link (images, av)
-    text_results = []
-    image_results = []
-    av_results = []
+    results = []
     te = []  # Case matrix (table) [row][col] of textEditWidget results
     # Variables for search restrictions
     file_ids = ""
@@ -757,7 +755,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     extra += '#t=' + item['av0'] +',' + item['av1'] + '"'
                     extra += ' type="' + mediatype + '/' + extension + '">'
                     extra += '</' + mediatype + '><p>'
-                    print("EXTRA:", extra)
+                    #print("EXTRA:", extra)
                     # hopefully only one location with video/link: [mins.secs - mins.secs]
                     location = html.find(item['avtext'])
                     location = location + len(['avtext'])- 1
@@ -1028,9 +1026,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        self.text_results = []
-        self.image_results = []
-        self.av_results = []
+        '''text_results = []
+        image_results = []
+        av_results = []'''
 
         file_or_case = ""  # Default for attributes selection
         if self.file_ids != "":
@@ -1095,11 +1093,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         code_ids = code_ids[1:]
         #logger.debug("File ids\n",self.file_ids, type(self.file_ids))
         #logger.debug("Case ids\n",self.case_ids, type(self.case_ids))
-        self.text_results = []
-        self.image_results = []
-        self.av_results = []
+        text_results = []
+        image_results = []
+        av_results = []
         self.html_links = []
+        self.results = []
         parameters = []
+
         # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
@@ -1127,9 +1127,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.text_results.append(dict(zip(keys, row)))
-            for r in self.text_results:
-                r['file_or_case'] = file_or_case
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'text'
+                tmp['file_or_case'] = file_or_case
+                #text_results.append(tmp)
+                self.results.append(tmp)
 
             # Coded images
             parameters = []
@@ -1159,9 +1161,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
                    'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
-                self.image_results.append(dict(zip(keys, row)))
-            for r in self.image_results:
-                r['file_or_case'] = file_or_case
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'image'
+                tmp['file_or_case'] = file_or_case
+                #image_results.append(tmp)
+                self.results.append(tmp)
 
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
@@ -1190,20 +1194,18 @@ class DialogReportCodes(QtWidgets.QDialog):
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid',\
                    'codename_memo', 'source_memo'
             for row in result:
-                self.av_results.append(dict(zip(keys, row)))
-            for r in self.av_results:
-                r['file_or_case'] = file_or_case
-                if r['file_or_casename'] is None:
-                    msg = _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
-                    Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
-                    logger.error("None value for a/v media name in AV results\n" + str(i))
-                text = str(r['file_or_casename']) + " "
-                if len(r['coded_memo']) > 0:
-                    text += "\nMemo: " + r['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(r['pos0']) +" - " + msecs_to_hours_mins_secs(r['pos1'])
-                r['text'] = text
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'av'
+                tmp['file_or_case'] = file_or_case
+                text = str(tmp['file_or_casename']) + " "
+                if len(tmp['coded_memo']) > 0:
+                    text += "\nMemo: " + tmp['coded_memo']
+                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) +" - " + msecs_to_hours_mins_secs(tmp['pos1'])
+                tmp['text'] = text
                 self.html_links.append({'imagename': None, 'image': None,
-                    'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)), 'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
+                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)), 'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text})
+                #av_results.append(tmp)
+                self.results.append(tmp)
 
         # CASES AND FILES SEARCH
         # Default to all files if none are selected, otherwise limit to the selected files
@@ -1236,9 +1238,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
                    'cases_memo', 'coded_memo', 'codename_memo', 'source_memo'
             for row in results:
-                self.text_results.append(dict(zip(keys, row)))
-            for r in self.text_results:
-                r['file_or_case'] = file_or_case
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'text'
+                tmp['file_or_case'] = file_or_case
+                #text_results.append(tmp)
+                self.results.append(tmp)
 
             # Coded images
             parameters = []
@@ -1270,9 +1274,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
                    'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
             for row in imgresults:
-                self.image_results.append(dict(zip(keys, row)))
-            for r in self.image_results:
-                r['file_or_case'] = file_or_case
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'image'
+                tmp['file_or_case'] = file_or_case
+                #image_results.append(tmp)
+                self.results.append(tmp)
 
             # Coded audio and video
             avresults = []
@@ -1304,231 +1310,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', \
                    'coder', 'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
             for row in avresults:
-                self.av_results.append(dict(zip(keys, row)))
-            for r in self.av_results:
-                r['file_or_case'] = file_or_case
-                if r['file_or_casename'] is None:
-                    msg = _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
-                    Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
-                    logger.error("None value for a/v media name in AV results\n" + str(i))
-                text = str(r['file_or_casename']) + " "
-                if len(r['coded_memo']) > 0:
-                    text += "\nMemo: " + r['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(r['pos0']) + " - " + msecs_to_hours_mins_secs(r['pos1'])
-                r['text'] = text
+                tmp = dict(zip(keys, row))
+                tmp['result_type'] = 'av'
+                tmp['file_or_case'] = file_or_case
+                text = str(tmp['file_or_casename']) + " "
+                if len(tmp['coded_memo']) > 0:
+                    text += "\nMemo: " + tmp['coded_memo']
+                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+                tmp['text'] = text
                 self.html_links.append({'imagename': None, 'image': None,
-                                        'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)),
-                                        'av1': str(int(r['pos1'] / 1000)), 'avtext': text})
+                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text})
+                #av_results.append(tmp)
+                self.results.append(tmp)
 
-        # ATTRIBUTES ONLY SEARCH
-        '''if self.attributes != []:
-            logger.debug("attributes:" + str(self.attributes))
-            # convert each row into sql and add to case or file lists
-            file_sql = []
-            case_sql = []
-            for a in self.attributes:
-                #print(a)
-                sql = " select id from attribute where attribute.name = '" + a[0] + "' "
-                sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    sql += "("
-                    sql += ','.join(a[4])
-                if a[3] in ('in', 'not in'):
-                    sql += ")"
-                if a[2] == 'numeric':
-                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                if a[1] == "file":
-                    sql += " and attribute.attr_type='file' "
-                    file_sql.append(sql)
-                else:
-                    sql += " and attribute.attr_type='case' "
-                    case_sql.append(sql)
-
-            # Find file_ids matching criteria, nested sqls for each parameter
-            sql = ""
-            if len(file_sql) > 0:
-                sql = file_sql[0]
-                del file_sql[0]
-            while len(file_sql) > 0:
-                    sql += " and id in ( " + file_sql[0] + ") "
-                    del file_sql[0]
-            logger.debug(sql)
-            cur.execute(sql)
-            result = cur.fetchall()
-            file_ids = ""
-            for i in result:
-                file_ids += "," + str(i[0])
-            if len(file_ids) > 0:
-                file_ids = file_ids[1:]
-            logger.debug("file_ids: " + file_ids)
-
-            # Find case_ids matching criteria, nested sqls for each parameter
-            # Can get multiple case ids
-            sql = ""
-            if len(case_sql) > 0:
-                sql = case_sql[0]
-                del case_sql[0]
-            while len(case_sql) > 0:
-                    sql += " and id in ( " + case_sql[0] + ") "
-                    del case_sql[0]
-            #logger.debug(sql)
-            print("SEARCH SQL", sql) # tmp
-            cur.execute(sql)
-            results = cur.fetchall()
-            case_ids = ""
-            for i in results:
-                case_ids += "," + str(i[0])
-            if len(case_ids) > 0:
-                case_ids = case_ids[1:]
-            #logger.debug("case_ids: " + case_ids)
-
-            # Text from attribute selection
-            sql = ""
-            # first sql is for cases with/without file parameters
-            if case_ids != "":
-                sql = "select code_name.name, color, cases.name, "
-                sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-                sql += "code_text.memo, cases.memo, code_name.memo, source.memo "
-                sql += "from code_text join code_name on code_name.cid=code_text.cid "
-                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-                sql += "code_text.fid = case_text.fid "
-                sql += "join source on source.id=code_text.fid "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and case_text.caseid in (" + case_ids + ") "
-                sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1) "
-                if file_ids != "":
-                    sql += "and code_text.fid in (" + file_ids + ") "
-            else:
-                # This sql is for file parameters only
-                sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-                sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo "
-                sql += "from code_text join code_name "
-                sql += "on code_name.cid = code_text.cid join source on fid = source.id "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and source.id in (" + file_ids + ") "
-            if coder != "":
-                sql += " and code_text.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and seltext like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if parameters == []:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            results = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', 'codename_memo', 'source_memo'
-            for row in results:
-                self.text_results.append(dict(zip(keys, row)))
-            for r in self.text_results:
-                r['file_or_case'] = file_or_case
-
-            # Images from attribute selection
-            sql = ""
-            # first sql is for cases with/without file parameters
-            if case_ids != "":
-                sql = "select code_name.name, color, cases.name, "
-                sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, code_image.memo, "
-                sql += " code_name.memo, source.memo "
-                sql += "from code_image join code_name on code_name.cid = code_image.cid "
-                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-                sql += "code_image.id = case_text.fid "
-                sql += " join source on case_text.fid = source.id "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and case_text.caseid in (" + case_ids + ") "
-                if file_ids != "":
-                    sql += "and case_text.fid in (" + file_ids + ") "
-            else:
-                # This sql is for file parameters only
-                sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-                sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
-                sql += " code_name.memo, source.memo "
-                sql += " from code_image join code_name "
-                sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and source.id in (" + file_ids + ") "
-            if coder != "":
-                sql += " and code_image.owner=? "
-            if search_text != "":
-                sql += " and code_image.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-                parameters.append(coder)
-            if parameters == []:
-                cur.execute(sql)
-            else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
-                cur.execute(sql, parameters)
-            imgresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
-                   'coded_memo', 'codename_memo', 'source_memo'
-            for row in imgresults:
-                self.image_results.append(dict(zip(keys, row)))
-            for r in self.image_results:
-                r['file_or_case'] = file_or_case
-
-            # Audio and video from attribute selection
-            sql = ""
-            # First sql is for cases with/without file parameters
-            if case_ids != "":
-                sql = "select code_name.name, color, cases.name, "
-                sql += "code_av.pos0, code_av.pos1, code_av.memo, code_av.owner,"
-                sql += "source.mediapath, source.id, code_name.memo, source.memo "
-                sql += "from code_av join code_name on code_name.cid = code_av.cid "
-                sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-                sql += "code_av.id = case_text.fid "
-                sql += " join source on case_text.fid = source.id "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and case_text.caseid in (" + case_ids + ") "
-                if file_ids != "":
-                    sql += "and case_text.fid in (" + file_ids + ") "
-            else:
-                # This sql is for file parameters only
-                sql = "select code_name.name, color, source.name, code_av.pos0, "
-                sql += "code_av.pos1, code_av.memo,"
-                sql += "code_av.owner, source.mediapath, source.id,  code_name.memo, source.memo "
-                sql += "from code_av join code_name "
-                sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-                sql += "where code_name.cid in (" + code_ids + ") "
-                sql += "and source.id in (" + file_ids + ") "
-            if coder != "":
-                sql += " and code_av.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_av.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            result = []
-            if parameters == []:
-                cur.execute(sql)
-                result = cur.fetchall()
-            else:
-                #logger.debug("SQL:" + sql)
-                try:
-                    cur.execute(sql, parameters)
-                    result = cur.fetchall()
-                except Exception as e:
-                    logger.debug(str(e))
-                    logger.debug("SQL:\n" + sql)
-                    logger.debug("Parameters:\n" + str(parameters))
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid',\
-                   'codename_memo', 'source_memo'
-            for row in result:
-                self.av_results.append(dict(zip(keys, row)))
-            for r in self.av_results:
-                r['file_or_case'] = file_or_case
-                if r['file_or_casename'] is None:
-                    msg = _("Backup project then: delete from code_av where ") + "id=" + str(i[9])
-                    Message(self.app, _("No media name in AV results"), msg, "warning").exec_()
-                    logger.error("None value for a/v media name in AV results\n" + str(i))
-                text = str(r['file_or_casename']) + " "
-                if len(r['coded_memo']) > 0:
-                    text += "\nMemo: " + r['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(r['pos0']) +" - " + msecs_to_hours_mins_secs(r['pos1'])
-                r['text'] = text
-                self.html_links.append({'imagename': None, 'image': None,
-                    'avname': r['mediapath'], 'av0': str(int(r['pos0'] / 1000)), 'av1': str(int(r['pos1'] / 1000)), 'avtext': text})'''
+        # Organise results by code name, ascending
+        self.results = sorted(self.results, key=lambda i: i['codename'])
         self.fill_text_edit_with_search_results()
         # Clean up for next search
         self.attribute_file_ids = []
@@ -1554,19 +1351,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Put results into the textEdit.document
         # Add textedit positioning for context on clicking appropriate heading in results
         choice = self.ui.comboBox_memos.currentText()
-        for row in self.text_results:
+        for i, row in enumerate(self.results):
             self.heading(row)
-            self.ui.textEdit.insertPlainText(row['text'] + "\n")
-            if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
-                self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
-            self.text_links.append(row)
-        for i, row in enumerate(self.image_results):
-            self.heading(row)
-            self.put_image_into_textedit(row, i, self.ui.textEdit)
-            self.text_links.append(row)
-        for i, row in enumerate(self.av_results):
-            self.heading(row)
-            self.ui.textEdit.insertPlainText(row['text'] + "\n")
+            if row['result_type'] == 'text':
+                self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
+                if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
+                    self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
+            if row['result_type'] == 'image':
+                self.put_image_into_textedit(row, i, self.ui.textEdit)
+            if row['result_type'] == 'av':
+                self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
             self.text_links.append(row)
 
         self.eventFilterTT.set_positions(self.text_links)
@@ -1577,16 +1371,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.setColumnCount(0)
             self.ui.tableWidget.setRowCount(0)
         elif matrix_option == "Categories":
-            self.fill_matrix_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+            self.fill_matrix_categories(self.results, self.case_ids)
         elif matrix_option == "Top categories":
-            self.fill_matrix_top_categories(self.text_results, self.image_results, self.av_results, self.case_ids)
+            self.fill_matrix_top_categories(self.results, self.case_ids)
         else:
-            self.fill_matrix_codes(self.text_results, self.image_results, self.av_results, self.case_ids)
+            self.fill_matrix_codes(self.results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
         """
 
+        text_edit.append("\n")
         path = self.app.project_path + img['mediapath']
         if img['mediapath'][0:7] == "images:":
             path = img['mediapath'][7:]
@@ -1664,7 +1459,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res is not None and res[0] != "" and res[0] is not None:
                     head += ", " + _("Case memo: ") + res[0]
-        head += " " + _("Coder: ") + item['coder'] + "<br />"
+        head += " " + _("Coder: ") + item['coder']
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1681,6 +1476,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
+        #self.ui.textEdit.append("\n")
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
@@ -1697,21 +1493,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Check that there is a link to view at this location before showing menu option
         action_view = None
         found = None
-        for row in self.text_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                found = True
-                break
-        for row in self.image_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                found = True
-                break
-        for row in self.av_results:
+        for row in self.results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 found = True
                 break
         if found:
             action_view = menu.addAction(_("View in context"))
-
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -1739,24 +1526,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         pos = cursor_context_pos.position()
-        # Check the clicked position for a text result
-        for row in self.text_results:
+        for row in self.results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                ui = DialogCodeInText(self.app, row)
-                ui.exec_()
-                return
-        # Check the position for an image result
-        for row in self.image_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                ui = DialogCodeInImage(self.app, row)
-                ui.exec_()
-                return
-        # Check the position for an a/v result
-        for row in self.av_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                ui = DialogCodeInAV(self.app, row)
-                ui.exec_()
-                return
+                if row['result_type'] == 'text':
+                    ui = DialogCodeInText(self.app, row)
+                    ui.exec_()
+                if row['result_type'] == 'image':
+                    ui = DialogCodeInImage(self.app, row)
+                    ui.exec_()
+                if row['result_type'] == 'av':
+                    ui = DialogCodeInAV(self.app, row)
+                    ui.exec_()
 
     def matrix_heading(self, item, textEdit):
         """ Takes a dictionary item and creates a heading for the coded text portion.
@@ -1788,8 +1568,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res is not None and res != "":
                     head += ", " + _("Case memo: ") + res[0]
-        head += item['coder'] + "<br />"  # Break is very mportant with the image insertion
-
+        head += item['coder']
         cursor = textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
         pos0 = len(textEdit.toPlainText())
@@ -1806,7 +1585,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(textEdit.toPlainText())
 
-    def fill_matrix_codes(self, text_results, image_results, av_results, case_ids):
+    def fill_matrix_codes(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
         First identify all codes.
         Fill tableWidget with columns of codes and rows of cases.
@@ -1819,10 +1598,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         # Do not overwrite positions in original text_links object
-        text_results = deepcopy(text_results)
-        image_results = deepcopy(image_results)
-        av_results = deepcopy(av_results)
-
+        results = deepcopy(results_)
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
         horizontal_labels = []  # column (code) labels
@@ -1862,30 +1638,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         choice = self.ui.comboBox_memos.currentText()
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
-                for t in text_results:
-                    if t['file_or_casename'] == vertical_labels[row] and t['codename'] == horizontal_labels[col]:
-                        t['row'] = row
-                        t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
-                        self.te[row][col].insertPlainText("\n")
-                        self.matrix_links.append(t)
-                for av in av_results:
-                    if av['file_or_casename'] == vertical_labels[row] and av['codename'] == horizontal_labels[col]:
-                        av['row'] = row
-                        av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
-                        self.matrix_links.append(av)
-                        self.te[row][col].insertPlainText(av['text'] + "\n")
-                for counter, im in enumerate(image_results):
-                    if im['file_or_casename'] == vertical_labels[row] and im['codename'] == horizontal_labels[col]:
-                        im['row'] = row
-                        im['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
-                        self.matrix_links.append(im)
-                        self.put_image_into_textedit(im, counter, self.te[row][col])
+                for counter, r in enumerate(results):
+                    if r['file_or_casename'] == vertical_labels[row] and r['codename'] == horizontal_labels[col]:
+                        r['row'] = row
+                        r['col'] = col
+                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                        if r['result_type'] == 'text':
+                            self.te[row][col].append(r['text'])
+                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                            self.te[row][col].insertPlainText("\n")
+                        if r['result_type'] == 'image':
+                            self.put_image_into_textedit(r, counter, self.te[row][col])
+                        if r['result_type'] == 'av':
+                            self.te[row][col].insertPlainText(r['text'] + "\n")
+                        self.matrix_links.append(r)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -1896,7 +1663,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def fill_matrix_categories(self, text_results, image_results, av_results, case_ids):
+    def fill_matrix_categories(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
         First identify the categories. Then map all codes which are directly assigned to the categories.
         Fill tableWidget with columns of categories and rows of cases.
@@ -1909,10 +1676,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         # Do not overwrite positions in original text_links object
-        text_results = deepcopy(text_results)
-        image_results = deepcopy(image_results)
-        av_results = deepcopy(av_results)
-
+        results = deepcopy(results_)
         # All categories within selection
         items = self.ui.treeWidget.selectedItems()
         top_level = []  # the categories at any level
@@ -1941,33 +1705,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                         horizontal_labels.append(item.parent().text(0))
 
         # Add category name - which will match the tableWidget column category name
-        res_text_categories = []
-        for i in text_results:
+        res_categories = []
+        for i in results:
             # Replaces the top-level name by mapping to the correct top-level category name (column)
             # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
             if "top" in i:
-                res_text_categories.append(i)
-        res_image_categories = []
-        for i in image_results:
-            # Replaces the top-level name by mapping to the correct top-level category name (column)
-            # Codes will not have 'top' key
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_image_categories.append(i)
-        res_av_categories = []
-        for i in av_results:
-            # Replaces the top-level name by mapping to the correct top-level category name (column)
-            # Codes will not have 'top' key
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_av_categories.append(i)
+                res_categories.append(i)
 
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
@@ -2000,30 +1746,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for t in res_text_categories:
-                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        t['row'] = row
-                        t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.matrix_links.append(t)
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te.append(_("Coded memo: ") + t['coded_memo'])
+                for counter, r in enumerate(res_categories):
+                    if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
+                        r['row'] = row
+                        r['col'] = col
+                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                        if r['result_type'] == 'text':
+                            self.te[row][col].append(r['text'])
+                            if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
+                                self.te.append(_("Coded memo: ") + r['coded_memo'])
+                        if r['result_type'] == 'image':
+                            self.put_image_into_textedit(r, counter, self.te[row][col])
+                        if r['result_type'] == 'av':
+                            self.te[row][col].append(r['text'] + "\n")
                         self.te[row][col].insertPlainText("\n")
-                for av in res_av_categories:
-                    if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
-                        av['row'] = row
-                        av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(av, self.te[row][col]))
-                        self.matrix_links.append(av)
-                        self.te[row][col].append(av['text'] + "\n")
-                for counter, im in enumerate(res_image_categories):
-                    if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
-                        im['row'] = row
-                        im['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
-                        self.matrix_links.append(im)
-                        self.put_image_into_textedit(im, counter, self.te[row][col])
+                        self.matrix_links.append(r)
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
@@ -2034,7 +1771,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def fill_matrix_top_categories(self, text_results, image_results, av_results, case_ids):
+    def fill_matrix_top_categories(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
         First identify top-level categories. Then map all other codes to the
         top-level categories.
@@ -2048,9 +1785,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         # Do not overwrite positions in original text_links object
-        text_results = deepcopy(text_results)
-        image_results = deepcopy(image_results)
-        av_results = deepcopy(av_results)
+        results = deepcopy(results_)
 
         # Get top level categories
         items = self.ui.treeWidget.selectedItems()
@@ -2085,33 +1820,15 @@ class DialogReportCodes(QtWidgets.QDialog):
                     horizontal_labels.append(sub_code['top'])
 
         # Add the top-level name - which will match the tableWidget column category name
-        res_text_categories = []
-        for i in text_results:
+        res_categories = []
+        for i in results:
             # Replaces the top-level name by mapping to the correct top-level category name (column)
             # Codes will not have 'top' key
             for s in sub_codes:
                 if i['codename'] == s['codename']:
                     i['top'] = s['top']
             if "top" in i:
-                res_text_categories.append(i)
-        res_image_categories = []
-        for i in image_results:
-            # Replaces the top-level name by mapping to the correct top-level category name (column)
-            # Codes will not have 'top' key
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_image_categories.append(i)
-        res_av_categories = []
-        for i in av_results:
-            # Replaces the top-level name by mapping to the correct top-level category name (column)
-            # Codes will not have 'top' key
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_av_categories.append(i)
+                res_categories.append(i)
 
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
@@ -2144,17 +1861,23 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, case in enumerate(cases):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
-                for t in res_text_categories:
-                    if t['file_or_casename'] == vertical_labels[row] and t['top'] == horizontal_labels[col]:
-                        t['row'] = row
-                        t['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(t, self.te[row][col]))
-                        self.matrix_links.append(t)
-                        self.te[row][col].append(t['text'])
-                        if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
-                            self.te[row][col].append(_("Coded memo: ") + t['coded_memo'])
+                for counter, r in enumerate(res_categories):
+                    if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
+                        r['row'] = row
+                        r['col'] = col
+                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                        self.matrix_links.append(r)
+                        if r['result_type'] == 'text':
+                            self.te[row][col].append(r['text'])
+                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                        if r['result_type'] == 'image':
+                            self.put_image_into_textedit(r, counter, self.te[row][col])
+                        if r['result_type'] == 'av':
+                            self.te[row][col].append(r['text'] + "\n")  # The time duration
+
                         self.te[row][col].insertPlainText("\n")
-                for av in res_av_categories:
+                '''for av in res_av_categories:
                     if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
                         av['row'] = row
                         av['col'] = col
@@ -2167,7 +1890,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         im['col'] = col
                         self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
                         self.matrix_links.append(im)
-                        self.put_image_into_textedit(im, counter, self.te[row][col])
+                        self.put_image_into_textedit(im, counter, self.te[row][col])'''
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
