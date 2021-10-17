@@ -36,8 +36,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -52,8 +52,8 @@
        <rect>
         <x>50</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -68,8 +68,8 @@
        <rect>
         <x>130</x>
         <y>10</y>
-        <width>32</width>
-        <height>32</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -110,8 +110,8 @@
        <rect>
         <x>90</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -157,8 +157,8 @@
        <rect>
         <x>520</x>
         <y>10</y>
-        <width>32</width>
-        <height>32</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -190,7 +190,7 @@
         <x>220</x>
         <y>10</y>
         <width>191</width>
-        <height>32</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -218,8 +218,8 @@
        <rect>
         <x>480</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -265,8 +265,8 @@
        <rect>
         <x>680</x>
         <y>10</y>
-        <width>30</width>
-        <height>30</height>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
