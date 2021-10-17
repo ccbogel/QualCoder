@@ -153,6 +153,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
+        self.ui.textEdit.textChanged.connect(self.text_changed)
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -237,11 +238,12 @@ class DialogJournals(QtWidgets.QDialog):
             return
         self.journals[self.ui.tableWidget.currentRow()]['jentry'] = self.ui.textEdit.toPlainText()
         # Update database as text is edited
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         cur = self.app.conn.cursor()
-        cur.execute("update journal set jentry=? where jid=?", (self.journals[self.ui.tableWidget.currentRow()]['jentry'], self.jid))
+        cur.execute("update journal set jentry=?, date=? where jid=?",
+                    (self.journals[self.ui.tableWidget.currentRow()]['jentry'], now_date, self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
-        print("changed")
 
     def closeEvent(self, event):
         """ Save splitter dimensions. """
