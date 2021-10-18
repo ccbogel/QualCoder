@@ -149,6 +149,7 @@ class Ui_Dialog_code_text(object):
         self.leftsplitter.setOrientation(QtCore.Qt.Vertical)
         self.leftsplitter.setObjectName("leftsplitter")
         self.listWidget = QtWidgets.QListWidget(self.leftsplitter)
+        self.listWidget.setMinimumSize(QtCore.QSize(0, 20))
         self.listWidget.setObjectName("listWidget")
         self.groupBox_file_buttons = QtWidgets.QGroupBox(self.leftsplitter)
         self.groupBox_file_buttons.setMinimumSize(QtCore.QSize(0, 30))
