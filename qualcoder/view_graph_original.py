@@ -238,7 +238,7 @@ class ViewGraphOriginal(QDialog):
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_['supercatid'] is not None and m.code_['supercatid'] == n.code_['catid'] and n.code_['depth'] < m.code_['depth']:
+                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
                         item = LinkGraphicsItem(self.app, m, n, True)  # corners only = True
                         self.scene.addItem(item)
@@ -305,7 +305,7 @@ class ViewGraphOriginal(QDialog):
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_['supercatid'] is not None and m.code_['supercatid'] == n.code_['catid'] and n.code_['depth'] < m.code_['depth']:
+                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
                         item = LinkGraphicsItem(self.app, m, n)
                         self.scene.addItem(item)
@@ -385,8 +385,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
         for item in self.items():
             if isinstance(item, TextGraphicsItem):
-                item.code_['x'] = item.pos().x()
-                item.code_['y'] = item.pos().y()
+                item.code_or_cat['x'] = item.pos().x()
+                item.code_or_cat['y'] = item.pos().y()
                 #logger.debug("item pos:" + str(item.pos()))
         for item in self.items():
             if isinstance(item, LinkGraphicsItem):
@@ -420,35 +420,35 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     allows selection of a code/category memo an displaying the information.
     """
 
-    code_ = None
+    code_or_cat = None
     border_rect = None
     app = None
     font = None
     settings = None
 
-    def __init__(self, app, code_):
+    def __init__(self, app, code_or_cat):
         """ Show name and colour of text. Has context menu for various options.
          param: app  : the main App class
-         param: data  : Dictionary of the code details: name, memo, color etc """
+         param: code_or_cat  : Dictionary of the code details: name, memo, color etc """
 
         super(TextGraphicsItem, self).__init__(None)
         self.app = app
         self.conn = app.conn
         self.settings = app.settings
         self.project_path = app.project_path
-        self.code_ = code_
+        self.code_or_cat = code_or_cat
         self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
-        if self.code_['cid'] is not None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_['fontsize'], QtGui.QFont.Normal)
+        if self.code_or_cat['cid'] is not None:
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Normal)
             self.setFont(self.font)
-            self.setPlainText(self.code_['name'])
-        if self.code_['cid'] is None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_['fontsize'], QtGui.QFont.Bold)
+            self.setPlainText(self.code_or_cat['name'])
+        if self.code_or_cat['cid'] is None:
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Bold)
             self.setFont(self.font)
-            self.setPlainText(self.code_['name'])
-        self.setPos(self.code_['x'], self.code_['y'])
+            self.setPlainText(self.code_or_cat['name'])
+        self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.document().contentsChanged.connect(self.text_changed)
         #self.border_rect = QtWidgets.QGraphicsRectItem(0, 0, rect.width(), rect.height())
         #self.border_rect.setParentItem(self)
@@ -459,13 +459,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             see:
             https://doc.qt.io/qt-5/qpainter.html """
 
-        color = QtGui.QColor(self.code_['color'])
+        color = QtGui.QColor(self.code_or_cat['color'])
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.setFont(self.font)
         fm = painter.fontMetrics()
-        painter.setPen(QtGui.QColor(TextColor(self.code_['color']).recommendation))
-        lines = self.code_['name'].split('\n')
+        painter.setPen(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
+        lines = self.code_or_cat['name'].split('\n')
         for row in range(0, len(lines)):
             painter.drawText(5, fm.height() * (row + 1), lines[row])
 
@@ -474,8 +474,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         #rect = self.boundingRect()
         #self.border_rect.setRect(0, 0, rect.width(), rect.height())
-        self.code_['name'] = self.toPlainText()
-        #logger.debug("self.data[name]:" + self.data['name'])
+        self.code_or_cat['name'] = self.toPlainText()
+        #logger.debug("self.data[name]:" + self.code_or_cat['name'])
 
     def contextMenuEvent(self, event):
         """
@@ -487,50 +487,50 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         menu.addAction('Memo')
-        if self.code_['cid'] is not None:
+        if self.code_or_cat['cid'] is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
         action = menu.exec_(QtGui.QCursor.pos())
         if action is None:
             return
         if action.text() == 'Memo':
-            self.add_edit_memo(self.code_)
+            self.add_edit_memo()
         if action.text() == 'Coded text and media':
-            self.coded_media(self.code_)
+            self.coded_media()
         if action.text() == 'Case text and media':
-            self.case_media(self.code_)
+            self.case_media()
 
-    def add_edit_memo(self, code_):
+    def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
 
-        if data['cid'] is not None:
-            ui = DialogMemo(self.app, "Memo for Code " + data['name'], data['memo'])
+        if self.code_or_cat['cid'] is not None:
+            ui = DialogMemo(self.app, "Memo for Code " + self.code_or_cat['name'], self.code_or_cat['memo'])
             ui.exec_()
-            self.data['memo'] = ui.memo
+            self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
-            cur.execute("update code_name set memo=? where cid=?", (self.data['memo'], self.data['cid']))
+            cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
-        if data['catid'] is not None and data['cid'] is None:
-            ui = DialogMemo(self.app, "Memo for Category " + data['name'], data['memo'])
+        if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
+            ui = DialogMemo(self.app, "Memo for Category " + self.code_or_cat['name'], self.code_or_cat['memo'])
             ui.exec_()
-            self.data['memo'] = ui.memo
+            self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
-            cur.execute("update code_cat set memo=? where catid=?", (self.data['memo'], self.data['catid']))
+            cur.execute("update code_cat set memo=? where catid=?", (self.code_or_cat['memo'], self.code_or_cat['catid']))
             self.conn.commit()
 
-    def case_media(self, code_):
+    def case_media(self,):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
-        DialogCodeInAllFiles(self.app, code_, "Case")
+        DialogCodeInAllFiles(self.app, self.code_or_cat, "Case")
 
-    def coded_media(self, code_):
+    def coded_media(self,):
         """ Display all coded media for this code.
         Coded media comes from ALL files and current coder.
         param:
             code_dict : dictionary of code {name, memo, owner, date, cid, catid, color, depth, x, y, supercatid, angle, fontsize} """
 
-        DialogCodeInAllFiles(self.app, code_)
+        DialogCodeInAllFiles(self.app, self.code_or_cat)
 
 
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
