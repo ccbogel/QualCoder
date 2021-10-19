@@ -94,7 +94,7 @@ about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
 <p>Depends on python at least 3.6, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
-<p>VLC should also be installed.</p>\
+<p>A recent version of VLC (64 bit) needs to be installed.</p>\
 <p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS. Used on other Linux platforms (Lubuntu, Raspberry Pi, Fedora)</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
@@ -103,7 +103,7 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
 <p>ebooklib: Aleksandar Erkalović https://github.com/aerkalov</p>\
 <p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
-<p>To various members on github for supporting this project. Greek translations from staff and students of the University of Macedonia.</p>\
+<p>To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
