@@ -3750,11 +3750,10 @@ class DialogViewAV(QtWidgets.QDialog):
             Ctrl + R rewind 30 seconds
             Alt + F forward 30 seconds
             Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
-        Can only use these options if the transcription is not coded:
             Ctrl + T to insert timestamp in format [hh.mm.ss]
             Ctrl + N to enter a new speakers name into shortcuts
+            Ctrl + D to delete speaker names from shortcuts
             Ctrl + 1 .. 8 to insert speaker in format [speaker name]
-
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
         """
@@ -3923,7 +3922,6 @@ class DialogViewAV(QtWidgets.QDialog):
         """
 
         fmt = self.app.settings['timestampformat']
-
         time_msecs = self.mediaplayer.get_time()
         mins_secs = msecs_to_hours_mins_secs(time_msecs)  # String
         delimiter = ":"
