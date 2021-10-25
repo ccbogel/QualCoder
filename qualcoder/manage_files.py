@@ -525,7 +525,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by mediapath"
         if order_by == "casename":
             sql = 'select distinct source.name, source.id, source.fulltext, source.mediapath, source.memo, source.owner, \
-                    source.date, , av_text_id \
+                    source.date, av_text_id \
                     from source left join case_text on source.id=case_text.fid \
                     left join cases on cases.caseid=case_text.caseid \
                    order by cases.name, source.name '
