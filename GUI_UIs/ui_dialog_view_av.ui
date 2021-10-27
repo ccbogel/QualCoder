@@ -83,8 +83,8 @@
        <rect>
         <x>10</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -221,8 +221,8 @@
        <rect>
         <x>408</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -237,8 +237,8 @@
        <rect>
         <x>490</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -253,8 +253,8 @@
        <rect>
         <x>50</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -269,8 +269,8 @@
        <rect>
         <x>90</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -285,8 +285,8 @@
        <rect>
         <x>130</x>
         <y>6</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -301,8 +301,8 @@
        <rect>
         <x>890</x>
         <y>10</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -317,7 +317,8 @@
    <item row="4" column="0">
     <widget class="QLabel" name="label_transcription">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>green underline = Assigned to case.
+red underline = Assigned to code or annotation</string>
      </property>
      <property name="text">
       <string>Transcription:</string>
@@ -367,7 +368,7 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>5</y>
+        <y>3</y>
         <width>191</width>
         <height>30</height>
        </rect>
@@ -381,8 +382,8 @@
        <rect>
         <x>280</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -396,7 +397,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>8</y>
+        <y>6</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -428,8 +429,8 @@
        <rect>
         <x>240</x>
         <y>3</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -453,6 +454,25 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_speechtotext">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Convert speech to text using online service</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
