@@ -93,6 +93,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
 from .select_items import DialogSelectItems
+from .speech_to_text import SpeechToText
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -3475,22 +3476,17 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # Get the transcription text and fill textedit
         self.transcription = None
-        print("line 1")
         cur = self.app.conn.cursor()
         if self.file_['av_text_id'] is not None:
-            print("2")
             cur.execute("select id, fulltext from source where id=?", [file_['av_text_id']])
             self.transcription = cur.fetchone()
         if self.transcription is not None:
-            print("l 3")
             self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             # Commented out as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
-        print("l 4")
         if self.transcription is None:
-            print("l 5")
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                     (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
                     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
@@ -3553,8 +3549,11 @@ class DialogViewAV(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.pushButton_next.setEnabled(False)
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_speechtotext.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_speechtotext.pressed.connect(self.speech_to_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         #self.ui.lineEdit_search.setEnabled(False)
         # My solution to getting gui mouse events by putting vlc video in another dialog
@@ -3661,6 +3660,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
+        # Only try speech to text if there is no text present
+        if self.text == "":
+            self.ui.pushButton_speechtotext.setEnabled(True)
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -3690,6 +3692,13 @@ class DialogViewAV(QtWidgets.QDialog):
         self.no_codes_annotes_cases = True
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
+
+    def speech_to_text(self):
+        """ Convert speech to text using online service. """
+
+        print("Speech to text")
+        filepath = "GGGGGG"
+        self.stt_ui = SpeechToText(self.app, filepath).exec_()
 
     def help(self):
         """ Open help for transcribe section in browser. """

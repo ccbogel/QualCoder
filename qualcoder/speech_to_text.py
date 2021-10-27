@@ -32,16 +32,18 @@ import os
 # sudo python3 -m pip install pydub
 import pydub
 # sudo python3 -m pip install SpeechRecognition
-# works with wavand flac files, wav can be multile formats, so a prblem, prefer flac
+# works with wav and flac files, wav can be multiple formats, so convert all to flac
+# need to have ffmpeg or avconv installed (tricky instillation on Windows)
 import speech_recognition
 import subprocess
 import sys
 import logging
 import traceback
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
-#from helpers import file_typer
+from .helpers import Message, msecs_to_mins_and_secs
+from .GUI.ui_speech_to_text import Ui_DialogSpeechToText
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -56,7 +58,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class SpeechToText():
+class SpeechToText(QtWidgets.QDialog):
     """ Converts audio or video audio track to text using online services.
      Process involves converting the audio track to flac, then chunk.
      Each chunk is stored as temp.was in the .qualcoder folder and chunk by chunk
@@ -65,6 +67,8 @@ class SpeechToText():
      https://github.com/Uberi/speech_recognition/blob/master/reference/library-reference.rst
      """
 
+    app = None
+    text = ""
     filepath = None
     flac_filepath = None
     # IBM an RFC5646 language tag
@@ -90,27 +94,30 @@ class SpeechToText():
     password_ibm = ""
     chunksize = 60000  # 60 seconds
 
-    def __init__(self):
+    def __init__(self, app, av_filepath):
 
         sys.excepthook = exception_handler
+        self.app = app
+        self.text = ""
         # Initialize the speech recognition class
-        app = QtWidgets.QApplication(sys.argv)  # tmp for filedialog
-        #TODO add GUI overlay
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_DialogSpeechToText()
+        self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        self.filepath = av_filepath
 
-        # Test file location
-        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open audio file')
-        if not ok or imports == []:
-            return
-        self.filepath = imports[0]
-        print("FP", self.filepath)  #, file_typer(filepath))
-        self.convert_to_flac()
-        print("FFP", self.flac_filepath)
+        '''self.convert_to_flac()
+        #print("FFP", self.flac_filepath)
         if self.flac_filepath is not None:
             self.convert_to_text()
         else:
-            print("Cannot process file")
+            Message(self.app, _("Processing error"), _("Cannot process file")).exec_()
         for s in self.strings:
-            print(s)
+            text += s
+        print("TEXT\n", text)'''
 
     def convert_to_text(self):
         """
@@ -127,7 +134,7 @@ class SpeechToText():
                 yield audio_file[i:i + chunksize]
         # Specify that a silent chunk must be at least 1 second long
         # Consider a chunk silent if it's quieter than -16 dBFS. May adjust these values.
-        # split on silence does nto work well
+        # split on silence does not work well
         #chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)
         chunks = list(divide_chunks(audio_file, self.chunksize))
         print(f"{len(chunks)} chunks of {self.chunksize / 1000}s each")
@@ -193,7 +200,7 @@ class SpeechToText():
                                                                                 credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
     '''
 
-    # tmp method, revert to helpers. ...
+    '''# tmp method, revert to helpers. ...
     def msecs_to_mins_and_secs(self, msecs):
         """ Convert milliseconds to minutes and seconds.
         msecs is an integer. Minutes and seconds output is a string."""
@@ -203,7 +210,7 @@ class SpeechToText():
         remainder_secs = str(secs - mins * 60)
         if len(remainder_secs) == 1:
             remainder_secs = "0" + remainder_secs
-        return str(mins) + "." + remainder_secs
+        return str(mins) + "." + remainder_secs'''
 
     def timestamp(self, time_msecs):
         """ timestamp using current format.
