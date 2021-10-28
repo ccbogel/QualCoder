@@ -10,6 +10,18 @@
     <height>431</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>734</width>
+    <height>431</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>734</width>
+    <height>431</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Speech to text</string>
   </property>
@@ -86,13 +98,13 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>270</y>
+     <y>260</y>
      <width>571</width>
-     <height>17</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="text">
-    <string>Speech to text requires installed software: ffmpg</string>
+    <string>Speech to text requires installed software: ffmpeg</string>
    </property>
   </widget>
   <widget class="QTextEdit" name="textEdit_notes">
@@ -157,6 +169,9 @@ en-AU</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -170,6 +185,9 @@ en-AU</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_id">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -180,6 +198,9 @@ en-AU</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_key">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -193,6 +214,9 @@ en-AU</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_key">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -205,27 +229,30 @@ en-AU</string>
   <widget class="QProgressBar" name="progressBar">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>340</y>
+     <x>64</x>
+     <y>345</y>
      <width>411</width>
      <height>23</height>
     </rect>
    </property>
    <property name="value">
-    <number>24</number>
+    <number>0</number>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_start">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>300</y>
-     <width>89</width>
-     <height>25</height>
+     <y>340</y>
+     <width>32</width>
+     <height>32</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Start speech to text conversion</string>
+   </property>
    <property name="text">
-    <string>Start</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -267,9 +294,9 @@ en-AU</string>
   <widget class="QLabel" name="label_process">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>20</x>
      <y>303</y>
-     <width>561</width>
+     <width>661</width>
      <height>17</height>
     </rect>
    </property>
