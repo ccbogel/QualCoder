@@ -3403,6 +3403,7 @@ class DialogViewAV(QtWidgets.QDialog):
     app = None
     label = None
     file_ = None
+    abs_path = ""
     is_paused = False
     media_duration_text = ""
     displayframe = None
@@ -3437,11 +3438,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.file_ = file_
         self.search_indices = []
         self.search_index = 0
-        abs_path = ""
+        self.abs_path = ""
         if self.file_['mediapath'][0:6] in ('/audio', '/video'):
-            abs_path = self.app.project_path + self.file_['mediapath']
+            self.abs_path = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
-            abs_path = self.file_['mediapath'][6:]
+            self.abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -3449,7 +3450,7 @@ class DialogViewAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
         self.ui.setupUi(self)
-        self.setWindowTitle(abs_path.split('/')[-1])
+        self.setWindowTitle(self.abs_path.split('/')[-1])
         try:
             x = int(self.app.settings['viewav_abs_pos_x'])
             y = int(self.app.settings['viewav_abs_pos_y'])
@@ -3563,7 +3564,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        title = abs_path.split('/')[-1]
+        title = self.abs_path.split('/')[-1]
         self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
@@ -3602,9 +3603,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
         try:
-            self.media = self.instance.media_new(abs_path)
+            self.media = self.instance.media_new(self.abs_path)
         except Exception as e:
-            Message(self.app, _('Media not found'), str(e) + "\n" + abs_path).exec_()
+            Message(self.app, _('Media not found'), str(e) + "\n" + self.abs_path).exec_()
             self.closeEvent()
             return
         if self.file_['mediapath'][0:7] not in ("/audio", "audio:"):
@@ -3696,9 +3697,8 @@ class DialogViewAV(QtWidgets.QDialog):
     def speech_to_text(self):
         """ Convert speech to text using online service. """
 
-        print("Speech to text")
-        filepath = "GGGGGG"
-        self.stt_ui = SpeechToText(self.app, filepath).exec_()
+        print("view_av.Speech to text")
+        self.stt_ui = SpeechToText(self.app, self.abs_path).exec_()
 
     def help(self):
         """ Open help for transcribe section in browser. """
