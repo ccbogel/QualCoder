@@ -733,6 +733,8 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        # Test of MacOS menu bar
+        self.ui.menubar.setNativeMenuBar(False)
         self.get_latest_github_release()
         try:
             w = int(self.app.settings['mainwindow_w'])
