@@ -3697,8 +3697,12 @@ class DialogViewAV(QtWidgets.QDialog):
     def speech_to_text(self):
         """ Convert speech to text using online service. """
 
-        print("view_av.Speech to text")
-        self.stt_ui = SpeechToText(self.app, self.abs_path).exec_()
+        ui = SpeechToText(self.app, self.abs_path)
+        ok = ui.exec_()
+        if not ok:
+            return
+        text = ui.text
+        self.ui.textEdit.setText(text)
 
     def help(self):
         """ Open help for transcribe section in browser. """

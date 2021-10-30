@@ -201,11 +201,12 @@ class SpeechToText(QtWidgets.QDialog):
             # looping till length l
             for i in range(0, len(audio_file), self.chunksize):
                 yield audio_file[i:i + chunksize]
-        # Specify that a silent chunk must be at least 1 second long
+        '''# Specify that a silent chunk must be at least 1 second long
         # Consider a chunk silent if it's quieter than -16 dBFS. May adjust these values.
         # split on silence does not work well
-        #chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)
+        chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)'''
         chunks = list(divide_chunks(audio_file, self.chunksize))
+        self.ui.progressBar.setMaximum(len(chunks))
         print(f"{len(chunks)} chunks of {self.chunksize / 1000}s each")
         qc_dir = os.path.expanduser('~') + '/.qualcoder'
         r = speech_recognition.Recognizer()
@@ -215,71 +216,72 @@ class SpeechToText(QtWidgets.QDialog):
             chunk.export(qc_dir + "/tmp.wav", format='wav')
             with speech_recognition.AudioFile(qc_dir + "/tmp.wav") as source:
                 audio = r.record(source)
-            # Google limited to 50 requests per day
+            self.ui.progressBar.setValue(i + 1)
+            self.ui.label_process.setText(_("Converting chunk ") + str(i + 1) + " / " + str(len(chunks)))
             if self.service == "google":
+                # Google limited to 50 requests per day
                 try:
                     s = r.recognize_google(audio, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") +"{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "wit.ai":
                 # Language is configured in the wit account
                 try:
                     s = r.recognize_wit(audio, key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "azure":
                 try:
                     s = r.recognize_azure(audio, key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
                     s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "bing":
                 try:
                     s = r.recognize_bing(audio, key=service_key, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "houndify":
                 # English only
                 try:
                     s = r.recognize_houndify(audio, client_id=service_id, client_key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "ibm":
                 try:
                     s = r.recognize_ibm(audio, username=service_key, password=service_key, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
-            print(i, "/", len(chunks))
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             ts = self.timestamp(i * self.chunksize)
             self.strings.append(ts + s)
 
     '''GOOGLE_CLOUD_SPEECH_CREDENTIALS = r"""INSERT THE CONTENTS OF THE GOOGLE CLOUD SPEECH JSON CREDENTIALS FILE HERE"""
-    print("Google Cloud Speech thinks you said " + r.recognize_google_cloud(audio,
-                                                                                credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
+    print("Google Cloud Speech " + r.recognize_google_cloud(audio, credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
     '''
-
-    '''# tmp method, revert to helpers. ...
-    def msecs_to_mins_and_secs(self, msecs):
-        """ Convert milliseconds to minutes and seconds.
-        msecs is an integer. Minutes and seconds output is a string."""
-
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        return str(mins) + "." + remainder_secs'''
 
     def timestamp(self, time_msecs):
         """ timestamp using current format.
@@ -289,13 +291,12 @@ class SpeechToText(QtWidgets.QDialog):
         """
 
         # tmp testing format
-        fmt =  "[mm.ss]"  # self.app.settings['timestampformat']
+        fmt = self.app.settings['timestampformat']
         #time_msecs = self.mediaplayer.get_time()  # tmp
-        mins_secs = self.msecs_to_mins_and_secs(time_msecs)  # String
+        mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
         delimiter = ":"
         if "." in mins_secs:
             delimiter = "."
-
         mins = int(mins_secs.split(delimiter)[0])
         secs = mins_secs.split(delimiter)[1]
         hours = int(mins / 60)
