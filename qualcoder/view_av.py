@@ -3664,6 +3664,8 @@ class DialogViewAV(QtWidgets.QDialog):
         # Only try speech to text if there is no text present
         if self.text == "":
             self.ui.pushButton_speechtotext.setEnabled(True)
+        else:
+            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
