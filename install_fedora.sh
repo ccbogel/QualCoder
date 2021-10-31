@@ -9,7 +9,7 @@ echo "The installer will also install dependencies"
 sudo dnf install python3-pip python3-pyqt5 python3-lxml python3-pil vlc python3-ply python3-six python3-chardet
 # python3-ebooklib is not available in Fedora, so install using pip
 echo "Please wait ..."
-python3 -m pip install --user pdfminer.six openpyxl Ebooklib
+python3 -m pip install --user pdfminer.six openpyxl Ebooklib SpeechRecognition
 sudo mv ~/.local/lib/python3.9/site-packages/Ebook* /usr/lib/python3.9/site-packages/
 sudo mv ~/.local/lib/python3.9/site-packages/ebook* /usr/lib/python3.9/site-packages/
 sudo cp -r qualcoder /usr/share/qualcoder
