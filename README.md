@@ -29,7 +29,7 @@ On some Linux versions you will need to install pip
 
 You also need to run this command from the terminal for pdf importing:
 
-`sudo python3 -m pip install pdfminer.six openpyxl ebooklib`
+`sudo python3 -m pip install pdfminer.six openpyxl ebooklib SpeechRecognition`
 
 In the terminal, Go to the QualCoder-master folder, type:
 
@@ -114,7 +114,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl
+pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -189,6 +189,8 @@ Required:
 * pdfminer.six
 
 * openpyxl
+
+*  SpeechRecognition
 
 * qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
