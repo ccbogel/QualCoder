@@ -285,12 +285,12 @@ en-AU</string>
    </property>
    <item>
     <property name="text">
-     <string>30 seconds</string>
+     <string>60 seconds</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>60 seconds</string>
+     <string>30 seconds</string>
     </property>
    </item>
   </widget>
