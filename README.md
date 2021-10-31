@@ -29,7 +29,7 @@ On some Linux versions you will need to install pip
 
 You also need to run this command from the terminal for pdf importing:
 
-`sudo python3 -m pip install pdfminer.six openpyxl ebooklib SpeechRecognition`
+`sudo python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
 In the terminal, Go to the QualCoder-master folder, type:
 
@@ -60,7 +60,7 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
-NEW - the 2.7 Release contains an exe file (created on Windows 10, 64 bit).
+The 2.8 Release contains an exe file (created on Windows 10, 64 bit).
 
 Download the QualCoder software from: https://github.com/ccbogel/QualCoder. This is the newest, but not yet officially released, version of code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
@@ -72,7 +72,7 @@ IMORTANT: in the first window of the installation mark the option "Add Python to
 
 The final step, install extra modules to Python. Type the letters "cmd" in the Windows Start searching engine, and click on the black software "cmd.exe" - this is the command console for Windows. In the console paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`py -m pip install wheel pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl`
+`py -m pip install wheel pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition`
 
 Then click enter. Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
 
@@ -96,7 +96,7 @@ Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/2.7 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/2.8 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -114,7 +114,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl SpeechRecognition
+pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -134,10 +134,10 @@ From the QualCoder-Master directory run the setup script:
 `python3 setup.py install`
 
 
-Assuming you downloaded the 2.7 version. You can now run with:
+Assuming you downloaded the 2.8 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.7/qualcoder/__main__.py
+python3 /applications/QualCoder-2.8/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -189,6 +189,8 @@ Required:
 * pdfminer.six
 
 * openpyxl
+
+* pydub
 
 *  SpeechRecognition
 
