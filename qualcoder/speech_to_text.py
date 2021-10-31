@@ -126,7 +126,10 @@ class SpeechToText(QtWidgets.QDialog):
             self.ui.lineEdit_key.setEnabled(True)
             self.ui.label_language.setEnabled(True)
             self.ui.lineEdit_language.setEnabled(True)
-            self.ui.textEdit_notes.setText("Microsoft Azure Speech\nAPI keys 32-character lowercase hexadecimal strings")
+            msg = "Microsoft Azure Speech\nAPI keys 32-character lowercase hexadecimal strings\n"
+            msg += "Language codes:\n"
+            msg += "https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support"
+            self.ui.textEdit_notes.setText(msg)
         if self.ui.comboBox_service.currentText() == "Microsoft Bing Voice Recognition":
             self.ui.label_id.setEnabled(False)
             self.ui.lineEdit_id.setEnabled(False)
@@ -150,7 +153,9 @@ class SpeechToText(QtWidgets.QDialog):
             self.ui.lineEdit_key.setEnabled(True)
             self.ui.label_language.setEnabled(False)
             self.ui.lineEdit_language.setEnabled(False)
-            self.ui.textEdit_notes.setText("Houndify\nHoundify client IDs and keys are Base64-encoded strings")
+            msg = "Houndify\nHoundify client IDs and keys are Base64-encoded strings\n"
+            msg += "www.houndify.com"
+            self.ui.textEdit_notes.setText(msg)
         if self.ui.comboBox_service.currentText() == "IBM Speech":
             self.ui.label_id.setEnabled(True)
             self.ui.lineEdit_id.setEnabled(True)
@@ -174,14 +179,12 @@ class SpeechToText(QtWidgets.QDialog):
         else:
             self.chunksize = 60000
         self.convert_to_flac()
-        #print("FFP", self.flac_filepath)
         if self.flac_filepath is not None:
             self.convert_to_text()
         else:
             Message(self.app, _("Processing error"), _("Cannot process file")).exec_()
         for s in self.strings:
             self.text += s
-        print("TEXT\n", self.text)
 
     def convert_to_text(self):
         """
@@ -207,7 +210,6 @@ class SpeechToText(QtWidgets.QDialog):
         chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)'''
         chunks = list(divide_chunks(audio_file, self.chunksize))
         self.ui.progressBar.setMaximum(len(chunks))
-        print(f"{len(chunks)} chunks of {self.chunksize / 1000}s each")
         qc_dir = os.path.expanduser('~') + '/.qualcoder'
         r = speech_recognition.Recognizer()
         # For each chunk, save as wav, then read and run through recognize_google()
