@@ -32,16 +32,19 @@ import os
 # sudo python3 -m pip install pydub
 import pydub
 # sudo python3 -m pip install SpeechRecognition
-# works with wavand flac files, wav can be multile formats, so a prblem, prefer flac
+# works with wav and flac files, wav can be multiple formats, so convert all to flac
+# need to have ffmpeg or avconv installed (tricky instillation on Windows)
 import speech_recognition
 import subprocess
 import sys
 import logging
 import traceback
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
-#from helpers import file_typer
+from .helpers import Message, msecs_to_mins_and_secs
+from .GUI.base64_helper import *
+from .GUI.ui_speech_to_text import Ui_DialogSpeechToText
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -56,7 +59,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class SpeechToText():
+class SpeechToText(QtWidgets.QDialog):
     """ Converts audio or video audio track to text using online services.
      Process involves converting the audio track to flac, then chunk.
      Each chunk is stored as temp.was in the .qualcoder folder and chunk by chunk
@@ -65,6 +68,8 @@ class SpeechToText():
      https://github.com/Uberi/speech_recognition/blob/master/reference/library-reference.rst
      """
 
+    app = None
+    text = ""
     filepath = None
     flac_filepath = None
     # IBM an RFC5646 language tag
@@ -74,43 +79,112 @@ class SpeechToText():
     strings = []
     service = "google" # wit.ai, azure, bing, houndify, ibm
     # dont use google_cloud, requires a file
-    # "INSERT WIT.AI API KEY HERE"  # Wit.ai keys are 32-character uppercase alphanumeric strings
-    key_wit_ai = ""
-    # "INSERT AZURE SPEECH API KEY "  # Microsoft Speech API keys 32-character lowercase hexadecimal strings
-    key_azure = ""
-    # "INSERT BING API KEY "  # Microsoft Bing Voice Recognition API keys 32-character lowercase hexadecimal strings
-    key_bing = ""
-    # "INSERT HOUNDIFY CLIENT ID "  # Houndify client IDs are Base64-encoded strings
-    # "INSERT HOUNDIFY CLIENT KEY "  # Houndify client keys are Base64-encoded strings
-    key_houndify = ""
-    id_houndify = ""
-    # "INSERT IBM SPEECH TO TEXT USERNAME "  # IBM Speech to Text usernames are strings of the form XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-    # "INSERT IBM SPEECH TO TEXT PASSWORD "  # IBM Speech to Text passwords are mixed-case alphanumeric strings
+
+
     username_ibm = ""
     password_ibm = ""
     chunksize = 60000  # 60 seconds
+    google_text = "Online free google translate service. Limited to 50 requests per day. Each request up to 60 seconds in size."
 
-    def __init__(self):
+    def __init__(self, app, av_filepath):
 
         sys.excepthook = exception_handler
+        self.app = app
+        self.text = ""
+        self.filepath = av_filepath
         # Initialize the speech recognition class
-        app = QtWidgets.QApplication(sys.argv)  # tmp for filedialog
-        #TODO add GUI overlay
+        QtWidgets.QDialog.__init__(self)
+        self.ui = Ui_DialogSpeechToText()
+        self.ui.setupUi(self)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(font)
+        # Default is google free
+        self.ui.comboBox_service.currentIndexChanged.connect(self.service_changed)
+        self.ui.textEdit_notes.setText(self.google_text)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_start.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_start.pressed.connect(self.start_conversion)
 
-        # Test file location
-        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, 'Open audio file')
-        if not ok or imports == []:
-            return
-        self.filepath = imports[0]
-        print("FP", self.filepath)  #, file_typer(filepath))
+    def service_changed(self):
+        """ Default is google. Change to"""
+
+        if self.ui.comboBox_service.currentText() == "Google":
+            self.ui.label_id.setEnabled(False)
+            self.ui.lineEdit_id.setEnabled(False)
+            self.ui.label_key.setEnabled(False)
+            self.ui.lineEdit_key.setEnabled(False)
+            self.ui.label_language.setEnabled(True)
+            self.ui.lineEdit_language.setEnabled(True)
+            self.ui.textEdit_notes.setText(self.google_text)
+        if self.ui.comboBox_service.currentText() == "Microsoft Azure Speech":
+            self.ui.label_id.setEnabled(False)
+            self.ui.lineEdit_id.setEnabled(False)
+            self.ui.label_key.setEnabled(True)
+            self.ui.lineEdit_key.setEnabled(True)
+            self.ui.label_language.setEnabled(True)
+            self.ui.lineEdit_language.setEnabled(True)
+            msg = "Microsoft Azure Speech\nAPI keys 32-character lowercase hexadecimal strings\n"
+            msg += "Language codes:\n"
+            msg += "https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support"
+            self.ui.textEdit_notes.setText(msg)
+        if self.ui.comboBox_service.currentText() == "Microsoft Bing Voice Recognition":
+            self.ui.label_id.setEnabled(False)
+            self.ui.lineEdit_id.setEnabled(False)
+            self.ui.label_key.setEnabled(True)
+            self.ui.lineEdit_key.setEnabled(True)
+            self.ui.label_language.setEnabled(True)
+            self.ui.lineEdit_language.setEnabled(True)
+            self.ui.textEdit_notes.setText("Bing\nBing Voice Recognition API keys 32-character lowercase hexadecimal strings")
+        if self.ui.comboBox_service.currentText() == "Wit.ai":
+            self.ui.label_id.setEnabled(False)
+            self.ui.lineEdit_id.setEnabled(False)
+            self.ui.label_key.setEnabled(True)
+            self.ui.lineEdit_key.setEnabled(True)
+            self.ui.label_language.setEnabled(False)
+            self.ui.lineEdit_language.setEnabled(False)
+            self.ui.textEdit_notes.setText("Wit.ai\nWit.ai keys are 32-character uppercase alphanumeric strings")
+        if self.ui.comboBox_service.currentText() == "Houndify":
+            self.ui.label_id.setEnabled(True)
+            self.ui.lineEdit_id.setEnabled(True)
+            self.ui.label_key.setEnabled(True)
+            self.ui.lineEdit_key.setEnabled(True)
+            self.ui.label_language.setEnabled(False)
+            self.ui.lineEdit_language.setEnabled(False)
+            msg = "Houndify\nHoundify client IDs and keys are Base64-encoded strings\n"
+            msg += "www.houndify.com"
+            self.ui.textEdit_notes.setText(msg)
+        if self.ui.comboBox_service.currentText() == "IBM Speech":
+            self.ui.label_id.setEnabled(True)
+            self.ui.lineEdit_id.setEnabled(True)
+            self.ui.label_key.setEnabled(True)
+            self.ui.lineEdit_key.setEnabled(True)
+            self.ui.label_language.setEnabled(True)
+            self.ui.lineEdit_language.setEnabled(True)
+            msg = "IBM Speech to text\n"
+            msg += "usernames are strings of the form XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\n"
+            msg += "passwords are mixed-case alphanumeric strings"
+            self.ui.textEdit_notes.setText(msg)
+
+    def start_conversion(self):
+        """ Convert the A/V format th audio flac format.
+        Obtain GUI settings for conversion.
+        Then process audio in chunks using online service. """
+
+        chunktext = self.ui.comboBox_chunksize.currentText()
+        if chunktext == "30 seconds":
+            self.chunksize = 30000
+        else:
+            self.chunksize = 60000
         self.convert_to_flac()
-        print("FFP", self.flac_filepath)
         if self.flac_filepath is not None:
             self.convert_to_text()
         else:
-            print("Cannot process file")
+            Message(self.app, _("Processing error"), _("Cannot process file")).exec_()
         for s in self.strings:
-            print(s)
+            self.text += s
 
     def convert_to_text(self):
         """
@@ -120,17 +194,22 @@ class SpeechToText():
 
         # Load flac file
         audio_file = pydub.AudioSegment.from_file(self.flac_filepath, "flac")
+        lang = self.ui.lineEdit_language.text()
+        if lang == "":
+            lang = "en-US"
+        service_id = self.ui.lineEdit_id.text()
+        service_key = self.ui.lineEdit_key.text()
         # Split file into 30 or 60 second chunks
         def divide_chunks(audio_file, chunksize):
             # looping till length l
             for i in range(0, len(audio_file), self.chunksize):
                 yield audio_file[i:i + chunksize]
-        # Specify that a silent chunk must be at least 1 second long
+        '''# Specify that a silent chunk must be at least 1 second long
         # Consider a chunk silent if it's quieter than -16 dBFS. May adjust these values.
-        # split on silence does nto work well
-        #chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)
+        # split on silence does not work well
+        chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)'''
         chunks = list(divide_chunks(audio_file, self.chunksize))
-        print(f"{len(chunks)} chunks of {self.chunksize / 1000}s each")
+        self.ui.progressBar.setMaximum(len(chunks))
         qc_dir = os.path.expanduser('~') + '/.qualcoder'
         r = speech_recognition.Recognizer()
         # For each chunk, save as wav, then read and run through recognize_google()
@@ -139,71 +218,72 @@ class SpeechToText():
             chunk.export(qc_dir + "/tmp.wav", format='wav')
             with speech_recognition.AudioFile(qc_dir + "/tmp.wav") as source:
                 audio = r.record(source)
-            # Google limited to 50 requests per day
+            self.ui.progressBar.setValue(i + 1)
+            self.ui.label_process.setText(_("Converting chunk ") + str(i + 1) + " / " + str(len(chunks)))
             if self.service == "google":
+                # Google limited to 50 requests per day
                 try:
-                    s = r.recognize_google(audio, language=self.language)
+                    s = r.recognize_google(audio, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") +"{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "wit.ai":
                 # Language is configured in the wit account
                 try:
-                    s = r.recognize_wit(audio, key=self.key_wit_ai)
+                    s = r.recognize_wit(audio, key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "azure":
                 try:
-                    s = r.recognize_azure(audio, key=self.key_azure)
+                    s = r.recognize_azure(audio, key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
                     s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "bing":
                 try:
-                    s = r.recognize_bing(audio, key=self.key_bing, language=self.language)
+                    s = r.recognize_bing(audio, key=service_key, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "houndify":
                 # English only
                 try:
-                    s = r.recognize_houndify(audio, client_id=self.id_houndify, client_key=self.key_houndify)
+                    s = r.recognize_houndify(audio, client_id=service_id, client_key=service_key)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
             if self.service == "ibm":
                 try:
-                    s = r.recognize_ibm(audio, username=self.username_ibm, password=self.password_ibm, language=self.language)
+                    s = r.recognize_ibm(audio, username=service_key, password=service_key, language=lang)
                 except speech_recognition.UnknownValueError:
-                    s = "UNINTELLIGIBLE AUDIO"
+                    s = _("UNINTELLIGIBLE AUDIO")
+                    self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
-            print(i, "/", len(chunks))
-            ts = self.timestamp(i * chunksize)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
+                    self.ui.label_process.setText(s)
+            ts = self.timestamp(i * self.chunksize)
             self.strings.append(ts + s)
 
     '''GOOGLE_CLOUD_SPEECH_CREDENTIALS = r"""INSERT THE CONTENTS OF THE GOOGLE CLOUD SPEECH JSON CREDENTIALS FILE HERE"""
-    print("Google Cloud Speech thinks you said " + r.recognize_google_cloud(audio,
-                                                                                credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
+    print("Google Cloud Speech " + r.recognize_google_cloud(audio, credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
     '''
-
-    # tmp method, revert to helpers. ...
-    def msecs_to_mins_and_secs(self, msecs):
-        """ Convert milliseconds to minutes and seconds.
-        msecs is an integer. Minutes and seconds output is a string."""
-
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        return str(mins) + "." + remainder_secs
 
     def timestamp(self, time_msecs):
         """ timestamp using current format.
@@ -213,13 +293,12 @@ class SpeechToText():
         """
 
         # tmp testing format
-        fmt =  "[mm.ss]"  # self.app.settings['timestampformat']
+        fmt = self.app.settings['timestampformat']
         #time_msecs = self.mediaplayer.get_time()  # tmp
-        mins_secs = self.msecs_to_mins_and_secs(time_msecs)  # String
+        mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
         delimiter = ":"
         if "." in mins_secs:
             delimiter = "."
-
         mins = int(mins_secs.split(delimiter)[0])
         secs = mins_secs.split(delimiter)[1]
         hours = int(mins / 60)
@@ -272,7 +351,6 @@ class SpeechToText():
         if audio is not None:
             self.flac_filepath = self.filepath[:-4] + ".flac"
             audio.export(self.flac_filepath, format="flac")
-
 
 if __name__ == "__main__":
     SpeechToText()

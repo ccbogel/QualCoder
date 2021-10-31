@@ -93,6 +93,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
 from .select_items import DialogSelectItems
+from .speech_to_text import SpeechToText
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -3402,6 +3403,7 @@ class DialogViewAV(QtWidgets.QDialog):
     app = None
     label = None
     file_ = None
+    abs_path = ""
     is_paused = False
     media_duration_text = ""
     displayframe = None
@@ -3436,11 +3438,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.file_ = file_
         self.search_indices = []
         self.search_index = 0
-        abs_path = ""
+        self.abs_path = ""
         if self.file_['mediapath'][0:6] in ('/audio', '/video'):
-            abs_path = self.app.project_path + self.file_['mediapath']
+            self.abs_path = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
-            abs_path = self.file_['mediapath'][6:]
+            self.abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
         self.time_positions = []
         self.speaker_list = []
@@ -3448,7 +3450,7 @@ class DialogViewAV(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_av()
         self.ui.setupUi(self)
-        self.setWindowTitle(abs_path.split('/')[-1])
+        self.setWindowTitle(self.abs_path.split('/')[-1])
         try:
             x = int(self.app.settings['viewav_abs_pos_x'])
             y = int(self.app.settings['viewav_abs_pos_y'])
@@ -3475,22 +3477,17 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # Get the transcription text and fill textedit
         self.transcription = None
-        print("line 1")
         cur = self.app.conn.cursor()
         if self.file_['av_text_id'] is not None:
-            print("2")
             cur.execute("select id, fulltext from source where id=?", [file_['av_text_id']])
             self.transcription = cur.fetchone()
         if self.transcription is not None:
-            print("l 3")
             self.ui.textEdit.setText(self.transcription[1])
             self.get_timestamps_from_transcription()
             # Commented out as auto-filling speaker names annoys users
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
-        print("l 4")
         if self.transcription is None:
-            print("l 5")
             cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                     (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
                     datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
@@ -3553,8 +3550,11 @@ class DialogViewAV(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.pushButton_next.setEnabled(False)
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_speechtotext.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_speechtotext.pressed.connect(self.speech_to_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         #self.ui.lineEdit_search.setEnabled(False)
         # My solution to getting gui mouse events by putting vlc video in another dialog
@@ -3564,7 +3564,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        title = abs_path.split('/')[-1]
+        title = self.abs_path.split('/')[-1]
         self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
@@ -3603,9 +3603,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
         try:
-            self.media = self.instance.media_new(abs_path)
+            self.media = self.instance.media_new(self.abs_path)
         except Exception as e:
-            Message(self.app, _('Media not found'), str(e) + "\n" + abs_path).exec_()
+            Message(self.app, _('Media not found'), str(e) + "\n" + self.abs_path).exec_()
             self.closeEvent()
             return
         if self.file_['mediapath'][0:7] not in ("/audio", "audio:"):
@@ -3661,6 +3661,11 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
+        # Only try speech to text if there is no text present
+        if self.text == "":
+            self.ui.pushButton_speechtotext.setEnabled(True)
+        else:
+            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -3690,6 +3695,16 @@ class DialogViewAV(QtWidgets.QDialog):
         self.no_codes_annotes_cases = True
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
+
+    def speech_to_text(self):
+        """ Convert speech to text using online service. """
+
+        ui = SpeechToText(self.app, self.abs_path)
+        ok = ui.exec_()
+        if not ok:
+            return
+        text = ui.text
+        self.ui.textEdit.setText(text)
 
     def help(self):
         """ Open help for transcribe section in browser. """
