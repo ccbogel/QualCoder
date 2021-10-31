@@ -97,14 +97,17 @@
   <widget class="QLabel" name="label_ffmpeg_info">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>260</y>
-     <width>571</width>
-     <height>22</height>
+     <x>30</x>
+     <y>140</y>
+     <width>281</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="text">
     <string>Speech to text requires installed software: ffmpeg</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QTextEdit" name="textEdit_notes">
@@ -175,7 +178,7 @@ en-AU</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>130</y>
+     <y>240</y>
      <width>291</width>
      <height>17</height>
     </rect>
@@ -190,9 +193,9 @@ en-AU</string>
    </property>
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>150</y>
-     <width>251</width>
+     <x>20</x>
+     <y>260</y>
+     <width>681</width>
      <height>25</height>
     </rect>
    </property>
@@ -204,7 +207,7 @@ en-AU</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>177</y>
+     <y>287</y>
      <width>291</width>
      <height>20</height>
     </rect>
@@ -219,9 +222,9 @@ en-AU</string>
    </property>
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>200</y>
-     <width>251</width>
+     <x>20</x>
+     <y>310</y>
+     <width>681</width>
      <height>25</height>
     </rect>
    </property>
@@ -230,7 +233,7 @@ en-AU</string>
    <property name="geometry">
     <rect>
      <x>64</x>
-     <y>345</y>
+     <y>385</y>
      <width>411</width>
      <height>23</height>
     </rect>
@@ -243,7 +246,7 @@ en-AU</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>340</y>
+     <y>380</y>
      <width>32</width>
      <height>32</height>
     </rect>
@@ -295,7 +298,7 @@ en-AU</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>303</y>
+     <y>350</y>
      <width>661</width>
      <height>17</height>
     </rect>
