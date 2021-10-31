@@ -65,6 +65,7 @@ setup(
         'ply',
         'chardet',
         'openpyxl',
+        'pydub',
         'SpeechRecognition'
     ],
     package_data={
