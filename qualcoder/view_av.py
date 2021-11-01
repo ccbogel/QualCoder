@@ -34,6 +34,7 @@ import os
 import platform
 from random import randint
 import re
+import shutil
 import sys
 import time
 import traceback
@@ -3662,10 +3663,22 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
         # Only try speech to text if there is no text present
-        if self.text == "":
+        if self.text == "" and self.check_ffmpeg_or_avconv():
             self.ui.pushButton_speechtotext.setEnabled(True)
-        else:
+        if self.text != "":
             self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
+        if self.text == "" and not self.check_ffmpeg_or_avconv():
+            self.ui.pushButton_speechtotext.setToolTip(_("Install ffmpeg or avconv for speech to text function."))
+
+    def check_ffmpeg_or_avconv(self):
+        """ Check if ffmpeg or avconv installed. """
+
+        #if platform.system() == "Windows":
+        files = ("ffmpeg", "avconv")
+        if not all([shutil.which(f) for f in files]):
+            return False
+        else:
+            return True     
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
