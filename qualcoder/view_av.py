@@ -34,7 +34,6 @@ import os
 import platform
 from random import randint
 import re
-import shutil
 import sys
 import time
 import traceback
@@ -3489,15 +3488,27 @@ class DialogViewAV(QtWidgets.QDialog):
             #self.get_speaker_names_from_bracketed_text()
             #self.add_speaker_names_to_label()
         if self.transcription is None:
-            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                    (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
-                    datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-            self.app.conn.commit()
-            cur.execute("select last_insert_rowid()")
-            tr_id_ = cur.fetchone()[0]
-            self.file_['av_text_id'] = tr_id
-            cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
-            self.app.conn.conmmit()
+            # Check if an existing matching text entry name is present, despite no linkage to av source
+            name = file_['name'] + ".txt"
+            name2 = file_['name'] + ".transcribed"
+            cur.execute("select id from source where name=? or name=?",[name, name2])
+            res = cur.fetchone()
+            tr_id = None
+            if res is not None:
+                # Recreate link from av entry to existing text entry
+                cur.execute("update source set av_text_id=? where id=?", [res[0], self.file_['id']])
+                self.app.conn.commit()
+                tr_id = res[0]
+            if res is None:
+                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                        (file_['name'] + ".txt", "", None, "", self.app.settings['codername'],
+                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                tr_id_ = cur.fetchone()[0]
+                self.file_['av_text_id'] = tr_id
+                cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
+                self.app.conn.conmmit()
             cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.get_cases_codings_annotations()
@@ -3663,22 +3674,10 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
         # Only try speech to text if there is no text present
-        if self.text == "" and self.check_ffmpeg_or_avconv():
+        if self.text == "":
             self.ui.pushButton_speechtotext.setEnabled(True)
-        if self.text != "":
-            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
-        if self.text == "" and not self.check_ffmpeg_or_avconv():
-            self.ui.pushButton_speechtotext.setToolTip(_("Install ffmpeg or avconv for speech to text function."))
-
-    def check_ffmpeg_or_avconv(self):
-        """ Check if ffmpeg or avconv installed. """
-
-        #if platform.system() == "Windows":
-        files = ("ffmpeg", "avconv")
-        if not all([shutil.which(f) for f in files]):
-            return False
         else:
-            return True     
+            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
