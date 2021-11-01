@@ -3505,10 +3505,15 @@ class DialogViewAV(QtWidgets.QDialog):
                         datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
-                tr_id_ = cur.fetchone()[0]
+                tr_id = cur.fetchone()[0]
                 self.file_['av_text_id'] = tr_id
+                #print("tr_id", tr_id, "file id", self.file_['id'])
                 cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
-                self.app.conn.conmmit()
+                try:
+                    # Called twice, and raises and error: 'sqlite3.Connection' object has no attribute 'conmmit'
+                    self.app.conn.conmmit()
+                except:
+                    pass
             cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.get_cases_codings_annotations()
