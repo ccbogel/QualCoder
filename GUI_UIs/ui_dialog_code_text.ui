@@ -277,7 +277,7 @@
      <widget class="QPushButton" name="pushButton_delete_all_codes">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>860</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -419,7 +419,7 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>880</x>
+        <x>740</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -459,6 +459,25 @@
       </property>
       <property name="toolTip">
        <string>Show annotations</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_edit">
+      <property name="geometry">
+       <rect>
+        <x>540</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Edit text mode. 
+You can click on a position, without selecting text, to type, delete, or paste text. 
+You can select text that is not underlined and delete or paste over. 
+Avoid selecting text to delete or paste over if the selected text is underlined (coded - red, annotated - yellow, case-assigned - green) as all assigned positions may be wrong. </string>
       </property>
       <property name="text">
        <string/>
