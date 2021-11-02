@@ -477,7 +477,9 @@
        <string>Edit text mode. 
 You can click on a position, without selecting text, to type, delete, or paste text. 
 You can select text that is not underlined and delete or paste over. 
-Avoid selecting text to delete or paste over if the selected text is underlined (coded - red, annotated - yellow, case-assigned - green) as all assigned positions may be wrong. </string>
+Avoid selecting text to delete or paste over if the selected text is underlined:
+(coded - red, annotated - yellow, case-assigned - green)
+As all assigned positions may be wrong. </string>
       </property>
       <property name="text">
        <string/>
