@@ -983,33 +983,49 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.pause()
         self.mediaplayer.audio_set_volume(100)
 
-        # Get the transcription text and fill textedit
+        # Get the transcription text
         self.transcription = None
         cur = self.app.conn.cursor()
         if self.file_['av_text_id'] is not None:
             cur.execute("select id, fulltext, name from source where id=?", [self.file_['av_text_id']])
             self.transcription = cur.fetchone()
         if self.transcription is None:
-            # Create a blank transcription file
-            entry = {'name': self.file['name'] + ".txt", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
-                     'owner': self.app.settings['codername'],
-                     'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-            cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                        (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
-                         entry['date']))
-            self.app.conn.commit()
-            cur.execute("select last_insert_rowid()")
-            tr_id_ = cur.fetchone()[0]
+            # Create or re-link to the transcription text
+            # Check if an existing matching text entry name is present, despite no linkage to the av source
+            name = self.file_['name'] + ".txt"
+            name2 = self.file_['name'] + ".transcribed"
+            cur.execute("select id from source where name=? or name=?", [name, name2])
+            existing_name_res = cur.fetchone()
+            tr_id = None
+            if existing_name_res is not None:
+                cur.execute("update source set av_text_id=? where id=?", [existing_name_res[0], self.file_['id']])
+                self.app.conn.commit()
+                tr_id = existing_name_res[0]
+            if existing_name_res is None:
+                # Create a blank transcription file
+                entry = {'name': self.file_['name'] + ".txt", 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': "",
+                         'owner': self.app.settings['codername'],
+                         'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
+                            (entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
+                             entry['date']))
+                self.app.conn.commit()
+                cur.execute("select last_insert_rowid()")
+                tr_id = cur.fetchone()[0]
+            # Create link from av entry to existing or new text entry
             self.file_['av_text_id'] = tr_id
             cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
-            self.app.conn.conmmit()
+            self.app.conn.commit()
             cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
+            print("transcritpion", self.transcription)
+            if self.transcription is None:
+                print("tr_id", tr_id)
         self.ui.textEdit.setText(self.transcription[1])
         self.ui.textEdit.ensureCursorVisible()
         self.get_timestamps_from_transcription()
 
-        # get text annotations
+        # Get text annotations
         cur = self.app.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=? and fid=?",
                     [self.app.settings['codername'], self.transcription[0]])
