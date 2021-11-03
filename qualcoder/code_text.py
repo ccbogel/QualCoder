@@ -150,7 +150,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
-        self.ui.label_editing.hide()
+        self.ui.groupBox_edit_mode.hide()
         ee = _("EDITING TEXT MODE (Ctrl+E)") + " "
         ee += _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
@@ -315,6 +315,14 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_edit.pressed.connect(self.edit_mode_toggle)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_exit_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -3329,7 +3337,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if temp_edit_pos > 0:
             self.edit_pos = temp_edit_pos
         self.ui.groupBox.hide()
-        self.ui.label_editing.show()
+        self.ui.groupBox_edit_mode.show()
         self.ui.listWidget.setEnabled(False)
         self.ui.listWidget.hide()
         self.ui.treeWidget.hide()
@@ -3361,7 +3369,7 @@ class DialogCodeText(QtWidgets.QWidget):
         but this may have changed a lot. """
 
         self.ui.groupBox.show()
-        self.ui.label_editing.hide()
+        self.ui.groupBox_edit_mode.hide()
         self.ui.listWidget.setEnabled(True)
         self.ui.groupBox_file_buttons.setEnabled(True)
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 30)
