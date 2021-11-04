@@ -45,6 +45,8 @@ Alternatively, go to the qualcoder directory and type:
 
 #### Fedora/CentOS/RHEL installation
 
+Fedora et al instructions may need revision.
+
 Retrieve the current package code from this repository
 
 `git clone https://github.com/ccbogel/QualCoder.git`
