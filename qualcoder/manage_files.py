@@ -74,7 +74,7 @@ from .docx import opendocx, getdocumenttext
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .GUI.ui_dialog_memo import Ui_Dialog_memo  # for manually creating a new file
 from .edit_textfile import DialogEditTextFile
-from .helpers import Message, ExportDirectoryPathDialog, msecs_to_hours_mins_secs
+from .helpers import Message, ExportDirectoryPathDialog, msecs_to_hours_mins_secs, file_typer
 from .html_parser import *
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
@@ -203,6 +203,19 @@ class DialogManageFiles(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
         webbrowser.open(url)
 
+    def is_transcription(self, id_):
+        """ Check of text file is a transcription.
+        param: id_ Integer id of the file
+        return: id of a/v file """
+
+        val = None
+        cur = self.app.conn.cursor()
+        cur.execute("select id from source where av_text_id=?", [id_])
+        res = cur.fetchone()
+        if res is not None:
+            val = res[0]
+        return val
+
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
 
@@ -211,6 +224,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         id_ = None
         mediapath = None
+        file_type = "text"
         try:
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         except AttributeError as e:
@@ -219,7 +233,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in self.source:
             if s['id'] == id_:
                 mediapath = s['mediapath']
-
+        transcription_of = self.is_transcription(id_)
         text = None
         try:
             text = str(self.ui.tableWidget.item(row, col).text())
@@ -241,6 +255,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_show_all = None
         action_import_linked = None
         action_export_to_linked = None
+        action_alt_transcription = None
         if col <= self.CASE_COLUMN:
             action_alphabetic = menu.addAction(_("Alphabetic order"))
             action_date = menu.addAction(_("Date order"))
@@ -257,6 +272,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
         else:
             action_import_linked = menu.addAction(_("Import linked file"))
+        if transcription_of:
+            action_alt_transcription = menu.addAction(_("Select alternative text transcription"))
+
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -302,6 +320,24 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+        if action == action_alt_transcription:
+            self.alt_transcription_file(transcription_of)
+
+    def alt_transcription_file(self, transcription_of):
+        """ Select alternative transcription file from list of text files. """
+
+        files_ = self.app.get_text_filenames()
+        ui = DialogSelectItems(self.app, files_, _("Select transcription file"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if selection == []:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update source set av_text_id=? where source.id=?", [selection['id'], transcription_of])
+        self.app.conn.commit()
+        self.load_file_data()
 
     def button_export_file_as_linked_file(self):
         """ User presses button to export current row's file.
@@ -326,7 +362,6 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def export_file_as_linked_file(self, id_, mediapath):
         """ Move an internal project file into an external location as a linked file.
-        #TODO Do not export text files as linked files. e.g. internally created in database, or
         docx, txt, md, odt files.
 
         params:
@@ -345,6 +380,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
         file_directory = ""
+        file_type = file_typer(mediapath)
         if mediapath is not None:
             file_directory = mediapath.split('/')[1]  # as [0] will be blank
             destination = directory + "/" + mediapath.split('/')[-1]
@@ -356,6 +392,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             file_directory = "documents"
             mediapath = "/documents/" + name
             destination = directory + "/" + name
+            # Check text file exists
+            exists = os.path.isfile(self.app.project_path + mediapath)
+            if not exists and file_type == "text":  # Create a text file for export
+                # Occurs with database created text entries and transcription entries
+                cur.execute("select fulltext from source where id=?", [id_, ])
+                fulltext = cur.fetchone()
+                if fulltext is not None:
+                    f = open(self.app.project_path + mediapath, 'w')
+                    f.write(fulltext[0])
+                    f.close()
         msg = _("Export to ") + destination + "\n"
         try:
             move(self.app.project_path + mediapath, destination)
@@ -588,11 +634,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon = QtGui.QIcon(pm)
         # Check if text file is a transcription and add details
         cur.execute("select name from source where av_text_id=?", [id_])
-        tr_res = cur.fetchone()
-        if tr_res is not None:
-            metadata += _("Transcript for: ") + tr_res[0] + "\n"
+        transcript_res = cur.fetchone()
+        if transcript_res is not None:
+            metadata += _("Transcript for: ") + transcript_res[0] + "\n"
+            if res[1] is not None and len(res[1]) > 0:
+                metadata += _("Characters: ") + str(len(res[1]))
             pm.loadFromData(QtCore.QByteArray.fromBase64(transcribed_text_icon), "png")
             icon = QtGui.QIcon(pm)
+            if res[2] is not None:
+                pm.loadFromData(QtCore.QByteArray.fromBase64(transcribed_link_text_icon), "png")
+                icon = QtGui.QIcon(pm)
+            return icon, metadata
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
             return icon, metadata
@@ -1572,7 +1624,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
 
-        # Delete image, audio or video source
+        # Delete image, audio or video source (and transcription).
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Get linked transcript file id
             cur.execute("select av_text_id from source where id=?")
