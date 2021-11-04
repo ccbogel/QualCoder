@@ -13,10 +13,10 @@ python3 -m pip install --user pdfminer.six openpyxl Ebooklib pydub SpeechRecogni
 sudo mv ~/.local/lib/python3.9/site-packages/Ebook* /usr/lib/python3.9/site-packages/
 sudo mv ~/.local/lib/python3.9/site-packages/ebook* /usr/lib/python3.9/site-packages/
 sudo cp -r qualcoder /usr/share/qualcoder
-sudo cp qualcoder/GUI/qualcoder.png /usr/share/pixmaps/qualcoder.png
+sudo cp qualcoder/GUI/qualcoder.png /usr/share/icons/qualcoder.png
 sudo cp qualcoder/GUI/qualcoder.desktop /usr/share/applications/qualcoder.desktop
 echo "If no errors then installation is completed."
 echo "To remove qualcoder from Linux run the following in the terminal:"
 echo "sudo rm -R /usr/share/qualcoder"
-echo "sudo rm /usr/share/pixmaps/qualcoder.png"
+echo "sudo rm /usr/share/icons/qualcoder.png"
 echo "sudo rm /usr/share/applications/qualcoder.desktop"
