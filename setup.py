@@ -73,7 +73,9 @@ setup(
         'GUI/*.html', 'GUI/NotoSans-hinted/*.ttf',
         'locale/de/app_de.qm', 'locale/de/LC_MESSAGES/de,mo',
         'locale/es/app_es.qm', 'locale/es/LC_MESSAGES/es,mo',
-        'locale/de/app_fr.qm', 'locale/fr/LC_MESSAGES/fr,mo',
+        'locale/de/app_fr.qm', 'locale/fr/LC_MESSAGES/fr.mo',
+        'locale/de/app_it.qm', 'locale/fr/LC_MESSAGES/it.mo',
+        'locale/de/app_pt.qm', 'locale/fr/LC_MESSAGES/pt,mo',
         'locale/en/LC_MESSAGES/en,mo',]
     },
     zip_safe=False,
