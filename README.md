@@ -91,7 +91,7 @@ To run type:
 
 ### Fedora/CentOS/RHEL linux
 
-Fedora et al instructions may need revision.
+These instructions may need revision.
 
 Retrieve the current package code from this repository
 
