@@ -24,7 +24,7 @@ The 2.8 Release contains an exe file (created on Windows 10, 64 bit).Double-clic
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
 2. Download and install the Python programming language. The minimum version for QualCoder is 3.6.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
-IMORTANT: in the first window of the installation mark the option "Add Python to PATH"
+IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
@@ -43,7 +43,7 @@ Move to the QualCoder-master folder, then type
 
 `py -m qualcoder`
 
-Altarnately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
+Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
 
 ### Debian/Ubuntu-based Linux
 
