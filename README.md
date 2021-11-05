@@ -13,7 +13,7 @@ _NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file
 ### Prerequisites
 You will need to have a python3.6 or newer version installed and a 64 bit VLC player installed. 
 
-### Windows: 
+### Windows
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
@@ -45,7 +45,7 @@ Move to the QualCoder-master folder, then type
 
 Altarnately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
 
-### Debian-based Linuxes:
+### Debian/Ubuntu-based Linuxes
 
 1. Install  modules from the command line
 
