@@ -3,14 +3,12 @@ QualCoder is a qualitative data analysis application written in python3 (python 
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on Linux Mint 18.04 Lubuntu 18.04, Mac OS.
+This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-_NOTE_ The in development QualCoder 2.8 version with database version v5 (download with the above green button). Transcriptions created with QualCoder 2.8 will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions (2.7 and earlier). You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any A/V files to view or code. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
+_NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions (2.7 and earlier). You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
 
 ## INSTALLATION 
-
-### Linux installation
 
 ### Prerequisites
 You will need to have a `python3.6` or newer version installed.
