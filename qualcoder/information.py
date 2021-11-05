@@ -93,9 +93,9 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python at least 3.6, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl</p>\
+<p>Depends on python at least 3.6, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
 <p>A recent version of VLC (64 bit) needs to be installed.</p>\
-<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS. Used on other Linux platforms (Lubuntu, Raspberry Pi, Fedora)</p>\
+<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS. Used on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
@@ -103,6 +103,7 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
 <p>ebooklib: Aleksandar Erkalović https://github.com/aerkalov</p>\
 <p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
+<p>Julius Reich for creating the cool QualCoder logo.</p>\
 <p>To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
@@ -111,7 +112,7 @@ images, audio and video. It also contains the sqlite database, named data.qda, t
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
-<p>QualCoder is written in python 3 using Qt5 for the graphical interface.</p>\
+<p>QualCoder is written in python 3.8 using Qt5 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
