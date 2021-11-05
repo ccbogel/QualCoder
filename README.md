@@ -63,9 +63,6 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 `qualcoder`
 
-Alternatively, go to the qualcoder directory and type:
-
-`python3 __main__.py`
 
 ### Arch/Manjaro Linux
 
