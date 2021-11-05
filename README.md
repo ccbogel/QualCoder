@@ -31,8 +31,8 @@ IMORTANT: in the first window of the installation mark the option "Add Python to
 
 `py -m pip install wheel pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition`
 
- Wait, until all modules are installed (the command phrase should be again visible: "C:\Users[Your Windows account name]> or similar).
-
+ Wait, until all modules are installed .
+ 
 4. Build and install Qualcoder
 
 `py setup.py install`
