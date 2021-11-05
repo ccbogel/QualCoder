@@ -45,7 +45,7 @@ Move to the QualCoder-master folder, then type
 
 Altarnately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
 
-### Debian/Ubuntu-based Linuxes
+### Debian/Ubuntu-based Linux
 
 1. Install  modules from the command line
 
