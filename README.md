@@ -12,7 +12,7 @@ _NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file
 
 ### Prerequisites
 You will need to have a `python3.6` or newer version installed.
-You will also need to have a `vlc` player installed - for audio and video. 
+You will also need to have a 64 bit `vlc` player installed. 
 
 ### Windows: 
 
