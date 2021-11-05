@@ -73,8 +73,6 @@ Alternatively, go to the qualcoder directory and type:
 
 `sudo pacman -S python python-lxml python-ply python-six python-pdfminer python-chardet python-pyqt5 python-pillow python-pip`
 
-This will install python in the latest version with given dependencies.
-
 2. Install additional python modules
 
 `sudo python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
