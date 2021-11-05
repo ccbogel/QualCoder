@@ -17,7 +17,7 @@ You will need to have a python3.6 or newer version installed and a 64 bit VLC pl
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
-The 2.8 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This doe swork on older Windows versions (e.g. Win 7).
+The 2.8 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This does work on older Windows versions (e.g. Win 7).
 
 **Alternatively:**
 
