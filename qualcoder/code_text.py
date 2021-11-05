@@ -574,7 +574,7 @@ class DialogCodeText(QtWidgets.QWidget):
         selected_text = self.ui.textEdit.textCursor().selectedText()
         if len(selected_text) > 0:
             self.mark()
-        self.underline_text_of_this_code(code_for_underlining)
+        #self.underline_text_of_this_code(code_for_underlining)
         # When a code is selected undo the show selected code features
         self.highlight()
         # Reload button icons as they dissapear on Windows
@@ -584,33 +584,6 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-
-    def underline_text_of_this_code(self, code_for_underlining):
-        """ User interface, highlight coded text selections for the currently selected code.
-        Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
-        Adjust for when portion of entire text file is loaded.
-        param:
-            code_for_underlining: dictionary of the code to be underlined """
-
-        # Remove all underlining
-        selstart = 0
-        selend = len(self.ui.textEdit.toPlainText())
-        format = QtGui.QTextCharFormat()
-        format.setUnderlineStyle(QtGui.QTextCharFormat.NoUnderline)
-        cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(selstart)
-        cursor.setPosition(selend, QtGui.QTextCursor.KeepAnchor)
-        cursor.mergeCharFormat(format)
-        # Apply underlining in for selected coded text
-        format = QtGui.QTextCharFormat()
-        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
-        format.setUnderlineStyle(QtGui.QTextCharFormat.DashUnderline)
-        cursor = self.ui.textEdit.textCursor()
-        for coded_text in self.code_text:
-            if coded_text['cid'] == code_for_underlining['cid']:
-                cursor.setPosition(int(coded_text['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(coded_text['pos1']) - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
-                cursor.mergeCharFormat(format)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
@@ -1654,7 +1627,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.pushButton_next.setFocus()
 
     def highlight_selected_overlap(self):
-        """ Hightlight the current overlapping text code, by placing formatting on top. """
+        """ Highlight the current overlapping text code, by placing formatting on top. """
 
         self.overlaps_at_pos_idx += 1
         if self.overlaps_at_pos_idx >= len(self.overlaps_at_pos):
@@ -1677,7 +1650,7 @@ class DialogCodeText(QtWidgets.QWidget):
             fmt.setFontWeight(QtGui.QFont.Bold)
         fmt.setForeground(QBrush(QColor(TextColor(color).recommendation)))
         cursor.setCharFormat(fmt)
-        self.apply_italic_to_overlaps()
+        self.apply_underline_to_overlaps()
 
     def overlapping_codes_in_text(self):
         """ When coded text is clicked on.
@@ -2756,12 +2729,12 @@ class DialogCodeText(QtWidgets.QWidget):
                         formatB = QtGui.QTextCharFormat()
                         formatB.setFontWeight(QtGui.QFont.Bold)
                         cursor.mergeCharFormat(formatB)
-        self.apply_italic_to_overlaps()
+        self.apply_underline_to_overlaps()
 
-    def apply_italic_to_overlaps(self):
-        """ Apply italic format to coded text sections which are overlapping.
+    def apply_underline_to_overlaps(self):
+        """ Apply underline format to coded text sections which are overlapping.
+        Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
         Adjust for start of text file, as this may be a smaller portion of the full text file.
-        Do not appyply overline when showing only important codes, as this causes user confusion.
         """
 
         if self.important:
@@ -2784,7 +2757,12 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt = QtGui.QTextCharFormat()
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
-            fmt.setFontItalic(True)
+            #fmt.setFontItalic(True)
+            fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
+            if self.app.settings['stylesheet'] == 'dark':
+                fmt.setUnderlineColor(QColor("#000000"))
+            else:
+                fmt.setUnderlineColor(QColor("#FFFFFF"))
             cursor.setPosition(o[0] - self.file_['start'], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
