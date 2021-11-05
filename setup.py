@@ -41,7 +41,7 @@ else:
 
 setup(
     name='Qualcoder',
-    version='2.8',
+    version='2.9',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
     author_email='ccbogel@hotmail.com',
