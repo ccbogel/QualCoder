@@ -46,7 +46,7 @@ Move to the QualCoder-master folder, then type
 
 Altarnately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
 
-#### Debian-based Linuxes:
+### Debian-based Linuxes:
 
 1. Install  modules from the command line
 
@@ -86,7 +86,7 @@ If success, all requirements are satisfied.
 To run type:
 `qualcoder`
 
-#### Fedora/CentOS/RHEL linux
+### Fedora/CentOS/RHEL linux
 
 Fedora et al instructions may need revision.
 
@@ -178,31 +178,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-* Python 3.x version
-
-* PyQt5
-
-* lxml
-
-* Pillow
-
-* six  (Mac OS)
-
-* ebooklib
-
-* ply
-
-* chardet
-
-* pdfminer.six
-
-* openpyxl
-
-* pydub
-
-*  SpeechRecognition
-
-* qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.6+ version, PyQt5, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
