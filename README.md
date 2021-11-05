@@ -33,7 +33,7 @@ IMORTANT: in the first window of the installation mark the option "Add Python to
 
  Wait, until all modules are installed .
  
-4. Build and install Qualcoder
+4. Build and install Qualcoder, from the downloaded folder type
 
 `py setup.py install`
 
@@ -56,7 +56,7 @@ Altarnately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 `sudo python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
-3. Building and installing QualCoder
+3. Building and install QualCoder, from the downloaded folder type
 
 `sudo python3 setup.py install`
 
@@ -80,7 +80,7 @@ This will install python in the latest version with given dependencies.
 
 If success, all requirements are satisfied.
 
-3. Building and installing Qualcoder
+3. Building and install Qualcoder, from the downloaded folder type
 `sudo python3 setup.py install`
 
 To run type:
