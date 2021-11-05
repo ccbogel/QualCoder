@@ -79,7 +79,7 @@ This will install python in the latest version with given dependencies.
 
 If success, all requirements are satisfied.
 
-3. Building and install Qualcoder, from the downloaded folder type
+3. Build and install QualCoder, from the downloaded folder type
 `sudo python3 setup.py install`
 
 To run type:
