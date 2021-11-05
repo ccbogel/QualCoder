@@ -39,6 +39,7 @@ home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -158,9 +159,11 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['codername'] = self.ui.lineEdit_coderName.text()
         if self.settings['codername'] == "":
             self.settings['codername'] = "default"
-        cur = self.app.conn.cursor()
-        cur.execute('update project set codername=?', [self.settings['codername']])
-        self.app.conn.commit()
+        if self.app.conn is not None:
+            # None if no project opened
+            cur = self.app.conn.cursor()
+            cur.execute('update project set codername=?', [self.settings['codername']])
+            self.app.conn.commit()
         self.settings['font'] = self.ui.fontComboBox.currentText()
         self.settings['fontsize'] = self.ui.spinBox.value()
         self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()
