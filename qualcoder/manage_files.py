@@ -222,24 +222,25 @@ class DialogManageFiles(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
-        id_ = None
         mediapath = None
-        file_type = "text"
         try:
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         except AttributeError as e:
             # Occurs if a table cell is not clicked, but click occurs elsewhere in container
             return
+        # Can add menu option to change transcription file in context of current file is a transcription or A/V file
+        transcription_of = self.is_transcription(id_)
         for s in self.source:
             if s['id'] == id_:
                 mediapath = s['mediapath']
-        transcription_of = self.is_transcription(id_)
-        text = None
+        if file_typer(mediapath) in ('audio', 'video'):
+            transcription_of = id_
+        text_ = None
         try:
-            text = str(self.ui.tableWidget.item(row, col).text())
-            # some blanks cells contain None and some contain blank strings
-            if text == "":
-                text = None
+            text_ = str(self.ui.tableWidget.item(row, col).text())
+            # Some cells contain None and some contain blank strings
+            if text_ == "":
+                text_ = None
         except:
             pass
         # action cannot be None otherwise may default to one of the actions below depending on column clicked
@@ -274,11 +275,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_import_linked = menu.addAction(_("Import linked file"))
         if transcription_of:
             action_alt_transcription = menu.addAction(_("Select alternative text transcription"))
-
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
-
         if action == action_view:
             self.view()
             return
@@ -304,16 +303,15 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.load_file_data("casename")
         if action == action_order_by_value:
             self.load_file_data("attribute:" + self.header_labels[col])
-
         if action == action_equals_value:
             # Hide rows that do not match this value, text can be None type
             # Cell items can be None or exist with ''
             for r in range(0, self.ui.tableWidget.rowCount()):
                 item = self.ui.tableWidget.item(r, col)
-                # items can be None or appear to be None when item text == ''
-                if text is None and (item is not None and len(item.text()) > 0):
+                # Items can be None or appear to be None when item text == ''
+                if text_ is None and (item is not None and len(item.text()) > 0):
                     self.ui.tableWidget.setRowHidden(r, True)
-                if text is not None and (item is None or item.text().find(text) == -1):
+                if text_ is not None and (item is None or item.text().find(text) == -1):
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
         if action == action_show_all:
@@ -332,7 +330,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not ok:
             return
         selection = ui.get_selected()
-        if selection == []:
+        if not selection:
             return
         cur = self.app.conn.cursor()
         cur.execute("update source set av_text_id=? where source.id=?", [selection['id'], transcription_of])
