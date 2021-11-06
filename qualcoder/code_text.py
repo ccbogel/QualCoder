@@ -2739,7 +2739,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.important:
             return
-        overlapping = []
         overlaps = []
         for i in self.code_text:
             for j in self.code_text:
@@ -2757,7 +2756,6 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt = QtGui.QTextCharFormat()
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
-            #fmt.setFontItalic(True)
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.SingleUnderline)
             if self.app.settings['stylesheet'] == 'dark':
                 fmt.setUnderlineColor(QColor("#000000"))

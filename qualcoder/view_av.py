@@ -570,9 +570,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         selected_text = self.ui.textEdit.textCursor().selectedText()
         if len(selected_text) > 0:
             self.mark()
-        self.underline_text_of_this_code(code_for_underlining)
+        #self.underline_text_of_this_code(code_for_underlining)
 
-    def underline_text_of_this_code(self, code_for_underlining):
+    '''def underline_text_of_this_code(self, code_for_underlining):
         """ User interface, highlight coded text selections for the currently selected code.
         Qt underline options: # NoUnderline, SingleUnderline, DashUnderline, DotLine, DashDotLine, WaveUnderline
         param:
@@ -595,7 +595,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if coded_text['cid'] == code_for_underlining['cid']:
                 cursor.setPosition(int(coded_text['pos0']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(coded_text['pos1']), QtGui.QTextCursor.KeepAnchor)
-                cursor.mergeCharFormat(format)
+                cursor.mergeCharFormat(format)'''
 
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
@@ -1808,7 +1808,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         fmt.setBackground(brush)
         fmt.setForeground(QBrush(QColor(TextColor(item['color']).recommendation)))
         cursor.setCharFormat(fmt)
-        self.apply_overline_to_overlaps()
+        self.apply_underline_to_overlaps()
 
     def rewind_30_seconds(self):
         """ Rewind AV by 30 seconds. Alt + R """
@@ -2434,20 +2434,19 @@ class DialogCodeAV(QtWidgets.QDialog):
             # Show all codes, as important button not selected
             if not self.important:
                 cursor.setCharFormat(fmt)
-
-        # add annotation marks - these are in bold
+        # Add annotation marks - these are in bold
         for note in self.annotations:
             if note['fid'] == self.transcription[0]:
                 cursor = self.ui.textEdit.textCursor()
                 cursor.setPosition(int(note['pos0']), QtGui.QTextCursor.MoveAnchor)
                 cursor.setPosition(int(note['pos1']), QtGui.QTextCursor.KeepAnchor)
-                formatB = QtGui.QTextCharFormat()
-                formatB.setFontWeight(QtGui.QFont.Bold)
-                cursor.mergeCharFormat(formatB)
-        self.apply_overline_to_overlaps()
+                fmt_bold = QtGui.QTextCharFormat()
+                fmt_bold.setFontWeight(QtGui.QFont.Bold)
+                cursor.mergeCharFormat(fmt_bold)
+        self.apply_underline_to_overlaps()
 
-    def apply_overline_to_overlaps(self):
-        """ Apply overline format to coded text sections which are overlapping. """
+    def apply_underline_to_overlaps(self):
+        """ Apply underline format to coded text sections which are overlapping. """
 
         overlapping = []
         overlaps = []
@@ -2465,13 +2464,15 @@ class DialogCodeAV(QtWidgets.QDialog):
                             overlaps.append([j['pos0'], i['pos1']])
                         else:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
-        #print(overlaps)
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
-            fmt.setFontOverline(True)
-            fmt.setFontItalic(True)
+            fmt.setFontUnderline(True)
+            if self.app.settings['stylesheet'] == 'dark':
+                fmt.setUnderlineColor(QColor("#000000"))
+            else:
+                fmt.setUnderlineColor(QColor("#FFFFFF"))
             cursor.setPosition(o[0], QtGui.QTextCursor.MoveAnchor)
             cursor.setPosition(o[1], QtGui.QTextCursor.KeepAnchor)
             cursor.mergeCharFormat(fmt)
