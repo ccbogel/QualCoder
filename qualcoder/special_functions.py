@@ -77,6 +77,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
