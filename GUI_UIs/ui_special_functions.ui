@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
+    <width>753</width>
     <height>528</height>
    </rect>
   </property>
@@ -44,39 +44,26 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>130</height>
+       <height>120</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>130</height>
+       <height>120</height>
       </size>
      </property>
      <property name="styleSheet">
       <string notr="true">QGroupBox{border: 1px solid #f89407;}</string>
      </property>
      <property name="title">
-      <string>Change base directory for linked files</string>
+      <string>Change base folder path for linked files</string>
      </property>
-     <widget class="QLabel" name="label_example_linked_info">
-      <property name="geometry">
-       <rect>
-        <x>3</x>
-        <y>30</y>
-        <width>271</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Example linked file</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_example_linked_file">
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>50</y>
+        <y>30</y>
         <width>721</width>
         <height>17</height>
        </rect>
@@ -89,9 +76,9 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>70</y>
+        <y>50</y>
         <width>130</width>
-        <height>17</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
@@ -102,9 +89,9 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>100</y>
+        <y>80</y>
         <width>121</width>
-        <height>17</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
@@ -114,8 +101,8 @@
      <widget class="QLineEdit" name="lineEdit_existing_prefix">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>70</y>
+        <x>170</x>
+        <y>50</y>
         <width>421</width>
         <height>25</height>
        </rect>
@@ -124,8 +111,8 @@
      <widget class="QLineEdit" name="lineEdit_new_prefix">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>100</y>
+        <x>170</x>
+        <y>80</y>
         <width>421</width>
         <height>25</height>
        </rect>
@@ -134,14 +121,30 @@
      <widget class="QPushButton" name="pushButton_change_prefix">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>690</x>
         <y>80</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Run</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_path">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>78</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select base folder path</string>
       </property>
       <property name="text">
        <string/>
@@ -172,10 +175,10 @@
      <widget class="QPushButton" name="pushButton_text_update">
       <property name="geometry">
        <rect>
-        <x>700</x>
+        <x>690</x>
         <y>70</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -203,8 +206,8 @@
        <rect>
         <x>6</x>
         <y>30</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -232,8 +235,8 @@
        <rect>
         <x>7</x>
         <y>70</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -268,10 +271,10 @@
      <widget class="QPushButton" name="pushButton_merge">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>690</x>
         <y>30</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -284,10 +287,10 @@
      <widget class="QPushButton" name="pushButton_select_project">
       <property name="geometry">
        <rect>
-        <x>16</x>
+        <x>10</x>
         <y>30</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -300,7 +303,7 @@
      <widget class="QLabel" name="label_merge_info">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>50</x>
         <y>30</y>
         <width>621</width>
         <height>30</height>
@@ -337,7 +340,7 @@
        <rect>
         <x>120</x>
         <y>80</y>
-        <width>611</width>
+        <width>601</width>
         <height>30</height>
        </rect>
       </property>
@@ -353,7 +356,7 @@
        <rect>
         <x>120</x>
         <y>30</y>
-        <width>611</width>
+        <width>601</width>
         <height>30</height>
        </rect>
       </property>
@@ -407,8 +410,8 @@
        <rect>
         <x>70</x>
         <y>80</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -423,8 +426,8 @@
        <rect>
         <x>70</x>
         <y>30</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
