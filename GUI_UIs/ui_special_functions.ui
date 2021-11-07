@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>527</height>
+    <height>528</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>600</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Special Functions</string>
@@ -29,7 +35,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Special functions. Backup project before running these functions.</string>
+      <string>Backup project before running these functions.</string>
      </property>
     </widget>
    </item>
@@ -38,13 +44,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>125</height>
+       <height>130</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>125</height>
+       <height>130</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -57,7 +63,7 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>20</y>
+        <y>30</y>
         <width>271</width>
         <height>17</height>
        </rect>
@@ -70,7 +76,7 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>40</y>
+        <y>50</y>
         <width>721</width>
         <height>17</height>
        </rect>
@@ -83,20 +89,20 @@
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>60</y>
+        <y>70</y>
         <width>130</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Prefix to change</string>
+       <string>Existing prefix</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
         <x>3</x>
-        <y>90</y>
+        <y>100</y>
         <width>121</width>
         <height>17</height>
        </rect>
@@ -105,21 +111,21 @@
        <string>New prefix</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="lineEdit_exisitng_prefix">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>58</y>
+        <y>70</y>
         <width>421</width>
         <height>25</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="lineEdit_new_prefix">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>88</y>
+        <y>100</y>
         <width>421</width>
         <height>25</height>
        </rect>
