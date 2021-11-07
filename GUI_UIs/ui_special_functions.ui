@@ -111,7 +111,7 @@
        <string>New prefix</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_exisitng_prefix">
+     <widget class="QLineEdit" name="lineEdit_existing_prefix">
       <property name="geometry">
        <rect>
         <x>150</x>
