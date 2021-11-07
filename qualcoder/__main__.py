@@ -27,7 +27,6 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-
 import base64
 import configparser
 import datetime
@@ -73,7 +72,7 @@ from qualcoder.report_sql import DialogSQL
 from qualcoder.rqda import Rqda_import
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
-#from qualcoder.text_mining import DialogTextMining
+# from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_graph_original import ViewGraphOriginal
 from qualcoder.view_image import DialogCodeImage
@@ -91,35 +90,34 @@ if not os.path.exists(home + '/.qualcoder'):
 logfile = home + '/.qualcoder/QualCoder.log'
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
-    f = open(logfile, "r")
-    data = f.read()
-    f.close()
+    log_file = open(logfile, "r")
+    data = log_file.read()
+    log_file.close()
     if len(data) > 12000:
         os.remove(logfile)
-        f.open(logfile, "w")
-        f.write(data[10000:])
-        f.close()
+        log_file = open(logfile, "w")
+        log_file.write(data[10000:])
+        log_file.close()
 except Exception as e:
     print(e)
 logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(message)s',
-     datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
+                    datefmt='%Y/%m/%d %H:%M:%S', filename=logfile)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # The rotating file handler does not work on Windows
 handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
 logger.addHandler(handler)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    #logger.error(_("Uncaught exception : ") + text)
+    msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(msg)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
-    #mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
+    mb.setText(msg)
     mb.exec_()
 
 
@@ -165,7 +163,7 @@ class App(object):
             with open(self.persist_path, 'r') as f:
                 for line in f:
                     previous.append(line.strip())
-        except:
+        except FileNotFoundError:
             logger.info('No previous projects found')
 
         # Add paths that exist
@@ -210,23 +208,14 @@ class App(object):
         if path == "":
             return
         nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
-        # result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
+        # Result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + path
-        if result == []:
-            result = [str(nowdate) + "|" + path]
+        if not result:
             with open(self.persist_path, 'w') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
             return
-
-        proj_path = ""
-        splt = result[0].split("|")
-        if len(splt) == 1:
-            proj_path = splt[0]
-        if len(splt) == 2:
-            proj_path = splt[1]
-        #print("PATH:", path, "ProjPATH:", proj_path)  # tmp
         # Compare first persisted project path to the currently open project path
         if "|" in result[0]:  # safety check
             if result[0].split("|")[1] != path:
@@ -288,7 +277,7 @@ class App(object):
         param:
             ids: list of Integer ids for a restricted list of files. """
         sql = "select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') "
-        if ids != []:
+        if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
         sql += "order by lower(name)"
@@ -306,7 +295,7 @@ class App(object):
             ids: list of Integer ids for a restricted list of files. """
 
         sql = "select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%'"
-        if ids != []:
+        if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
         sql += " order by lower(name)"
@@ -325,7 +314,7 @@ class App(object):
 
         sql = "select id, name, memo from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
-        if ids != []:
+        if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
         sql += " order by lower(name)"
@@ -342,7 +331,7 @@ class App(object):
 
         cur = self.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
-            [self.settings['codername'], ])
+                    [self.settings['codername'], ])
         result = cur.fetchall()
         res = []
         keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
@@ -388,13 +377,13 @@ class App(object):
         bad_links = []
         for r in result:
             if r[2][0:5] == "docs:" and not os.path.exists(r[2][5:]):
-                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+                bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
             if r[2][0:7] == "images:" and not os.path.exists(r[2][7:]):
-                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+                bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
             if r[2][0:6] == "video:" and not os.path.exists(r[2][6:]):
-                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+                bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
             if r[2][0:6] == "audio:" and not os.path.exists(r[2][6:]):
-                bad_links.append({'name': r[1], 'mediapath': r[2] , 'id': r[0]})
+                bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
         return bad_links
 
     def write_config_ini(self, settings):
@@ -431,37 +420,37 @@ class App(object):
 
         dict_len = len(data)
         keys = ['mainwindow_w', 'mainwindow_h',
-        'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
-        'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
-        'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
-        'dialogcodebycase_splitter0','dialogcodebycase_splitter1',
-        'dialogcodebycase_splitter_v0', 'dialogcodebycase_splitter_v1',
-        'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
-        'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
-        'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
-        'dialogreportcodes_splitter_v0', 'dialogreportcodes_splitter_v1',
-        'dialogreportcodes_splitter_v2',
-        'dialogjournals_splitter0', 'dialogjournals_splitter1',
-        'dialogsql_splitter_h0', 'dialogsql_splitter_h1',
-        'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
-        'dialogcases_splitter0', 'dialogcases_splitter1',
-        'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1',
-        'timestampformat', 'speakernameformat',
-        'video_w', 'video_h',
-        'codeav_abs_pos_x', 'codeav_abs_pos_y',
-        'viewav_abs_pos_x', 'viewav_abs_pos_y',
-        'viewav_video_pos_x', 'viewav_video_pos_y',
-        'codeav_video_pos_x', 'codeav_video_pos_y',
-        'dialogcodeav_splitter_0','dialogcodeav_splitter_1',
-        'dialogcodeav_splitter_h0','dialogcodeav_splitter_h1',
-        'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
-        'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
-        'dialogmanagelinks_w', 'dialogmanagelinks_h',
-        'docfontsize',
-        'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
-        'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-        'stylesheet'
-        ]
+                'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
+                'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
+                'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
+                'dialogcodebycase_splitter0', 'dialogcodebycase_splitter1',
+                'dialogcodebycase_splitter_v0', 'dialogcodebycase_splitter_v1',
+                'dialogcodeimage_splitter0', 'dialogcodeimage_splitter1',
+                'dialogcodeimage_splitter_h0', 'dialogcodeimage_splitter_h1',
+                'dialogreportcodes_splitter0', 'dialogreportcodes_splitter1',
+                'dialogreportcodes_splitter_v0', 'dialogreportcodes_splitter_v1',
+                'dialogreportcodes_splitter_v2',
+                'dialogjournals_splitter0', 'dialogjournals_splitter1',
+                'dialogsql_splitter_h0', 'dialogsql_splitter_h1',
+                'dialogsql_splitter_v0', 'dialogsql_splitter_v1',
+                'dialogcases_splitter0', 'dialogcases_splitter1',
+                'dialogcasefilemanager_splitter0', 'dialogcasefilemanager_splitter1',
+                'timestampformat', 'speakernameformat',
+                'video_w', 'video_h',
+                'codeav_abs_pos_x', 'codeav_abs_pos_y',
+                'viewav_abs_pos_x', 'viewav_abs_pos_y',
+                'viewav_video_pos_x', 'viewav_video_pos_y',
+                'codeav_video_pos_x', 'codeav_video_pos_y',
+                'dialogcodeav_splitter_0', 'dialogcodeav_splitter_1',
+                'dialogcodeav_splitter_h0', 'dialogcodeav_splitter_h1',
+                'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
+                'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
+                'dialogmanagelinks_w', 'dialogmanagelinks_h',
+                'docfontsize',
+                'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
+                'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
+                'stylesheet'
+                ]
         for key in keys:
             if key not in data:
                 data[key] = 0
@@ -522,7 +511,8 @@ class App(object):
         QTreeWidget {font-size: 12px;}\n\
         QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style_dark = style_dark.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        style_dark = style_dark.replace("QTreeWidget {font-size: 12",
+                                        "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         style = "* {font-size: 12px; color: #000000;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
@@ -536,7 +526,8 @@ class App(object):
         QTreeWidget {font-size: 12px;}\n\
         QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style = style.replace("QTreeWidget {font-size: 12", "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        style = style.replace("QTreeWidget {font-size: 12",
+                              "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         if self.settings['stylesheet'] == 'dark':
             return style_dark
@@ -552,7 +543,7 @@ class App(object):
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
-        #TODO TEMPORARY delete in 2022, legacy
+        # TODO TEMPORARY delete in 2022, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
@@ -649,7 +640,8 @@ class App(object):
                 fileids
             )
         else:
-            cur.execute("select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
+            cur.execute(
+                "select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
         keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date'
         result = []
         for row in cur.fetchall():
@@ -766,17 +758,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSettings.triggered.connect(self.change_settings)
         self.ui.actionSettings.setShortcut('Alt+S')
         self.ui.actionProject_summary.triggered.connect(self.project_summary_report)
-        self.ui.actionProject_Exchange_Export.triggered.connect(self.REFI_project_export)
-        self.ui.actionREFI_Codebook_export.triggered.connect(self.REFI_codebook_export)
-        self.ui.actionREFI_Codebook_import.triggered.connect(self.REFI_codebook_import)
-        self.ui.actionREFI_QDA_Project_import.triggered.connect(self.REFI_project_import)
+        self.ui.actionProject_Exchange_Export.triggered.connect(self.refi_project_export)
+        self.ui.actionREFI_Codebook_export.triggered.connect(self.refi_codebook_export)
+        self.ui.actionREFI_Codebook_import.triggered.connect(self.refi_codebook_import)
+        self.ui.actionREFI_QDA_Project_import.triggered.connect(self.refi_project_import)
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
 
-        # file cases and journals menu
+        # File cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
-        #self.ui.actionManage_files.setShortcut('Alt+F') Affects code AV function
         self.ui.actionManage_journals.triggered.connect(self.journals)
         self.ui.actionManage_journals.setShortcut('Alt+J')
         self.ui.actionManage_cases.triggered.connect(self.manage_cases)
@@ -787,7 +778,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_survey.setShortcut('Alt+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
 
-        # codes menu
+        # Codes menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCodes.setShortcut('Alt+T')
         self.ui.actionCode_image.triggered.connect(self.image_coding)
@@ -797,9 +788,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_by_case.triggered.connect(self.code_by_case)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
-        # reports menu
+        # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
-        #self.ui.actionCoding_reports.setShortcut('Ctrl+R') Affects code AV function
+        # self.ui.actionCoding_reports.setShortcut('Ctrl+R') Affects code AV function
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCoding_comparison_by_file.triggered.connect(self.report_compare_coders_by_file)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
@@ -808,7 +799,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
         self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
-        #TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
+        # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
         # help menu
@@ -965,7 +956,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
-        #TODO FOR FUTURE EXPANSION text mining
+        # TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionText_mining.setVisible(False)
 
@@ -977,7 +968,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
         msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
         msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
-        msg += _("Working directory") + ": " +  self.app.settings['directory']
+        msg += _("Working directory") + ": " + self.app.settings['directory']
         msg += "\n" + _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Timestamp format") + ": " + self.app.settings['timestampformat'] + "\n"
@@ -1063,7 +1054,8 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
-    def help(self):
+    @staticmethod
+    def help():
         """ Display manual in browser. """
 
         webbrowser.open("https://github.com/ccbogel/QualCoder/wiki")
@@ -1119,10 +1111,11 @@ class MainWindow(QtWidgets.QMainWindow):
         File names must match but paths can be different. """
 
         self.ui.label_manage.hide()
+        # TODO unexpected arguement
         ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
-        if bad_links == []:
+        if not bad_links:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
 
     def journals(self):
@@ -1161,7 +1154,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = _("This project contains no text files.")
             if len(cases) == 0:
-                    msg = _("This project contains no cases.")
+                msg = _("This project contains no cases.")
             Message(self.app, _('No cases or files'), msg).exec_()
 
     def image_coding(self):
@@ -1187,16 +1180,14 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec_()
             return
-
         self.ui.label_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
-        except Exception as e:
-            logger.debug(str(e))
-            print(e)
-            QtWidgets.QMessageBox.warning(None, "A/V Coding", str(e), QtWidgets.QMessageBox.Ok)
+        except Exception as e_:
+            logger.debug(str(e_))
+            Message(self.app, _("A/V Coding"), str(e_), "warning").exec_()
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -1224,7 +1215,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Codebook(self.app, self.ui.textEdit)
 
-    def REFI_project_export(self):
+    def refi_project_export(self):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
          CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
@@ -1233,21 +1224,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         RefiExport(self.app, self.ui.textEdit, "project")
 
-    def REFI_codebook_export(self):
+    def refi_codebook_export(self):
         """ Export the codebook as .qdc
         Follows the REFI standard version 1.0. https://www.qdasoftware.org/
         """
         #
         RefiExport(self.app, self.ui.textEdit, "codebook")
 
-    def REFI_codebook_import(self):
+    def refi_codebook_import(self):
         """ Import a codebook .qdc into an opened project.
         Follows the REFI-QDA standard version 1.0. https://www.qdasoftware.org/
          """
 
         RefiImport(self.app, self.ui.textEdit, "qdc")
 
-    def REFI_project_import(self):
+    def refi_project_import(self):
         """ Import a qpdx QDA project into a new project space.
         Follows the REFI standard.
         CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
@@ -1273,7 +1264,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
-        msg = _("Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
+        msg = _(
+            "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
         Message(self.app, _('RQDA import steps'), msg).exec_()
         self.new_project()
         # check project created successfully
@@ -1294,11 +1286,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if not self.force_quit:
             quit_msg = _("Are you sure you want to quit?")
             reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
-            QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+                                                   QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.Yes:
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
-                #self.dialog_list = None
+                # self.dialog_list = None
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -1329,11 +1321,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
-            _("Enter project name"), self.app.settings['directory'], ".qda")[0]
+                                                             _("Enter project name"), self.app.settings['directory'],
+                                                             ".qda")[0]
         if project_path == "":
             Message(self.app, _("Project"), _("No project created."), "critical").exec_()
             return
-
         # Add suffix to project name if it already exists
         counter = 0
         extension = ""
@@ -1349,8 +1341,8 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.app.project_path + "/audio")
             os.mkdir(self.app.project_path + "/video")
             os.mkdir(self.app.project_path + "/documents")
-        except Exception as e:
-            logger.critical(_("Project creation error ") + str(e))
+        except Exception as e_:
+            logger.critical(_("Project creation error ") + str(e_))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec_()
             self.app = App()
             return
@@ -1358,27 +1350,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
         self.app.create_connection(self.app.project_path)
         cur = self.app.conn.cursor()
-        cur.execute("CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer, codername text);")
-        cur.execute("CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, av_text_id integer, unique(name));")
-        cur.execute("CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
-        cur.execute("CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
-        cur.execute("CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner));")
-        cur.execute("CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
-        cur.execute("CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
-        cur.execute("CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
-        cur.execute("CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
-        cur.execute("CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
-        cur.execute("CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
-        cur.execute("CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
+        cur.execute(
+            "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer, codername text);")
+        cur.execute(
+            "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, av_text_id integer, unique(name));")
+        cur.execute(
+            "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
+        cur.execute(
+            "CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
+        cur.execute(
+            "CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner));")
+        cur.execute(
+            "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
+        cur.execute(
+            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
+        cur.execute(
+            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
+        cur.execute(
+            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
+        cur.execute(
+            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
+        cur.execute(
+            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
+        cur.execute(
+            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0, 0, self.app.settings['codername']))
+                    ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                     0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
-            # get and display some project details
+            # Get and display some project details
             self.ui.textEdit.append("\n" + _("New project: ") + self.app.project_path + _(" created."))
-            #self.settings['projectName'] = self.path.rpartition('/')[2]
             self.ui.textEdit.append(_("Opening: ") + self.app.project_path)
             self.setWindowTitle("QualCoder " + self.app.project_name)
             cur.execute('select sqlite_version()')
@@ -1390,16 +1394,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.project['memo'] = result[2]
             self.project['about'] = result[3]
             self.ui.textEdit.append(_("New Project Created") + "\n========\n"
-                + _("DB Version:") + str(self.project['databaseversion']) + "\n"
-                + _("Date: ") + str(self.project['date']) + "\n"
-                + _("About: ") + str(self.project['about']) + "\n"
-                + _("Coder:") + str(self.app.settings['codername']) + "\n"
-                + "========")
-        except Exception as e:
+                                    + _("DB Version:") + str(self.project['databaseversion']) + "\n"
+                                    + _("Date: ") + str(self.project['date']) + "\n"
+                                    + _("About: ") + str(self.project['about']) + "\n"
+                                    + _("Coder:") + str(self.app.settings['codername']) + "\n"
+                                    + "========")
+        except Exception as e_:
             msg = _("Problem creating database ")
-            logger.warning(msg + self.app.project_path + " Exception:" + str(e))
+            logger.warning(msg + self.app.project_path + " Exception:" + str(e_))
             self.ui.textEdit.append("\n" + msg + "\n" + self.app.project_path)
-            self.ui.textEdit.append(str(e))
+            self.ui.textEdit.append(str(e_))
             self.close_project()
             return
         # New project, so tell open project NOT to backup, as there will be nothing in there to backup
@@ -1462,7 +1466,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("select memo from project")
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
-            memo)
+                        memo)
         ui.exec_()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
@@ -1490,7 +1494,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if default_directory == "":
                 default_directory = os.path.expanduser('~')
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                _('Open project directory'), default_directory)
+                                                              _('Open project directory'), default_directory)
         if path == "" or path is False:
             return
         self.close_project()
@@ -1506,9 +1510,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(path) > 3 and proj_path[-4:] == ".qda":
             try:
                 self.app.create_connection(proj_path)
-            except Exception as e:
+            except Exception as e_:
                 self.app.conn = None
-                msg += " " + str(e)
+                msg += " " + str(e_)
                 logger.debug(msg)
         if self.app.conn is None:
             msg += "\n" + proj_path
@@ -1525,8 +1529,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug("This is not a QualCoder database")
                 self.close_project()
                 return
-        except Exception as e:
-            logger.debug("This in not a QualCoder database " + str(e))
+        except Exception as e_:
+            logger.debug("This in not a QualCoder database " + str(e_))
             self.close_project()
             return
 
@@ -1553,8 +1557,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_text ADD avid integer")
                 self.app.conn.commit()
-            except Exception as e:
-                logger.debug(str(e))
+            except Exception as e_:
+                logger.debug(str(e_))
         try:
             cur.execute("select bookmarkfile from project")
         except:
@@ -1564,8 +1568,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur.execute("ALTER TABLE project ADD bookmarkpos integer")
                 self.app.conn.commit()
                 self.ui.textEdit.append(_("Updating database to version") + " v2")
-            except Exception as e:
-                logger.debug(str(e))
+            except Exception as e_:
+                logger.debug(str(e_))
         # Database version v3
         cur = self.app.conn.cursor()
         try:
@@ -1574,8 +1578,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_text ADD important integer")
                 self.app.conn.commit()
-            except Exception as e:
-                logger.debug(str(e))
+            except Exception as e_:
+                logger.debug(str(e_))
                 cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_av")
@@ -1583,8 +1587,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_av ADD important integer")
                 self.app.conn.commit()
-            except Exception as e:
-                logger.debug(str(e))
+            except Exception as e_:
+                logger.debug(str(e_))
         cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_image")
@@ -1593,12 +1597,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur.execute("ALTER TABLE code_image ADD important integer")
                 self.app.conn.commit()
                 self.ui.textEdit.append(_("Updating database to version") + " v3")
-            except Exception as e:
-                logger.debug(str(e))
+            except Exception as e_:
+                logger.debug(str(e_))
         # Database version v4
         try:
             cur.execute("select ctid from code_text")
-        except:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
             cur.execute(
                 "CREATE TABLE code_text2 (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner))")
             self.app.conn.commit()
@@ -1615,15 +1619,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add codername to project, add av_text_id to source, add stored sql table
         try:
             cur.execute("select codername from project")
-        except:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
             print(self.app.settings['codername'])
             cur.execute("ALTER TABLE project ADD codername text")
             self.app.conn.commit()
-            cur.execute('update project set databaseversion="v5", about=?, codername=?', [qualcoder_version, self.app.settings['codername']])
+            cur.execute('update project set databaseversion="v5", about=?, codername=?',
+                        [qualcoder_version, self.app.settings['codername']])
             self.app.conn.commit()
         try:
             cur.execute("select av_text_id from source")
-        except:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
             cur.execute('ALTER TABLE source ADD av_text_id integer')
             self.app.conn.commit()
             # Add id link from AV file to text file.
@@ -1637,8 +1642,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Updating database to version") + " v5")
         try:
             cur.execute("select title from stored_sql")
-        except:  # sqlite3.OperationalError as e:
-            cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
+        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
+            cur.execute(
+                "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
@@ -1651,21 +1657,21 @@ class MainWindow(QtWidgets.QMainWindow):
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
         res = cur.fetchall()
-        if res != []:
+        if res:
             self.ui.textEdit.append(_("Deleting code_text coding to deleted files: ") + str(res))
         for r in res:
             cur.execute("delete from code_text where fid=?", [r[0]])
         sql = "select code_image.id from code_image where code_image.id not in (select source.id from source)"
         cur.execute(sql)
         res = cur.fetchall()
-        if res != []:
+        if res:
             self.ui.textEdit.append(_("Deleting code_image coding to deleted files: ") + str(res))
         for r in res:
             cur.execute("delete from code_image where id=?", [r[0]])
         sql = "select code_av.id from code_av where code_av.id not in (select source.id from source)"
         cur.execute(sql)
         res = cur.fetchall()
-        if res != []:
+        if res:
             self.ui.textEdit.append(_("Deleting code_av coding to deleted files: ") + str(res))
         for r in res:
             cur.execute("delete from code_av where id=?", [r[0]])
@@ -1694,17 +1700,17 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.settings['backup_av_files'] == 'True':
             try:
                 shutil.copytree(self.app.project_path, backup)
-            except FileExistsError as e:
+            except FileExistsError as e_:
                 msg = _("There is already a backup with this name")
-                print(str(e) + "\n" + msg)
-                logger.warning(_(msg) + "\n" + str(e))
+                print(str(e_) + "\n" + msg)
+                logger.warning(_(msg) + "\n" + str(e_))
         else:
             shutil.copytree(self.app.project_path, backup,
-            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
-                '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
+                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
+                                                          '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
             self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
         self.ui.textEdit.append(_("Project backup created: ") + backup)
-        # delete backup path - delete the backup if no changes occurred in the project during the session
+        # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.app.delete_backup_path_name = backup
 
     def project_summary_report(self):
@@ -1712,7 +1718,6 @@ class MainWindow(QtWidgets.QMainWindow):
          Display project memo, and code, attribute, journal, files frequencies.
          Also detect and display bad links to linked files. """
 
-        os_type = platform.system()
         if self.app.conn is None:
             return
         cur = self.app.conn.cursor()
@@ -1721,14 +1726,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        #self.project['about'] = result[3]
         msg = "\n" + _("PROJECT SUMMARY")
         msg += "\n========\n"
         msg += _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
         msg += _("Project path: ") + self.app.project_path + "\n"
-        #msg += _("Database version: ") + self.project['databaseversion'] + ". "
-        msg+= _("Project date: ") + str(self.project['date']) + "\n"
+        msg += _("Project date: ") + str(self.project['date']) + "\n"
         sql = "select memo from project"
         cur.execute(sql)
         res = cur.fetchone()
@@ -1757,7 +1760,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(sql)
         res = cur.fetchone()
         msg += _("Journals: ") + str(res[0])
-        cur.execute("select name from source where id=?", [result[4],])
+        cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
             msg += "\nText Bookmark: " + str(bookmark_filename[0])
@@ -1766,12 +1769,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
-
         bad_links = self.app.check_bad_file_links()
         if bad_links:
             self.ui.textEdit.append('<span style="color:red">' + _("Bad links to files") + "</span>")
-            for l in bad_links:
-                self.ui.textEdit.append('<span style="color:red">' + l['name'] + "   " + l['mediapath'] + '</span>')
+            for lnk in bad_links:
+                self.ui.textEdit.append('<span style="color:red">' + lnk['name'] + "   " + lnk['mediapath'] + '</span>')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
@@ -1836,8 +1838,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.delete_backup_path_name != "" and self.app.delete_backup:
             try:
                 shutil.rmtree(self.app.delete_backup_path_name)
-            except Exception as e:
-                print(str(e))
+            except Exception as e_:
+                print(str(e_))
 
         # Get a list of backup folders for current project
         parts = self.app.project_path.split('/')
@@ -1848,22 +1850,22 @@ class MainWindow(QtWidgets.QMainWindow):
         lenname = len(projectname_and_bkup)
         files_folders = os.listdir(directory)
         backups = []
-        for f in files_folders:
-            if f[0:lenname] == projectname_and_bkup and f[-4:] == ".qda":
-                backups.append(f)
+        for f_ in files_folders:
+            if f_[0:lenname] == projectname_and_bkup and f_[-4:] == ".qda":
+                backups.append(f_)
         # Sort newest to oldest, and remove any that are more than fifth position in the list
         backups.sort(reverse=True)
         to_remove = []
         if len(backups) > 5:
             to_remove = backups[5:]
-        if to_remove == []:
+        if not to_remove:
             return
-        for f in to_remove:
+        for f_ in to_remove:
             try:
-                shutil.rmtree(directory + f)
-                self.ui.textEdit.append(_("Deleting: ") + directory + f)
-            except Exception as e:
-                print(str(e))
+                shutil.rmtree(directory + f_)
+                self.ui.textEdit.append(_("Deleting: ") + directory + f_)
+            except Exception as e_:
+                print(str(e_))
 
     def get_latest_github_release(self):
         """ Get latest github release.
@@ -1887,12 +1889,10 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
                 self.ui.textEdit.append(_json['html_url'] + "\n")
-                #asset = _json['assets'][0]
-                #urllib.request.urlretrieve(asset['browser_download_url'], asset['name'])
-        except Exception as e:
-            print(e)
-            logger.debug(str(e))
-            #self.ui.textEdit.append(_("Could not detect latest release from Github\n") + str(e))
+        except Exception as e_:
+            print(e_)
+            logger.debug(str(e_))
+
 
 def gui():
     qual_app = App()
@@ -1906,7 +1906,7 @@ def gui():
     pm = QtGui.QPixmap()
     pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
     app.setWindowIcon(QtGui.QIcon(pm))
-    
+
     # Use two character language setting
     lang = settings.get('language', 'en')
     # Test for pyinstall data files
@@ -1918,22 +1918,22 @@ def gui():
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
-        #print("ext data dir: ", ext_data_dir)
+        # print("ext data dir: ", ext_data_dir)
         locale_dir = os.path.join(ext_data_dir, 'qualcoder')
         locale_dir = os.path.join(locale_dir, 'locale')
-        #locale_dir = os.path.join(locale_dir, lang)
-        #locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    #print("locale dir: ", locale_dir)
-    #print("LISTDIR: ", os.listdir(locale_dir))
-    #getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
+        # locale_dir = os.path.join(locale_dir, lang)
+        # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+    # print("locale dir: ", locale_dir)
+    # print("LISTDIR: ", os.listdir(locale_dir))
+    # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
         # qt translator applies to ui designed GUI widgets only
         qt_locale_dir = os.path.join(locale_dir, lang)
-        qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-        #print("qt qm translation file: ", qt_locale_file)
+        # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
+        # print("qt qm translation file: ", qt_locale_file)
         qt_translator = QtCore.QTranslator()
-        #qt_translator.load(qt_locale_file)
+        # qt_translator.load(qt_locale_file)
         ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
         A solution to this error [Errno 13] Permission denied:
         Replace 'lang' with the short language name, e.g. app_de.qm '''
@@ -1947,7 +1947,6 @@ def gui():
                 print("Installing app_" + lang + ".qm to .qualcoder folder")
                 install_language(lang)
                 qt_translator.load(qm)
-
         app.installTranslator(qt_translator)
         '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
         A solution to this [Errno 13] Permission denied:
@@ -1957,12 +1956,11 @@ def gui():
         try:
             translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
             print("locale directory for python translations: ", locale_dir)
-        except Exception as e:
-            print("Error accessing python translations mo file")
-            print(e)
-            print("locale directory for python translations: ", locale_dir)
+        except Exception as e_:
+            print("Error accessing python translations mo file\n", e_)
+            print("Locale directory for python translations: ", locale_dir)
             try:
-                print("trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
+                print("Trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
                 mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
             except:
@@ -1980,6 +1978,7 @@ def gui():
             proj_path = split_[1]
         ex.open_project(path=proj_path)
     sys.exit(app.exec_())
+
 
 def install_language(lang):
     """ Mainly for pyinstaller on Windows, as cnnot access language data files.
