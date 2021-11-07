@@ -46,10 +46,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(msg)
-    logger.error(_("Uncaught exception: ") + msg)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), msg)
+    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text)
+    logger.error(_("Uncaught exception: ") + text)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
 class DialogSpecialFunctions(QtWidgets.QDialog):
@@ -74,66 +74,18 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.get_prefix_for_linked_files()
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
         self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
         self.ui.pushButton_change_prefix.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_change_prefix.pressed.connect(self.change_prefix_for_linked_files)
         self.ui.pushButton_text_update.setIcon(QtGui.QIcon(pm))
-        self.ui.groupBox_update_text.hide()  # TODO tmp
-        self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
-        self.ui.groupBox_merge.hide()  # TODO tmp
-
-    def get_prefix_for_linked_files(self):
-        """ Search through all linked files and calculate existing prefix. """
-
-        cur = self.app.conn.cursor()
-        sql = 'select substr(mediapath,instr(mediapath,":")+1) ' \
-              'from source where mediapath is not null and mediapath not like "/%" '
-        cur.execute(sql)
-        res = cur.fetchall()
-        if len(res) == 0:
-            self.ui.groupBox__base_directory.hide()
-            return
-        path_list = []
-        for r in res:
-            path_list.append(r[0])
-        prefix = os.path.commonprefix(path_list)
-        self.ui.lineEdit_existing_prefix.setText(prefix)
-
-    def change_prefix_for_linked_files(self):
-        """ Get existing prefix text. Replace with new prefix,
-         update mediapath fo affected files. """
-
-        existing_prefix = self.ui.lineEdit_existing_prefix.text()
-        new_prefix = self.ui.lineEdit_new_prefix.text()
-        cur = self.app.conn.cursor()
-        sql = 'select id,mediapath,substr(mediapath,1,instr(mediapath,":")),' \
-              'substr(mediapath,instr(mediapath,":")+1) ' \
-              'from source where mediapath is not null and mediapath not like "/%" '
-        cur.execute(sql)
-        keys = "id", "mediapath", "filetype", "filepath"
-        res = []
-        for row in cur.fetchall():
-            res.append(dict(zip(keys, row)))
-        for r in res:
-            print(r)
-            r['mediapath'] = r['filetype'] + r['filepath'].replace(existing_prefix, new_prefix, 1)
-        print("=============")
-        for r in res:
-            print(r)
-            cur.execute("update source set mediapath=? where id=?", [r['mediapath'], r['id']])
-        # Update the prefix to the new
-        self.get_prefix_for_linked_files()
+        self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
+        self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
 
     def change_text_code_start_positions(self):
         """ Extend or shrink text coding start positions in all codings and all files for owner. """
@@ -147,7 +99,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         update_sql = "update code_text set pos0=?, seltext=? where pos0=? and pos1=? and cid=? and fid=? and owner=?"
         cur.execute(sql, [self.app.settings['codername']])
         res = cur.fetchall()
-        if not res:
+        if res == []:
             return
         msg = _("Change ALL text code start positions in ALL text files by ")
         msg += str(delta) + _(" characters.\n")
@@ -190,7 +142,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         update_sql = "update code_text set pos1=?, seltext=? where pos0=? and pos1=? and cid=? and fid=? and owner=?"
         cur.execute(sql, [self.app.settings['codername']])
         res = cur.fetchall()
-        if not res:
+        if res == []:
             return
         msg = _("Change ALL text code end positions in ALL text files by ")
         msg += str(delta) + _(" characters.\n")
@@ -303,3 +255,5 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.app.conn.commit()
         cur.execute("delete from code_text where fid != ?", [id_])
         self.app.conn.commit()"""'''
+
+

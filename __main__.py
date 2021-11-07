@@ -1771,14 +1771,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
         bad_links = self.app.check_bad_file_links()
         if bad_links:
-            self.ui.textEdit.append('<span style="color:red">' + _("Bad links to files") + "</span>")
+            span = '<span style="color:red">'
+            self.ui.textEdit.append(span + _("Bad links to files") + "</span>")
+            self.ui.textEdit.append(span + _("If all links are bad, for example project moved to a different operating system.") + "</span>")
+            self.ui.textEdit.append(span + _("Consider changing base folder path in Help > Special Functions") + "</span>")
             for lnk in bad_links:
-                self.ui.textEdit.append('<span style="color:red">' + lnk['name'] + "   " + lnk['mediapath'] + '</span>')
+                self.ui.textEdit.append(span + lnk['name'] + "   " + lnk['mediapath'] + '</span>')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
-        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.End)
+        tc = self.ui.textEdit.textCursor()
+        tc.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveAnchor)
+        self.ui.textEdit.setTextCursor(tc)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def close_project(self):
@@ -1981,7 +1986,7 @@ def gui():
 
 
 def install_language(lang):
-    """ Mainly for pyinstaller on Windows, as cnnot access language data files.
+    """ Mainly for pyinstaller on Windows, as cannot access language data files.
     So, recreate them from base64 data into home/.qualcoder folder.
     Install Qt translation file into folder .qualcoder/app_lang.qm
     Install poedit.mo file into folder .qualcoder/lang/LC_MESSAGES/lang.mo
