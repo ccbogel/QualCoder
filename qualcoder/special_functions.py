@@ -34,7 +34,8 @@ from PyQt5 import QtGui, QtWidgets, QtCore
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
-from .GUI.ui_dialog_special_functions import Ui_Dialog_special_functions
+from .GUI.base64_helper import *
+from .GUI.ui_special_functions import Ui_Dialog_special_functions
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -73,6 +74,15 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
+        self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_change_prefix.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_text_update.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
         self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
 
