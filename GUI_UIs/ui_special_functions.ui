@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>539</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -235,6 +235,73 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_merge">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox{border: 1px solid #f89407;}</string>
+     </property>
+     <property name="title">
+      <string>Merge projects</string>
+     </property>
+     <widget class="QPushButton" name="pushButton_merge">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>30</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_project">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>30</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select text file to update</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_merge_info">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>30</y>
+        <width>621</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select project to merge</string>
       </property>
      </widget>
     </widget>
