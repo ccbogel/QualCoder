@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>461</height>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -134,6 +134,9 @@
         <height>32</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Run</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -145,13 +148,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>110</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>110</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -163,11 +166,14 @@
      <widget class="QPushButton" name="pushButton_text_update">
       <property name="geometry">
        <rect>
-        <x>681</x>
-        <y>30</y>
+        <x>700</x>
+        <y>70</y>
         <width>32</width>
         <height>32</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run</string>
       </property>
       <property name="text">
        <string/>
@@ -194,6 +200,38 @@
         <width>32</width>
         <height>32</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select text file to update</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_text_update_info_2">
+      <property name="geometry">
+       <rect>
+        <x>54</x>
+        <y>73</y>
+        <width>621</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select replacement text file</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_replacement_text_file">
+      <property name="geometry">
+       <rect>
+        <x>7</x>
+        <y>70</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select replacement text file</string>
       </property>
       <property name="text">
        <string/>
@@ -300,6 +338,9 @@
         <height>32</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Run</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -312,6 +353,9 @@
         <width>32</width>
         <height>32</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run</string>
       </property>
       <property name="text">
        <string/>
