@@ -285,7 +285,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Select text file to update</string>
+       <string>Select project to merge</string>
       </property>
       <property name="text">
        <string/>
