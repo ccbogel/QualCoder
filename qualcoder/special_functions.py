@@ -123,8 +123,17 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         path_list = []
         for r in res:
             path_list.append(r[0])
+        # Prefix may contain a fullpath including filename if ther eis only one linked file
         prefix = os.path.commonprefix(path_list)
-        self.ui.lineEdit_existing_prefix.setText(prefix)
+        # The trailing slash is removed in the split function
+        head_tail = os.path.split(prefix)
+        self.ui.lineEdit_existing_prefix.setText(head_tail[0] + "/")
+        counter =0
+        for r in res:
+            if head_tail[0] + "/" in r[0]:
+                counter += 1
+        msg = _("Linked files: ") + str(len(res)) + " " + _("Linked files with prefix: ") + str(counter)
+        self.ui.label_linked_info.setText(msg)
 
     def change_prefix_for_linked_files(self):
         """ Get existing prefix text. Replace with new prefix,
