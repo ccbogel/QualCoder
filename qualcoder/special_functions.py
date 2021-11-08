@@ -36,6 +36,7 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
+#from .helpers import Message
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -75,11 +76,15 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.get_prefix_for_linked_files()
+        self.ui.lineEdit_existing_prefix.setEnabled(False)
+        self.ui.lineEdit_new_prefix.setEnabled(False)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_path.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_path.pressed.connect(self.get_filepath)
+        self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
@@ -92,6 +97,17 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.groupBox_update_text.hide()  # TODO tmp
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
         self.ui.groupBox_merge.hide()  # TODO tmp
+
+    def get_filepath(self):
+        """ Get base file path for linked files folder.
+         Fill textedit_new_prefix. """
+
+        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None, _("Select directory"),
+                                                               self.app.last_export_directory, options)
+        if directory is None or directory == "":
+            return
+        self.ui.lineEdit_new_prefix.setText(directory + "/")
 
     def get_prefix_for_linked_files(self):
         """ Search through all linked files and calculate existing prefix. """
@@ -126,11 +142,11 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         for row in cur.fetchall():
             res.append(dict(zip(keys, row)))
         for r in res:
-            print(r)
+            #print(r)
             r['mediapath'] = r['filetype'] + r['filepath'].replace(existing_prefix, new_prefix, 1)
-        print("=============")
+        #print("=============")
         for r in res:
-            print(r)
+            #print(r)
             cur.execute("update source set mediapath=? where id=?", [r['mediapath'], r['id']])
         # Update the prefix to the new
         self.get_prefix_for_linked_files()
