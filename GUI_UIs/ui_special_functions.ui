@@ -59,7 +59,7 @@
      <property name="title">
       <string>Change base folder path for linked files</string>
      </property>
-     <widget class="QLabel" name="label_example_linked_file">
+     <widget class="QLabel" name="label_linked_info">
       <property name="geometry">
        <rect>
         <x>3</x>
@@ -68,8 +68,12 @@
         <height>17</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Useful if you have transferred a folder of linked files from one operating system to another.
+Or you have changed the location of name of the folder containing linked files.</string>
+      </property>
       <property name="text">
-       <string>.</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_prefix_old">
@@ -85,7 +89,7 @@
        <string>Existing prefix</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="label_prefix_new">
       <property name="geometry">
        <rect>
         <x>3</x>
@@ -335,7 +339,7 @@
      <property name="title">
       <string>Change text positions</string>
      </property>
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="label_end_positions">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -351,7 +355,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="label_start_positions">
       <property name="geometry">
        <rect>
         <x>120</x>
