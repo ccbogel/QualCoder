@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,10 +35,8 @@ import traceback
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 from .code_text import DialogCodeText  # for isinstance()
-from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
-from .report_codes import DialogReportCodes  # for isinstance()
-from .view_image import DialogCodeImage  # for isinstance()
+from .helpers import Message
 from .view_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
@@ -67,6 +65,7 @@ class DialogManageLinks(QtWidgets.QDialog):
 
     parent_textEdit = None
     tab_coding = None  # Tab widget coding tab for updates
+    links = []
 
     def __init__(self, app, parent_textEdit, tab_coding):
 
@@ -74,7 +73,6 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textEdit
         self.tab_coding = tab_coding
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_links()
         self.ui.setupUi(self)
@@ -89,14 +87,25 @@ class DialogManageLinks(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        #self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        #self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.links = self.app.check_bad_file_links()
+        home = os.path.expanduser('~')
+        for link in self.links:
+            link['filepaths'] = self.find_filepaths(home, link['name'])
+            print(link)
         self.fill_table()
+
+    def find_filepaths(self, root_dir, filename):
+        """ Get file paths of this file name. """
+
+        paths = []
+        for root, dirs, files in os.walk(root_dir):
+            if filename in files:
+                paths.append(os.path.join(root, filename))
+        return paths
 
     def closeEvent(self, event):
         """ Save dialog dimensions. """
@@ -109,7 +118,6 @@ class DialogManageLinks(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-
         menu = QtWidgets.QMenu()
         action_open_file_dialog = menu.addAction(_("Select file"))
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -119,10 +127,11 @@ class DialogManageLinks(QtWidgets.QDialog):
         if action == action_open_file_dialog:
             self.file_selection(row)
 
-    def file_selection(self, x):
-        """ Select a file to replace the bad link.
+    def file_dialog_selection(self, row):
+        """ Select a file using  a file dialog to replace the bad link.
         Called by: table_menu, filename cell clicked.
         The path can be different but the file name must match.
+        param: row : Integer of selected QTableWidget row
         """
 
         file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None, _('Select file'),
@@ -131,25 +140,25 @@ class DialogManageLinks(QtWidgets.QDialog):
             return
         if len(file_path) < 4:
             return
-
         new_file_name = file_path.split('/')[-1]
-        if self.links[x]['name'] != new_file_name:
-            msg = _("Filename does not match.") + "\n" + self.links[x]['name'] + "\n" + new_file_name
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Wrong file'))
-            mb.setText(msg)
-            mb.exec_()
+        if self.links[row]['name'] != new_file_name:
+            msg = _("Filename does not match.") + "\n" + self.links[row]['name'] + "\n" + new_file_name
+            Message(self.app, _('Wrong file'), msg, "warning").exec_()
             return
-        # All ok so update link and database
-        self.links[x]['mediapath'] = self.links[x]['mediapath'].split(':')[0] + ':' + file_path
+        self.update_database(file_path, row)
+
+    def update_database(self, new_file_path, row):
+        """ Update database and links list.
+         Called by: file_dialog_selection, cell_selected. """
+
+        new_file_name = new_file_path.split('/')[-1]
+        self.links[row]['mediapath'] = self.links[row]['mediapath'].split(':')[0] + ':' + new_file_path
         cur = self.app.conn.cursor()
         sql = "update source set mediapath=? where id=?"
-        cur.execute(sql, [self.links[x]['mediapath'], self.links[x]['id']])
+        cur.execute(sql, [self.links[row]['mediapath'], self.links[row]['id']])
         self.app.conn.commit()
         self.fill_table()
-        # Add file to file list in any opened coding dialog
+        # Update file in file list in any opened coding dialog
         contents = self.tab_coding.layout()
         if contents:
             for i in reversed(range(contents.count())):
@@ -160,47 +169,60 @@ class DialogManageLinks(QtWidgets.QDialog):
                     c.get_files()
                 if isinstance(c, DialogCodeText):
                     c.get_files()
-        contents_reports = self.tab_reports.layout()
-        if contents_reports:
-            for i in reversed(range(contents_reports.count())):
-                c = contents2.itemAt(i).widget()
-                if isinstance(c, DialogReportCodes):
-                    c.get_files()
-
-        self.parent_textEdit.append(_("Bad link fixed for file: ") + new_file_name + _(" Path: ") + file_path)
+        self.parent_textEdit.append(_("Bad link fixed for file: ") + new_file_name + _(" Path: ") + new_file_path)
         self.app.delete_backup = False
 
     def cell_selected(self):
         """ When the table widget cell is selected open file select dialog.
+        Or select suggested file path.
         """
 
-        self.file_selection(self.ui.tableWidget.currentRow())
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        if col < 3:  # type, filename, current filepath
+            self.file_dialog_selection(self.ui.tableWidget.currentRow())
+            return
+        try:
+            file_path = self.ui.tableWidget.item(row, col).text()
+        except AttributeError:  # NoneType
+            return
+        if file_path == "":
+            return
+        self.update_database(file_path, row)
 
     def fill_table(self):
-        """ Fill the table widget with file details. """
+        """ Fill the table widget with file details.
+         Also contains two columns for filepath suggestions. """
 
         self.ui.tableWidget.blockSignals(True)
-        self.ui.tableWidget.setColumnCount(3)
-        self.ui.tableWidget.setHorizontalHeaderLabels([_("Filename"), _("Current path"), _("Type")])
+        self.ui.tableWidget.setColumnCount(5)
+        self.ui.tableWidget.setHorizontalHeaderLabels([_("Type"), _("Filename"), _("Current path"), _("Suggestion 1"), _("Suggestion 2")])
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         for row, item in enumerate(self.links):
             self.ui.tableWidget.insertRow(row)
+            type_and_path = item['mediapath'].split(':')
+            type_item = QtWidgets.QTableWidgetItem(type_and_path[0])
+            type_item.setFlags(type_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            self.ui.tableWidget.setItem(row, 0, type_item)
             name_item = QtWidgets.QTableWidgetItem(item['name'])
             name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, 0, name_item)
-            link = item['mediapath'].split(':')
-            path_item = QtWidgets.QTableWidgetItem(link[1])
+            self.ui.tableWidget.setItem(row, 1, name_item)
+            path_item = QtWidgets.QTableWidgetItem(type_and_path[1])
             path_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            if not os.path.exists(link[1]):
-                # path_item.setBackground(QtGui.QBrush(QtGui.QColor("Red")))
+            if not os.path.exists(type_and_path[1]):
                 path_item.setForeground(QtGui.QBrush(QtGui.QColor("Red")))
-            self.ui.tableWidget.setItem(row, 1, path_item)
-            type_item = QtWidgets.QTableWidgetItem(link[0])
-            type_item.setFlags(type_item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(row, 2, type_item)
-        self.ui.tableWidget.hideColumn(2)
+            self.ui.tableWidget.setItem(row, 2, path_item)
+            if len(item['filepaths']) > 0:
+                suggestion1 = QtWidgets.QTableWidgetItem(item['filepaths'][0])
+                suggestion1.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(row, 3, suggestion1)
+            if len(item['filepaths']) > 1:
+                suggestion2 = QtWidgets.QTableWidgetItem(item['filepaths'][1])
+                suggestion2.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+                self.ui.tableWidget.setItem(row, 4, suggestion2)
+        self.ui.tableWidget.hideColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()
         if self.ui.tableWidget.columnWidth(0) > 450:
             self.ui.tableWidget.setColumnWidth(0, 450)

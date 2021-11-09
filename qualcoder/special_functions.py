@@ -82,8 +82,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_select_path.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_select_path.pressed.connect(self.get_filepath)
+        #self.ui.pushButton_select_path.setIcon(QtGui.QIcon(pm))
+        #self.ui.pushButton_select_path.pressed.connect(self.get_filepath)
         self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
@@ -91,9 +91,10 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
         self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
-        self.ui.pushButton_change_prefix.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_change_prefix.pressed.connect(self.change_prefix_for_linked_files)
+        #self.ui.pushButton_change_prefix.setIcon(QtGui.QIcon(pm))
+        #self.ui.pushButton_change_prefix.pressed.connect(self.change_prefix_for_linked_files)
         self.ui.pushButton_text_update.setIcon(QtGui.QIcon(pm))
+        self.ui.groupBox__base_directory.hide()  # TODO delete later
         self.ui.groupBox_update_text.hide()  # TODO tmp
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
         self.ui.groupBox_merge.hide()  # TODO tmp
