@@ -95,7 +95,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         home = os.path.expanduser('~')
         for link in self.links:
             link['filepaths'] = self.find_filepaths(home, link['name'])
-            print(link)
+            #print(link)
         self.fill_table()
 
     def find_filepaths(self, root_dir, filename):
