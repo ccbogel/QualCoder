@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>753</width>
-    <height>528</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -37,123 +37,6 @@
      <property name="text">
       <string>Backup project before running these functions.</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox__base_directory">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>120</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>120</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QGroupBox{border: 1px solid #f89407;}</string>
-     </property>
-     <property name="title">
-      <string>Change base folder path for linked files</string>
-     </property>
-     <widget class="QLabel" name="label_linked_info">
-      <property name="geometry">
-       <rect>
-        <x>3</x>
-        <y>30</y>
-        <width>721</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Useful if you have transferred a folder of linked files from one operating system to another.
-Or you have changed the location of name of the folder containing linked files.</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_prefix_old">
-      <property name="geometry">
-       <rect>
-        <x>3</x>
-        <y>50</y>
-        <width>130</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Existing prefix</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_prefix_new">
-      <property name="geometry">
-       <rect>
-        <x>3</x>
-        <y>80</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>New prefix</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_existing_prefix">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>50</y>
-        <width>421</width>
-        <height>25</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_new_prefix">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>80</y>
-        <width>421</width>
-        <height>25</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_change_prefix">
-      <property name="geometry">
-       <rect>
-        <x>690</x>
-        <y>80</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Run</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_select_path">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>78</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Select base folder path</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </widget>
    </item>
    <item>
