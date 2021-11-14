@@ -658,10 +658,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 need_media_folders = True
         html_folder_name = ""
         if need_media_folders:
-            # Create folder for images and sub-folders for audio and video
+            # Create folder with sub-folders for inages, audio and video
             html_folder_name = filepath[:-5]
             try:
                 os.mkdir(html_folder_name)
+                os.mkdir(html_folder_name + "/images")
                 os.mkdir(html_folder_name + "/audio")
                 os.mkdir(html_folder_name + "/video")
             except Exception as e:
@@ -678,26 +679,24 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Change html links to reference the html folder
         for item in self.html_links:
             if item['imagename'] is not None:
-                print("ORG IMG PATH ", item['imagename'])
+                #print("item['imagename'] ", item['imagename'])
                 ''' item['imagename'] is in this format: 
                 0-/images/filename.jpg  # where 0- is the counter
                 '''
                 image_name = item['imagename'].replace('/images/', '')
-                #print("IMG NAME: ", image_name)
-                folder_link = html_filename[:-5] + "/" + image_name
-                img_path = filepath[:-5] + "/" + image_name
-                #print("IMG PATH", img_path)
+                print("IMG NAME: ", item['imagename'])
+                img_path = html_folder_name + "/images/" + image_name
+                print("IMG PATH", img_path)
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
-                ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
+                html = html.replace(item['imagename'], img_path)
+                #TODO check on Windows
+                '''unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
+                Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
                 this needs to be upper case for the replace method to work:  c:  =>  C: '''
-                '''#TODO Check, this may fail on Windows now
-                unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
-                html = html.replace(item['imagename'], folder_link)
-                if unreplaced_html == html:
+                '''if unreplaced_html == html:
                     html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], folder_link)'''
             if item['avname'] is not None:
-                #print("AVITEM", item)
                 # Add audio/video to html folder
                 mediatype = "video"
                 if item['avname'][0:6] in ("/audio", "audio:"):
@@ -714,11 +713,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 av_destination = html_folder_name + av_path
                 # Copy non-linked a/v file to html folder
                 if not linked and not os.path.isfile(html_folder_name + av_path):
-                    #print("APP + item avname", self.app.project_path + item['avname'])
-                    #print("HTmL folder + av path",html_folder_name + av_path)
                     copyfile(self.app.project_path + item['avname'], html_folder_name + av_path)
                     av_destination = html_folder_name + av_path
-                    #print("AV_DESTINATION", av_destination)
                 # Copy Linked video file to html folder
                 if mediatype == "video" and linked:
                     av_destination = html_folder_name + "/video/" + av_path.split('/')[-1]
