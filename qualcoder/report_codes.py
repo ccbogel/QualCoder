@@ -863,7 +863,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def select_attributes(self):
         """ Trim the files list to files identified by attributes.
         Attribute dialing results are a dictionary of:
-        [0] attribute name, or 'case name'
+        [0] attribute name,
         [1] attribute type: character, numeric
         [2] modifier: > < == != like between
         [3] comparison value as list, one item or two items for between
@@ -1032,16 +1032,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        '''text_results = []
-        image_results = []
-        av_results = []'''
-
-        file_or_case = ""  # Default for attributes selection
+        # Default for attributes selection
+        file_or_case = ""
         if self.file_ids != "":
             file_or_case = "File"
         if self.case_ids != "":
             file_or_case = "Case"
-
         # Add search terms to textEdit
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
