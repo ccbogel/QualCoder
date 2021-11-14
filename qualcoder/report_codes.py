@@ -636,14 +636,13 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
-        TODO: Possibly have picture data in base64 so there is no need for a separate folder.
-        TODO: REVIEW HTML EXPORT - some errors with images and a/v
+        TODO: REVIEW HTML EXPORT IMAGES, A/V ON WINDOWS
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = "Report_codings.html"
-        e = ExportDirectoryPathDialog(self.app, filename)
+        html_filename = "Report_codings.html"
+        e = ExportDirectoryPathDialog(self.app, html_filename)
         filepath = e.filepath
         if filepath is None:
             return
@@ -657,19 +656,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         for item in self.html_links:
             if item['image'] is not None or item['avname'] is not None:
                 need_media_folders = True
+        html_folder_name = ""
         if need_media_folders:
-            # Create folder of images and media and change html links
-            foldername = filepath[:-5]
-            foldername_without_path = foldername.split('/')[-1]
+            # Create folder for images and sub-folders for audio and video
+            html_folder_name = filepath[:-5]
             try:
-                os.mkdir(foldername)
-                os.mkdir(foldername + "/audio")
-                os.mkdir(foldername + "/video")
+                os.mkdir(html_folder_name)
+                os.mkdir(html_folder_name + "/audio")
+                os.mkdir(html_folder_name + "/video")
             except Exception as e:
                 logger.warning(_("html folder creation error ") + str(e))
-                Message(self.app, _("Folder creation"), foldername + _(" error ") + str(e), "critical").exec_()
+                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(e), "critical").exec_()
                 return
-        html = ""
         try:
             with open(filepath, 'r') as f:
                 html = f.read()
@@ -677,80 +675,77 @@ class DialogReportCodes(QtWidgets.QDialog):
             logger.warning(_('html file reading error:') + str(e))
             return
 
+        # Change html links to reference the html folder
         for item in self.html_links:
             if item['imagename'] is not None:
-                #print("===================")
-                #print("IMG PATH ", item['imagename'])
-                # item['imagename'] is in this format: 0-/images/filename.jpg  # where 0- is the counter
-                imagename = item['imagename'].replace('/images/', '')
-                #print("IMG NAME: ", imagename)
-                folder_link = filename[:-5] + "/" + imagename
-                #print("FOLDER LINK:", folder_link)
-                item['image'].save(folder_link)
-                # TODO foldername referenced before assignment
-                html_link = foldername_without_path + "/" + imagename
+                print("ORG IMG PATH ", item['imagename'])
+                ''' item['imagename'] is in this format: 
+                0-/images/filename.jpg  # where 0- is the counter
+                '''
+                image_name = item['imagename'].replace('/images/', '')
+                #print("IMG NAME: ", image_name)
+                folder_link = html_filename[:-5] + "/" + image_name
+                img_path = filepath[:-5] + "/" + image_name
+                #print("IMG PATH", img_path)
+                # item['image'] is  QtGui.QImage object
+                item['image'].save(img_path)
                 ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
                 this needs to be upper case for the replace method to work:  c:  =>  C: '''
-                #TODO Check, this may fail on Windows now
+                '''#TODO Check, this may fail on Windows now
                 unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
-                html = html.replace(item['imagename'], html_link)
+                html = html.replace(item['imagename'], folder_link)
                 if unreplaced_html == html:
-                    html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
+                    html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], folder_link)'''
             if item['avname'] is not None:
-                try:
-                    # Add audio/video to folder
-                    mediatype = ""
-                    if item['avname'][0:6] in ("/video", "video:"):
-                        mediatype = "video"
-                    if item['avname'][0:6] in ("/audio", "audio:"):
-                        mediatype = "audio"
-                    # Remove link prefix and note if link or not
-                    linked = False
-                    av_path = item['avname']
-                    if av_path[0:6] == "video:":
-                        av_path = av_path[6:]
-                        linked = True
-                    if av_path[0:6] == "audio:":
-                        linked = True
-                        av_path = av_path[6:]
-                    av_filepath_dest = ""
-                    # TODO foldername referenced before assignment
-                    if not linked and not os.path.isfile(foldername + av_path):
-                        copyfile(self.app.project_path + item['avname'], foldername + av_path)
-                        av_filepath_dest = foldername + av_path
-                    # Extra work to check and copy a Linked file
-                    if mediatype == "video" and linked:
-                        av_filepath = av_path.split("/")[-1]  # TODO not used
-                        if not os.path.isfile(foldername + "/video/" + av_path.split('/')[-1]):
-                            av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
-                            copyfile(av_path, av_filepath_dest)
-                    if mediatype == "audio" and linked:
-                        av_filename = av_path.split("/")[-1]  # TODO not used
-                        if not os.path.isfile(foldername + "/audio/" + av_path.split('/')[-1]):
-                            av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
-                            copyfile(av_path + item['avname'], av_filepath_dest)
-
-                    extension = item['avname'][item['avname'].rfind('.') + 1:]
-                    extra = "</p><" + mediatype + " controls>"
-                    extra += '<source src="' + av_filepath_dest
-                    extra += '#t=' + item['av0'] + ',' + item['av1'] + '"'
-                    extra += ' type="' + mediatype + '/' + extension + '">'
-                    extra += '</' + mediatype + '><p>'
-                    #print("EXTRA:", extra)
-                    # hopefully only one location with video/link: [mins.secs - mins.secs]
-                    location = html.find(item['avtext'])
-                    location = location + len(['avtext']) - 1
-                    tmp = html[:location] + extra + html[location:]
-                    html = tmp
-                except Exception as e:
-                    logger.debug(str(e))
-                    Message(self.app, _("HTML folder creation error"), str(e), "warning").exec_()
-
+                #print("AVITEM", item)
+                # Add audio/video to html folder
+                mediatype = "video"
+                if item['avname'][0:6] in ("/audio", "audio:"):
+                    mediatype = "audio"
+                # Remove link prefix and note if link or not
+                linked = False
+                av_path = item['avname']
+                if av_path[0:6] == "video:":
+                    av_path = av_path[6:]
+                    linked = True
+                if av_path[0:6] == "audio:":
+                    linked = True
+                    av_path = av_path[6:]
+                av_destination = html_folder_name + av_path
+                # Copy non-linked a/v file to html folder
+                if not linked and not os.path.isfile(html_folder_name + av_path):
+                    #print("APP + item avname", self.app.project_path + item['avname'])
+                    #print("HTmL folder + av path",html_folder_name + av_path)
+                    copyfile(self.app.project_path + item['avname'], html_folder_name + av_path)
+                    av_destination = html_folder_name + av_path
+                    #print("AV_DESTINATION", av_destination)
+                # Copy Linked video file to html folder
+                if mediatype == "video" and linked:
+                    av_destination = html_folder_name + "/video/" + av_path.split('/')[-1]
+                    if not os.path.isfile(html_folder_name + "/video/" + av_path.split('/')[-1]):
+                        copyfile(av_path, av_destination)
+                # Copy Linked audio file to html folder
+                if mediatype == "audio" and linked:
+                    av_destination = html_folder_name + "/audio/" + av_path.split('/')[-1]
+                    if not os.path.isfile(html_folder_name + "/audio/" + av_path.split('/')[-1]):
+                        copyfile(av_path + item['avname'], av_destination)
+                # Create html to display media time positions
+                extension = item['avname'][item['avname'].rfind('.') + 1:]
+                extra = "</p>\n<" + mediatype + " controls>"
+                extra += '<source src="' + av_destination
+                extra += '#t=' + item['av0'] + ',' + item['av1'] + '"'
+                extra += ' type="' + mediatype + '/' + extension + '">'
+                extra += '</' + mediatype + '><p>\n'
+                # Hopefully only one location with exact audio/video/link: [mins.secs - mins.secs]
+                location = html.find(item['avtext'].replace('&', '&amp;'))
+                location = location + len(['avtext']) - 1
+                tmp = html[:location] + extra + html[location:]
+                html = tmp
         with open(filepath, 'w', encoding='utf-8-sig') as f:
             f.write(html)
         msg = _("Report exported to: ") + filepath
         if need_media_folders:
-            msg += "\n" + _("Media folder: ") + foldername
+            msg += "\n" + _("Media folder: ") + html_folder_name
         self.parent_textEdit.append(msg)
         Message(self.app, _('Report exported'), msg, "information").exec_()
 
