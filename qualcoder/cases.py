@@ -28,17 +28,11 @@ https://github.com/ccbogel/QualCoder
 import csv
 import datetime
 import logging
+from openpyxl import load_workbook
 import os
-import platform
 import sys
 import traceback
 import webbrowser
-
-openpyxl_module = True
-try:
-    from openpyxl import load_workbook
-except Exception as e:
-    openpyxl_module = False
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -56,7 +50,6 @@ from .memo import DialogMemo
 from .view_av import DialogViewAV
 from .view_image import DialogViewImage
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -67,7 +60,7 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
-    logger.error(_("Uncaught exception: ")  + text)
+    logger.error(_("Uncaught exception: ") + text)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
@@ -93,7 +86,7 @@ class DialogCases(QtWidgets.QDialog):
     case_text = []
     selected_case = None
     selected_file = None
-    display_text_links = [] # clickable links for audio video images as dictionaries of pos0, pos1, file id
+    display_text_links = []  # Clickable links for A/V images as dictionaries of pos0, pos1, file id
     attributes = []
 
     def __init__(self, app, parent_textEdit):
@@ -112,7 +105,6 @@ class DialogCases(QtWidgets.QDialog):
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textBrowser.setStyleSheet(doc_font)
         self.load_cases_and_attributes()
-        #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/pencil_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
@@ -151,7 +143,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.fill_tableWidget()
-        #Initial resize of table columns
+        # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 1])
         try:
@@ -159,12 +151,13 @@ class DialogCases(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogcases_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
-        except:
+        except KeyError:
             pass
-        self.eventFilterTT = ToolTip_EventFilter()
+        self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
 
-    def help(self):
+    @staticmethod
+    def help():
         """ Open help for transcribe section in browser. """
 
         url = "https://github.com/ccbogel/QualCoder/wiki/06-Cases"
@@ -242,15 +235,16 @@ class DialogCases(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-            'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+                                'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
         cur.execute("select name, memo, owner, date, caseid from cases")
         result = cur.fetchall()
         for row in result:
-            sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+            sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id "
+            sql += "where caseid=? order by source.name asc"
             cur.execute(sql, [row[4], ])
             files = cur.fetchall()
             self.cases.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'caseid': row[4], 'files': files})
+                               'caseid': row[4], 'files': files})
         cur.execute("select name from attribute_type where caseOrFile='case'")
         attribute_names = cur.fetchall()
         self.header_labels = ["Name", "Memo", "Id", "Files"]
@@ -275,7 +269,7 @@ class DialogCases(QtWidgets.QDialog):
         attribute_names = []
         for a in result:
             attribute_names.append({'name': a[0]})
-        check_names = attribute_names + [{'name': 'name'}, {'name':'memo'}, {'name':'caseid'}, {'name':'date'}]
+        check_names = attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'caseid'}, {'name': 'date'}]
         add_ui = DialogAddAttribute(self.app, check_names)
         ok = add_ui.exec_()
         if not ok or add_ui.new_name == "":
@@ -285,8 +279,8 @@ class DialogCases(QtWidgets.QDialog):
 
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
-        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(name, now_date, self.app.settings['codername'], "", 'case', value_type))
+        sql = "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
+        cur.execute(sql, (name, now_date, self.app.settings['codername'], "", 'case', value_type))
         self.app.conn.commit()
         sql = "select caseid from cases"
         cur.execute(sql)
@@ -303,10 +297,11 @@ class DialogCases(QtWidgets.QDialog):
     def import_cases_and_attributes(self):
         """ Get user chosen file as xlxs or csv for importation """
 
-        if self.cases != []:
+        if self.cases:
             logger.warning(_("Cases have already been created."))
         filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select cases file'),
-            self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[0]
+                                                         self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[
+            0]
         if filename == "":
             return
         if filename[-4:].lower() == ".csv":
@@ -321,16 +316,13 @@ class DialogCases(QtWidgets.QDialog):
         The attribute types are calculated from the data.
         """
 
-        if openpyxl_module is False:
-            self.fail_msg = _("Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
-            return False
         data = []
         wb = load_workbook(filename=filepath)
         sheet = wb.active
         for value in sheet.iter_rows(values_only=True):
-            # some rows may be complete blank so ignore importation
+            # Some rows may be blank so ignore importation
             if (set(value)) != {None}:
-                # values are tuples, convert to list, and remove 'None' string
+                # Values are tuples, convert to list, and remove 'None' string
                 row = []
                 for item in value:
                     if item is None:
@@ -352,10 +344,10 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
-                'date': now_date}
+                    'date': now_date}
             try:
-                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                    ,(item['name'],item['memo'],item['owner'],item['date']))
+                sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 item['caseid'] = cur.fetchone()[0]
@@ -377,10 +369,9 @@ class DialogCases(QtWidgets.QDialog):
         for col, att_name in enumerate(fields):
             if col > 0:
                 try:
-                    cur.execute("insert into attribute_type (name,date,owner,memo, \
-                    valueType, caseOrFile) values(?,?,?,?,?,?)"
-                    , (att_name, now_date, self.app.settings['codername'], "",
-                    attribute_value_type[col], 'case'))
+                    sql = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
+                    cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
+                                   attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
@@ -394,7 +385,7 @@ class DialogCases(QtWidgets.QDialog):
                     for col in range(1, len(v)):
                         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
-                        now_date, self.app.settings['codername']))
+                                          now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
@@ -428,10 +419,10 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for v in data:
             item = {'name': v[0], 'memo': "", 'owner': self.app.settings['codername'],
-                'date': now_date}
+                    'date': now_date}
             try:
-                cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                    ,(item['name'],item['memo'],item['owner'],item['date']))
+                sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
+                cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 item['caseid'] = cur.fetchone()[0]
@@ -453,10 +444,10 @@ class DialogCases(QtWidgets.QDialog):
         for col, att_name in enumerate(fields):
             if col > 0:
                 try:
-                    cur.execute("insert into attribute_type (name,date,owner,memo, \
+                    sql = "insert into attribute_type (name,date,owner,memo, \
                     valueType, caseOrFile) values(?,?,?,?,?,?)"
-                    , (att_name, now_date, self.app.settings['codername'], "",
-                    attribute_value_type[col], 'case'))
+                    cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
+                                   attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
@@ -470,7 +461,7 @@ class DialogCases(QtWidgets.QDialog):
                     for col in range(1, len(v)):
                         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
-                        now_date, self.app.settings['codername']))
+                                          now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
         self.fill_tableWidget()
@@ -492,20 +483,20 @@ class DialogCases(QtWidgets.QDialog):
             return
         # update case list and database
         item = {'name': case_name, 'memo': "", 'owner': self.app.settings['codername'],
-                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
         cur = self.app.conn.cursor()
-        cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date']))
+        sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
+        cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         item['caseid'] = cur.fetchone()[0]
-        # add placeholder attribute values
+        # Add placeholder attribute values
         cur.execute("select name, valuetype from attribute_type where caseOrFile='case'")
         atts = cur.fetchall()
         for att in atts:
             cur.execute("insert into attribute(name,attr_type,value,id,date,owner) \
                 values (?,?,?,?,?,?)",
-                (att[0], "case", "", item['caseid'], item['date'], item['owner']))
+                        (att[0], "case", "", item['caseid'], item['date'], item['owner']))
         self.app.conn.commit()
         self.cases.append(item)
         self.fill_tableWidget()
@@ -515,32 +506,30 @@ class DialogCases(QtWidgets.QDialog):
     def delete_case(self):
         """ When delete button pressed, case is deleted from model and database. """
 
-        tableRows_to_delete = []  # for table widget ids
-        caseNames_to_delete = ""  # for confirmDelete Dialog
+        table_rows_to_delete = []  # for table widget ids
+        case_names_to_delete = ""  # for confirmDelete Dialog
         ids_to_delete = []  # for ids for cases and db
 
         for itemWidget in self.ui.tableWidget.selectedItems():
-            tableRows_to_delete.append(int(itemWidget.row()))
+            table_rows_to_delete.append(int(itemWidget.row()))
             ids_to_delete.append(int(self.ui.tableWidget.item(itemWidget.row(),
-            self.ID_COLUMN).text()))
-            caseNames_to_delete = caseNames_to_delete + "\n" + str(self.ui.tableWidget.item(itemWidget.row(),
-            self.NAME_COLUMN).text())
-            #logger.debug("X:"+ str(itemWidget.row()) + "  y:"+str(itemWidget.column()) +"  "+itemWidget.text() +"  id:"+str(self.tableWidget_codes.item(itemWidget.row(),3).text()))
-        tableRows_to_delete.sort(reverse=True)
-        if len(caseNames_to_delete) == 0:
+                                                              self.ID_COLUMN).text()))
+            case_names_to_delete = case_names_to_delete + "\n" + str(self.ui.tableWidget.item(itemWidget.row(),
+                                                                                            self.NAME_COLUMN).text())
+        table_rows_to_delete.sort(reverse=True)
+        if len(case_names_to_delete) == 0:
             return
-        ui = DialogConfirmDelete(self.app, caseNames_to_delete)
+        ui = DialogConfirmDelete(self.app, case_names_to_delete)
         ok = ui.exec_()
         if not ok:
             return
-        for id in ids_to_delete:
+        for id_ in ids_to_delete:
             for c in self.cases:
-                if c['caseid'] == id:
+                if c['caseid'] == id_:
                     cur = self.app.conn.cursor()
-                    #logger.debug(str(id) + "  "+ str(type(id)))
-                    cur.execute("delete from cases where caseid=?", [id])
-                    cur.execute("delete from case_text where caseid=?", [id])
-                    cur.execute("delete from attribute where id=? and attr_type='case'", [id])
+                    cur.execute("delete from cases where caseid=?", [id_])
+                    cur.execute("delete from case_text where caseid=?", [id_])
+                    cur.execute("delete from attribute where id=? and attr_type='case'", [id_])
                     self.app.conn.commit()
                     self.parent_textEdit.append("Case deleted: " + c['name'])
         self.load_cases_and_attributes()
@@ -595,7 +584,7 @@ class DialogCases(QtWidgets.QDialog):
                             (value, self.cases[x]['caseid'], attribute_name))
                 self.app.conn.commit()
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
-            (value, self.cases[x]['caseid'], attribute_name))
+                        (value, self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
             # Reload attributes
             sql = "select attribute.name, value, id from attribute where attr_type='case'"
@@ -622,25 +611,25 @@ class DialogCases(QtWidgets.QDialog):
         if self.count_selected_items() > 1:
             return
 
-        #logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])'''
+        # logger.debug("Selected case: " + str(self.selected_case['id']) +" "+self.selected_case['name'])'''
         # get case_text for this file
         if self.selected_file is not None:
-            #logger.debug("File Selected: " + str(self.selected_file['id'])+"  "+self.selected_file['file'])
+            # logger.debug("File Selected: " + str(self.selected_file['id'])+"  "+self.selected_file['file'])
             self.case_text = []
             cur = self.app.conn.cursor()
             cur.execute("select caseid, fid, pos0, pos1, owner, date, memo from case_text where fid = ? and caseid = ?",
-                [self.selected_file['id'], self.selected_case['caseid']])
+                        [self.selected_file['id'], self.selected_case['caseid']])
             result = cur.fetchall()
             for row in result:
                 self.case_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
-                'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
+                                       'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
         # if y == self.NAME_COLUMN:
         self.view()
 
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
-                self.cases[x]['memo'])
+                            self.cases[x]['memo'])
             ui.exec_()
             self.cases[x]['memo'] = ui.memo
             cur = self.app.conn.cursor()
@@ -665,7 +654,8 @@ class DialogCases(QtWidgets.QDialog):
         ui.exec_()
         # reload files count
         cur = self.app.conn.cursor()
-        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by source.name asc"
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where "
+        sql += "caseid=? order by source.name asc"
         cur.execute(sql, [self.cases[x]['caseid'], ])
         files = cur.fetchall()
         self.cases[x]['files'] = files
@@ -683,7 +673,7 @@ class DialogCases(QtWidgets.QDialog):
         for row, c in enumerate(self.cases):
             self.ui.tableWidget.insertRow(row)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN,
-            QtWidgets.QTableWidgetItem(c['name']))
+                                        QtWidgets.QTableWidgetItem(c['name']))
             memotmp = c['memo']
             item = QtWidgets.QTableWidgetItem("")
             item.setToolTip(_("Click to edit memo"))
@@ -729,8 +719,9 @@ class DialogCases(QtWidgets.QDialog):
         display_text = []
         self.display_text_links = []
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, fid, pos0, pos1, owner, date, memo from case_text where caseid = ? order by fid, pos0",
-            [self.selected_case['caseid'],])
+        cur.execute(
+            "select caseid, fid, pos0, pos1, owner, date, memo from case_text where caseid = ? order by fid, pos0",
+            [self.selected_case['caseid'], ])
         result = cur.fetchall()
         for row in result:
             case_text = ""
@@ -744,8 +735,8 @@ class DialogCases(QtWidgets.QDialog):
                     filename = src['name']
                     mediapath = src['mediapath']
             display_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
-            'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-            'text': case_text, 'name': filename, 'mediapath': mediapath})
+                                 'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
+                                 'text': case_text, 'name': filename, 'mediapath': mediapath})
 
         format_reg = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
@@ -768,7 +759,8 @@ class DialogCases(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.textCursor()
         for c in display_text:
             if c['mediapath'] is None or c['mediapath'] == '' or c['mediapath'][:5] == "docs:":  # text source
-                header = "\n" + _("File: ") + c['name']  # + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
+                header = "\n" + _("File: ") + c[
+                    'name']  # + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
                 header += ", " + _("Characters: ") + str(c['pos1'] - c['pos0'])
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
@@ -828,7 +820,6 @@ class DialogCases(QtWidgets.QDialog):
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 try:
                     ui = None
-                    abs_path = ""
                     if item['mediapath'][:6] == "video:":
                         abs_path = item['mediapath'].split(':')[1]
                         if not os.path.exists(abs_path):
@@ -881,7 +872,7 @@ class DialogCases(QtWidgets.QDialog):
             cb.setText(selected_text, mode=cb.Clipboard)
 
 
-class ToolTip_EventFilter(QtCore.QObject):
+class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textBrowser.
     The tool top text is presented according to its position in the text.
     """
@@ -899,16 +890,15 @@ class ToolTip_EventFilter(QtCore.QObject):
 
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        # Added chack for media_data, it may be None
+        # Added check for media_data, it may be None
         if event.type() == QtCore.QEvent.ToolTip and self.media_data:
-            helpEvent = QHelpEvent(event)
-            cursor = QtGui.QTextCursor()
-            cursor = receiver.cursorForPosition(helpEvent.pos())
+            help_event = QHelpEvent(event)
+            # cursor = QtGui.QTextCursor()
+            cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             for item in self.media_data:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
-
+        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
