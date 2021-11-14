@@ -71,8 +71,8 @@
        <rect>
         <x>10</x>
         <y>80</y>
-        <width>32</width>
-        <height>32</height>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -110,7 +110,7 @@
        <rect>
         <x>240</x>
         <y>81</y>
-        <width>44</width>
+        <width>34</width>
         <height>30</height>
        </rect>
       </property>
