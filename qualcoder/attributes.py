@@ -50,6 +50,7 @@ PTH = os.path.dirname(PTH) + "/"
 if platform.system() == "Windows":
     PTH = ""
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -68,7 +69,6 @@ class DialogManageAttributes(QtWidgets.QDialog):
     CASE_FILE_COLUMN = 1
     VALUETYPE_COLUMN = 2
     MEMO_COLUMN = 3
-
     app = None
     parent_tetEdit = None
     attributes = []
@@ -86,14 +86,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.get_attributes()
         self.fill_tableWidget()
-        #Initial resize of table columns
+        # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        #self.ui.pushButton_add.setStyleSheet("background-image : url("+PTH+"GUI/plus_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
-        #self.ui.pushButton_delete.setStyleSheet("background-image : url("+PTH+"GUI/delete_icon.png);")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
@@ -105,16 +103,20 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_attributes(self):
+        """ Get attributes from sqlite. """
+
         self.attributes = []
         cur = self.app.conn.cursor()
         cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
+        self.attributes = []
+        keys = 'name', 'date', 'owner', 'memo', 'caseOrFile', 'valuetype'
         for row in result:
-            self.attributes.append({'name': row[0], 'date': row[1], 'owner': row[2],
-                'memo': row[3], 'caseOrFile': row[4], 'valuetype': row[5]})
+            self.attributes.append(dict(zip(keys, row)))
 
     def count_selected_items(self):
         """ Update label with the count of selected items. """
+
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = []
         for i in indexes:
@@ -127,33 +129,34 @@ class DialogManageAttributes(QtWidgets.QDialog):
         AddItem dialog checks for duplicate attribute name.
         New attribute is added to the model and database. """
 
-        check_names = self.attributes + [{'name': 'name'}, {'name':'memo'}, {'name':'id'}, {'name':'date'}]
+        check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
+        check_names.extend(self.attributes)
         ui = DialogAddAttribute(self.app, check_names)
         ui.exec_()  # ok = ui.exec_() does not pick up pressing the cancel button
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
             return
-        Dialog_assign = QtWidgets.QDialog()
+        dialog_assign = QtWidgets.QDialog()
         ui = Ui_Dialog_assignAttribute()
-        ui.setupUi(Dialog_assign)
-        Dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        ui.setupUi(dialog_assign)
+        dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
-        Dialog_assign.setStyleSheet(font)
-        Dialog_assign.exec_()
+        dialog_assign.setStyleSheet(font)
+        dialog_assign.exec_()
         case_or_file = "case"
         if ui.radioButton_files.isChecked():
             case_or_file = "file"
-        # update attributes list and database
+        # Update attributes list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         item = {'name': name, 'memo': "", 'owner': self.app.settings['codername'],
             'date': now_date, 'valuetype': value_type,
             'caseOrFile': case_or_file}
         self.attributes.append(item)
         cur = self.app.conn.cursor()
-        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-            ,(item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
+        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+            (item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
         self.app.conn.commit()
         sql = "select id from source"
         cur.execute(sql)
@@ -233,8 +236,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
             return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        text = str(self.ui.tableWidget.item(row, col).text())
-        if col == 2 and text == _("numeric"):
+        text_ = str(self.ui.tableWidget.item(row, col).text())
+        action_to_character = None
+        if col == 2 and text_ == _("numeric"):
             action_to_character = menu.addAction(_("Change to character"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
@@ -243,7 +247,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             attr_name = str(self.ui.tableWidget.item(row, 0).text())
             cur = self.app.conn.cursor()
             print(attr_name)
-            cur.execute('update attribute_type set valuetype="character" where name=?',[attr_name, ])
+            cur.execute('update attribute_type set valuetype="character" where name=?', [attr_name])
             self.app.conn.commit()
             self.get_attributes()
             self.fill_tableWidget()
@@ -251,12 +255,11 @@ class DialogManageAttributes(QtWidgets.QDialog):
     def cell_modified(self):
         """ If the attribute name has been changed in the table widget and update the database. """
 
-        NAME_COLUMN = 0
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        if y == NAME_COLUMN:
+        if y == self.NAME_COLUMN:
             new_name = str(self.ui.tableWidget.item(x, y).text()).strip()
-            # check that no other attribute has this text and this is is not empty
+            # Check that no other attribute has this text and this is is not empty
             update = True
             if new_name == "":
                 update = False
@@ -264,15 +267,14 @@ class DialogManageAttributes(QtWidgets.QDialog):
                 if att['name'] == new_name:
                     update = False
             if update:
-                # update attribute type list and database
+                # Update attribute type list and database
                 cur = self.app.conn.cursor()
                 cur.execute("update attribute_type set name=? where name=?", (new_name, self.attributes[x]['name']))
                 cur.execute("update attribute set name=? where name=?", (new_name, self.attributes[x]['name']))
                 self.app.conn.commit()
                 self.parent_textEdit.append(_("Attribute renamed from: ") + self.attributes[x]['name'] + _(" to ") + new_name)
                 self.attributes[x]['name'] = new_name
-
-            else:  # put the original text in the cell
+            else:  # Put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.attributes[x]['name'])
 
     def fill_tableWidget(self):
@@ -292,11 +294,11 @@ class DialogManageAttributes(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(a['caseOrFile'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_FILE_COLUMN, item)
-            mText = ""
+            m_text = ""
             mtmp = a['memo']
             if mtmp is not None and mtmp != "":
-                mText = _("Yes")
-            item = QtWidgets.QTableWidgetItem(mText)
+                m_text = _("Yes")
+            item = QtWidgets.QTableWidgetItem(m_text)
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(a['valuetype'])
@@ -304,11 +306,3 @@ class DialogManageAttributes(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, self.VALUETYPE_COLUMN, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogManageAttributes()
-    ui.show()
-    sys.exit(app.exec_())
-
