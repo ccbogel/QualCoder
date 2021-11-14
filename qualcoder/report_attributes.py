@@ -38,6 +38,7 @@ from .helpers import Message
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -103,6 +104,24 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.fill_tableWidget()
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
 
+    def fill_parameters(self, attribute_list):
+        """ Pre fill attributes in Dialog from previous selection. """
+
+        if not attribute_list:
+            return
+        for a in attribute_list:
+            for x in range(0, self.ui.tableWidget.rowCount()):
+                if self.ui.tableWidget.item(x, self.NAME_COLUMN).text() == a[0]:
+                    val_text = ""
+                    if len(a[4]) == 1:
+                        val_text = str(a[4][0])
+                    if len(a[4]) > 1:
+                        val_text = ";".join(a[4])
+                    # Character values are apostrophe quoted, so remove those '
+                    val_text = val_text.replace("'", "")
+                    self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
+                    self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText(a[3])
+
     def accept(self):
         """ Make a parameter list where operator and value are entered.
         Check that values are acceptable for operator and for numeric type. """
@@ -117,7 +136,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             if operator == '':
                 values = []
             if operator in ('<', '<=', '>', '>=', '=', 'like') and len(values) > 1:
-               values = [values[0]]
+                values = [values[0]]
             if operator == 'between' and len(values) > 2:
                 values = values[:2]
             if operator == 'between' and len(values) < 2:
@@ -136,9 +155,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 values = []
             # add single quotes to character values
             if type_ == "character":
-                for i in range (0, len(values)):
+                for i in range(0, len(values)):
                     values[i] = "'" + values[i] + "'"
-            if values != []:
+            if values:
                 self.parameters.append([self.ui.tableWidget.item(x, self.NAME_COLUMN).text(),
                 self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
                 self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
@@ -168,7 +187,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             Message(self.app, _('Warning'), _("No operator was selected"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText('')
         # Enforce that value list is only one item for selected operators
-        if operator in ('<','<=','>','>=','=','like') and len(values) > 1:
+        if operator in ('<', '<=', '>', '>=', '=', 'like') and len(values) > 1:
             Message(self.app, _('Warning'), _("Too many values given for this operator"), "warning").exec()
             self.ui.tableWidget.item(x, y).setText(values[0])
         if operator == 'between' and len(values) != 2:
@@ -184,20 +203,20 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, y).setText("")
         self.ui.tableWidget.blockSignals(False)
 
-    def get_tooltip_values(self, name, caseOrFile, valuetype):
+    def get_tooltip_values(self, name, case_or_file, valuetype):
         """ Get values to display in tooltips for the value list column. """
 
         tt = ""
         cur = self.app.conn.cursor()
         if valuetype == "numeric":
             sql = "select min(cast(value as real)), max(cast(value as real)) from attribute where name=? and attr_type=?"
-            cur.execute(sql, [name, caseOrFile])
+            cur.execute(sql, [name, case_or_file])
             res = cur.fetchone()
             tt = _("Minimum: ") + str(res[0]) + "\n"
             tt += _("Maximum: ") + str(res[1])
         if valuetype == "character":
             sql = "select distinct value from attribute where name=? and attr_type=? and length(value)>0 limit 10"
-            cur.execute(sql, [name, caseOrFile])
+            cur.execute(sql, [name, case_or_file])
             res = cur.fetchall()
             for r in res:
                 tt += "\n" + r[0]
@@ -228,18 +247,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             cb.addItems(items)
             self.ui.tableWidget.setCellWidget(row, self.OPERATOR_COLUMN, cb)
             item = QtWidgets.QTableWidgetItem('')
-            #item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             tt = self.get_tooltip_values(a['name'], a['caseOrFile'], a['valuetype'])
             item.setToolTip(tt)
             self.ui.tableWidget.setItem(row, self.VALUE_LIST_COLUMN, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSelectAttributeParameters()
-    ui.show()
-    sys.exit(app.exec_())
-

@@ -28,14 +28,11 @@ https://qualcoder.wordpress.com/
 
 from copy import copy, deepcopy
 import csv
-import datetime
 import logging
 import os
-import platform
 from shutil import copyfile
 import sys
 import traceback
-import qualcoder.vlc as vlc
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.Qt import QHelpEvent
@@ -45,11 +42,9 @@ from PyQt5.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
-from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
-from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from .helpers import Message, msecs_to_hours_mins_secs, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
+    ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
-from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -72,7 +67,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         Text context of a coded text portion is shown in the thord splitter pan in a text edit.
         Case matrix is also shown in a qtablewidget in the third splitter pane.
-        If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the text in context.
+        If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the
+        text in context.
         TODO - export case matrix
     """
 
@@ -131,13 +127,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_search.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.label_exports.setPixmap(pm.scaled(22, 22))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
+        self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_matrix.setPixmap(pm)
@@ -171,7 +169,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             v1 = self.app.settings['dialogreportcodes_splitter_v1']
             v2 = self.app.settings['dialogreportcodes_splitter_v2']
             self.ui.splitter_vert.setSizes([v0, v1, v2])
-        except:
+        except Exception:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
@@ -180,10 +178,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
-        self.eventFilterTT = ToolTip_EventFilter()
+        self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
 
-    def splitter_sizes(self, pos, index):
+    def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
 
         sizes = self.ui.splitter.sizes()
@@ -251,7 +249,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         item.setToolTip(_("No case selection"))
         self.ui.listWidget_cases.addItem(item)
         for c in self.cases:
-            tt= ""
+            tt = ""
             item = QtWidgets.QListWidgetItem(c['name'])
             if c['memo'] is not None and c['memo'] != "":
                 tt = _("Memo: ") + c['memo']
@@ -321,10 +319,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             ok = dialog.exec_()
             if not ok:
                 return
-            text = str(dialog.textValue())
+            dlg_text = str(dialog.textValue())
             for i in range(self.ui.listWidget_files.count()):
                 item_name = self.ui.listWidget_files.item(i).text()
-                if text in item_name:
+                if dlg_text in item_name:
                     self.ui.listWidget_files.item(i).setSelected(True)
                 else:
                     self.ui.listWidget_files.item(i).setSelected(False)
@@ -398,13 +396,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         count = 0
         while len(cats) > 0 and count < 10000:
             remove_list = []
-            #logger.debug(cats)
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 count2 = 0
                 while item and count2 < 10000:  # while there is an item in the list
-                    #logger.debug("While item in list: " + item.text(0) + "|" + item.text(1) + ", c[catid]:" + str(c['catid']) + ", supercatid:" + str(c['supercatid']))
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
                         if c['memo'] != "":
@@ -412,7 +408,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
-                        #logger.debug("Adding item: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -425,7 +420,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("add unlinked code:" + c['name'])
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
@@ -433,7 +427,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
+                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -446,7 +440,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             item = it.value()
             count = 0
             while item and count < 10000:
-                #logger.debug("add codes as children, item:" + item.text(0) + "|" + item.text(1) + ", c[id]:" + str(c['cid']) + ", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "":
@@ -455,7 +448,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)  # | Qt.ItemIsDragEnabled)
+                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -476,7 +469,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         item = it.value()
         count = 0
         while item and count < 10000:
-            #print(item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 cur.execute(sql, [cid, cid, cid])  # , self.app.settings['codername']])
@@ -495,7 +487,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_option_selected(self):
         """ ComboBox export option selected. """
 
-        #TODO add case matrix as csv, xlsx options
+        # TODO add case matrix as csv, xlsx options
         text = self.ui.comboBox_export.currentText()
         if text == "":
             return
@@ -564,31 +556,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.text_results == [] and self.image_results == [] and self.av_results == []:
             return
         codes_all = []
-        codes_set = []
+        codes_set = []  # TODO
         codes_freq_list = []
-        #print("TEXT")  # tmp
         for i in self.text_results:
             codes_all.append(i['codename'])
-            #print(i)
-        #print("IMAGES")  # tmp
         for i in self.image_results:
             codes_all.append(i['codename'])
-            #print(i)
-        #print("AUDIO/VIDEO")  # tmp
         for i in self.av_results:
             codes_all.append(i['codename'])
-            #print(i)
         codes_set = list(set(codes_all))
         codes_set.sort()
         for x in codes_set:
             codes_freq_list.append(codes_all.count(x))
-        #print(codes_all)
-        #print(codes_set)
-        #print(codes_freq_list)
 
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
-        #print("ncols:", ncols, "nrows:", nrows)
 
         # Prepare data rows for csv writer
         csv_data = []
@@ -604,10 +586,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             for i in self.text_results:
                 if i['codename'] == code:
                     d = i['text'] + "\n" + i['file_or_casename']
-                     # Add file id if results are based on attribute selection
+                    # Add file id if results are based on attribute selection
                     if i['file_or_case'] == "":
                         d += " fid:" + str(i['fid'])
-                    csv_data[row][col]  = d
+                    csv_data[row][col] = d
                     row += 1
             for i in self.image_results:
                 if i['codename'] == code:
@@ -619,7 +601,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if i['file_or_case'] == "":
                         d += " " + i['mediapath'][8:]
                     csv_data[row][col] = d
-                    row +=1
+                    row += 1
             for i in self.av_results:
                 if i['codename'] == code:
                     d = i['memo']
@@ -641,7 +623,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         filepath = e.filepath
         if filepath is None:
             return
-        with open(filepath, 'w', encoding ='utf-8-sig', newline='') as csvfile:
+        with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
@@ -705,6 +687,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 folder_link = filename[:-5] + "/" + imagename
                 #print("FOLDER LINK:", folder_link)
                 item['image'].save(folder_link)
+                # TODO foldername referenced before assignment
                 html_link = foldername_without_path + "/" + imagename
                 ''' Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
                 this needs to be upper case for the replace method to work:  c:  =>  C: '''
@@ -713,9 +696,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 html = html.replace(item['imagename'], html_link)
                 if unreplaced_html == html:
                     html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], html_link)
-                #print("Windows 10 not replacing issue ", item['imagename'], html_link)
-                #logger.debug("Windows 10 not replacing issue: item[imagename]: " + item['imagename'] + ", html_link: " + html_link)
-
             if item['avname'] is not None:
                 try:
                     # Add audio/video to folder
@@ -734,17 +714,18 @@ class DialogReportCodes(QtWidgets.QDialog):
                         linked = True
                         av_path = av_path[6:]
                     av_filepath_dest = ""
+                    # TODO foldername referenced before assignment
                     if not linked and not os.path.isfile(foldername + av_path):
                         copyfile(self.app.project_path + item['avname'], foldername + av_path)
                         av_filepath_dest = foldername + av_path
                     # Extra work to check and copy a Linked file
                     if mediatype == "video" and linked:
-                        av_filepath = av_path.split("/")[-1]
+                        av_filepath = av_path.split("/")[-1]  # TODO not used
                         if not os.path.isfile(foldername + "/video/" + av_path.split('/')[-1]):
                             av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
                             copyfile(av_path, av_filepath_dest)
                     if mediatype == "audio" and linked:
-                        av_filename = av_path.split("/")[-1]
+                        av_filename = av_path.split("/")[-1]  # TODO not used
                         if not os.path.isfile(foldername + "/audio/" + av_path.split('/')[-1]):
                             av_filepath_dest = foldername + "/video/" + av_path.split('/')[-1]
                             copyfile(av_path + item['avname'], av_filepath_dest)
@@ -752,13 +733,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                     extension = item['avname'][item['avname'].rfind('.') + 1:]
                     extra = "</p><" + mediatype + " controls>"
                     extra += '<source src="' + av_filepath_dest
-                    extra += '#t=' + item['av0'] +',' + item['av1'] + '"'
+                    extra += '#t=' + item['av0'] + ',' + item['av1'] + '"'
                     extra += ' type="' + mediatype + '/' + extension + '">'
                     extra += '</' + mediatype + '><p>'
                     #print("EXTRA:", extra)
                     # hopefully only one location with video/link: [mins.secs - mins.secs]
                     location = html.find(item['avtext'])
-                    location = location + len(['avtext'])- 1
+                    location = location + len(['avtext']) - 1
                     tmp = html[:location] + extra + html[location:]
                     html = tmp
                 except Exception as e:
@@ -781,10 +762,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         # change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
-        if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or \
+        if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
             self.ui.listWidget_files.hasFocus() or self.ui.listWidget_cases.hasFocus()):
             key = event.key()
-            mod = event.modifiers()
+            # mod = event.modifiers()
             # Hide unHide top groupbox
             if key == QtCore.Qt.Key_H:
                 self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
@@ -830,7 +811,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.clearSelection()
 
         cur = self.app.conn.cursor()
-        sql = "select anid, fid, source.name, pos0, pos1, annotation.memo, annotation.owner, annotation.date, substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
+        sql = "select anid, fid, source.name, pos0, pos1, annotation.memo, annotation.owner, annotation.date, "
+        sql += "substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
         sql += "from annotation join source on source.id=annotation.fid "
         sql += "where source.fulltext is not null and fid in (" + self.file_ids + ") "
         # Coder limiter
@@ -842,7 +824,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += " and instr(subtext, ?) is not null "
             values.append(search_text)
         sql += " order by source.name, anid asc"
-        if values == []:
+        if not values:
             cur.execute(sql)
         else:
             cur.execute(sql, values)
@@ -870,7 +852,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.append(file_txt)
         self.ui.textEdit.append("==========")
         for a in annotes:
-            txt = "\n" + _("File") + ": " + a['filename'] + " anid: " + str(a['anid']) + " " + _("Date:") + " " + a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
+            txt = "\n" + _("File") + ": " + a['filename'] + " anid: " + str(a['anid']) + " " + _("Date:") + " "
+            txt += a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
             txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
             txt += _("TEXT") + ": " + a['text'] + "\n"
             txt += _("ANNOTATION") + ": " + a['annotation']
@@ -898,7 +881,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Clear ui
         self.attributes_msg = ""
         self.attribute_file_ids = []
-        self.attributes = []
         self.ui.pushButton_attributeselect.setToolTip("")
         self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
@@ -909,13 +891,26 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.listWidget_cases.item(i).setSelected(False)
 
         ui = DialogSelectAttributeParameters(self.app)
+        ui.fill_parameters(self.attributes)
+        self.attributes = []
         ok = ui.exec_()
         if not ok:
             self.attributes = []
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
+            self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             return
         self.attributes = ui.parameters
         if not self.attributes:
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
+            self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             return
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
+        self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
 
         file_ids = []
         case_file_ids = []
@@ -923,38 +918,49 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
         for a in self.attributes:
-            sql = "select id from attribute where "
             # File attributes
+            file_sql = "select id from attribute where "
             if a[1] == 'file':
-                sql += "attribute.name = '" + a[0] + "' "
-                sql += " and attribute.value " + a[3] + " "
+                file_sql += "attribute.name = '" + a[0] + "' "
+                file_sql += " and attribute.value " + a[3] + " "
                 if a[3] == 'between':
-                    sql += a[4][0] + " and " + a[4][1] + " "
+                    file_sql += a[4][0] + " and " + a[4][1] + " "
                 if a[3] in ('in', 'not in'):
-                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
                 if a[3] not in ('between', 'in', 'not in'):
-                    sql += a[4][0]
+                    file_sql += a[4][0]
                 if a[2] == 'numeric':
-                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                sql += " and attribute.attr_type='file'"
-                #print("Attribute selected: ", a)
-                cur.execute(sql)
+                    file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                file_sql += " and attribute.attr_type='file'"
+                cur.execute(file_sql)
                 result = cur.fetchall()
                 for i in result:
                     file_ids.append(i[0])
-            # Case names
-            if a[1] == "case":
+            # Case attributes
+            if a[1] == 'case':
                 # Case text table also links av and images
-                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
-                sql += "join source on source.id=case_text.fid where cases.name " +a[3]
-                if a[3] != "like":
-                    sql += a[4][0]
-                else:
-                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
-                cur.execute(sql)
+                case_sql = "select distinct case_text.fid from cases "
+                case_sql += "join case_text on case_text.caseid=cases.caseid "
+                case_sql += "join attribute on cases.caseid=attribute.id "
+                case_sql += " where "
+                case_sql += "attribute.name = '" + a[0] + "' "
+                case_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    case_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                if a[2] == 'numeric':
+                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                case_sql += " and attribute.attr_type='case'"
+                #print("Attribute selected: ", a)
+                #print(case_sql)
+                cur.execute(case_sql)
                 case_result = cur.fetchall()
                 for i in case_result:
                     case_file_ids.append(i[0])
+
         if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec_()
             return
@@ -970,7 +976,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             set_ids = set_case_file_ids
         self.attribute_file_ids = list(set_ids)
         #print("Attribute file ids", self.attribute_file_ids)
-        # Prepare message for label tooltop
+        # Prepare message for label tooltip
         self.attributes_msg = ""
         file_msg = ""
         case_msg = ""
@@ -978,12 +984,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             if a[1] == 'file':
                 file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(file_msg) > 4:
-            file_msg = "(" + file_msg[3:] + ")"
+            file_msg = "(" + _("File: ") + file_msg[3:] + ")"
         for a in self.attributes:
             if a[1] == 'case':
                 case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(case_msg) > 5:
-            case_msg = "(" + case_msg[4:] + ")"
+            case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
         if file_msg != "" and case_msg != "":
             self.attributes_msg = file_msg + " and " + case_msg
         else:
@@ -1050,13 +1056,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             if i.text(1)[0:3] == 'cid':
                 codes_count += 1
                 codes_string += i.text(0) + ". "
-        codes_string +=  _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
+        codes_string += _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
         self.ui.textEdit.insertPlainText(codes_string)
         important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
         parameters = ""
-        if self.attribute_file_ids != []:
+        if self.attribute_file_ids:
             self.file_ids = ""
             for a in self.attribute_file_ids:
                 self.file_ids += "," + str(a)
@@ -1091,11 +1097,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             if i.text(1)[0:3] == 'cid':
                 code_ids += "," + i.text(1)[4:]
         code_ids = code_ids[1:]
-        #logger.debug("File ids\n",self.file_ids, type(self.file_ids))
-        #logger.debug("Case ids\n",self.case_ids, type(self.case_ids))
-        text_results = []
-        image_results = []
-        av_results = []
         self.html_links = []
         self.results = []
         parameters = []
@@ -1118,19 +1119,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             if important:
                 sql += " and code_text.important=1 "
             sql += " order by code_name.name, source.name, pos0"
-            if parameters == []:
+            if not parameters:
                 cur.execute(sql)
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', 'codename_memo', 'source_memo'
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
+                   'codename_memo', 'source_memo'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
                 tmp['file_or_case'] = file_or_case
-                #text_results.append(tmp)
                 self.results.append(tmp)
 
             # Coded images
@@ -1151,20 +1150,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             if important:
                 sql += " and code_image.important=1 "
             sql += " order by code_name.name, source.name, x1"
-            if parameters == []:
+            if not parameters:
                 cur.execute(sql)
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
-                   'coded_memo', 'codename_memo', 'source_memo'
+            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+                   'fid', 'coded_memo', 'codename_memo', 'source_memo'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
                 tmp['file_or_case'] = file_or_case
-                #image_results.append(tmp)
                 self.results.append(tmp)
 
             # Coded audio and video, also looks for search_text in coded segment memo
@@ -1184,11 +1180,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if important:
                 sql += " and code_av.important=1 "
             sql += " order by code_name.name, source.name, pos0"
-            if parameters == []:
+            if not parameters:
                 cur.execute(sql)
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid',\
@@ -1200,11 +1194,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                 text = str(tmp['file_or_casename']) + " "
                 if len(tmp['coded_memo']) > 0:
                     text += "\nMemo: " + tmp['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) +" - " + msecs_to_hours_mins_secs(tmp['pos1'])
+                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
                 tmp['text'] = text
                 self.html_links.append({'imagename': None, 'image': None,
                     'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)), 'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text})
-                #av_results.append(tmp)
                 self.results.append(tmp)
 
         # CASES AND FILES SEARCH
@@ -1230,7 +1223,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 sql += " and seltext like ? "
                 parameters.append("%" + str(search_text) + "%")
             sql += " order by code_name.name, cases.name"
-            if parameters == []:
+            if not parameters:
                 cur.execute(sql)
             else:
                 cur.execute(sql, parameters)
@@ -1241,7 +1234,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
                 tmp['file_or_case'] = file_or_case
-                #text_results.append(tmp)
                 self.results.append(tmp)
 
             # Coded images
@@ -1264,11 +1256,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 sql += " and code_image.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
             sql += " order by code_name.name, cases.name"
-            if parameters == []:
+            if not parameters:
                 cur.execute(sql)
             else:
-                #logger.info("SQL:" + sql)
-                #logger.info("Parameters:" + str(parameters))
                 cur.execute(sql, parameters)
             imgresults = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
@@ -1277,11 +1267,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
                 tmp['file_or_case'] = file_or_case
-                #image_results.append(tmp)
                 self.results.append(tmp)
 
             # Coded audio and video
-            avresults = []
             parameters = []
             av_sql = "select distinct code_name.name, color, cases.name as case_name, "
             av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
@@ -1301,10 +1289,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 av_sql += " and code_av.memo like ? "
                 parameters.append("%" + str(search_text) + "%")
             sql += " order by code_name.name, cases.name"
-            if parameters == []:
+            if not parameters:
                 cur.execute(av_sql)
             else:
-                #logger.info("SQL:" + av_sql + "\nParameters:" + str(parameters))
                 cur.execute(av_sql, parameters)
             avresults = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', \
@@ -1313,23 +1300,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
                 tmp['file_or_case'] = file_or_case
-                text = str(tmp['file_or_casename']) + " "
+                tmp_text = str(tmp['file_or_casename']) + " "
                 if len(tmp['coded_memo']) > 0:
-                    text += "\nMemo: " + tmp['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = text
+                    tmp_text += "\nMemo: " + tmp['coded_memo']
+                tmp_text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+                tmp['text'] = tmp_text
                 self.html_links.append({'imagename': None, 'image': None,
                                         'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
-                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text})
-                #av_results.append(tmp)
+                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
                 self.results.append(tmp)
 
         # Organise results by code name, ascending
-        self.results = sorted(self.results, key=lambda i: i['codename'])
+        self.results = sorted(self.results, key=lambda i_: i_['codename'])
         self.fill_text_edit_with_search_results()
-        # Clean up for next search
+        # Clean up for next search. Except attributes list
         self.attribute_file_ids = []
-        self.attributes = []
         self.file_ids = ""
         self.case_ids = ""
         self.attributes_msg = ""
@@ -1382,14 +1367,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         text_edit.append("\n")
-        path = self.app.project_path + img['mediapath']
+        path_ = self.app.project_path + img['mediapath']
         if img['mediapath'][0:7] == "images:":
-            path = img['mediapath'][7:]
+            path_ = img['mediapath'][7:]
         document = text_edit.document()
-        image = QtGui.QImageReader(path).read()
+        image = QtGui.QImageReader(path_).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
         # Scale to max 300 wide or high. perhaps add option to change maximum limit?
-        scaler = 1.0
         scaler_w = 1.0
         scaler_h = 1.0
         if image.width() > 300:
@@ -1401,14 +1385,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        #print("REPORTS IMG MEDIAPATH", img['mediapath'])
-
         # Default for an image  stored in the project folder.
-        #imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         imagename = str(counter) + '-' + img['mediapath']
         # Check and change path for a linked image file
         if img['mediapath'][0:7] == "images:":
-            #imagename = self.app.project_path + '/images/' + str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
             imagename = str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
         # imagename is now:
         # 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
@@ -1440,7 +1420,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         filename = ""
         try:  # In case no filename results, rare possibility
             filename = cur.fetchone()[0]
-        except:
+        except Exception:
             pass
 
         head = "\n" + _("[VIEW] ")
@@ -1452,7 +1432,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if choice == "All memos" and item['source_memo'] != "" and item['source_memo'] is not None:
             head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
-            head += " " + _("Case: " ) + item['file_or_casename']
+            head += " " + _("Case: ") + item['file_or_casename']
             if choice == "All memos":
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
@@ -1465,7 +1445,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt = QtGui.QTextCharFormat()
         pos0 = len(self.ui.textEdit.toPlainText())
         item['textedit_start'] = pos0
-        #self.ui.textEdit.append(self.heading(row))
         self.ui.textEdit.append(head)
         cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
         pos1 = len(self.ui.textEdit.toPlainText())
@@ -1476,7 +1455,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
-        #self.ui.textEdit.append("\n")
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit.
@@ -1515,8 +1493,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action == action_copy_all:
             cb = QtWidgets.QApplication.clipboard()
             cb.clear(mode=cb.Clipboard)
-            text = self.ui.textEdit.toPlainText()
-            cb.setText(text, mode=cb.Clipboard)
+            te_text = self.ui.textEdit.toPlainText()
+            cb.setText(te_text, mode=cb.Clipboard)
 
     def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
@@ -1573,7 +1551,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt = QtGui.QTextCharFormat()
         pos0 = len(textEdit.toPlainText())
         item['textedit_start'] = pos0
-        #self.ui.textEdit.append(self.heading(row))
         textEdit.append(head)
         cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
         pos1 = len(textEdit.toPlainText())
@@ -1603,9 +1580,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         items = self.ui.treeWidget.selectedItems()
         horizontal_labels = []  # column (code) labels
         for item in items:
-            #print(item.text(0), item.text(1))
             if item.text(1)[:3] == "cid":
-                horizontal_labels.append(item.text(0))  #, 'cid': item.text(1)})
+                horizontal_labels.append(item.text(0))
 
         # Get cases (rows)
         cur = self.app.conn.cursor()
@@ -1625,9 +1601,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for row, case in enumerate(cases):
+        for case in cases:
             column_list = []
-            for col, colname in enumerate(horizontal_labels):
+            for colname in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1656,7 +1632,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
-        # maximise the space from one column or one row
+        # Maximise the space from one column or one row
         if self.ui.tableWidget.columnCount() == 1:
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
@@ -1683,14 +1659,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         horizontal_labels = []
         sub_codes = []
         for item in items:
-            #print(item.text(0), item.text(1), "root", root)
             if item.text(1)[0:3] == "cat":
                 top_level.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
             # Find sub-code and traverse upwards to map to category
             if item.text(1)[0:3] == 'cid':
-                #print("sub", item.text(0), item.text(1))
-                not_top = True
                 sub_code = {'codename': item.text(0), 'cid': item.text(1)}
                 # May be None of a top level code - as this will have no parent
                 if item.parent() is not None:
@@ -1733,9 +1706,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         choice = self.ui.comboBox_memos.currentText()
-        for row, case in enumerate(cases):
+        for case in cases:
             column_list = []
-            for col, colname in enumerate(horizontal_labels):
+            for colname in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1794,13 +1767,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         sub_codes = []
         for item in items:
             root = self.ui.treeWidget.indexOfTopLevelItem(item)
-            #print(item.text(0), item.text(1), "root", root)
             if root > -1 and item.text(1)[0:3] == "cat":
                 top_level.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
             # Find sub-code and traverse upwards to map to top-level category
             if root == -1 and item.text(1)[0:3] == 'cid':
-                #print("sub", item.text(0), item.text(1))
                 not_top = True
                 sub_code = {'codename': item.text(0), 'cid': item.text(1)}
                 top_id = None
@@ -1813,7 +1784,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         sub_codes.append(sub_code)
                 add_cat = True
                 for tl in top_level:
-                    if tl['name'] == sub_code['top']:  #item.parent().text(0):
+                    if tl['name'] == sub_code['top']:
                         add_cat = False
                 if add_cat and top_id is not None:
                     top_level.append({'name': sub_code['top'], 'cat': top_id})
@@ -1847,9 +1818,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for row, case in enumerate(cases):
+        for case in cases:
             column_list = []
-            for col, colname in enumerate(horizontal_labels):
+            for colname in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1908,12 +1879,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
         te = self.te[x][y]
-        text = te.toPlainText()
-        if text == "":
+        te_text = te.toPlainText()
+        if te_text == "":
             return
         cursor_context_pos = te.cursorForPosition(position)
         pos = cursor_context_pos.position()
-        #print("POS:", pos, "row",x, "col",y, "text",text)
         selected_text = te.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -1940,8 +1910,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action == action_copy_all:
             cb = QtWidgets.QApplication.clipboard()
             cb.clear(mode=cb.Clipboard)
-            text = te.toPlainText()
-            cb.setText(text, mode=cb.Clipboard)
+            te_text = te.toPlainText()
+            cb.setText(te_text, mode=cb.Clipboard)
         if action == action_view:
             for m in self.matrix_links:
                 if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
@@ -1959,7 +1929,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         return
 
 
-class ToolTip_EventFilter(QtCore.QObject):
+class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textBrowser.
     The tool top text is presented according to its position in the text.
     """
@@ -1978,18 +1948,14 @@ class ToolTip_EventFilter(QtCore.QObject):
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.ToolTip:
-            helpEvent = QHelpEvent(event)
-            cursor = QtGui.QTextCursor()
-            cursor = receiver.cursorForPosition(helpEvent.pos())
+            help_event = QHelpEvent(event)
+            cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             if self.media_data is None:
-                return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
+                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
             for item in self.media_data:
                 if item['textedit_start'] <= pos and item['textedit_end'] >= pos:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTip_EventFilter, self).eventFilter(receiver, event)
-
-
-
+        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
