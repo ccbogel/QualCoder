@@ -92,7 +92,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             h = int(self.app.settings['dialogcasefilemanager_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
-        except:
+        except KeyError:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -102,7 +102,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(font2)
         self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.ui.tableWidget.doubleClicked.connect(self.doubleClickedCell)
+        self.ui.tableWidget.doubleClicked.connect(self.double_clicked_to_view)
         self.ui.tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.label_case.setText(_("Case: ") + self.case['name'])
@@ -120,7 +120,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogcasefilemanager_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
-        except:
+        except KeyError:
             pass
         self.get_files()
         self.fill_table()
@@ -138,7 +138,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         """ Get files for this case. """
 
         cur = self.app.conn.cursor()
-        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where caseid=? order by lower(source.name) asc"
+        sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where "
+        sql += "caseid=? order by lower(source.name) asc"
         cur.execute(sql, [self.case['caseid'], ])
         self.casefiles = cur.fetchall()
         sql = "select id, name, fulltext, mediapath, memo, owner, date from  source order by source.name asc"
@@ -174,12 +175,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             return
         selected_files = []
         for r in rows:
-            #print(self.allfiles[r])
             selected_files.append(self.allfiles[r])
         msg = ""
         for file_ in selected_files:
             msg += self.add_file_to_case(file_)
-        # update messages and table widget
+        # Update messages and table widget
         self.get_files()
         self.fill_table()
         Message(self.app, _("File added to case"), msg, "information").exec_()
@@ -203,16 +203,16 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         'pos1': text_len, 'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
-        # check for an existing duplicated linked file first
+        # Check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
             (link['caseid'], link['fid'], link['pos0'], link['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
             msg = _("This file has already been linked to this case ") + file_[1] + "\n"
             return msg
-        # even non-text files can be assigned to the case here
-        cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
-            ,(link['caseid'], link['fid'], link['pos0'], link['pos1'],
+        # Even non-text files can be assigned to the case here
+        sql = "insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
+        cur.execute(sql, (link['caseid'], link['fid'], link['pos0'], link['pos1'],
             link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
         msg = file_[1] + _(" added to case.") + "\n"
@@ -231,11 +231,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         selected_files = []
         remove_msg = ""
         for r in rows:
-            #print(self.allfiles[r])
             selected_files.append(self.allfiles[r])
             remove_msg += "\n" + self.allfiles[r][1]
-        ui = DialogConfirmDelete(self.app, remove_msg)
-        ok = ui.exec_()
+        del_ui = DialogConfirmDelete(self.app, remove_msg)
+        ok = del_ui.exec_()
         if not ok:
             return
         cur = self.app.conn.cursor()
@@ -269,7 +268,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             item.setFlags(QtCore.Qt.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 0, item)
             item = QtWidgets.QTableWidgetItem(f[1])
-            item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 1, item)
             # Mark Yes if assigned
             assigned = ""
@@ -285,17 +284,18 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.ui.tableWidget.showColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()
 
-    def doubleClickedCell(self, row):
+    def double_clicked_to_view(self):
         """ Double click on a row allow viewing of that file.
         rows begin at 0  to n.
         param:
             row: signal emitted by doubleclick event """
 
-        #print("double clicked", row.row())
+        #TODO need this method? better in init to go to view_file
+
         self.view_file()
 
     def view_file(self):
-        """ View text file in qtext browser, or open image or media file.
+        """ View text file in qTextBrowser, or open image or media file.
          Check media file link works, as media may have moved. """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
@@ -307,8 +307,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.textBrowser.setText("")
         self.ui.tableWidget.selectRow(index)
         self.selected_text_file = None
-        # a fulltext source is displayed if filltext is present
-        # if the mediapath is None, this represents an A/V transcribed file
+        # A fulltext source is displayed if fulltext is present
+        # If the mediapath is None, this represents an A/V transcribed file
         self.ui.label_file.setText(_("Displayed file: ") + self.allfiles[index][NAME])
         if self.allfiles[index][FULLTEXT] != "" and self.allfiles[index][FULLTEXT] is not None:
             self.selected_text_file = self.allfiles[index]
@@ -319,7 +319,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             return
         # need the data as a dictionary to view images and audio/video
         dictionary = {'name': self.allfiles[index][NAME], 'mediapath': self.allfiles[index][MEDIAPATH],
-                      'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0], 'date': self.allfiles[index][DATE],
+                      'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0],
+                      'date': self.allfiles[index][DATE],
                       'memo': self.allfiles[index][MEMO], 'fulltext': self.allfiles[index][FULLTEXT]}
         # Mediapath will be None for a .transcribed empty text media entry, and 'docs:' for a linked text document
         if self.allfiles[index][MEDIAPATH] is None or self.allfiles[index][MEDIAPATH][0:5] == 'docs:':
@@ -334,8 +335,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
                 if not os.path.exists(abs_path):
                     return
-            ui = DialogViewAV(self.app, dictionary)
-            ui.exec_()
+            ui_av = DialogViewAV(self.app, dictionary)
+            ui_av.exec_()
         if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
             if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
@@ -345,8 +346,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 abs_path = self.app.project_path + self.allfiles[index][MEDIAPATH]
                 if not os.path.exists(abs_path):
                     return
-            ui = DialogViewAV(self.app, dictionary)
-            ui.exec_()
+            ui_av = DialogViewAV(self.app, dictionary)
+            ui_av.exec_()
         if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
             if self.allfiles[index][MEDIAPATH][0:7] == "images:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
@@ -357,8 +358,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if not os.path.exists(abs_path):
                     return
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
-            ui = DialogViewImage(self.app, dictionary)
-            ui.exec_()
+            ui_img = DialogViewImage(self.app, dictionary)
+            ui_img.exec_()
 
     def load_case_text(self):
         """ Load case text for selected_text_file """
@@ -441,7 +442,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             cursor.setPosition(len(self.selected_text_file[FULLTEXT]) - 1, QtGui.QTextCursor.KeepAnchor)
             cursor.setCharFormat(QtGui.QTextCharFormat())
         except Exception as e:
-            logger.debug((str(e) + "\n unlight, text length" +str(len(self.ui.textBrowser.toPlainText()))))
+            logger.debug((str(e) + "\n unlight, text length" + str(len(self.ui.textBrowser.toPlainText()))))
 
     def highlight(self):
         """ Apply text highlighting to current file.
@@ -487,7 +488,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.highlight()
 
         cur = self.app.conn.cursor()
-        # check for an existing duplicated linkage first
+        # Check for an existing duplicated linkage first
         cur.execute("select * from case_text where caseid=? and fid=? and pos0<=? and pos1>=?",
                     (item['caseid'], item['fid'], item['pos0'], item['pos1']))
         result = cur.fetchall()
@@ -521,7 +522,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if unmarked is None:
             return
 
-        # delete from database, remove from case_text and update gui
+        # Delete from database, remove from case_text and update gui
         cur = self.app.conn.cursor()
         cur.execute("delete from case_text where fid=? and caseid=? and pos0=? and pos1=?",
             (unmarked['fid'], unmarked['caseid'], unmarked['pos0'], unmarked['pos1']))
@@ -550,23 +551,23 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         selected_files = []
         filenames = ""
         for r in rows:
-            #print(self.allfiles[r])
             if self.allfiles[r][2] is not None and self.allfiles[r][2] != "":
                 selected_files.append(self.allfiles[r])
                 filenames += self.allfiles[r][1] + " "
-        ui = DialogGetStartAndEndMarks(self.case['name'], filenames)
-        ok = ui.exec_()
+        ui_se = DialogGetStartAndEndMarks(self.case['name'], filenames)
+        ok = ui_se.exec_()
         if not ok:
             return
-        start_mark = ui.get_start_mark()
-        end_mark = ui.get_end_mark()
+        start_mark = ui_se.get_start_mark()
+        end_mark = ui_se.get_end_mark()
         if start_mark == "" or end_mark == "":
-            QtWidgets.QMessageBox.warning(None, _('Warning'), _('Cannot have blank text marks'))
+            Message(self.app, _("Warning"), _('Cannot have blank text marks'), "warning").exec_()
             return
         msg = _("Auto assign text to case: ") + self.case['name']
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + _("\nIn files:\n")
         msg += filenames
         warning_msg = ""
+        already_assigned = ""
         entries = 0
         cur = self.app.conn.cursor()
         for f in selected_files:
@@ -576,38 +577,35 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             text = currentfile[2]
             text_starts = [match.start() for match in re.finditer(re.escape(start_mark), text)]
             text_ends = [match.start() for match in re.finditer(re.escape(end_mark), text)]
-            #logger.debug(textStarts, textEnds)
-            #add new code linkage items to database
+            # Add new code linkage items to database
             already_assigned = ""
-            for startPos in text_starts:
-                pos1 = -1  # default if not found
-                textEndIterator = 0
+            for start_pos in text_starts:
+                text_end_iterator = 0
                 try:
-                    while startPos >= text_ends[textEndIterator]:
-                        textEndIterator += 1
+                    while start_pos >= text_ends[text_end_iterator]:
+                        text_end_iterator += 1
                 except IndexError:
-                    textEndIterator = -1
+                    text_end_iterator = -1
                     warning_msg += _("Auto assign. Could not find an end mark: ") + f[1] + "  " + end_mark + "\n"
-                    #logger.warning(warning_msg)
-                if textEndIterator >= 0:
-                    pos1 = text_ends[textEndIterator]
+                if text_end_iterator >= 0:
+                    pos1 = text_ends[text_end_iterator]
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
-                    'pos0': startPos, 'pos1': pos1,
+                    'pos0': start_pos, 'pos1': pos1,
                     'owner': self.app.settings['codername'],
                     'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
-                    # check if already assigned to case_text
+                    # Check if already assigned to case_text
                     sql = "select id from case_text where caseid=? and fid=? and pos0=? and pos1=?"
                     cur.execute(sql, [item['caseid'], item['fid'], item['pos0'], item['pos1']])
                     res = cur.fetchone()
                     if res is None:
-                        cur.execute("insert into case_text (caseid,fid,pos0,pos1,owner,date,memo) values(?,?,?,?,?,?,?)"
-                            ,(item['caseid'], item['fid'], item['pos0'], item['pos1'],
+                        sql = "insert into case_text (caseid,fid,pos0,pos1,owner,date,memo) values(?,?,?,?,?,?,?)"
+                        cur.execute(sql, (item['caseid'], item['fid'], item['pos0'], item['pos1'],
                               item['owner'], item['date'], item['memo']))
                         entries += 1
                         self.app.conn.commit()
                     else:
                         already_assigned = _("\nAlready assigned.")
-        # update messages and table widget
+        # Update messages and table widget
         self.get_files()
         self.fill_table()
         # Text file is loaded in browser then update the highlights
@@ -622,7 +620,6 @@ class DialogCaseFileManager(QtWidgets.QDialog):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ui = DialogCaseFileManager("app","text", "case")
+    ui = DialogCaseFileManager("app", "text", "case")
     ui.show()
     sys.exit(app.exec_())
-
