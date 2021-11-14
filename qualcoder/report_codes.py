@@ -728,7 +728,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if mediatype == "audio" and linked:
                     av_destination = html_folder_name + "/audio/" + av_path.split('/')[-1]
                     if not os.path.isfile(html_folder_name + "/audio/" + av_path.split('/')[-1]):
-                        copyfile(av_path + item['avname'], av_destination)
+                        copyfile(av_path, av_destination)
                 # Create html to display media time positions
                 extension = item['avname'][item['avname'].rfind('.') + 1:]
                 extra = "</p>\n<" + mediatype + " controls>"
