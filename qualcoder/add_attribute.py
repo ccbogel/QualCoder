@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2020 Colin Curtain
+"""
+Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,20 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5 import QtWidgets, QtCore
 import os
 import sys
 import logging
 import traceback
 
 from .GUI.ui_attribute import Ui_DialogAddAttribute
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -54,7 +55,6 @@ class DialogAddAttribute(QtWidgets.QDialog):
     Requires a name for Dialog title (and label in setupUI)
     Requires a list of dictionary 'name' items.
     Dialog returns ok if the item is not a duplicate of a name in the list.
-    Returns one item through getnewItem method.
     """
 
     existing_names = []
@@ -87,7 +87,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         duplicate = False
         if new_name in self.existing_names:
             duplicate = True
-            QtWidgets.QMessageBox.warning(None, _("Duplicated"), _("This already exists"))
+            Message(self.app, _("Duplicated"), _("This already exists"), "warning").exec_()
             self.new_name = ""
             self.done(0)
         if duplicate is False:
@@ -95,11 +95,3 @@ class DialogAddAttribute(QtWidgets.QDialog):
         if self.ui.radioButton_numeric.isChecked():
             self.value_type = "numeric"
         self.done(1)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogAddAttribute([{"name":"aaa"}, {"name":"bbb"}], "title")
-    ui.show()
-    sys.exit(app.exec_())
-
