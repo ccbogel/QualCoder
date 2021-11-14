@@ -572,23 +572,28 @@ class DialogCases(QtWidgets.QDialog):
         if y > 2:  # update attribute value
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
-            #print(attribute_name)
             cur = self.app.conn.cursor()
-
             # Check numeric for numeric attributes, clear "" if cannot be cast
-            cur.execute("select valuetype from attribute_type where caseOrFile='case' and name=?", (attribute_name, ))
+            cur.execute("select valuetype from attribute_type where caseOrFile='case' and name=?", [attribute_name])
             result = cur.fetchone()
             if result is None:
                 return
             if result[0] == "numeric":
                 try:
                     float(value)
-                except Exception as e:
+                except ValueError:
                     self.ui.tableWidget.item(x, y).setText("")
                     value = ""
                     msg = _("This attribute is numeric")
                     Message(self.app, _("Warning"), msg, "warning").exec_()
-
+            # Check attribute row is present before updating
+            cur.execute("select value from attribute where id=? and name=? and attr_type='case'",
+                        [self.cases[x]['caseid'], attribute_name])
+            res = cur.fetchone()
+            if res is None:
+                cur.execute("insert into attribute (value,id,name,attr_type) values(?,?,?,'case')",
+                            (value, self.cases[x]['caseid'], attribute_name))
+                self.app.conn.commit()
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
             (value, self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
