@@ -60,14 +60,15 @@ class DialogAddAttribute(QtWidgets.QDialog):
     existing_names = []
     new_name = ""
     value_type = "character"
+    app = None
 
     def __init__(self, app, names, parent=None):
         super(DialogAddAttribute, self).__init__(parent)  # overrride accept method
 
         sys.excepthook = exception_handler
+        self.app = app
         for n in names:
             self.existing_names.append(n['name'])
-
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogAddAttribute()
         self.ui.setupUi(self)
