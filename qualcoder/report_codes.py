@@ -165,11 +165,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogreportcodes_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1, 0])
-            v0 = self.app.settings['dialogreportcodes_splitter_v0']
-            v1 = self.app.settings['dialogreportcodes_splitter_v1']
-            v2 = self.app.settings['dialogreportcodes_splitter_v2']
+            v0 = int(self.app.settings['dialogreportcodes_splitter_v0'])
+            v1 = int(self.app.settings['dialogreportcodes_splitter_v1'])
+            v2 = int(self.app.settings['dialogreportcodes_splitter_v2'])
             self.ui.splitter_vert.setSizes([v0, v1, v2])
-        except Exception:
+        except KeyError:  # and TypeError
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
@@ -556,7 +556,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.text_results == [] and self.image_results == [] and self.av_results == []:
             return
         codes_all = []
-        codes_set = []  # TODO
         codes_freq_list = []
         for i in self.text_results:
             codes_all.append(i['codename'])
@@ -679,7 +678,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Change html links to reference the html folder
         for item in self.html_links:
             if item['imagename'] is not None:
-                #print("item['imagename'] ", item['imagename'])
+                # print("item['imagename'] ", item['imagename'])
                 ''' item['imagename'] is in this format: 
                 0-/images/filename.jpg  # where 0- is the counter
                 '''
@@ -769,7 +768,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         Called by: search
         """
 
-        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
         child_count = item.childCount()
         for i in range(child_count):
             if item.isSelected():
@@ -866,7 +864,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         ['case name', 'case', 'character', '==', ["'ID1'"]]
 
         Note, sqls are NOT parameterised.
-        results from multiple parameters are intersected, an AND boolean function.
+        Results from multiple parameters are intersected, an AND boolean function.
         """
 
         # Clear ui
@@ -883,14 +881,19 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         ui = DialogSelectAttributeParameters(self.app)
         ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
         self.attributes = []
         ok = ui.exec_()
         if not ok:
-            self.attributes = []
+            self.attributes = temp_attributes
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
             self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
+            if self.attributes:
+                pm = QtGui.QPixmap()
+                pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
+                self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
             return
         self.attributes = ui.parameters
         if not self.attributes:
@@ -902,7 +905,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
-
         file_ids = []
         case_file_ids = []
         cur = self.app.conn.cursor()
@@ -945,8 +947,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if a[2] == 'numeric':
                     case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
                 case_sql += " and attribute.attr_type='case'"
-                #print("Attribute selected: ", a)
-                #print(case_sql)
+                # print("Attribute selected: ", a)
+                # print(case_sql)
                 cur.execute(case_sql)
                 case_result = cur.fetchall()
                 for i in case_result:
@@ -966,7 +968,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if file_ids == [] and case_file_ids != []:
             set_ids = set_case_file_ids
         self.attribute_file_ids = list(set_ids)
-        #print("Attribute file ids", self.attribute_file_ids)
+        # print("Attribute file ids", self.attribute_file_ids)
         # Prepare message for label tooltip
         self.attributes_msg = ""
         file_msg = ""
