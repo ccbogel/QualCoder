@@ -30,17 +30,20 @@ class Ui_Dialog_report_attribute_parameters(object):
         self.tableWidget.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(4, item)
-        self.gridLayout.addWidget(self.tableWidget, 1, 0, 1, 2)
+        self.gridLayout.addWidget(self.tableWidget, 1, 0, 1, 3)
         self.label = QtWidgets.QLabel(Dialog_report_attribute_parameters)
         self.label.setMinimumSize(QtCore.QSize(0, 85))
         self.label.setMaximumSize(QtCore.QSize(16777215, 80))
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 2)
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 3)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_report_attribute_parameters)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 3, 2, 1, 1)
+        self.pushButton_clear = QtWidgets.QPushButton(Dialog_report_attribute_parameters)
+        self.pushButton_clear.setObjectName("pushButton_clear")
+        self.gridLayout.addWidget(self.pushButton_clear, 3, 1, 1, 1)
 
         self.retranslateUi(Dialog_report_attribute_parameters)
         self.buttonBox.rejected.connect(Dialog_report_attribute_parameters.reject)
@@ -64,6 +67,8 @@ class Ui_Dialog_report_attribute_parameters(object):
 "between requires 2 values separated by ; e.g. 1;100\n"
 " in and not in require 1 or more values separated by ;\n"
 "Wildcards for \'like\' are % and _"))
+        self.pushButton_clear.setToolTip(_translate("Dialog_report_attribute_parameters", "Clear attribute selections"))
+        self.pushButton_clear.setText(_translate("Dialog_report_attribute_parameters", "Clear"))
 
 
 if __name__ == "__main__":
