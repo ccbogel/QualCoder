@@ -85,11 +85,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         if limiter == "file":
             sql = "select name, valuetype, memo, 'file' from attribute_type where caseOrFile='file'"
         cur.execute(sql)
-        result = cur.fetchall()
         self.attribute_type = []
-        for row in result:
-            self.attribute_type.append({'name': row[0], 'valuetype': row[1],
-                'memo': row[2], 'caseOrFile': row[3]})
+        keys = 'name', 'valuetype', 'memo', 'caseOrFile'
+        for row in cur.fetchall():
+            self.attribute_type.append(dict(zip(keys, row)))
         # Add the case name as an 'attribute' to files attributes
         if self.limiter == "file":
             casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
@@ -103,9 +102,19 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.fill_tableWidget()
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
+        self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
+
+    def clear_parameters(self):
+        """ Clear attribute_list and empty table cells. """
+
+        for x in range(0, self.ui.tableWidget.rowCount()):
+            val_text = ""
+            self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
+            self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText("")
 
     def fill_parameters(self, attribute_list):
-        """ Pre fill attributes in Dialog from previous selection. """
+        """ Pre fill attributes in Dialog from a previous selection.
+        Called by parent class. """
 
         if not attribute_list:
             return
