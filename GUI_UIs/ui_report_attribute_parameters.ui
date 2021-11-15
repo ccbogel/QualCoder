@@ -14,7 +14,7 @@
    <string>Attribute selection parameters</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="2">
+   <item row="1" column="0" colspan="3">
     <widget class="QTableWidget" name="tableWidget">
      <column>
       <property name="text">
@@ -43,7 +43,7 @@
      </column>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="0" colspan="3">
     <widget class="QLabel" name="label">
      <property name="minimumSize">
       <size>
@@ -68,10 +68,20 @@ Wildcards for 'like' are % and _</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="pushButton_clear">
+     <property name="toolTip">
+      <string>Clear attribute selections</string>
+     </property>
+     <property name="text">
+      <string>Clear</string>
      </property>
     </widget>
    </item>
