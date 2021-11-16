@@ -1,3 +1,5 @@
+https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png
+
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt5.
 
