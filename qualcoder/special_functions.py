@@ -112,7 +112,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             return
         self.file_to_replace = ui.get_selected()
         if not self.file_to_replace:
-            self.ui.pushButton_select_text_file.setToolTip(_("Select text file to update"))
+            self.ui.pushButton_select_text_file.setToolTip(_("Select text file to replace"))
             return
         self.ui.pushButton_select_text_file.setToolTip(_("Updating: ") + self.file_to_replace['name'])
 
@@ -135,6 +135,10 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             Message(self.app, _("No files selected"), _("No existing or replacement file selected")).exec_()
             return
         ReplaceTextFile(self.app, self.file_to_replace, self.file_replacement)
+        self.file_to_replace = None
+        self.ui.pushButton_select_text_file.setToolTip(_("Select text file to replace"))
+        self.file_replacement = None
+        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
 
     def change_text_code_start_positions(self):
         """ Extend or shrink text coding start positions in all codings and all files for owner. """
