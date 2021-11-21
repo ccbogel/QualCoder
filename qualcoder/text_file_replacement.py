@@ -101,10 +101,11 @@ class ReplaceTextFile:
                 return
         self.get_codings_annotations_case()
         self.load_file_text()
-        self.update_annotation_positions()
-        self.update_code_positions()
-        self.update_case_positions()
-        Message(self.app,_("File replaced"), _("Text file replaced.")).exec_()
+        errs = self.update_annotation_positions()
+        errs += self.update_code_positions()
+        errs += self.update_case_positions()
+        msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.") + "\n" + errs
+        Message(self.app, _("File replaced"), msg).exec_()
 
     def update_case_positions(self):
         """ Update case if all file is assigned to case or portions assigned to case. """
@@ -114,7 +115,7 @@ class ReplaceTextFile:
         # Entire file assigned to case
         if self.case_is_full_file is not None:
             cur = self.app.conn.cursor()
-            cur.execute("update casetext set pos1=? where caseid=?", [len(self.new_file['fulltext']) - 1, self.case_is_full_file])
+            cur.execute("update case_text set pos1=? where caseid=?", [len(self.new_file['fulltext']) - 1, self.case_is_full_file])
             self.app.conn.commit()
             return
         # Find matching text segments and assign to case
@@ -133,12 +134,11 @@ class ReplaceTextFile:
                 cur.execute("update case_text set pos0=?, pos1=? where id=?", [pos, pos + c_len, c['id']])
                 self.app.conn.commit()
         for id_ in to_delete:
-            cur.execute("delete from code_text where ctid=?", [id_])
+            cur.execute("delete from case_text where id=?", [id_])
             self.app.conn.commit()
-        '''if len(to_delete) > 0:
-            err_msg += _("\nDeleted ") + str(len(to_delete)) + _(" unmatched case text segments")'''
         if err_msg != "":
-            Message(self.app, "Case text warnings", err_msg).exec_()
+            return "\n" + err_msg
+        return err_msg
 
     def update_code_positions(self):
         """ Find matching text and update pos0 and pos1.
@@ -164,7 +164,8 @@ class ReplaceTextFile:
         if len(to_delete) > 0:
             err_msg += _("\nDeleted ") + str(len(to_delete)) + _(" unmatched codings")
         if err_msg != "":
-            Message(self.app, "Coding warnings", err_msg).exec_()
+            return err_msg
+        return err_msg
 
     def update_annotation_positions(self):
         """ Find matching text and update pos0 and pos1.
@@ -190,7 +191,8 @@ class ReplaceTextFile:
         if len(to_delete) > 0:
             err_msg += _("\nDeleted ") + str(len(to_delete)) + _(" unmatched codings")
         if err_msg != "":
-            Message(self.app, "Annotation warnings", err_msg).exec_()
+            return err_msg + "\n"
+        return err_msg
 
     def get_codings_annotations_case(self):
         """ Get codings and annotations for old file. """
