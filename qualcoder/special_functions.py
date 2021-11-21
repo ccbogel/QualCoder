@@ -36,7 +36,9 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
-#from .helpers import Message
+from .select_items import DialogSelectItems
+from .helpers import Message
+from .text_file_replacement import ReplaceTextFile
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -60,6 +62,10 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     app = None
     parent_textEdit = None
     tab_coding = None  # Tab widget coding tab for updates
+
+    # For Replacing a text file with another and keeping codings
+    file_to_replace = None
+    file_replacement = None
 
     def __init__(self, app, parent_textEdit, tab_coding, parent=None):
 
@@ -87,9 +93,48 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
         self.ui.pushButton_text_update.setIcon(QtGui.QIcon(pm))
-        self.ui.groupBox_update_text.hide()  # TODO tmp
+        self.ui.groupBox_text_positions.hide()
+        self.ui.pushButton_select_text_file.pressed.connect(self.select_original_text_file)
+        self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
+        self.ui.pushButton_text_update.pressed.connect(self.replace_file_update_codings)
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
         self.ui.groupBox_merge.hide()  # TODO tmp
+
+    # Functions to update a text file but attempt to keep original codings
+    def select_original_text_file(self):
+        """ Select text file to replace. """
+
+        self.file_to_replace = []
+        file_texts = self.app.get_file_texts()
+        ui = DialogSelectItems(self.app, file_texts, _("Delete files"), "single")
+        ok = ui.exec_()
+        if not ok:
+            return
+        self.file_to_replace = ui.get_selected()
+        if not self.file_to_replace:
+            self.ui.pushButton_select_text_file.setToolTip(_("Select text file to update"))
+            return
+        self.ui.pushButton_select_text_file.setToolTip(_("Updating: ") + self.file_to_replace['name'])
+
+    def select_replacement_text_file(self):
+        """ Select replacement updated text file. """
+
+        file_types = "Text Files (*.docx *.epub *.html *.htm *.md *.odt *.pdf *.txt)"
+        filepath, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Replacement file'),
+                self.app.settings['directory'], file_types)
+        if not ok or filepath == []:
+            self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
+            return
+        self.file_replacement = filepath[0]
+        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Replacment: ") + self.file_replacement)
+
+    def replace_file_update_codings(self):
+        """  """
+
+        if self.file_to_replace is None or self.file_replacement is None:
+            Message(self.app, _("No files selected"), _("No existing or replacement file selected")).exec_()
+            return
+        ReplaceTextFile(self.app, self.file_to_replace, self.file_replacement)
 
     def change_text_code_start_positions(self):
         """ Extend or shrink text coding start positions in all codings and all files for owner. """
@@ -115,7 +160,6 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         ok = ui.exec_()
         if not ok:
             return
-
         for r in res:
             new_pos0 = r[2] - delta
             # cannot have start pos less than start of text
@@ -125,12 +169,13 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             if new_pos0 > r[3]:
                 new_pos0 = r[3] - 1
             cur.execute(text_sql, [new_pos0 + 1, r[3] - new_pos0, r[1]])
-            seltext = cur.fetchone()[0]
+            seltext = ""
             try:
-                cur.execute(update_sql, [new_pos0, seltext, r[2], r[3], r[0], r[1], r[4]])
-            except:
+                seltext = cur.fetchone()[0]
+            except TypeError:
                 pass
-        self.app.conn.commit()
+            cur.execute(update_sql, [new_pos0, seltext, r[2], r[3], r[0], r[1], r[4]])
+            self.app.conn.commit()
         self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
         self.update_tab_coding_dialog()
 
@@ -158,7 +203,6 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         ok = ui.exec_()
         if not ok:
             return
-
         for r in res:
             new_pos1 = r[3] + delta
             # cannot have end pos less or equal to startpos
@@ -168,12 +212,13 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             if new_pos1 >= r[5]:
                 new_pos1 = r[5] - 1
             cur.execute(text_sql, [r[2] + 1, new_pos1 - r[2], r[1]])
-            seltext = cur.fetchone()[0]
+            seltext = ""
             try:
-                cur.execute(update_sql, [new_pos1, seltext, r[2], r[3], r[0], r[1], r[4]])
-            except:
+                seltext = cur.fetchone()[0]
+            except TypeError:
                 pass
-        self.app.conn.commit()
+            cur.execute(update_sql, [new_pos1, seltext, r[2], r[3], r[0], r[1], r[4]])
+            self.app.conn.commit()
         self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
         self.update_tab_coding_dialog()
 
