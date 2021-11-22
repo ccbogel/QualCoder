@@ -42,8 +42,6 @@ import sys
 import traceback
 import zipfile
 
-# from PyQt5 import QtWidgets
-
 from .docx import opendocx, getdocumenttext
 from .helpers import Message
 from .html_parser import *
@@ -95,7 +93,8 @@ class ReplaceTextFile:
         filenames = self.app.get_filenames()
         for f in filenames:
             if f['name'] == new_filename and not self.matching_filename:
-                Message(self.app, _("Warning"), _(" New file name matches another existing file name"), "warning").exec_()
+                msg = _(" New file name matches another existing file name")
+                Message(self.app, _("Warning"), msg, "warning").exec_()
                 return
         self.get_codings_annotations_case()
         self.load_file_text()
@@ -115,7 +114,8 @@ class ReplaceTextFile:
         # Entire file assigned to case
         if self.case_is_full_file is not None:
             cur = self.app.conn.cursor()
-            cur.execute("update case_text set pos1=? where caseid=?", [len(self.new_file['fulltext']) - 1, self.case_is_full_file])
+            cur.execute("update case_text set pos1=? where caseid=?", [len(self.new_file['fulltext']) - 1,
+                                                                       self.case_is_full_file])
             self.app.conn.commit()
             return ""
         # Find matching text segments and assign to case
@@ -222,7 +222,7 @@ class ReplaceTextFile:
         cur.execute("select id, caseid,pos0,pos1 from case_text where fid=?", [self.old_file['id']])
         case_result = cur.fetchall()
         self.case_assign = []
-        keys = 'id','caseid', 'pos0', 'pos1'
+        keys = 'id', 'caseid', 'pos0', 'pos1'
         for r in case_result:
             self.case_assign.append(dict(zip(keys, r)))
         for r in self.case_assign:
@@ -232,10 +232,9 @@ class ReplaceTextFile:
                         [ca_st, ca_len, self.old_file['id']])
             res1 = cur.fetchone()
             r['seltext'] = res1[0]
-            print()
         self.case_is_full_file = None
-        if len(self.case_assign) == 1 and self.case_assign[0]['pos0'] == 0 and self.case_assign[0]['pos1'] == len(self.old_file['fulltext']) - 1:
-            print("Full file assigned to case")
+        if len(self.case_assign) == 1 and self.case_assign[0]['pos0'] == 0 and \
+                self.case_assign[0]['pos1'] == len(self.old_file['fulltext']) - 1:
             self.case_is_full_file = self.case_assign[0]['caseid']
 
     # Copied from manage_files.DialogManageFiles
@@ -322,7 +321,8 @@ class ReplaceTextFile:
                     if text[0:6] == "\ufeff":
                         text = text[6:]
             except Exception as e:
-                Message(self.app, _("Warning"), _("Cannot import") + str(self.new_file_path) + "\n" + str(e), "warning").exec_()
+                msg = _("Cannot import") + str(self.new_file_path) + "\n" + str(e)
+                Message(self.app, _("Warning"), msg, "warning").exec_()
                 return
             if import_errors > 0:
                 Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec_()
