@@ -87,8 +87,6 @@ class ReplaceTextFile:
         self.app = app
         self.old_file = old_file
         self.new_file_path = new_file_path
-        print(self.old_file['name'])
-        print(self.new_file_path)
         # Check for matching file name
         name_split = self.new_file_path.split("/")
         new_filename = name_split[-1]
@@ -104,20 +102,22 @@ class ReplaceTextFile:
         errs = self.update_annotation_positions()
         errs += self.update_code_positions()
         errs += self.update_case_positions()
-        msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.") + "\n" + errs
+        msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.\n")
+        msg += _("Function works by identifying the first matching text segment for each coding and annotation.")
+        msg += "\n" + errs
         Message(self.app, _("File replaced"), msg).exec_()
 
     def update_case_positions(self):
         """ Update case if all file is assigned to case or portions assigned to case. """
 
         if len(self.case_assign) == 0:
-            return
+            return ""
         # Entire file assigned to case
         if self.case_is_full_file is not None:
             cur = self.app.conn.cursor()
             cur.execute("update case_text set pos1=? where caseid=?", [len(self.new_file['fulltext']) - 1, self.case_is_full_file])
             self.app.conn.commit()
-            return
+            return ""
         # Find matching text segments and assign to case
         to_delete = []
         err_msg = ""
@@ -232,8 +232,9 @@ class ReplaceTextFile:
                         [ca_st, ca_len, self.old_file['id']])
             res1 = cur.fetchone()
             r['seltext'] = res1[0]
+            print()
         self.case_is_full_file = None
-        if len(self.case_assign) == 1 and self.case_assign[0]['pos0'] == 0 and self.case_assign[0]['pos1'] == len(self.old_file['fulltext']):
+        if len(self.case_assign) == 1 and self.case_assign[0]['pos0'] == 0 and self.case_assign[0]['pos1'] == len(self.old_file['fulltext']) - 1:
             print("Full file assigned to case")
             self.case_is_full_file = self.case_assign[0]['caseid']
 
@@ -243,7 +244,7 @@ class ReplaceTextFile:
         """ Import from file types of odt, docx pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
         Do not link the new text, load it instead.
-        Delete old project folder file, inssert new project folder file.
+        Delete old project folder file, insert new file int project folder.
         Update database entry and keep same id.
 
         param:

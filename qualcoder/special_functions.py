@@ -114,7 +114,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         if not self.file_to_replace:
             self.ui.pushButton_select_text_file.setToolTip(_("Select text file to replace"))
             return
-        self.ui.pushButton_select_text_file.setToolTip(_("Updating: ") + self.file_to_replace['name'])
+        self.ui.pushButton_select_text_file.setToolTip(_("Replacing: ") + self.file_to_replace['name'])
 
     def select_replacement_text_file(self):
         """ Select replacement updated text file. """
