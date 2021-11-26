@@ -1700,7 +1700,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
-            if diff.microseconds < 180000:
+            if diff.microseconds < 100000:
                 return False
             # Ctrl + E Edit mode
             if key == QtCore.Qt.Key_E and mod == QtCore.Qt.ControlModifier:

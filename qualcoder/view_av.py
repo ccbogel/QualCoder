@@ -1679,20 +1679,21 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if cursor_pos >= item['pos0'] and cursor_pos <= item['pos1'] and item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                # Key event can be too sensitive, adjusted  for 150 millisecond gap
+                # Key event can be too sensitive, adjusted  for 100 millisecond gap
+                msec_gap = 100000
                 now = datetime.datetime.now()
                 diff = now - self.code_resize_timer
                 self.code_resize_timer = datetime.datetime.now()
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.AltModifier and diff.microseconds > msec_gap:
                     self.shrink_to_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier and diff.microseconds > 150000:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.AltModifier and diff.microseconds > msec_gap:
                     self.shrink_to_right(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
+                if key == QtCore.Qt.Key_Left and mod == QtCore.Qt.ShiftModifier and diff.microseconds > msec_gap:
                     self.extend_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier and diff.microseconds > 150000:
+                if key == QtCore.Qt.Key_Right and mod == QtCore.Qt.ShiftModifier and diff.microseconds > msec_gap:
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
