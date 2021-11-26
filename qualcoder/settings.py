@@ -54,22 +54,26 @@ class DialogSettings(QtWidgets.QDialog):
     """ Settings for the coder name, coder table and to display ids. """
 
     settings = {}
+    current_coder = "default"
 
     def __init__(self, app, parent=None):
 
         sys.excepthook = exception_handler
         self.app = app
         self.settings = app.settings
+        self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
+        self.ui.label_8.hide()  # tmp - future function
+        self.ui.spinBox_backups.hide()  # tmp - future function
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
-        self.ui.lineEdit_coderName.setText(self.app.settings['codername'])
+        self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # get coder names from all tables
         # Note: does not appear to require a distinct clause
@@ -86,8 +90,10 @@ class DialogSettings(QtWidgets.QDialog):
                 if row[0] != "":
                     coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-        languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
-                "Italiano it", "日本 jp", "Português, pt"]
+        '''languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
+                "Italiano it", "日本 jp", "Português, pt"]'''
+        languages = ["Deutsch de", "English en", "Español es", "Français fr",
+                     "Italiano it", "Português, pt"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
@@ -106,10 +112,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.spinBox.setValue(self.settings['fontsize'])
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         self.ui.spinBox_docfontsize.setValue(self.settings['docfontsize'])
-        self.ui.lineEdit_coderName.setText(self.settings['codername'])
-        self.ui.comboBox_coders.currentIndexChanged.connect(self.comboBox_coder_changed)
+        self.ui.comboBox_coders.currentIndexChanged.connect(self.combobox_coder_changed)
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
-
         if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
         else:
@@ -122,7 +126,6 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
             self.ui.checkBox_auto_backup.setChecked(False)
-
         if self.settings['backup_av_files'] == 'True':
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
@@ -131,6 +134,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
+        self.ui.lineEdit_coderName.returnPressed.connect(self.new_coder_entered)
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -140,10 +144,23 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
 
-    def comboBox_coder_changed(self):
+    def new_coder_entered(self):
+        """ New coder name entered.
+        Disable Enter key. """
+
+        print("here")
+        new_coder = self.ui.lineEdit_coderName.text()
+        if new_coder == "":
+            return
+        self.ui.lineEdit_coderName.setEnabled(False)
+        self.current_coder = new_coder
+        self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
+
+    def combobox_coder_changed(self):
         """ Set the coder name to the current selection. """
 
-        self.ui.lineEdit_coderName.setText(self.ui.comboBox_coders.currentText())
+        self.current_coder = self.ui.comboBox_coders.currentText()
+        self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
 
     def choose_directory(self):
         """ Choose default project directory. """
@@ -156,7 +173,7 @@ class DialogSettings(QtWidgets.QDialog):
 
     def accept(self):
         restart_qualcoder = False
-        self.settings['codername'] = self.ui.lineEdit_coderName.text()
+        self.settings['codername'] = self.current_coder
         if self.settings['codername'] == "":
             self.settings['codername'] = "default"
         if self.app.conn is not None:
@@ -201,12 +218,5 @@ class DialogSettings(QtWidgets.QDialog):
         """ Save settings to text file in user's home directory.
         Each setting has a variable identifier then a colon
         followed by the value. """
+
         self.app.write_config_ini(self.settings)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSettings()
-    ui.show()
-    sys.exit(app.exec_())
-
