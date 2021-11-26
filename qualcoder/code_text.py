@@ -2159,10 +2159,10 @@ class DialogCodeText(QtWidgets.QWidget):
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
-        newCatText = ui.get_new_name()
-        if newCatText is None:
+        new_category_name = ui.get_new_name()
+        if new_category_name is None:
             return
-        item = {'name': newCatText, 'cid': None, 'memo': "",
+        item = {'name': new_category_name, 'cid': None, 'memo': "",
         'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
@@ -2208,12 +2208,12 @@ class DialogCodeText(QtWidgets.QWidget):
         selected = None
         self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
-
         # Remove from recent codes
         for item in self.recent_codes:
             if item['name'] == code_['name']:
                 self.recent_codes.remove(item)
                 break
+        self.update_dialog_codes_and_categories()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
