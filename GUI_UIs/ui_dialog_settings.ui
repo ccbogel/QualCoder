@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
-    <height>578</height>
+    <width>860</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>537</y>
+     <x>400</x>
+     <y>580</y>
      <width>261</width>
      <height>32</height>
     </rect>
@@ -33,23 +33,23 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>24</y>
+     <y>37</y>
      <width>241</width>
      <height>31</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_coderName">
+  <widget class="QLabel" name="label_new_coder">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>30</y>
+     <y>43</y>
      <width>171</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>This Coder Name</string>
+    <string>New coder</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -59,7 +59,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>180</y>
+     <y>220</y>
      <width>229</width>
      <height>38</height>
     </rect>
@@ -69,7 +69,7 @@
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>180</y>
+     <y>220</y>
      <width>71</width>
      <height>38</height>
     </rect>
@@ -88,7 +88,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>150</y>
+     <y>190</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -101,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>180</y>
+     <y>220</y>
      <width>151</width>
      <height>22</height>
     </rect>
@@ -117,7 +117,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>507</y>
+     <y>560</y>
      <width>671</width>
      <height>21</height>
     </rect>
@@ -130,7 +130,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>467</y>
+     <y>520</y>
      <width>391</width>
      <height>31</height>
     </rect>
@@ -143,13 +143,13 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>77</y>
+     <y>90</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Coders</string>
+    <string>Other coders</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -159,7 +159,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>67</y>
+     <y>80</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -169,7 +169,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>220</y>
+     <y>260</y>
      <width>241</width>
      <height>41</height>
     </rect>
@@ -185,7 +185,7 @@
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>220</y>
+     <y>260</y>
      <width>71</width>
      <height>38</height>
     </rect>
@@ -204,7 +204,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>120</y>
+     <y>160</y>
      <width>151</width>
      <height>20</height>
     </rect>
@@ -220,7 +220,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>110</y>
+     <y>150</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -232,8 +232,8 @@
   <widget class="QCheckBox" name="checkBox_auto_backup">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>344</y>
+     <x>10</x>
+     <y>384</y>
      <width>900</width>
      <height>23</height>
     </rect>
@@ -248,10 +248,10 @@
   <widget class="QCheckBox" name="checkBox_backup_AV_files">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>377</y>
-     <width>601</width>
-     <height>81</height>
+     <x>10</x>
+     <y>417</y>
+     <width>671</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text">
@@ -267,7 +267,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>307</y>
+     <y>347</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -286,7 +286,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>300</y>
+     <y>340</y>
      <width>151</width>
      <height>32</height>
     </rect>
@@ -296,7 +296,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>307</y>
+     <y>347</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -315,7 +315,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>520</x>
-     <y>300</y>
+     <y>340</y>
      <width>71</width>
      <height>32</height>
     </rect>
@@ -325,7 +325,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>260</y>
+     <y>300</y>
      <width>241</width>
      <height>41</height>
     </rect>
@@ -341,7 +341,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>270</x>
-     <y>260</y>
+     <y>300</y>
      <width>71</width>
      <height>38</height>
     </rect>
@@ -360,13 +360,61 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>210</y>
+     <y>250</y>
      <width>191</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>Dark mode</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_current_coder">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>651</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Current coder: </string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>385</y>
+     <width>141</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Backups</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_backups">
+   <property name="geometry">
+    <rect>
+     <x>635</x>
+     <y>384</y>
+     <width>48</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>10</number>
+   </property>
+   <property name="value">
+    <number>5</number>
    </property>
   </widget>
  </widget>
