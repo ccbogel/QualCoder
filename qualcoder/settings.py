@@ -134,7 +134,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
-        self.ui.lineEdit_coderName.returnPressed.connect(self.new_coder_entered)
+        self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -146,9 +146,9 @@ class DialogSettings(QtWidgets.QDialog):
 
     def new_coder_entered(self):
         """ New coder name entered.
-        Disable Enter key. """
+        Tried to disable Enter key or catch the event. Failed. So new coder name assigned
+        when the pushButton_set_coder is activated. """
 
-        print("here")
         new_coder = self.ui.lineEdit_coderName.text()
         if new_coder == "":
             return
@@ -159,7 +159,10 @@ class DialogSettings(QtWidgets.QDialog):
     def combobox_coder_changed(self):
         """ Set the coder name to the current selection. """
 
-        self.current_coder = self.ui.comboBox_coders.currentText()
+        current_selection = self.ui.comboBox_coders.currentText()
+        if current_selection == "":
+            return
+        self.current_coder = current_selection
         self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
 
     def choose_directory(self):
