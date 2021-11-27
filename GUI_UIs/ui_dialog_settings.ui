@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
-    <height>636</height>
+    <width>721</width>
+    <height>619</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>490</x>
      <y>580</y>
-     <width>261</width>
+     <width>201</width>
      <height>32</height>
     </rect>
    </property>
@@ -32,8 +32,8 @@
   <widget class="QLineEdit" name="lineEdit_coderName">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>37</y>
+     <x>190</x>
+     <y>80</y>
      <width>241</width>
      <height>31</height>
     </rect>
@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>43</y>
+     <y>84</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -100,8 +100,8 @@
   <widget class="QCheckBox" name="checkBox">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>220</y>
+     <x>460</x>
+     <y>150</y>
      <width>151</width>
      <height>22</height>
     </rect>
@@ -116,9 +116,9 @@
   <widget class="QLabel" name="label_directory">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>10</x>
      <y>560</y>
-     <width>671</width>
+     <width>691</width>
      <height>21</height>
     </rect>
    </property>
@@ -143,10 +143,13 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>90</y>
+     <y>47</y>
      <width>161</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Select another coder in this project</string>
    </property>
    <property name="text">
     <string>Other coders</string>
@@ -158,8 +161,8 @@
   <widget class="QComboBox" name="comboBox_coders">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>80</y>
+     <x>190</x>
+     <y>40</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -203,7 +206,7 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>25</x>
+     <x>20</x>
      <y>160</y>
      <width>151</width>
      <height>20</height>
@@ -219,7 +222,7 @@
   <widget class="QComboBox" name="comboBox_language">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>190</x>
      <y>150</y>
      <width>241</width>
      <height>32</height>
@@ -250,7 +253,7 @@
     <rect>
      <x>10</x>
      <y>417</y>
-     <width>671</width>
+     <width>691</width>
      <height>91</height>
     </rect>
    </property>
@@ -266,8 +269,8 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>347</y>
+     <x>370</x>
+     <y>230</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -285,8 +288,8 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_timestamp">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>340</y>
+     <x>530</x>
+     <y>223</y>
      <width>151</width>
      <height>32</height>
     </rect>
@@ -295,8 +298,8 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>347</y>
+     <x>360</x>
+     <y>277</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -314,8 +317,8 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_speaker">
    <property name="geometry">
     <rect>
-     <x>520</x>
-     <y>340</y>
+     <x>540</x>
+     <y>270</y>
      <width>71</width>
      <height>32</height>
     </rect>
@@ -359,8 +362,8 @@ You must store these files elsewhere.</string>
   <widget class="QCheckBox" name="checkBox_dark_mode">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>250</y>
+     <x>460</x>
+     <y>180</y>
      <width>191</width>
      <height>23</height>
     </rect>
@@ -415,6 +418,49 @@ You must store these files elsewhere.</string>
    </property>
    <property name="value">
     <number>5</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_set_coder">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>80</y>
+     <width>89</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Set this name as the current coder.
+</string>
+   </property>
+   <property name="text">
+    <string>Apply</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>120</y>
+     <width>661</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>360</y>
+     <width>661</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>
