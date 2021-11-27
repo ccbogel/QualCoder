@@ -51,7 +51,7 @@ from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_by_case import DialogCodeByCase
-from qualcoder.GUI.base64_helper import *  # qualcoder32
+from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
@@ -451,7 +451,7 @@ class App(object):
                 'docfontsize',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet'
+                'stylesheet', 'backup_num'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -460,6 +460,8 @@ class App(object):
                     settings_data[key] = "[hh.mm.ss]"
                 if key == "speakernameformat":
                     settings_data[key] = "[]"
+                if key == "backup_num":
+                    settings_data[key] = 5
         # write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
@@ -541,7 +543,7 @@ class App(object):
             self.write_config_ini(self.default_settings)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
-        # codername is alo legacy, v2.8 plus keeps current coder name in database project table
+        # codername is also legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
@@ -556,6 +558,7 @@ class App(object):
     def default_settings(self):
         """ Standard Settings for config.ini file. """
         return {
+            'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
@@ -1352,42 +1355,42 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text);")
+            "bookmarkpos integer, codername text)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
-            "owner text, date text, av_text_id integer, unique(name));")
+            "owner text, date text, av_text_id integer, unique(name))")
         cur.execute(
             "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, "
-            "height integer, cid integer, memo text, date text, owner text, important integer);")
+            "height integer, cid integer, memo text, date text, owner text, important integer)")
         cur.execute(
             "CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, "
-            "memo text, date text, owner text, important integer);")
+            "memo text, date text, owner text, important integer)")
         cur.execute(
             "CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, "
-            "owner text, date text, unique(fid,pos0,pos1,owner));")
+            "owner text, date text, unique(fid,pos0,pos1,owner))")
         cur.execute(
             "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
-            "valuetype text);")
+            "valuetype text)")
         cur.execute(
             "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
-            "date text, owner text);")
+            "date text, owner text)")
         cur.execute(
             "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
-            "owner text, date text, memo text);")
+            "owner text, date text, memo text)")
         cur.execute(
             "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, "
-            "constraint ucm unique(name));")
+            "constraint ucm unique(name))")
         cur.execute(
             "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, "
-            "supercatid integer, unique(name));")
+            "supercatid integer, unique(name))")
         cur.execute(
             "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, "
-            "pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner))")
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
-            "date text, color text, unique(name));")
-        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
+            "date text, color text, unique(name))")
+        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text)")
+        cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
