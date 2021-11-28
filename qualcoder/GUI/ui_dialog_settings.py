@@ -122,6 +122,7 @@ class Ui_Dialog_settings(object):
         self.label_backups_to_keep.setObjectName("label_backups_to_keep")
         self.spinBox_backups = QtWidgets.QSpinBox(Dialog_settings)
         self.spinBox_backups.setGeometry(QtCore.QRect(635, 384, 48, 26))
+        self.spinBox_backups.setMinimum(1)
         self.spinBox_backups.setMaximum(10)
         self.spinBox_backups.setProperty("value", 5)
         self.spinBox_backups.setObjectName("spinBox_backups")
