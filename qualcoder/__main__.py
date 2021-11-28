@@ -399,17 +399,20 @@ class App(object):
             config.write(configfile)
 
     def _load_config_ini(self):
+        """ load config settings, and convert some to int. """
+
         config = configparser.ConfigParser()
         config.read(self.configpath)
         default = config['DEFAULT']
         result = dict(default)
-        # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
-        if 'treefontsize' in default:
-            result['treefontsize'] = default.getint('treefontsize')
         if 'docfontsize' in default:
             result['docfontsize'] = default.getint('docfontsize')
+        if 'treefontsize' in default:
+            result['treefontsize'] = default.getint('treefontsize')
+        if 'backup_num' in default:
+            result['backup_num'] = default.getint('backup_num')
         return result
 
     def check_and_add_additional_settings(self, settings_data):
@@ -1848,10 +1851,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
         providing the project was not changed in any way.
-        Delete oldest backups if more than 5 are created.
-        Backup name format:
-        directories/projectname_BKUP_yyyymmdd_hh.qda
-        Keep up to FIVE backups only. """
+        Delete oldest backups if more than BACKUP_NUM are created.
+        Backup name format: directories/projectname_BKUP_yyyymmdd_hh.qda
+        Requires: self.settings['backup_num'] """
 
         if self.app.project_path == "":
             return
@@ -1860,24 +1862,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.rmtree(self.app.delete_backup_path_name)
             except Exception as e_:
                 print(str(e_))
-
         # Get a list of backup folders for current project
         parts = self.app.project_path.split('/')
-        projectname_and_suffix = parts[-1]
-        directory = self.app.project_path[0:-len(projectname_and_suffix)]
-        projectname = projectname_and_suffix[:-4]
-        projectname_and_bkup = projectname + "_BKUP_"
-        lenname = len(projectname_and_bkup)
+        project_name_and_suffix = parts[-1]
+        directory = self.app.project_path[0:-len(project_name_and_suffix)]
+        project_name = project_name_and_suffix[:-4]
+        project_name_and_bkup = project_name + "_BKUP_"
+        lenname = len(project_name_and_bkup)
         files_folders = os.listdir(directory)
         backups = []
         for f_ in files_folders:
-            if f_[0:lenname] == projectname_and_bkup and f_[-4:] == ".qda":
+            if f_[0:lenname] == project_name_and_bkup and f_[-4:] == ".qda":
                 backups.append(f_)
-        # Sort newest to oldest, and remove any that are more than fifth position in the list
+        # Sort newest to oldest, and remove any that are more than BACKUP_NUM position in the list
         backups.sort(reverse=True)
         to_remove = []
-        if len(backups) > 5:
-            to_remove = backups[5:]
+        if len(backups) > self.app.settings['backup_num']:
+            to_remove = backups[self.app.settings['backup_num']:]
         if not to_remove:
             return
         for f_ in to_remove:

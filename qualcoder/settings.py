@@ -66,8 +66,6 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
-        self.ui.label_8.hide()  # tmp - future function
-        self.ui.spinBox_backups.hide()  # tmp - future function
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -75,8 +73,7 @@ class DialogSettings(QtWidgets.QDialog):
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
         self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
-        # get coder names from all tables
-        # Note: does not appear to require a distinct clause
+        # Get coder names from all tables
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
         sql += " union select owner from cases union select owner from journal union select owner from attribute "
         sql += "union select owner from source union select owner from annotation union select owner from code_name "
@@ -130,6 +127,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
+        self.ui.spinBox_backups.setValue(self.settings['backup_num'])
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
@@ -212,6 +210,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'True'
         else:
             self.settings['backup_av_files'] = 'False'
+        self.settings['backup_num'] = self.ui.spinBox_backups.value()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec_()
