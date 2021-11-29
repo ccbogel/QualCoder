@@ -27,28 +27,22 @@ https://qualcoder.wordpress.com/
 """
 
 from copy import copy
-import csv
 import datetime
 import logging
 import os
-import platform
-from shutil import copyfile
 import sys
 import traceback
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.Qt import QHelpEvent
-from PyQt5.QtCore import Qt, QTextCodec
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-import qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.base64_helper import *
-from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
-from .helpers import Message, msecs_to_mins_and_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
-from .report_attributes import DialogSelectAttributeParameters
+from .helpers import Message, ExportDirectoryPathDialog
+from .information import DialogInformation
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -59,10 +53,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
@@ -89,7 +83,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/doc_export_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
@@ -148,18 +141,19 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3], 'memo': row[4], 'supercatid': row[5],
-            'display_list': [row[0], 'catid:' + str(row[1])]})
+                'date': row[3], 'memo': row[4], 'supercatid': row[5],
+                'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-            'cid': row[4], 'catid': row[5], 'color': row[6],
-            'display_list': [row[0], 'cid:' + str(row[4])]})
+                'cid': row[4], 'catid': row[5], 'color': row[6],
+                'display_list': [row[0], 'cid:' + str(row[4])]})
 
         self.coders = []
-        cur.execute("select distinct owner from code_text union select distinct owner from code_image union select distinct owner from code_av")
+        cur.execute("select distinct owner from code_text union select distinct owner from code_image union "
+                    "select distinct owner from code_av")
         result = cur.fetchall()
         self.coders = []
         for row in result:
@@ -275,9 +269,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if filepath is None:
             return
         f = open(filepath, 'w',  encoding='utf-8-sig')
-        text = _("Code frequencies") + "\n"
-        text += self.app.project_name + "\n"
-        text += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
+        text_ = _("Code frequencies") + "\n"
+        text_ += self.app.project_name + "\n"
+        text_ += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         item_total_position = 1 + len(self.coders)
@@ -290,14 +284,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                text += "\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
-                text += ", Frequency: " + item.text(item_total_position)
+                text_ += "\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
+                text_ += ", Frequency: " + item.text(item_total_position)
             else:
-                text += "\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
-                text += _(", Frequency: ") + item.text(item_total_position)
+                text_ += "\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
+                text_ += _(", Frequency: ") + item.text(item_total_position)
             it += 1
             item = it.value()
-        f.write(text)
+        f.write(text_)
         f.close()
         msg = _("Coding frequencies text file exported to: ") + filepath
         Message(self.app, _('Text file Export'), msg).exec_()
@@ -319,13 +313,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         data += ",".join(header) + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        item_total_position = 1 + len(self.coders)
         while item:
             line = ""
             for i in range(0, len(header)):
                 line += "," + item.text(i)
             data += line[1:] + "\n"
-            #self.depthgauge(item)
             it += 1
             item = it.value()
         f = open(filepath, 'w',  encoding='utf-8-sig')
@@ -367,29 +359,22 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug(str(e) + " item:" + str(item))
-
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
         while not(len(cats) < 1 or count > 10000):
             remove_list = []
-            #logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         display_list = []
                         for i in c['display_list']:
                             display_list.append(str(i))
                         child = QtWidgets.QTreeWidgetItem(display_list)
                         item.addChild(child)
-                        #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -401,7 +386,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
@@ -420,7 +404,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                #logger.debug("for c in codes, item:" + item.text(0) +"|" + item.text(1) + ", c[cid]:" + str(c['cid']) +", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
                     display_list = []
                     for i in c['display_list']:
@@ -462,7 +445,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
-        #icon = QtGui.QIcon(QtGui.QPixmap('GUI/cogs_icon.png'))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
@@ -474,6 +456,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help1.pressed.connect(self.information)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -487,7 +473,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, file_summaries.
-        Images are not loaded. """
+        Images and A/V dta are not loaded. """
 
         self.code_names, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
@@ -557,13 +543,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         self.comparisons = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
         self.comparisons += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
-
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
-        while item:  # while there is an item in the list
-            #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
+        while item:
             if item.text(1)[0:4] == 'cid:':
-                #logger.debug(item.text(0), item.text(1))
                 agreement = self.calculate_agreement_for_code_name(int(item.text(1)[4:]))
                 item.setText(2, str(agreement['agreement']) + "%")
                 item.setText(3, str(agreement['dual_percent']) + "%")
@@ -589,24 +572,19 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
 
-        #logger.debug("Code id: " + str(cid))
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
-        # loop through each source file
+        # Loop through each source file
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
         for f in self.file_summaries:
-            #logger.debug("file summary ", f)
             cur.execute(sql, [f[0], cid, self.selected_coders[0]])
             result0 = cur.fetchall()
             cur.execute(sql, [f[0], cid, self.selected_coders[1]])
             result1 = cur.fetchall()
-            #logger.debug("result0: " + str(result0))
-            #logger.debug("result1: " + str(result1))
-            # determine the same characters coded by both coders, by adding 1 to each coded character
+            # Determine the same characters coded by both coders, by adding 1 to each coded character
             char_list = [0] * f[1]
             for coded in result0:
-                #print(coded[0], coded[1])  # tmp
                 for char in range(coded[0], coded[1]):
                     char_list[char] += 1
                     total['coded0'] += 1
@@ -624,7 +602,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                     single_coded += 1
                 if char == 2:
                     dual_coded += 1
-            #logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
             total['dual_coded'] += dual_coded
             total['single_coded'] += single_coded
             total['uncoded'] += uncoded
@@ -666,8 +643,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
         except ZeroDivisionError:
-            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
-            logger.debug(msg)
+            pass
         return total
 
     def fill_tree(self):
@@ -677,7 +653,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
-        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id","Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
@@ -687,30 +663,23 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug(str(e) + " item:" + str(item))
-
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
         while len(cats) > 0 or count < 10000:
             remove_list = []
-            #logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         item.addChild(child)
-                        #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -722,8 +691,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -738,9 +706,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                #logger.debug("for c in codes, item:" + item.text(0) +"|" + item.text(1) + ", c[cid]:" + str(c['cid']) +", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -750,4 +717,22 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
+
+    def information(self):
+        """ Provide statistical help information. """
+
+        ui = DialogInformation(self.app, "Statistics information", "")
+        ui.setHtml(info)
+        ui.exec_()
+
+
+info = "<b>Agree %</b>" \
+       "<p>Calculated across all text files as the (total dual coded plus the total uncoded) / total characters</p>" \
+       "<b>A and B %</b><p>Calculated as the total dual coded characters / total characters</p>" \
+       "<b>Not A Not B %</b><p>The characters not coded by either coder / total characters</p>" \
+       "<b>Disagree %</b><p>Is 100% minus the total agreement percent.</p>" \
+       "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
+       "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
+
+
 
