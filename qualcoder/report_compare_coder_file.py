@@ -27,26 +27,21 @@ https://qualcoder.wordpress.com/
 """
 
 from copy import copy
-import csv
-import datetime
 import logging
 import os
-import platform
-from shutil import copyfile
 import sys
 import traceback
 
 from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.Qt import QHelpEvent
-from PyQt5.QtCore import Qt, QTextCodec
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 
-import qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
-from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, ExportDirectoryPathDialog
+from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog
+from .information import DialogInformation
 
 vlc_msg = ""
 try:
@@ -54,10 +49,8 @@ try:
 except Exception as e:
     vlc_msg = str(e) + "\n"
     if sys.platform.startswith("win"):
-        imp = False
-    if not imp:
         msg = str(e) + "\n"
-        msg = "view_av. Cannot import vlc\n"
+        msg += "view_av. Cannot import vlc\n"
         msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
         msg += "32 bit python AND 32 bit VLC installed."
         print(msg)
@@ -72,10 +65,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogCompareCoderByFile(QtWidgets.QDialog):
@@ -93,6 +86,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     categories = []
     code_ = None  # Selected code
     file_ = None  # Selected file
+    pixmap = None
     files = []
     codes = []
     comparisons = ""
@@ -120,7 +114,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export_odt.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_export_odt.pressed.connect(self.export_odt_file)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help1.pressed.connect(self.information)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -137,6 +134,13 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.fill_tree()
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
+
+    def information(self):
+        """ Provide statistical help information. """
+
+        ui = DialogInformation(self.app, "Statistics information", "")
+        ui.setHtml(info)
+        ui.exec_()
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, files.
@@ -236,7 +240,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] != 'cid':
             return
-        code_= None
+        self.code_ = None
         for c in self.codes:
             if c['name'] == current.text(0):
                 self.code_ = c
@@ -269,24 +273,25 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = "Coder_comparison_by_file.odt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        e_ = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_.filepath
         if filepath is None:
             return
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
-        msg = _("Report exported: ") + filepath
-        self.parent_textEdit.append(msg)
-        Message(self.app, _('Report exported'), msg, "information").exec_()
+        msg_ = _("Report exported: ") + filepath
+        self.parent_textEdit.append(msg_)
+        Message(self.app, _('Report exported'), msg_, "information").exec_()
 
     def results(self):
         """ Iterate through tree widget, for all cids
         For each code_name calculate the two-coder comparison statistics.
 
         {'id': 7, 'name': 'Brighton_Storm.mp4.transcribed', 'memo': 'A transcription of the Optus video'}
-        {'name': 'enthusiastic', 'memo': 'very entuistic suggeses', 'owner': 'colin', 'date': '2019-08-05 08:20:48', 'cid': 12, 'catid': -1, 'color': '#F781F3'}
+        {'name': 'enthusiastic', 'memo': 'very entuistic suggeses', 'owner': 'colin', 'date': '2019-08-05 08:20:48',
+        'cid': 12, 'catid': -1, 'color': '#F781F3'}
         ['colin', 'jemima']
         """
 
@@ -319,7 +324,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         text_brush = QBrush(QtGui.QColor(TextColor(color).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
-
         if self.file_['type'] == 'text':
             self.ui.textEdit.append(self.agreement_text_file())
         if self.file_['type'] == 'image':
@@ -334,25 +338,21 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         """
 
         source = self.app.project_path + self.file_['mediapath']
-        if self.file_['mediapath'][0:6] in("audio:", "video:"):
+        if self.file_['mediapath'][0:6] in ("audio:", "video:"):
             source = self.file_['mediapath'][7:]
         instance = vlc.Instance()
-        mediaplayer = instance.media_player_new()
-        msecs = 0
-        duration_txt = ""
         try:
             media = instance.media_new(source)
             media.parse()
             msecs = media.get_duration()
             duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
-        except Exception as e:
-            logger.debug(str(e))
-            msg = _("Cannot open: ") + source
-            Message(self.app, _("A/V Error"), msg, "warning").exec_()
-            logger.warning("Cannot open A/V media: " + source)
+        except Exception as e_:
+            msg_ = _("Cannot open: ") + source + "\n" + str(e_)
+            logger.debug(msg_)
+            Message(self.app, _("A/V Error"), msg_, "warning").exec_()
+            logger.warning(msg_)
             return
         self.ui.textEdit.append(duration_txt)
-        cid = self.code_['cid']
         # coded0 and coded1 are the total segment lengths coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'duration': msecs, 'coded0': 0, 'coded1': 0}
         # Get res0 and res1 a/v segments
@@ -363,7 +363,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         res1 = []
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[0]])
         results0 = cur.fetchall()
-        total_seg_len_res0 = 0
         for row in results0:
             tmp0 = dict(zip(keys, row))
             tmp0['overlaps'] = []
@@ -371,7 +370,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             total['coded0'] += row[2]
         cur.execute(sql, [self.file_['id'], self.code_['cid'], self.selected_coders[1]])
         results1 = cur.fetchall()
-        total_seg_len_res1 = 0
         for row in results1:
             tmp1 = dict(zip(keys, row))
             tmp1['overlaps'] = []
@@ -395,6 +393,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         total['disagreement'] = round(100 - total['agreement'], 2)
         total['kappa'] = "zerodiv"
         # Calculate kappa
+        unique_codings = 0
         try:
             unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
             Po = total['dual_coded'] / unique_codings
@@ -405,8 +404,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
         except ZeroDivisionError:
-            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
-            logger.debug(msg)
+            msg_ = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
+            logger.debug(msg_)
         overall = "\nOVERALL SUMMARY\n"
         overall += _("Total msecs: ") + str(msecs) + ", "
         overall += _("Dual coded: ") + str(total['dual_coded']) + ", "
@@ -420,7 +419,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         overall += _("Total msecs disagreement (single coded): ") + str(total['disagreement']) + "%\n"
         overall += _("Kappa: ") + str(total['kappa']) + "\n"
         self.ui.textEdit.append(overall)
-
         self.ui.textEdit.append(_("Overlaps Coder: ") + self.selected_coders[0])
         for r in res0:
             txt = "\n" + "pos0: " + str(r['pos0']) + " pos1: " + str(r['pos1'])
@@ -441,14 +439,15 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 txt += str(r['overlaps']) + " " + _("Total: ") + str(sum(r['overlaps'])) + " " + _("msecs")
             self.ui.textEdit.append(txt)
 
-    def segment_overlap(self, r0, r1):
-        """ Calcuate overlap of two A/V segments. """
+    @staticmethod
+    def segment_overlap(r0, r1):
+        """ Calculate overlap of two A/V segments. """
 
         result = max(0, min(r0['pos1'], r1['pos1']) - max(r0['pos0'], r1['pos0']))
-        #print("r0", r0['pos0'], r0['pos1'], "r1", r1['pos0'], r1['pos1'], "result", result)
         return result
 
-    def intersect(self, r0, r1):
+    @staticmethod
+    def intersect(r0, r1):
         """ Calculation intersection area of two rectangles in image coding. """
 
         x1 = max(r0['x1'], r1['x1'])
@@ -474,11 +473,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.pixmap = QtGui.QPixmap.fromImage(image)
         width, height = self.pixmap.width(), self.pixmap.height()
 
-        cid = self.code_['cid']
         # coded0 and coded1 are the total pixels coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
-        #print("Image agreement method, width, height ", width, height)
         sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int), " \
               "cast(width as int) * cast(height as int), memo, owner from code_image where id=? and cid=? and owner=?"
         keys = 'x1', 'y1', 'width', 'height', 'area', 'memo', 'owner'
@@ -542,6 +539,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         NEED TO CONFIRM THIS IS THE CORRECT APPROACH
         '''
         total['kappa'] = "zerodiv"
+        unique_codings = 0
         try:
             unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
             Po = total['dual_coded'] / unique_codings
@@ -552,8 +550,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
         except ZeroDivisionError:
-            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
-            logger.debug(msg)
+            msg_ = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
+            logger.debug(msg_)
 
         overall = "\nOVERALL SUMMARY\n"
         overall += _("Total pixels: ") + str(total['pixels']) + ", "
@@ -578,7 +576,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 txt += str(r['intersections']) + " " + _("Total: ") + str(sum(r['intersections'])) + " " + _("pixels")
             self.ui.textEdit.append(txt)
 
-        self.ui.textEdit.append( "\n" + _("Intersections Coder: ") + self.selected_coders[1])
+        self.ui.textEdit.append("\n" + _("Intersections Coder: ") + self.selected_coders[1])
         for r in res1:
             txt = "\n" + "x: " + str(r['x1']) + " y: " + str(r['y1']) + " w: " + str(r['width']) + " h: " + str(r['height'])
             if len(r['intersections']) == 0:
@@ -598,7 +596,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         'Disagree%':'','A not B':'','B not A':'','K':''
         """
 
-        cid = self.code_['cid']
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
@@ -617,7 +614,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # List of which coders coded this char: 1 = coder 1, 2= coder2, 12 = coders 1 and 2
         char_list_coders = [''] * len(fulltext[0])
         for coded in res0:
-            #print(coded[0], coded[1])  # tmp
             for char in range(coded[0], coded[1]):
                 char_list[char] += 1
                 total['coded0'] += 1
@@ -640,7 +636,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 single_coded += 1
             if char == 2:
                 dual_coded += 1
-        #logger.debug("file:" + f[0] + " dual:" + str(dual_coded) + " single:" + str(single_coded) + " uncoded:" + str(uncoded))
         total['dual_coded'] += dual_coded
         total['single_coded'] += single_coded
         total['uncoded'] += uncoded
@@ -674,6 +669,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         NEED TO CONFIRM THIS IS THE CORRECT APPROACH
         '''
         total['kappa'] = "zerodiv"
+        unique_codings = 0
         try:
             unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
             Po = total['dual_coded'] / unique_codings
@@ -683,9 +679,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
         except ZeroDivisionError:
-            msg = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
-            logger.debug(msg)
-
+            msg_ = _("ZeroDivisionError. unique_codings:") + str(unique_codings)
+            logger.debug(msg_)
         overall = "\nOVERALL SUMMARY\n"
         overall += _("Total characters: ") + str(total['characters']) + ", "
         overall += _("Dual coded: ") + str(total['dual_coded']) + ", "
@@ -700,13 +695,11 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         overall += _("Kappa: ") + str(total['kappa']) + "\n\n"
         overall += "FULLTEXT"
         self.ui.textEdit.append(overall)
-
         cursor = self.ui.textEdit.textCursor()
         cursor.movePosition(QtGui.QTextCursor.End)
         pos = cursor.position()
         self.ui.textEdit.append(fulltext[0])
         # Apply brush, yellow for coder 1, blue for coder 2 and green for dual coded
-        #print("\nCHARLIST CODERS\n", char_list_coders)  # tmp
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
         # Foreground depends on the defined need_white_text color in color_selector
@@ -756,30 +749,23 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug(str(e) + " item:" + str(item))
-
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
         while len(cats) > 0 and count < 10000:
             remove_list = []
-            #logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']) ])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         item.addChild(child)
-                        #logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -791,8 +777,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("c[catid] is None: new top item c[name]:" + c['name'])
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -807,9 +792,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                #logger.debug("for c in codes, item:" + item.text(0) +"|" + item.text(1) + ", c[cid]:" + str(c['cid']) +", c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']) ])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -819,6 +803,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
+
 
 class DialogDualCodedImage(QtWidgets.QDialog):
     """ View two coders coded sections for one code in original image.
@@ -883,8 +868,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
 
         # Scale initial picture by height to mostly fit inside scroll area
         # Tried other methods e.g. sizes of components, but nothing was correct.
-        self_h = self.height() - 30 - 80  # slider and textedit heights
-        s_w = self.width()
+        # slider and textedit heights
         if self.pixmap.height() > self.height() - 30 - 80:
             self.scale = (self.height() - 30 - 80) / self.pixmap.height()
             slider_value = int(self.scale * 100)
@@ -912,7 +896,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         if len(coded['intersections']) > 0:
             tooltip += "\n " + _("Intersections: ") + str(len(coded['intersections'])) + " "
             tooltip += _("Intersecting: ") + str(sum(coded['intersections'])) + _(" pixels")
-            tooltip += " \n" + _("Proportion: ") + str(int(sum(coded['intersections'])/ coded['area'] * 100)) + "%"
+            tooltip += " \n" + _("Proportion: ") + str(int(sum(coded['intersections']) / coded['area'] * 100)) + "%"
         if coded['memo'] != "":
             tooltip += "\nMemo: " + coded['memo']
         x = coded['x1'] * self.scale
@@ -941,3 +925,8 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
 
 
+info = "<b>Agreement %</b>" \
+       "<p>Calculated across the text file as the (total dual coded plus the total uncoded) / total characters</p>" \
+       "<b>Disagreement %</b><p>Is 100% minus the total agreement percent.</p>" \
+       "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
+       "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
