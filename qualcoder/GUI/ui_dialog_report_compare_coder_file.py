@@ -61,6 +61,10 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.pushButton_run.setGeometry(QtCore.QRect(10, 60, 32, 32))
         self.pushButton_run.setText("")
         self.pushButton_run.setObjectName("pushButton_run")
+        self.pushButton_help1 = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_help1.setGeometry(QtCore.QRect(130, 60, 32, 32))
+        self.pushButton_help1.setText("")
+        self.pushButton_help1.setObjectName("pushButton_help1")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCompareCoderFile)
         self.groupBox_2.setTitle("")
@@ -103,6 +107,7 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.pushButton_clear.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Clear selection</p></body></html>"))
         self.pushButton_export_odt.setToolTip(_translate("Dialog_reportCompareCoderFile", "Export ODT file"))
         self.pushButton_run.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Run comparison</p></body></html>"))
+        self.pushButton_help1.setToolTip(_translate("Dialog_reportCompareCoderFile", "Statistics explanation"))
 
 
 if __name__ == "__main__":
