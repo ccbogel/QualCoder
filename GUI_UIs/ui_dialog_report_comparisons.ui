@@ -110,12 +110,12 @@
        <rect>
         <x>10</x>
         <y>0</y>
-        <width>301</width>
+        <width>491</width>
         <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Coder comparisons</string>
+       <string>Coder comparisons - text files</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_selections">
