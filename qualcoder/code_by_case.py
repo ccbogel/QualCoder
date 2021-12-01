@@ -43,6 +43,20 @@ from PyQt5.Qt import QHelpEvent
 from PyQt5.QtCore import Qt  # for context menu
 from PyQt5.QtGui import QBrush, QColor
 
+from .add_item_name import DialogAddItemName
+from .color_selector import DialogColorSelect
+from .color_selector import colors, TextColor
+from .confirm_delete import DialogConfirmDelete
+from .helpers import msecs_to_hours_mins_secs, file_typer, Message, DialogCodeInAllFiles
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_code_by_case import Ui_Dialog_code_by_case
+from .memo import DialogMemo
+from .report_attributes import DialogSelectAttributeParameters
+from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
+from .report_codes import DialogReportCodes
+from .report_code_summary import DialogReportCodeSummary  # for isinstance()
+from .select_items import DialogSelectItems  # for isinstance()
+
 # https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
 vlc_msg = ""
 imp = True
@@ -61,20 +75,6 @@ except Exception as e:
         vlc_msg = msg
     QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
 
-from .add_item_name import DialogAddItemName
-from .color_selector import DialogColorSelect
-from .color_selector import colors, TextColor
-from .confirm_delete import DialogConfirmDelete
-from .helpers import msecs_to_hours_mins_secs, file_typer, Message, DialogCodeInAllFiles
-from .GUI.base64_helper import *
-from .GUI.ui_dialog_code_by_case import Ui_Dialog_code_by_case
-from .memo import DialogMemo
-from .report_attributes import DialogSelectAttributeParameters
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from .report_codes import DialogReportCodes
-from .report_code_summary import DialogReportCodeSummary  # for isinstance()
-from .select_items import DialogSelectItems  # for isinstance()
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -83,13 +83,13 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception:") + "\n" + text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception:") + "\n" + text_)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
+    mb.setText(text_)
     mb.exec_()
 
 
@@ -133,6 +133,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
     scene = None
     pixmap = None
     selection = None  # mouse point 0
+    scale = 1
 
     # A/V variables
     ddialog = None
@@ -167,6 +168,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.recent_codes = []
         self.important = False
         self.attributes = []
+        self.scale = 1
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_by_case()
@@ -207,15 +209,10 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ui.graphicsView_av.hide()
         self.ui.groupBox_av.hide()
 
-        # Icons marked icon_24 icons are 24x24 px but need a button of 28
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_attributes.pressed.connect(self.get_cases_from_attributes)
-        '''pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
-        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_case_and_file)'''
         self.ui.pushButton_latest.hide()  # too hard to implement
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
@@ -249,26 +246,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
-        '''pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
-        self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_icon), "png")
-        self.ui.pushButton_auto_code_frag_this_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_all_files_icon), "png")
-        self.ui.pushButton_auto_code_frag_all_files.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_brackets_icon), "png")
-        self.ui.pushButton_auto_code_surround.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)'''
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
@@ -467,8 +444,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 sources.append(res)
             c['files'] = sources
             sql_vars = "select attribute.name, value, valuetype from attribute " \
-                   "join attribute_type on attribute_type.name=attribute.name " \
-                   "where attr_type='case' and id=? order by attribute.name"
+                "join attribute_type on attribute_type.name=attribute.name " \
+                "where attr_type='case' and id=? order by attribute.name"
             cur.execute(sql_vars, [c['caseid']])
             result_vars = cur.fetchall()
             case_vars = []
@@ -531,13 +508,13 @@ class DialogCodeByCase(QtWidgets.QWidget):
             ok = dialog.exec_()
             if not ok:
                 return
-            text = str(dialog.textValue())
-            if text == "":
+            text_ = str(dialog.textValue())
+            if text_ == "":
                 self.get_cases()
                 return
             cur = self.app.conn.cursor()
             sql = "select caseid, name from cases where name like ? order by cases.name"
-            cur.execute(sql, ["%" + text + "%"])
+            cur.execute(sql, ["%" + text_ + "%"])
             res = cur.fetchall()
             ids = []
             for r in res:
@@ -647,16 +624,16 @@ class DialogCodeByCase(QtWidgets.QWidget):
         set_case_ids = set(case_ids)
         self.get_cases(list(set_case_ids))
         # Set message for label tooltip
-        msg = ""
+        msg_ = ""
         for a in self.attributes:
             if a[1] == 'file':
-                msg += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        if len(msg) > 3:
-            msg = msg[3:]
+                msg_ += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        if len(msg_) > 3:
+            msg_ = msg_[3:]
         for a in self.attributes:
             if a[1] == 'case':
-                msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        self.ui.pushButton_attributes.setToolTip(_("Show cases:") + msg)
+                msg_ += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
+        self.ui.pushButton_attributes.setToolTip(_("Show cases:") + msg_)
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon(pm))
 
@@ -1106,7 +1083,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         """ Check if position is annotated to provide annotation menu option.
         Returns True or False """
 
-        if self.case_ is None  or not self.case_['files']:
+        if self.case_ is None or not self.case_['files']:
             return
         text_pos0 = self.case_['files'][self.case_['file_index']]['pos0']
         fid = self.case_['files'][self.case_['file_index']]['fid']
@@ -1154,8 +1131,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if important:
             importance = 1
         cur = self.app.conn.cursor()
+        sql = "update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?"
         for item in text_items:
-            cur.execute("update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+            cur.execute(sql,
                 (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'], item['owner']))
             self.app.conn.commit()
         self.app.delete_backup = False
@@ -1358,7 +1336,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         Required for: merge_category()
         """
 
-        #logger.debug("recurse this item:" + item.text(0) + "|" item.text(1))
         child_count = item.childCount()
         for i in range(child_count):
             if item.child(i).text(1)[0:3] == "cat":
@@ -1466,11 +1443,11 @@ class DialogCodeByCase(QtWidgets.QWidget):
         ok = dialog.exec_()
         if not ok:
             return
-        text = str(dialog.textValue())
+        text_ = str(dialog.textValue())
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, text)
+        self.recursive_traverse(root, text_)
 
-    def recursive_traverse(self, item, text):
+    def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
         Called by: show_codes_like
@@ -1481,11 +1458,11 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(text) > 0 and text not in item.child(i).text(0):
+            if "cid:" in item.child(i).text(1) and len(text_) > 0 and text_ not in item.child(i).text(0):
                 item.child(i).setHidden(True)
-            if "cid:" in item.child(i).text(1) and text == "":
+            if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), text)
+            self.recursive_traverse(item.child(i), text_)
 
     def keyPressEvent(self, event):
         """ This works best without the modifiers.
@@ -1658,7 +1635,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     self.extend_right(codes_here[0])
                     return True
         if object is self.scene:
-            #logger.debug(event.type(), type(event))
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
                 # pos = event.buttonDownScenePos(1)
                 # logger.debug(event.type(), type(event))
@@ -2094,10 +2070,10 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec_()
-        newCatText = ui.get_new_name()
-        if newCatText is None:
+        new_cat_text = ui.get_new_name()
+        if new_cat_text is None:
             return
-        item = {'name': newCatText, 'cid': None, 'memo': "",
+        item = {'name': new_cat_text, 'cid': None, 'memo': "",
         'owner': self.app.settings['codername'],
         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
@@ -2567,7 +2543,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
             # Add annotation marks - these are in bold, important codings are also bold
             for note in self.annotations:
-                #if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
                 # Cursor pos could be negative if annotation was for an earlier text portion
                 cursor = self.ui.textEdit.textCursor()
                 if note['fid'] == fid and \
@@ -2576,9 +2551,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
                         int(note['pos1']) - text_pos0 <= len(self.ui.textEdit.toPlainText()):
                     cursor.setPosition(int(note['pos0']) - text_pos0, QtGui.QTextCursor.MoveAnchor)
                     cursor.setPosition(int(note['pos1']) - text_pos0, QtGui.QTextCursor.KeepAnchor)
-                    formatB = QtGui.QTextCharFormat()
-                    formatB.setFontWeight(QtGui.QFont.Bold)
-                    cursor.mergeCharFormat(formatB)
+                    format_bold = QtGui.QTextCharFormat()
+                    format_bold.setFontWeight(QtGui.QFont.Bold)
+                    cursor.mergeCharFormat(format_bold)
         self.apply_italic_to_overlaps()
 
     def apply_italic_to_overlaps(self):
@@ -2996,7 +2971,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 # print(pos, item['x1'], item['y1'], item['width'], item['height'])
                 if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
                     and pos.y() >= item['y1'] * self.scale and pos.y() <= (item['y1'] + item['height']) * self.scale:
-                    # print(pos, item['x1'] * self.scale, item['y1'] * self.scale, item['width'] * self.scale, item['height'] * self.scale)
                     return item
         return None
 
@@ -3140,7 +3114,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     w = 100
                     h = 80
                 self.ddialog.resize(w, h)
-            except:
+            except KeyError:
                 self.ddialog.resize(500, 400)
         else:
             self.ddialog.hide()
@@ -3228,10 +3202,10 @@ class DialogCodeByCase(QtWidgets.QWidget):
         for s in self.segments:
             cur.execute(sql, [s['avid']])
             res = cur.fetchall()
-            text = ""
+            text_ = ""
             for r in res:
-                text += str(r[0]) + "\n"
-            s['seltext'] = text
+                text_ += str(r[0]) + "\n"
+            s['seltext'] = text_
 
         # Draw coded segments in scene, scale segments to graphics view witdth
         self.av_scene_width = self.ui.graphicsView_av.viewport().size().width()
@@ -3345,8 +3319,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 self.segment['start_msecs'] = self.segment['end_msecs']
                 self.segment['end'] = tmp
                 self.segment['end_msecs'] = tmp_msecs
-            text = _("Segment: ") + str(self.segment['start']) + " - " + self.segment['end']
-            self.ui.label_segment.setText(text)
+            text_ = _("Segment: ") + str(self.segment['start']) + " - " + self.segment['end']
+            self.ui.label_segment.setText(text_)
 
     def clear_segment(self):
         """ Called by assign_segment_to code. """
@@ -3387,10 +3361,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
         The video needs to be playing/paused before the combobox is filled with track options.
         The combobox only has positive integers."""
 
-        text = self.ui.comboBox_tracks.currentText()
-        if text == "":
-            text = 1
-        # print("text: ", text)
+        text_ = self.ui.comboBox_tracks.currentText()
+        if text_ == "":
+            text_ = 1
         success = self.mediaplayer.audio_set_track(int(text))
         # print("changed audio ", success)
 
@@ -3483,14 +3456,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
         video's current position.
         time_postion list item: [text_pos0, text_pos1, milliseconds]
         """
-        '''if self.ui.checkBox_scroll_transcript.isChecked() and self.transcription is not None and self.ui.textEdit.toPlainText() != "":
-            for i in range(1, len(self.time_positions)):
-                if msecs > self.time_positions[i - 1][2] and msecs < self.time_positions[i][2]:
-                    text_pos = self.time_positions[i][0]
-                    textCursor = self.ui.textEdit.textCursor()
-                    textCursor.setPosition(text_pos)
-                    self.ui.textEdit.setTextCursor(textCursor)'''
-
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
@@ -3851,11 +3816,11 @@ class ToolTipEventFilter(QtCore.QObject):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.ToolTip:
             help_event = QHelpEvent(event)
-            cursor = QtGui.QTextCursor()
+            # cursor = QtGui.QTextCursor()
             cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
-            text = ""
+            text_ = ""
             multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
             multiple = 0
             # Occasional None type error
@@ -3882,27 +3847,27 @@ class ToolTipEventFilter(QtCore.QObject):
                         seltext = " ".join(pre) + " ... " + " ".join(post)
                     try:
                         color = TextColor(item['color']).recommendation
-                        text += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                        text += item['name'] + "</em><br />" + seltext
+                        text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
+                        text_ += item['name'] + "</em><br />" + seltext
                         if item['memo'] is not None and item['memo'] != "":
-                            text += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                            text_ += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
-                            text += "<br /><em>IMPORTANT</em>"
-                        text += "</p>"
+                            text_ += "<br /><em>IMPORTANT</em>"
+                        text_ += "</p>"
                         multiple += 1
-                    except Exception as e:
-                        msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
-                        msg += str(item)
-                        logger.error(msg)
+                    except Exception as e_:
+                        msg_ = "Codes ToolTipEventFilter Exception\n" + str(e_) + ". Possible key error: \n"
+                        msg_ += str(item)
+                        logger.error(msg_)
             if multiple > 1:
-                text = multiple_msg + text
+                text_ = multiple_msg + text_
 
             # Check annotations
             for item in self.annotations:
                 if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
-                    text += "<p>" + _("ANNOTATED") + "</p>"
-            if text != "":
-                receiver.setToolTip(text)
+                    text_ += "<p>" + _("ANNOTATED") + "</p>"
+            if text_ != "":
+                receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
@@ -3998,7 +3963,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         Makes use of current segment: self.segment
         """
 
-        seltext = self.code_av_dialog.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo for segment'))
