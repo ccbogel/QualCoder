@@ -438,6 +438,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textEdit
         self.comparisons = ""
+        self.selected_coders = []
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
