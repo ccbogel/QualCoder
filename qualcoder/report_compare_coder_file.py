@@ -97,6 +97,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textEdit
         self.comparisons = ""
+        self.selected_coders = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCompareCoderFile()
         self.ui.setupUi(self)
@@ -927,6 +928,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
 
 info = "<b>Agreement %</b>" \
        "<p>Calculated across the text file as the (total dual coded plus the total uncoded) / total characters</p>" \
+       "<p>Calculated in images similarly but by pixel count.</p>" \
        "<b>Disagreement %</b><p>Is 100% minus the total agreement percent.</p>" \
        "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
        "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
