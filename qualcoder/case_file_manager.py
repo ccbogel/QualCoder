@@ -78,10 +78,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     case_text = []
     selected_text_file = None
 
-    def __init__(self, app, parent_textEdit, case):
+    def __init__(self, app_, parent_textEdit, case):
 
         sys.excepthook = exception_handler
-        self.app = app
+        self.app = app_
         self.parent_textEdit = parent_textEdit
         self.case = case
         QtWidgets.QDialog.__init__(self)
@@ -200,8 +200,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if file_[2] is not None:
             text_len = len(file_[2]) - 1
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
-        'pos1': text_len, 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+            'pos1': text_len, 'owner': self.app.settings['codername'],
+            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
         # Check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
@@ -290,8 +290,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         param:
             row: signal emitted by doubleclick event """
 
-        #TODO need this method? better in init to go to view_file
-
+        # TODO need this method? better in init to go to view_file
         self.view_file()
 
     def view_file(self):
@@ -496,8 +495,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             Message(self.app, _("Already Linked"),
                 _("This segment has already been linked to this case"), "warning").exec_()
             return
-        cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
-            , (item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
+        cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
+                (item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
         self.app.conn.commit()
         # File may not be assigned in the table widget as Yes
         self.get_files()
@@ -590,9 +589,9 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if text_end_iterator >= 0:
                     pos1 = text_ends[text_end_iterator]
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
-                    'pos0': start_pos, 'pos1': pos1,
-                    'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+                        'pos0': start_pos, 'pos1': pos1,
+                        'owner': self.app.settings['codername'],
+                        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
                     # Check if already assigned to case_text
                     sql = "select id from case_text where caseid=? and fid=? and pos0=? and pos1=?"
                     cur.execute(sql, [item['caseid'], item['fid'], item['pos0'], item['pos1']])
