@@ -41,7 +41,7 @@ class Ui_Dialog_reportComparisons(object):
         self.pushButton_clear.setText("")
         self.pushButton_clear.setObjectName("pushButton_clear")
         self.label_title = QtWidgets.QLabel(self.groupBox)
-        self.label_title.setGeometry(QtCore.QRect(10, 0, 301, 22))
+        self.label_title.setGeometry(QtCore.QRect(10, 0, 491, 22))
         self.label_title.setObjectName("label_title")
         self.label_selections = QtWidgets.QLabel(self.groupBox)
         self.label_selections.setGeometry(QtCore.QRect(10, 60, 751, 32))
@@ -79,7 +79,7 @@ class Ui_Dialog_reportComparisons(object):
         self.pushButton_run.setToolTip(_translate("Dialog_reportComparisons", "<html><head/><body><p>Run comparison</p></body></html>"))
         self.label_2.setText(_translate("Dialog_reportComparisons", "Coders:"))
         self.pushButton_clear.setToolTip(_translate("Dialog_reportComparisons", "<html><head/><body><p>Clear selection</p></body></html>"))
-        self.label_title.setText(_translate("Dialog_reportComparisons", "Coder comparisons"))
+        self.label_title.setText(_translate("Dialog_reportComparisons", "Coder comparisons - text files"))
         self.label_selections.setText(_translate("Dialog_reportComparisons", "Coders selected:"))
         self.pushButton_help1.setToolTip(_translate("Dialog_reportComparisons", "Statistics help"))
 
