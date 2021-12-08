@@ -1,5 +1,4 @@
-#############################################################################
-##
+"""
 ## Copyright (C) 2013 Riverbank Computing Limited.
 ## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
 ## All rights reserved.
@@ -36,9 +35,9 @@
 ## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 ## $QT_END_LICENSE$
 ##
-#############################################################################
 ## Highlighter code was extracted and modified by Colin Curtain from:
 ## https://github.com/baoboa/pyqt5/blob/master/examples/richtext/syntaxhighlighter.py
+"""
 
 
 from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QBrush, QFont, QColor
@@ -76,8 +75,8 @@ class Highlighter(QSyntaxHighlighter):
                     " ON", " OR", "ORDER", "OUTER", "PLAN", "PRAGMA", "PRIMARY", "QUERY",
                     "RAISE", "RECURSIVE", "REFERENCES", "REGEXP", "REINDEX", "RELEASE", "RENAME", "REPLACE", "RESTRICT",
                     "RIGHT", "ROLLBACK", "ROW",
-                    "SAVEPOINT", "SELECT ", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", " TO", "TRANSACTION", "TRIGGER",
-                    "UNION", "UNIQUE", "UPDATE",
+                    "SAVEPOINT", "SELECT ", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", " TO", "TRANSACTION",
+                    "TRIGGER", "UNION", "UNIQUE", "UPDATE",
                     "USING", "VACUUM", "VALUES", "VIEW", "VIRTUAL", "WHEN", "WHERE", "WITH", "WITHOUT"]
         tmp = []
         for k in keywords:
@@ -155,13 +154,11 @@ class Highlighter(QSyntaxHighlighter):
         self.highlighting_rules += [(QRegExp("\'.*\'"), string2_format)]
 
     def highlightBlock(self, text):
-        for pattern, format in self.highlighting_rules:
+        for pattern, format_ in self.highlighting_rules:
             expression = QRegExp(pattern)
             index = expression.indexIn(text)
             while index >= 0:
                 length = expression.matchedLength()
-                self.setFormat(index, length, format)
+                self.setFormat(index, length, format_)
                 index = expression.indexIn(text, index + length)
         self.setCurrentBlockState(0)
-
-
