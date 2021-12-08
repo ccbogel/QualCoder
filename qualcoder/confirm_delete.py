@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2019 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 from PyQt5 import QtWidgets, QtCore
 import os
@@ -35,6 +35,7 @@ from .GUI.ui_dialog_confirm_delete import Ui_Dialog_confirmDelete
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -68,11 +69,3 @@ class DialogConfirmDelete(QtWidgets.QDialog):
         if title != "":
             self.setWindowTitle(title)
         self.adjustSize()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogConfirmDelete("text")
-    ui.show()
-    sys.exit(app.exec_())
-
