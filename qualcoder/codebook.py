@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Copyright (c) 2021 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-'''
+"""
 
 from copy import copy
 import logging
@@ -47,7 +47,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class Codebook():
+class Codebook:
     """ Create a codebook and export to file. """
 
     app = None
@@ -56,11 +56,11 @@ class Codebook():
     categories = []
     tree = None
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.code_names, self.categories = self.app.get_codes_categories()
         self.get_code_frequencies()
         self.tree = QtWidgets.QTreeWidget()
@@ -86,23 +86,18 @@ class Codebook():
                 self.tree.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug(e, item)
 
-        ''' add child categories. look at each unmatched category, iterate through tree
+        ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child then remove matched categories from the list. '''
 
         count = 0
         while len(cats) > 0 or count < 10000:
             remove_list = []
-            #logger.debug(cats)
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.tree)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
                         if c['memo'] != "":
@@ -110,19 +105,16 @@ class Codebook():
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
                         item.addChild(child)
-                        #logger.debug("Adding child: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
             for item in remove_list:
                 cats.remove(item)
             count += 1
-
-        # add unlinked codes as top level items
+        # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                #logger.debug("Unlinked code as top level item:" + c['name'])
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
@@ -131,13 +123,11 @@ class Codebook():
                 remove_items.append(c)
         for item in remove_items:
             codes.remove(item)
-
-        # add codes as children
+        # Add codes as children
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.tree)
             item = it.value()
             while item:
-                #logger.debug("add codes as children:" + item.text(0), item.text(1), c['cid'], c['catid'])
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
                     if c['memo'] != "":
@@ -147,7 +137,6 @@ class Codebook():
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
-        #self.ui.treeWidget.expandAll()
 
     def export(self):
         """ Export codes to a plain text file, filename will have .txt ending. """
@@ -155,7 +144,7 @@ class Codebook():
         filename = "codebook.txt"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-        _("Select directory to save file"), self.app.settings['directory'], options)
+            _("Select directory to save file"), self.app.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
@@ -193,7 +182,6 @@ class Codebook():
 
             it += 1
             item = it.value()
-        #logger.debug("File data:" + filedata)
         f = open(filename, 'w')
         f.write(filedata)
         f.close()
