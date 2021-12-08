@@ -553,21 +553,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         Each data cell contains coded text, or the memo if A/V or image and the file or case name.
         """
 
-        if self.text_results == [] and self.image_results == [] and self.av_results == []:
+        if not self.results:
             return
         codes_all = []
         codes_freq_list = []
-        for i in self.text_results:
-            codes_all.append(i['codename'])
-        for i in self.image_results:
-            codes_all.append(i['codename'])
-        for i in self.av_results:
+        for i in self.results:
             codes_all.append(i['codename'])
         codes_set = list(set(codes_all))
         codes_set.sort()
         for x in codes_set:
             codes_freq_list.append(codes_all.count(x))
-
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
 
@@ -582,41 +577,48 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Look at each code and fill column with data
         for col, code in enumerate(codes_set):
             row = 0
-            for i in self.text_results:
+            for i in self.results:
                 if i['codename'] == code:
-                    d = i['text'] + "\n" + i['file_or_casename']
-                    # Add file id if results are based on attribute selection
-                    if i['file_or_case'] == "":
-                        d += " fid:" + str(i['fid'])
-                    csv_data[row][col] = d
-                    row += 1
-            for i in self.image_results:
-                if i['codename'] == code:
-                    d = i['memo']
-                    if d == "":
-                        d = "NO MENO"
-                    d += "\n" + i['file_or_casename']
-                    # Add filename if results are based on attribute selection
-                    if i['file_or_case'] == "":
-                        d += " " + i['mediapath'][8:]
-                    csv_data[row][col] = d
-                    row += 1
-            for i in self.av_results:
-                if i['codename'] == code:
-                    d = i['memo']
-                    if d == "":
-                        d = "NO MEMO"
-                    d += "\n"
-                    # av 'text' contains video/filename, time slot and memo, so trim some out
-                    trimmed = i['text'][6:]
-                    pos = trimmed.find(']')
-                    trimmed = trimmed[:pos + 1]
-                    # Add case name as well as file name and time slot
-                    if i['file_or_case'] != "File":
-                        trimmed = i['file_or_casename'] + " " + trimmed
-                    d += trimmed
-                    csv_data[row][col] = d
-                    row += 1
+                    if i['result_type'] == 'text':
+                        d = i['text'] + "\n" + i['file_or_casename']
+                        # Add file id if results are based on attribute selection
+                        if i['file_or_case'] == "":
+                            d += " fid:" + str(i['fid'])
+                        csv_data[row][col] = d
+                        row += 1
+                    if i['result_type'] == 'image':
+                        d= ""
+                        try:
+                            d = i['memo']
+                        except KeyError:
+                            pass
+                        if d == "":
+                            d = _("NO MEMO")
+                        d += "\n" + i['file_or_casename']
+                        # Add filename if results are based on attribute selection
+                        if i['file_or_case'] == "":
+                            d += " " + i['mediapath'][8:]
+                        csv_data[row][col] = d
+                        row += 1
+                    if i['result_type'] == 'av':
+                        d = ""
+                        try:
+                            d = i['memo']
+                        except KeyError:
+                            pass
+                        if d == "":
+                            d = _("NO MEMO")
+                        d += "\n"
+                        # av 'text' contains video/filename, time slot and memo, so trim some out
+                        trimmed = i['text'][6:]
+                        pos = trimmed.find(']')
+                        trimmed = trimmed[:pos + 1]
+                        # Add case name as well as file name and time slot
+                        if i['file_or_case'] != "File":
+                            trimmed = i['file_or_casename'] + " " + trimmed
+                        d += trimmed
+                        csv_data[row][col] = d
+                        row += 1
         filename = "Report_codings.csv"
         e = ExportDirectoryPathDialog(self.app, filename)
         filepath = e.filepath
