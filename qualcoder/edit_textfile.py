@@ -39,6 +39,7 @@ from .GUI.ui_dialog_memo import Ui_Dialog_memo
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -80,7 +81,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if res[0] is not None:
             self.text = res[0]
         title = res[1]
-        self.code_deletions= []
+        self.code_deletions = []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -91,7 +92,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         msg = _("Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
         label = QtWidgets.QLabel(msg)
         label.setWordWrap(True)
-        tt = _("Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned)." )
+        tt = _("Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
         tt += _("Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
         label.setToolTip(tt)
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
@@ -166,37 +167,35 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if self.no_codes_annotes_cases:
             return
 
-        cursor = self.ui.textEdit.textCursor()
+        # cursor = self.ui.textEdit.textCursor()
         self.text = self.ui.textEdit.toPlainText()
-        #print("cursor", cursor.position())
-        #for d in difflib.unified_diff(self.prev_text, self.text):
+        # print("cursor", cursor.position())
         # n is how many context lines to show
         d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
-        #print(d)  # 4 items
+        # print(d)  # 4 items
         if len(d) < 4:
-            #print("D", d)
+            # print("D", d)
             return
         char = d[3]
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
-        #print("position", position, "char", char)
+        # print("position", position, "char", char)
 
         previous = position.split(" ")[0]
         pre_start = int(previous.split(",")[0])
         pre_chars = None
         try:
             pre_chars = previous.split(",")[1]
-        except:
+        except IndexError:
             pass
         post = position.split(" ")[1]
         post_start = int(post.split(",")[0])
         post_chars = None
         try:
             post_chars = post.split(",")[1]
-        except:
+        except IndexError:
             pass
-
-        #print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        # print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         """
         Replacing 'way' with 'the' start position 13
         -w  previous 13 3  post 13 3
@@ -229,7 +228,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if post_chars is None:
             post_chars = 1
         post_chars = int(post_chars)  # String if not None
-        #print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
+        # print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         # Adding characters
         if char[0] == "+":
             for c in self.codetext:
@@ -240,7 +239,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     changed = True
                 if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
-                    changed = True
             for c in self.annotations:
                 changed = False
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
@@ -249,7 +247,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     changed = True
                 if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
-                    changed = True
             for c in self.casetext:
                 changed = False
                 # print("npos0", c['npos0'], "pre start", pre_start)
@@ -259,7 +256,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     changed = True
                 if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
-                    changed=True
             self.highlight()
             self.prev_text = copy(self.text)
             return
@@ -268,26 +264,26 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if char[0] == "-":
             for c in self.codetext:
                 changed = False
-                #print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
+                # print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
-                #print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                #print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1*pre_chars + post_chars:
+                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
+                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1\
+                        * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
                     self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
                     c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0']  and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from code_text where ctid=" +str(c['ctid']))
+                        self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
                         c['npos0'] = None
-                        changed = True
             for c in self.annotations:
                 changed = False
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
@@ -306,9 +302,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from annotation where anid=" +str(c['anid']))
+                        self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
                         c['npos0'] = None
-                        changed = True
             for c in self.casetext:
                 changed = False
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
@@ -318,7 +313,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 # Remove, as entire text is being removed (e.g. copy replace)
                 # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                 # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1\
+                        * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
@@ -327,9 +323,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
-                        self.code_deletions.append("delete from case_text where id=" +str(c['id']))
+                        self.code_deletions.append("delete from case_text where id=" + str(c['id']))
                         c['npos0'] = None
-                        changed = True
         self.highlight()
         self.prev_text = copy(self.text)
 
@@ -434,27 +429,19 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.app.conn.commit()
 
     def textEdit_menu(self, position):
-            """ Context menu for select all and copy of text. """
+        """ Context menu for select all and copy of text. """
 
-            if self.ui.textEdit.toPlainText() == "":
-                return
-            menu = QtWidgets.QMenu()
-            menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            action_select_all = menu.addAction(_("Select all"))
-            action_copy = menu.addAction(_("Copy"))
-            action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
-            if action == action_copy:
-                selected_text = self.ui.textEdit.textCursor().selectedText()
-                cb = QtWidgets.QApplication.clipboard()
-                cb.clear(mode=cb.Clipboard)
-                cb.setText(selected_text, mode=cb.Clipboard)
-            if action == action_select_all:
-                self.ui.textEdit.selectAll()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogEditTextFile("settings", "title", "text")
-    ui.show()
-    sys.exit(app.exec_())
-
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_select_all = menu.addAction(_("Select all"))
+        action_copy = menu.addAction(_("Copy"))
+        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        if action == action_copy:
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.clear(mode=cb.Clipboard)
+            cb.setText(selected_text, mode=cb.Clipboard)
+        if action == action_select_all:
+            self.ui.textEdit.selectAll()
