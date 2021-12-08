@@ -49,13 +49,13 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class TextColor():
+class TextColor:
     """ Returns light or dark depending on the code color. """
 
     white_text = [
         "#EB7333", "#E65100", "#C54949", "#B71C1C", "#CB5E3C", "#BF360C",
         "#FA58F4", "B76E95", "#9F3E72", "#880E4F", "#7D26CD",  "#1B5E20",
-        "#487E4B", "#1B5E20", "#5E9179", "#AC58FA", "#5E9179","#9090E3",
+        "#487E4B", "#1B5E20", "#5E9179", "#AC58FA", "#5E9179", "#9090E3",
         "#6B6BDA", "#4646D1", "#3498DB", "#6D91C6", "#3D6CB3", "#0D47A1",
         "#9090E3"]
     recommendation = "#000000"
@@ -65,6 +65,7 @@ class TextColor():
             self.recommendation = "#eeeeee"
         else:
             self.recommendation = "#000000"
+
 
 colors = [
     "#F5F6CE", "#F2F5A9", "#F4FA58", "#F7FE2E", "#DDE600", "#F8ECE0", "#F6E3CE", "#F5D0A9", "#F7BE81", "#FAAC58",
@@ -103,7 +104,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         cur = app.conn.cursor()
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()
-        self.setupUi()
+        self.setup_ui()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
@@ -141,7 +142,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
         super(DialogColorSelect, self).accept()
 
-    def setupUi(self):
+    def setup_ui(self):
         """ Eight rows of ten columns of colours. """
 
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -167,10 +168,3 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogColorSelect("#101010")
-    ui.show()
-    sys.exit(app.exec_())
