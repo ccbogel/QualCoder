@@ -1,12 +1,35 @@
 # -*- coding: utf-8 -*-
 
 """
-This code comes from the following stack overflow entry, with some modifications
-HTML <-> text conversions.
+Copyright (c) 2021 Colin Curtain
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+This code is modified from the stack overflow entry:
 https://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python
+
+Author: Colin Curtain (ccbogel)
+https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
 """
 
-from html.parser import HTMLParser  #, HTMLParseError  # Python 3.5 does not have HTMLParseError
+from html.parser import HTMLParser
 from html.entities import name2codepoint
 import re
 import os
@@ -17,6 +40,7 @@ from PyQt5 import QtWidgets
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -29,6 +53,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class _HTMLToText(HTMLParser):
+    """ Convert HTML to text. """
+
     def __init__(self):
 
         sys.excepthook = exception_handler
@@ -94,6 +120,6 @@ def text_to_html(text):
     def f(mo):
         t = mo.group()
         if len(t) == 1:
-            return {'&':'&amp;', "'":'&#39;', '"':'&quot;', '<':'&lt;', '>':'&gt;'}.get(t)
+            return {'&': '&amp;', "'": '&#39;', '"': '&quot;', '<': '&lt;', '>': '&gt;'}.get(t)
         return '<a href="%s">%s</a>' % (t, t)
     return re.sub(r'https?://[^] ()"\';]+|[&\'"<>]', f, text)
