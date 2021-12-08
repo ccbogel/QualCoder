@@ -84,6 +84,7 @@ def msecs_to_hours_mins_secs(msecs):
     res = hours + "." + remainder_mins + "." + remainder_secs
     return res
 
+
 def file_typer(mediapath):
     """ Take the source mediapath and return type as: text, audio, video, image
     Required function as this is a historical quirk of development
@@ -124,7 +125,7 @@ class Message(QtWidgets.QMessageBox):
             self.setIcon(QtWidgets.QMessageBox.Critical)
 
 
-class ExportDirectoryPathDialog():
+class ExportDirectoryPathDialog:
     """ Dialog to get export directory path, but also to check for existing file.
     If an existing file found, add a counter to the file name until a new file name is made.
      Counter in format _1, _2, etc. """
@@ -137,7 +138,7 @@ class ExportDirectoryPathDialog():
                     filename: String of filename with extension only"""
 
         extension = filename.split('.')[-1]
-        filename_only = filename[0:-len(extension) -1]
+        filename_only = filename[0:-len(extension) - 1]
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
@@ -193,7 +194,8 @@ class DialogCodeInText(QtWidgets.QDialog):
     def __init__(self, app, data, parent=None):
         """ Prepare QDialog window.
         param:
-            data : dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
+            data : dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
+                textedit_start, textedit_end
             app : class containing app details such as database connection
         """
 
@@ -379,7 +381,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("\n")
-            img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'], 'height': row['height']}
+            img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
+                   'height': row['height']}
             self.put_image_into_textedit(img, counter, self.te)
             self.te.append(_("Memo: ") + row['memo'] + "\n\n")
 
@@ -435,16 +438,15 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             text_edit:  the widget that shows the data
         """
 
-        path = self.app.project_path
+        path_ = self.app.project_path
         if img['mediapath'][0] == "/":
-            path = path + img['mediapath']
+            path_ = path_ + img['mediapath']
         else:
-            path = img['mediapath'][7:]
+            path_ = img['mediapath'][7:]
         document = text_edit.document()
-        image = QtGui.QImageReader(path).read()
+        image = QtGui.QImageReader(path_).read()
         image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
-        scaler = 1.0
         scaler_w = 1.0
         scaler_h = 1.0
         if image.width() > 300:
@@ -455,7 +457,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             scaler = scaler_w
         else:
             scaler = scaler_h
-        # need unique image names or the same image from the same path is reproduced
+        # Need unique image names or the same image from the same path is reproduced
         imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
@@ -470,12 +472,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def show_context_of_clicked_heading(self):
         """ Heading (code, file, etc) in textEdit clicked so show context of coding in dialog.
         Called by: textEdit.cursorPositionChanged, after results are filled.
-        text/image/AV results contain textedit_start and textedit_end which map the cursor position to the specific result.
+        text/image/AV results contain textedit_start and textedit_end which map the cursor position to the
+        specific result.
         """
 
         pos = self.te.textCursor().position()
         # Check the clicked position for a text result
-        found = None
         for row in self.text_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInText(self.app, row)
@@ -651,12 +653,9 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.ui.scrollArea.setWidget(self.label)
         self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
-
         # Scale initial picture by height to mostly fit inside scroll area
         # Tried other methods e.g. sizes of components, but nothing was correct.
-        self_h = self.height() - 30 - 80  # slider and textedit heights
-        s_w = self.width()
-        if self.pixmap.height() > self.height() - 30 - 80:
+        if self.pixmap.height() > self.height() - 30 - 80:  # slider 30 and textedit 80 heights
             self.scale = (self.height() - 30 - 80) / self.pixmap.height()
             slider_value = int(self.scale * 100)
             if slider_value > 100:
@@ -667,7 +666,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     def draw_coded_area(self):
         """ Draw the coded rectangle in the scene """
 
-        tooltip = self.data['codename']   #+ " (" + self.data['coder'] + ")"
+        tooltip = self.data['codename']
         tooltip += "\nMemo: " + self.data['coded_memo']
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
