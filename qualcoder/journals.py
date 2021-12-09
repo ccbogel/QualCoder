@@ -29,7 +29,6 @@ https://qualcoder.wordpress.com/
 from PyQt5 import QtCore, QtWidgets, QtGui
 import datetime
 import os
-import platform
 import re
 import sys
 import logging
@@ -55,13 +54,13 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
+    mb.setText(text_)
     mb.exec_()
 
 
@@ -77,12 +76,12 @@ class DialogJournals(QtWidgets.QDialog):
     search_indices = []   # A list of tuples of (journal name, match.start, match length)
     search_index = 0
 
-    def __init__(self, app, parent_textEdit, parent=None):
+    def __init__(self, app, parent_text_edit, parent=None):
 
         super(DialogJournals, self).__init__(parent)  # overrride accept method
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         self.journals = []
         self.current_jid = None
         self.search_indices = []
@@ -91,7 +90,7 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute("select name, date, jentry, owner, jid from journal")
         result = cur.fetchall()
         for row in result:
-            self.journals.append({'name':row[0], 'date':row[1], 'jentry':row[2], 'owner':row[3], 'jid': row[4]})
+            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4]})
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
@@ -108,7 +107,7 @@ class DialogJournals(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogjournals_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
-        except:
+        except KeyError:
             pass
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
@@ -116,7 +115,7 @@ class DialogJournals(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_create.clicked.connect(self.create)
+        self.ui.pushButton_create.clicked.connect(self.create_journal)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
@@ -155,7 +154,8 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
 
-    def help(self):
+    @staticmethod
+    def help():
         """ Open help for transcribe section in browser. """
 
         url = "https://github.com/ccbogel/QualCoder/wiki/04-Journals"
@@ -197,10 +197,10 @@ class DialogJournals(QtWidgets.QDialog):
     def export_all_journals_as_one_file(self):
         """ Export a collation of all journals as one text file. """
 
-        text = ""
+        text_ = ""
         for j in self.journals:
-            text += _("Journal: ") + j['name'] + "\n"
-            text += j['jentry'] + "\n========\n\n"
+            text_ += _("Journal: ") + j['name'] + "\n"
+            text_ += j['jentry'] + "\n========\n\n"
         filename = "Collated_journals.txt"
         e = ExportDirectoryPathDialog(self.app, filename)
         filepath = e.filepath
@@ -210,7 +210,7 @@ class DialogJournals(QtWidgets.QDialog):
         Using a byte order mark so that other software recognises UTF-8
         '''
         f = open(filepath, 'w', encoding='utf-8-sig')
-        f.write(text)
+        f.write(text_)
         f.close()
         msg = _("Collated journals exported as text file to: ") + filepath
         self.parent_textEdit.append(msg)
@@ -252,7 +252,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.settings['dialogjournals_splitter0'] = sizes[0]
         self.app.settings['dialogjournals_splitter1'] = sizes[1]
 
-    def create(self):
+    def create_journal(self):
         """ Create a new journal by entering text into the dialog. """
 
         self.jid = None
@@ -277,8 +277,8 @@ class DialogJournals(QtWidgets.QDialog):
             return
 
         # Update database
-        journal = {'name':name, 'jentry': '', 'owner':self.app.settings['codername'],
-            'date':datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid':None}
+        journal = {'name': name, 'jentry': '', 'owner': self.app.settings['codername'],
+            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid': None}
         cur = self.app.conn.cursor()
         cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
             (journal['name'], journal['jentry'], journal['owner'], journal['date']))
@@ -328,7 +328,7 @@ class DialogJournals(QtWidgets.QDialog):
         if ok:
             cur = self.app.conn.cursor()
             cur.execute("delete from journal where name = ?", [journalname])
-            cur = self.app.conn.commit()
+            self.app.conn.commit()
             for item in self.journals:
                 if item['name'] == journalname:
                     self.journals.remove(item)
@@ -364,7 +364,8 @@ class DialogJournals(QtWidgets.QDialog):
             # Check for unusual characters in filename that would affect exporting
             valid = re.match('^[\ \w-]+$', new_name) is not None
             if not valid:
-                Message(self.app, _('Warning - invalid characters'), _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec_()
+                Message(self.app, _('Warning - invalid characters'),
+                        _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec_()
                 update = False
             if update:
                 # update journals list and database
@@ -390,7 +391,7 @@ class DialogJournals(QtWidgets.QDialog):
 
         if self.jid is None and not(self.ui.checkBox_search_all_journals.isChecked()):
             return
-        if self.search_indices == []:
+        if not self.search_indices:
             self.ui.pushButton_next.setEnabled(False)
             self.ui.pushButton_previous.setEnabled(False)
         self.search_indices = []
@@ -401,8 +402,6 @@ class DialogJournals(QtWidgets.QDialog):
             return
         pattern = None
         flags = 0
-        '''if not self.ui.checkBox_search_case.isChecked():
-            flags |= re.IGNORECASE'''
         try:
             pattern = re.compile(search_term, flags)
         except:
@@ -414,12 +413,12 @@ class DialogJournals(QtWidgets.QDialog):
             """ Search for this text across all journals. """
             for jdata in self.app.get_journal_texts():
                 try:
-                    text = jdata['jentry']
-                    for match in pattern.finditer(text):
+                    text_ = jdata['jentry']
+                    for match in pattern.finditer(text_):
                         self.search_indices.append((jdata, match.start(), len(match.group(0))))
                 except Exception as e:
                     print(e)
-                    logger.exception('Failed searching text %s for %s',jdata['name'], search_term)
+                    logger.exception('Failed searching text %s for %s', jdata['name'], search_term)
         else:  # Current journal only
             row = self.ui.tableWidget.currentRow()
             try:
@@ -438,7 +437,7 @@ class DialogJournals(QtWidgets.QDialog):
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
 
-        if self.search_indices == []:
+        if not self.search_indices:
             return
         self.search_index -= 1
         if self.search_index < 0:
@@ -462,7 +461,7 @@ class DialogJournals(QtWidgets.QDialog):
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
 
-        if self.search_indices == []:
+        if not self.search_indices:
             return
         self.search_index += 1
         if self.search_index == len(self.search_indices):
@@ -482,5 +481,3 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
-
-
