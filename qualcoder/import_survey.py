@@ -34,11 +34,7 @@ import datetime
 import logging
 from shutil import copyfile
 
-openpyxl_module = True
-try:
-    from openpyxl import load_workbook
-except Exception as e:
-    openpyxl_module = False
+from openpyxl import load_workbook
 import os
 import re
 import sqlite3
@@ -91,13 +87,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
     success = False  # ability to load file and has individual ids in first column
     fail_msg = ""
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_text_edit):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise get a double-up of accept signals. """
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         self.delimiter = ","
         self.fields = []
         self.filepath = ""
@@ -148,10 +144,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
         """ Read the data from the xlsx file.
         Fill Class variables self.fields, self.data """
 
-        if openpyxl_module is False:
-            self.fail_msg = _(
-                "Please install the openpyxl module.\nsudo python3 -m pip install openpyxl OR\npython -m pip install openpyxl")
-            return False
         self.data = []
         wb = load_workbook(filename=self.filepath)
         # To work with the first sheet (by name)
@@ -159,9 +151,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         ws = wb[sheets[0]]
         sheet = ws
         for value in sheet.iter_rows(values_only=True):
-            # some rows may be complete blank so ignore importation
+            # Some rows may be complete blank so ignore importation
             if (set(value)) != {None}:
-                # values are tuples, convert to list, and remove 'None' string
+                # Values are tuples, convert to list, and remove 'None' string
                 row = []
                 for item in value:
                     if item is None:
@@ -249,8 +241,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 return False
         self.setWindowTitle(_("Importing from: ") + self.filepath.split('/')[-1])
 
-        # clean field names
-        removes = "!@#$%^&*()-+=[]{}\|;:,.<>/?~`"
+        # Clean field names
+        removes = "!@#$%^&*()-+=[]{}\\|;:,.<>/?~`"
         for i in range(0, len(self.fields)):
             self.fields[i] = self.fields[i].replace('\t', '')
             self.fields[i] = self.fields[i].replace('\xa0', '')
@@ -258,17 +250,15 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 self.fields[i] = self.fields[i].replace(r, '')
             if self.fields[i] in self.preexisting_fields:
                 self.fields[i] += "_DUPLICATED"
-
-        # default field type is character
+        # Default field type is character
         self.fields_type = ["character"] * len(self.fields)
-
-        # determine if field type is numeric
+        # Determine if field type is numeric
         for field in range(0, len(self.fields)):
             numeric = True
             for row in range(0, len(self.data)):
                 try:
                     float(self.data[row][field])
-                except:
+                except ValueError:
                     numeric = False
             if numeric:
                 self.fields_type[field] = "numeric"
@@ -295,16 +285,14 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for row in self.data:
             try:
                 ids.append(row[0])
-            except IndexError as e:
+            except IndexError:
                 # Occurs with csv import if wrong quote type selected
                 ids.append("")
-
         ids_set = set(ids)
         if len(ids) > len(ids_set):
             self.fail_msg = _("There are duplicated identifiers in the first column.\nFile not imported")
             self.parent_textEdit.append(self.filepath + " " + self.fail_msg)
             return False
-
         msg = _("Survey file: ") + self.filepath + "\n"
         msg += _("Fields: ") + str(len(self.fields)) + ". "
         msg += _("Rows: ") + str(len(self.data))
@@ -417,8 +405,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for field in range(1, len(self.fields)):  # column 0 is for identifiers
             case_text_list = []
             if self.fields_type[field] == "qualitative":
-                self.fields[field]
-                # create one text file combining each row, prefix [case identifier] to each row.
+                # Create one text file combining each row, prefix [case identifier] to each row.
                 pos0 = 0
                 pos1 = 0
                 fulltext = ""
@@ -468,8 +455,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
         num_fields_in_row_error = False
         self.ui.label_msg.setText("")
-        numRows = self.ui.tableWidget.rowCount()
-        for row in range(0, numRows):
+        num_rows = self.ui.tableWidget.rowCount()
+        for row in range(0, num_rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(len(self.fields))
         for c, field in enumerate(self.fields):
@@ -528,8 +515,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         Qualitative data is stored in the source table in a generated text file. """
 
         self.fields_type[self.headerIndex] = 'qualitative'
-        item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
-                                          self.fields_type[self.headerIndex] + "\n")
+        item_txt = self.fields[self.headerIndex] + "\n" + self.fields_type[self.headerIndex] + "\n"
+        item = QtWidgets.QTableWidgetItem(item_txt)
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
 
     def character_field_type(self):
@@ -537,8 +524,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         """
 
         self.fields_type[self.headerIndex] = 'character'
-        item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
-                                          self.fields_type[self.headerIndex] + "\n")
+        item_txt = self.fields[self.headerIndex] + "\n" + self.fields_type[self.headerIndex] + "\n"
+        item = QtWidgets.QTableWidgetItem(item_txt)
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
 
     def change_fieldname(self):
@@ -559,6 +546,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
             return
 
         self.fields[self.headerIndex] = fieldname
-        item = QtWidgets.QTableWidgetItem(self.fields[self.headerIndex] + "\n" + \
-                                          self.fields_type[self.headerIndex])
+        item_txt = self.fields[self.headerIndex] + "\n" + self.fields_type[self.headerIndex]
+        item = QtWidgets.QTableWidgetItem(item_txt)
         self.ui.tableWidget.setHorizontalHeaderItem(self.headerIndex, item)
