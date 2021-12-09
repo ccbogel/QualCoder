@@ -37,6 +37,7 @@ from .GUI.ui_dialog_information import Ui_Dialog_information
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -59,8 +60,9 @@ class DialogInformation(QtWidgets.QDialog):
 
     title = ""
     text = ""
+    information = ""
 
-    def __init__(self, app, title, html="", parent=None):
+    def __init__(self, app_, title, html=""):
         """Display information text in dialog.
         If no html is given, fill with About html. """
 
@@ -69,12 +71,12 @@ class DialogInformation(QtWidgets.QDialog):
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
+        font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
         if html == "":
-            self.setHtml(about.replace("QualCoderVersion", app.version))
+            self.setHtml(about.replace("QualCoderVersion", app_.version))
         else:
             self.setHtml(html)
 
@@ -89,6 +91,7 @@ class DialogInformation(QtWidgets.QDialog):
         """ Accepted button overridden method """
         self.information = self.ui.textEdit.toPlainText()
         super().accept()
+
 
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
