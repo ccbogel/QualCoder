@@ -129,6 +129,28 @@
          </item>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_quote">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>120</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>All fields quoted with quotation marks.</string>
+         </property>
+         <property name="text">
+          <string>Quote</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
