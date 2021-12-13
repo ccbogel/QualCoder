@@ -60,6 +60,11 @@ class Ui_Dialog_sql(object):
         self.comboBox_delimiter.addItem("")
         self.comboBox_delimiter.addItem("")
         self.horizontalLayout.addWidget(self.comboBox_delimiter)
+        self.checkBox_quote = QtWidgets.QCheckBox(Dialog_sql)
+        self.checkBox_quote.setMinimumSize(QtCore.QSize(120, 0))
+        self.checkBox_quote.setMaximumSize(QtCore.QSize(120, 16777215))
+        self.checkBox_quote.setObjectName("checkBox_quote")
+        self.horizontalLayout.addWidget(self.checkBox_quote)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
@@ -77,6 +82,8 @@ class Ui_Dialog_sql(object):
         self.comboBox_delimiter.setItemText(1, _translate("Dialog_sql", ","))
         self.comboBox_delimiter.setItemText(2, _translate("Dialog_sql", ";"))
         self.comboBox_delimiter.setItemText(3, _translate("Dialog_sql", "|"))
+        self.checkBox_quote.setToolTip(_translate("Dialog_sql", "All fields quoted with quotation marks."))
+        self.checkBox_quote.setText(_translate("Dialog_sql", "Quote"))
 
 
 if __name__ == "__main__":
