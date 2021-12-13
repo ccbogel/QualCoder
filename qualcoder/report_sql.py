@@ -28,11 +28,13 @@ https://github.com/ccbogel/QualCoder
 from PyQt5 import QtCore, QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-import sqlite3
-import os
-import sys
+
+import csv
 from datetime import datetime
 import logging
+import os
+import sqlite3
+import sys
 import traceback
 
 from .GUI.base64_helper import *
@@ -68,7 +70,6 @@ class DialogSQL(QtWidgets.QDialog):
     sql = ""
     stored_sqls = []  # a list of dictionaries of user created sql, as {index, sql}
     default_sqls = []  # a list of dictionaries of default sql, as {index, sql}
-    delimiter = "\t"  # default delimiter for file exports
     file_data = []  # for file exports
     results = None  # SQL results
     queryTime = ""  # for label tooltip
@@ -161,37 +162,28 @@ class DialogSQL(QtWidgets.QDialog):
             Message(self.app, _("SQL error"), str(e), "warning").exec_()
             return
         results = cur.fetchall()
-        col_names = []
+        header = []
         if cur.description is not None:
-            col_names = list(map(lambda x: x[0], cur.description))  # gets column names
+            header = list(map(lambda x: x[0], cur.description))  # gets column names
         filename = "sql_report.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
         if filepath is None:
             return
-        self.delimiter = str(self.ui.comboBox_delimiter.currentText())
-        if self.delimiter == "tab":
-            self.delimiter = "\t"
-        ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
-        Using a byte order mark so that other software recognised UTF-8 '''
-        f = open(filepath, 'w', encoding='utf-8-sig')
-        # Write the header row
-        file_line = ""
-        for item in col_names:
-            file_line += item + self.delimiter
-        file_line = file_line[:len(file_line) - 1]
-        f.write(file_line + "\r\n")
-        # Write data rows
-        for r, row in enumerate(results):
-            file_line = ""
-            for item in row:
-                if item is None:
-                    file_line += self.delimiter
-                else:
-                    file_line += str(item) + self.delimiter
-            file_line = file_line[:len(file_line) - 1]
-            f.write(file_line + "\r\n")
-        f.close()
+
+        print("FP", filepath)
+
+        quote_option = csv.QUOTE_MINIMAL
+        if self.ui.checkBox_quote.isChecked():
+            quote_option = csv.QUOTE_ALL
+        delimiter_ = str(self.ui.comboBox_delimiter.currentText())
+        if delimiter_ == "tab":
+            delimiter_ = "\t"
+        with open(filepath, 'wt', encoding='utf-8-sig') as export_file:
+            csv_writer = csv.writer(export_file, delimiter=delimiter_, quoting=quote_option)
+            csv_writer.writerow(header)
+            for row in results:
+                csv_writer.writerow(row)
         msg = _("SQL Results exported to: ") + filepath
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(_("Query:") + "\n" + sql)
