@@ -1,10 +1,10 @@
 [Desktop Entry]
 Name=QualCoder
 Type=Application
-Version=1.0
+Version=2.9
 Comment=Qualitiatve data analysis
 Exec=python3 -m qualcoder
-Icon=/usr/share/icons/qualcoder.png
+Icon=/usr/share/icons/qualcoder128.png
 Terminal=false
 Categories=Science;
 Name[en_AU]=QualCoder
