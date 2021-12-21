@@ -54,10 +54,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogReportCodes(QtWidgets.QDialog):
@@ -94,11 +94,11 @@ class DialogReportCodes(QtWidgets.QDialog):
     # list of dictionaries of row, col, textEdit, list of links
     matrix_links = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
         super(DialogReportCodes, self).__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
@@ -158,7 +158,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self)  # for H key
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.splitter.setSizes([100, 200, 0])
         try:
             s0 = int(self.app.settings['dialogreportcodes_splitter0'])
@@ -169,7 +169,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             v1 = int(self.app.settings['dialogreportcodes_splitter_v1'])
             v2 = int(self.app.settings['dialogreportcodes_splitter_v2'])
             self.ui.splitter_vert.setSizes([v0, v1, v2])
-        except KeyError:  # and TypeError
+        except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
@@ -354,10 +354,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             ok = dialog.exec_()
             if not ok:
                 return
-            text = str(dialog.textValue())
+            text_ = str(dialog.textValue())
             for i in range(self.ui.listWidget_cases.count()):
                 item_name = self.ui.listWidget_cases.item(i).text()
-                if text in item_name:
+                if text_ in item_name:
                     self.ui.listWidget_cases.item(i).setSelected(True)
                 else:
                     self.ui.listWidget_cases.item(i).setSelected(False)
@@ -488,16 +488,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ ComboBox export option selected. """
 
         # TODO add case matrix as csv, xlsx options
-        text = self.ui.comboBox_export.currentText()
-        if text == "":
+        text_ = self.ui.comboBox_export.currentText()
+        if text_ == "":
             return
-        if text == "html":
+        if text_ == "html":
             self.export_html_file()
-        if text == "odt":
+        if text_ == "odt":
             self.export_odt_file()
-        if text == "txt":
+        if text_ == "txt":
             self.export_text_file()
-        if text == "csv":
+        if text_ == "csv":
             self.export_csv_file()
 
     def export_text_file(self):
@@ -587,7 +587,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         csv_data[row][col] = d
                         row += 1
                     if i['result_type'] == 'image':
-                        d= ""
+                        d = ""
                         try:
                             d = i['memo']
                         except KeyError:
@@ -626,7 +626,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
-                quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(codes_set)  # header row
             for row in csv_data:
                 filewriter.writerow(row)
@@ -691,12 +691,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
                 html = html.replace(item['imagename'], img_path)
-                #TODO check on Windows
-                '''unreplaced_html = copy(html)  # for Windows 10 directory name upper/lower case issue
-                Replace html links, with fix for Windows 10, item[imagename] contains a lower case directory but
-                this needs to be upper case for the replace method to work:  c:  =>  C: '''
-                '''if unreplaced_html == html:
-                    html = html.replace(item['imagename'][0].upper() + item['imagename'][1:], folder_link)'''
             if item['avname'] is not None:
                 # Add audio/video to html folder
                 mediatype = "video"
@@ -746,21 +740,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
         Message(self.app, _('Report exported'), msg, "information").exec_()
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object_, event):
         """ Used to detect key events in the textedit.
         H Hide / Unhide top groupbox
         """
 
-        # change start and end code positions using alt arrow left and alt arrow right
+        # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
         if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
-            self.ui.listWidget_files.hasFocus() or self.ui.listWidget_cases.hasFocus()):
+                                               self.ui.listWidget_files.hasFocus() or
+                                               self.ui.listWidget_cases.hasFocus()):
             key = event.key()
             # mod = event.modifiers()
             # Hide unHide top groupbox
             if key == QtCore.Qt.Key_H:
-                self.ui.groupBox.setHidden(not(self.ui.groupBox.isHidden()))
+                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
                 return True
         return False
 
@@ -835,7 +830,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if search_text != "":
             self.ui.textEdit.append(_("Search text: ") + search_text)
         self.ui.textEdit.append(_("Files:"))
-        cur.execute("select name from source where id in (" + self.file_ids + ") and source.fulltext is not null order by name")
+        cur.execute(
+            "select name from source where id in (" + self.file_ids + ") and source.fulltext is not null order by name")
         res = cur.fetchall()
         file_txt = ""
         for r in res:
@@ -1110,6 +1106,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if important:
                 sql += " and code_text.important=1 "
             sql += " order by code_name.name, source.name, pos0"
+            print(sql)
             if not parameters:
                 cur.execute(sql)
             else:
@@ -1176,19 +1173,20 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 cur.execute(sql, parameters)
             result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid',\
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
                    'codename_memo', 'source_memo'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
                 tmp['file_or_case'] = file_or_case
-                text = str(tmp['file_or_casename']) + " "
+                text_ = str(tmp['file_or_casename']) + " "
                 if len(tmp['coded_memo']) > 0:
-                    text += "\nMemo: " + tmp['coded_memo']
-                text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = text
+                    text_ += "\nMemo: " + tmp['coded_memo']
+                text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+                tmp['text'] = text_
                 self.html_links.append({'imagename': None, 'image': None,
-                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)), 'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text})
+                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
                 self.results.append(tmp)
 
         # CASES AND FILES SEARCH
@@ -1311,6 +1309,58 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip("")
 
+    def code_count_and_text_percent(self):
+        """ First part of results, fill code counts and text percentages.
+        Text percentages is total of coded text divided by total of text source characters. """
+
+        # Get file text lengths for the text files from the files in the results
+        text_file_ids = []
+        code_names = []
+        for r in self.results:
+            if r['result_type'] == 'text':
+                text_file_ids.append(r['fid'])
+                code_names.append(r['codename'])
+        text_file_ids = list(set(text_file_ids))
+        code_names = list(set(code_names))
+        code_names.sort()
+        cur = self.app.conn.cursor()
+        sql = "select id, length(fulltext), name from source where fulltext is not null and id=? order by name"
+        file_lengths = []
+        for id_ in text_file_ids:
+            cur.execute(sql, [id_])
+            res = cur.fetchone()
+            res_dict = {"fid": res[0], "length": res[1], "filename": res[2]}
+            file_lengths.append(res_dict)
+
+        # Stats results dictionary preparation
+        stats = []
+        for c in code_names:
+            for f in file_lengths:
+                stats.append({'codename': c, 'fid': f['fid'], 'filetextlength': f['length'],
+                              'filename': f['filename'], 'codecount': 0,
+                              'codetextlength': 0, 'percent': 0})
+        # Stats results calculated
+        """
+        {codename , color , file_or_casename , pos0 , pos1 , text , coder, fid, 
+        coded_memo codename_memo, source_memo, result_type, file_or_case': 'File'}
+        """
+        for st in stats:
+            for r in self.results:
+                if st['codename'] == r['codename'] and st['fid'] == r['fid']:
+                    st['codecount'] += 1
+                    st['codetextlength'] += len(r['text'])
+                    st['percent'] = int((st['codetextlength'] / st['filetextlength']) * 100)
+
+        final_stats = []
+        for st in stats:
+            if st['codecount'] > 0:
+                final_stats.append(st)
+
+        print("stats results:")
+        for st in final_stats:
+            print("stats", st)
+
+
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
         Results are drawn from the textEdit.document to fill reports in .txt and .odt formats.
@@ -1324,7 +1374,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.text_links = []
         self.matrix_links = []
 
-        # Put results into the textEdit.document
+        self.code_count_and_text_percent()
+
         # Add textedit positioning for context on clicking appropriate heading in results
         choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
@@ -1381,8 +1432,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Check and change path for a linked image file
         if img['mediapath'][0:7] == "images:":
             imagename = str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
-        # imagename is now:
-        # 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
+        # imagename is now: 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
 
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
@@ -1394,7 +1444,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
         self.html_links.append({'imagename': imagename, 'image': image,
-            'avname': None, 'av0': None, 'av1': None, 'avtext': None})
+                                'avname': None, 'av0': None, 'av1': None, 'avtext': None})
         if img['coded_memo'] != "":
             text_edit.insertPlainText(_("Memo: ") + img['coded_memo'] + "\n")
 
@@ -1409,11 +1459,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name from source where id=?", [item['fid']])
         filename = ""
-        try:  # In case no filename results, rare possibility
-            filename = cur.fetchone()[0]
-        except Exception:
-            pass
-
+        res = cur.fetchone()
+        if res is not None:
+            filename = res[0]
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         choice = self.ui.comboBox_memos.currentText()
@@ -1447,7 +1495,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
 
-    def textEdit_menu(self, position):
+    def text_edit_menu(self, position):
         """ Context menu for textEdit.
         To view coded in context. """
 
@@ -1507,7 +1555,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     ui = DialogCodeInAV(self.app, row)
                     ui.exec_()
 
-    def matrix_heading(self, item, textEdit):
+    def matrix_heading(self, item, text_edit):
         """ Takes a dictionary item and creates a heading for the coded text portion.
         Also adds the textEdit start and end character positions for this text in this text edit
         param:
@@ -1517,10 +1565,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name from source where id=?", [item['fid']])
         filename = ""
-        try:  # In case no filename results, rare possibility
-            filename = cur.fetchone()[0]
-        except:
-            pass
+        res = cur.fetchone()
+        if res is not None:
+            filename = res[0]
         choice = self.ui.comboBox_memos.currentText()
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
@@ -1538,20 +1585,20 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if res is not None and res != "":
                     head += ", " + _("Case memo: ") + res[0]
         head += item['coder']
-        cursor = textEdit.textCursor()
+        cursor = text_edit.textCursor()
         fmt = QtGui.QTextCharFormat()
-        pos0 = len(textEdit.toPlainText())
+        pos0 = len(text_edit.toPlainText())
         item['textedit_start'] = pos0
-        textEdit.append(head)
+        text_edit.append(head)
         cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-        pos1 = len(textEdit.toPlainText())
+        pos1 = len(text_edit.toPlainText())
         cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
         brush = QBrush(QtGui.QColor(item['color']))
         fmt.setBackground(brush)
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
-        item['textedit_end'] = len(textEdit.toPlainText())
+        item['textedit_end'] = len(text_edit.toPlainText())
 
     def fill_matrix_codes(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
@@ -1598,7 +1645,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
-                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
@@ -1703,7 +1750,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
-                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
@@ -1717,7 +1764,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                         if r['result_type'] == 'text':
                             self.te[row][col].append(r['text'])
-                            if choice in ("All memos", "Code text memos") and t['coded_memo'] != "":
+                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
                                 self.te.append(_("Coded memo: ") + r['coded_memo'])
                         if r['result_type'] == 'image':
                             self.put_image_into_textedit(r, counter, self.te[row][col])
@@ -1815,7 +1862,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
-                tedit.customContextMenuRequested.connect(self.table_textEdit_menu)
+                tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
@@ -1863,7 +1910,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def table_textEdit_menu(self, position):
+    def table_text_edit_menu(self, position):
         """ Context menu for textEdit.
         To view coded in context. """
 
