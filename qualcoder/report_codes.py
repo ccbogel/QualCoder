@@ -1357,9 +1357,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 final_stats.append(st)
 
         print("stats results:")
+        msg = _("Text code statistics:")
         for st in final_stats:
-            print("stats", st)
-
+            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
+            msg += _("Percent of file: ") + str(st['percent']) + "%"
+        msg += "\n========"
+        if len(final_stats) > 0:
+            self.ui.textEdit.append(msg)
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
