@@ -259,6 +259,22 @@
        <string/>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_show_stats">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>40</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Display summary statistics</string>
+      </property>
+      <property name="text">
+       <string>Statistics</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
