@@ -81,6 +81,9 @@ class Ui_Dialog_reportCodings(object):
         self.label_memos.setGeometry(QtCore.QRect(600, 70, 30, 30))
         self.label_memos.setText("")
         self.label_memos.setObjectName("label_memos")
+        self.checkBox_show_stats = QtWidgets.QCheckBox(self.groupBox)
+        self.checkBox_show_stats.setGeometry(QtCore.QRect(430, 40, 161, 23))
+        self.checkBox_show_stats.setObjectName("checkBox_show_stats")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodings)
         self.groupBox_2.setTitle("")
@@ -136,6 +139,8 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_important.setText(_translate("Dialog_reportCodings", "Important"))
         self.comboBox_memos.setToolTip(_translate("Dialog_reportCodings", "Memo reporting options"))
         self.label_memos.setToolTip(_translate("Dialog_reportCodings", "Memo reporting options"))
+        self.checkBox_show_stats.setToolTip(_translate("Dialog_reportCodings", "Display summary statistics"))
+        self.checkBox_show_stats.setText(_translate("Dialog_reportCodings", "Statistics"))
 
 
 if __name__ == "__main__":
