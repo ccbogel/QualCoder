@@ -30,6 +30,7 @@ from copy import copy, deepcopy
 import csv
 import logging
 import os
+from PIL import Image
 from shutil import copyfile
 import sys
 import traceback
@@ -45,6 +46,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
+import qualcoder.vlc as vlc
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -680,14 +682,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Change html links to reference the html folder
         for item in self.html_links:
             if item['imagename'] is not None:
-                # print("item['imagename'] ", item['imagename'])
-                ''' item['imagename'] is in this format: 
-                0-/images/filename.jpg  # where 0- is the counter
-                '''
                 image_name = item['imagename'].replace('/images/', '')
-                print("IMG NAME: ", item['imagename'])
+                # print("IMG NAME: ", item['imagename'])
                 img_path = html_folder_name + "/images/" + image_name
-                print("IMG PATH", img_path)
+                # print("IMG PATH", img_path)
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
                 html = html.replace(item['imagename'], img_path)
@@ -1106,7 +1104,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             if important:
                 sql += " and code_text.important=1 "
             sql += " order by code_name.name, source.name, pos0"
-            print(sql)
             if not parameters:
                 cur.execute(sql)
             else:
@@ -1309,24 +1306,24 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip("")
 
-    def code_count_and_text_percent(self):
+    def text_code_count_and_percent(self):
         """ First part of results, fill code counts and text percentages.
         Text percentages is total of coded text divided by total of text source characters. """
 
         # Get file text lengths for the text files from the files in the results
-        text_file_ids = []
+        file_ids = []
         code_names = []
         for r in self.results:
             if r['result_type'] == 'text':
-                text_file_ids.append(r['fid'])
+                file_ids.append(r['fid'])
                 code_names.append(r['codename'])
-        text_file_ids = list(set(text_file_ids))
+        file_ids = list(set(file_ids))
         code_names = list(set(code_names))
         code_names.sort()
         cur = self.app.conn.cursor()
         sql = "select id, length(fulltext), name from source where fulltext is not null and id=? order by name"
         file_lengths = []
-        for id_ in text_file_ids:
+        for id_ in file_ids:
             cur.execute(sql, [id_])
             res = cur.fetchone()
             res_dict = {"fid": res[0], "length": res[1], "filename": res[2]}
@@ -1355,9 +1352,131 @@ class DialogReportCodes(QtWidgets.QDialog):
         for st in stats:
             if st['codecount'] > 0:
                 final_stats.append(st)
-
-        print("stats results:")
         msg = _("Text code statistics:")
+        for st in final_stats:
+            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
+            msg += _("Percent of file: ") + str(st['percent']) + "%"
+        msg += "\n========"
+        if len(final_stats) > 0:
+            self.ui.textEdit.append(msg)
+
+    def image_code_count_and_percent(self):
+        """ First part of results, fill code counts and image percentages.
+        Image percentages is total of coded area divided by total of Image source area. """
+
+        # Get file area for each image
+        file_ids = []
+        code_names = []
+        for r in self.results:
+            if r['result_type'] == 'image':
+                file_ids.append(r['fid'])
+                code_names.append(r['codename'])
+        file_ids = list(set(file_ids))
+        code_names = list(set(code_names))
+        code_names.sort()
+        cur = self.app.conn.cursor()
+        sql = "select id, name, mediapath from source where id=? order by name"
+        file_areas = []
+        for id_ in file_ids:
+            cur.execute(sql, [id_])
+            res = cur.fetchone()
+            abs_path = ""
+            w, h = 1, 1
+            if 'images:' == res[2][0:7]:
+                abs_path = res[2][7:]
+            else:
+                abs_path = self.app.project_path + res[2]
+            try:
+                image = Image.open(abs_path)
+                w, h = image.size
+            except FileNotFoundError:
+                pass
+            res_dict = {"fid": res[0], "area": w * h, "filename": res[1]}
+            file_areas.append(res_dict)
+
+        # Stats results dictionary preparation
+        stats = []
+        for c in code_names:
+            for f in file_areas:
+                stats.append({'codename': c, 'fid': f['fid'], 'filearea': f['area'],
+                              'filename': f['filename'], 'codecount': 0,
+                              'codedarea': 0, 'percent': 0})
+        # Stats results calculated
+        for st in stats:
+            for r in self.results:
+                if st['codename'] == r['codename'] and st['fid'] == r['fid']:
+                    st['codecount'] += 1
+                    st['codedarea'] += r['width'] * r['height']
+                    st['percent'] = int((st['codedarea'] / st['filearea']) * 100)
+        final_stats = []
+        for st in stats:
+            if st['codecount'] > 0:
+                final_stats.append(st)
+        msg = _("Image code statistics:")
+        for st in final_stats:
+            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
+            msg += _("Percent of file: ") + str(st['percent']) + "%"
+        msg += "\n========"
+        if len(final_stats) > 0:
+            self.ui.textEdit.append(msg)
+
+    def av_code_count_and_percent(self):
+        """ First part of results, fill code counts and AV percentages.
+        AV percentages is total of coded text divided by total of AV source duration. """
+
+        # Get file lengths
+        file_ids = []
+        code_names = []
+        for r in self.results:
+            if r['result_type'] == 'av':
+                file_ids.append(r['fid'])
+                code_names.append(r['codename'])
+        file_ids = list(set(file_ids))
+        code_names = list(set(code_names))
+        code_names.sort()
+        cur = self.app.conn.cursor()
+        sql = "select id, name, mediapath from source where id=? order by name"
+        file_lengths = []
+        for id_ in file_ids:
+            cur.execute(sql, [id_])
+            res = cur.fetchone()
+            abs_path = ""
+            if 'audio:' == res[2][0:6]:
+                abs_path = res[2][6:]
+            elif 'video:' == res[2][0:6]:
+                abs_path = res[2][6:]
+            else:
+                abs_path = self.app.project_path + res[2]
+            instance = vlc.Instance()
+            msecs = 1
+            try:
+                media = instance.media_new(abs_path)
+                media.parse()
+                msecs = media.get_duration()
+            except FileNotFoundError:
+                pass
+            res_dict = {"fid": res[0], "file_duration": msecs, "filename": res[1]}
+            file_lengths.append(res_dict)
+
+        # Stats results dictionary preparation
+        stats = []
+        for c in code_names:
+            for f in file_lengths:
+                stats.append({'codename': c, 'fid': f['fid'], 'file_duration': f['file_duration'],
+                              'filename': f['filename'], 'codecount': 0,
+                              'coded_duration': 0, 'percent': 0})
+        # Stats results calculated
+        for st in stats:
+            for r in self.results:
+                if st['codename'] == r['codename'] and st['fid'] == r['fid']:
+                    st['codecount'] += 1
+                    st['coded_duration'] += r['pos1'] - r['pos0']
+                    st['percent'] = int((st['coded_duration'] / st['file_duration']) * 100)
+        final_stats = []
+        for st in stats:
+            if st['codecount'] > 0:
+                final_stats.append(st)
+        msg = _("A/V code statistics:")
         for st in final_stats:
             msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
             msg += _("Percent of file: ") + str(st['percent']) + "%"
@@ -1377,9 +1496,10 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         self.text_links = []
         self.matrix_links = []
-
-        self.code_count_and_text_percent()
-
+        if self.ui.checkBox_show_stats.isChecked():
+            self.text_code_count_and_percent()
+            self.image_code_count_and_percent()
+            self.av_code_count_and_percent()
         # Add textedit positioning for context on clicking appropriate heading in results
         choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
