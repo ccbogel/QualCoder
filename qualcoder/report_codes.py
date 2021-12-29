@@ -83,7 +83,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     cases = []
     html_links = []  # For html output with media link (images, av)
     results = []
-    te = []  # Case matrix (table) [row][col] of textEditWidget results
+    te = []  # Matrix (table) [row][col] of textEditWidget results
     # Variables for search restrictions
     file_ids = ""
     case_ids = ""
@@ -770,7 +770,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.recursive_set_selected(item.child(i))
 
     def case_selection_changed(self):
-        """ Show or hide the case matrix options.
+        """ Show or hide the matrix options.
          Show if cases are selected. """
 
         self.ui.label_matrix.hide()
@@ -1328,7 +1328,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             res = cur.fetchone()
             res_dict = {"fid": res[0], "length": res[1], "filename": res[2]}
             file_lengths.append(res_dict)
-
         # Stats results dictionary preparation
         stats = []
         for c in code_names:
@@ -1346,8 +1345,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if st['codename'] == r['codename'] and st['fid'] == r['fid']:
                     st['codecount'] += 1
                     st['codetextlength'] += len(r['text'])
-                    st['percent'] = int((st['codetextlength'] / st['filetextlength']) * 100)
-
+                    # 2 decimal places
+                    st['percent'] = round((st['codetextlength'] / st['filetextlength']) * 100, 2)
         final_stats = []
         for st in stats:
             if st['codecount'] > 0:
@@ -1357,8 +1356,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
             msg += _("Percent of file: ") + str(st['percent']) + "%"
         msg += "\n========"
-        if len(final_stats) > 0:
-            self.ui.textEdit.append(msg)
+        if len(final_stats) == 0:
+            msg = ""
+        return stats, msg
 
     def image_code_count_and_percent(self):
         """ First part of results, fill code counts and image percentages.
@@ -1407,7 +1407,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if st['codename'] == r['codename'] and st['fid'] == r['fid']:
                     st['codecount'] += 1
                     st['codedarea'] += r['width'] * r['height']
-                    st['percent'] = int((st['codedarea'] / st['filearea']) * 100)
+                    # 2 decimal places
+                    st['percent'] = round((st['codedarea'] / st['filearea']) * 100, 2)
         final_stats = []
         for st in stats:
             if st['codecount'] > 0:
@@ -1417,8 +1418,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
             msg += _("Percent of file: ") + str(st['percent']) + "%"
         msg += "\n========"
-        if len(final_stats) > 0:
-            self.ui.textEdit.append(msg)
+        if len(final_stats) == 0:
+            msg = ""
+        return stats, msg
 
     def av_code_count_and_percent(self):
         """ First part of results, fill code counts and AV percentages.
@@ -1457,7 +1459,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 pass
             res_dict = {"fid": res[0], "file_duration": msecs, "filename": res[1]}
             file_lengths.append(res_dict)
-
         # Stats results dictionary preparation
         stats = []
         for c in code_names:
@@ -1471,7 +1472,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if st['codename'] == r['codename'] and st['fid'] == r['fid']:
                     st['codecount'] += 1
                     st['coded_duration'] += r['pos1'] - r['pos0']
-                    st['percent'] = int((st['coded_duration'] / st['file_duration']) * 100)
+                    # 2 decimal places
+                    st['percent'] = round((st['coded_duration'] / st['file_duration']) * 100, 2)
         final_stats = []
         for st in stats:
             if st['codecount'] > 0:
@@ -1481,8 +1483,48 @@ class DialogReportCodes(QtWidgets.QDialog):
             msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
             msg += _("Percent of file: ") + str(st['percent']) + "%"
         msg += "\n========"
-        if len(final_stats) > 0:
-            self.ui.textEdit.append(msg)
+        if len(final_stats) == 0:
+            msg = ""
+        return stats, msg
+
+    def fill_text_edit_stats_results(self):
+        """ Fill text edit with statistics for codes.
+         As total counts and count and percent per file. """
+
+        text_stats, text_msg = self.text_code_count_and_percent()
+        img_stats, img_msg = self.image_code_count_and_percent()
+        av_stats, av_msg = self.av_code_count_and_percent()
+        counts = []
+        for s in text_stats:
+            counts.append(s['codename'])
+        for s in img_stats:
+            counts.append(s['codename'])
+        for s in av_stats:
+            counts.append(s['codename'])
+        counts = list(set(counts))
+        counts.sort()
+        # Display code count totals
+        msg = "Code count totals\n============"
+        for c in counts:
+            count = 0
+            for s in text_stats:
+                if s['codename'] == c:
+                    count += s['codecount']
+            for s in img_stats:
+                if s['codename'] == c:
+                    count += s['codecount']
+            for s in av_stats:
+                if s['codename'] == c:
+                    count += s['codecount']
+            msg += "\n" + c + " : " + str(count)
+        msg += "\n============"
+        self.ui.textEdit.append(msg)
+        if text_msg != "":
+            self.ui.textEdit.append(text_msg)
+        if img_msg != "":
+            self.ui.textEdit.append(img_msg)
+        if av_msg != "":
+            self.ui.textEdit.append(av_msg)
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
@@ -1497,9 +1539,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.text_links = []
         self.matrix_links = []
         if self.ui.checkBox_show_stats.isChecked():
-            self.text_code_count_and_percent()
-            self.image_code_count_and_percent()
-            self.av_code_count_and_percent()
+            self.fill_text_edit_stats_results()
+
         # Add textedit positioning for context on clicking appropriate heading in results
         choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
@@ -1516,17 +1557,17 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         self.eventFilterTT.set_positions(self.text_links)
 
-        # Fill case matrix or clear third splitter pane.
+        # Fill matrix or clear third splitter pane.
         matrix_option = self.ui.comboBox_matrix.currentText()
         if self.case_ids == "":
             self.ui.tableWidget.setColumnCount(0)
             self.ui.tableWidget.setRowCount(0)
         elif matrix_option == "Categories":
-            self.fill_matrix_categories(self.results, self.case_ids)
+            self.matrix_fill_cases_by_categories(self.results, self.case_ids)
         elif matrix_option == "Top categories":
-            self.fill_matrix_top_categories(self.results, self.case_ids)
+            self.matrix_fill_cases_by_top_categories(self.results, self.case_ids)
         else:
-            self.fill_matrix_codes(self.results, self.case_ids)
+            self.matrix_fill_cases_by_codes(self.results, self.case_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -1724,7 +1765,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(text_edit.toPlainText())
 
-    def fill_matrix_codes(self, results_, case_ids):
+    #TODO
+    def matrix_fill_files_by_codes(self, results, file_ids):
+        pass
+
+    def matrix_fill_cases_by_codes(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of codes.
         First identify all codes.
         Fill tableWidget with columns of codes and rows of cases.
@@ -1801,7 +1846,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def fill_matrix_categories(self, results_, case_ids):
+    def matrix_fill_cases_by_categories(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
         First identify the categories. Then map all codes which are directly assigned to the categories.
         Fill tableWidget with columns of categories and rows of cases.
@@ -1906,7 +1951,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def fill_matrix_top_categories(self, results_, case_ids):
+    def matrix_fill_cases_by_top_categories(self, results_, case_ids):
         """ Fill a tableWidget with rows of cases and columns of categories.
         First identify top-level categories. Then map all other codes to the
         top-level categories.
