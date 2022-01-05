@@ -122,9 +122,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.ui.listWidget_cases.itemSelectionChanged.connect(self.case_selection_changed)
-        self.ui.label_matrix.hide()
-        self.ui.comboBox_matrix.setEnabled(False)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
@@ -141,7 +138,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_matrix.setPixmap(pm)
-        options = [_("Top categories"), _("Categories"), _("Codes")]
+        options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
+                   _("Categories by file"), _("Codes by case"), _("Codes by file")]
         self.ui.comboBox_matrix.addItems(options)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
@@ -768,17 +766,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             if item.isSelected():
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
-
-    def case_selection_changed(self):
-        """ Show or hide the matrix options.
-         Show if cases are selected. """
-
-        self.ui.label_matrix.hide()
-        self.ui.comboBox_matrix.setEnabled(False)
-        for item in self.ui.listWidget_cases.selectedItems():
-            if item.text() != "":
-                self.ui.label_matrix.show()
-                self.ui.comboBox_matrix.setEnabled(True)
 
     def search_annotations(self):
         """ Find and display annotations from selected text files. """
@@ -1557,20 +1544,31 @@ class DialogReportCodes(QtWidgets.QDialog):
             if row['result_type'] == 'av':
                 self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
             self.text_links.append(row)
-
         self.eventFilterTT.set_positions(self.text_links)
 
         # Fill matrix or clear third splitter pane.
+        self.ui.tableWidget.setColumnCount(0)
+        self.ui.tableWidget.setRowCount(0)
         matrix_option = self.ui.comboBox_matrix.currentText()
+        if matrix_option in ("Categories by case", "Top categories by case", "Codes by case") and self.case_ids == "":
+            Message(self.app, _("No case matrix"), _("Cases not selected")).exec_()
+        if matrix_option in ("Categories by file", "Top categories by file", "Codes by file") and self.case_ids != "":
+            Message(self.app, _("No file matrix"), _("Cases are selected")).exec_()
         if self.case_ids == "":
             self.ui.tableWidget.setColumnCount(0)
             self.ui.tableWidget.setRowCount(0)
-        elif matrix_option == "Categories":
-            self.matrix_fill_cases_by_categories(self.results, self.case_ids)
-        elif matrix_option == "Top categories":
-            self.matrix_fill_cases_by_top_categories(self.results, self.case_ids)
-        else:
-            self.matrix_fill_cases_by_codes(self.results, self.case_ids)
+        if matrix_option == "Categories by case" and self.case_ids != "":
+            self.matrix_fill_by_categories(self.results, self.case_ids, "case")
+        if matrix_option == "Categories by file" and self.case_ids == "":
+            self.matrix_fill_by_categories(self.results, self.file_ids)
+        if matrix_option == "Top categories by case" and self.case_ids != "":
+            self.matrix_fill_by_top_categories(self.results, self.case_ids, "case")
+        if matrix_option == "Top categories by file" and self.case_ids == "":
+            self.matrix_fill_by_top_categories(self.results, self.file_ids)
+        if matrix_option == "Codes by case" and self.case_ids != "":
+            self.matrix_fill_by_codes(self.results, self.case_ids, "case")
+        if matrix_option == "Codes by file" and self.case_ids == "":
+            self.matrix_fill_by_codes(self.results, self.file_ids)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -1768,11 +1766,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cursor.setCharFormat(fmt)
         item['textedit_end'] = len(text_edit.toPlainText())
 
-    #TODO
-    def matrix_fill_files_by_codes(self, results, file_ids):
-        pass
-
-    def matrix_fill_cases_by_codes(self, results_, case_ids):
+    def matrix_fill_by_codes(self, results_, ids, type_="file"):
         """ Fill a tableWidget with rows of cases and columns of codes.
         First identify all codes.
         Fill tableWidget with columns of codes and rows of cases.
@@ -1781,7 +1775,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             text_results : list of dictionary text result items
             image_results : list of dictionary image result items
             av_results : list of dictionary av result items
-            case_ids : list of case ids
+            ids : list of case ids OR file ids - as a string of integers, comma separated
+            type_ : 'file' or 'case'
         """
 
         # Do not overwrite positions in original text_links object
@@ -1795,10 +1790,13 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Get cases (rows)
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
-        cases = cur.fetchall()
+        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        if type_ == "case":
+            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+        cur.execute(sql)
+        id_and_name = cur.fetchall()
         vertical_labels = []
-        for c in cases:
+        for c in id_and_name:
             vertical_labels.append(c[1])
 
         # Clear and fill tableWidget
@@ -1807,13 +1805,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
-        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setRowCount(len(id_and_name))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for case in cases:
+        for _ in id_and_name:
             column_list = []
-            for colname in horizontal_labels:
+            for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1822,7 +1820,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.te.append(column_list)
         self.matrix_links = []
         choice = self.ui.comboBox_memos.currentText()
-        for row, case in enumerate(cases):
+        for row, case in enumerate(id_and_name):
             for col, colname in enumerate(horizontal_labels):
                 for counter, r in enumerate(results):
                     if r['file_or_casename'] == vertical_labels[row] and r['codename'] == horizontal_labels[col]:
@@ -1849,16 +1847,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def matrix_fill_cases_by_categories(self, results_, case_ids):
-        """ Fill a tableWidget with rows of cases and columns of categories.
+    def matrix_fill_by_categories(self, results_, ids, type_="file"):
+        """ Fill a tableWidget with rows of case or file name and columns of categories.
         First identify the categories. Then map all codes which are directly assigned to the categories.
-        Fill tableWidget with columns of categories and rows of cases.
         Called by: fill_text_edit_with_search_results
         param:
             text_results : list of dictionary text result items
             image_results : list of dictionary image result items
             av_results : list of dictionary av result items
-            case_ids : list of case ids
+            ids : list of case ids OR file ids, as string of comma separated integers
+            type_ : file or case ids
         """
 
         # Do not overwrite positions in original text_links object
@@ -1897,12 +1895,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                     i['top'] = s['top']
             if "top" in i:
                 res_categories.append(i)
-
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
-        cases = cur.fetchall()
+        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        if type_ == "case":
+            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+        cur.execute(sql)
+        id_and_name = cur.fetchall()
         vertical_labels = []
-        for c in cases:
+        for c in id_and_name:
             vertical_labels.append(c[1])
 
         # Clear and fill the tableWidget
@@ -1911,14 +1911,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
-        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setRowCount(len(id_and_name))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         choice = self.ui.comboBox_memos.currentText()
-        for case in cases:
+        for _ in id_and_name:
             column_list = []
-            for colname in horizontal_labels:
+            for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -1926,7 +1926,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
-        for row, case in enumerate(cases):
+        for row, case in enumerate(id_and_name):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
                 for counter, r in enumerate(res_categories):
@@ -1954,17 +1954,17 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
-    def matrix_fill_cases_by_top_categories(self, results_, case_ids):
-        """ Fill a tableWidget with rows of cases and columns of categories.
+    def matrix_fill_by_top_categories(self, results_, ids, type_="file"):
+        """ Fill a tableWidget with rows of case or file name and columns of top level categories.
         First identify top-level categories. Then map all other codes to the
         top-level categories.
-        Fill tableWidget with columns of top-level categories and rows of cases.
         Called by: fill_text_edit_with_search_results
         param:
             text_results : list of dictionary text result items
             image_results : list of dictionary image result items
             av_results : list of dictionary av result items
-            case_ids : list of case ids
+            ids : string list of case ids or file ids, comma separated
+            type_ : file or case
         """
 
         # Do not overwrite positions in original text_links object
@@ -2012,10 +2012,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 res_categories.append(i)
 
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, name from cases where caseid in (" + case_ids + ")")
-        cases = cur.fetchall()
+        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        if type_ == "case":
+            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+        cur.execute(sql)
+        id_and_name = cur.fetchall()
         vertical_labels = []
-        for c in cases:
+        for c in id_and_name:
             vertical_labels.append(c[1])
 
         # Clear and fill the tableWidget
@@ -2024,13 +2027,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
-        self.ui.tableWidget.setRowCount(len(cases))
+        self.ui.tableWidget.setRowCount(len(id_and_name))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for case in cases:
+        for _ in id_and_name:
             column_list = []
-            for colname in horizontal_labels:
+            for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -2039,7 +2042,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.te.append(column_list)
         self.matrix_links = []
         choice = self.ui.comboBox_memos.currentText()
-        for row, case in enumerate(cases):
+        for row, case in enumerate(id_and_name):
             for col, colname in enumerate(horizontal_labels):
                 self.te[row][col].setReadOnly(True)
                 for counter, r in enumerate(res_categories):
@@ -2056,22 +2059,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.put_image_into_textedit(r, counter, self.te[row][col])
                         if r['result_type'] == 'av':
                             self.te[row][col].append(r['text'] + "\n")  # The time duration
-
                         self.te[row][col].insertPlainText("\n")
-                '''for av in res_av_categories:
-                    if av['file_or_casename'] == vertical_labels[row] and av['top'] == horizontal_labels[col]:
-                        av['row'] = row
-                        av['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(i, self.te[row][col]))
-                        self.matrix_links.append(av)
-                        self.te[row][col].append(av['text'] + "\n")  # The time duration
-                for counter, im in enumerate(res_image_categories):
-                    if im['file_or_casename'] == vertical_labels[row] and im['top'] == horizontal_labels[col]:
-                        im['row'] = row
-                        im['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(im, self.te[row][col]))
-                        self.matrix_links.append(im)
-                        self.put_image_into_textedit(im, counter, self.te[row][col])'''
                 self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
