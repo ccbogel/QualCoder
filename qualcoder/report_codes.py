@@ -1504,7 +1504,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         counts = list(set(counts))
         counts.sort()
         # Display code count totals
-        msg = "Code count totals\n============"
+        msg = ""
+        total_count = 0
         for c in counts:
             count = 0
             for s in text_stats:
@@ -1517,6 +1518,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if s['codename'] == c:
                     count += s['codecount']
             msg += "\n" + c + " : " + str(count)
+            total_count += count
+        msg = _("Code count totals") + ": " + str(total_count) + "\n============" + msg
         msg += "\n============"
         self.ui.textEdit.append(msg)
         if text_msg != "":
