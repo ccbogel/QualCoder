@@ -1554,9 +1554,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec_()
         if matrix_option in ("Categories by file", "Top categories by file", "Codes by file") and self.case_ids != "":
             Message(self.app, _("No file matrix"), _("Cases are selected")).exec_()
-        if self.case_ids == "":
-            self.ui.tableWidget.setColumnCount(0)
-            self.ui.tableWidget.setRowCount(0)
         if matrix_option == "Categories by case" and self.case_ids != "":
             self.matrix_fill_by_categories(self.results, self.case_ids, "case")
         if matrix_option == "Categories by file" and self.case_ids == "":
@@ -1799,17 +1796,21 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in id_and_name:
             vertical_labels.append(c[1])
 
+        transpose = self.ui.checkBox_matrix_transpose.isChecked()
+        if transpose:
+            vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
+
         # Clear and fill tableWidget
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
-        self.ui.tableWidget.setRowCount(len(id_and_name))
+        self.ui.tableWidget.setRowCount(len(vertical_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for _ in id_and_name:
+        for _ in vertical_labels:
             column_list = []
             for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
@@ -1820,24 +1821,44 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.te.append(column_list)
         self.matrix_links = []
         choice = self.ui.comboBox_memos.currentText()
-        for row, case in enumerate(id_and_name):
-            for col, colname in enumerate(horizontal_labels):
-                for counter, r in enumerate(results):
-                    if r['file_or_casename'] == vertical_labels[row] and r['codename'] == horizontal_labels[col]:
-                        r['row'] = row
-                        r['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
-                        if r['result_type'] == 'text':
-                            self.te[row][col].append(r['text'])
-                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
-                            self.te[row][col].insertPlainText("\n")
-                        if r['result_type'] == 'image':
-                            self.put_image_into_textedit(r, counter, self.te[row][col])
-                        if r['result_type'] == 'av':
-                            self.te[row][col].insertPlainText(r['text'] + "\n")
-                        self.matrix_links.append(r)
-                self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+        if transpose:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    for counter, r in enumerate(results):
+                        if r['file_or_casename'] == horizontal_labels[col] and r['codename'] == vertical_labels[row]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].insertPlainText("\n")
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].insertPlainText(r['text'] + "\n")
+                            self.matrix_links.append(r)
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+        else:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    for counter, r in enumerate(results):
+                        if r['file_or_casename'] == vertical_labels[row] and r['codename'] == horizontal_labels[col]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].insertPlainText("\n")
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].insertPlainText(r['text'] + "\n")
+                            self.matrix_links.append(r)
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
@@ -1905,6 +1926,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in id_and_name:
             vertical_labels.append(c[1])
 
+        transpose = self.ui.checkBox_matrix_transpose.isChecked()
+        if transpose:
+            vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
+
         # Clear and fill the tableWidget
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
@@ -1926,25 +1951,47 @@ class DialogReportCodes(QtWidgets.QDialog):
                 column_list.append(tedit)
             self.te.append(column_list)
         self.matrix_links = []
-        for row, case in enumerate(id_and_name):
-            for col, colname in enumerate(horizontal_labels):
-                self.te[row][col].setReadOnly(True)
-                for counter, r in enumerate(res_categories):
-                    if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
-                        r['row'] = row
-                        r['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
-                        if r['result_type'] == 'text':
-                            self.te[row][col].append(r['text'])
-                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                self.te.append(_("Coded memo: ") + r['coded_memo'])
-                        if r['result_type'] == 'image':
-                            self.put_image_into_textedit(r, counter, self.te[row][col])
-                        if r['result_type'] == 'av':
-                            self.te[row][col].append(r['text'] + "\n")
-                        self.te[row][col].insertPlainText("\n")
-                        self.matrix_links.append(r)
-                self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+
+        if transpose:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    self.te[row][col].setReadOnly(True)
+                    for counter, r in enumerate(res_categories):
+                        if r['file_or_casename'] == horizontal_labels[col] and r['top'] == vertical_labels[row]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te.append(_("Coded memo: ") + r['coded_memo'])
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].append(r['text'] + "\n")
+                            self.te[row][col].insertPlainText("\n")
+                            self.matrix_links.append(r)
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+        else:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    self.te[row][col].setReadOnly(True)
+                    for counter, r in enumerate(res_categories):
+                        if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te.append(_("Coded memo: ") + r['coded_memo'])
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].append(r['text'] + "\n")
+                            self.te[row][col].insertPlainText("\n")
+                            self.matrix_links.append(r)
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
@@ -2021,6 +2068,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in id_and_name:
             vertical_labels.append(c[1])
 
+        transpose = self.ui.checkBox_matrix_transpose.isChecked()
+        if transpose:
+            vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
+
         # Clear and fill the tableWidget
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
@@ -2042,25 +2093,47 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.te.append(column_list)
         self.matrix_links = []
         choice = self.ui.comboBox_memos.currentText()
-        for row, case in enumerate(id_and_name):
-            for col, colname in enumerate(horizontal_labels):
-                self.te[row][col].setReadOnly(True)
-                for counter, r in enumerate(res_categories):
-                    if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
-                        r['row'] = row
-                        r['col'] = col
-                        self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
-                        self.matrix_links.append(r)
-                        if r['result_type'] == 'text':
-                            self.te[row][col].append(r['text'])
-                            if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
-                        if r['result_type'] == 'image':
-                            self.put_image_into_textedit(r, counter, self.te[row][col])
-                        if r['result_type'] == 'av':
-                            self.te[row][col].append(r['text'] + "\n")  # The time duration
-                        self.te[row][col].insertPlainText("\n")
-                self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+
+        if transpose:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    self.te[row][col].setReadOnly(True)
+                    for counter, r in enumerate(res_categories):
+                        if r['file_or_casename'] == horizontal_labels[col] and r['top'] == vertical_labels[row]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            self.matrix_links.append(r)
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].append(r['text'] + "\n")  # The time duration
+                            self.te[row][col].insertPlainText("\n")
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
+        else:
+            for row in range(len(vertical_labels)):
+                for col in range(len(horizontal_labels)):
+                    self.te[row][col].setReadOnly(True)
+                    for counter, r in enumerate(res_categories):
+                        if r['file_or_casename'] == vertical_labels[row] and r['top'] == horizontal_labels[col]:
+                            r['row'] = row
+                            r['col'] = col
+                            self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
+                            self.matrix_links.append(r)
+                            if r['result_type'] == 'text':
+                                self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                            if r['result_type'] == 'image':
+                                self.put_image_into_textedit(r, counter, self.te[row][col])
+                            if r['result_type'] == 'av':
+                                self.te[row][col].append(r['text'] + "\n")  # The time duration
+                            self.te[row][col].insertPlainText("\n")
+                    self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
