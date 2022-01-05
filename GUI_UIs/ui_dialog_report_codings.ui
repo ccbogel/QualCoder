@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>989</width>
+    <width>1085</width>
     <height>580</height>
    </rect>
   </property>
@@ -188,7 +188,7 @@
      <widget class="QLabel" name="label_matrix">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>580</x>
         <y>20</y>
         <width>30</width>
         <height>30</height>
@@ -204,7 +204,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>620</x>
         <y>20</y>
         <width>281</width>
         <height>30</height>
@@ -233,8 +233,8 @@
      <widget class="QComboBox" name="comboBox_memos">
       <property name="geometry">
        <rect>
-        <x>640</x>
-        <y>70</y>
+        <x>410</x>
+        <y>80</y>
         <width>151</width>
         <height>30</height>
        </rect>
@@ -246,8 +246,8 @@
      <widget class="QLabel" name="label_memos">
       <property name="geometry">
        <rect>
-        <x>600</x>
-        <y>70</y>
+        <x>370</x>
+        <y>80</y>
         <width>30</width>
         <height>30</height>
        </rect>
@@ -273,6 +273,19 @@
       </property>
       <property name="text">
        <string>Statistics</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_matrix_transpose">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>60</y>
+        <width>211</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Transpose matrix</string>
       </property>
      </widget>
     </widget>
