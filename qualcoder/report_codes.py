@@ -637,7 +637,6 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
-        TODO: REVIEW HTML EXPORT IMAGES, A/V ON WINDOWS
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -741,14 +740,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         H Hide / Unhide top groupbox
         """
 
-        # Change start and end code positions using alt arrow left and alt arrow right
-        # and shift arrow left, shift arrow right
-        # QtGui.QKeyEvent = 7
         if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
                                                self.ui.listWidget_files.hasFocus() or
                                                self.ui.listWidget_cases.hasFocus()):
             key = event.key()
-            # mod = event.modifiers()
             # Hide unHide top groupbox
             if key == QtCore.Qt.Key_H:
                 self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
@@ -853,7 +848,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Clear ui
         self.attributes_msg = ""
         self.attribute_file_ids = []
-        self.ui.pushButton_attributeselect.setToolTip("")
+        self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         self.ui.splitter.setSizes([300, 300, 0])
         self.file_ids = ""
         for i in range(self.ui.listWidget_files.count()):
@@ -1102,7 +1097,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
                 tmp['file_or_case'] = file_or_case
+                tmp['pretext'] = ""
+                tmp['posttext'] = ""
                 self.results.append(tmp)
+            if self.ui.checkBox_text_context.isChecked():
+                self.get_prettext_and_posttext()
 
             # Coded images
             parameters = []
@@ -1207,7 +1206,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
                 tmp['file_or_case'] = file_or_case
+                tmp['pretext'] = ""
+                tmp['posttext'] = ""
                 self.results.append(tmp)
+            if self.ui.checkBox_text_context.isChecked():
+                self.get_prettext_and_posttext()
 
             # Coded images
             parameters = []
@@ -1291,7 +1294,36 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.file_ids = ""
         self.case_ids = ""
         self.attributes_msg = ""
-        self.ui.pushButton_attributeselect.setToolTip("")
+        self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
+
+    def get_prettext_and_posttext(self):
+        """ Get surrounding text 200 characters.
+        When context checkbox is checked """
+
+        cur = self.app.conn.cursor()
+        for r in self.results:
+            # Pre text
+            pre_text_length = 200
+            if r['pos0'] > pre_text_length - 1:
+                pre_text_start = r['pos0'] - pre_text_length + 1  # sqlite strings start at 1 not 0
+            else:
+                pre_text_start = 1  # sqlite strings start at 1 not 0
+                pre_text_length = r['pos0']  # sqlite strings start at 1 not 0, so this length is OK
+            if pre_text_start < 1:
+                pre_text_start = 1
+            sql = "select substr(fulltext,?,?) from source where id=?"
+            cur.execute(sql, [pre_text_start, pre_text_length, r['fid']])
+            res_pre = cur.fetchone()
+            if res_pre is not None:
+                r['pretext'] = res_pre[0]
+            # Post text
+            post_text_start = r['pos1'] + 1  # sqlite strings start at 1 not 0
+            post_text_length = 200
+            sql = "select substr(fulltext,?,?) from source where id=?"
+            cur.execute(sql, [post_text_start, post_text_length, r['fid']])
+            res_post = cur.fetchone()
+            if res_post is not None:
+                r['posttext'] = res_post[0]
 
     def text_code_count_and_percent(self):
         """ First part of results, fill code counts and text percentages.
@@ -1532,11 +1564,38 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.fill_text_edit_stats_results()
 
         # Add textedit positioning for context on clicking appropriate heading in results
+        # Fill text edit with heading, text, image or
+        fmt_normal = QtGui.QTextCharFormat()
+        fmt_normal.setFontWeight(QtGui.QFont.Normal)
+        fmt_bold = QtGui.QTextCharFormat()
+        fmt_bold.setFontWeight(QtGui.QFont.Bold)
         choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
             self.heading(row)
             if row['result_type'] == 'text':
-                self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
+                cursor = self.ui.textEdit.textCursor()
+                pos0 = len(self.ui.textEdit.toPlainText())
+                self.ui.textEdit.insertPlainText("\n")
+                self.ui.textEdit.insertPlainText(row['pretext'])
+                pos1 = len(self.ui.textEdit.toPlainText())
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setCharFormat(fmt_normal)
+                pos0 = len(self.ui.textEdit.toPlainText())
+                self.ui.textEdit.insertPlainText(row['text'])
+                pos1 = len(self.ui.textEdit.toPlainText())
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                if self.ui.checkBox_text_context.isChecked():
+                    cursor.setCharFormat(fmt_bold)
+                pos0 = len(self.ui.textEdit.toPlainText())
+                self.ui.textEdit.insertPlainText(row['posttext'])
+                pos1 = len(self.ui.textEdit.toPlainText())
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                if self.ui.checkBox_text_context.isChecked():
+                    cursor.setCharFormat(fmt_normal)
+                self.ui.textEdit.insertPlainText("\n")
                 if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
                     self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
             if row['result_type'] == 'image':
