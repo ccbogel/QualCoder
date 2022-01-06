@@ -218,7 +218,7 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>16</y>
+        <y>0</y>
         <width>161</width>
         <height>23</height>
        </rect>
@@ -263,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>40</y>
+        <y>24</y>
         <width>161</width>
         <height>23</height>
        </rect>
@@ -286,6 +286,22 @@
       </property>
       <property name="text">
        <string>Transpose matrix</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_text_context">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>50</y>
+        <width>161</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Surround coded tet with pre-text and post-text for context.</string>
+      </property>
+      <property name="text">
+       <string>Text context</string>
       </property>
      </widget>
     </widget>
