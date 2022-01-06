@@ -72,7 +72,7 @@ class Ui_Dialog_reportCodings(object):
         self.comboBox_matrix.setGeometry(QtCore.QRect(620, 20, 281, 30))
         self.comboBox_matrix.setObjectName("comboBox_matrix")
         self.checkBox_important = QtWidgets.QCheckBox(self.groupBox)
-        self.checkBox_important.setGeometry(QtCore.QRect(430, 16, 161, 23))
+        self.checkBox_important.setGeometry(QtCore.QRect(430, 0, 161, 23))
         self.checkBox_important.setObjectName("checkBox_important")
         self.comboBox_memos = QtWidgets.QComboBox(self.groupBox)
         self.comboBox_memos.setGeometry(QtCore.QRect(410, 80, 151, 30))
@@ -82,11 +82,14 @@ class Ui_Dialog_reportCodings(object):
         self.label_memos.setText("")
         self.label_memos.setObjectName("label_memos")
         self.checkBox_show_stats = QtWidgets.QCheckBox(self.groupBox)
-        self.checkBox_show_stats.setGeometry(QtCore.QRect(430, 40, 161, 23))
+        self.checkBox_show_stats.setGeometry(QtCore.QRect(430, 24, 161, 23))
         self.checkBox_show_stats.setObjectName("checkBox_show_stats")
         self.checkBox_matrix_transpose = QtWidgets.QCheckBox(self.groupBox)
         self.checkBox_matrix_transpose.setGeometry(QtCore.QRect(620, 60, 211, 23))
         self.checkBox_matrix_transpose.setObjectName("checkBox_matrix_transpose")
+        self.checkBox_text_context = QtWidgets.QCheckBox(self.groupBox)
+        self.checkBox_text_context.setGeometry(QtCore.QRect(430, 50, 161, 23))
+        self.checkBox_text_context.setObjectName("checkBox_text_context")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodings)
         self.groupBox_2.setTitle("")
@@ -145,6 +148,8 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_show_stats.setToolTip(_translate("Dialog_reportCodings", "Display summary statistics"))
         self.checkBox_show_stats.setText(_translate("Dialog_reportCodings", "Statistics"))
         self.checkBox_matrix_transpose.setText(_translate("Dialog_reportCodings", "Transpose matrix"))
+        self.checkBox_text_context.setToolTip(_translate("Dialog_reportCodings", "Surround coded tet with pre-text and post-text for context."))
+        self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "Text context"))
 
 
 if __name__ == "__main__":
