@@ -28,7 +28,6 @@ https://qualcoder.wordpress.com/
 
 from copy import copy
 import csv
-import datetime
 import logging
 import os
 import sys
@@ -43,7 +42,6 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -52,10 +50,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(txt)
+    logger.error(_("Uncaught exception: ") + txt)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), txt)
 
 
 class DialogReportRelations(QtWidgets.QDialog):
@@ -69,11 +67,11 @@ class DialogReportRelations(QtWidgets.QDialog):
     codes = []
     result_relations = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.get_code_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
@@ -84,7 +82,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
-        except:
+        except KeyError:
             pass
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -158,7 +156,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r in result:
             file_ids.append(r[0])
             file_ids_str += "," + str(r[0])
-        if file_ids == []:
+        if not file_ids:
             return
 
         # To add file names to relation result - makes easier for diplaying results
@@ -185,34 +183,33 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if row[0] in file_ids or file_ids == []:
                     coded.append(row)
 
-            #TODO later, find the closest Other code for relation analysis
+            # TODO later, find the closest Other code for relation analysis
 
             # Look at each code again other codes, when done remove from list of codes
-            CID = 1
-            POS0 = 2
-            POS1 = 3
-            NAME = 4
+            cid = 1
+            pos0 = 2
+            pos1 = 3
+            name = 4
             while len(coded) > 0:
                 c0 = coded.pop()
                 for c1 in coded:
-                    if c0[CID] != c1[CID]:
-                        #print(c0, c1)
+                    if c0[cid] != c1[cid]:
                         relation = self.relation(c0, c1)
                         # Add extra details for output
-                        relation['c0_name'] = c0[NAME]
-                        relation['c1_name'] = c1[NAME]
+                        relation['c0_name'] = c0[name]
+                        relation['c1_name'] = c1[name]
                         relation['fid'] = fid
                         relation['file_name'] = filename
-                        relation['c0_pos0'] = c0[POS0]
-                        relation['c0_pos1'] = c0[POS1]
-                        relation['c1_pos0'] = c1[POS0]
-                        relation['c1_pos1'] = c1[POS1]
+                        relation['c0_pos0'] = c0[pos0]
+                        relation['c0_pos1'] = c0[pos1]
+                        relation['c1_pos0'] = c1[pos0]
+                        relation['c1_pos1'] = c1[pos1]
                         relation['owner'] = coder_name
                         self.result_relations.append(relation)
         self.display_relations()
 
     def closest_relation(self, c0, c1):
-        #TODO later
+        # TODO later
         pass
 
     def relation(self, c0, c1):
@@ -229,39 +226,39 @@ class DialogReportRelations(QtWidgets.QDialog):
         actual text as before, overlap, after
         """
 
-        FID = 0
-        CID = 1
-        POS0 = 2
-        POS1 = 3
-        result = {"cid0": c0[CID], "cid1": c1[CID], "relation": "", "whichmin": None, "min": 0,
-            "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
-            "text_before": "", "text_overlap": "", "text_after": ""}
+        # fid = 0
+        cid = 1
+        pos0 = 2
+        pos1 = 3
+        result = {"cid0": c0[cid], "cid1": c1[cid], "relation": "", "whichmin": None, "min": 0,
+                  "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
+                  "text_before": "", "text_overlap": "", "text_after": ""}
 
         cur = self.app.conn.cursor()
 
-        # whichmin
-        if c0[POS0] < c1[POS0]:
-            result['whichmin'] = c0[CID]
-            result['min'] = c0[POS0]
-        if c1[POS0] < c0[POS0]:
-            result['whichmin'] = c1[CID]
-            result['min'] = c1[POS0]
+        # Which min
+        if c0[pos0] < c1[pos0]:
+            result['whichmin'] = c0[cid]
+            result['min'] = c0[pos0]
+        if c1[pos0] < c0[pos0]:
+            result['whichmin'] = c1[cid]
+            result['min'] = c1[pos0]
 
-        # whichmax
-        if c0[POS1] > c1[POS1]:
-            result['whichmax'] = c0[CID]
-            result['max'] = c0[POS1]
-        if c1[POS1] > c0[POS1]:
-            result['whichmax'] = c1[CID]
-            result['max'] = c1[POS1]
+        # Which max
+        if c0[pos1] > c1[pos1]:
+            result['whichmax'] = c0[cid]
+            result['max'] = c0[pos1]
+        if c1[pos1] > c0[pos1]:
+            result['whichmax'] = c1[cid]
+            result['max'] = c1[pos1]
 
         # Check for Exact
-        if c0[POS0] == c1[POS0] and c0[POS1] == c1[POS1]:
+        if c0[pos0] == c1[pos0] and c0[pos1] == c1[pos1]:
             result['relation'] = "E"
-            result['overlapindex'] = [c0[POS0], c0[POS1]]
-            result['unionindex'] = [c0[POS0], c0[POS1]]
+            result['overlapindex'] = [c0[pos0], c0[pos1]]
+            result['unionindex'] = [c0[pos0], c0[pos1]]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
@@ -270,16 +267,16 @@ class DialogReportRelations(QtWidgets.QDialog):
             return result
 
         # Check for Proximity
-        if c0[POS1] < c1[POS0]:
+        if c0[pos1] < c1[pos0]:
             result['relation'] = "P"
-            result['distance'] = c1[POS0] - c0[POS1]
+            result['distance'] = c1[pos0] - c0[pos1]
             result['text_overlap'] = ""
             result['text_before'] = ""
             result['text_after'] = ""
             return result
-        if c0[POS0] > c1[POS1]:
+        if c0[pos0] > c1[pos1]:
             result['relation'] = "P"
-            result['distance'] = c0[POS0] - c1[POS1]
+            result['distance'] = c0[pos0] - c1[pos1]
             result['text_overlap'] = ""
             result['text_before'] = ""
             result['text_after'] = ""
@@ -288,44 +285,44 @@ class DialogReportRelations(QtWidgets.QDialog):
         # Check for Inclusion
         # Exact has been resolved above
         # c0 inside c1
-        if c0[POS0] >= c1[POS0] and c0[POS1] <= c1[POS1]:
+        if c0[pos0] >= c1[pos0] and c0[pos1] <= c1[pos1]:
             result['relation'] = "I"
-            result['overlapindex'] = [c0[POS0], c0[POS1]]
-            result['unionindex'] = [c0[POS0], c0[POS1]]
+            result['overlapindex'] = [c0[pos0], c0[pos1]]
+            result['unionindex'] = [c0[pos0], c0[pos1]]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS0] + 1, c0[POS1] - c0[POS0], c0[0]])
+                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
             return result
 
         # c1 inside c0
-        if c1[POS0] >= c0[POS0] and c1[POS1] <= c0[POS1]:
+        if c1[pos0] >= c0[pos0] and c1[pos1] <= c0[pos1]:
             result['relation'] = "I"
-            result['overlapindex'] = [c1[POS0], c1[POS1]]
-            result['unionindex'] = [c1[POS0], c1[POS1]]
+            result['overlapindex'] = [c1[pos0], c1[pos1]]
+            result['unionindex'] = [c1[pos0], c1[pos1]]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[POS0] + 1, c1[POS1] - c1[POS0], c0[0]])
+                        [c1[pos0] + 1, c1[pos1] - c1[pos0], c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[POS0] + 1, c1[POS0] - c0[POS0], c0[0]])
+                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[POS1] + 1, c0[POS1] - c1[POS1], c0[0]])
+                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
@@ -334,53 +331,53 @@ class DialogReportRelations(QtWidgets.QDialog):
         # Check for Overlap
         # Should be all that is remaining
         # c0 overlaps on the right side, left side is not overlapping
-        if c0[POS0] < c1[POS0] and c0[POS1] < c1[POS1]:
+        if c0[pos0] < c1[pos0] and c0[pos1] < c1[pos1]:
             '''print("c0 overlaps on the right side, left side is not overlapping")
             print("c0", c0)
             print("C1", c1)'''
             result['relation'] = "O"
             # Reorder lowest to highest
-            result['overlapindex'] = sorted([c0[POS0], c1[POS1]])
-            result['unionindex'] = sorted([c0[POS1], c1[POS0]])
+            result['overlapindex'] = sorted([c0[pos0], c1[pos1]])
+            result['unionindex'] = sorted([c0[pos1], c1[pos0]])
             overlap_length = result['unionindex'][1] - result['unionindex'][0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c1[POS0] + 1, overlap_length, c0[0]])
+                        [c1[pos0] + 1, overlap_length, c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c0[POS0] + 1, c1[POS0] - c0[POS0], c0[0]])
+                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c0[POS1] + 1, c1[POS1] - c0[POS1], c0[0]])
+                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
             return result
 
         # c1 overlaps on the right side, left side is not overlapping
-        if c1[POS0] < c0[POS0] and c1[POS1] < c0[POS1]:
+        if c1[pos0] < c0[pos0] and c1[pos1] < c0[pos1]:
             result['relation'] = "O"
-            result['overlapindex'] = sorted([c1[POS0], c0[POS1]])
-            result['unionindex'] = sorted([c1[POS1], c0[POS0]])
+            result['overlapindex'] = sorted([c1[pos0], c0[pos1]])
+            result['unionindex'] = sorted([c1[pos1], c0[pos0]])
             overlap_length = result['unionindex'][1] - result['unionindex'][0]
             '''print("TODO c1 overlaps on the right, the left side is not overlapping")
             print("C0", c0)
             print("C1", c1)'''
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c0[POS0] + 1, overlap_length, c0[0]])
+                        [c0[pos0] + 1, overlap_length, c0[0]])
             txt = cur.fetchone()
             if txt is not None:
                 result['text_overlap'] = txt[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c1[POS0] + 1, c0[POS0] - c1[POS0], c0[0]])
+                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
             txt_before = cur.fetchone()
             if txt_before is not None:
                 result['text_before'] = txt_before[0]
             cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                    [c1[POS1] + 1, c0[POS1] - c1[POS1], c0[0]])
+                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
@@ -393,10 +390,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         try:
             row = self.ui.tableWidget.currentRow()
-            #col = self.ui.tableWidget.currentColumn()
-            #cell_value = str(self.ui.tableWidget.item(self.row, self.col).text())
-        except AttributeError as e:
-            logger.warning("No table for table menu: " + str(e))
+        except AttributeError:
+            # No table for table menu
             return
         action_show_context = menu.addAction(_("View in context"))
         action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
@@ -423,8 +418,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 color1 = c['color']
         # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
         data0 = {'codename': codename0, 'color': color0, 'file_or_casename': d['file_name'],
-            'pos0': d['c0_pos0'], 'pos1': d['c0_pos1'],
-            'text':'', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File' }
+                 'pos0': d['c0_pos0'], 'pos1': d['c0_pos1'],
+                 'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
         data1 = {'codename': codename1, 'color': color1, 'file_or_casename': d['file_name'],
                  'pos0': d['c1_pos0'], 'pos1': d['c1_pos1'],
                  'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
@@ -440,23 +435,23 @@ class DialogReportRelations(QtWidgets.QDialog):
         relation is: inclusion, overlap, exact, proximity
         """
 
-        FID = 0
-        C0 = 1
-        C1 = 2
-        REL = 3
-        MIN = 4
-        MAX = 5
-        O0 = 6
-        O1 = 7
-        U0 = 8
-        U1 = 9
-        DIST = 10
-        TEXT_BEFORE = 11
-        TEXT_OVERLAP = 12
-        TEXT_AFTER = 13
-        OWNER = 14
-
-        col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0", _("Overlap") + " 1",
+        fid = 0
+        code0 = 1
+        code1 = 2
+        relation_type = 3
+        min_ = 4
+        max_ = 5
+        overlap0 = 6
+        overlap1 = 7
+        union0 = 8
+        union1 = 9
+        distance = 10
+        text_before = 11
+        text_overlap = 12
+        text_after = 13
+        owner = 14
+        col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0",
+                     _("Overlap") + " 1",
                      _("Union") + " 0", _("Union") + " 1",
                      _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner")]
         self.ui.tableWidget.setColumnCount(len(col_names))
@@ -469,18 +464,15 @@ class DialogReportRelations(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(i['fid']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['file_name'])
-            self.ui.tableWidget.setItem(r, FID, item)
-
+            self.ui.tableWidget.setItem(r, fid, item)
             item = QtWidgets.QTableWidgetItem(str(i['cid0']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
-            self.ui.tableWidget.setItem(r, C0, item)
-
+            self.ui.tableWidget.setItem(r, code0, item)
             item = QtWidgets.QTableWidgetItem(str(i['cid1']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
-            self.ui.tableWidget.setItem(r, C1, item)
-
+            self.ui.tableWidget.setItem(r, code1, item)
             item = QtWidgets.QTableWidgetItem(str(i['relation']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             ttip = _("Proximity")
@@ -491,8 +483,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             if i['relation'] == "I":
                 ttip = _("Inclusion")
             item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, REL, item)
-
+            self.ui.tableWidget.setItem(r, relation_type, item)
             item = QtWidgets.QTableWidgetItem(str(i['whichmin']).replace("None", ""))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
             if i['whichmin'] is not None:
@@ -500,7 +491,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if i['whichmin'] == i['cid1']:
                     ttip = i['c1_name']
                 item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, MIN, item)
+            self.ui.tableWidget.setItem(r, min_, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['whichmax']).replace("None", ""))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
@@ -509,39 +500,36 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if i['whichmax'] == i['cid1']:
                     ttip = i['c1_name']
                 item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, MAX, item)
+            self.ui.tableWidget.setItem(r, max_, item)
             if i['overlapindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, O0, item)
+                self.ui.tableWidget.setItem(r, overlap0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, O1, item)
+                self.ui.tableWidget.setItem(r, overlap1, item)
             if i['unionindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][0]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, U0, item)
+                self.ui.tableWidget.setItem(r, union0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, U1, item)
+                self.ui.tableWidget.setItem(r, union1, item)
             item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, DIST, item)
-
+            self.ui.tableWidget.setItem(r, distance, item)
             item = QtWidgets.QTableWidgetItem(str(i['owner']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, OWNER, item)
-
+            self.ui.tableWidget.setItem(r, owner, item)
             item = QtWidgets.QTableWidgetItem(i['text_before'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, TEXT_BEFORE, item)
-
+            self.ui.tableWidget.setItem(r, text_before, item)
             item = QtWidgets.QTableWidgetItem(i['text_overlap'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, TEXT_OVERLAP, item)
+            self.ui.tableWidget.setItem(r, text_overlap, item)
             item = QtWidgets.QTableWidgetItem(i['text_after'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, TEXT_AFTER, item)
+            self.ui.tableWidget.setItem(r, text_after, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
     def fill_tree(self):
@@ -570,9 +558,9 @@ class DialogReportRelations(QtWidgets.QDialog):
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
+            # try:
             cats.remove(item)
-            #except Exception as e:
+            # except Exception as e:
             #    logger.debug(str(e) + " item:" + str(item))
 
         ''' Add child categories. Look at each unmatched category, iterate through tree to
@@ -584,11 +572,11 @@ class DialogReportRelations(QtWidgets.QDialog):
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    #logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
+                    # logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         item.addChild(child)
-                        #logger.debug("Adding: " + c['name'])
+                        # logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -640,7 +628,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         filepath = e.filepath
         if filepath is None:
             return
-        col_names = ["Fid", _("Filename"), "Code0","Code0 " +_("name"), "Code0_pos0", "Code0_pos1",
+        col_names = ["Fid", _("Filename"), "Code0", "Code0 " + _("name"), "Code0_pos0", "Code0_pos1",
                      "Code1", "Code1 " + _("name"),
                      "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
                      _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
@@ -649,20 +637,9 @@ class DialogReportRelations(QtWidgets.QDialog):
             writer = csv.writer(f, quoting=csv.QUOTE_ALL)
             writer.writerow(col_names)
             for r in self.result_relations:
-                row = []
-                row.append(r['fid'])
-                row.append(r['file_name'])
-                row.append(r['cid0'])
-                row.append(r['c0_name'])
-                row.append(r['c0_pos0'])
-                row.append(r['c0_pos1'])
-                row.append(r['cid1'])
-                row.append(r['c1_name'])
-                row.append(r['c1_pos0'])
-                row.append(r['c1_pos1'])
-                row.append(r['relation'] )
-                row.append(str(r['whichmin']).replace('None', ''))
-                row.append(str(r['whichmax']).replace('None', ''))
+                row = [r['fid'], r['file_name'], r['cid0'], r['c0_name'], r['c0_pos0'], r['c0_pos1'], r['cid1'],
+                       r['c1_name'], r['c1_pos0'], r['c1_pos1'], r['relation'], str(r['whichmin']).replace('None', ''),
+                       str(r['whichmax']).replace('None', '')]
                 if r['overlapindex']:
                     row.append(r['overlapindex'][0])
                     row.append(r['overlapindex'][1])
