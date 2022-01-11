@@ -29,7 +29,6 @@ class Ui_DialogSpeechToText(object):
         self.comboBox_service.addItem("")
         self.comboBox_service.addItem("")
         self.comboBox_service.addItem("")
-        self.comboBox_service.addItem("")
         self.label_service = QtWidgets.QLabel(DialogSpeechToText)
         self.label_service.setGeometry(QtCore.QRect(30, 10, 461, 17))
         self.label_service.setObjectName("label_service")
@@ -93,11 +92,10 @@ class Ui_DialogSpeechToText(object):
         _translate = QtCore.QCoreApplication.translate
         DialogSpeechToText.setWindowTitle(_translate("DialogSpeechToText", "Speech to text"))
         self.comboBox_service.setItemText(0, _translate("DialogSpeechToText", "Google"))
-        self.comboBox_service.setItemText(1, _translate("DialogSpeechToText", "Microsoft Azure Speech"))
-        self.comboBox_service.setItemText(2, _translate("DialogSpeechToText", "Microsoft Bing Voice Recognition"))
-        self.comboBox_service.setItemText(3, _translate("DialogSpeechToText", "Wit.ai"))
-        self.comboBox_service.setItemText(4, _translate("DialogSpeechToText", "Houndify"))
-        self.comboBox_service.setItemText(5, _translate("DialogSpeechToText", "IBM Speech"))
+        self.comboBox_service.setItemText(1, _translate("DialogSpeechToText", "Microsoft Bing Voice Recognition"))
+        self.comboBox_service.setItemText(2, _translate("DialogSpeechToText", "Wit.ai"))
+        self.comboBox_service.setItemText(3, _translate("DialogSpeechToText", "Houndify"))
+        self.comboBox_service.setItemText(4, _translate("DialogSpeechToText", "IBM Speech"))
         self.label_service.setText(_translate("DialogSpeechToText", "Select online speech to text service"))
         self.label_ffmpeg_info.setText(_translate("DialogSpeechToText", "Speech to text requires installed software: ffmpeg"))
         self.label_language.setToolTip(_translate("DialogSpeechToText", "Please select language in the format prefered by the service.\n"
