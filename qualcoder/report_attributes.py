@@ -51,7 +51,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
     mb.exec_()
-    
+
 
 class DialogSelectAttributeParameters(QtWidgets.QDialog):
     """ Select parameters for attributes to limit coding report results.
@@ -100,7 +100,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.fill_tableWidget()
+        self.fill_table_widget()
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
 
@@ -168,9 +168,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     values[i] = "'" + values[i] + "'"
             if values:
                 self.parameters.append([self.ui.tableWidget.item(x, self.NAME_COLUMN).text(),
-                self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
-                self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
-                operator, values])
+                                        self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
+                                        self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
+                                        operator, values])
         super(DialogSelectAttributeParameters, self).accept()
 
     def reject(self):
@@ -233,7 +233,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 tt = tt[1:]
         return tt
 
-    def fill_tableWidget(self):
+    def fill_table_widget(self):
         """ Fill the table widget with attribute name and type. """
 
         for row, a in enumerate(self.attribute_type):
