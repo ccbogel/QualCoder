@@ -37,6 +37,7 @@ from .GUI.ui_save_query import Ui_DialogSaveQuery
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -58,7 +59,7 @@ class DialogSaveSql(QtWidgets.QDialog):
     grouper = ""
     description = ""
 
-    def __init__(self, app, parent=None):
+    def __init__(self, app_, parent=None):
         """ """
 
         sys.excepthook = exception_handler
@@ -66,8 +67,8 @@ class DialogSaveSql(QtWidgets.QDialog):
         self.ui = Ui_DialogSaveQuery()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
+        font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
 
     def accept(self):
@@ -77,9 +78,3 @@ class DialogSaveSql(QtWidgets.QDialog):
         self.grouper = self.ui.lineEdit_group.text()
         self.description = self.ui.textEdit.toPlainText()
         super().accept()
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSaveSql(None, "a title", "")
-    ui.show()
-    sys.exit(app.exec_())
