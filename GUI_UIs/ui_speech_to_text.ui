@@ -57,11 +57,6 @@
    </item>
    <item>
     <property name="text">
-     <string>Microsoft Azure Speech</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
      <string>Microsoft Bing Voice Recognition</string>
     </property>
    </item>
