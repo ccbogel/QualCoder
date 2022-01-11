@@ -37,6 +37,7 @@ from .GUI.ui_dialog_memo import Ui_Dialog_memo
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -88,11 +89,3 @@ class DialogMemo(QtWidgets.QDialog):
 
         self.memo = self.ui.textEdit.toPlainText()
         super(DialogMemo, self).accept()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogMemo("settings", "title", "memo")
-    ui.show()
-    sys.exit(app.exec_())
-
