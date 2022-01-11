@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,6 @@ import pydub
 # works with wav and flac files, wav can be multiple formats, so convert all to flac
 # need to have ffmpeg or avconv installed (tricky instillation on Windows)
 import speech_recognition
-import subprocess
 import sys
 import logging
 import traceback
@@ -49,14 +48,15 @@ from .GUI.ui_speech_to_text import Ui_DialogSpeechToText
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(txt)
+    logger.error(_("Uncaught exception: ") + txt)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), txt)
 
 
 class SpeechToText(QtWidgets.QDialog):
@@ -77,9 +77,8 @@ class SpeechToText(QtWidgets.QDialog):
     # Google IETF language tag
     language = "en-US"  # default
     strings = []
-    service = "google" # wit.ai, azure, bing, houndify, ibm
-    # dont use google_cloud, requires a file
-
+    service = "google"  # Also wit.ai, bing, houndify, ibm
+    # Do not use google_cloud, requires a file
 
     username_ibm = ""
     password_ibm = ""
@@ -119,17 +118,6 @@ class SpeechToText(QtWidgets.QDialog):
             self.ui.label_language.setEnabled(True)
             self.ui.lineEdit_language.setEnabled(True)
             self.ui.textEdit_notes.setText(self.google_text)
-        if self.ui.comboBox_service.currentText() == "Microsoft Azure Speech":
-            self.ui.label_id.setEnabled(False)
-            self.ui.lineEdit_id.setEnabled(False)
-            self.ui.label_key.setEnabled(True)
-            self.ui.lineEdit_key.setEnabled(True)
-            self.ui.label_language.setEnabled(True)
-            self.ui.lineEdit_language.setEnabled(True)
-            msg = "Microsoft Azure Speech\nAPI keys 32-character lowercase hexadecimal strings\n"
-            msg += "Language codes:\n"
-            msg += "https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support"
-            self.ui.textEdit_notes.setText(msg)
         if self.ui.comboBox_service.currentText() == "Microsoft Bing Voice Recognition":
             self.ui.label_id.setEnabled(False)
             self.ui.lineEdit_id.setEnabled(False)
@@ -199,11 +187,12 @@ class SpeechToText(QtWidgets.QDialog):
             lang = "en-US"
         service_id = self.ui.lineEdit_id.text()
         service_key = self.ui.lineEdit_key.text()
-        # Split file into 30 or 60 second chunks
-        def divide_chunks(audio_file, chunksize):
-            # looping till length l
-            for i in range(0, len(audio_file), self.chunksize):
-                yield audio_file[i:i + chunksize]
+
+        def divide_chunks(audio_file_, chunksize):
+            """ Split file into 30 or 60 second chunks. """
+
+            for j in range(0, len(audio_file_), self.chunksize):
+                yield audio_file[j:j + chunksize]
         '''# Specify that a silent chunk must be at least 1 second long
         # Consider a chunk silent if it's quieter than -16 dBFS. May adjust these values.
         # split on silence does not work well
@@ -220,6 +209,7 @@ class SpeechToText(QtWidgets.QDialog):
                 audio = r.record(source)
             self.ui.progressBar.setValue(i + 1)
             self.ui.label_process.setText(_("Converting chunk ") + str(i + 1) + " / " + str(len(chunks)))
+            s = ""
             if self.service == "google":
                 # Google limited to 50 requests per day
                 try:
@@ -228,7 +218,7 @@ class SpeechToText(QtWidgets.QDialog):
                     s = _("UNINTELLIGIBLE AUDIO")
                     self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = _("NO SERVICE RESULTS: ") +"{0}".format(e)
+                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
                     self.ui.label_process.setText(s)
             if self.service == "wit.ai":
                 # Language is configured in the wit account
@@ -238,16 +228,6 @@ class SpeechToText(QtWidgets.QDialog):
                     s = _("UNINTELLIGIBLE AUDIO")
                     self.ui.label_process.setText(s)
                 except speech_recognition.RequestError as e:
-                    s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
-                    self.ui.label_process.setText(s)
-            if self.service == "azure":
-                try:
-                    s = r.recognize_azure(audio, key=service_key)
-                except speech_recognition.UnknownValueError:
-                    s = _("UNINTELLIGIBLE AUDIO")
-                    self.ui.label_process.setText(s)
-                except speech_recognition.RequestError as e:
-                    s = "NO SERVICE RESULTS; {0}".format(e)
                     s = _("NO SERVICE RESULTS: ") + "{0}".format(e)
                     self.ui.label_process.setText(s)
             if self.service == "bing":
@@ -281,7 +261,8 @@ class SpeechToText(QtWidgets.QDialog):
             ts = self.timestamp(i * self.chunksize)
             self.strings.append(ts + s)
 
-    '''GOOGLE_CLOUD_SPEECH_CREDENTIALS = r"""INSERT THE CONTENTS OF THE GOOGLE CLOUD SPEECH JSON CREDENTIALS FILE HERE"""
+    '''GOOGLE_CLOUD_SPEECH_CREDENTIALS = 
+       r"""INSERT THE CONTENTS OF THE GOOGLE CLOUD SPEECH JSON CREDENTIALS FILE HERE"""
     print("Google Cloud Speech " + r.recognize_google_cloud(audio, credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS))
     '''
 
@@ -292,9 +273,7 @@ class SpeechToText(QtWidgets.QDialog):
         {hh.mm.ss}, #hh:mm:ss.sss#
         """
 
-        # tmp testing format
         fmt = self.app.settings['timestampformat']
-        #time_msecs = self.mediaplayer.get_time()  # tmp
         mins_secs = msecs_to_mins_and_secs(time_msecs)  # String
         delimiter = ":"
         if "." in mins_secs:
@@ -325,7 +304,7 @@ class SpeechToText(QtWidgets.QDialog):
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
             ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
-        return "\n" + ts+ " "
+        return "\n" + ts + " "
 
     def convert_to_flac(self):
         if len(self.filepath) < 5:
@@ -351,12 +330,3 @@ class SpeechToText(QtWidgets.QDialog):
         if audio is not None:
             self.flac_filepath = self.filepath[:-4] + ".flac"
             audio.export(self.flac_filepath, format="flac")
-
-if __name__ == "__main__":
-    SpeechToText()
-
-
-
-
-
-
