@@ -71,11 +71,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     coded = []  # to refactor name
     file_ids = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.get_data()
         self.calculate_code_frequencies()
         QtWidgets.QDialog.__init__(self)
@@ -141,16 +141,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-                'date': row[3], 'memo': row[4], 'supercatid': row[5],
-                'display_list': [row[0], 'catid:' + str(row[1])]})
+                                    'date': row[3], 'memo': row[4], 'supercatid': row[5],
+                                    'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-                'cid': row[4], 'catid': row[5], 'color': row[6],
-                'display_list': [row[0], 'cid:' + str(row[4])]})
-
+                               'cid': row[4], 'catid': row[5], 'color': row[6],
+                               'display_list': [row[0], 'cid:' + str(row[4])]})
         self.coders = []
         cur.execute("select distinct owner from code_text union select distinct owner from code_image union "
                     "select distinct owner from code_av")
@@ -268,7 +267,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filepath = e.filepath
         if filepath is None:
             return
-        f = open(filepath, 'w',  encoding='utf-8-sig')
+        f = open(filepath, 'w', encoding='utf-8-sig')
         text_ = _("Code frequencies") + "\n"
         text_ += self.app.project_name + "\n"
         text_ += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
@@ -320,7 +319,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             data += line[1:] + "\n"
             it += 1
             item = it.value()
-        f = open(filepath, 'w',  encoding='utf-8-sig')
+        f = open(filepath, 'w', encoding='utf-8-sig')
         f.write(data)
         f.close()
         msg = _("Coding frequencies csv file exported to: ") + filepath
@@ -363,7 +362,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
         count = 0
-        while not(len(cats) < 1 or count > 10000):
+        while not (len(cats) < 1 or count > 10000):
             remove_list = []
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
@@ -432,11 +431,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     file_summaries = []
     comparisons = ""
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.comparisons = ""
         self.selected_coders = []
         self.get_data()
@@ -484,7 +483,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
-        cur.execute('select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
+        cur.execute(
+            'select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
         self.file_summaries = cur.fetchall()
 
     def coder_selected(self):
@@ -629,7 +629,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         IMMEDIATE BELOW IS INCORRECT - RESULTS IN THE TOTAL AGREEMENT SCORE
         Po = total['agreement'] / 100
         Pyes = total['coded0'] / total['characters'] * total['coded1'] / total['characters']
-        Pno = (total['characters'] - total['coded0']) / total['characters'] * (total['characters'] - total['coded1']) / total['characters']
+        Pno = (total['characters'] - total['coded0']) / total['characters'] * (total['characters'] - total['coded1']) / 
+            total['characters']
 
         BELOW IS BETTER - ONLY LOOKS AT PROPORTIONS OF CODED CHARACTERS
         NEED TO CONFIRM THIS IS THE CORRECT APPROACH
@@ -639,7 +640,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             unique_codings = total['coded0'] + total['coded1'] - total['dual_coded']
             Po = total['dual_coded'] / unique_codings
             Pyes = total['coded0'] / unique_codings * total['coded1'] / unique_codings
-            Pno = (unique_codings - total['coded0']) / unique_codings * (unique_codings - total['coded1']) / unique_codings
+            Pno = (unique_codings - total['coded0']) / unique_codings * (
+                        unique_codings - total['coded1']) / unique_codings
             Pe = Pyes * Pno
             kappa = round((Po - Pe) / (1 - Pe), 4)
             total['kappa'] = kappa
@@ -654,7 +656,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         codes = copy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
-        self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+        self.ui.treeWidget.setHeaderLabels(
+            [_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
@@ -734,6 +737,3 @@ info = "<b>Agree %</b>" \
        "<b>Disagree %</b><p>Is 100% minus the total agreement percent.</p>" \
        "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
        "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
-
-
-
