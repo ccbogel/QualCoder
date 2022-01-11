@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,20 +26,12 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
-import datetime
 import logging
-from lxml import etree
-from operator import itemgetter
 import os
 from random import randint
-import re
-import shutil
 import sqlite3
 import sys
 import traceback
-import uuid
-import zipfile
 
 from PyQt5 import QtWidgets
 
@@ -56,25 +48,25 @@ def exception_handler(exception_type, value, tb_obj):
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
     logger.error(_("Uncaught exception: ") + text)
-    #QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class Rqda_import():
+class RqdaImport:
     """ Import an RQDA database into a new QualCoder database. """
 
     parent_textEdit = None
     app = None
     conn = None
 
-    def __init__(self, app, parent_textEdit):
-        super(Rqda_import, self).__init__()
+    def __init__(self, app, parent_textedit):
+        super(RqdaImport, self).__init__()
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
 
         self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-            _('Select RQDA file'), self.app.settings['directory'], "*.rqda")
+                                                                   _('Select RQDA file'),
+                                                                   self.app.settings['directory'], "*.rqda")
         if not ok or self.file_path == "":
             return
         self.conn = sqlite3.connect(self.file_path)
@@ -86,7 +78,8 @@ class Rqda_import():
         except Exception as e:
             self.parent_textEdit.append(_("Data import unsuccessful from ") + self.file_path + "\n" + str(e))
 
-    def convert_date(self, r_date):
+    @staticmethod
+    def convert_date(r_date):
         """ Convert RQDA date format from:
         Mon Oct 28 08:11:36 2019 to: yyyy-mm-dd hh:mm:ss
         Mon Oct 28 8:11:36 2019 to: yyyy-mm-dd hh:mm:ss
@@ -96,7 +89,6 @@ class Rqda_import():
 
         TODO some dates are like this after rqda conversion: 2019-03- 1 17:51:21
         TODO original RQDA date:  Fri Mar  1 17:51:21 2019
-
 
         param: rqda formatted date
         return: standard format date
@@ -129,7 +121,7 @@ class Rqda_import():
         q_cur = self.app.conn.cursor()
         r_cur.execute("select memo from project")
         res = r_cur.fetchone()
-        q_cur.execute("update project set memo=?", (res[0], ))
+        q_cur.execute("update project set memo=?", (res[0],))
         if res[0] is not None:
             self.parent_textEdit.append(_("Project memo imported"))
         r_cur.execute("select id,name, file, memo, owner, date from source")
@@ -137,7 +129,7 @@ class Rqda_import():
         i = 0
         for r in res:
             q_cur.execute("insert into source (id, name, fulltext,memo, owner, date, mediapath) values (?,?,?,?,?,?,?)",
-                [r[0], r[1], r[2], r[3], r[4], self.convert_date(r[5]), None])
+                          [r[0], r[1], r[2], r[3], r[4], self.convert_date(r[5]), None])
             i += 1
         self.parent_textEdit.append(str(i) + _(" files imported"))
         r_cur.execute("select fid,position,annotation, owner, date from annotation")
@@ -146,7 +138,7 @@ class Rqda_import():
         for r in res:
             if r[3] != "" and r[3] is not None:
                 q_cur.execute("insert into annotation (fid, pos0, pos1, memo, owner, date) values (?,?,?,?,?,?)",
-                    [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
+                              [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
                 i += 1
         self.parent_textEdit.append(str(i) + _(" annotations imported"))
         r_cur.execute("select name,journal, owner, date from journal")
@@ -154,7 +146,7 @@ class Rqda_import():
         i = 0
         for r in res:
             q_cur.execute("insert into journal (name, jentry, owner, date) values (?,?,?,?)",
-                [r[0], r[1], r[2], self.convert_date(r[3])])
+                          [r[0], r[1], r[2], self.convert_date(r[3])])
             i += 1
         self.parent_textEdit.append(str(i) + _(" journals imported"))
         r_cur.execute("select id, name, memo, owner, date from cases")
@@ -163,21 +155,21 @@ class Rqda_import():
         for r in res:
             try:
                 q_cur.execute("insert into cases (caseid, name, memo, owner, date) values (?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], self.convert_date(r[4])])
+                              [r[0], r[1], r[2], r[3], self.convert_date(r[4])])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" cases imported"))
         r_cur.execute("select catid, name, memo, owner, date from codecat")
         res = r_cur.fetchall()
-        i = 0  # do not use enumerate as res could be None
+        i = 0  # Do not use enumerate as res could be None
         for r in res:
-            # there are no supercatids in rqda
+            # There are no supercatids in rqda
             try:
                 q_cur.execute("insert into code_cat (catid,name, memo, owner, date,supercatid) values (?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), None])
+                              [r[0], r[1], r[2], r[3], self.convert_date(r[4]), None])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" code categories imported"))
         # get catids for each code cid
@@ -194,9 +186,9 @@ class Rqda_import():
                     treecode = t[1]  # the corresponding catid
             try:
                 q_cur.execute("insert into code_name (cid, catid,name, memo,color, owner, date) values (?,?,?,?,?,?,?)",
-                    [r[0],treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
+                              [r[0], treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + " codes imported")
         r_cur.execute("select cid, fid, seltext,selfirst,selend,memo, owner, date from coding")
@@ -206,10 +198,11 @@ class Rqda_import():
         for r in res:
             if r[2] != "" and r[2] is not None:
                 try:
-                    q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
+                    q_cur.execute(
+                        "insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                        [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
                     i += 1
-                except sqlite3.IntegrityError as e:
+                except sqlite3.IntegrityError:
                     dup += 1
         self.parent_textEdit.append(str(i) + _(" codings imported"))
         if dup > 0:
@@ -221,10 +214,11 @@ class Rqda_import():
         for r in res:
             if r[2] != "" and r[2] is not None:
                 try:
-                    q_cur.execute("insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
+                    q_cur.execute(
+                        "insert into code_text (cid, fid,seltext, pos0,pos1,memo, owner, date) values (?,?,?,?,?,?,?,?)",
+                        [r[0], r[1], r[2], r[3], r[4], r[5], r[6], self.convert_date(r[7])])
                     i += 1
-                except sqlite3.IntegrityError as e:
+                except sqlite3.IntegrityError:
                     dup += 1
         self.parent_textEdit.append(str(i) + _(" codings imported from coding2 table"))
         if dup > 0:
@@ -237,15 +231,16 @@ class Rqda_import():
         i = 0
         for r in res:
             # default to a file attribute unless it is a case attribute
-            caseOrFile = "file"
+            case_or_file = "file"
             for c in case_attr:
                 if c[0] == r[0]:
-                    caseOrFile = "case"
+                    case_or_file = "case"
             try:
-                q_cur.execute("insert into attribute_type (name, valuetype,caseOrFile,memo, owner, date) values (?,?,?,?,?,?)",
-                    [r[0], r[1], caseOrFile, r[2], r[3], self.convert_date(r[4])])
+                q_cur.execute(
+                    "insert into attribute_type (name, valuetype,caseOrFile,memo, owner, date) values (?,?,?,?,?,?)",
+                    [r[0], r[1], case_or_file, r[2], r[3], self.convert_date(r[4])])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" attribute types imported"))
         r_cur.execute("select variable, value, caseID, owner, date from caseAttr")
@@ -254,9 +249,9 @@ class Rqda_import():
         for r in res:
             try:
                 q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "case"])
+                              [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "case"])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" case attribute values imported"))
         r_cur.execute("select variable, value, fileID, owner, date from fileAttr")
@@ -265,9 +260,9 @@ class Rqda_import():
         for r in res:
             try:
                 q_cur.execute("insert into attribute (name,value, id, owner,date, attr_type) values(?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "file"])
+                              [r[0], r[1], r[2], r[3], self.convert_date(r[4]), "file"])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" file attribute values imported"))
         r_cur.execute("select caseid,fid,selfirst,selend, owner, memo,date from caselinkage")
@@ -276,12 +271,11 @@ class Rqda_import():
         for r in res:
             try:
                 q_cur.execute("insert into case_text (caseid,fid,pos0,pos1,owner,memo, date) values(?,?,?,?,?,?,?)",
-                    [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
+                              [r[0], r[1], r[2], r[3], r[4], r[5], self.convert_date(r[6])])
                 i += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" case linked texts imported"))
-
         self.app.conn.commit()
 
         # Keep a copy of the text sources in the QualCoder documents folder
@@ -292,14 +286,12 @@ class Rqda_import():
             if name[:-4] in (".pdf", ".odt", ".htm"):
                 name = name[:-4] + ".txt"
             if name[:-5] in (".html", ".docx"):
-                name  = name[:-5] + ".txt"
+                name = name[:-5] + ".txt"
             destination = self.app.project_path + "/documents/" + name
-            print(destination)  # tmp
             f = open(destination, 'w')
             f.write(r[1])
             f.close()
             logger.info("Text file exported to " + destination)
-
         # Change the user name to the owner name from RQDA
         sql = "select owner from code_text"
         q_cur.execute(sql)
@@ -309,23 +301,24 @@ class Rqda_import():
         self.app.settings['codername'] = result[0]
         self.app.write_config_ini(self.app.settings)
 
+
 """
- done project (databaseversion text, date text,dateM text, memo text,about text, imageDir text
- done source (name text, id integer, file text, memo text, owner text, date text, dateM text, status integer
- done annotation (fid integer,position integer,annotation text, owner text, date text,dateM text, status integer
- done journal (name text, journal text, date text, dateM text, owner text,status integer
- done cases  (name text, memo text, owner text,date text,dateM text, id integer, status integer
- done codecat  (name text, cid integer, catid integer, owner text, date text, dateM text,memo text, status integer
- done coding  (cid integer, fid integer,seltext text, selfirst real, selend real, status integer, owner text, date text, memo text
- done coding2  (cid integer, fid integer,seltext text, selfirst real, selend real, status integer, owner text, date text, memo text
- done freecode  (name text, memo text, owner text,date text,dateM text, id integer, status integer, color text
- donetreecode  (cid integer, catid integer, date text, dateM text, memo text, status integer, owner text
- done attributes (name text, status integer, date text, dateM text, owner text,memo text, class text
- done fileAttr (variable text, value text, fileID integer, date text, dateM text, owner text, status integer
- done caseAttr (variable text, value text, caseID integer, date text, dateM text, owner text, status integer
- done caselinkage  (caseid integer, fid integer, selfirst real, selend real, status integer, owner text, date text, memo text
+RQDA database format
+project (databaseversion text, date text,dateM text, memo text,about text, imageDir text
+source (name text, id integer, file text, memo text, owner text, date text, dateM text, status integer
+annotation (fid integer,position integer,annotation text, owner text, date text,dateM text, status integer
+journal (name text, journal text, date text, dateM text, owner text,status integer
+cases  (name text, memo text, owner text,date text,dateM text, id integer, status integer
+codecat  (name text, cid integer, catid integer, owner text, date text, dateM text,memo text, status integer
+coding  (cid integer, fid integer,seltext text, selfirst real, selend real, status integer, owner text, date text, memo text
+coding2  (cid integer, fid integer,seltext text, selfirst real, selend real, status integer, owner text, date text, memo text
+freecode  (name text, memo text, owner text,date text,dateM text, id integer, status integer, color text
+treecode  (cid integer, catid integer, date text, dateM text, memo text, status integer, owner text
+attributes (name text, status integer, date text, dateM text, owner text,memo text, class text
+fileAttr (variable text, value text, fileID integer, date text, dateM text, owner text, status integer
+caseAttr (variable text, value text, caseID integer, date text, dateM text, owner text, status integer
+caselinkage  (caseid integer, fid integer, selfirst real, selend real, status integer, owner text, date text, memo text
 
- treefile  (fid integer, catid integer, date text,dateM text, memo text, status integer,owner text
- filecat  (name text,fid integer, catid integer, owner text, date text, dateM text,memo text, status integer
+treefile  (fid integer, catid integer, date text,dateM text, memo text, status integer,owner text
+filecat  (name text,fid integer, catid integer, owner text, date text, dateM text,memo text, status integer
  """
-

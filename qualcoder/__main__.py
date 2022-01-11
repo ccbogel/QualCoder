@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import base64
 import configparser
 import datetime
 import gettext
-import json  # to get latest Github release information
+import json  # To get latest Github release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -69,7 +69,7 @@ from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
-from qualcoder.rqda import Rqda_import
+from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 # from qualcoder.text_mining import DialogTextMining
@@ -1278,7 +1278,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.project_name == "":
             Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec_()
             return
-        Rqda_import(self.app, self.ui.textEdit)
+        RqdaImport(self.app, self.ui.textEdit)
         self.project_summary_report()
 
     def closeEvent(self, event):
@@ -1388,7 +1388,8 @@ class MainWindow(QtWidgets.QMainWindow):
             "supercatid integer, unique(name))")
         cur.execute(
             "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, "
-            "pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner))")
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer, "
+            "unique(cid,fid,pos0,pos1, owner))")
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
             "date text, color text, unique(name))")
