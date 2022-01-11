@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ from .helpers import Message
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
@@ -63,7 +64,7 @@ class DialogSelectItems(QtWidgets.QDialog):
     selectedname = None
     title = None
 
-    def __init__(self, app, data, title, selection_mode):
+    def __init__(self, app_, data, title, selection_mode):
         """ present list of names to user for selection.
 
         params:
@@ -76,15 +77,15 @@ class DialogSelectItems(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_selectitems()
         self.ui.setupUi(self)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
+        font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
         self.selection_mode = selection_mode
         # Check data exists
         if len(data) == 0:
-            Message(app, _('Dictionary is empty'), _("No data to select from"), "warning")
+            Message(app_, _('Dictionary is empty'), _("No data to select from"), "warning")
         # Check for 'name' key
         no_name_key = False
 
@@ -93,10 +94,10 @@ class DialogSelectItems(QtWidgets.QDialog):
                 no_name_key = True
         if no_name_key:
             text = _("This data does not contain names to select from")
-            Message(app, _('Dictionary has no "name" key'), text, "warning")
+            Message(app_, _('Dictionary has no "name" key'), text, "warning")
 
         self.dict_list = data
-        self.model = list_model(self.dict_list)
+        self.model = ListModel(self.dict_list)
         self.ui.listView.setModel(self.model)
         if self.selection_mode == "single":
             self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -122,9 +123,9 @@ class DialogSelectItems(QtWidgets.QDialog):
             return selected
 
 
-class list_model(QtCore.QAbstractListModel):
+class ListModel(QtCore.QAbstractListModel):
     def __init__(self, dict_list, parent=None):
-        super(list_model, self).__init__(parent)
+        super(ListModel, self).__init__(parent)
         sys.excepthook = exception_handler
         self.list = dict_list
 
@@ -139,11 +140,3 @@ class list_model(QtCore.QAbstractListModel):
             rowitem = self.list[index.row()]
             return rowitem
         return QtCore.QVariant()
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogSelectItems([{"name":"fff"}, {"name":"jjj"}], "title", "single")
-    ui.show()
-    sys.exit(app.exec_())
-
