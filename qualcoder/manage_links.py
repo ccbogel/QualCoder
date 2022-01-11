@@ -40,7 +40,6 @@ from .helpers import Message
 from .view_av import DialogCodeAV  # for isinstance()
 from .view_image import DialogCodeImage  # DialogCodeImage for isinstance()
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -67,11 +66,11 @@ class DialogManageLinks(QtWidgets.QDialog):
     tab_coding = None  # Tab widget coding tab for updates
     links = []
 
-    def __init__(self, app, parent_textEdit, tab_coding):
+    def __init__(self, app, parent_text_edit, tab_coding):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         self.tab_coding = tab_coding
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_links()
@@ -81,7 +80,7 @@ class DialogManageLinks(QtWidgets.QDialog):
             h = int(self.app.settings['dialogmanagelinks_h'])
             if h > 50 and w > 50:
                 self.resize(w, h)
-        except:
+        except KeyError:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -95,10 +94,10 @@ class DialogManageLinks(QtWidgets.QDialog):
         home = os.path.expanduser('~')
         for link in self.links:
             link['filepaths'] = self.find_filepaths(home, link['name'])
-            #print(link)
         self.fill_table()
 
-    def find_filepaths(self, root_dir, filename):
+    @staticmethod
+    def find_filepaths(root_dir, filename):
         """ Get file paths of this file name. """
 
         paths = []
@@ -117,7 +116,6 @@ class DialogManageLinks(QtWidgets.QDialog):
         """ Context menu for opening file select dialog. """
 
         row = self.ui.tableWidget.currentRow()
-        col = self.ui.tableWidget.currentColumn()
         menu = QtWidgets.QMenu()
         action_open_file_dialog = menu.addAction(_("Select file"))
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -135,7 +133,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         """
 
         file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None, _('Select file'),
-            self.app.settings['directory'])
+                                                              self.app.settings['directory'])
         if not ok or file_path == []:
             return
         if len(file_path) < 4:
@@ -196,7 +194,8 @@ class DialogManageLinks(QtWidgets.QDialog):
 
         self.ui.tableWidget.blockSignals(True)
         self.ui.tableWidget.setColumnCount(5)
-        self.ui.tableWidget.setHorizontalHeaderLabels([_("Type"), _("Filename"), _("Current path"), _("Suggestion 1"), _("Suggestion 2")])
+        self.ui.tableWidget.setHorizontalHeaderLabels(
+            [_("Type"), _("Filename"), _("Current path"), _("Suggestion 1"), _("Suggestion 2")])
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
@@ -229,11 +228,3 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.blockSignals(False)
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = Ui_Dialog_manage_links()
-    ui.show()
-    sys.exit(app.exec_())
-
