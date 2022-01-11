@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,10 +63,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
     categories = []
     codes = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_textedit):
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_summary()
         self.ui.setupUi(self)
@@ -83,7 +83,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             s0 = int(self.app.settings['dialogreport_code_summary_splitter0'])
             s1 = int(self.app.settings['dialogreport_code_summary_splitter1'])
             self.ui.splitter.setSizes([s0, s1])
-        except:
+        except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.treeWidget.setStyleSheet(treefont)
@@ -91,7 +91,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.fill_tree()
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
 
-    def splitter_sizes(self, pos, index):
+    def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
 
         sizes = self.ui.splitter.sizes()
@@ -132,17 +132,13 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            #try:
             cats.remove(item)
-            #except Exception as e:
-            #    logger.debug(e, item)
 
         ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child, then remove matched categories from the list '''
         count = 0
         while len(cats) > 0 and count < 10000:
             remove_list = []
-            #logger.debug("Cats: " + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
@@ -216,7 +212,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         item = it.value()
         count = 0
         while item and count < 10000:
-            #print("fill code counts in tree", item.text(0), item.text(1), item.text(2), item.text(3))
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 try:
@@ -243,7 +238,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         if current.text(1)[0:3] != 'cid':
             self.ui.textEdit.setText("")
             return
-        code_= None
+        code_ = None
         for c in self.codes:
             if c['name'] == current.text(0):
                 code_ = c
@@ -294,23 +289,23 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             sourcename = cur.fetchone()
             if sourcename is None:
                 sourcename = [""]
-                self.ui.textEdit.append(_("Report code summary. Code_text, code_image or code_av had a coding to a deleted file"))
+                msg_ = _("Report code summary. Code_text, code_image or code_av had a coding to a deleted file")
+                self.ui.textEdit.append(msg_)
             text += " | " + sourcename[0]
         text += "\n"
-        text += self.text_statistics(code_, text_res)
-        text += self.image_statistics(code_, img_res)
-        text += self.av_statistics(code_, av_res)
+        text += self.text_statistics(text_res)
+        text += self.image_statistics(img_res)
+        text += self.av_statistics(av_res)
         self.ui.textEdit.setText(text)
 
-    def text_statistics(self, code_, text_res):
-        """ Get text statistics for code.
+    def text_statistics(self, text_res):
+        """ Get the average segment length, total characters, word counts for the text results for the code.
         param:
-            code_ : dictionary {name, color, cid,}
-            text_res: list of text results
+            text_res: list of fid, seltext, pos0, pos1, owner, memo, avid
         """
 
         text = "\n" + _("TEXT CODINGS: ") + str(len(text_res)) + "\n"
-        if text_res == []:
+        if not text_res:
             return text
         total_chars = 0
         fulltext = ""
@@ -327,12 +322,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 chars += " "
         chars = chars.lower()
         word_list = chars.split()
-        # print(word_list)
         msg = _(
             "Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
         text += msg + "\n"
-        # TODO use word list for word proximity
-
         text += _("Words: ") + f"{len(word_list):,d}" + "\n"
         # Word frequency
         d = {}
@@ -343,7 +335,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
-        # print(word_freq)
         text += _("Unique words: ") + str(len(word_freq)) + "\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
@@ -356,18 +347,16 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += "  " + _("Average characters: ") + str(int(avg_chars)) + "\n"
         return text
 
-    def image_statistics(self, code_, img_res):
-        """ Get image statistics for code
+    def image_statistics(self, img_res):
+        """ Get image statistics (code count, image size ,average coded area) for code results.
         param:
-            code_ : dictionary {name, color, cid,}
-            img_res: list of text results
+            img_res: list of id, x1, y1, width, height, owner, memo
         """
 
         text = "\n" + _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
         if img_res == []:
             return text
         cur = self.app.conn.cursor()
-        image_areas = []  # list of list of id, area
         sql = "select id, mediapath from source where (mediapath like '/images%' or mediapath like 'images:%') "
         cur.execute(sql)
         res = cur.fetchall()
@@ -394,7 +383,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     count += 1
             try:
                 avg_area = int(total_area / count)
-            except:
+            except ZeroDivisionError:
                 pass
             percent_of_image = round(avg_area / image['area'] * 100, 3)
             if count > 0:
@@ -403,14 +392,16 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 text += "  " + _("Average area of image: ") + str(percent_of_image) + "%\n"
         return text
 
-    def av_statistics(self, code_, av_res):
+    def av_statistics(self, av_res):
         """ Get video statistics for image file
-        param: id : Integer """
+        param:
+            av_res: List of id, pos0, pos1, owner, memo
+        """
 
         text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
         cur = self.app.conn.cursor()
-        image_areas = []  # list of list of id, area
-        sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or mediapath like '/audio%' or mediapath like 'audio:%') "
+        sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or " \
+              "mediapath like '/audio%' or mediapath like 'audio:%') "
         cur.execute(sql)
         res = cur.fetchall()
         for r in res:
@@ -419,7 +410,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 abs_path = r[1][6:]
             else:
                 abs_path = self.app.project_path + r[1]
-            # media duration
+            # Media duration
             instance = vlc.Instance()
             mediaplayer = instance.media_player_new()
             media = instance.media_new(abs_path)
@@ -437,7 +428,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     count += 1
             try:
                 avg_coded_secs = int(total_coded_secs / count)
-            except:
+            except ZeroDivisionError:
                 pass
             percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
             if count > 0:
@@ -446,11 +437,4 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 text += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs")
                 text += "  " + _("Average percent of media: ") + str(percent_of_media) + "%\n"
         return text
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogReportCodeSummary()
-    ui.show()
-    sys.exit(app.exec_())
 
