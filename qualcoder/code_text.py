@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -95,6 +95,7 @@ class DialogCodeText(QtWidgets.QWidget):
     file_ = None  # contains filename and file id returned from SelectItems
     code_text = []
     annotations = []
+    undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at hte same time, so a list
     # Overlapping coded text details
     overlaps_at_pos = []
     overlaps_at_pos_idx = 0
@@ -102,7 +103,7 @@ class DialogCodeText(QtWidgets.QWidget):
     search_indices = []
     search_index = 0
     search_term = ""
-    search_type = "3"  # 3 or 5 or 1 for Enter
+    search_type = "3"  # 3 chars or 5 chars or 1 for Enter
     selected_code_index = 0
     eventFilter = None
     important = False  # Show/hide important codes
@@ -124,7 +125,7 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_pos = 0
     no_codes_annotes_cases = None
 
-    # Variables associated with right-hand side splitter, for project memo, curent journal, code rule
+    # Variables associated with right-hand side splitter, for project memo, current journal, code rule
     project_memo = False
     journal_entry = False
     code_rule = False
@@ -142,6 +143,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.recent_codes = []
         self.autocode_history = []
+        self.undo_deleted_codes = []
         self.journal = False
         self.project_memo = False
         self.code_rule = False
@@ -645,7 +647,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                top_item.setFlags(
+                    Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -666,7 +669,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
                     child.setToolTip(2, c['memo'])
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    child.setFlags(
+                        Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
                 it += 1
@@ -796,7 +800,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.journal_entry is not False:
             now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             cur.execute("update journal set jentry=?, date=?, owner=? where jid=?",
-                [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])
+                        [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])
         if self.project_memo is not False:
             cur.execute("update project set memo=?", [txt])
         self.app.conn.commit()
@@ -1151,7 +1155,8 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?"
         for item in text_items:
             cur.execute(sql,
-                (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'], item['owner']))
+                        (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'],
+                         item['owner']))
             self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1214,12 +1219,13 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cur = self.app.conn.cursor()
         cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
-            (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'], text_item['pos1'],
-             text_item['owner']))
+                    (memo, text_item['cid'], text_item['fid'], text_item['seltext'], text_item['pos0'],
+                     text_item['pos1'],
+                     text_item['owner']))
         self.app.conn.commit()
         for i in self.code_text:
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
-                and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
+                    and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1261,14 +1267,16 @@ class DialogCodeText(QtWidgets.QWidget):
             max_ = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
             min_ = -1 * code_to_edit['pos0']
             changed_start, ok = int_dialog.getInt(self, _("Change start position"),
-                            _("Change start character position. Positive or negative number:"), 0, min_, max_, 1)
+                                                  _("Change start character position. Positive or negative number:"), 0,
+                                                  min_, max_, 1)
             if not ok:
                 return
         if start_or_end == "end":
             max_ = txt_len - code_to_edit['pos1']
             min_ = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
             changed_end, ok = int_dialog.getInt(self, _("Change end position"),
-                            _("Change end character position. Positive or negative number:"), 0, min_, max_, 1)
+                                                _("Change end character position. Positive or negative number:"), 0,
+                                                min_, max_, 1)
             if not ok:
                 return
         if changed_start == 0 and changed_end == 0:
@@ -1281,8 +1289,9 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'], code_to_edit['pos1'],
-             self.app.settings['codername']))
+                    (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'],
+                     code_to_edit['pos1'],
+                     self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1668,8 +1677,8 @@ class DialogCodeText(QtWidgets.QWidget):
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
-
         Ctrl + E Turn Edit mode on or off
+        Ctrl + Z Undo the last coding deletion.
         """
 
         if object_ is self.ui.treeWidget.viewport():
@@ -1681,10 +1690,15 @@ class DialogCodeText(QtWidgets.QWidget):
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key_Z and mod == QtCore.Qt.ControlModifier:
+                self.undo_last_unmarked_code()
+                return True
         if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
             key = event.key()
             mod = event.modifiers()
-
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
@@ -1733,8 +1747,8 @@ class DialogCodeText(QtWidgets.QWidget):
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'],
-             self.app.settings['codername']))
+                    (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'],
+                     self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1742,7 +1756,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def extend_right(self, code_):
         """ Shift right arrow. """
 
-        if code_['pos1'] +1 >= len(self.ui.textEdit.toPlainText()):
+        if code_['pos1'] + 1 >= len(self.ui.textEdit.toPlainText()):
             return
         code_['pos1'] += 1
         cur = self.app.conn.cursor()
@@ -1751,8 +1765,8 @@ class DialogCodeText(QtWidgets.QWidget):
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1,
-             self.app.settings['codername']))
+                    (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1,
+                     self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1769,8 +1783,8 @@ class DialogCodeText(QtWidgets.QWidget):
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1,
-             self.app.settings['codername']))
+                    (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1,
+                     self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1787,8 +1801,8 @@ class DialogCodeText(QtWidgets.QWidget):
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
         cur.execute(sql,
-            (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'],
-             self.app.settings['codername']))
+                    (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'],
+                     self.app.settings['codername']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -2010,7 +2024,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.categories[found]['supercatid'] = supercatid
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set supercatid=? where catid=?",
-            [self.categories[found]['supercatid'], self.categories[found]['catid']])
+                        [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
@@ -2036,7 +2050,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
             cur = self.app.conn.cursor()
             cur.execute("update code_name set catid=? where cid=?",
-            [self.codes[found]['catid'], self.codes[found]['cid']])
+                        [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
             self.app.delete_backup = False
             self.update_dialog_codes_and_categories()
@@ -2048,7 +2062,7 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
         msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
-        msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+                                               msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return
         cur = self.app.conn.cursor()
@@ -2084,11 +2098,11 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
-        'color': code_color}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
+                'color': code_color}
         cur = self.app.conn.cursor()
-        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
+        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                    (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
         self.app.delete_backup = False
         cur.execute("select last_insert_rowid()")
@@ -2137,11 +2151,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if new_category_name is None:
             return
         item = {'name': new_category_name, 'cid': None, 'memo': "",
-        'owner': self.app.settings['codername'],
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                'owner': self.app.settings['codername'],
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
         cur = self.app.conn.cursor()
-        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)"
-            , (item['name'], item['memo'], item['owner'], item['date'], supercatid))
+        cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                    (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
@@ -2271,14 +2285,15 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                _("New code name:"), QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          _("New code name:"), QtWidgets.QLineEdit.Normal,
+                                                          selected.text(0))
             if not ok or new_name == '':
                 return
             # Check that no other code has this name
             for c in self.codes:
                 if c['name'] == new_name:
                     Message(self.app, _("Name in use"),
-                    new_name + _(" is already in use, choose another name."), "warning").exec_()
+                            new_name + _(" is already in use, choose another name."), "warning").exec_()
                     return
             # Find the code in the list
             found = -1
@@ -2304,7 +2319,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if selected.text(1)[0:3] == 'cat':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:"),
-            QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          QtWidgets.QLineEdit.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # Check that no other category has this name
@@ -2323,7 +2338,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Update category list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set name=? where catid=?",
-            (new_name, self.categories[found]['catid']))
+                        (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             self.app.delete_backup = False
             old_name = self.categories[found]['name']
@@ -2354,7 +2369,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
-        (self.codes[found]['color'], self.codes[found]['cid']))
+                    (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
@@ -2778,14 +2793,14 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selected_text,
-        'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-        'important': None}
+                 'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                 'important': None}
 
         # Check for an existing duplicated marking first
         cur = self.app.conn.cursor()
         cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-            (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
+                    (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
             # The event can trigger multiple times, so dont present a warning to the user
@@ -2794,11 +2809,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.highlight()
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
-            coded['seltext'], coded['pos0'], coded['pos1'], coded['owner'],
-            coded['memo'], coded['date'], coded['important']))
+                                                               coded['seltext'], coded['pos0'], coded['pos1'],
+                                                               coded['owner'],
+                                                               coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
         self.app.delete_backup = False
-
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2809,7 +2824,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 tmp_code = c
         if tmp_code is None:
             return
-        # Need to remove as may not be in first position
+        # Need to remove from recent_codes, if there and add back in first position
         for item in self.recent_codes:
             if item == tmp_code:
                 self.recent_codes.remove(item)
@@ -2819,10 +2834,30 @@ class DialogCodeText(QtWidgets.QWidget):
             self.recent_codes = self.recent_codes[:10]
         self.update_file_tooltip()
 
+    def undo_last_unmarked_code(self):
+        """ Restore the last deleted code(s).
+        One code or multiple, depends on what was selected when the unmark method was used.
+        Requires self.undo_deleted_codes """
+
+        if not self.undo_deleted_codes:
+            return
+        cur = self.app.conn.cursor()
+        for item in self.undo_deleted_codes:
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
+                                                                   item['seltext'], item['pos0'], item['pos1'],
+                                                                   item['owner'],
+                                                                   item['memo'], item['date'], item['important']))
+        self.app.conn.commit()
+        self.undo_deleted_codes = []
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
         Called by text_edit_context_menu
         Adjust for start of text file, as this may be a smaller portion of the full text file.
+
         param:
             location: text cursor location, Integer
         """
@@ -2848,14 +2883,13 @@ class DialogCodeText(QtWidgets.QWidget):
             to_unmark = ui.get_selected()
         if to_unmark is None:
             return
-
+        self.undo_deleted_codes = deepcopy(to_unmark)
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         for item in to_unmark:
             cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
-                (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
+                        (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
             self.app.conn.commit()
-
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2885,7 +2919,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if cursor_pos is None:
             for note in self.annotations:
                 if ((pos0 + self.file_['start'] >= note['pos0'] and pos0 + self.file_['start'] <= note['pos1']) or
-                        (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
+                    (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
                         and note['fid'] == self.file_['id']:
                     item = note  # use existing annotation
                     details = item['owner'] + " " + item['date']
@@ -2905,9 +2939,10 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Add new item to annotations, add to database and update GUI
         if item is None:
-            item = {'fid': int(self.file_['id']), 'pos0': pos0 + self.file_['start'], 'pos1': pos1 + self.file_['start'],
-            'memo': str(annotation), 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
+            item = {'fid': int(self.file_['id']), 'pos0': pos0 + self.file_['start'],
+                    'pos1': pos1 + self.file_['start'],
+                    'memo': str(annotation), 'owner': self.app.settings['codername'],
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'anid': -1}
             ui = DialogMemo(self.app, _("Annotation: ") + details, item['memo'])
             ui.exec_()
             item['memo'] = ui.memo
@@ -2915,7 +2950,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur = self.app.conn.cursor()
                 cur.execute("insert into annotation (fid,pos0, pos1,memo,owner,date) \
                     values(?,?,?,?,?,?)", (item['fid'], item['pos0'], item['pos1'],
-                    item['memo'], item['owner'], item['date']))
+                                           item['memo'], item['owner'], item['date']))
                 self.app.conn.commit()
                 self.app.delete_backup = False
                 cur.execute("select last_insert_rowid()")
@@ -2923,7 +2958,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 item['anid'] = anid
                 self.annotations.append(item)
                 self.parent_textEdit.append(_("Annotation added at position: ") \
-                    + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_['name'])
+                                            + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_[
+                                                'name'])
                 self.get_coded_text_update_eventfilter_tooltips()
             return
 
@@ -2946,12 +2982,12 @@ class DialogCodeText(QtWidgets.QWidget):
         # If blank delete the annotation
         if item['memo'] == "":
             cur = self.app.conn.cursor()
-            cur.execute("delete from annotation where pos0 = ?", (item['pos0'], ))
+            cur.execute("delete from annotation where pos0 = ?", (item['pos0'],))
             self.app.conn.commit()
             self.app.delete_backup = False
             self.annotations = self.app.get_annotations()
             self.parent_textEdit.append(_("Annotation removed from position ") \
-                + str(item['pos0']) + _(" for: ") + self.file_['name'])
+                                        + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.get_coded_text_update_eventfilter_tooltips()
 
     def button_autocode_sentences_this_file(self):
@@ -3009,7 +3045,7 @@ class DialogCodeText(QtWidgets.QWidget):
         undo_list = []
         cur = self.app.conn.cursor()
         for start_pos in text_starts:
-            pos1 = -1  # default if not found
+            pos1 = -1  # Default if not found
             text_end_iterator = 0
             try:
                 while start_pos >= text_ends[text_end_iterator]:
@@ -3026,7 +3062,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     seltext = self.file_['fulltext'][start_pos: pos1]
                     sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
                     cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
-                                   self.app.settings['codername'], now_date, ""))
+                                      self.app.settings['codername'], now_date, ""))
                     # Add to undo auto-coding history
                     undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
                             "cid": cid, "fid": self.file_['id'], "pos0": start_pos, "pos1": pos1,
@@ -3134,21 +3170,22 @@ class DialogCodeText(QtWidgets.QWidget):
             for sentence in sentences:
                 if text_ in sentence:
                     i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
-                            'pos0': pos0, 'pos1': pos0 + len(sentence),
-                            'owner': self.app.settings['codername'], 'memo': "",
-                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                         'pos0': pos0, 'pos1': pos0 + len(sentence),
+                         'owner': self.app.settings['codername'], 'memo': "",
+                         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                     # TODO IntegrityError: UNIQUE constraint failed
                     try:
                         codes_added += 1
                         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                            owner,memo,date) values(?,?,?,?,?,?,?,?)"
-                            , (i['cid'], i['fid'], i['seltext'], i['pos0'],
-                            i['pos1'], i['owner'], i['memo'], i['date']))
+                            owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                    (i['cid'], i['fid'], i['seltext'], i['pos0'],
+                                     i['pos1'], i['owner'], i['memo'], i['date']))
                         self.app.conn.commit()
                         # Record a list of undo sql
                         undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                            "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'], "owner": i['owner']
-                            }
+                                "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'],
+                                "owner": i['owner']
+                                }
                         undo_list.append(undo)
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
@@ -3161,8 +3198,9 @@ class DialogCodeText(QtWidgets.QWidget):
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:") \
-            + _("\nCode: ") + item.text(0)
-            + _("\nWith text fragment: ") + text + _("\nUsing line ending: ") + ending + "\n" + msg)
+                                    + _("\nCode: ") + item.text(0)
+                                    + _("\nWith text fragment: ") + text + _(
+            "\nUsing line ending: ") + ending + "\n" + msg)
         self.app.delete_backup = False
         # Update tooltip filter and code tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3214,33 +3252,33 @@ class DialogCodeText(QtWidgets.QWidget):
             for f in files:
                 filenames += f['name'] + " "
                 cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
-                    [f['id']])
+                            [f['id']])
                 currentfile = cur.fetchone()
                 text_ = currentfile[2]
                 text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
                 # Add new items to database
                 for startPos in text_starts:
                     item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
-                    'pos0': startPos, 'pos1': startPos + len(txt),
-                    'owner': self.app.settings['codername'], 'memo': "",
-                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                            'pos0': startPos, 'pos1': startPos + len(txt),
+                            'owner': self.app.settings['codername'], 'memo': "",
+                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                     # TODO IntegrityError: UNIQUE constraint failed
                     try:
                         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                            owner,memo,date) values(?,?,?,?,?,?,?,?)"
-                            , (item['cid'], item['fid'], item['seltext'], item['pos0'],
-                            item['pos1'], item['owner'], item['memo'], item['date']))
+                            owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                    (item['cid'], item['fid'], item['seltext'], item['pos0'],
+                                     item['pos1'], item['owner'], item['memo'], item['date']))
                         self.app.conn.commit()
                         # Record a list of undo sql
                         undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                            "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
+                                "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
                                 "owner": item['owner']}
                         undo_list.append(undo)
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
-                    + _(". with text: ") + txt)
+                                            + _(". with text: ") + txt)
         if len(undo_list) > 0:
             name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
             name += _("\nWith: ") + find_text
@@ -3560,21 +3598,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ed_codetext = []
         for r in res:
             self.ed_codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
-                'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
+                                     'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
         sql = "select anid, pos0, pos1 from annotation where fid=?"
         cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         self.ed_annotations = []
         for r in res:
             self.ed_annotations.append({'anid': r[0], 'pos0': r[1], 'pos1': r[2],
-                'npos0': r[1], 'npos1': r[2]})
+                                        'npos0': r[1], 'npos1': r[2]})
         sql = "select id, pos0, pos1 from case_text where fid=?"
         cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         self.ed_casetext = []
         for r in res:
             self.ed_casetext.append({'id': r[0], 'pos0': r[1], 'pos1': r[2],
-                'npos0': r[1], 'npos1': r[2]})
+                                     'npos0': r[1], 'npos1': r[2]})
         self.no_codes_annotes_cases = False
         if self.ed_casetext == [] and self.ed_annotations == [] and self.ed_codetext == []:
             self.no_codes_annotes_cases = True
@@ -3665,7 +3703,8 @@ class ToolTipEventFilter(QtCore.QObject):
                 # Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTipEventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
-                if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos and item['seltext'] is not None:
+                if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos and \
+                        item['seltext'] is not None:
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
                     seltext = seltext.replace("\r", "")
