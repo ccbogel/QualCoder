@@ -136,6 +136,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     segment_for_text = None  # when linking segment to text
     timer = QtCore.QTimer()
     play_segment_end = None
+    undo_deleted_codes = []  # Undo last deleted segment code, or text code(s).
 
     # For transcribed text
     annotations = []
@@ -186,6 +187,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         '''self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
                 'owner': None, 'memo': None, 'date': None, 'avid': None}'''
         self.segment_for_text = None
+        self.undo_deleted_codes = []
         self.get_codes_and_categories()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
@@ -898,15 +900,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                     w = 100
                     h = 80
                 self.ddialog.resize(w, h)
-                '''x = int(self.app.settings['codeav_video_pos_x']) - int(self.app.settings['codeav_abs_pos_x'])
-                y = int(self.app.settings['codeav_video_pos_y'])  - int(self.app.settings['codeav_abs_pos_y'])
-                self.ddialog.move(self.mapToGlobal(QtCore.QPoint(x, y)))'''
-            except:
+            except KeyError:
                 self.ddialog.resize(500, 400)
         else:
             self.ddialog.hide()
 
-        # clear comboBox tracks options and reload when playing/pausing
+        # Clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
         # Put the media in the media player
         self.mediaplayer.set_media(self.media)
@@ -1298,10 +1297,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.app.settings['video_h'] = 80
 
     def create_or_clear_segment(self):
-        """ Make the start end end points of the segment of time.
-        Use minutes and seconds, and milliseconds formats for the time.
+        """ Make the start and end points of the segment duration.
+        Use milliseconds formats for the times.
         Can also clear the segment by pressing the button when it says Clear segment.
-        clear segment text is changed to Start segment once a segment is assigned to a code.
+        QButton text is changed to Start segment once a segment is assigned to a code.
         """
 
         if self.ui.pushButton_coding.text() == _("Clear segment"):
@@ -1593,6 +1592,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             Q Quick Mark with code - for current selection
             R opens a context menu for recently used codes for marking text
 
+            Ctrl + Z restore last unmarked code(s) - text code(s) or segment code.
+
         Also detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
@@ -1609,9 +1610,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             return False
         key = event.key()
         mods = event.modifiers()
-        # print("KEY ", key, "MODS ", mods)
 
-        # change start and end code positions using alt arrow left and alt arrow right
+        # Restore unmarked code(s) if undo code is present
+        if key == QtCore.Qt.Key_Z and mods == QtCore.Qt.ControlModifier:
+            if not self.undo_deleted_codes:
+                return True
+            try:
+                self.undo_deleted_codes[0]['is_segment']
+                self.restore_unmarked_segment()
+            except KeyError:
+                self.restore_unmarked_text_codes()
+
+        # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         if self.ui.textEdit.hasFocus():
             key = event.key()
@@ -2726,10 +2736,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Copy text to clipboard for external use.
         For example adding text to another document. """
 
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         cb = QtWidgets.QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
-        cb.setText(selectedText, mode=cb.Clipboard)
+        cb.setText(selected_text, mode=cb.Clipboard)
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -2746,13 +2756,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
         cid = int(item.text(1).split(':')[1])
-        selectedText = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.textEdit.textCursor().selectedText()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         if pos0 == pos1:  # Something quirky happened
             return
         # add the coded section to code text, add to database and update GUI
-        coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selectedText,
+        coded = {'cid': cid, 'fid': self.transcription[0], 'seltext': selected_text,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
                  'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'important': None}
 
@@ -2800,8 +2810,47 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(self.recent_codes) > 5:
             self.recent_codes = self.recent_codes[:5]
 
+    def restore_unmarked_segment(self):
+        """ Restore the last deleted coded segment.
+        The event filer method checks for text or segment coding.
+        Requires self.undo_deleted_codes """
+
+        item = self.undo_deleted_codes[0]
+        sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?,?)"
+        values = [item['id'], item['pos0'], item['pos1'], item['cid'], item['memo'],
+                  item['date'], item['owner'], item['important']]
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        self.app.conn.commit()
+        self.load_segments()
+        self.clear_segment()
+        self.app.delete_backup = False
+        self.fill_code_counts_in_tree()
+
+
+    def restore_unmarked_text_codes(self):
+        """ Restore the last deleted code(s).
+        One code or multiple, depends on what was selected when the unmark method was used.
+        The event filer method checks for text or segment coding.
+        Requires self.undo_deleted_codes """
+
+        if not self.undo_deleted_codes:
+            return
+        cur = self.app.conn.cursor()
+        for item in self.undo_deleted_codes:
+            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (item['cid'], item['fid'],
+                                                                   item['seltext'], item['pos0'], item['pos1'],
+                                                                   item['owner'],
+                                                                   item['memo'], item['date'], item['important']))
+        self.app.conn.commit()
+        self.undo_deleted_codes = []
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
+        Keep a record for ctrl Z restore.
         param:
             location: integer """
 
@@ -2826,6 +2875,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             to_unmark = ui.get_selected()
         if not to_unmark:
             return
+        self.undo_deleted_codes = deepcopy(to_unmark)
 
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
@@ -3088,8 +3138,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_important = None
         action_not_important = None
         action_link_segment_to_text = None
-        '''if self.code_av_dialog.text_for_segment['seltext'] is not None:
-            action_link_text = menu.addAction(_('Link text to segment'))'''
         if self.code_av_dialog.ui.textEdit.toPlainText() != "" and seltext != "":
             action_link_segment_to_text = menu.addAction(_("Link segment to selected text"))
         if self.segment['important'] is None or self.segment['important'] > 1:
@@ -3114,9 +3162,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action == action_edit_end:
             self.edit_segment_end()
             return
-        '''if self.code_av_dialog.text_for_segment['seltext'] is not None and action == action_link_text:
-            self.link_text_to_segment()
-            return'''
         # if self.code_av_dialog.text_for_segment['seltext'] is None and action == action_link_segment_to_text:
         if seltext != "" and action == action_link_segment_to_text:
             self.link_segment_to_text()
@@ -3137,10 +3182,10 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         importance = None
         if important:
             importance = 1
-        self.segment['important'] = important
+        self.segment['important'] = importance
         cur = self.app.conn.cursor()
         sql = "update code_av set important=?, date=? where avid=?"
-        values = [important, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
+        values = [importance, datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), self.segment['avid']]
         cur.execute(sql, values)
         self.app.conn.commit()
         self.app.delete_backup = False
@@ -3238,7 +3283,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.timer.start()
 
     def delete(self):
-        """ Mark segment for deletion. Does not actually delete segment item, but hides
+        """ Mark the segment for deletion. Does not actually delete segment item, but hides
         it from the scene. Reload_segment is set to True, so on playing media, the update
         event will reload all segments. """
 
@@ -3248,6 +3293,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         ok = ui.exec_()
         if not ok:
             return
+        tmp_seg = deepcopy(self.segment)
+        tmp_seg['is_segment'] = True  # Need to distinguish from text coding
+        self.code_av_dialog.undo_deleted_codes = [tmp_seg]
 
         self.setToolTip("")
         self.setLine(-100, -100, -100, -100)
@@ -3504,9 +3552,9 @@ class DialogViewAV(QtWidgets.QDialog):
         # self.ui.lineEdit_search.setEnabled(False)
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
-        # enable custom window hint - must be set to enable customizing window controls
+        # Enable custom window hint - must be set to enable customizing window controls
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        # disable close button, only close through closing the Ui_Dialog_view_av
+        # Disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         title = self.abs_path.split('/')[-1]
