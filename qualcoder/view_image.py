@@ -87,6 +87,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     code_areas = []
     important = False  # Show/hide imporant flagged codes
     attributes = []
+    undo_deleted_code = None  # Undo last deleted code
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -103,6 +104,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.codes = []
         self.categories = []
         self.files = []
+        self.undo_deleted_code = None
         self.file_ = None
         self.log = ""
         self.scale = 1.0
@@ -741,7 +743,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_color = menu.addAction(_("Change code color"))
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_showCodesLike = menu.addAction(_("Show codes like"))
+        action_show_codes_like = menu.addAction(_("Show codes like"))
         action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -762,7 +764,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if action == action_add_code_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_code(catid)
-        if action == action_showCodesLike:
+        if action == action_show_codes_like:
             self.show_codes_like()
             return
         if selected is not None and action == action_rename:
@@ -859,11 +861,17 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         Key events on scene
         H Hide / unHide top groupbox
+        minus reduce the scale
+        plus increase the scale
+        Ctrl Z undo last unmarked code
         """
 
-        # Hide / unHide top groupbox
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key_Z and mod == QtCore.Qt.ControlModifier:
+                self.undo_last_unmarked_code()
+                return True
             if key == QtCore.Qt.Key_H:
                 self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                 return True
@@ -1024,11 +1032,31 @@ class DialogCodeImage(QtWidgets.QDialog):
         # re-draw to update memos in tooltips
         self.draw_coded_areas()
 
+    def undo_last_unmarked_code(self):
+        """ Restore the last deleted code.
+        Requires self.undo_deleted_code """
+
+        if not self.undo_deleted_code:
+            return
+        item = self.undo_deleted_code
+        cur = self.app.conn.cursor()
+        cur.execute(
+            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) "
+            "values(?,?,?,?,?,?,?,?,?,?)",
+            (item['id'], item['x1'], item['y1'], item['width'], item['height'], item['cid'], item['memo'],
+             item['date'], item['owner'], item['important']))
+        self.app.conn.commit()
+        self.undo_deleted_code = []
+        self.get_coded_areas()
+        self.redraw_scene()
+        self.fill_code_counts_in_tree()
+
     def unmark(self, item):
         """ Remove coded area.
         param:
             item : dictionary of coded area """
 
+        self.undo_deleted_code = deepcopy(item)
         cur = self.app.conn.cursor()
         cur.execute("delete from code_image where imid=?", [item['imid'], ])
         self.app.conn.commit()
@@ -1078,7 +1106,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 'cid': cid, 'memo': '', 'important': None}
         cur = self.app.conn.cursor()
         cur.execute(
-            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,null)",
+            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,"
+            "null)",
             (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
              item['date'], item['owner']))
         self.app.conn.commit()
