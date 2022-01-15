@@ -38,16 +38,16 @@ import sqlite3
 import sys
 import traceback
 import uuid
+
 try:
     import qualcoder.vlc as vlc
-except:
+except ImportError:
     pass
 import zipfile
 
 from PyQt5 import QtWidgets, QtCore
 
 from .xsd import codebook, project
-from .confirm_delete import DialogConfirmDelete  # REFI export question about line endings
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
 
@@ -62,22 +62,21 @@ def exception_handler(exception_type, value, tb_obj):
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
     logger.error(_("Uncaught exception: ") + text)
-    #QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class RefiImport():
-    """     Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml
+class RefiImport:
+    """ Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml
     and project.xml
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
     """
 
-    #TODO parse_sources PDF - WORKS BUT FULLY WORKS ?
-    #TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
-    #TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
-    #TODO check imports from different vendors, tried Quirkos, Maxqda
-    #TODO reference external sources - relative or absolute paths
+    # TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
+    # TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
+    # TODO check imports from different vendors, tried Quirkos, Maxqda
+    # TODO reference external sources - relative or absolute paths
 
     file_path = None
+    folder_name = ""  # Temporary extract folder name
     codes = []
     users = []
     cases = []
@@ -92,16 +91,16 @@ class RefiImport():
     import_type = None
     xml = None
     base_path = ""
-    sofware_name = ""
+    software_name = ""
     # Progress dialog
     pd = None
     pd_value = 0
 
-    def __init__(self, app, parent_textEdit, import_type):
+    def __init__(self, app, parent_textedit, import_type):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.import_type = import_type
         self.tree = None
         self.codes = []
@@ -114,13 +113,16 @@ class RefiImport():
         self.software_name = ""
         if import_type == "qdc":
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdc *.QDC)")
+                                                                       _('Select REFI-QDA file'),
+                                                                       self.app.settings['directory'], "(*.qdc *.QDC)")
             if not ok or self.file_path == "":
                 return
             self.import_codebook()
         else:
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                _('Select REFI-QDA file'), self.app.settings['directory'], "(*.qdpx *.QDPX)")
+                                                                       _('Select REFI-QDA file'),
+                                                                       self.app.settings['directory'],
+                                                                       "(*.qdpx *.QDPX)")
             if not ok or self.file_path == "":
                 return
             self.import_project()
@@ -143,15 +145,15 @@ class RefiImport():
         # look for the Codes tag, which contains each Code element
         children = root.getchildren()
         for cb in children:
-            #print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
+            # print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
             if cb.tag in ("{urn:QDA-XML:codebook:1:0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = cb.getchildren()
-                for c in code_elements:
+                for _ in code_elements:
                     # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 Message(self.app, _("Codebook imported"),
-                    str(counter) + _(" categories and codes imported from ") + self.file_path).exec_()
+                        str(counter) + _(" categories and codes imported from ") + self.file_path).exec_()
                 return
         Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec_()
 
@@ -169,9 +171,9 @@ class RefiImport():
         Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
         Note: urn difference between codebook.qdc and project.qdpx
 
-        :param parent element, cat_id
+        param parent element, cat_id
 
-        :returns counter of inserted codes and categories
+        returns counter of inserted codes and categories
         """
 
         counter = 0
@@ -179,7 +181,7 @@ class RefiImport():
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         description = ""
         for e in elements:
-            if e.tag in("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
+            if e.tag in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
                 description = e.text
 
         # Determine if the parent is a code or a category
@@ -195,91 +197,88 @@ class RefiImport():
                 cur = self.app.conn.cursor()
                 # insert this category into code_cat table
                 try:
-                    cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)"
-                        , [name, description, now_date, cat_id])
+                    cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
+                                [name, description, now_date, cat_id])
                     self.app.conn.commit()
                     cur.execute("select last_insert_rowid()")
                     last_insert_id = cur.fetchone()[0]
                     counter += 1
-                except sqlite3.IntegrityError as e:
+                except sqlite3.IntegrityError:
                     pass
-                    #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Category name already exists: ") + name)
-
                 # This category may ALSO be a code (e.g. MAXQDA has categories as codes also)
                 # So create a code for this codable category
-                isCodable = parent.get("isCodable")
-                if isCodable == "true":
+                is_codable = parent.get("isCodable")
+                if is_codable == "true":
                     color = parent.get("color")
                     if color is None:
                         color = "#999999"
                     try:
-                        #print(isCodable, name, "inserting into code name")
+                        # print(is_codable, name, "inserting into code name")
                         cur = self.app.conn.cursor()
-                        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
-                            , [name, description, now_date, last_insert_id, color])
+                        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
+                                    [name, description, now_date, last_insert_id, color])
                         self.app.conn.commit()
                         cur.execute("select last_insert_rowid()")
                         code_last_insert_id = cur.fetchone()[0]
                         self.codes.append({'guid': parent.get('guid'), 'cid': code_last_insert_id})
                         counter += 1
-                    except sqlite3.IntegrityError as e:
+                    except sqlite3.IntegrityError:
                         pass
-                        #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
-
             for e in elements:
                 if e.tag not in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
                     counter += self.sub_codes(e, last_insert_id)
-                    #print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
+                    # print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
             return counter
 
         # No children and no Description child element so, insert this code into code_name table
         if is_category is False and elements == []:
             name = parent.get("name")
-            #print("No children or description ", name)
+            # print("No children or description ", name)
             color = parent.get("color")
-            if color == None:
+            if color is None:
                 color = "#999999"
             try:
                 cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
-                    , [name, description, now_date, cat_id, color])
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
+                            [name, description, now_date, cat_id, color])
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 last_insert_id = cur.fetchone()[0]
                 self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
-                #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
+                # Code name already exists
             return counter
 
         # One child, a description so, insert this code into code_name table
-        if is_category is False and len(elements) == 1 and elements[0].tag in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
+        if is_category is False and len(elements) == 1 and elements[0].tag in (
+                "{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
             name = parent.get("name")
-            #print("Only a description child: ", name)
+            # print("Only a description child: ", name)
             color = parent.get("color")
-            if color == None:
+            if color is None:
                 color = "#999999"
             try:
                 cur = self.app.conn.cursor()
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)"
-                    , [name, description, now_date, cat_id, color])
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
+                            [name, description, now_date, cat_id, color])
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 last_insert_id = cur.fetchone()[0]
                 self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 pass
-                #QtWidgets.QMessageBox.warning(None, _("Import error"), _("Code name already exists: ") + name)
             return counter
-
         # SHOULD NOT GET HERE
-        print("SHOULD NOT GET HERE")
+        '''print("SHOULD NOT GET HERE")
         print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
         logger.debug("REFI sub_codes import: SHOULD NOT GET HERE:")
-        logger.debug("tag:" + str(e.tag) + " " + str(e.text) + " name:" + str(e.get("name")) + " color:" + str(e.get("isCodable")))
-        QtWidgets.QMessageBox.warning(None, "tag: " + e.tag +"  " + e.text + " " + e.get("name") + " " + e.get("color") +" " + e.get("isCodable"))
+        logger.debug("tag:" + str(e.tag) + " " + str(e.text) + " name:" + str(e.get("name")) + " color:" +
+                     str(e.get("isCodable")))
+        QtWidgets.QMessageBox.warning(None, "tag: " + e.tag + "  " + e.text + " " + e.get("name") + " " +
+                                      e.get("color") + " " + e.get("isCodable"))'''
         return counter
 
     def import_project(self):
@@ -349,7 +348,7 @@ class RefiImport():
         self.parse_project_tag(root)
         children = root.getchildren()
         for c in children:
-            #print(c.tag)
+            # print(c.tag)
             if c.tag == "{urn:QDA-XML:project:1.0}Users":
                 count = self.parse_users(c)
                 self.parent_textEdit.append(_("Parse users. Loaded: " + str(count)))
@@ -383,7 +382,7 @@ class RefiImport():
         # Parse Notes after sources. Some Notes are text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                self.parse_notes(c)
+                count = self.parse_notes(c)
                 self.parent_textEdit.append(_("Parsing Notes. Loaded: " + str(count)))
 
         # Fill attributes table for File variables drawn fom Cases.Case tags
@@ -467,7 +466,7 @@ class RefiImport():
         for el in ec:
             # A variable assigned to a source
             if el.tag == "{urn:QDA-XML:project:1.0}SourceRef":
-                #print("el source ref tag ", el.tag, el.get(("targetGUID")))
+                # print("el source ref tag ", el.tag, el.get(("targetGUID")))
                 count += 1
                 file_guid = el.get("targetGUID")
         if file_guid is None or count != 1:
@@ -482,9 +481,9 @@ class RefiImport():
                     if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
                         var_guid = v_element.get("targetGUID")
                     if v_element.tag in (
-                    "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
-                    "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                    "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                            "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
+                            "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                            "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
                         value = v_element.text
                 attr_val = {'file_guid': file_guid, 'var_guid': var_guid, 'value': value}
                 # Get attribute name by linking guids
@@ -532,17 +531,18 @@ class RefiImport():
             # <Variable name="Cases:something"> or ?
             name = e.get("name")
             valuetype = e.get("typeOfVariable")
-            if valuetype in("Text", "Boolean", "Date", "DateTime"):
+            if valuetype in ("Text", "Boolean", "Date", "DateTime"):
                 valuetype = "character"
             if valuetype in ("Integer", "Float"):
                 valuetype = "numeric"
             # Default variable type to "file"
-            variable = {"name": name, "caseOrFile": "file", "guid": e.get("guid"), "id": None, "memo": "", "valuetype": valuetype}
+            variable = {"name": name, "caseOrFile": "file", "guid": e.get("guid"), "id": None, "memo": "",
+                        "valuetype": valuetype}
             # Get the description text
             d_elements = e.getchildren()
             for d in d_elements:
                 memo = ""
-                #print("Memo ", d.tag)
+                # print("Memo ", d.tag)
                 if e.tag != "{urn:QDA-XML:project:1:0}Description":
                     memo = d.text
                 variable["memo"] = memo
@@ -551,14 +551,15 @@ class RefiImport():
             # CaseOrFile is designated 'file'' - to be updated
             try:
                 cur.execute(
-                    "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-                    , (name, now_date, self.app.settings['codername'], variable["memo"], "file", valuetype))
+                    "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                    (name, now_date, self.app.settings['codername'], variable["memo"], "file", valuetype))
                 self.app.conn.commit()
                 var_count += 1
                 cur.execute("select last_insert_rowid()")
                 variable['id'] = cur.fetchone()[0]
-            except sqlite3.IntegrityError as e:
-                Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
+            except sqlite3.IntegrityError:
+                Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name,
+                        "warning").exec_()
             # Refer to the variables later
             # To update caseOrFile and to assign attributes
             self.variables.append(variable)
@@ -595,8 +596,9 @@ class RefiImport():
         cur = self.app.conn.cursor()
         count = 0
         for e in element.getchildren():
-            #print("CASE TAG", e.tag, "CASE NAME", e.get("name"), "GUID", e.get("guid"))  # tmp
-            item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.app.settings['codername'], "memo": "", "caseid": None}
+            # print("CASE TAG", e.tag, "CASE NAME", e.get("name"), "GUID", e.get("guid"))  # tmp
+            item = {"name": e.get("name"), "guid": e.get("guid"), "owner": self.app.settings['codername'], "memo": "",
+                    "caseid": None}
 
             # Quirkos, MAXQDA: Cases have no name attribute
             if item['name'] is None:
@@ -606,15 +608,15 @@ class RefiImport():
                 d_elements = e.getchildren()
                 item['memo'] = ""
                 for d in d_elements:
-                    #print("Memo ", d.tag)
+                    # print("Memo ", d.tag)
                     if d.tag == "{urn:QDA-XML:project:1:0}Description":
-                        #print("case memo")
+                        # print("case memo")
                         item['memo'] = d.text
 
                 # Enter Case into sqlite and keep a copy in  a list
                 try:
-                    cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)"
-                        ,(item['name'], item['memo'], item['owner'], now_date))
+                    cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)",
+                                (item['name'], item['memo'], item['owner'], now_date))
                     self.app.conn.commit()
                     cur.execute("select last_insert_rowid()")
                     item['caseid'] = cur.fetchone()[0]
@@ -624,18 +626,9 @@ class RefiImport():
                     self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e))
                     logger.error("item:" + str(item) + ", " + str(e))
 
-                #TODO revise after further testing
-                '''# Create an empty attribute entry for each Case and variable in the attributes table
-                sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-                for v in self.variables:
-                    print(v)  # tmp
-                    if v['caseOrFile'] == 'case':
-                        cur.execute(sql, (v['name'], "", item['caseid'], 'case', now_date, self.app.settings['codername']))
-                        self.app.conn.commit()'''
-
                 # Use case_vars to update attribute-type from 'file' to 'case'
                 case_vars = []
-                # look for VariableValue tag, extract and enter into
+                # Look for VariableValue tag, extract and enter into attribute table
                 for vv in d_elements:
                     guid = None
                     value = None
@@ -644,30 +637,31 @@ class RefiImport():
                             if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
                                 guid = v_element.get("targetGUID")
                                 case_vars.append(guid)
-                            if v_element.tag in ("{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
-                            "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                            "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                            if v_element.tag in (
+                                    "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
+                                    "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                                    "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
                                 value = v_element.text
-                        #print(item, guid, value)  # tmp
+                        # print(item, guid, value)  # tmp
                         # Get attribute name by linking guids
                         attr_name = ""
                         for attr in self.variables:
                             if attr['guid'] == guid:
                                 attr_name = attr['name']
                         # Insert into the attribute table
-                        '''sql = "update attribute set value=? where name=? and attr_type='case'and id=?"
-                        cur.execute(sql, (value, attr_name, item['caseid']))'''
                         sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                         cur.execute(sql,
-                            (attr_name, value, item['caseid'], 'case', now_date, self.app.settings['codername']))
+                                    (
+                                        attr_name, value, item['caseid'], 'case', now_date,
+                                        self.app.settings['codername']))
                         self.app.conn.commit()
 
                 # Update attribute_type replace 'file' with 'case'
                 case_vars = list(set(case_vars))
                 sql = "update attribute_type set caseOrFile='case' where attribute_type.name=?"
-                for c in case_vars:
+                for case_var_guid in case_vars:
                     for attr in self.variables:
-                        if attr['guid'] == guid:
+                        if attr['guid'] == case_var_guid:
                             cur.execute(sql, [attr['name']])
                 self.app.conn.commit()
         return count
@@ -687,7 +681,7 @@ class RefiImport():
                 if case['guid'] == code['guid']:
                     cur.execute("delete from code_name where cid=?", (code['cid'],))
                     cur.execute("select ? as 'caseid', fid, pos0,pos1, owner, date, memo from code_text where cid=?",
-                        (case['caseid'], code['cid']))
+                                (case['caseid'], code['cid']))
                     results = cur.fetchall()
                     for c in results:
                         case_texts.append(c)
@@ -717,7 +711,7 @@ class RefiImport():
 
         count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"))
+            # print(e.tag, e.get("name"))
             if e.tag == "{urn:QDA-XML:project:1.0}TextSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
@@ -747,7 +741,6 @@ class RefiImport():
          MAXQDA uses sources, NVIVO uses Sources
          """
 
-        #guid = element.get("guid")
         name = element.get("name")
         creating_user_guid = element.get("creatingUser")
         if creating_user_guid is None:
@@ -759,10 +752,13 @@ class RefiImport():
         create_date = element.get("creationDateTime")
         if create_date is None:
             create_date = element.get("modifiedDateTime")
+        if create_date is None:
+            # This occurs with the plain text representation of a PDF source.
+            create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%SZ")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
-        # path starts with internal:// or relative:// (with<Project basePath or absolute
-        path = element.get("path")
+        # path_ starts with internal:// or relative:// (with<Project basePath or absolute
+        path_ = element.get("path")
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
         self.sources_name = "/Sources"
@@ -772,19 +768,19 @@ class RefiImport():
         # Determine internal or external path
         source_path = ""
         path_type = ""
-        if path is None:
+        if path_ is None:
             source_path = element.get("plainTextPath").split('internal:/')[1]
             source_path = self.folder_name + self.sources_name + source_path
             path_type = "internal"
-        if path is not None and path.find("internal://") == 0:
-            path = element.get("path").split('internal:/')[1]
-            source_path = self.folder_name + self.sources_name + path
+        if path_ is not None and path_.find("internal://") == 0:
+            path_ = element.get("path").split('internal:/')[1]
+            source_path = self.folder_name + self.sources_name + path_
             path_type = "internal"
-        if path is not None and path.find("relative://") == 0:
-            source_path = self.base_path + path.split('relative://')[1]
+        if path_ is not None and path_.find("relative://") == 0:
+            source_path = self.base_path + path_.split('relative://')[1]
             path_type = "relative"
-        if path is not None and path.find("absolute://") == 0:
-            source_path = path.split('absolute://')[1]
+        if path_ is not None and path_.find("absolute://") == 0:
+            source_path = path_.split('absolute://')[1]
             path_type = "absolute"
         return name, creating_user, create_date, source_path, path_type
 
@@ -798,19 +794,22 @@ class RefiImport():
             element: PictureSource element object
          """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
+            element)
+        media_path = "/images/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda images folder and rename into original name
             destination = self.app.project_path + "/images/" + name
             media_path = "/images/" + name
             try:
                 shutil.copyfile(source_path, destination)
-            except Exception as e:
-                self.parent_textEdit.append(_('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as e:
+                self.parent_textEdit.append(
+                    _('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         if path_type == "absolute":
             media_path = "images:" + source_path
         if path_type == "relative":
-            #TODO check this works
+            # TODO check this works
             media_path = "images:" + self.base_path + source_path
             print("relative path", source_path, media_path)
         memo = ""
@@ -819,12 +818,12 @@ class RefiImport():
                 memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, memo, creating_user, create_date, media_path, None))
+                    (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         source = {'name': name, 'id': id_, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
-                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+                  'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
         self.sources.append(source)
         # Parse PictureSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
@@ -845,12 +844,12 @@ class RefiImport():
         </Coding></PictureSelection>
         """
 
-        firstX = int(element.get("firstX"))
-        firstY = int(element.get("firstY"))
-        secondX = int(element.get("secondX"))
-        secondY = int(element.get("secondY"))
-        width = secondX - firstX
-        height = secondY - firstY
+        first_x = int(element.get("firstX"))
+        first_y = int(element.get("firstY"))
+        second_x = int(element.get("secondX"))
+        second_y = int(element.get("secondY"))
+        width = second_x - first_x
+        height = second_y - first_y
         memo = element.get("name")
         create_date = element.get("creationDateTime")
         if create_date is None:
@@ -869,13 +868,13 @@ class RefiImport():
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
                 # Get the code id from the CodeRef guid
                 cid = None
-                codeRef = e.getchildren()[0]
+                code_ref = e.getchildren()[0]
                 for c in self.codes:
-                    if c['guid'] == codeRef.get("targetGUID"):
+                    if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
                 cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,\
-                    date, owner) values(?,?,?,?,?,?,?,?,?)", (id_, firstX, firstY,
-                    width, height, cid, memo, create_date, creating_user))
+                    date, owner) values(?,?,?,?,?,?,?,?,?)", (id_, first_x, first_y,
+                                                              width, height, cid, memo, create_date, creating_user))
                 self.app.conn.commit()
 
     def load_audio_source(self, element):
@@ -888,7 +887,9 @@ class RefiImport():
             element: AudioSource element object
         """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
+            element)
+        media_path = "/audio/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda audio folder and rename into original name
             destination = self.app.project_path + "/audio/" + name
@@ -896,13 +897,14 @@ class RefiImport():
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as e:
-                self.parent_textEdit.append(_('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+                self.parent_textEdit.append(
+                    _('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         if path_type == "absolute":
             media_path = "audio:" + source_path
         if path_type == "relative":
-            #TODO check relative import works
+            # TODO check relative import works
             media_path = "audio:" + self.base_path + source_path
-            #print(source_path, media_path)
+            # print(source_path, media_path)
 
         memo = ""
         for e in element.getchildren():
@@ -910,19 +912,19 @@ class RefiImport():
                 memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, memo, creating_user, create_date, media_path, None))
+                    (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         source = {'name': name, 'id': id_, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
-                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+                  'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
         self.sources.append(source)
 
         no_transcript = True
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
                 no_transcript = False
-                self.parse_transcript_with_codings_and_syncpoints(name, id_, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(name, id_, e)
         if no_transcript:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -930,7 +932,6 @@ class RefiImport():
             cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
                         (txt_name, creating_user, now_date))
             self.app.conn.commit()
-
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
@@ -948,40 +949,43 @@ class RefiImport():
             element: VideoSource element object
         """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
+            element)
+        media_path = "/video/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda video folder and rename into original name
             destination = self.app.project_path + "/video/" + name
             media_path = "/video/" + name
             try:
                 shutil.copyfile(source_path, destination)
-            except Exception as e:
-                self.parent_textEdit.append(_('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as e:
+                self.parent_textEdit.append(
+                    _('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         if path_type == "absolute":
             media_path = "video:" + source_path
         if path_type == "relative":
-            #TODO check relative import works
+            # TODO check relative import works
             media_path = "video:" + self.base_path + source_path
-            #print(source_path, media_path)
+            # print(source_path, media_path)
         memo = ""
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = e.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-            (name, memo, creating_user, create_date, media_path, None))
+                    (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         av_id = cur.fetchone()[0]
         source = {'name': name, 'id': av_id, 'fulltext': "", 'mediapath': media_path, 'memo': memo,
-                 'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
+                  'owner': creating_user, 'date': create_date, 'guid': element.get('guid')}
         self.sources.append(source)
 
         no_transcript = True
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Transcript":
                 no_transcript = False
-                self.parse_transcript_with_codings_and_syncpoints(name, av_id, creating_user, e)
+                self.parse_transcript_with_codings_and_syncpoints(name, av_id, e)
         if no_transcript:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -997,7 +1001,7 @@ class RefiImport():
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, av_id, creating_user)
 
-    def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, creating_user, element):
+    def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, element):
         """ Load the transcript plain text file into source table.
         For now - this file MUST be internal to the project.
         Change transcript filename to match the audio/video name, unless .srt
@@ -1029,16 +1033,15 @@ class RefiImport():
             create_date = element.get("modifiedDateTime")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
-        guid = element.get("guid")
-        #print("guid", element.get("guid"))
+        # guid = element.get("guid")  # Testing
+        # print("guid", element.get("guid"))
 
         # Load the plain text transcript file into project.
         # Presumes the plain text file is internal
-        #TODO rich text path import - UNSURE - IMPORT OR NOT?
-        #rich_text_path = element.get("richTextPath")
-        #print("rtpath", element.get("richTextPath"))
+        # TODO rich text path import - UNSURE - IMPORT OR NOT?
+        # rich_text_path = element.get("richTextPath")
+        # print("rtpath", element.get("richTextPath"))
         plain_text_path = element.get("plainTextPath")
-        path_type = "internal"
         if plain_text_path[0:11] == "internal://":
             plain_text_path = plain_text_path[11:]
         else:
@@ -1055,20 +1058,19 @@ class RefiImport():
         else:
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
-        contents = os.listdir(self.folder_name)
+        # Not Used: contents = os.listdir(self.folder_name)
         source_path = self.folder_name + self.sources_name + plain_text_path
-        #print("Source path: ", source_path)
-        #print("Destination: ", destination)
+        # print("Source path: ", source_path)
+        # print("Destination: ", destination)
         try:
             shutil.copyfile(source_path, destination)
         except Exception as e:
             self.parent_textEdit.append(
                 _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
-
-        # Load transcription text into database with filename matching and suffixed with .transcribed
+        # Load transcription text into database with filename matching and suffixed with .txt
         text = ""
         try:
-            # can get UnicodeDecode Error on Windows so using error handler
+            # Can get UnicodeDecode Error on Windows so using error handler
             with open(destination, "r", encoding="utf-8", errors="backslashreplace") as sourcefile:
                 while 1:
                     line = sourcefile.readline()
@@ -1076,10 +1078,9 @@ class RefiImport():
                         break
                     try:
                         text += line
-                    except Exception as e:
-                        # logger.debug("Importing plain text file, line ignored: " + str(e))
+                    except UnicodeDecodeError:
                         pass
-                if text[0:6] == "\ufeff":  # associated with notepad files
+                if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
         except Exception as e:
             Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec_()
@@ -1089,20 +1090,18 @@ class RefiImport():
             memo = "Name: " + name + "\n"
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
-                if(e.text) is not None:
+                if e.text is not None:
                     memo += e.text
-        if av_name[-12:] != '.transcribed':
-            av_filename = av_name + ".transcribed"
-
+        transcript_filename = av_name + ".txt"
         cur = self.app.conn.cursor()
-        sql = "insert into source (name, fulltext, mediapath, memo, owner, date) values (?,?,?,?,?,?)"
-        cur.execute(sql, [av_filename, text, None, memo, creating_user, create_date])
+        sql = "insert into source (name, fulltext, mediapath, memo, owner, date, av_text_id) values (?,?,?,?,?,?,?)"
+        cur.execute(sql, [transcript_filename, text, None, memo, creating_user, create_date, av_id])
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         fid = cur.fetchone()[0]
 
         # Syncpoints
-        #TODO syncpoints are not stored in QualCoder - unsure how to make use of the timestamps
+        # TODO syncpoints are not stored in QualCoder - unsure how to make use of the timestamps
         # Perhaps add syncpoint timestamps from and to into the code_text table ?
         syncpoints = []
         """ Format:
@@ -1135,7 +1134,7 @@ class RefiImport():
                 guid_pos1 = e.get("toSyncPoint")
                 for s in syncpoints:
                     if guid_pos0 == s['guid']:
-                        #TODO test pos0 and 1 are correct, added 1 for python as String starts from 0
+                        # TODO test pos0 and 1 are correct, added 1 for python as String starts from 0
                         pos0 = int(s['pos']) + 1
                     if guid_pos1 == s['guid']:
                         pos1 = int(s['pos']) + 1
@@ -1145,12 +1144,12 @@ class RefiImport():
                         memo = str(ee.text)
                 for ee in e.getchildren():
                     if ee.tag == "{urn:QDA-XML:project:1.0}Coding":
-                        cid = None
                         code_ref = ee.getchildren()[0]
                         for c in self.codes:
                             if c['guid'] == code_ref.get("targetGUID"):
-                                cid = c['cid']  # String ?
-                                value_list.append([cid, fid, text[pos0:pos1], pos0 , pos1, creating_user, create_date, memo, av_id])
+                                cid = c['cid']
+                                value_list.append(
+                                    [cid, fid, text[pos0:pos1], pos0, pos1, creating_user, create_date, memo, av_id])
         sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo, avid) "
         sql += " values (?,?,?,?,?,?,?,?,?)"
         cur = self.app.conn.cursor()
@@ -1201,13 +1200,13 @@ class RefiImport():
             if e.tag == "{urn:QDA-XML:project:1.0}Coding":
                 # Get the code id from the CodeRef guid
                 cid = None
-                codeRef = e.getchildren()[0]
+                code_ref = e.getchildren()[0]
                 for c in self.codes:
-                    if c['guid'] == codeRef.get("targetGUID"):
+                    if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
                 cur.execute("insert into code_av (id,pos0,pos1,cid,memo,\
                     date, owner) values(?,?,?,?,?,?,?)", (id_, seg_start, seg_end,
-                    cid, memo, create_date, creating_user))
+                                                          cid, memo, create_date, creating_user))
                 self.app.conn.commit()
 
     def load_pdf_source(self, element):
@@ -1218,23 +1217,25 @@ class RefiImport():
             element: PDFSource element object
         """
 
-        #TODO relative
+        # TODO relative path
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
+            element)
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = self.app.project_path + "/documents/" + name
             try:
                 shutil.copyfile(source_path, destination)
-                #print("PDF IMPORT", source_path, destination)
+                # print("PDF IMPORT", source_path, destination)
             except Exception as e:
-                self.parent_textEdit.append(_('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+                self.parent_textEdit.append(
+                    _('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         if path_type == "absolute":
             media_path = "docs:" + source_path
         if path_type == "relative":
-            #TODO check this works
             media_path = "docs:" + self.base_path + source_path
-            #print(source_path, media_path)
+            # print(source_path, media_path)
+        # TODO media_path varaible is not used, dont actually use the PDF document, but keep the PDF in the Documents folder
 
         """ The PDF source contains a text representation:
         <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
@@ -1253,23 +1254,34 @@ class RefiImport():
         </Representation>
         """
         for e in element:
-            if e.tag == "{urn:QDA-XML:project:1.0}Represenation":
-                self.load_text_source(e)
+            if e.tag == "{urn:QDA-XML:project:1.0}Representation":
+                # print("PDF Representation element found")
+                self.load_text_source(e, name, create_date)
+                break
 
-    def load_text_source(self, element):
+    def load_text_source(self, element, pdf_rep_name="", pdf_rep_date=""):
         """ Load this text source into sqlite.
          Add the description and the text codings.
          When testing with Windows Nvivo export: import from docx or txt
-         The text may need an additional line-ending character for Windows \r\n
+         The text may need an additional line-ending character for Windows: \r\n
         Can manage internal and absolute source paths.
 
         Params:
-            element: TextSource element object
+        :name element: TextSource element object
+        :type element: etree element
+        :name pdf_rep_name: Name of the PDF file
+        :type pdf_rep_name: String
+        :name pdf_rep_date: Creation date of the PDF file
+        :type pdf_rep_date: String
          """
 
-        #TODO absolute and relative
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(element)
-
+        # TODO absolute and relative - ?
+        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
+            element)
+        if pdf_rep_name != "":
+            name = pdf_rep_name
+        if pdf_rep_date != "":
+            create_date = pdf_rep_date
         cur = self.app.conn.cursor()
         # find Description to complete memo
         memo = ""
@@ -1277,22 +1289,22 @@ class RefiImport():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = e.text
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
-                 'owner': self.app.settings['codername'], 'date': create_date, 'guid': element.get('guid')}
+                  'owner': self.app.settings['codername'], 'date': create_date, 'guid': element.get('guid')}
 
         # Check plain text file line endings for Windows 2 character \r\n
         add_ending = False
-        with open(source_path,"rb") as f:
+        with open(source_path, "rb") as f:
             while True:
                 c = f.read(1)
                 if not c or c == b'\n':
                     break
                 if c == b'\r':
                     if f.read(1) == b'\n':
-                        #print('rn')
+                        # print('rn')
                         add_ending = True
-                    #print('r')
+                    # print('r')
                     pass
-            #print('n')
+            # print('n')
 
         """Atlas stored correct positions in the project.qde xml
         as though it is \n  - one character
@@ -1307,28 +1319,33 @@ class RefiImport():
                 fulltext = f.read()
                 # Replace fixes mismatched coding with line endings on import from Windows text files.
                 # Due to 2 character line endings
-                #TODO TEST if importing Windows endings on Windows OS that it requires the 2 char line-ending replacement
                 if fulltext is not None and add_ending:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
-                # logger.debug("type fulltext: " + str(type(entry['fulltext'])))
+                # ADding split()
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                    (name, fulltext, source['mediapath'], memo, creating_user, create_date))
+                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo, creating_user, create_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 id_ = cur.fetchone()[0]
                 source['id'] = id_
                 self.sources.append(source)
         except Exception as e:
+            print("Error text source", e)
             self.parent_textEdit.append(_("Cannot read from TextSource: ") + source_path + "\n" + str(e))
 
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
+            print("project path", self.app.project_path)
+            print("name", name) # ISSUE HERE
+            print("source_path", source_path)
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
+            print("destination", destination)
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as e:
-                self.parent_textEdit.append(_('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
+                self.parent_textEdit.append(
+                    _('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
 
         # Parse PlainTextSelection elements for Coding elements
         for e in element.getchildren():
@@ -1359,8 +1376,8 @@ class RefiImport():
         """
 
         value_types = ["{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}TextValue",
-                "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                "{urn:QDA-XML:project:1.0}DateTimeValue", "{urn:QDA-XML:project:1.0}BooleanValue"]
+                       "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}FloatValue",
+                       "{urn:QDA-XML:project:1.0}DateTimeValue", "{urn:QDA-XML:project:1.0}BooleanValue"]
 
         var_name = ""
         value = ""
@@ -1376,7 +1393,7 @@ class RefiImport():
             if var_el.tag in value_types and var_el.text is not None:
                 value = var_el.text
                 value = value.strip()
-        #print("Text attribute:", var_name, " value:",value)  # tmp
+        # print("Text attribute:", var_name, " value:",value)  # tmp
         cur = self.app.conn.cursor()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
         placeholders = [var_name, value, id_, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), creating_user]
@@ -1436,13 +1453,13 @@ class RefiImport():
                 annotation = False
                 # Get the code id from the CodeRef guid
                 cid = None
-                codeRef = e.getchildren()[0]
+                code_ref = e.getchildren()[0]
                 for c in self.codes:
-                    if c['guid'] == codeRef.get("targetGUID"):
+                    if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
                 cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                     memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
-                    seltext, pos0, pos1, creating_user, memo, create_date))
+                                                          seltext, pos0, pos1, creating_user, memo, create_date))
                 self.app.conn.commit()
         if annotation:
             sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
@@ -1478,7 +1495,7 @@ class RefiImport():
         cur = self.app.conn.cursor()
         count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"), e.get("plainTextPath"))
+            # print(e.tag, e.get("name"), e.get("plainTextPath"))
             name = e.get("name")
             create_date = e.get("creationDateTime")
             if create_date is None:
@@ -1503,17 +1520,17 @@ class RefiImport():
 
             # Journal paths starts with internal://
             if e.get("plainTextPath") is not None and not annotation:
-                path = e.get("plainTextPath").split('internal:/')[1]
-                # sources or Sources folder
-                path = self.folder_name + self.sources_name + path
+                path_ = e.get("plainTextPath").split('internal:/')[1]
+                # Folder can be named: sources or Sources
+                path_ = self.folder_name + self.sources_name + path_
                 jentry = ""
                 try:
-                    with open(path) as f:
+                    with open(path_) as f:
                         jentry = f.read()
                 except Exception as err:
-                    self.parent_textEdit.append(_('Trying to read Note element: ') + path + '\n'+ str(err))
+                    self.parent_textEdit.append(_('Trying to read Note element: ') + path_ + '\n' + str(err))
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-                (name, jentry, creating_user, create_date))
+                            (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
             count += 1
         return count
@@ -1549,6 +1566,9 @@ class RefiImport():
             date = date.replace('Z', '')
         else:
             date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        memo = ""
+        pos0 = None
+        pos1 = None
         for el in element:
             if el.tag == "{urn:QDA-XML:project:1.0}PlainTextContent":
                 memo = el.text
@@ -1556,7 +1576,7 @@ class RefiImport():
                 pos0 = el.get("startPosition")
                 pos1 = el.get("endPosition")
         if pos0 is None or pos1 is None or memo is None:
-            #print("None values ", pos0, pos1, memo)
+            # print("None values ", pos0, pos1, memo)
             return
         fid = None
         for s in self.sources:
@@ -1624,11 +1644,11 @@ class RefiImport():
         cur = self.app.conn.cursor()
         try:
             cur.execute(
-                "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
-                , (name, now_date, self.app.settings['codername'], memo, "file", "character"))
+                "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                (name, now_date, self.app.settings['codername'], memo, "file", "character"))
             self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
-        except sqlite3.IntegrityError as e:
+        except sqlite3.IntegrityError:
             Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
             return
 
@@ -1652,7 +1672,7 @@ class RefiImport():
         if memo is None:
             memo = ""
         cur = self.app.conn.cursor()
-        cur.execute("update project set memo = ?", (memo, ))
+        cur.execute("update project set memo = ?", (memo,))
         self.app.conn.commit()
 
     def parse_project_tag(self, element):
@@ -1660,22 +1680,24 @@ class RefiImport():
         Interested in basePath for relative linked sources.
          software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
         self.base_path = element.get("basePath")
-        #print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        # print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
         self.software_name = element.get("origin")
-        #print("SOFTWARE NAME: ", self.software_name)
+        # print("SOFTWARE NAME: ", self.software_name)
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
         There is no user table in QualCoder sqlite.
         Store each user in dictionary with name and guid.
-        :param Users element
+
+        :param element: Users element
+        :type element: xml tag
 
         :return count of users
         """
 
         count = 0
         for e in element.getchildren():
-            #print(e.tag, e.get("name"), e.get("guid"))
+            # print(e.tag, e.get("name"), e.get("guid"))
             self.users.append({"name": e.get("name"), "guid": e.get("guid")})
             count += 1
         return count
@@ -1744,12 +1766,12 @@ class RefiExport(QtWidgets.QDialog):
     tree = None
     export_type = ""
 
-    def __init__(self, app, parent_textEdit, export_type):
-        """  """
+    def __init__(self, app, parent_textedit, export_type):
 
+        super().__init__()
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_textedit
         self.export_type = export_type
         self.xml = ""
         self.get_categories()
@@ -1785,7 +1807,7 @@ class RefiExport(QtWidgets.QDialog):
         prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
         try:
             shutil.rmtree(prep_path)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             pass
         try:
             os.mkdir(prep_path)
@@ -1795,40 +1817,39 @@ class RefiExport(QtWidgets.QDialog):
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
             return
         try:
-            with open(prep_path +'/project.qde', 'w', encoding="utf-8-sig") as f:
+            with open(prep_path + '/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as e:
-            Message(self.app,_("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
             logger.debug(str(e))
             return
 
         add_line_ending_for_maxqda = False
-        add_line_ending_for_atlas = False
         ui = RefiLineEndings(self.app)
         ui.exec_()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
         txt_errors = ""
         for s in self.sources:
-            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
+            # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
             destination = '/Sources/' + s['filename']
             if s['mediapath'] is not None and s['external'] is None:
-                    try:
-                        if s['external'] is None:
-                            shutil.copyfile(self.app.project_path + s['mediapath'],
-                                prep_path + destination)
-                        else:
-                            shutil.copyfile(self.app.project_path + s['mediapath'],
-                                self.app.settings['directory'] + '/' + s['filename'])
-                    except FileNotFoundError as e:
-                        txt_errors += "Error in media export: " + s['filename'] + "\n" + str(e)
-                        print("ERROR in refi.export_project. media export: " + s['filename'])
-                        print(e)
+                try:
+                    if s['external'] is None:
+                        shutil.copyfile(self.app.project_path + s['mediapath'],
+                                        prep_path + destination)
+                    else:
+                        shutil.copyfile(self.app.project_path + s['mediapath'],
+                                        self.app.settings['directory'] + '/' + s['filename'])
+                except FileNotFoundError as e:
+                    txt_errors += "Error in media export: " + s['filename'] + "\n" + str(e)
+                    print("ERROR in refi.export_project. media export: " + s['filename'])
+                    print(e)
             if s['mediapath'] is None:  # an internal document
                 try:
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
-                        prep_path + destination)
-                except FileNotFoundError as e:
+                                    prep_path + destination)
+                except FileNotFoundError:
                     with open(prep_path + destination, 'w', encoding="utf-8-sig") as f:
                         f.write(s['fulltext'])
             # Also need to export a plain text file as a source
@@ -1883,7 +1904,8 @@ class RefiExport(QtWidgets.QDialog):
         filename = "Codebook-" + self.app.project_name[:-4] + ".qdc"
         options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
+                                                               _("Select directory to save file"),
+                                                               self.app.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
@@ -1916,7 +1938,8 @@ class RefiExport(QtWidgets.QDialog):
                 return c['guid']
         return ""
 
-    def convert_xml_predefined_entities(self, text):
+    @staticmethod
+    def convert_xml_predefined_entities(text):
         """ Helper function to convert predefiend xml entnties " ' < > &
         into numeric equivalents #nnn;
         Also convert None type into ""
@@ -1952,13 +1975,14 @@ class RefiExport(QtWidgets.QDialog):
         cur.execute("select date from project")
         result = cur.fetchone()
         self.xml += 'creationDateTime="' + self.convert_timestamp(result[0]) + '" '
-        #self.xml += 'basePath="' + self.app.settings['directory'] + '" '
+        # self.xml += 'basePath="' + self.app.settings['directory'] + '" '
         self.xml += 'xmlns="urn:QDA-XML:project:1.0"'
         self.xml += '>\n'
         # add users
         self.xml += "<Users>\n"
         for row in self.users:
-            self.xml += '<User guid="' + row['guid'] + '" name="' + self.convert_xml_predefined_entities(row['name']) + '" />\n'
+            self.xml += '<User guid="' + row['guid'] + '" name="' + self.convert_xml_predefined_entities(
+                row['name']) + '" />\n'
         self.xml += "</Users>\n"
         self.xml += self.codebook_xml()
         self.xml += self.variables_xml()
@@ -2029,11 +2053,11 @@ class RefiExport(QtWidgets.QDialog):
        <Description></Description>
        </Note>
 
-        :param guid
-        :param journal[1] the text of the journal entry
-        :param journal[3] user is the user who created the entry
-        :param journal[2] datetime is the creation datetime of the entry
-        :param journal[0] name is the name of the journal entry
+        :param journal: [0] name is the name of the journal entry
+        [1] the text of the journal entry
+        [2] the creation datetime of the entry
+        [3] user is the user who created the entry
+        :type journal: List
 
         :returns a guid for a NoteRef
         """
@@ -2045,7 +2069,7 @@ class RefiExport(QtWidgets.QDialog):
         xml += 'name="' + self.convert_xml_predefined_entities(journal[0]) + '" '
         xml += ' plainTextPath="internal://' + guid + '.txt" '
         xml += '>\n'
-        #xml += '<PlainTextContent>' + text + '</PlainTextContent>\n'
+        # xml += '<PlainTextContent>' + text + '</PlainTextContent>\n'
         # Add blank Description tag for the journal entry, as these are not memoed
         xml += '<Description />'
         xml += '</Note>\n'
@@ -2156,7 +2180,7 @@ class RefiExport(QtWidgets.QDialog):
         xml = ""
         cur = self.app.conn.cursor()
         sql = "select attribute.name, value from attribute where attr_type='case' and id=?"
-        cur.execute(sql, (caseid, ))
+        cur.execute(sql, (caseid,))
         attributes = cur.fetchall()
         for a in attributes:
             xml += '<VariableValue>\n'
@@ -2165,7 +2189,7 @@ class RefiExport(QtWidgets.QDialog):
             for v in self.variables:
                 if v['name'] == a[0]:
                     guid = v['guid']
-                    var_type == v['type']
+                    var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
             if var_type == 'numeric':
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
@@ -2185,7 +2209,7 @@ class RefiExport(QtWidgets.QDialog):
 
         xml = ''
         cur = self.app.conn.cursor()
-        cur.execute("select fid, owner, date from case_text where caseid=? and pos0=0 and pos1=0", [caseid,])
+        cur.execute("select fid, owner, date from case_text where caseid=? and pos0=0 and pos1=0", [caseid, ])
         result = cur.fetchall()
         if result == []:
             return xml
@@ -2206,7 +2230,8 @@ class RefiExport(QtWidgets.QDialog):
         <TextValue>20-29</TextValue>
         </VariableValue>
 
-        :param caseid Integer
+        :param sourceid:
+        :type sourceid: Integer
 
         :returns xml String for case variables
         """
@@ -2214,7 +2239,7 @@ class RefiExport(QtWidgets.QDialog):
         xml = ""
         cur = self.app.conn.cursor()
         sql = "select attribute.name, value from attribute where attr_type='file' and id=?"
-        cur.execute(sql, (sourceid, ))
+        cur.execute(sql, (sourceid,))
         attributes = cur.fetchall()
         for a in attributes:
             xml += '<VariableValue>\n'
@@ -2223,7 +2248,7 @@ class RefiExport(QtWidgets.QDialog):
             for v in self.variables:
                 if v['name'] == a[0]:
                     guid = v['guid']
-                    var_type == v['type']
+                    var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
             if var_type == 'numeric':
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
@@ -2278,13 +2303,14 @@ class RefiExport(QtWidgets.QDialog):
         :returns xml String
         """
 
-        #TODO after Coding: NoteRef and VariableValue for each Source element
+        # TODO after Coding: NoteRef and VariableValue for each Source element
         xml = "<Sources>\n"
         for s in self.sources:
             guid = self.create_guid()
             # Text document
             if (s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
-                (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
+                    (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (
+                            s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
                 xml += '<TextSource '
                 if s['external'] is None:
                     # Internal filename is a guid identifier
@@ -2305,12 +2331,13 @@ class RefiExport(QtWidgets.QDialog):
                 for a in self.annotations:
                     if a['fid'] == s['id']:
                         a['NoteRef_guid'] = self.create_guid()
-                        xml += '<NoteRef targetGUID="'+ a['NoteRef_guid'] + '" />\n'
+                        xml += '<NoteRef targetGUID="' + a['NoteRef_guid'] + '" />\n'
                         break
                 xml += '</TextSource>\n'
             # PDF document
             if (s['mediapath'] is None and s['name'][-4:].lower() == '.pdf') or \
-                (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][-4:].lower() == '.pdf') :
+                    (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and s['name'][
+                                                                                       -4:].lower() == '.pdf'):
                 xml += '<PDFSource '
                 if s['external'] is None:
                     # Internal filename is a guid identifier
@@ -2384,7 +2411,7 @@ class RefiExport(QtWidgets.QDialog):
                     print("plaintext internal", s['plaintext_filename'])
                     xml += 'path="internal://' + self.convert_xml_predefined_entities(s['filename']) + '" '
                 else:
-                    xml +='path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
+                    xml += 'path="absolute://' + self.convert_xml_predefined_entities(s['external']) + '" '
                 xml += 'guid="' + guid + '" '
                 xml += 'name="' + self.convert_xml_predefined_entities(s['name']) + '" >\n'
                 memo = self.convert_xml_predefined_entities(self.code_guid(s['memo']))
@@ -2533,7 +2560,6 @@ class RefiExport(QtWidgets.QDialog):
         :returns xml String
         """
 
-
         xml = ""
         for t in self.sources:
             if t['name'] == source['name'] + '.transcribed':
@@ -2585,7 +2611,7 @@ class RefiExport(QtWidgets.QDialog):
         cur.execute(sql, [media['id'], ])
         results = cur.fetchall()
         for coded in results:
-            #print(coded)
+            # print(coded)
             xml += '<TranscriptSelection guid="' + self.create_guid() + '" '
             xml += 'name="' + self.convert_xml_predefined_entities(media['name']) + '" '
             xml += 'fromSyncPoint="'
@@ -2619,8 +2645,8 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         tps = self.get_transcript_timepoints(media)  # ordered list of charpos, msecs
-        #print("TIME POINTS", len(tps))
-        #print(tps)
+        # print("TIME POINTS", len(tps))
+        # print(tps)
 
         sql = "select pos0,pos1,cid,owner, date, memo from code_text where fid=? order by pos0"
         cur = self.app.conn.cursor()
@@ -2654,9 +2680,9 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'timeStamp="' + str(msecs) + '" />\n'
             sync_list.append([guid, xml, r[1]])
 
-        #TODO might have multiples of the same char position and msecs, trim back?
-        #print("SYNC_LIST", len(sync_list))
-        #print(sync_list)  # tmp
+        # TODO might have multiples of the same char position and msecs, trim back?
+        # print("SYNC_LIST", len(sync_list))
+        # print(sync_list)  # tmp
         return sync_list
 
     def get_transcript_timepoints(self, media):
@@ -2671,7 +2697,8 @@ class RefiExport(QtWidgets.QDialog):
         <SyncPoint guid="c32d0ae1‐7f16‐4bbe‐93a1‐537e2dc0fb66"
         position="94" timeStamp="45000" />
 
-        :param text String
+        :param media:
+        :type media: Dictionary
 
         :return list of time points as [character position, milliseconds]
         """
@@ -2695,7 +2722,7 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(s[0]) * 60 + int(s[1])) * 1000
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
         for match in re.finditer(hhmmss1, text):
             stamp = match.group()[1:-1]
@@ -2703,7 +2730,7 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
         for match in re.finditer(mmss2, text):
             stamp = match.group()[1:-1]
@@ -2711,7 +2738,7 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(s[0]) * 60 + int(s[1])) * 1000
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
         for match in re.finditer(hhmmss2, text):
             stamp = match.group()[1:-1]
@@ -2719,7 +2746,7 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s[2])) * 1000
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
         for match in re.finditer(hhmmss_sss, text):
             # Format #00:12:34.567#
@@ -2735,7 +2762,7 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(text_hms[0]) * 3600 + int(text_hms[1]) * 60 + int(text_secs)) * 1000 + int(text_msecs)
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
         for match in re.finditer(srt, text):
             # Format 09:33:04,100 --> 09:33:09,600  skip the arrow and second time position
@@ -2745,13 +2772,13 @@ class RefiExport(QtWidgets.QDialog):
             try:
                 msecs = (int(s[0]) * 3600 + int(s[1]) * 60 + int(s2[0])) * 1000 + int(s2[1])
                 time_pos.append([match.span()[0], msecs])
-            except:
+            except KeyError:
                 pass
 
         media_length = 0
         cur = self.app.conn.cursor()
         media_name = media['name'][0:-12]
-        cur.execute("select mediapath from source where name=?", (media_name, ))
+        cur.execute("select mediapath from source where name=?", (media_name,))
         media_path_list = cur.fetchone()
         try:
             instance = vlc.Instance()
@@ -2762,14 +2789,15 @@ class RefiExport(QtWidgets.QDialog):
                 media_length = 0
         except Exception as e:
             QtWidgets.QMessageBox.warning(None, _("Media not found"),
-                str(e) + "\n" + media_name)
+                                          str(e) + "\n" + media_name)
         time_pos.append([len(text) - 1, media_length])
 
-        # order the list by character positions
+        # Order the list by character positions
         time_pos = sorted(time_pos, key=itemgetter(0))
         return time_pos
 
-    def convert_timestamp(self, time_in):
+    @staticmethod
+    def convert_timestamp(time_in):
         """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ
         I have found one instance of an underscore where the space should be. """
 
@@ -2811,14 +2839,14 @@ class RefiExport(QtWidgets.QDialog):
             if r[2] is not None:
                 plaintext_filename = self.create_guid() + ".txt"
             source = {'id': r[0], 'name': r[1], 'fulltext': r[2], 'mediapath': r[3],
-            'memo': r[4], 'owner': r[5], 'date': r[6], 'guid': guid,
-            'filename': filename, 'plaintext_filename': plaintext_filename,
-            'external': None}
+                      'memo': r[4], 'owner': r[5], 'date': r[6], 'guid': guid,
+                      'filename': filename, 'plaintext_filename': plaintext_filename,
+                      'external': None}
             # external is an absolute path
             # Make it so that no media > 2Gb is able to be imported internally into the project
             if source['mediapath'] is not None:
-                #fileinfo = os.stat(self.app.project_path + source['mediapath'])
-                #f fileinfo.st_size >= 2147483647:
+                # fileinfo = os.stat(self.app.project_path + source['mediapath'])
+                # f fileinfo.st_size >= 2147483647:
                 if source['mediapath'][0:5] == 'docs:':
                     source['external'] = source['mediapath'][5:]
                 if source['mediapath'][0:7] == 'images:':
@@ -2832,7 +2860,7 @@ class RefiExport(QtWidgets.QDialog):
         QualCoder sqlite does not actually keep a separate list of users.
         Usernames are drawn from coded text, images and a/v."""
 
-        self. users = []
+        self.users = []
         sql = "select distinct owner from code_image union select owner from code_text union \
         select owner from source union select owner from code_av"
         cur = self.app.conn.cursor()
@@ -2850,7 +2878,7 @@ class RefiExport(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
-                'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
+                 'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
             xml = '<Code guid="' + c['guid']
             xml += '" name="' + self.convert_xml_predefined_entities(c['name'])
             xml += '" isCodable="true'
@@ -2876,8 +2904,8 @@ class RefiExport(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
-            'date': row[3].replace(' ', 'T'), 'memo': row[4], 'supercatid': row[5],
-            'guid': self.create_guid(), 'examine': True})
+                                    'date': row[3].replace(' ', 'T'), 'memo': row[4], 'supercatid': row[5],
+                                    'guid': self.create_guid(), 'examine': True})
 
     def codebook_xml(self):
         """ Top level items are main categories and unlinked codes
@@ -2895,9 +2923,9 @@ class RefiExport(QtWidgets.QDialog):
         cats = copy(self.categories)
 
         # Add unlinked codes as top level items
-        for c in self.codes:
-            if c['catid'] is None:
-                xml += c['xml']
+        for code_ in self.codes:
+            if code_['catid'] is None:
+                xml += code_['xml']
         # Add top level categories
         for ca in cats:
             if ca['supercatid'] is None and ca['examine']:
@@ -2910,10 +2938,10 @@ class RefiExport(QtWidgets.QDialog):
                 if memo != "":
                     xml += '<Description>' + memo + '</Description>\n'
                 # Add codes in this category
-                for co in self.codes:
-                    if co['catid'] == ca['catid']:
-                        xml += co['xml']
-                xml += self.add_sub_categories(c['catid'], cats)
+                for code_ in self.codes:
+                    if code_['catid'] == ca['catid']:
+                        xml += code_['xml']
+                xml += self.add_sub_categories(ca['catid'], cats)
                 xml += '</Code>\n'
         xml += '</Codes>\n'
         xml += '</CodeBook>\n'
@@ -3022,6 +3050,3 @@ class RefiExport(QtWidgets.QDialog):
         except AssertionError as err:
             print("Incorrect XML schema: {0}".format(err))
             return False
-
-
-

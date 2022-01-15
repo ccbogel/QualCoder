@@ -797,7 +797,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
-        # self.ui.actionCoding_reports.setShortcut('Ctrl+R') Affects code AV function
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCoding_comparison_by_file.triggered.connect(self.report_compare_coders_by_file)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
@@ -935,8 +934,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionProject_Exchange_Export.setEnabled(True)
         self.ui.actionREFI_Codebook_export.setEnabled(True)
         self.ui.actionREFI_Codebook_import.setEnabled(True)
-        self.ui.actionREFI_QDA_Project_import.setEnabled(False)
-        self.ui.actionRQDA_Project_import.setEnabled(False)
+        self.ui.actionREFI_QDA_Project_import.setEnabled(True)
+        self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
