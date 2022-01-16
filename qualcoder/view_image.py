@@ -45,6 +45,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
+from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import Message, DialogCodeInAllFiles
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -650,7 +651,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     c.fill_tree()
 
     def redraw_scene(self):
-        """ Resize image. Triggered by user change in slider.
+        """ Resize image. Triggered by user change in slider. Or resize or move of a coded area.
         Also called by unmark, as all items need to be redrawn. """
 
         if self.pixmap is None:
@@ -793,7 +794,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         DialogCodeInAllFiles(self.app, code_dict)
 
     def move_code(self, selected):
-        """ Move code to another category or to no category.
+        """ Move code to another category or to no category in the tree.
         Uses a list selection.
         param:
             selected : QTreeWidgetItem
@@ -933,6 +934,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo'))
         action_unmark = menu.addAction(_('Unmark'))
+        action_move_resize = menu.addAction(_("Move or resize"))
         action_important = None
         if item['important'] is None or item['important'] != 1:
             action_important = menu.addAction(_("Add important mark"))
@@ -957,11 +959,59 @@ class DialogCodeImage(QtWidgets.QDialog):
         if action == action_not_important:
             self.set_coded_importance(item, False)
             return
+        if action == action_move_resize:
+            self.move_or_resize_coding(item)
+
+    def move_or_resize_coding(self, item):
+        """ Move or resize a coding rectangle, in pixels
+
+        params:
+        :name item: Details of the coded image rectangle
+        :type item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
+        """
+
+        ui = DialogMoveResizeRectangle(self.app)
+        ui.exec_()
+        item['x1'] += ui.move_x
+        if item['x1'] < 0:
+            item['x1'] = 0
+        # x is past the image size, so resize to 10 wide and 11 back from image x edge
+        if item['x1'] + 11 > self.pixmap.width():
+            item['x1'] = self.pixmap.width() - 11
+            item['width'] = 10
+        item['y1'] += ui.move_y
+        if item['y1'] < 0:
+            item['y1'] = 0
+        # y is past the image size, so resize to 10 wide and 11 back from image y edge
+        if item['y1'] + 11 > self.pixmap.height():
+            item['y1'] = self.pixmap.height() - 11
+            item['height'] = 10
+        item['width'] += ui.resize_x
+        if item['width'] < 10:
+            item['width'] = 10
+        if item['x1'] + item['width'] > self.pixmap.width():
+            overreach = item['x1'] + item['width'] - self.pixmap.width()
+            item['width'] -= overreach + 1
+        item['height'] += ui.resize_y
+        if item['height'] < 10:
+            item['height'] = 10
+        if item['y1'] + item['height'] > self.pixmap.height():
+            overreach = item['y1'] + item['height'] - self.pixmap.height()
+            item['height'] -= overreach + 1
+
+        cur = self.app.conn.cursor()
+        cur.execute("update code_image set x1=?,y1=?,width=?,height=? where imid=?",
+            (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
+        self.app.conn.commit()
+        self.redraw_scene()
+        self.fill_coded_area_label(item)
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for this coder.
 
-        param: pos
+        params:
+        :name pos:
+        :type pos:
         returns: None or coded item
         """
 
@@ -1092,11 +1142,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                     self.selection = None
                     return
 
-        x_unscaled = x / self.scale
-        y_unscaled = y / self.scale
-        width_unscaled = width / self.scale
-        height_unscaled = height / self.scale
-        if width_unscaled == 0 or height_unscaled == 0:
+        x_unscaled = round(x / self.scale)
+        y_unscaled = round(y / self.scale)
+        width_unscaled = round(width / self.scale)
+        height_unscaled = round(height / self.scale)
+        if width_unscaled < 10 or height_unscaled < 10:
             return
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
                 'width': width_unscaled, 'height': height_unscaled, 'owner': self.app.settings['codername'],
