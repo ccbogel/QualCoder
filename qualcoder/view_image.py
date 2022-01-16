@@ -287,17 +287,15 @@ class DialogCodeImage(QtWidgets.QDialog):
         """
 
         pm = QtGui.QPixmap()
-        if self.attributes:
+        ui = DialogSelectAttributeParameters(self.app, "file")
+        ui.fill_parameters(self.attributes)
+        ok = ui.exec_()
+        if not ok:
             self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
-            return
-        ui = DialogSelectAttributeParameters(self.app, "file")
-        ok = ui.exec_()
-        if not ok:
-            self.attributes = []
             return
         self.attributes = ui.parameters
         if not self.attributes:

@@ -95,7 +95,7 @@ class DialogCodeText(QtWidgets.QWidget):
     file_ = None  # contains filename and file id returned from SelectItems
     code_text = []
     annotations = []
-    undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at hte same time, so a list
+    undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
     # Overlapping coded text details
     overlaps_at_pos = []
     overlaps_at_pos_idx = 0
@@ -446,17 +446,15 @@ class DialogCodeText(QtWidgets.QWidget):
         """
 
         pm = QtGui.QPixmap()
-        if self.attributes:
+        ui = DialogSelectAttributeParameters(self.app, "file")
+        ui.fill_parameters(self.attributes)
+        ok = ui.exec_()
+        if not ok:
             self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
             self.get_files()
-            return
-        ui = DialogSelectAttributeParameters(self.app, "file")
-        ok = ui.exec_()
-        if not ok:
-            self.attributes = []
             return
         self.attributes = ui.parameters
         if not self.attributes:
