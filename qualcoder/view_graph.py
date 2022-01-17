@@ -100,7 +100,7 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.pressed.connect(self.export_image)
 
-        # set the scene
+        # Set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
@@ -379,7 +379,6 @@ class ViewGraph(QDialog):
         super(ViewGraph, self).accept()
 
 
-# http://stackoverflow.com/questions/17891613/pyqt-mouse-events-for-qgraphicsview
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
@@ -450,13 +449,10 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     def suggested_scene_size(self):
         """ Calculate the maximum width and height from the current Text Items. """
 
-        min_x = 0
-        min_y = 0
         max_x = 0
         max_y = 0
         for i in self.items():
             if isinstance(i, TextGraphicsItem):
-                #print(i.code_or_cat, i.pos().x(), i.pos().y(), "r.w", i.boundingRect().width(), "r.h", i.boundingRect().height())
                 if i.pos().x() + i.boundingRect().width() > max_x:
                     max_x = i.pos().x() + i.boundingRect().width()
                 if i.pos().y() + i.boundingRect().height() > max_y:
@@ -467,7 +463,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
     Categories are typically shown white, and category font sizes can be enlarged using a
-    checkbox and code colours can be ignores using a check box. A custom context menu
+    checkbox and code colours can be ignored using a check box. A custom context menu
     allows selection of a code/category memo an displaying the information.
     """
 
