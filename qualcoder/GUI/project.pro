@@ -10,6 +10,7 @@ ui_dialog_code_relations.py \
 ui_dialog_code_text.py \
 ui_dialog_colour_selector.py \
 ui_dialog_confirm_delete.py \
+ui_dialog_graph.py \
 ui_dialog_import.py \
 ui_dialog_information.py \
 ui_dialog_journals.py \
@@ -37,8 +38,7 @@ ui_main.py \
 ui_queryDetails.py \
 ui_report_attribute_parameters.py \
 ui_save_query.py \
-ui_special_functions.py \
-ui_visualise_graph_original.py
+ui_special_functions.py
 TRANSLATIONS    = app_de.ts \
                   app_es.ts \
                   app_fr.ts \
