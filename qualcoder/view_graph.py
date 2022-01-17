@@ -38,6 +38,7 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 
 from .color_selector import TextColor
+from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
 from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
@@ -51,13 +52,13 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
+    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(txt)
+    logger.error(_("Uncaught exception: ") + txt)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
+    mb.setText(txt)
     mb.exec_()
 
 
@@ -90,10 +91,15 @@ class ViewGraph(QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        fsize_list = []
+        font_size_list = []
         for i in range(8, 22, 2):
-            fsize_list.append(str(i))
-        self.ui.comboBox_fontsize.addItems(fsize_list)
+            font_size_list.append(str(i))
+        self.ui.comboBox_fontsize.addItems(font_size_list)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.pressed.connect(self.export_image)
+
         # set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
@@ -116,31 +122,36 @@ class ViewGraph(QDialog):
         else:
             self.circular_graph()
 
-    def contextMenuEvent(self, event):
+    '''def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         action_export_image = menu.addAction(_("Export image"))
         menu.addAction(action_export_image)
         action = menu.exec_(event.globalPos())
         if action == action_export_image:
             self.export_image()
-            return
+            return'''
 
     def export_image(self):
-        """ Export the QGraphicsScene as a png image. """
+        """ Export the QGraphicsScene as a png image with transparent background.
+        Called by QButton.
+        """
 
         filename = "Graph.png"
         e_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = e_dir.filepath
         if filepath is None:
-            print("No file path?")
             return
         # print("supported formats:", QtGui.QImageWriter.supportedImageFormats())
         # Scene size is too big.
-
-        image = QtGui.QImage(int(self.scene.width()), int(self.scene.height()), QtGui.QImage.Format_ARGB32_Premultiplied)
+        max_x, max_y = self.scene.suggested_scene_size()
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
+        image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format_ARGB32_Premultiplied)
+        # image = QtGui.QImage(int(self.scene.width()), int(self.scene.height()), QtGui.QImage.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.scene.render(painter)
+        # self.scene.render(painter)
+        # render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
         painter.end()
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec_()
@@ -436,6 +447,22 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 item.redraw()
         self.update(self.sceneRect())"""
 
+    def suggested_scene_size(self):
+        """ Calculate the maximum width and height from the current Text Items. """
+
+        min_x = 0
+        min_y = 0
+        max_x = 0
+        max_y = 0
+        for i in self.items():
+            if isinstance(i, TextGraphicsItem):
+                #print(i.code_or_cat, i.pos().x(), i.pos().y(), "r.w", i.boundingRect().width(), "r.h", i.boundingRect().height())
+                if i.pos().x() + i.boundingRect().width() > max_x:
+                    max_x = i.pos().x() + i.boundingRect().width()
+                if i.pos().y() + i.boundingRect().height() > max_y:
+                    max_y = i.pos().y() + i.boundingRect().height()
+        return max_x, max_y
+
 
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
@@ -652,4 +679,3 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
-
