@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog_visualiseGraph_original</class>
- <widget class="QDialog" name="Dialog_visualiseGraph_original">
+ <class>DialogGraph</class>
+ <widget class="QDialog" name="DialogGraph">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -107,6 +107,22 @@
       </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export image</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

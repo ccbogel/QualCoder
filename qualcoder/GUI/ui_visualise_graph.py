@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_visualise_graph_original.ui'
+# Form implementation generated from reading ui file 'ui_visualise_graph.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
@@ -43,6 +43,10 @@ class Ui_Dialog_visualiseGraph_original(object):
         self.graphicsView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.graphicsView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.graphicsView.setObjectName("graphicsView")
+        self.pushButton_export = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_export.setGeometry(QtCore.QRect(860, 0, 28, 28))
+        self.pushButton_export.setText("")
+        self.pushButton_export.setObjectName("pushButton_export")
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog_visualiseGraph_original)
@@ -57,6 +61,7 @@ class Ui_Dialog_visualiseGraph_original(object):
         self.checkBox_blackandwhite.setText(_translate("Dialog_visualiseGraph_original", "Black and white"))
         self.checkBox_listview.setText(_translate("Dialog_visualiseGraph_original", "List view"))
         self.label.setText(_translate("Dialog_visualiseGraph_original", "Font size"))
+        self.pushButton_export.setToolTip(_translate("Dialog_visualiseGraph_original", "Export image"))
 
 
 if __name__ == "__main__":

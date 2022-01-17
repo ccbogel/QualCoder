@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,9 +38,9 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QDialog
 
 from .color_selector import TextColor
-from .GUI.ui_visualise_graph_original import Ui_Dialog_visualiseGraph_original
-from .helpers import msecs_to_mins_and_secs, DialogCodeInAllFiles
-from .information import DialogInformation
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_graph import Ui_DialogGraph
+from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 
 
@@ -52,17 +52,17 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
+    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(txt)
+    logger.error(_("Uncaught exception: ") + txt)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
+    mb.setText(txt)
     mb.exec_()
 
 
-class ViewGraphOriginal(QDialog):
+class ViewGraph(QDialog):
     """ Dialog to view code and categories in an acyclic graph. Provides options for
     colors and amount of nodes to display (based on category selection).
     """
@@ -71,8 +71,10 @@ class ViewGraphOriginal(QDialog):
 
     conn = None
     settings = None
+    scene = None
     categories = []
     code_names = []
+    dialog_list = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -83,16 +85,21 @@ class ViewGraphOriginal(QDialog):
         self.settings = app.settings
         self.conn = app.conn
         # Set up the user interface from Designer.
-        self.ui = Ui_Dialog_visualiseGraph_original()
+        self.ui = Ui_DialogGraph()
         self.ui.setupUi(self)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        fsize_list = []
+        font_size_list = []
         for i in range(8, 22, 2):
-            fsize_list.append(str(i))
-        self.ui.comboBox_fontsize.addItems(fsize_list)
+            font_size_list.append(str(i))
+        self.ui.comboBox_fontsize.addItems(font_size_list)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.pressed.connect(self.export_image)
+
         # set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
@@ -115,15 +122,44 @@ class ViewGraphOriginal(QDialog):
         else:
             self.circular_graph()
 
-    """def contextMenuEvent(self, event):
+    '''def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        menu.addAction('sample')
-        menu.exec_(event.globalPos())"""
+        action_export_image = menu.addAction(_("Export image"))
+        menu.addAction(action_export_image)
+        action = menu.exec_(event.globalPos())
+        if action == action_export_image:
+            self.export_image()
+            return'''
+
+    def export_image(self):
+        """ Export the QGraphicsScene as a png image with transparent background.
+        Called by QButton.
+        """
+
+        filename = "Graph.png"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
+            return
+        # print("supported formats:", QtGui.QImageWriter.supportedImageFormats())
+        # Scene size is too big.
+        max_x, max_y = self.scene.suggested_scene_size()
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
+        image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format_ARGB32_Premultiplied)
+        # image = QtGui.QImage(int(self.scene.width()), int(self.scene.height()), QtGui.QImage.Format_ARGB32_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        # self.scene.render(painter)
+        # render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
+        painter.end()
+        image.save(filepath)
+        Message(self.app, _("Image exported"), filepath).exec_()
 
     def create_initial_model(self):
-        """ Create inital model
+        """ Create initial model
 
-        return: categories, oces, model  """
+        return: categories, codes, model  """
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.code_names)
@@ -171,7 +207,6 @@ class ViewGraphOriginal(QDialog):
         Also determine the number of children for each catid. '''
         supercatid_list = []
         for c in model:
-            supercatid = 0
             depth = 0
             supercatid = c['supercatid']
             supercatid_list.append(c['supercatid'])
@@ -221,15 +256,15 @@ class ViewGraphOriginal(QDialog):
         model = ordered_model
 
         # expand scene width and height if needed
-        max_x = self.scene.getWidth()
-        max_y = self.scene.getHeight()
+        max_x = self.scene.get_width()
+        max_y = self.scene.get_height()
         for m in model:
-             if m['x'] > max_x - 50:
-                 max_x = m['x'] + 50
-             if m['y'] > max_y - 20:
-                 max_y = m['y'] + 40
-        self.scene.setWidth(max_x)
-        self.scene.setHeight(max_y)
+            if m['x'] > max_x - 50:
+                max_x = m['x'] + 50
+            if m['y'] > max_y - 20:
+                max_y = m['y'] + 40
+        self.scene.set_width(max_x)
+        self.scene.set_height(max_y)
 
         # Add text items to the scene
         for m in model:
@@ -238,8 +273,9 @@ class ViewGraphOriginal(QDialog):
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
+                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
+                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
+                            n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n, True)  # corners only = True
                         self.scene.addItem(item)
 
@@ -253,7 +289,6 @@ class ViewGraphOriginal(QDialog):
 
         # assign angles to each item segment
         for cat_key in catid_counts.keys():
-            #logger.debug("cat_key:" + cat_key + "", catid_counts[cat_key]:" + str(catid_counts[cat_key]))
             segment = 1
             for m in model:
                 if m['angle'] is None and m['supercatid'] == cat_key:
@@ -263,10 +298,10 @@ class ViewGraphOriginal(QDialog):
         The 'central' x value is towards the left side rather than true center, because
         the text boxes will draw to the right-hand side.
         '''
-        c_x = self.scene.getWidth() / 3
-        c_y = self.scene.getHeight() / 2
+        c_x = self.scene.get_width() / 3
+        c_y = self.scene.get_height() / 2
         r = 220
-        rx_expander = c_x / c_y  # screen is landscape, so stretch x position
+        rx_expander = c_x / c_y  # Screen is landscape, so stretch x position
         x_is_none = True
         i = 0
         while x_is_none and i < 1000:
@@ -305,8 +340,9 @@ class ViewGraphOriginal(QDialog):
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        #item = QtWidgets.QGraphicsLineItem(m['x'], m['y'], super_m['x'], super_m['y'])  # xy xy
+                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
+                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
+                            n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n)
                         self.scene.addItem(item)
 
@@ -335,12 +371,12 @@ class ViewGraphOriginal(QDialog):
     def reject(self):
 
         self.dialog_list = []
-        super(ViewGraphOriginal, self).reject()
+        super(ViewGraph, self).reject()
 
     def accept(self):
 
         self.dialog_list = []
-        super(ViewGraphOriginal, self).accept()
+        super(ViewGraph, self).accept()
 
 
 # http://stackoverflow.com/questions/17891613/pyqt-mouse-events-for-qgraphicsview
@@ -348,46 +384,45 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
     # matches the initial designer file graphics view
-    sceneWidth = 982
-    sceneHeight = 647
+    scene_width = 982
+    scene_height = 647
 
-    def __init__ (self, parent=None):
-        super(GraphicsScene, self).__init__ (parent)
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+    def __init__(self, parent=None):
+        super(GraphicsScene, self).__init__(parent)
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def setWidth(self, width):
+    def set_width(self, width):
         """ Resize scene width. """
 
-        self.sceneWidth = width
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+        self.scene_width = width
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def setHeight(self, height):
+    def set_height(self, height):
         """ Resize scene height. """
 
-        self.sceneHeight = height
-        self.setSceneRect(QtCore.QRectF(0, 0, self.sceneWidth, self.sceneHeight))
+        self.scene_height = height
+        self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
-    def getWidth(self):
+    def get_width(self):
         """ Return scene width. """
 
-        return self.sceneWidth
+        return self.scene_width
 
-    def getHeight(self):
+    def get_height(self):
         """ Return scene height. """
 
-        return self.sceneHeight
+        return self.scene_height
 
-    def mouseMoveEvent(self, mouseEvent):
+    def mouseMoveEvent(self, mouse_event):
         """ On mouse move, an item might be repositioned so need to redraw all the link_items.
         This slows re-drawing down, but is more dynamic. """
 
-        super(GraphicsScene, self).mousePressEvent(mouseEvent)
+        super(GraphicsScene, self).mousePressEvent(mouse_event)
 
         for item in self.items():
             if isinstance(item, TextGraphicsItem):
                 item.code_or_cat['x'] = item.pos().x()
                 item.code_or_cat['y'] = item.pos().y()
-                #logger.debug("item pos:" + str(item.pos()))
         for item in self.items():
             if isinstance(item, LinkGraphicsItem):
                 item.redraw()
@@ -411,6 +446,22 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, LinkGraphicsItem):
                 item.redraw()
         self.update(self.sceneRect())"""
+
+    def suggested_scene_size(self):
+        """ Calculate the maximum width and height from the current Text Items. """
+
+        min_x = 0
+        min_y = 0
+        max_x = 0
+        max_y = 0
+        for i in self.items():
+            if isinstance(i, TextGraphicsItem):
+                #print(i.code_or_cat, i.pos().x(), i.pos().y(), "r.w", i.boundingRect().width(), "r.h", i.boundingRect().height())
+                if i.pos().x() + i.boundingRect().width() > max_x:
+                    max_x = i.pos().x() + i.boundingRect().width()
+                if i.pos().y() + i.boundingRect().height() > max_y:
+                    max_y = i.pos().y() + i.boundingRect().height()
+        return max_x, max_y
 
 
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
@@ -437,7 +488,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
-        self.setFlags (QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable | QtWidgets.QGraphicsItem.ItemIsSelectable)
+        self.setFlags(QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         if self.code_or_cat['cid'] is not None:
@@ -450,8 +502,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setPlainText(self.code_or_cat['name'])
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.document().contentsChanged.connect(self.text_changed)
-        #self.border_rect = QtWidgets.QGraphicsRectItem(0, 0, rect.width(), rect.height())
-        #self.border_rect.setParentItem(self)
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -472,10 +522,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def text_changed(self):
         """ Text changed in a node. Redraw the border rectangle item to match. """
 
-        #rect = self.boundingRect()
-        #self.border_rect.setRect(0, 0, rect.width(), rect.height())
         self.code_or_cat['name'] = self.toPlainText()
-        #logger.debug("self.data[name]:" + self.code_or_cat['name'])
 
     def contextMenuEvent(self, event):
         """
@@ -527,8 +574,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def coded_media(self,):
         """ Display all coded media for this code.
         Coded media comes from ALL files and current coder.
-        param:
-            code_dict : dictionary of code {name, memo, owner, date, cid, catid, color, depth, x, y, supercatid, angle, fontsize} """
+        """
 
         DialogCodeInAllFiles(self.app, self.code_or_cat)
 
@@ -551,9 +597,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.from_widget = from_widget
         self.to_widget = to_widget
         self.corners_only = corners_only
-        #self.setFlag(self.ItemIsSelectable, True)
         self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable)
-        self.calculatePointsAndDraw()
+        self.calculate_points_and_draw()
         self.line_color = QtCore.Qt.black
         if app.settings['stylesheet'] == "dark":
             self.line_color = QtCore.Qt.white
@@ -585,9 +630,9 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     def redraw(self):
         """ Called from mouse move and release events. """
 
-        self.calculatePointsAndDraw()
+        self.calculate_points_and_draw()
 
-    def calculatePointsAndDraw(self):
+    def calculate_points_and_draw(self):
         """ Calculate the to x and y and from x and y points. Draw line between the
         widgets. Join the line to appropriate side of widget. """
 
@@ -634,5 +679,3 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
-
-
