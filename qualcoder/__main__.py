@@ -74,7 +74,7 @@ from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 # from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
-from qualcoder.view_graph_original import ViewGraphOriginal
+from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 2.9"
@@ -1056,7 +1056,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Show list or acyclic graph of codes and categories. """
 
         self.ui.label_reports.hide()
-        ui = ViewGraphOriginal(self.app)
+        ui = ViewGraph(self.app)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
