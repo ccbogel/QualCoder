@@ -31,7 +31,7 @@ class Ui_DialogGraph(object):
         self.checkBox_listview.setChecked(True)
         self.checkBox_listview.setObjectName("checkBox_listview")
         self.comboBox_fontsize = QtWidgets.QComboBox(self.groupBox_2)
-        self.comboBox_fontsize.setGeometry(QtCore.QRect(310, 0, 71, 31))
+        self.comboBox_fontsize.setGeometry(QtCore.QRect(310, -1, 71, 30))
         self.comboBox_fontsize.setObjectName("comboBox_fontsize")
         self.label = QtWidgets.QLabel(self.groupBox_2)
         self.label.setGeometry(QtCore.QRect(205, 4, 101, 17))
