@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,11 @@ https://qualcoder.wordpress.com/
 """
 
 import base64
-import os
 
-languages = ['de', 'el', 'es', 'fr', 'it', 'jp', 'pt']
+languages = ['de', 'es', 'fr', 'it', 'pt']
 
-class CreateHelperFile():
+
+class CreateHelperFile:
     """ Create an output python file with converted languaged into base64
     The output file is used as a helper file in QualCoder
     This helps to get around translation data failing to load depending on where qualcoder
@@ -40,7 +40,6 @@ class CreateHelperFile():
     """
 
     def __init__(self):
-        #super(CreateHellpderFile, self).__init__()
 
         header = '#!/usr/bin/python\n# -*- coding: utf-8 -*-\n\
         \n"""\nCopyright (c) 2021 Colin Curtain\n\n\
@@ -65,29 +64,31 @@ class CreateHelperFile():
         Generated base64 helper file\n"""\n\n'
 
         text = header
+        # Create directory path Strings
         files = []
-        for l in languages:
-            files.append(l + "/" + "app_" + l + ".qm")
-            files.append(l + "/LC_MESSAGES/" + l + ".mo")
-            #tmp_files = os.listdir()
+        for lang in languages:
+            files.append(lang + "/" + "app_" + lang + ".qm")
+            files.append(lang + "/LC_MESSAGES/" + lang + ".mo")
 
+        # Convert each binary lang .mo or lang.qm to base64
         for f in files:
             text += "\n"
             name = f[:2] + "_" + f[-2:]
             text += name + " = b'"
-            s = self.encode_base64(f)
-            text += s.decode('utf-8')
+            src = self.encode_base64(f)
+            text += src.decode('utf-8')
             text += "'\n"
 
-        # write the generated file
+        # Write the generated file
         filename = "base64_lang_helper.py"
-        f = open(filename, 'w', encoding='utf-8-sig')
-        f.write(text)
-        f.close()
+        base64file = open(filename, 'w', encoding='utf-8-sig')
+        base64file.write(text)
+        base64file.close()
         print("FINISHED CREATING BASE64 HELPER FILE")
 
-    def encode_base64(self, file_path):
-        """ """
+    @staticmethod
+    def encode_base64(file_path):
+        """ Save the file in the .qualcoder/locale directory. """
 
         with open(file_path, "rb") as image_file:
             base64_string = base64.b64encode(image_file.read())
