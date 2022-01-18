@@ -660,10 +660,21 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.draw_coded_area()
 
     def draw_coded_area(self):
-        """ Draw the coded rectangle in the scene """
+        """ Draw the coded rectangle in the scene.
+         The coded memo can be in the data as ['memo'] if data from DialogCodeText, DialogCodeImage, DialogCodeAV
+         It is in the data as ['coded memo'] if data from DialogReportCodes
+         DialogReportCodes can produce various memos on output: source memo, coded memo, codename memo
+         """
 
         tooltip = self.data['codename']
-        tooltip += "\nMemo: " + self.data['memo']
+        try:
+            tooltip += "\nMemo: " + self.data['memo']
+        except KeyError:
+            pass
+        try:
+            tooltip += "\nMemo: " + self.data['coded memo']
+        except KeyError:
+            pass
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
         width = self.data['width'] * self.scale
