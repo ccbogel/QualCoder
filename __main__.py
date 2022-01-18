@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import base64
 import configparser
 import datetime
 import gettext
-import json  # to get latest Github release information
+import json  # To get latest Github release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -51,7 +51,7 @@ from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_by_case import DialogCodeByCase
-from qualcoder.GUI.base64_helper import *  # qualcoder32
+from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
@@ -69,12 +69,12 @@ from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
-from qualcoder.rqda import Rqda_import
+from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 # from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
-from qualcoder.view_graph_original import ViewGraphOriginal
+from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 2.9"
@@ -201,16 +201,18 @@ class App(object):
                     f.write(os.linesep)
         return result
 
-    def append_recent_project(self, path):
+    def append_recent_project(self, new_path):
         """ Add project path as first entry to .qualcoder/recent_projects.txt
+        param:
+            new_path String filepath to project
         """
 
-        if path == "":
+        if new_path == "":
             return
         nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
         # Result is a list of strings containing yyyy-mm-dd:hh:mm:ss|projectpath
         result = self.read_previous_project_paths()
-        dated_path = nowdate + "|" + path
+        dated_path = nowdate + "|" + new_path
         if not result:
             with open(self.persist_path, 'w') as f:
                 f.write(dated_path)
@@ -218,7 +220,7 @@ class App(object):
             return
         # Compare first persisted project path to the currently open project path
         if "|" in result[0]:  # safety check
-            if result[0].split("|")[1] != path:
+            if result[0].split("|")[1] != new_path:
                 result.append(dated_path)
                 result.sort()
                 if len(result) > 8:
@@ -397,28 +399,31 @@ class App(object):
             config.write(configfile)
 
     def _load_config_ini(self):
+        """ load config settings, and convert some to int. """
+
         config = configparser.ConfigParser()
         config.read(self.configpath)
         default = config['DEFAULT']
         result = dict(default)
-        # convert to int can be removed when all manual styles are removed
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
-        if 'treefontsize' in default:
-            result['treefontsize'] = default.getint('treefontsize')
         if 'docfontsize' in default:
             result['docfontsize'] = default.getint('docfontsize')
+        if 'treefontsize' in default:
+            result['treefontsize'] = default.getint('treefontsize')
+        if 'backup_num' in default:
+            result['backup_num'] = default.getint('backup_num')
         return result
 
-    def check_and_add_additional_settings(self, data):
+    def check_and_add_additional_settings(self, settings_data):
         """ Newer features include width and height settings for many dialogs and main window.
         timestamp format.
         dialog_crossovers IS dialog relations
-        :param data:  dictionary of most or all settings
+        :param settings_data:  dictionary of most or all settings
         :return: dictionary of all settings
         """
 
-        dict_len = len(data)
+        dict_len = len(settings_data)
         keys = ['mainwindow_w', 'mainwindow_h',
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
@@ -449,19 +454,21 @@ class App(object):
                 'docfontsize',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet'
+                'stylesheet', 'backup_num'
                 ]
         for key in keys:
-            if key not in data:
-                data[key] = 0
+            if key not in settings_data:
+                settings_data[key] = 0
                 if key == "timestampformat":
-                    data[key] = "[hh.mm.ss]"
+                    settings_data[key] = "[hh.mm.ss]"
                 if key == "speakernameformat":
-                    data[key] = "[]"
+                    settings_data[key] = "[]"
+                if key == "backup_num":
+                    settings_data[key] = 5
         # write out new ini file, if needed
-        if len(data) > dict_len:
-            self.write_config_ini(data)
-        return data
+        if len(settings_data) > dict_len:
+            self.write_config_ini(settings_data)
+        return settings_data
 
     def merge_settings_with_default_stylesheet(self, settings):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
@@ -539,7 +546,7 @@ class App(object):
             self.write_config_ini(self.default_settings)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
-        # codername is alo legacy, v2.8 plus keeps current coder name in database project table
+        # codername is also legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
@@ -554,6 +561,7 @@ class App(object):
     def default_settings(self):
         """ Standard Settings for config.ini file. """
         return {
+            'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
             'fontsize': 14,
@@ -683,11 +691,10 @@ class App(object):
             res = cur.fetchone()
             if res[0] is not None:
                 self.settings['codername'] = res[0]
-        except:
+        except sqlite3.OperationalError:
             pass
         # For versions 1 to 4, current coder name stored in the config.ini file, so is added here.
         coder_names = [self.settings['codername']]
-        # Try except, as there may not be an open project
         try:
             cur = self.conn.cursor()
             sql = "select owner from code_image union select owner from code_text union select owner from code_av "
@@ -697,7 +704,7 @@ class App(object):
             for r in res:
                 if r[0] not in coder_names:
                     coder_names.append(r[0])
-        except:
+        except sqlite3.OperationalError:
             pass
         return coder_names
 
@@ -733,7 +740,7 @@ class MainWindow(QtWidgets.QMainWindow):
             h = int(self.app.settings['mainwindow_h'])
             if h > 40 and w > 50:
                 self.resize(w, h)
-        except:
+        except KeyError:
             pass
         self.hide_menu_options()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -790,7 +797,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
-        # self.ui.actionCoding_reports.setShortcut('Ctrl+R') Affects code AV function
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCoding_comparison_by_file.triggered.connect(self.report_compare_coders_by_file)
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
@@ -928,8 +934,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionProject_Exchange_Export.setEnabled(True)
         self.ui.actionREFI_Codebook_export.setEnabled(True)
         self.ui.actionREFI_Codebook_import.setEnabled(True)
-        self.ui.actionREFI_QDA_Project_import.setEnabled(False)
-        self.ui.actionRQDA_Project_import.setEnabled(False)
+        self.ui.actionREFI_QDA_Project_import.setEnabled(True)
+        self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
@@ -1050,7 +1056,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Show list or acyclic graph of codes and categories. """
 
         self.ui.label_reports.hide()
-        ui = ViewGraphOriginal(self.app)
+        ui = ViewGraph(self.app)
         ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
@@ -1111,8 +1117,7 @@ class MainWindow(QtWidgets.QMainWindow):
         File names must match but paths can be different. """
 
         self.ui.label_manage.hide()
-        # TODO unexpected arguement
-        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
+        ui = DialogManageLinks(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_manage, ui)
         bad_links = self.app.check_bad_file_links()
         if not bad_links:
@@ -1272,7 +1277,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.project_name == "":
             Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec_()
             return
-        Rqda_import(self.app, self.ui.textEdit)
+        RqdaImport(self.app, self.ui.textEdit)
         self.project_summary_report()
 
     def closeEvent(self, event):
@@ -1351,31 +1356,44 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.create_connection(self.app.project_path)
         cur = self.app.conn.cursor()
         cur.execute(
-            "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, bookmarkpos integer, codername text);")
+            "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
+            "bookmarkpos integer, codername text)")
         cur.execute(
-            "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, av_text_id integer, unique(name));")
+            "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
+            "owner text, date text, av_text_id integer, unique(name))")
         cur.execute(
-            "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, height integer, cid integer, memo text, date text, owner text, important integer);")
+            "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, "
+            "height integer, cid integer, memo text, date text, owner text, important integer)")
         cur.execute(
-            "CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, memo text, date text, owner text, important integer);")
+            "CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, "
+            "memo text, date text, owner text, important integer)")
         cur.execute(
-            "CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner));")
+            "CREATE TABLE annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, "
+            "owner text, date text, unique(fid,pos0,pos1,owner))")
         cur.execute(
-            "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, valuetype text);")
+            "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
+            "valuetype text)")
         cur.execute(
-            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, date text, owner text);")
+            "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
+            "date text, owner text)")
         cur.execute(
-            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, owner text, date text, memo text);")
+            "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
+            "owner text, date text, memo text)")
         cur.execute(
-            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, constraint ucm unique(name));")
+            "CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text, "
+            "constraint ucm unique(name))")
         cur.execute(
-            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name));")
+            "CREATE TABLE code_cat (catid integer primary key, name text, owner text, date text, memo text, "
+            "supercatid integer, unique(name))")
         cur.execute(
-            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner));")
+            "CREATE TABLE code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, "
+            "pos1 integer, owner text, date text, memo text, avid integer, important integer, "
+            "unique(cid,fid,pos0,pos1, owner))")
         cur.execute(
-            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name));")
-        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text);")
-        cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
+            "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
+            "date text, color text, unique(name))")
+        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text)")
+        cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1474,7 +1492,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    def open_project(self, path="", newproject="no"):
+    def open_project(self, path_="", newproject="no"):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not backup on a newly created project, as it wont contain data.
@@ -1490,18 +1508,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """
 
         default_directory = self.app.settings['directory']
-        if path == "" or path is False:
+        if path_ == "" or path_ is False:
             if default_directory == "":
                 default_directory = os.path.expanduser('~')
-            path = QtWidgets.QFileDialog.getExistingDirectory(self,
+            path_ = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                               _('Open project directory'), default_directory)
-        if path == "" or path is False:
+        if path_ == "" or path_ is False:
             return
         self.close_project()
         msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
-        splt = path.split("|")
+        splt = path_.split("|")
         proj_path = ""
         if len(splt) == 1:
             proj_path = splt[0]
@@ -1538,7 +1556,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # as it would change to this coder when opening different projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
-        # Datbase version 5 (QualCoder 2.8 and newer) stores the current coder in the project table
+        # Database version 5 (QualCoder 2.8 and newer) stores the current coder in the project table
         names = self.app.get_coder_names_in_project()
         if self.app.settings['codername'] not in names and len(names) > 0:
             self.app.settings['codername'] = names[0]
@@ -1553,7 +1571,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.app.conn.cursor()
         try:
             cur.execute("select avid from code_text")
-        except:
+        except sqlite3.OperationalError:
             try:
                 cur.execute("ALTER TABLE code_text ADD avid integer")
                 self.app.conn.commit()
@@ -1561,7 +1579,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug(str(e_))
         try:
             cur.execute("select bookmarkfile from project")
-        except:
+        except sqlite3.OperationalError:
             try:
                 cur.execute("ALTER TABLE project ADD bookmarkfile integer")
                 self.app.conn.commit()
@@ -1574,7 +1592,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_text")
-        except:
+        except sqlite3.OperationalError:
             try:
                 cur.execute("ALTER TABLE code_text ADD important integer")
                 self.app.conn.commit()
@@ -1583,7 +1601,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_av")
-        except:
+        except sqlite3.OperationalError:
             try:
                 cur.execute("ALTER TABLE code_av ADD important integer")
                 self.app.conn.commit()
@@ -1592,7 +1610,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_image")
-        except:
+        except sqlite3.OperationalError:
             try:
                 cur.execute("ALTER TABLE code_image ADD important integer")
                 self.app.conn.commit()
@@ -1602,9 +1620,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # Database version v4
         try:
             cur.execute("select ctid from code_text")
-        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:
             cur.execute(
-                "CREATE TABLE code_text2 (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, unique(cid,fid,pos0,pos1, owner))")
+                "CREATE TABLE code_text2 (ctid integer primary key, cid integer, fid integer,seltext text, "
+                "pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer, "
+                "unique(cid,fid,pos0,pos1, owner))")
             self.app.conn.commit()
             sql = "insert into code_text2 (cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important) "
             sql += "select cid, fid, seltext, pos0, pos1, owner, date, memo, avid, important from code_text"
@@ -1619,7 +1639,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add codername to project, add av_text_id to source, add stored sql table
         try:
             cur.execute("select codername from project")
-        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:
             print(self.app.settings['codername'])
             cur.execute("ALTER TABLE project ADD codername text")
             self.app.conn.commit()
@@ -1628,7 +1648,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
         try:
             cur.execute("select av_text_id from source")
-        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:
             cur.execute('ALTER TABLE source ADD av_text_id integer')
             self.app.conn.commit()
             # Add id link from AV file to text file.
@@ -1642,7 +1662,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Updating database to version") + " v5")
         try:
             cur.execute("select title from stored_sql")
-        except sqlite3.OperationalError:  # sqlite3.OperationalError as e:
+        except sqlite3.OperationalError:
             cur.execute(
                 "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
@@ -1773,8 +1793,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if bad_links:
             span = '<span style="color:red">'
             self.ui.textEdit.append(span + _("Bad links to files") + "</span>")
-            self.ui.textEdit.append(span + _("If all links are bad, for example project moved to a different operating system.") + "</span>")
-            self.ui.textEdit.append(span + _("Consider changing base folder path in Help > Special Functions") + "</span>")
             for lnk in bad_links:
                 self.ui.textEdit.append(span + lnk['name'] + "   " + lnk['mediapath'] + '</span>')
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
@@ -1833,10 +1851,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
         providing the project was not changed in any way.
-        Delete oldest backups if more than 5 are created.
-        Backup name format:
-        directories/projectname_BKUP_yyyymmdd_hh.qda
-        Keep up to FIVE backups only. """
+        Delete oldest backups if more than BACKUP_NUM are created.
+        Backup name format: directories/projectname_BKUP_yyyymmdd_hh.qda
+        Requires: self.settings['backup_num'] """
 
         if self.app.project_path == "":
             return
@@ -1845,24 +1862,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.rmtree(self.app.delete_backup_path_name)
             except Exception as e_:
                 print(str(e_))
-
         # Get a list of backup folders for current project
         parts = self.app.project_path.split('/')
-        projectname_and_suffix = parts[-1]
-        directory = self.app.project_path[0:-len(projectname_and_suffix)]
-        projectname = projectname_and_suffix[:-4]
-        projectname_and_bkup = projectname + "_BKUP_"
-        lenname = len(projectname_and_bkup)
+        project_name_and_suffix = parts[-1]
+        directory = self.app.project_path[0:-len(project_name_and_suffix)]
+        project_name = project_name_and_suffix[:-4]
+        project_name_and_bkup = project_name + "_BKUP_"
+        lenname = len(project_name_and_bkup)
         files_folders = os.listdir(directory)
         backups = []
         for f_ in files_folders:
-            if f_[0:lenname] == projectname_and_bkup and f_[-4:] == ".qda":
+            if f_[0:lenname] == project_name_and_bkup and f_[-4:] == ".qda":
                 backups.append(f_)
-        # Sort newest to oldest, and remove any that are more than fifth position in the list
+        # Sort newest to oldest, and remove any that are more than BACKUP_NUM position in the list
         backups.sort(reverse=True)
         to_remove = []
-        if len(backups) > 5:
-            to_remove = backups[5:]
+        if len(backups) > self.app.settings['backup_num']:
+            to_remove = backups[self.app.settings['backup_num']:]
         if not to_remove:
             return
         for f_ in to_remove:
@@ -1981,7 +1997,7 @@ def gui():
         # Newer datetime | path
         if len(split_) == 2:
             proj_path = split_[1]
-        ex.open_project(path=proj_path)
+        ex.open_project(path_=proj_path)
     sys.exit(app.exec_())
 
 
@@ -1999,9 +2015,6 @@ def install_language(lang):
     if lang == "de":
         qm_data = de_qm
         mo_data = de_mo
-    '''if lang == "el":
-        qm_data = el_qm
-        mo_data = el_mo'''
     if lang == "es":
         qm_data = es_qm
         mo_data = es_mo
@@ -2011,9 +2024,6 @@ def install_language(lang):
     if lang == "it":
         qm_data = it_qm
         mo_data = it_mo
-    '''if lang == "jp":
-        qm_data = jp_qm
-        mo_data = jp_mo'''
     if lang == "pt":
         qm_data = pt_qm
         mo_data = pt_mo
