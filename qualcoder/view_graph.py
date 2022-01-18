@@ -101,7 +101,7 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_image)
 
         # Set the scene
-        self.scene = GraphicsScene()
+        self.scene = GraphicsScene(self)
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
@@ -349,10 +349,11 @@ class ViewGraph(QDialog):
     def get_node_with_children(self, node, model):
         """ Return a short list of this top node and all its children.
         Note, maximum depth of 10. """
+
         if node is None:
             return model
         new_model = [node]
-        i = 0  # not really needed, but keep for ensuring an exit from while loop
+        i = 0  # for ensuring an exit from while loop
         new_model_changed = True
         while model != [] and new_model_changed and i < 10:
             new_model_changed = False
@@ -382,12 +383,13 @@ class ViewGraph(QDialog):
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
 
-    # matches the initial designer file graphics view
-    scene_width = 982
-    scene_height = 647
+    scene_width = 990
+    scene_height = 650
+    parent = None
 
     def __init__(self, parent=None):
         super(GraphicsScene, self).__init__(parent)
+        self.parent = parent
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
 
     def set_width(self, width):
@@ -414,7 +416,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
     def mouseMoveEvent(self, mouse_event):
         """ On mouse move, an item might be repositioned so need to redraw all the link_items.
-        This slows re-drawing down, but is more dynamic. """
+        This slows re-drawing down, but is dynamic. """
 
         super(GraphicsScene, self).mousePressEvent(mouse_event)
 
@@ -422,19 +424,21 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, TextGraphicsItem):
                 item.code_or_cat['x'] = item.pos().x()
                 item.code_or_cat['y'] = item.pos().y()
+                item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
+                break
         for item in self.items():
             if isinstance(item, LinkGraphicsItem):
                 item.redraw()
         self.update()
 
-        '''def mousePressEvent(self, mouseEvent):
-        super(GraphicsScene, self).mousePressEvent(mouseEvent)
-        #position = QtCore.QPointF(event.scenePos())
-        #logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
-        for item in self.items(): # item is QGraphicsProxyWidget
-            if isinstance(item, LinkItem):
-                item.redraw()
-        self.update(self.sceneRect())'''
+    '''def mousePressEvent(self, mouseEvent):
+    super(GraphicsScene, self).mousePressEvent(mouseEvent)
+    #position = QtCore.QPointF(event.scenePos())
+    #logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
+    for item in self.items(): # item is QGraphicsProxyWidget
+        if isinstance(item, LinkItem):
+            item.redraw()
+    self.update(self.sceneRect())'''
 
     """def mouseReleaseEvent(self, mouseEvent):
         ''' On mouse release, an item might be repositioned so need to redraw all the
