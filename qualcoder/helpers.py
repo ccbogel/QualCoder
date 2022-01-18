@@ -30,6 +30,7 @@ import logging
 import os
 import platform
 import sys
+import traceback
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -637,6 +638,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.installEventFilter(self)
 
         self.pixmap = QtGui.QPixmap.fromImage(image)
         self.pixmap = QtGui.QPixmap.fromImage(image)
@@ -699,3 +701,34 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.scene.addItem(pixmap_item)
         self.draw_coded_area()
         self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+
+    def eventFilter(self, object, event):
+        """ Using this event filter to identify treeWidgetItem drop events.
+        http://doc.qt.io/qt-5/qevent.html#Type-enum
+        QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
+        https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
+        Also use eventFilter for QGraphicsView.
+
+        Key events on scene
+        minus reduce the scale
+        plus increase the scale
+        """
+
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key_Minus:
+                v = self.ui.horizontalSlider.value()
+                v -= 3
+                if v < self.ui.horizontalSlider.minimum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+            if key == QtCore.Qt.Key_Plus:
+                v = self.ui.horizontalSlider.value()
+                v += 3
+                if v > self.ui.horizontalSlider.maximum():
+                    return True
+                self.ui.horizontalSlider.setValue(v)
+                return True
+        return False
