@@ -220,8 +220,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.te.setStyleSheet(font)
         self.te.setPlainText(file_text['fulltext'])
         self.te.ensureCursorVisible()
-        gridLayout = QtWidgets.QGridLayout(self)
-        gridLayout.addWidget(self.te, 1, 0)
+        grid_layout = QtWidgets.QGridLayout(self)
+        grid_layout.addWidget(self.te, 1, 0)
         self.resize(400, 300)
         cursor = self.te.textCursor()
         cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
@@ -292,7 +292,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.resize(550, 580)
-        # enable custom window hint - must be set to enable customizing window controls
+        # Enable custom window hint to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
 
@@ -303,6 +303,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.te = QtWidgets.QTextEdit()
         self.gridLayout.addWidget(self.te, 1, 0)
+        msg = _("Click on heading for coding in context") + "\n\n"
+        self.te.append(msg)
 
         # Get coded text by file for this coder data
         cur = self.app.conn.cursor()
@@ -525,17 +527,13 @@ class DialogCodeInAV(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.resize(400, 300)
-        # enable custom window hint - must be set to enable customizing window controls
+        # Enable custom window hint to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
         if platform.system() == "Darwin":  # for MacOS
             self.frame = QtWidgets.QMacCocoaViewContainer(0)
-        '''self.palette = self.frame.palette()
-        self.palette.setColor(QtGui.QPalette.Window, QtGui.QColor(30, 30, 30))
-        self.frame.setPalette(self.palette)
-        self.frame.setAutoFillBackground(True)'''
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
         # Create a vlc instance with an empty vlc media player
         # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
@@ -573,9 +571,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
         # The vlc MediaPlayer needs a float value between 0 and 1 for AV position,
         pos = self.data['pos0'] / self.mediaplayer.get_media().get_duration()
-        # print("dur", self.mediaplayer.get_media().get_duration())
-        # print("pos as float", pos)
-        self.mediaplayer.play()  # Need to start play forst
+        self.mediaplayer.play()  # Need to start play first
         self.mediaplayer.set_position(pos)
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update_ui)
@@ -586,7 +582,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
-        msg += "\n" + _("Memo: ") + self.data['coded_memo']
+        msg += "\n" + _("Memo: ") + self.data['memo']
         self.setToolTip(msg)
         if self.data['pos1'] < msecs:
             self.mediaplayer.stop()
@@ -667,7 +663,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         """ Draw the coded rectangle in the scene """
 
         tooltip = self.data['codename']
-        tooltip += "\nMemo: " + self.data['coded_memo']
+        tooltip += "\nMemo: " + self.data['memo']
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
         width = self.data['width'] * self.scale
