@@ -15,44 +15,27 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="groupBox_header">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>60</height>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
       </size>
      </property>
      <property name="title">
       <string/>
      </property>
-     <widget class="QCheckBox" name="checkBox_blackandwhite">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>0</y>
-        <width>191</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Black and white</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>0</y>
-        <width>421</width>
-        <height>30</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_listview">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>30</y>
+        <x>0</x>
+        <y>40</y>
         <width>141</width>
         <height>22</height>
        </rect>
@@ -64,12 +47,12 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_fontsize">
+     <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>-1</y>
-        <width>71</width>
+        <x>400</x>
+        <y>5</y>
+        <width>421</width>
         <height>30</height>
        </rect>
       </property>
@@ -77,8 +60,8 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>205</x>
-        <y>4</y>
+        <x>185</x>
+        <y>10</y>
         <width>101</width>
         <height>17</height>
        </rect>
@@ -90,30 +73,24 @@
        <string>Font size</string>
       </property>
      </widget>
-     <widget class="QGraphicsView" name="graphicsView">
+     <widget class="QCheckBox" name="checkBox_blackandwhite">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>60</y>
-        <width>1000</width>
-        <height>520</height>
+        <y>6</y>
+        <width>181</width>
+        <height>22</height>
        </rect>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::RightToLeft</enum>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
+      <property name="text">
+       <string>Black and white</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>860</x>
-        <y>0</y>
+        <x>840</x>
+        <y>6</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -125,6 +102,29 @@
        <string/>
       </property>
      </widget>
+     <widget class="QComboBox" name="comboBox_fontsize">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>5</y>
+        <width>71</width>
+        <height>30</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
     </widget>
    </item>
   </layout>
