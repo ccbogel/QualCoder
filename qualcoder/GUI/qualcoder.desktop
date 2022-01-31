@@ -6,5 +6,6 @@ Comment=Qualitiatve data analysis
 Exec=python3 -m qualcoder
 Icon=/usr/share/icons/qualcoder128.png
 Terminal=false
+Keywords=QDA;Social Science;
 Categories=Science;
 Name[en_AU]=QualCoder
