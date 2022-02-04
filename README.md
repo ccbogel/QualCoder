@@ -49,6 +49,8 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 ### Debian/Ubuntu Linux
 
+Warning. If you use the Anaconda python distribution platform this may be incompatible with the pip installation instructions below.
+
 1. Install  modules from the command line
 
 `sudo apt install python3-pip python3-lxml python3-ply python3-six python3-pdfminer python3-chardet python3-pyqt5 python3-pillow`
