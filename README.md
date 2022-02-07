@@ -57,11 +57,11 @@ Warning. If you use the Anaconda python distribution platform this may be incomp
 
 2. Install additional modules
 
-`sudo python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
+`python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
 3. Building and install QualCoder, from the downloaded folder type
 
-`sudo python3 setup.py install`
+`python3 setup.py install`
 
 4. To run type
 
