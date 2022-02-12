@@ -19,9 +19,11 @@ You will need to have a python3.6 or newer version installed and a 64 bit VLC pl
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
-The 2.8 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This does work on older Windows versions (e.g. Win 7). I have had one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+The 2.9 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This does work on older Windows versions (e.g. Win 7). I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 
 **Alternatively:**
+
+Consider using a virtual environment, I have not tested using venv on a Windows intallation yet.
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCode from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
