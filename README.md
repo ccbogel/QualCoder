@@ -55,6 +55,7 @@ It is best to run QualCoder inside a python virtual environment, so that the sys
 
 1. Install venv
 I am using python3.9  you can choose another recent version if you prefer.
+
 `sudo apt install python3.9-venv`
 
 2. Download and unzip the Qualcoder folder.
@@ -62,14 +63,18 @@ I am using python3.9  you can choose another recent version if you prefer.
 3. Open a terminal and move (cd) into that folder. 
 You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-2.9 folder.
 Inside the QualCoder-master folder:
+
 `python3.9 -m venv qualcoder`
+
 Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
 Note: To exit venv type `deactivate`
+
 `source qualcoder/bin/activate`
 
 4. Move (cd) to the inner qualcoder folder.
 
 5. Install the needed python modules.
+6. 
 `pip install lxml ply six pdfminer chardet pyqt5 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
 6. Install QualCoder, type the following, the dot is important:
