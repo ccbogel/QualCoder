@@ -49,19 +49,33 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 ### Debian/Ubuntu Linux
 
-Warning. If you use the Anaconda python distribution platform this may be incompatible with the pip installation instructions below.
+It is best to run QualCoder inside a python virtual environment, so that the system install python modules do not clash and cause problems.
+I have added the additonal code to do this here.
 
-1. Install  modules from the command line
+1. Install venv
+I am using python3.9  you can choose another recent version if you prefer.
+`sudo apt install python3.9-venv`
 
-`sudo apt install python3-pip python3-lxml python3-ply python3-six python3-pdfminer python3-chardet python3-pyqt5 python3-pillow`
+2. Download and unzip the Qualcoder folder.
 
-2. Install additional modules
+3. Open a terminal and move (cd) into that folder. 
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-2.9 folder.
+Inside the QualCoder-master folder:
+`python3.9 -m venv qualcoder`
+Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
+Note: To exit venv type `deactivate`
+`source qualcoder/bin/activate`
 
-`python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
+4. Move (cd) to the inner qualcoder folder.
 
-3. Building and install QualCoder, from the downloaded folder type
+5. Install the needed python modules.
+`pip install lxml ply six pdfminer chardet pyqt5 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
-`python3 setup.py install`
+6. Install QualCoder, type, (the dot is important):
+
+`python3 -m pip install .`
+
+You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
 
 4. To run type
 
@@ -69,6 +83,8 @@ Warning. If you use the Anaconda python distribution platform this may be incomp
 
 
 ### Arch/Manjaro Linux
+
+Not tested, but please see the above instructions to build qualcoder inside a virual environment.
 
 1. Install modules from the command line
 
@@ -90,7 +106,7 @@ If success, all requirements are satisfied.
 
 ### Fedora/CentOS/RHEL linux
 
-These instructions may need revision.
+Not tested, but please see the above instructions to build qualcoder inside a virual environment.
 
 Retrieve the current package code from this repository
 
