@@ -70,7 +70,7 @@ Note: To exit venv type `deactivate`
 5. Install the needed python modules.
 `pip install lxml ply six pdfminer chardet pyqt5 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
-6. Install QualCoder, type, (the dot is important):
+6. Install QualCoder, type the following, the dot is important:
 
 `python3 -m pip install .`
 
