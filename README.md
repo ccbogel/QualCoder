@@ -87,7 +87,7 @@ You may get a warning which can be ignored: WARNING: Building wheel for Qualcode
 
 After all this is done, you can `deactivate` to exit the virtual environment.
 At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder-2.9 release folder), then type:
-`activate`
+`source qualcoder/bin/activate`
 Then type
 `qualcoder`
 
