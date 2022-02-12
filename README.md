@@ -92,7 +92,7 @@ Then type
 
 ### Arch/Manjaro Linux
 
-Not tested, but please see the above instructions to build qualcoder inside a virual environment. The below installation instructions may affect system installed python modules.
+Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
 
 1. Install modules from the command line
 
@@ -114,7 +114,7 @@ If success, all requirements are satisfied.
 
 ### Fedora/CentOS/RHEL linux
 
-Not tested, but please see the above instructions to build qualcoder inside a virual environment. The below installation instructions may affect system installed python modules.
+Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
 
 Retrieve the current package code from this repository
 
