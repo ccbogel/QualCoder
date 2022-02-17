@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,6 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogEditTextFile(QtWidgets.QDialog):
-
     """ Dialog to view and edit text file data.
     Needs to adjust codings annotations and cases for changed character positions.
     """
@@ -89,11 +88,17 @@ class DialogEditTextFile(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
-        msg = _("Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
+        msg = _(
+            "Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
+        msg += " " + _("Positions may not correctly adjust.") + " "
+        msg += " " + _("Do not code this text until you reload Coding - Code Text from the menu bar.")
         label = QtWidgets.QLabel(msg)
         label.setWordWrap(True)
-        tt = _("Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
-        tt += _("Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
+
+        tt = _(
+            "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
+        tt += _(
+            "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
         label.setToolTip(tt)
         self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
         if clear_button == "hide":
@@ -112,7 +117,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.prev_text = copy(self.text)
         self.highlight()
         self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.textEdit.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.ui.textEdit.installEventFilter(self)
 
@@ -126,21 +131,21 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.codetext = []
         for r in res:
             self.codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
-                'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
+                                  'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
         sql = "select anid, pos0, pos1 from annotation where fid=?"
         cur.execute(sql, [self.fid])
         res = cur.fetchall()
         self.annotations = []
         for r in res:
             self.annotations.append({'anid': r[0], 'pos0': r[1], 'pos1': r[2],
-                'npos0': r[1], 'npos1': r[2]})
+                                     'npos0': r[1], 'npos1': r[2]})
         sql = "select id, pos0, pos1 from case_text where fid=?"
         cur.execute(sql, [self.fid])
         res = cur.fetchall()
         self.casetext = []
         for r in res:
             self.casetext.append({'id': r[0], 'pos0': r[1], 'pos1': r[2],
-                'npos0': r[1], 'npos1': r[2]})
+                                  'npos0': r[1], 'npos1': r[2]})
         self.no_codes_annotes_cases = True
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
@@ -272,7 +277,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 # Remove, as entire text is being removed (e.g. copy replace)
                 # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                 # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1\
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 \
                         * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
@@ -313,7 +318,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 # Remove, as entire text is being removed (e.g. copy replace)
                 # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
                 # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1\
+                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 \
                         * pre_chars + post_chars:
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
@@ -428,7 +433,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
 
-    def textEdit_menu(self, position):
+    def textedit_menu(self, position):
         """ Context menu for select all and copy of text. """
 
         if self.ui.textEdit.toPlainText() == "":
