@@ -2079,8 +2079,8 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
-        # update filter for tooltip
-        self.eventFilterTT.set_codes(self.code_text, self.codes, self.file_['start'])
+        # Update filter for tooltip
+        self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations, self.file_['start'])
 
     def add_code(self, catid=None):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
@@ -3405,14 +3405,14 @@ class DialogCodeText(QtWidgets.QWidget):
         pre_chars = None
         try:
             pre_chars = previous.split(",")[1]
-        except KeyError:
+        except IndexError:
             pass
         post = position.split(" ")[1]
         post_start = int(post.split(",")[0])
         post_chars = None
         try:
             post_chars = post.split(",")[1]
-        except KeyError:
+        except IndexError:
             pass
         # No additions or deletions
         if pre_start == post_start and pre_chars == post_chars:
