@@ -25,7 +25,7 @@ The 2.9 Release contains an exe file (created on Windows 10, 64 bit).Double-clic
 
 Consider using a virtual environment, I have not tested using venv on a Windows intallation yet.
 
-1. Download the QualCoder software from: https://github.com/ccbogel/QualCode from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
+1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
 2. Download and install the Python programming language. The minimum version for QualCoder is 3.6.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
