@@ -77,7 +77,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 2.9"
+qualcoder_version = "QualCoder 3.0"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -274,10 +274,13 @@ class App(object):
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_text_filenames(self, ids=[]):
+    def get_text_filenames(self, ids=None):
         """ Get filenames of text files.
         param:
             ids: list of Integer ids for a restricted list of files. """
+
+        if ids is None:
+            ids = []
         sql = "select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') "
         if ids:
             str_ids = list(map(str, ids))
@@ -291,11 +294,13 @@ class App(object):
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_image_filenames(self, ids=[]):
+    def get_image_filenames(self, ids=None):
         """ Get filenames of image files only.
         param:
             ids: list of Integer ids for a restricted list of files. """
 
+        if ids is None:
+            ids = []
         sql = "select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
             str_ids = list(map(str, ids))
@@ -309,11 +314,13 @@ class App(object):
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
-    def get_av_filenames(self, ids=[]):
+    def get_av_filenames(self, ids=None):
         """ Get filenames of audio video files only.
         param:
             ids: list of Integer ids for a restricted list of files. """
 
+        if ids is None:
+            ids = []
         sql = "select id, name, memo from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
@@ -1300,8 +1307,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     try:
                         self.app.conn.commit()
                         self.app.conn.close()
-                    except:
-                        pass
+                    except Exception as e_:
+                        print("closeEvent", e_)
                 QtWidgets.qApp.quit()
                 return
             if event is False:
@@ -1829,11 +1836,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.project_name != "":
             self.ui.textEdit.append("Closing project: " + self.app.project_name)
             self.ui.textEdit.append("========\n")
-        try:
+        if self.app.conn is not None:
             self.app.conn.commit()
             self.app.conn.close()
-        except:
-            pass
         self.delete_backup_folders()
         self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
@@ -1984,8 +1989,8 @@ def gui():
                 print("Trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
                 mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-            except:
-                print("No " + lang + ".mo translation file loaded")
+            except Exception as e2_:
+                print("No " + lang + ".mo translation file loaded", e2_)
     translator.install()
     ex = MainWindow(qual_app)
     if project_path:
