@@ -20,8 +20,10 @@ You will need to have a python3.6 or newer version installed and a 64 bit VLC pl
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
 The 2.9 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This does work on older Windows versions (e.g. Win 7). I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
+If you are uncomfortable with these warnings install from source as detailed next.
 
-**Alternatively:**
+**Alternatively install from source:**
 
 Consider using a virtual environment, I have not tested using venv on a Windows intallation yet.
 
