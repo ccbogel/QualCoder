@@ -153,7 +153,7 @@
       <string notr="true">QGroupBox{border: 1px solid #f89407;}</string>
      </property>
      <property name="title">
-      <string>Merge projects</string>
+      <string>Merge project into this project</string>
      </property>
      <widget class="QPushButton" name="pushButton_merge">
       <property name="geometry">
@@ -197,7 +197,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Select project to merge</string>
+       <string>Select project to merge into this project</string>
       </property>
      </widget>
     </widget>
