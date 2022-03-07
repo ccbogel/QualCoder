@@ -36,8 +36,9 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
-from .select_items import DialogSelectItems
 from .helpers import Message
+from .merge_projects import MergeProjects
+from .select_items import DialogSelectItems
 from .text_file_replacement import ReplaceTextFile
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -137,6 +138,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         print("MERGE PROJECTS")
         print("Merge: ", self.merge_project_path)
         print("Into: ", self.app.project_path)
+        MergeProjects(self.app, self.merge_project_path )
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):

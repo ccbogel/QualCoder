@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,28 +24,25 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 
-Information:
-This have been made only for text codings. (maybe in the future, I will extend this code to be more comprehensive).
+Have backups of both projects. Essential.
+The texts, and codings and codes from Project B will be copied into Project A.
+If there are matching codes (same codenames), thats OK.
+If there are unique codes in Project B, these will be copied into Project A.
 
-1 Have backups of both projects. Essential.
-2 Change the file ending of the attached code from .txt to .py
-3 The computer must have the python modules installed as described in the QualCoder GitHub pages (e.g. python3, pyqt5 et cetera)
-4 Run the merge.py file (I am not sure how this works on your computers, it would be in the same way you start QualCoder. e.g. python3 merge.py   or py merge.py  - (you need to run the command in the same folder that merge.py is stored).  Or double-click on merge.py  - this works sometimes on Windows.
-5 The first file selection screen - select Project A.qda   (the Source)
-6 The second file selection screen - select Project B.qda   (the Destination)
-7 Tthe program runs, hopefully no errors and the information will be copied from Project A database into the database of Project B
-8 If you have unique files inside Project A documents folder, copy these into the documents folder of Project B
-9 The texts, and codings and codes from Project B will be copied into Project A. If there are matching codes (same codenames), thats OK. If there are unique codes in Project B, these will be copied into Project A. Categories (the code tree structure) is not copied from Project B to Project A.
+TODO
+Categories (the code tree structure) is not copied from Project B to Project A.
 """
 
-from PyQt5 import QtWidgets, QtCore
+import logging
 import os
 import sqlite3
-import sys
+
+from PyQt5 import QtWidgets
 
 
-'''path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -54,34 +51,41 @@ def exception_handler(exception_type, value, tb_obj):
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
     logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)'''
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 
-class MergeProjects():
-    """ Merge one Qualcoder project (source) database into another (destination) database.
-     Only for merging text coding projects.
-     Create 2 test projects:
+class MergeProjects:
+    """ Merge one external Qualcoder project (source) database into existing project (destination).
      The merge will combine files, and codings.
      The merge will not insert the Source Categories structure into the Destination.
      Codes will be merged into the Destination.
-     
      """
 
     app = None
-    path_s = ""
-    path_d = ""
-    conn_s = None
+    path_d = ""  # Path to destination project folder
     conn_d = None
-
+    path_s = ""  # Path to source project folder
+    conn_s = None
     source_s = []  # source text from Source project
     code_text_s = []  # coded text segments from Source project
-    code_name_s = []  # code names from Source project
     annotations_s = []  # annotations from Source project
-    #code_cat_s = []  # code cats from Source project
 
-    def __init__(self):
-        self.app = QtWidgets.QApplication(sys.argv)
-        self.get_projects()
+    # TODO
+    code_image_s = []  # coded image areas from Source project
+    code_av_s = []  # coded A/V segments from Source project
+
+    code_name_s = []  # code names from Source project
+    # TODO to import code cats
+    code_cat_s = []  # code cats from Source project
+    # TODO import journals, stored_sql, cases, case_text, attributes
+
+    def __init__(self, app, path_s):
+        self.app = app
+        self.path_s = path_s
+        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))
+        self.conn_d = self.app.conn
+        self.path_d = self.app.project_path
+
         self.get_source_data()
         self.fill_sources_update_id()
         self.update_code_name_cid()
@@ -105,8 +109,8 @@ class MergeProjects():
         for cn in self.code_name_s:
             # Unmatched code name
             if cn['newcid'] == -1:
-                cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)"
-                    , (cn['name'], cn['memo'], cn['owner'], cn['date'], None, cn['color']))
+                cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                    (cn['name'], cn['memo'], cn['owner'], cn['date'], None, cn['color']))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
@@ -147,7 +151,7 @@ class MergeProjects():
                 src['newid'] = res[0]
             else:
                 cur_d.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                    (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'],src['date']))
+                    (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date']))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
@@ -207,28 +211,7 @@ class MergeProjects():
         cur_s.execute(sql_annotations)
         res_annot = cur_s.fetchall()
         for i in res_annot:
-            an = {"fid": i[0], "newfid": -1, "pos0": i[1], "pos1": i[2], "memo":i[3], "owner": i[4], "date": i[5]}
-            #print(an)
+            an = {"fid": i[0], "newfid": -1, "pos0": i[1], "pos1": i[2], "memo": i[3], "owner": i[4], "date": i[5]}
+            # print(an)
             self.annotations_s.append(an)
-
-    def get_projects(self):
-        self.path_s = QtWidgets.QFileDialog.getExistingDirectory(None, 'Source Project', os.path.expanduser('~'))
-        if self.path_s == "" or self.path_s is False or self.path_s[-4:] != ".qda":
-            print("Source qda folder not selected. Exiting")
-            exit(0)
-        self.path_d = QtWidgets.QFileDialog.getExistingDirectory(None, 'Destination Project', os.path.expanduser('~'))
-        if self.path_d == "" or self.path_d is False or self.path_d[-4:] != ".qda":
-            print("Destination qda folder not selected. Exiting")
-            exit(0)
-        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))
-        self.conn_d = sqlite3.connect(os.path.join(self.path_d, 'data.qda'))
-        if self.conn_d is None or self.conn_s is None:
-            print("Cannot connect to databases. Exiting")
-            exit(0)
-        print("Merge Source", self.path_s)
-        print("Into Destination", self.path_d)
-
-if __name__ == "__main__":
-    ui = MergeProjects()
-
 
