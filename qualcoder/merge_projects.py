@@ -35,6 +35,7 @@ Categories (the code tree structure) is not copied from Project B to Project A.
 
 import logging
 import os
+import shutil
 import sqlite3
 
 from PyQt5 import QtWidgets
@@ -69,6 +70,7 @@ class MergeProjects:
     source_s = []  # source text from Source project
     code_text_s = []  # coded text segments from Source project
     annotations_s = []  # annotations from Source project
+    summary_msg = ""
 
     # TODO
     code_image_s = []  # coded image areas from Source project
@@ -85,7 +87,8 @@ class MergeProjects:
         self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))
         self.conn_d = self.app.conn
         self.path_d = self.app.project_path
-
+        self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
+        self.copy_source_files_into_destination()
         self.get_source_data()
         self.fill_sources_update_id()
         self.update_code_name_cid()
@@ -115,6 +118,8 @@ class MergeProjects:
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
                 cn['newcid'] = cid
+                self.summary_msg += _("Adding code name: ") + cn['name'] + "\n"
+                print(_("Adding new code name: " + cn['name'] + ", " + str(cn['newcid'])))
         # Update code_text cids
         print("Updating Source.code_text cid to Destination.cid")
         for cn in self.code_name_s:
@@ -135,7 +140,8 @@ class MergeProjects:
                 c['memo'], c['date'], c['important']))
         self.conn_d.commit()
         for a in self.annotations_s:
-            cur_d.execute("insert into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)", [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
+            cur_d.execute("insert into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
+                          [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
         self.conn_d.commit()
 
     def fill_sources_update_id(self):
@@ -173,14 +179,35 @@ class MergeProjects:
             if an['newfid'] == -1:
                 print("Annotation. No Match for existing fid ", an)
 
+    def copy_source_files_into_destination(self):
+        """ Copy source files into destination project.
+        TODO Do not copy matching file names.
+        """
+
+        print("Copy source files into dest")
+        folders = ["audio", "documents", "images", "video"]
+        for folder_name in folders:
+            dir_ = self.path_s + "/" + folder_name
+            files = os.listdir(dir_)
+            for f in files:
+                try:
+                    shutil.copyfile(dir_ + "/" + f, self.app.project_path + "/" + folder_name + "/" + f)
+                    self.summary_msg += _("File copied: ") + f + "\n"
+                except shutil.SameFileError:
+                    pass
+                except PermissionError:
+                    self.summary_msg += f + " " + _("NOT copied. Permission error")
+
     def get_source_data(self):
         """ Load the source data into memory.
 
         code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name))
         ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name))
         source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name))
-        code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer, owner text, date text, memo text, avid integer, important integer
-        annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text, unique(fid,pos0,pos1,owner
+        code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer,
+        owner text, date text, memo text, avid integer, important integer
+        annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text,
+        unique(fid,pos0,pos1,owner
         """
 
         print("Getting Source table data for source, code_text, code_name, annotation")
@@ -189,14 +216,16 @@ class MergeProjects:
         cur_s.execute(sql_source)
         res_source = cur_s.fetchall()
         for i in res_source:
-            src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4], "owner": i[5], "date": i[6]}
+            src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
+                   "owner": i[5], "date": i[6]}
             #print(src)
             self.source_s.append(src)
         sql_codenames = "select cid, name, memo, owner, date, color from code_name"
         cur_s.execute(sql_codenames)
         res_codenames = cur_s.fetchall()
         for i in res_codenames:
-            cn = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5], "catid": None}
+            cn = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
+                  "catid": None}
             #print(cn)
             self.code_name_s.append(cn)
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
