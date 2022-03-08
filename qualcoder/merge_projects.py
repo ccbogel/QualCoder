@@ -40,7 +40,6 @@ import sqlite3
 
 from PyQt5 import QtWidgets
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -57,9 +56,18 @@ def exception_handler(exception_type, value, tb_obj):
 
 class MergeProjects:
     """ Merge one external Qualcoder project (source) database into existing project (destination).
-     The merge will combine files, and codings.
-     The merge will not insert the Source Categories structure into the Destination.
-     Codes will be merged into the Destination.
+    The merge will combine files, and codings.
+    Copies files from source to destination folders.
+    Adds new source code names to dest database.
+    Adds text codings, annotations to dest database.
+
+    The merge will not insert the Source Categories structure into the Destination.
+    TODO
+        Does not add new category names.
+        Does not add image or A/V codings.
+        Does not add journals.
+        Does not add cases.
+        Does not add attributes.
      """
 
     app = None
@@ -70,6 +78,8 @@ class MergeProjects:
     source_s = []  # source text from Source project
     code_text_s = []  # coded text segments from Source project
     annotations_s = []  # annotations from Source project
+    journals_s = []
+    stored_sql_s = []
     summary_msg = ""
 
     # TODO
@@ -79,6 +89,7 @@ class MergeProjects:
     code_name_s = []  # code names from Source project
     # TODO to import code cats
     code_cat_s = []  # code cats from Source project
+
     # TODO import journals, stored_sql, cases, case_text, attributes
 
     def __init__(self, app, path_s):
@@ -113,7 +124,7 @@ class MergeProjects:
             # Unmatched code name
             if cn['newcid'] == -1:
                 cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                    (cn['name'], cn['memo'], cn['owner'], cn['date'], None, cn['color']))
+                              (cn['name'], cn['memo'], cn['owner'], cn['date'], None, cn['color']))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 cid = cur_d.fetchone()[0]
@@ -131,18 +142,36 @@ class MergeProjects:
         """ Code text fid and cid updated, annotation fid updated.
         Now insert into Destination project. """
 
-        print("Inserting coded text and annotations into Destination project.")
         cur_d = self.conn_d.cursor()
+        # Earlier db versions did not have Unique journal name
+        cur_d.execute("select name from journal")
+        j_names_res = cur_d.fetchall()
+        j_names = []
+        for j in j_names_res:
+            j_names.append(j[0])
+        for j in self.journals_s:
+            # Possible to have two identical journal names in earlier db versions
+            if j['name'] not in j_names:
+                cur_d.execute("insert into journal (name, jentry, date, owner) values(?,?,?,?)",
+                              (j['name'], j['jentry'], j['date'], j['owner']))
+                self.summary_msg += _("Copying journal: ") + j['name'] + "\n"
+                self.conn_d.commit()
+        for s in self.stored_sql_s:
+            # Cannot have two identical titles, so 'or ignore'
+            cur_d.execute("insert or ignore into stored_sql (title, description, grouper, ssql) values(?,?,?,?)",
+                            (s['title'], s['description'], s['grouper'], s['ssql']))
+            self.conn_d.commit()
         for c in self.code_text_s:
             cur_d.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date, important) values(?,?,?,?,?,?,?,?,?)", (c['newcid'], c['newfid'],
-                c['seltext'], c['pos0'], c['pos1'], c['owner'],
-                c['memo'], c['date'], c['important']))
+                                                                   c['seltext'], c['pos0'], c['pos1'], c['owner'],
+                                                                   c['memo'], c['date'], c['important']))
         self.conn_d.commit()
         for a in self.annotations_s:
             cur_d.execute("insert into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
                           [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
         self.conn_d.commit()
+        #TODO
 
     def fill_sources_update_id(self):
         """ Insert Source.source into Destination.source, unless source name is already present.
@@ -157,7 +186,7 @@ class MergeProjects:
                 src['newid'] = res[0]
             else:
                 cur_d.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                    (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date']))
+                              (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date']))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
@@ -181,7 +210,7 @@ class MergeProjects:
 
     def copy_source_files_into_destination(self):
         """ Copy source files into destination project.
-        TODO Do not copy matching file names.
+        Do not copy over existing files.
         """
 
         print("Copy source files into dest")
@@ -190,35 +219,65 @@ class MergeProjects:
             dir_ = self.path_s + "/" + folder_name
             files = os.listdir(dir_)
             for f in files:
-                try:
-                    shutil.copyfile(dir_ + "/" + f, self.app.project_path + "/" + folder_name + "/" + f)
-                    self.summary_msg += _("File copied: ") + f + "\n"
-                except shutil.SameFileError:
-                    pass
-                except PermissionError:
-                    self.summary_msg += f + " " + _("NOT copied. Permission error")
+                if not os.path.exists(self.app.project_path + "/" + folder_name + "/" + f):
+                    try:
+                        shutil.copyfile(dir_ + "/" + f, self.app.project_path + "/" + folder_name + "/" + f)
+                        self.summary_msg += _("File copied: ") + f + "\n"
+                    except shutil.SameFileError:
+                        pass
+                    except PermissionError:
+                        self.summary_msg += f + " " + _("NOT copied. Permission error")
 
     def get_source_data(self):
         """ Load the source data into memory.
-
-        code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name))
-        ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name))
-        source (id integer primary key, name text, fulltext text, mediapath text, memo text, owner text, date text, unique(name))
-        code_text (ctid integer primary key, cid integer, fid integer,seltext text, pos0 integer, pos1 integer,
-        owner text, date text, memo text, avid integer, important integer
-        annotation (anid integer primary key, fid integer,pos0 integer, pos1 integer, memo text, owner text, date text,
-        unique(fid,pos0,pos1,owner
+        DONE
+        code_name (cid integer primary key, name text, memo text, catid integer, owner text,date text, color text, unique(name)
+        TODO
+        ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name)
+        TODO
+        code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, "
+            "memo text, date text, owner text, important
+        TODO
+        code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, "
+            "height integer, cid integer, memo text, date text, owner text, important
+        TODO
+        CREATE TABLE cases (caseid integer primary key, name text, memo text, owner text,date text
+        TODO
+        case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
+            "owner text, date text, memo
+        TODO
+        attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
+            "valuetype
+        TODO
+        attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
+            "date text, owner
         """
 
+        self.journals_s = []
+        self.stored_sql_s = []
+        self.code_name_s = []
+        self.code_text_s = []
+        self.annotations_s = []
         print("Getting Source table data for source, code_text, code_name, annotation")
         cur_s = self.conn_s.cursor()
+        sql_journal = "select name, jentry, date, owner from journal"
+        cur_s.execute(sql_journal)
+        res_journals = cur_s.fetchall()
+        for i in res_journals:
+            src = {"name": i[0], "jentry": i[1], "date": i[2], "owner": i[3]}
+            self.journals_s.append(src)
+        sql_stored_sql = "select title, description, grouper, ssql from stored_sql"
+        cur_s.execute(sql_stored_sql)
+        res_stored_sqls = cur_s.fetchall()
+        for i in res_stored_sqls:
+            src = {"title": i[0], "description": i[1], "grouper": i[2], "ssql": i[3]}
+            self.stored_sql_s.append(src)
         sql_source = "select id, name, fulltext,mediapath,memo,owner,date from source"
         cur_s.execute(sql_source)
         res_source = cur_s.fetchall()
         for i in res_source:
             src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
                    "owner": i[5], "date": i[6]}
-            #print(src)
             self.source_s.append(src)
         sql_codenames = "select cid, name, memo, owner, date, color from code_name"
         cur_s.execute(sql_codenames)
@@ -226,7 +285,6 @@ class MergeProjects:
         for i in res_codenames:
             cn = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
                   "catid": None}
-            #print(cn)
             self.code_name_s.append(cn)
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         cur_s.execute(sql_codetext)
@@ -234,13 +292,10 @@ class MergeProjects:
         for i in res_codetext:
             ct = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "seltext": i[2], "pos0": i[3], "pos1": i[4],
                   "owner": i[5], "date": i[6], "memo": i[7], "important": i[8]}
-            #print(ct)
             self.code_text_s.append(ct)
         sql_annotations = "select fid, pos0, pos1, memo, owner, date from annotation"
         cur_s.execute(sql_annotations)
         res_annot = cur_s.fetchall()
         for i in res_annot:
             an = {"fid": i[0], "newfid": -1, "pos0": i[1], "pos1": i[2], "memo": i[3], "owner": i[4], "date": i[5]}
-            # print(an)
             self.annotations_s.append(an)
-
