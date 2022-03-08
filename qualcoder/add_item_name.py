@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogAddItemName(QtWidgets.QDialog):
-    """
-    Dialog to get a new code or code category from user.
+    """ Dialog to get a new code or code category from user.
     Also used for Case and File adding attributes.
     Requires a name for Dialog title (and label in setupUI)
     Requires a list of dictionary 'name' items.
@@ -65,6 +64,7 @@ class DialogAddItemName(QtWidgets.QDialog):
     def __init__(self, app, items, title, text, parent=None):
         super(DialogAddItemName, self).__init__(parent)
         sys.excepthook = exception_handler
+        self.existing_items = []
         for i in items:
             self.existing_items.append(i['name'])
         QtWidgets.QDialog.__init__(self)
