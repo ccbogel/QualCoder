@@ -138,7 +138,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         print("MERGE PROJECTS")
         print("Merge: ", self.merge_project_path)
         print("Into: ", self.app.project_path)
-        MergeProjects(self.app, self.merge_project_path )
+        mp = MergeProjects(self.app, self.merge_project_path)
+        self.parent_text_edit.append(mp.summary_msg)
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):
