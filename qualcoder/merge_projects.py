@@ -23,14 +23,6 @@ THE SOFTWARE.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-
-Have backups of both projects. Essential.
-The texts, and codings and codes from Project B will be copied into Project A.
-If there are matching codes (same codenames), thats OK.
-If there are unique codes in Project B, these will be copied into Project A.
-
-TODO
-Categories (the code tree structure) is not copied from Project B to Project A.
 """
 
 import logging
@@ -58,15 +50,16 @@ class MergeProjects:
     """ Merge one external Qualcoder project (source) database into existing project (destination).
     The merge will combine files, and codings.
     Copies files from source to destination folders.
-    Adds new source code names to dest database.
-    Adds text codings, annotations, image codings, av codings to dest database.
+    Adds new source code names to destination database.
+    Adds journals and stored_sql to destination database, as long as they have unique names,
+    Adds text codings, annotations, image codings, av codings to destination database.
 
-    The merge will not insert the Source Categories structure into the Destination.
     TODO
+        Does not insert the Source Categories tree into the Destination.
         Does not add new category names.
-        Does not add journals.
         Does not add cases.
         Does not add attributes.
+        Does not link A/V to text transcript file
      """
 
     app = None
@@ -100,7 +93,9 @@ class MergeProjects:
         self.update_coding_file_ids()
         self.update_code_name_cid()
         self.insert_data_into_destination()
-        print("Finished merging ", self.path_s, " into ", self.path_d)
+        self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
+        self.summary_msg += _("NOT MERGED: code categories, cases, attributes") + "\n"
+        self.summary_msg += _("NOT LINKED: text transcript to audio/video")
 
     def update_code_name_cid(self):
         """ Update the cid to the one already in Destination.code_name.
@@ -145,6 +140,7 @@ class MergeProjects:
 
         cur_d = self.conn_d.cursor()
         # Earlier db versions did not have Unique journal name
+        # Need to identify duplicate journal names and not import them
         cur_d.execute("select name from journal")
         j_names_res = cur_d.fetchall()
         j_names = []
@@ -158,21 +154,36 @@ class MergeProjects:
                 self.summary_msg += _("Copying journal: ") + j['name'] + "\n"
                 self.conn_d.commit()
         for s in self.stored_sql_s:
-            # Cannot have two identical titles, so 'or ignore'
+            # Cannot have two identical stored_sql titles, using 'or ignore'
             cur_d.execute("insert or ignore into stored_sql (title, description, grouper, ssql) values(?,?,?,?)",
                             (s['title'], s['description'], s['grouper'], s['ssql']))
             self.conn_d.commit()
         for c in self.code_text_s:
-            cur_d.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+            cur_d.execute("insert or ignore into code_text (cid,fid,seltext,pos0,pos1,owner,\
                 memo,date, important) values(?,?,?,?,?,?,?,?,?)", (c['newcid'], c['newfid'],
                                                                    c['seltext'], c['pos0'], c['pos1'], c['owner'],
                                                                    c['memo'], c['date'], c['important']))
-        self.conn_d.commit()
+            self.conn_d.commit()
+        if len(self.code_text_s) > 0:
+            self.summary_msg += _("Merging coded text") + "\n"
         for a in self.annotations_s:
-            cur_d.execute("insert into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
+            cur_d.execute("insert or ignore into annotation (fid,pos0,pos1,memo,owner,date) values(?,?,?,?,?,?)",
                           [a["newfid"], a["pos0"], a["pos1"], a["memo"], a["owner"], a["date"]])
-        self.conn_d.commit()
-        #TODO code_image, code_av
+            self.conn_d.commit()
+        if len(self.annotations_s) > 0:
+            self.summary_msg += _("Merging annotations") + "\n"
+        for c in self.code_image_s:
+            cur_d.execute("insert or ignore into code_image (cid, id,x1,y1,width,height,memo,owner,date,important) values(?,?,?,?,?,?,?,?,?,?)",
+                          [c["newcid"], c["newfid"], c["x1"], c["y1"], c["width"], c["height"], c["memo"], c["owner"], c["date"], c["important"]])
+            self.conn_d.commit()
+        if len(self.code_image_s) > 0:
+            self.summary_msg += _("Merging coded image areas") + "\n"
+        for c in self.code_av_s:
+            cur_d.execute("insert or ignore into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
+                [c["newcid"], c["newfid"], c["pos0"], c["pos1"], c["memo"], c["owner"], c["date"], c["important"]])
+            self.conn_d.commit()
+        if len(self.code_av_s) > 0:
+            self.summary_msg += _("Merging coded audio/video segments") + "\n"
 
     def fill_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source name is already present.
