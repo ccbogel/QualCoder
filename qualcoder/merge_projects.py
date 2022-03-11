@@ -32,6 +32,8 @@ import sqlite3
 
 from PyQt5 import QtWidgets
 
+from .helpers import Message
+
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -57,9 +59,8 @@ class MergeProjects:
     TODO
         Does not insert the Source Categories tree into the Destination.
         Does not add new category names.
-        Does not add cases.
+        Does not add cases, case_text.
         Does not add attributes.
-        Does not link A/V to text transcript file
      """
 
     app = None
@@ -77,8 +78,8 @@ class MergeProjects:
     code_av_s = []  # coded A/V segments from Source project
     code_name_s = []  # code names from Source project
     code_cat_s = []  # code cats from Source project
-
-    # TODO import cases, case_text, attribute_types, attributes
+    cases_s = []  # cases
+    case_text_s = []  # case text and links to non-text files
 
     def __init__(self, app, path_s):
         self.app = app
@@ -88,14 +89,20 @@ class MergeProjects:
         self.path_d = self.app.project_path
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
         self.copy_source_files_into_destination()
-        self.get_source_data()
-        self.fill_sources_get_new_file_ids()
-        self.update_coding_file_ids()
-        self.update_code_name_cid()
-        self.insert_data_into_destination()
-        self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
-        self.summary_msg += _("NOT MERGED: code categories, cases, attributes") + "\n"
-        self.summary_msg += _("NOT LINKED: text transcript to audio/video")
+        loaded = self.get_source_data()
+        if loaded:
+            self.fill_sources_get_new_file_ids()
+            self.update_coding_file_ids()
+            self.update_code_name_cid()
+            self.insert_coding_and_journal_data()
+            #TODO update cases caseid and case text caseid, fid
+            self.insert_cases()
+            self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
+            self.summary_msg += _("NOT MERGED: code categories, cases, attributes") + "\n"
+            self.summary_msg += _("NOT LINKED: text transcript to audio/video")
+            Message(self.app, _('Project merged'), _("Project merged")).exec_()
+        else:
+            Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
 
     def update_code_name_cid(self):
         """ Update the cid to the one already in Destination.code_name.
@@ -134,12 +141,12 @@ class MergeProjects:
                 if cav['cid'] == cn['cid']:
                     cav['newcid'] = cn['newcid']
 
-    def insert_data_into_destination(self):
-        """ Code text fid and cid updated, annotation fid updated.
-        Now insert into Destination project. """
+    def insert_coding_and_journal_data(self):
+        """ Coding fid and cid have been updated, annotation fid has been updated.
+        Insert code_text, code_image, code_av, journal and stored_sql data into Destination project. """
 
         cur_d = self.conn_d.cursor()
-        # Earlier db versions did not have Unique journal name
+        # Earlier db versions did not have unique journal name
         # Need to identify duplicate journal names and not import them
         cur_d.execute("select name from journal")
         j_names_res = cur_d.fetchall()
@@ -185,24 +192,52 @@ class MergeProjects:
         if len(self.code_av_s) > 0:
             self.summary_msg += _("Merging coded audio/video segments") + "\n"
 
+    def insert_cases(self):
+        """ Insert case data into destination. """
+
+        print("TODO update caseid in cases and case_text. Update fid in case_text")
+        print("TODO load cases and case text data")
+
+        '''{'caseid': 1, 'newcaseid': -1, 'name': 'first case', 'memo': 'first test case', 
+         'owner': 'default',
+         'date': '2022-03-11 22:00:21'}
+        {'caseid': 1, 'newcaseid': -1, 'fid': 4, 'newfid': -1, 'pos0': 0, 'pos1': 0}
+        {'caseid': 1, 'newcaseid': -1, 'fid': 5, 'newfid': -1, 'pos0': 0, 'pos1': 4}'''
+
+        for i in self.cases_s:
+            print(i)
+        for i in self.case_text_s:
+            print(i)
+
     def fill_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source name is already present.
         update newfid in source_s and code_text_s.
-        TODO link transcript to A/V file """
+        Update the av_text_id link to link A/V to the corresponding transcript.
+        """
 
         cur_d = self.conn_d.cursor()
         for src in self.source_s:
             cur_d.execute("select id from source where name=?", [src['name']])
             res = cur_d.fetchone()
             if res is not None:
+                # Existing same named source file in the destination project
                 src['newid'] = res[0]
             else:
-                cur_d.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                              (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date']))
+                # To update the av_text_id after all new ids have been generated
+                cur_d.execute("insert into source(name,fulltext,mediapath,memo,owner,date, av_text_id) values(?,?,?,?,?,?,?)",
+                              (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date'], None))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
                 src['newid'] = id_
+        # Need to find matching av_text_filename to get its id to link as the av_text_id
+        for src in self.source_s:
+            if src['av_text_filename'] != "":
+                cur_d.execute("select id from source where name=?", [src['av_text_filename']])
+                res = cur_d.fetchone()
+                if res is not None:
+                    cur_d.execute("update source set av_text_id=? where id=?", [res[0], src['id']])
+                    self.conn_d.commit()
 
     def update_coding_file_ids(self):
 
@@ -221,13 +256,6 @@ class MergeProjects:
             for c_av in self.code_av_s:
                 if c_av['fid'] == src['id']:
                     c_av['newfid'] = src['newid']
-        # Display potential problems
-        '''for ct in self.code_text_s:
-            if ct['newfid'] == -1:
-                print("Code Text. No Match for existing fid ", ct)
-        for an in self.annotations_s:
-            if an['newfid'] == -1:
-                print("Annotation. No Match for existing fid ", an)'''
 
     def copy_source_files_into_destination(self):
         """ Copy source files into destination project.
@@ -250,20 +278,25 @@ class MergeProjects:
                         self.summary_msg += f + " " + _("NOT copied. Permission error")
 
     def get_source_data(self):
-        """ Load the source data into memory.
-        TODO
-        ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name)
+        """ Load the entire database data into Lists of Dictionaries.
         TODO
         cases (caseid integer primary key, name text, memo text, owner text,date text
         TODO
         case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
             "owner text, date text, memo
+
+
+        TODO
+        ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name)
         TODO
         attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
             "valuetype
         TODO
         attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
             "date text, owner
+
+        return:
+            True or False if data was able to be loaded
         """
 
         self.journals_s = []
@@ -274,8 +307,17 @@ class MergeProjects:
         self.annotations_s = []
         self.code_image_s = []
         self.code_av_s = []
-        print("Getting Source table data for source, code_text, code_name, annotation")
+        self.cases_s = []
+        self.case_text_s = []
         cur_s = self.conn_s.cursor()
+        # Database version must be v5
+        cur_s.execute("select databaseversion from project")
+        version = cur_s.fetchone()
+        if version[0] < "v5":
+            self.summary_msg += _("Need to update the source project database.") + "\n"
+            self.summary_msg += _("Please open the source project using QualCoder. Then close the project") + "n"
+            self.summary_msg += _("Project not merged") + "\n"
+            return False
         # Journal data
         sql_journal = "select name, jentry, date, owner from journal"
         cur_s.execute(sql_journal)
@@ -291,13 +333,21 @@ class MergeProjects:
             src = {"title": i[0], "description": i[1], "grouper": i[2], "ssql": i[3]}
             self.stored_sql_s.append(src)
         # Source data
-        sql_source = "select id, name, fulltext,mediapath,memo,owner,date from source"
+        sql_source = "select id, name, fulltext,mediapath,memo,owner,date,av_text_id from source"
         cur_s.execute(sql_source)
         res_source = cur_s.fetchall()
+        # Later update av_text_id
         for i in res_source:
             src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
-                   "owner": i[5], "date": i[6]}
+                   "owner": i[5], "date": i[6], "av_text_id": i[7], "av_text_filename": ""}
             self.source_s.append(src)
+        # The av_text_id is not enough to recreate linkages. Need the actual text filename.
+        for i in self.source_s:
+            if i['av_text_id'] is not None:
+                cur_s.execute("select name from source where id=?", [i['av_text_id']])
+                res = cur_s.fetchone()
+                if res is not None:
+                    i['av_text_filename'] = res[0]
         # Code data
         sql_codenames = "select cid, name, memo, owner, date, color from code_name"
         cur_s.execute(sql_codenames)
@@ -334,7 +384,7 @@ class MergeProjects:
         res_code_img = cur_s.fetchall()
         for i in res_code_img:
             cimg = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "x1": i[2], "y1": i[3],
-                  "width": i[4], "height": i[5], "memo": i[6], "date": i[7], "owner": i[8], "important": i[9]}
+                    "width": i[4], "height": i[5], "memo": i[6], "date": i[7], "owner": i[8], "important": i[9]}
             self.code_image_s.append(cimg)
         # Code AV data
         sql_code_av = "select cid, id, pos0, pos1, owner, date, memo, important from code_av"
@@ -342,5 +392,19 @@ class MergeProjects:
         res_code_av = cur_s.fetchall()
         for i in res_code_av:
             c_av = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3],
-                  "owner": i[4], "date": i[5], "memo": i[6], "important": i[7]}
+                    "owner": i[4], "date": i[5], "memo": i[6], "important": i[7]}
             self.code_av_s.append(c_av)
+        # Case data
+        sql_cases = "select caseid, name, memo, owner, date from cases"
+        cur_s.execute(sql_cases)
+        res_cases = cur_s.fetchall()
+        for i in res_cases:
+            c = {"caseid": i[0], "newcaseid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4]}
+            self.cases_s.append(c)
+        sql_case_text = "select caseid, fid, pos0, pos1 from case_text"
+        cur_s.execute(sql_case_text)
+        res_case_text = cur_s.fetchall()
+        for i in res_case_text:
+            c = {"caseid": i[0], "newcaseid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3]}
+            self.cases_s.append(c)
+        return True
