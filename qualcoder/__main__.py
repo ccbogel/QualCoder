@@ -1399,11 +1399,12 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
             "date text, color text, unique(name))")
+        # Database version v6 - unique name for journal
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text), "
                     "unique(name)")
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
