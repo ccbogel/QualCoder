@@ -76,8 +76,8 @@ class MergeProjects:
     summary_msg = ""
     code_image_s = []  # coded image areas from Source project
     code_av_s = []  # coded A/V segments from Source project
-    code_name_s = []  # code names from Source project
-    code_cat_s = []  # code cats from Source project
+    codes_s = []  # codes from Source project
+    categories_s = []  # code cats from Source project
     cases_s = []  # cases
     case_text_s = []  # case text and links to non-text files
 
@@ -93,32 +93,32 @@ class MergeProjects:
         if loaded:
             self.fill_sources_get_new_file_ids()
             self.update_coding_file_ids()
-            self.update_code_name_cid()
+            self.insert_categories()
+            self.update_code_name_cid_insert_code()
             self.insert_coding_and_journal_data()
             #TODO update cases caseid and case text caseid, fid
             self.insert_cases()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _("NOT MERGED: code categories, cases, attributes") + "\n"
             self.summary_msg += _("NOT LINKED: text transcript to audio/video")
-            Message(self.app, _('Project merged'), _("Project merged")).exec_()
+            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
         else:
             Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
 
-    def update_code_name_cid(self):
+    def update_code_name_cid_insert_code(self):
         """ Update the cid to the one already in Destination.code_name.
         Check for no matches and insert these into the Destination.code_name table.
         """
 
-        print("Updating Source.code_name cid")
         cur_d = self.conn_d.cursor()
         sql = "select cid, name from code_name"
         cur_d.execute(sql)
         res = cur_d.fetchall()
         for r in res:
-            for cn in self.code_name_s:
+            for cn in self.codes_s:
                 if cn['name'] == r[1]:
                     cn['newcid'] = r[0]
-        for cn in self.code_name_s:
+        for cn in self.codes_s:
             # Unmatched code name
             if cn['newcid'] == -1:
                 cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
@@ -130,7 +130,7 @@ class MergeProjects:
                 self.summary_msg += _("Adding code name: ") + cn['name'] + "\n"
         # Update code_text, code_image, code_av cids
         print("Updating Source.code_text cid to Destination.cid")
-        for cn in self.code_name_s:
+        for cn in self.codes_s:
             for ct in self.code_text_s:
                 if ct['cid'] == cn['cid']:
                     ct['newcid'] = cn['newcid']
@@ -140,6 +140,56 @@ class MergeProjects:
             for cav in self.code_av_s:
                 if cav['cid'] == cn['cid']:
                     cav['newcid'] = cn['newcid']
+
+    def insert_categories(self):
+        """ Insert categories into destination code_cat table.
+         The categories have already been filtered to remove any names that match names in the destination.
+         """
+
+        cur_d = self.conn_d.cursor()
+        # Insert top level categories
+        remove_list = []
+        for c in self.categories_s:
+            if c['supercatname'] is None:
+                self.summary_msg += _("Adding top level category: ") + c['name'] + "\n"
+                cur_d.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
+                              (c['name'], c['memo'], c['owner'], c['date'], c['supercatid']))
+                self.conn_d.commit()
+                remove_list.append(c)
+        for item in remove_list:
+            self.categories_s.remove(item)
+        print("TODO SUB CATS")
+        for c in self.categories_s:
+            print("SUBCAT\n", c)
+
+        ''' Add child categories. look at each unmatched category, iterate through
+        to add as child, then remove matched categories from the list '''
+        count = 0
+        while len(self.categories_s) > 0 and count < 10000:
+            remove_list = []
+            for c in self.categories_s:
+                count2 = 0
+                cur_d.execute("select name, catid from code_cat")
+                dest_cats = cur_d.fetchall()
+
+
+                '''item = 
+                while item and count2 < 10000:  # While there is an item in the list
+                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                        memo = ""
+                        if c['memo'] != "" and c['memo'] is not None:
+                            memo = _("Memo")
+                        # db insert HERE
+                        remove_list.append(c)
+                    it += 1
+                    item = it.value()
+                    count2 += 1'''
+            for item in remove_list:
+                self.categories_s.remove(item)
+            count += 1
+
+        print("END CATEGORIES METHOD\n")
+
 
     def insert_coding_and_journal_data(self):
         """ Coding fid and cid have been updated, annotation fid has been updated.
@@ -240,9 +290,8 @@ class MergeProjects:
                     self.conn_d.commit()
 
     def update_coding_file_ids(self):
+        """ Update the file ids in the codings and annotations data. """
 
-        # Update code_text and annotations fids
-        print("Updating code_text.fid and annotation.fid")
         for src in self.source_s:
             for c_text in self.code_text_s:
                 if c_text['fid'] == src['id']:
@@ -284,8 +333,6 @@ class MergeProjects:
         TODO
         case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
             "owner text, date text, memo
-
-
         TODO
         ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name)
         TODO
@@ -301,8 +348,8 @@ class MergeProjects:
 
         self.journals_s = []
         self.stored_sql_s = []
-        self.code_name_s = []
-        self.code_cat_s = []
+        self.codes_s = []
+        self.categories_s = []
         self.code_text_s = []
         self.annotations_s = []
         self.code_image_s = []
@@ -341,30 +388,53 @@ class MergeProjects:
             src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
                    "owner": i[5], "date": i[6], "av_text_id": i[7], "av_text_filename": ""}
             self.source_s.append(src)
-        # The av_text_id is not enough to recreate linkages. Need the actual text filename.
+        # The av_text_id is not enough to recreate linkages. Need the refernced text file name.
         for i in self.source_s:
             if i['av_text_id'] is not None:
                 cur_s.execute("select name from source where id=?", [i['av_text_id']])
                 res = cur_s.fetchone()
                 if res is not None:
                     i['av_text_filename'] = res[0]
+        # Category data
+        sql_codecats = "select catid, supercatid, name, memo, owner, date from code_cat"
+        cur_s.execute(sql_codecats)
+        res_codecats = cur_s.fetchall()
+        for i in res_codecats:
+            ccat = {"catid": i[0], "supercatid": i[1], "supercatname": None,
+                    "name": i[2], "memo": i[3], "owner": i[4], "date": i[5], }
+            self.categories_s.append(ccat)
+        # Remove categories from the source list, that are already present in the destination database
+        cur_d = self.app.conn.cursor()
+        cur_d.execute("select name from code_cat")
+        res_dest_catnames = cur_d.fetchall()
+        dest_cat_names_list = []
+        for r in res_dest_catnames:
+            dest_cat_names_list.append(r[0])
+        temp_source_cats = []
+        for cat in self.categories_s:
+            if cat['name'] not in dest_cat_names_list:
+                temp_source_cats.append(cat)
+        self.categories_s = temp_source_cats
+        # Add reference to linked supercat using category name
+        for cat in self.categories_s:
+            cur_s.execute("select name from code_cat where catid=?", [cat['supercatid']])
+            res = cur_s.fetchone()
+            if res is not None:
+                cat['supercatname'] = res[0]
         # Code data
         sql_codenames = "select cid, name, memo, owner, date, color from code_name"
         cur_s.execute(sql_codenames)
         res_codenames = cur_s.fetchall()
         for i in res_codenames:
             cn = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
-                  "catid": None}
-            self.code_name_s.append(cn)
-        # Code category data
-        sql_codecats = "select catid, supercatid, name, memo, owner, date from code_cat"
-        cur_s.execute(sql_codecats)
-        res_codecats = cur_s.fetchall()
-        for i in res_codecats:
-            ccat = {"catid": i[0], "newcatid": -1, "supercatid": i[1], "newsupercatid": -1,
-                    "name": i[2], "memo": i[3], "owner": i[4], "date": i[5]}
-            self.code_cat_s.append(ccat)
-        # Code text and text annotation data
+                  "catid": None, "catname": None}
+            self.codes_s.append(cn)
+        for c in self.codes_s:
+            cur_s.execute("select name from code_cat where catid=?", [c['catid']])
+            res = cur_s.fetchone()
+            if res is not None:
+                cat['catname'] = res[0]
+        # Code text data
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         cur_s.execute(sql_codetext)
         res_codetext = cur_s.fetchall()
@@ -372,6 +442,7 @@ class MergeProjects:
             ct = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "seltext": i[2], "pos0": i[3], "pos1": i[4],
                   "owner": i[5], "date": i[6], "memo": i[7], "important": i[8]}
             self.code_text_s.append(ct)
+        # Text annotations data
         sql_annotations = "select fid, pos0, pos1, memo, owner, date from annotation"
         cur_s.execute(sql_annotations)
         res_annot = cur_s.fetchall()
@@ -394,6 +465,7 @@ class MergeProjects:
             c_av = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3],
                     "owner": i[4], "date": i[5], "memo": i[6], "important": i[7]}
             self.code_av_s.append(c_av)
+
         # Case data
         sql_cases = "select caseid, name, memo, owner, date from cases"
         cur_s.execute(sql_cases)
