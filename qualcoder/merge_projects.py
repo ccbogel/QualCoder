@@ -56,10 +56,10 @@ class MergeProjects:
     Adds new (unmatched) source code names to destination database.
     Adds journals and stored_sql to destination database, only if they have unique names,
     Adds text codings, text annotations, image codings, av codings to destination database.
+    Adds cases and case_text (links to text file segments and images and A/V)
 
     TODO
-        Does not add cases, case_text.
-        Does not add attributes.
+        To add attributes for files and cases.
      """
 
     app = None
@@ -99,7 +99,7 @@ class MergeProjects:
             self.insert_cases()
             # TODO insert attributes
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
-            self.summary_msg += _("NOT MERGED: cases, attributes") + "\n"
+            self.summary_msg += _("NOT MERGED: Case and File Attributes") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
         else:
             Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
@@ -144,7 +144,7 @@ class MergeProjects:
 
         if len(self.categories_s) > 0:
             self.summary_msg += str(len(self.categories_s)) + _(" categories not added") + "\n"
-            print(self.categories_s)
+            print("Categories NOT added:\n", self.categories_s)
 
     def update_code_cid_and_insert_code(self):
         """ Update the cid to the one already in Destination.code_name.
@@ -265,7 +265,6 @@ class MergeProjects:
             existing_case_names.append(r[0])
         self.remove_case_list = []
         for case_s in self.cases_s:
-            print("case_s", case_s)
             if case_s['name'] in existing_case_names:
                 self.remove_case_list.append(case_s)
         removed_case_text_list = []
@@ -279,7 +278,6 @@ class MergeProjects:
         # TODO remove from attributes also
         #
         for case_s in self.cases_s:
-            print(case_s)
             cur_d.execute("insert into cases (name, memo, owner, date) values (?,?,?,?)",
                         [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
             self.app.conn.commit()
@@ -287,12 +285,23 @@ class MergeProjects:
             case_id = cur_d.fetchone()[0]
             case_s['newcaseid'] = case_id
             self.summary_msg += _("Adding case: ") + case_s['name'] + "\n"
-        #TODO
+        # Update newcaseid and newfid in case_text
         for case_text in self.case_text_s:
-            print(case_text)
+            for case_s in self.cases_s:
+                if case_s['caseid'] == case_text['caseid']:
+                    case_text['newcaseid'] = case_s['newcaseid']
+            for file_ in self.source_s:
+                if case_text['fid'] == file_['newid']:
+                    case_text['newfid'] = file_['newid']
+        # Insert case text if newfileid is not -1 and newcaseid is not -1
+        for c in self.case_text_s:
+            if c['newcaseid'] > -1 and c['newfid'] > -1:
+                cur_d.execute("insert into case_text (caseid,fid,pos0,pos1) values(?,?,?,?)",
+                              [c['newcaseid'], c['newfid'], c['pos0'], c['pos1']])
+                self.app.conn.commit()
 
     def fill_sources_get_new_file_ids(self):
-        """ Insert Source.source into Destination.source, unless source name is already present.
+        """ Insert Source.source into Destination.source, unless source file name is already present.
         update newfid in source_s and code_text_s.
         Update the av_text_id link to link A/V to the corresponding transcript.
         """
