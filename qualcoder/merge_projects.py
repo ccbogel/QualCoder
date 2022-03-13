@@ -41,6 +41,7 @@ logger = logging.getLogger(__name__)
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
+
     tb = '\n'.join(traceback.format_tb(tb_obj))
     text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text)
@@ -50,15 +51,13 @@ def exception_handler(exception_type, value, tb_obj):
 
 class MergeProjects:
     """ Merge one external Qualcoder project (source) database into existing project (destination).
-    The merge will combine files, and codings.
-    Copies files from source to destination folders.
-    Adds new source code names to destination database.
-    Adds journals and stored_sql to destination database, as long as they have unique names,
-    Adds text codings, annotations, image codings, av codings to destination database.
+    Copies unmatched files from source project folders to destination project folders.
+    Adds new (unmatched) source categories to destination database.
+    Adds new (unmatched) source code names to destination database.
+    Adds journals and stored_sql to destination database, only if they have unique names,
+    Adds text codings, text annotations, image codings, av codings to destination database.
 
     TODO
-        Does not insert the Source Categories tree into the Destination.
-        Does not add new category names.
         Does not add cases, case_text.
         Does not add attributes.
      """
@@ -80,6 +79,7 @@ class MergeProjects:
     categories_s = []  # code cats from Source project
     cases_s = []  # cases
     case_text_s = []  # case text and links to non-text files
+    remove_case_list = []  # cases that match existing destination name
 
     def __init__(self, app, path_s):
         self.app = app
@@ -94,56 +94,20 @@ class MergeProjects:
             self.fill_sources_get_new_file_ids()
             self.update_coding_file_ids()
             self.insert_categories()
-            self.update_code_name_cid_insert_code()
+            self.update_code_cid_and_insert_code()
             self.insert_coding_and_journal_data()
-            #TODO update cases caseid and case text caseid, fid
             self.insert_cases()
+            # TODO insert attributes
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
-            self.summary_msg += _("NOT MERGED: code categories, cases, attributes") + "\n"
-            self.summary_msg += _("NOT LINKED: text transcript to audio/video")
+            self.summary_msg += _("NOT MERGED: cases, attributes") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
         else:
             Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
 
-    def update_code_name_cid_insert_code(self):
-        """ Update the cid to the one already in Destination.code_name.
-        Check for no matches and insert these into the Destination.code_name table.
-        """
-
-        cur_d = self.conn_d.cursor()
-        sql = "select cid, name from code_name"
-        cur_d.execute(sql)
-        res = cur_d.fetchall()
-        for r in res:
-            for cn in self.codes_s:
-                if cn['name'] == r[1]:
-                    cn['newcid'] = r[0]
-        for cn in self.codes_s:
-            # Unmatched code name
-            if cn['newcid'] == -1:
-                cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                              (cn['name'], cn['memo'], cn['owner'], cn['date'], None, cn['color']))
-                self.conn_d.commit()
-                cur_d.execute("select last_insert_rowid()")
-                cid = cur_d.fetchone()[0]
-                cn['newcid'] = cid
-                self.summary_msg += _("Adding code name: ") + cn['name'] + "\n"
-        # Update code_text, code_image, code_av cids
-        print("Updating Source.code_text cid to Destination.cid")
-        for cn in self.codes_s:
-            for ct in self.code_text_s:
-                if ct['cid'] == cn['cid']:
-                    ct['newcid'] = cn['newcid']
-            for ci in self.code_image_s:
-                if ci['cid'] == cn['cid']:
-                    ci['newcid'] = cn['newcid']
-            for cav in self.code_av_s:
-                if cav['cid'] == cn['cid']:
-                    cav['newcid'] = cn['newcid']
-
     def insert_categories(self):
         """ Insert categories into destination code_cat table.
-         The categories have already been filtered to remove any names that match names in the destination.
+         The categories have already been filtered to remove any names that match names
+         in the destination database.
          """
 
         cur_d = self.conn_d.cursor()
@@ -158,38 +122,74 @@ class MergeProjects:
                 remove_list.append(c)
         for item in remove_list:
             self.categories_s.remove(item)
-        print("TODO SUB CATS")
-        for c in self.categories_s:
-            print("SUBCAT\n", c)
 
-        ''' Add child categories. look at each unmatched category, iterate through
-        to add as child, then remove matched categories from the list '''
+        ''' Add sub-categories. look at each unmatched category, iterate through
+        to add as child, then remove from the list '''
         count = 0
-        while len(self.categories_s) > 0 and count < 10000:
+        while len(self.categories_s) > 0 and count < 1000:
             remove_list = []
             for c in self.categories_s:
-                count2 = 0
-                cur_d.execute("select name, catid from code_cat")
-                dest_cats = cur_d.fetchall()
-
-
-                '''item = 
-                while item and count2 < 10000:  # While there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
-                        memo = ""
-                        if c['memo'] != "" and c['memo'] is not None:
-                            memo = _("Memo")
-                        # db insert HERE
-                        remove_list.append(c)
-                    it += 1
-                    item = it.value()
-                    count2 += 1'''
+                # This needs to be repeated as it is changes
+                cur_d.execute("select catid from code_cat where name=?", [c['supercatname']])
+                res_category = cur_d.fetchone()
+                if res_category is not None:
+                    remove_list.append(c)
+                    sql = "insert into code_cat (name, memo, owner, date, supercatid) values (?,?,?,?,?)"
+                    cur_d.execute(sql, [c['name'], c['memo'], c['owner'], c['date'], res_category[0]])
+                    self.conn_d.commit()
+                    self.summary_msg += _("Adding sub-category: " + c['name']) + " --> " + c['supercatname'] + "\n"
             for item in remove_list:
                 self.categories_s.remove(item)
             count += 1
 
-        print("END CATEGORIES METHOD\n")
+        if len(self.categories_s) > 0:
+            self.summary_msg += str(len(self.categories_s)) + _(" categories not added") + "\n"
+            print(self.categories_s)
 
+    def update_code_cid_and_insert_code(self):
+        """ Update the cid to the one already in Destination.code_name.
+        Check for no matches and insert these into the Destination.code_name table.
+        """
+
+        cur_d = self.conn_d.cursor()
+        cur_d.execute("select name, catid from code_cat")
+        dest_categories = cur_d.fetchall()
+
+        sql = "select cid, name from code_name"
+        cur_d.execute(sql)
+        res = cur_d.fetchall()
+        for code_dest in res:
+            for code_source in self.codes_s:
+                if code_source['name'] == code_dest[1]:
+                    code_source['newcid'] = code_dest[0]
+
+        # Insert unmatched code names
+        for code_s in self.codes_s:
+            if code_s['newcid'] == -1:
+                # Fill category id using matching category name
+                for cat in dest_categories:
+                    if cat[0] == code_s['catname']:
+                        code_s['catid'] = cat[1]
+                cur_d.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                              (code_s['name'], code_s['memo'], code_s['owner'], code_s['date'], code_s['catid'],
+                               code_s['color']))
+                self.conn_d.commit()
+                cur_d.execute("select last_insert_rowid()")
+                cid = cur_d.fetchone()[0]
+                code_s['newcid'] = cid
+                self.summary_msg += _("Adding code name: ") + code_s['name'] + "\n"
+
+        # Update code_text, code_image, code_av cids to destination values
+        for code_s in self.codes_s:
+            for coding_text in self.code_text_s:
+                if coding_text['cid'] == code_s['cid']:
+                    coding_text['newcid'] = code_s['newcid']
+            for coding_image in self.code_image_s:
+                if coding_image['cid'] == code_s['cid']:
+                    coding_image['newcid'] = code_s['newcid']
+            for coding_av in self.code_av_s:
+                if coding_av['cid'] == code_s['cid']:
+                    coding_av['newcid'] = code_s['newcid']
 
     def insert_coding_and_journal_data(self):
         """ Coding fid and cid have been updated, annotation fid has been updated.
@@ -208,12 +208,12 @@ class MergeProjects:
             if j['name'] not in j_names:
                 cur_d.execute("insert into journal (name, jentry, date, owner) values(?,?,?,?)",
                               (j['name'], j['jentry'], j['date'], j['owner']))
-                self.summary_msg += _("Copying journal: ") + j['name'] + "\n"
+                self.summary_msg += _("Adding journal: ") + j['name'] + "\n"
                 self.conn_d.commit()
         for s in self.stored_sql_s:
             # Cannot have two identical stored_sql titles, using 'or ignore'
             cur_d.execute("insert or ignore into stored_sql (title, description, grouper, ssql) values(?,?,?,?)",
-                            (s['title'], s['description'], s['grouper'], s['ssql']))
+                          (s['title'], s['description'], s['grouper'], s['ssql']))
             self.conn_d.commit()
         for c in self.code_text_s:
             cur_d.execute("insert or ignore into code_text (cid,fid,seltext,pos0,pos1,owner,\
@@ -230,23 +230,25 @@ class MergeProjects:
         if len(self.annotations_s) > 0:
             self.summary_msg += _("Merging annotations") + "\n"
         for c in self.code_image_s:
-            cur_d.execute("insert or ignore into code_image (cid, id,x1,y1,width,height,memo,owner,date,important) values(?,?,?,?,?,?,?,?,?,?)",
-                          [c["newcid"], c["newfid"], c["x1"], c["y1"], c["width"], c["height"], c["memo"], c["owner"], c["date"], c["important"]])
+            cur_d.execute(
+                "insert or ignore into code_image (cid, id,x1,y1,width,height,memo,owner,date,important) values(?,?,?,?,?,?,?,?,?,?)",
+                [c["newcid"], c["newfid"], c["x1"], c["y1"], c["width"], c["height"], c["memo"], c["owner"], c["date"],
+                 c["important"]])
             self.conn_d.commit()
         if len(self.code_image_s) > 0:
             self.summary_msg += _("Merging coded image areas") + "\n"
         for c in self.code_av_s:
-            cur_d.execute("insert or ignore into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
+            cur_d.execute(
+                "insert or ignore into code_av (cid, id,pos0,pos1,memo,owner,date,important) values(?,?,?,?,?,?,?,?)",
                 [c["newcid"], c["newfid"], c["pos0"], c["pos1"], c["memo"], c["owner"], c["date"], c["important"]])
             self.conn_d.commit()
         if len(self.code_av_s) > 0:
             self.summary_msg += _("Merging coded audio/video segments") + "\n"
 
     def insert_cases(self):
-        """ Insert case data into destination. """
-
-        print("TODO update caseid in cases and case_text. Update fid in case_text")
-        print("TODO load cases and case text data")
+        """ Insert case data into destination.
+        First remove all existing matching case names and the associated case text data.
+        """
 
         '''{'caseid': 1, 'newcaseid': -1, 'name': 'first case', 'memo': 'first test case', 
          'owner': 'default',
@@ -254,10 +256,40 @@ class MergeProjects:
         {'caseid': 1, 'newcaseid': -1, 'fid': 4, 'newfid': -1, 'pos0': 0, 'pos1': 0}
         {'caseid': 1, 'newcaseid': -1, 'fid': 5, 'newfid': -1, 'pos0': 0, 'pos1': 4}'''
 
-        for i in self.cases_s:
-            print(i)
-        for i in self.case_text_s:
-            print(i)
+        cur_d = self.app.conn.cursor()
+        # Remove all duplicate cases and case text lists from source data
+        cur_d.execute("select name from cases")
+        res_cases_dest = cur_d.fetchall()
+        existing_case_names = []
+        for r in res_cases_dest:
+            existing_case_names.append(r[0])
+        self.remove_case_list = []
+        for case_s in self.cases_s:
+            print("case_s", case_s)
+            if case_s['name'] in existing_case_names:
+                self.remove_case_list.append(case_s)
+        removed_case_text_list = []
+        for removed_case in self.remove_case_list:
+            self.cases_s.remove(removed_case)
+            for case_text in self.case_text_s:
+                if case_text['caseid'] == removed_case['caseid']:
+                    removed_case_text_list.append(case_text)
+        for removed_case_text in removed_case_text_list:
+            self.case_text_s.remove(removed_case_text)
+        # TODO remove from attributes also
+        #
+        for case_s in self.cases_s:
+            print(case_s)
+            cur_d.execute("insert into cases (name, memo, owner, date) values (?,?,?,?)",
+                        [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
+            self.app.conn.commit()
+            cur_d.execute("select last_insert_rowid()")
+            case_id = cur_d.fetchone()[0]
+            case_s['newcaseid'] = case_id
+            self.summary_msg += _("Adding case: ") + case_s['name'] + "\n"
+        #TODO
+        for case_text in self.case_text_s:
+            print(case_text)
 
     def fill_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source name is already present.
@@ -274,8 +306,9 @@ class MergeProjects:
                 src['newid'] = res[0]
             else:
                 # To update the av_text_id after all new ids have been generated
-                cur_d.execute("insert into source(name,fulltext,mediapath,memo,owner,date, av_text_id) values(?,?,?,?,?,?,?)",
-                              (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date'], None))
+                cur_d.execute(
+                    "insert into source(name,fulltext,mediapath,memo,owner,date, av_text_id) values(?,?,?,?,?,?,?)",
+                    (src['name'], src['fulltext'], src['mediapath'], src['memo'], src['owner'], src['date'], None))
                 self.conn_d.commit()
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
@@ -311,7 +344,6 @@ class MergeProjects:
         Do not copy over existing files.
         """
 
-        print("Copy source files into dest")
         folders = ["audio", "documents", "images", "video"]
         for folder_name in folders:
             dir_ = self.path_s + "/" + folder_name
@@ -329,12 +361,8 @@ class MergeProjects:
     def get_source_data(self):
         """ Load the entire database data into Lists of Dictionaries.
         TODO
-        cases (caseid integer primary key, name text, memo text, owner text,date text
-        TODO
         case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
             "owner text, date text, memo
-        TODO
-        ##code_cat (catid integer primary key, name text, owner text, date text, memo text, supercatid integer, unique(name)
         TODO
         attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
             "valuetype
@@ -422,18 +450,19 @@ class MergeProjects:
             if res is not None:
                 cat['supercatname'] = res[0]
         # Code data
-        sql_codenames = "select cid, name, memo, owner, date, color from code_name"
+        sql_codenames = "select cid, name, memo, owner, date, color, catid from code_name"
         cur_s.execute(sql_codenames)
-        res_codenames = cur_s.fetchall()
-        for i in res_codenames:
-            cn = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
-                  "catid": None, "catname": None}
-            self.codes_s.append(cn)
-        for c in self.codes_s:
-            cur_s.execute("select name from code_cat where catid=?", [c['catid']])
+        res_codes = cur_s.fetchall()
+        for i in res_codes:
+            code_s = {"cid": i[0], "newcid": -1, "name": i[1], "memo": i[2], "owner": i[3], "date": i[4], "color": i[5],
+                      "catid": i[6], "catname": None}
+            self.codes_s.append(code_s)
+        # Get and fill category name if code is in a category
+        for code_s in self.codes_s:
+            cur_s.execute("select name from code_cat where catid=?", [code_s['catid']])
             res = cur_s.fetchone()
             if res is not None:
-                cat['catname'] = res[0]
+                code_s['catname'] = res[0]
         # Code text data
         sql_codetext = "select cid, fid, seltext, pos0, pos1, owner, date, memo, important from code_text"
         cur_s.execute(sql_codetext)
@@ -465,7 +494,6 @@ class MergeProjects:
             c_av = {"cid": i[0], "newcid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3],
                     "owner": i[4], "date": i[5], "memo": i[6], "important": i[7]}
             self.code_av_s.append(c_av)
-
         # Case data
         sql_cases = "select caseid, name, memo, owner, date from cases"
         cur_s.execute(sql_cases)
@@ -478,5 +506,5 @@ class MergeProjects:
         res_case_text = cur_s.fetchall()
         for i in res_case_text:
             c = {"caseid": i[0], "newcaseid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3]}
-            self.cases_s.append(c)
+            self.case_text_s.append(c)
         return True
