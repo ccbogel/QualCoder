@@ -79,7 +79,11 @@ class MergeProjects:
     categories_s = []  # code cats from Source project
     cases_s = []  # cases
     case_text_s = []  # case text and links to non-text files
+    #TODO check this is needed as a class variable:
     remove_case_list = []  # cases that match existing destination name
+
+    attribute_types = []  # For new attributes that are not existing in the destination database
+    attributes = []  # values for Case and File attibutes
 
     def __init__(self, app, path_s):
         self.app = app
@@ -97,7 +101,7 @@ class MergeProjects:
             self.update_code_cid_and_insert_code()
             self.insert_coding_and_journal_data()
             self.insert_cases()
-            # TODO insert attributes
+            self.insert_attributes()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _("NOT MERGED: Case and File Attributes") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
@@ -145,6 +149,7 @@ class MergeProjects:
         if len(self.categories_s) > 0:
             self.summary_msg += str(len(self.categories_s)) + _(" categories not added") + "\n"
             print("Categories NOT added:\n", self.categories_s)
+            logger.debug("Categories NOT added:\n" + str(self.categories_s))
 
     def update_code_cid_and_insert_code(self):
         """ Update the cid to the one already in Destination.code_name.
@@ -367,14 +372,36 @@ class MergeProjects:
                     except PermissionError:
                         self.summary_msg += f + " " + _("NOT copied. Permission error")
 
+    def insert_attributes(self):
+        """ After Cases and files have been inserted. Add new attribute types for cases and files.
+        Insert values foe case and file attributes. """
+
+        cur_d = self.app.conn.cursor()
+        cur_d.execute("select id from source")
+        res_file_ids = cur_d.fetchall()
+        cur_d.execute("select caseid from cases")
+        res_case_ids = cur_d.fetchall()
+
+        # Insert new attribute types
+        for a in self.attribute_types:
+            print("Attribute_type: ", a)
+            cur_d.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                        (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
+            self.app.conn.commit()
+            self.summary_msg += _("Adding attribute (") + a['caseOrFile'] + "): " + a['name'] + "\n"
+            # Create attribute placeholders
+            if a['caseOrFile'] == "file":
+                for id_ in res_file_ids:
+                    sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                    cur_d.execute(sql, (a['name'], "", id_[0], "file", a['date'], a['owner']))
+            if a['caseOrFile'] == "case":
+                for id_ in res_file_ids:
+                    sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                    cur_d.execute(sql, (a['name'], "", id_[0], "case", a['date'], a['owner']))
+
     def get_source_data(self):
         """ Load the entire database data into Lists of Dictionaries.
-        TODO
-        case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
-            "owner text, date text, memo
-        TODO
-        attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
-            "valuetype
+
         TODO
         attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
             "date text, owner
@@ -393,6 +420,8 @@ class MergeProjects:
         self.code_av_s = []
         self.cases_s = []
         self.case_text_s = []
+        self.attribute_types = []
+        self.attributes = []
         cur_s = self.conn_s.cursor()
         # Database version must be v5
         cur_s.execute("select databaseversion from project")
@@ -516,4 +545,27 @@ class MergeProjects:
         for i in res_case_text:
             c = {"caseid": i[0], "newcaseid": -1, "fid": i[1], "newfid": -1, "pos0": i[2], "pos1": i[3]}
             self.case_text_s.append(c)
+        # Attribute type data
+        sql_attr_type = "select name, memo, date, owner, caseOrFile, valuetype from attribute_type"
+        cur_s.execute(sql_attr_type)
+        res_attr_type_s = cur_s.fetchall()
+        keys = 'name', 'memo', 'date', 'owner', 'caseOrFile', 'valuetype'
+        temp_attribute_types_s = []
+        for row in res_attr_type_s:
+            temp_attribute_types_s.append(dict(zip(keys, row)))
+        # Remove matching attribute type names
+        cur_d = self.app.conn.cursor()
+        cur_d.execute("select name from attribute_type")
+        res_attr_name_dest = cur_d.fetchall()
+        attribute_names_dest = []
+        for r in res_attr_name_dest:
+            attribute_names_dest.append(r[0])
+        self.attribute_types = []
+        for r in temp_attribute_types_s:
+            if r['name'] not in attribute_names_dest:
+                self.attribute_types.append(r)
+
+        # TODO Attribute data
+        # TODO attribute (attrid , name , attr_type text, value text, id integer, date , owner
+
         return True
