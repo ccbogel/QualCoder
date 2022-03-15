@@ -25,6 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
+import datetime
 import logging
 import os
 import shutil
@@ -59,7 +60,6 @@ class MergeProjects:
     Adds cases and case_text (links to text file segments and images and A/V)
 
     Existing values in destination are not over-written
-
     TODO
         To add attributes for files and cases.
      """
@@ -102,6 +102,7 @@ class MergeProjects:
             self.update_code_cid_and_insert_code()
             self.insert_coding_and_journal_data()
             self.insert_cases()
+            self.insert_new_attribute_types()
             self.insert_attributes()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _("Existing values in destination project are not over-written") + "\n"
@@ -276,8 +277,9 @@ class MergeProjects:
                     removed_case_text_list.append(case_text)
         for removed_case_text in removed_case_text_list:
             self.case_text_s.remove(removed_case_text)
-        # TODO remove from attributes also
-        #
+
+        # Insert new cases into destination
+        new_case_ids = []
         for case_s in self.cases_s:
             cur_d.execute("insert into cases (name, memo, owner, date) values (?,?,?,?)",
                         [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
@@ -285,6 +287,7 @@ class MergeProjects:
             cur_d.execute("select last_insert_rowid()")
             case_id = cur_d.fetchone()[0]
             case_s['newcaseid'] = case_id
+            new_case_ids.append(case_id)
             self.summary_msg += _("Adding case: ") + case_s['name'] + "\n"
         # Update newcaseid and newfid in case_text
         for case_text in self.case_text_s:
@@ -300,6 +303,16 @@ class MergeProjects:
                 cur_d.execute("insert into case_text (caseid,fid,pos0,pos1) values(?,?,?,?)",
                               [c['newcaseid'], c['newfid'], c['pos0'], c['pos1']])
                 self.app.conn.commit()
+        # Create attribute placeholders for the destination case attributes
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        sql_attribute_types = 'select name from attribute_type where caseOrFile ="case"'
+        cur_d.execute(sql_attribute_types)
+        res_attr_types = cur_d.fetchall()
+        sql_attribute = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for id_ in new_case_ids:
+            for attribute_name in res_attr_types:
+                cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
+                self.app.conn.commit()
 
     def fill_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source file name is already present.
@@ -307,6 +320,7 @@ class MergeProjects:
         Update the av_text_id link to link A/V to the corresponding transcript.
         """
 
+        new_source_file_ids = []
         cur_d = self.conn_d.cursor()
         for src in self.source_s:
             cur_d.execute("select id from source where name=?", [src['name']])
@@ -323,6 +337,7 @@ class MergeProjects:
                 cur_d.execute("select last_insert_rowid()")
                 id_ = cur_d.fetchone()[0]
                 src['newid'] = id_
+                new_source_file_ids.append(id_)
         # Need to find matching av_text_filename to get its id to link as the av_text_id
         for src in self.source_s:
             if src['av_text_filename'] != "":
@@ -331,6 +346,16 @@ class MergeProjects:
                 if res is not None:
                     cur_d.execute("update source set av_text_id=? where id=?", [res[0], src['id']])
                     self.conn_d.commit()
+        # Create attribute placeholders for the destination file attributes
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        sql_attribute_types = 'select name from attribute_type where caseOrFile ="file"'
+        cur_d.execute(sql_attribute_types)
+        res_attr_types = cur_d.fetchall()
+        sql_attribute = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for id_ in new_source_file_ids:
+            for attribute_name in res_attr_types:
+                cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
+                self.app.conn.commit()
 
     def update_coding_file_ids(self):
         """ Update the file ids in the codings and annotations data. """
@@ -368,17 +393,17 @@ class MergeProjects:
                     except PermissionError:
                         self.summary_msg += f + " " + _("NOT copied. Permission error")
 
-    def insert_attributes(self):
-        """ After Cases and files have been inserted. Add new attribute types for cases and files.
-        Insert values foe case and file attributes. """
+    def insert_new_attribute_types(self):
+        """ Insert new attribute types  for cases and files.
+        Insert placeholders for the new attribute types.
+        To be performed after Cases and files have been inserted.
+        """
 
         cur_d = self.app.conn.cursor()
         cur_d.execute("select id from source")
         res_file_ids = cur_d.fetchall()
         cur_d.execute("select caseid from cases")
         res_case_ids = cur_d.fetchall()
-
-        # Insert new attribute types
         for a in self.attribute_types_s:
             cur_d.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
                         (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
@@ -390,13 +415,17 @@ class MergeProjects:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "file", a['date'], a['owner']))
             if a['caseOrFile'] == "case":
-                for id_ in res_file_ids:
+                for id_ in res_case_ids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "case", a['date'], a['owner']))
 
+    def insert_attributes(self):
+        """ Insert new attribute values for files and cases """
+
+        self.summary_msg += _("TODO Inserting attribute values for cases and files") + "\n"
         # example attribute
         # {'name': 'rating', 'attr_type': 'file', 'value': '1', 'id': 4, 'date': '2022-03-14 10:35:27', 'owner': 'default'}
-        # update , on fail try insert
+        #TODO
 
     def get_source_data(self):
         """ Load the database data into Lists of Dictionaries.
