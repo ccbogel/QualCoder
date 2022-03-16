@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
-from .select_items import DialogSelectItems
 from .helpers import Message
+from .merge_projects import MergeProjects
+from .select_items import DialogSelectItems
 from .text_file_replacement import ReplaceTextFile
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -60,14 +60,18 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     """
 
     app = None
-    parent_textEdit = None
+    parent_text_edit = None
     tab_coding = None  # Tab widget coding tab for updates
 
     # For Replacing a text file with another and keeping codings
     file_to_replace = None
     file_replacement = None
 
-    def __init__(self, app, parent_textEdit, tab_coding, parent=None):
+    # For merging projects
+    merge_project_path = ""
+    projects_merged = False
+
+    def __init__(self, app, parent_text_edit, tab_coding, parent=None):
 
         super(DialogSpecialFunctions, self).__init__(parent)
         sys.excepthook = exception_handler
@@ -75,15 +79,17 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui = Ui_Dialog_special_functions()
         self.ui.setupUi(self)
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.merge_project_path = ""
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_text_file.setFocus(True)
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
@@ -98,7 +104,42 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
         self.ui.pushButton_text_update.pressed.connect(self.replace_file_update_codings)
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
-        self.ui.groupBox_merge.hide()  # TODO tmp
+        self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
+        self.ui.pushButton_merge.setEnabled(False)
+        self.ui.pushButton_merge.pressed.connect(self.merge_projects)
+
+    # Functions to merge external project into this project
+    def select_project_folder(self):
+        """ Select another .qda project """
+
+        self.merge_project_path = ""
+        default_directory = self.app.settings['directory']
+        if default_directory == "":
+            default_directory = os.path.expanduser('~')
+        self.merge_project_path = QtWidgets.QFileDialog.getExistingDirectory(self,
+                                                                             _('Open project directory'),
+                                                                             default_directory)
+        if self.merge_project_path is False or len(self.merge_project_path) < 5:
+            Message(self.app, _(""), _("No project selected")).exec_()
+            return
+        if self.merge_project_path[-4:] != ".qda":
+            Message(self.app, _("Error"), _("Not a QualCoder project")).exec_()
+            return
+        if self.merge_project_path == self.app.project_path:
+            Message(self.app, _("Error"), _("The same project")).exec_()
+            return
+        msg = _("Merge") + "\n" + self.merge_project_path + "\n" + _("into") + "\n" + self.app.project_path + "\n"
+        msg += _("Press Run Button to merge projects")
+        Message(self.app, _("Merge projects"), msg).exec_()
+        self.ui.pushButton_merge.setEnabled(True)
+        self.ui.pushButton_merge.setFocus(True)
+
+    def merge_projects(self):
+        """ Merge selected project into this project. """
+
+        mp = MergeProjects(self.app, self.merge_project_path)
+        self.parent_text_edit.append(mp.summary_msg)
+        self.projects_merged = mp.projects_merged
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):
@@ -121,7 +162,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         file_types = "Text Files (*.docx *.epub *.html *.htm *.md *.odt *.pdf *.txt)"
         filepath, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Replacement file'),
-                self.app.settings['directory'], file_types)
+                                                              self.app.settings['directory'], file_types)
         if not ok or filepath == []:
             self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
             return
@@ -180,7 +221,9 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
             cur.execute(update_sql, [new_pos0, seltext, r[2], r[3], r[0], r[1], r[4]])
             self.app.conn.commit()
-        self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
+        self.parent_text_edit.append(
+            _("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(
+                " characters."))
         self.update_tab_coding_dialog()
 
     def change_text_code_end_positions(self):
@@ -223,7 +266,9 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 pass
             cur.execute(update_sql, [new_pos1, seltext, r[2], r[3], r[0], r[1], r[4]])
             self.app.conn.commit()
-        self.parent_textEdit.append(_("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(" characters."))
+        self.parent_text_edit.append(
+            _("All text codings by ") + self.app.settings['codername'] + _(" resized by ") + str(delta) + _(
+                " characters."))
         self.update_tab_coding_dialog()
 
     def update_tab_coding_dialog(self):
@@ -242,69 +287,3 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         """ Overrride accept button. """
 
         super(DialogSpecialFunctions, self).accept()
-
-    '''def menelic(self):
-        """ Convert MAXQDA REFI-QDA export from many files into one text file.
-         Need to load the qdpx file first. Then run this function to collate and add codings. """
-        text = ""
-        cur = self.app.conn.cursor()
-        owner = "default"
-        date = ""
-        o_sql = "select owner, date from source limit 1"
-        cur.execute(o_sql)
-        o_res = cur.fetchone()
-        owner = o_res[0]
-        date_ = o_res[1]
-
-        # Insert empty text file, named '0_collated', to get the id_
-        cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-            ('0_collated',  '', None, '', owner, date_))
-        self.app.conn.commit()
-        cur.execute("select last_insert_rowid()")
-        id_ = cur.fetchone()[0]
-        print("id_ ", id_)
-        source_sql = "select id, name, fulltext from source order by id"
-        cur.execute(source_sql)
-        source_res = cur.fetchall()
-        coding_sql = "select cid, pos0, pos1, seltext, owner, date from code_text where fid=?"
-        code_text = []
-        pos = 0
-        for source in source_res:
-            id_text = source[1] + " "
-            insert_text = source[2] + "\n"
-            text += id_text + insert_text  
-            # Get codings for this file
-            cur.execute(coding_sql, [source[0]])
-            coding_res = cur.fetchall()
-            for c in coding_res:
-                pos0 = pos + len(id_text) + c[1]
-                pos1 = pos + len(id_text) + c[2]
-                seltext = insert_text[c[1]:c[2]]
-                code_text.append({'cid': c[0], 'fid': id_, 'seltext': seltext, 'pos0': pos0, 'pos1': pos1, 'owner': c[4], 'date': c[5]})
-                #print(code_text)
-            pos = len(text)
-        #print(text)
-
-        # Update file, named '0_collated' with text
-        cur.execute("update source set fulltext=? where id=?", [text, id_])
-        self.app.conn.commit()
-        self.ui.label_2.setText("0_collated Text file created")
-
-        # Insert codings
-        # Making up memo at nothing and date as current date
-        for c in code_text:
-            try:
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                    memo,date) values(?,?,?,?,?,?,?,?)",
-                    [c['cid'], c['fid'], c['seltext'], c['pos0'], c['pos1'], c['owner'], '', c['date']])
-                self.app.conn.commit()
-            except Exception as e:
-                logger.debug(str(e))
-        self.ui.label_2.setText("Codes added to file 0_collated")
-        self.ui.pushButton_text_starts.hide()
-
-        # Delete other codes and files
-        """cur.execute("delete from source where id != ?", [id_])
-        self.app.conn.commit()
-        cur.execute("delete from code_text where fid != ?", [id_])
-        self.app.conn.commit()"""'''

@@ -557,7 +557,7 @@ class App(object):
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
-        # TODO TEMPORARY delete in 2022, legacy
+        # TODO TEMPORARY delete, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
@@ -1084,6 +1084,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogSpecialFunctions(self.app, self.ui.textEdit, self.ui.tab_coding)
         ui.exec_()
+        if ui.projects_merged:
+            self.tab_layout_helper(self.ui.tab_manage, None)
+            self.tab_layout_helper(self.ui.tab_coding, None)
+            self.tab_layout_helper(self.ui.tab_reports, None)
 
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
@@ -1212,14 +1216,16 @@ class MainWindow(QtWidgets.QMainWindow):
         if contents is None:
             # Tab has no layout so add one with widget
             layout = QtWidgets.QVBoxLayout()
-            layout.addWidget(ui)
+            if ui is not None:
+                layout.addWidget(ui)
             tab_widget.setLayout(layout)
         else:
             # Remove widgets from layout
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
-            contents.addWidget(ui)
+            if ui is not None:
+                contents.addWidget(ui)
 
     def codebook(self):
         """ Export a text file code book of categories and codes.
@@ -1380,9 +1386,10 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(
             "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
             "valuetype text)")
+        # Database version v6 - unique constraint for attribute (name, attr_type, id)
         cur.execute(
             "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
-            "date text, owner text)")
+            "date text, owner text, unique(name,attr_type,id))")
         cur.execute(
             "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
             "owner text, date text, memo text)")
@@ -1399,10 +1406,12 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
             "date text, color text, unique(name))")
-        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text)")
+        # Database version v6 - unique name for journal
+        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text, "
+                    "unique(name))")
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v5', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
