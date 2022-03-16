@@ -321,11 +321,19 @@ class MergeProjects:
         new_source_file_ids = []
         cur_d = self.conn_d.cursor()
         for src in self.source_s:
-            cur_d.execute("select id from source where name=?", [src['name']])
+            cur_d.execute("select id, length(fulltext) from source where name=?", [src['name']])
             res = cur_d.fetchone()
             if res is not None:
-                # Existing same named source file in the destination project
+                # Existing same named source file is in the destination database
                 src['newid'] = res[0]
+                # Warn user if the source and destination fulltexts are different lengths
+                # Occurs if one of the texts was edited or replaced
+                if len(src['fulltext']) != res[1]:
+                    msg = _("Warning! Inaccurate coding positions. Text lengths different for same text file: ")
+                    msg += src['name'] + "\n"
+                    msg += _("Import project file text length: ") + str(len(src['fulltext'])) + "  "
+                    msg += _("Destination project file text length: ") + str(res[1]) + "\n"
+                    self.summary_msg += msg
             else:
                 # To update the av_text_id after all new ids have been generated
                 cur_d.execute(
