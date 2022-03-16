@@ -1224,7 +1224,8 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
-            contents.addWidget(ui)
+            if ui is not None:
+                contents.addWidget(ui)
 
     def codebook(self):
         """ Export a text file code book of categories and codes.
