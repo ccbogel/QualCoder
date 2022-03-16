@@ -557,7 +557,7 @@ class App(object):
         if result['codername'] == "":
             result['codername'] = "default"
         result = self.check_and_add_additional_settings(result)
-        # TODO TEMPORARY delete in 2022, legacy
+        # TODO TEMPORARY delete, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
@@ -1380,9 +1380,10 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute(
             "CREATE TABLE attribute_type (name text primary key, date text, owner text, memo text, caseOrFile text, "
             "valuetype text)")
+        # Database version v6 - unique constraint for attribute (name, attr_type, id)
         cur.execute(
             "CREATE TABLE attribute (attrid integer primary key, name text, attr_type text, value text, id integer, "
-            "date text, owner text)")
+            "date text, owner text, unique(name,attr_type,id))")
         cur.execute(
             "CREATE TABLE case_text (id integer primary key, caseid integer, fid integer, pos0 integer, pos1 integer, "
             "owner text, date text, memo text)")
@@ -1400,8 +1401,8 @@ class MainWindow(QtWidgets.QMainWindow):
             "CREATE TABLE code_name (cid integer primary key, name text, memo text, catid integer, owner text,"
             "date text, color text, unique(name))")
         # Database version v6 - unique name for journal
-        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text), "
-                    "unique(name)")
+        cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text, "
+                    "unique(name))")
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
