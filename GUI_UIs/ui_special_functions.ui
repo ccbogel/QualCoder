@@ -69,7 +69,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Run</string>
+       <string>Run update text content</string>
       </property>
       <property name="text">
        <string/>
@@ -165,7 +165,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Run</string>
+       <string>Run merge projects</string>
       </property>
       <property name="text">
        <string/>
