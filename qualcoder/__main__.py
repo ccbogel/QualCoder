@@ -1084,6 +1084,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         ui = DialogSpecialFunctions(self.app, self.ui.textEdit, self.ui.tab_coding)
         ui.exec_()
+        if ui.projects_merged:
+            self.tab_layout_helper(self.ui.tab_manage, None)
+            self.tab_layout_helper(self.ui.tab_coding, None)
+            self.tab_layout_helper(self.ui.tab_reports, None)
 
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """
@@ -1212,7 +1216,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if contents is None:
             # Tab has no layout so add one with widget
             layout = QtWidgets.QVBoxLayout()
-            layout.addWidget(ui)
+            if ui is not None:
+                layout.addWidget(ui)
             tab_widget.setLayout(layout)
         else:
             # Remove widgets from layout

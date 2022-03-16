@@ -67,7 +67,9 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     file_to_replace = None
     file_replacement = None
 
+    # For merging projects
     merge_project_path = ""
+    projects_merged = False
 
     def __init__(self, app, parent_text_edit, tab_coding, parent=None):
 
@@ -137,6 +139,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         mp = MergeProjects(self.app, self.merge_project_path)
         self.parent_text_edit.append(mp.summary_msg)
+        self.projects_merged = mp.projects_merged
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):

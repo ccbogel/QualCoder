@@ -58,10 +58,8 @@ class MergeProjects:
     Adds journals and stored_sql to destination database, only if they have unique names,
     Adds text codings, text annotations, image codings, av codings to destination database.
     Adds cases and case_text (links to text file segments and images and A/V)
-
-    Existing values in destination are not over-written
-    TODO
-        To add attributes for files and cases.
+    Add attributes for files and cases.
+    Existing attribute values in destination are not over-written, unless already blank
      """
 
     app = None
@@ -83,8 +81,7 @@ class MergeProjects:
     attributes_s = []  # values for Case and File attributes
     cases_s = []  # cases
     case_text_s = []  # case text and links to non-text files
-    #TODO check this is needed as a class variable:
-    remove_case_list = []  # cases that match existing destination name
+    projects_merged = False
 
     def __init__(self, app, path_s):
         self.app = app
@@ -96,7 +93,7 @@ class MergeProjects:
         self.copy_source_files_into_destination()
         loaded = self.get_source_data()
         if loaded:
-            self.fill_sources_get_new_file_ids()
+            self.insert_sources_get_new_file_ids()
             self.update_coding_file_ids()
             self.insert_categories()
             self.update_code_cid_and_insert_code()
@@ -105,9 +102,10 @@ class MergeProjects:
             self.insert_new_attribute_types()
             self.insert_attributes()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
-            self.summary_msg += _("Existing values in destination project are not over-written") + "\n"
-            self.summary_msg += _("NOT MERGED: Case and File Attributes") + "\n"
+            self.summary_msg += _("Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
+            self.projects_merged = True
+            self.app.delete_backup = False
         else:
             Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
 
@@ -265,12 +263,12 @@ class MergeProjects:
         existing_case_names = []
         for r in res_cases_dest:
             existing_case_names.append(r[0])
-        self.remove_case_list = []
+        remove_case_list = []
         for case_s in self.cases_s:
             if case_s['name'] in existing_case_names:
-                self.remove_case_list.append(case_s)
+                remove_case_list.append(case_s)
         removed_case_text_list = []
-        for removed_case in self.remove_case_list:
+        for removed_case in remove_case_list:
             self.cases_s.remove(removed_case)
             for case_text in self.case_text_s:
                 if case_text['caseid'] == removed_case['caseid']:
@@ -314,7 +312,7 @@ class MergeProjects:
                 cur_d.execute(sql_attribute, [attribute_name[0], id_, now_date, self.app.settings['codername']])
                 self.app.conn.commit()
 
-    def fill_sources_get_new_file_ids(self):
+    def insert_sources_get_new_file_ids(self):
         """ Insert Source.source into Destination.source, unless source file name is already present.
         update newfid in source_s and code_text_s.
         Update the av_text_id link to link A/V to the corresponding transcript.
@@ -404,28 +402,58 @@ class MergeProjects:
         res_file_ids = cur_d.fetchall()
         cur_d.execute("select caseid from cases")
         res_case_ids = cur_d.fetchall()
+        # Insert new attribute type and placeholder in attribute table
         for a in self.attribute_types_s:
             cur_d.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
                         (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
             self.app.conn.commit()
             self.summary_msg += _("Adding attribute (") + a['caseOrFile'] + "): " + a['name'] + "\n"
-            # Create attribute placeholders
+            # Create attribute placeholders for new attributes, does NOT create for existing destination attributes
             if a['caseOrFile'] == "file":
                 for id_ in res_file_ids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "file", a['date'], a['owner']))
+                    self.app.conn.commit()
             if a['caseOrFile'] == "case":
                 for id_ in res_case_ids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
                     cur_d.execute(sql, (a['name'], "", id_[0], "case", a['date'], a['owner']))
+                    self.app.conn.commit()
 
     def insert_attributes(self):
-        """ Insert new attribute values for files and cases """
+        """ Insert new attribute values for files and cases.
+         Need to use destination file and case ids.
+         Example attribute:
+         {'name': 'age', 'attr_type': 'file', 'value': '100', 'id': 4, 'newid': -1, 'date': '2022-03-14 10:35:27', 'owner': 'default'}
+         """
 
-        self.summary_msg += _("TODO Inserting attribute values for cases and files") + "\n"
-        # example attribute
-        # {'name': 'rating', 'attr_type': 'file', 'value': '1', 'id': 4, 'date': '2022-03-14 10:35:27', 'owner': 'default'}
-        #TODO
+        # Only update if value does not over-write an existing placeholder attribute value
+        sql_update = "update attribute set value=? where name=? and id=? and attr_type=? and value=''"
+        # Insert if a placeholder is missing
+        sql_insert = "insert into attribute (name,id,attr_type,value,date,owner) values (?,?,?,?,?,?)"
+        cur_d = self.app.conn.cursor()
+        for a in self.attributes_s:
+            if a['attr_type'] == "file":
+                source_dict = next((item for item in self.source_s if item["id"] == a['id']), {'newid': -1})
+                a['newid'] = source_dict['newid']
+            if a['attr_type'] == "case":
+                case_dict = next((item for item in self.cases_s if item["caseid"] == a['id']), {'newid': -1})
+                a['newid'] = case_dict['newcaseid']
+            # Only update or insert value does not over-write an existing placeholder attribute value
+            if a['newid'] != -1:
+                # Check placeholder exists, if not then insert values
+                cur_d.execute("select * from attribute where name=? and id=? and attr_type=?",
+                              [a['name'], a['newid'], a['attr_type']])
+                res = cur_d.fetchall()
+                if not res:
+                    cur_d.execute(sql_insert, (a['name'], a['newid'], a['attr_type'],a['value'], a['date'], a['owner']))
+                    self.app.conn.commit()
+                    #print("INSERTING", a['value'], a['name'], "ID", a['newid'], a['attr_type'])
+                else:
+                    cur_d.execute(sql_update, (a['value'], a['name'], a['newid'], a['attr_type']))
+                    #print("UPDATING", a['value'], a['name'], "ID", a['newid'], a['attr_type'])
+                    self.app.conn.commit()
+        self.summary_msg += _("Added attribute values for cases and files") + "\n"
 
     def get_source_data(self):
         """ Load the database data into Lists of Dictionaries.
@@ -447,12 +475,13 @@ class MergeProjects:
         self.attribute_types_s = []
         self.attributes_s = []
         cur_s = self.conn_s.cursor()
-        # Database version must be v5
+        # Database version must be v5 or higher
         cur_s.execute("select databaseversion from project")
         version = cur_s.fetchone()
-        if version[0] < "v5":
+        if version[0] in ("v1", "v2", "v3", "v4"):
             self.summary_msg += _("Need to update the source project database.") + "\n"
-            self.summary_msg += _("Please open the source project using QualCoder. Then close the project") + "n"
+            self.summary_msg += _("Please open the source project using QualCoder. Then close the project.") + "\n"
+            self.summary_msg += _("This will update the database schema. Then try merging again.")
             self.summary_msg += _("Project not merged") + "\n"
             return False
         # Journal data
@@ -478,7 +507,7 @@ class MergeProjects:
             src = {"id": i[0], "newid": -1, "name": i[1], "fulltext": i[2], "mediapath": i[3], "memo": i[4],
                    "owner": i[5], "date": i[6], "av_text_id": i[7], "av_text_filename": ""}
             self.source_s.append(src)
-        # The av_text_id is not enough to recreate linkages. Need the refernced text file name.
+        # The av_text_id is not enough to recreate linkages. Need the referenced text file name.
         for i in self.source_s:
             if i['av_text_id'] is not None:
                 cur_s.execute("select name from source where id=?", [i['av_text_id']])
@@ -593,6 +622,6 @@ class MergeProjects:
         cur_s.execute(sql_attributes)
         res_attributes = cur_s.fetchall()
         for i in res_attributes:
-            attribute = {"name": i[0], "attr_type": i[1], "value": i[2], "id": i[3], "date": i[4], "owner": i[5]}
+            attribute = {"name": i[0], "attr_type": i[1], "value": i[2], "id": i[3], "newid": -1, "date": i[4], "owner": i[5]}
             self.attributes_s.append(attribute)
         return True
