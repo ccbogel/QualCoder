@@ -439,13 +439,14 @@ class MergeProjects:
         sql_update = "update attribute set value=? where name=? and id=? and attr_type=? and value=''"
         # Insert if a placeholder is missing
         sql_insert = "insert into attribute (name,id,attr_type,value,date,owner) values (?,?,?,?,?,?)"
+        attribute_count = 0
         cur_d = self.app.conn.cursor()
         for a in self.attributes_s:
             if a['attr_type'] == "file":
                 source_dict = next((item for item in self.source_s if item["id"] == a['id']), {'newid': -1})
                 a['newid'] = source_dict['newid']
             if a['attr_type'] == "case":
-                case_dict = next((item for item in self.cases_s if item["caseid"] == a['id']), {'newid': -1})
+                case_dict = next((item for item in self.cases_s if item["caseid"] == a['id']), {'newcaseid': -1})
                 a['newid'] = case_dict['newcaseid']
             # Only update or insert value does not over-write an existing placeholder attribute value
             if a['newid'] != -1:
@@ -456,12 +457,13 @@ class MergeProjects:
                 if not res:
                     cur_d.execute(sql_insert, (a['name'], a['newid'], a['attr_type'],a['value'], a['date'], a['owner']))
                     self.app.conn.commit()
-                    #print("INSERTING", a['value'], a['name'], "ID", a['newid'], a['attr_type'])
+                    attribute_count += 1
                 else:
                     cur_d.execute(sql_update, (a['value'], a['name'], a['newid'], a['attr_type']))
-                    #print("UPDATING", a['value'], a['name'], "ID", a['newid'], a['attr_type'])
                     self.app.conn.commit()
-        self.summary_msg += _("Added attribute values for cases and files") + "\n"
+                    attribute_count += 1
+        if attribute_count > 0:
+            self.summary_msg += _("Added attribute values for cases and files: n=") + str(attribute_count) + "\n"
 
     def get_source_data(self):
         """ Load the database data into Lists of Dictionaries.
