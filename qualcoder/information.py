@@ -119,7 +119,7 @@ default working directory, selected font and other parameters.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
-<p>Copyright (c) 2021 Colin Curtain</p>\
+<p>Copyright (c) 2022 Colin Curtain</p>\
 <p>Permission is hereby granted, free of charge, to any person<br />\
 obtaining a copy of this software and associated documentation files<br />\
 (the &quot;Software&quot;), to deal in the Software without<br />\
