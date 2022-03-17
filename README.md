@@ -101,21 +101,25 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 1. Install modules from the command line
 
-`sudo pacman -S python python-lxml python-ply python-six python-pdfminer python-chardet python-pyqt5 python-pillow python-pip`
+`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pillow python-ply python-pyqt5 python-pip`
 
 2. Install additional python modules
 
-`sudo python3 -m pip install pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
+`sudo python3 -m pip install ebooklib pdfminer.six pydub SpeechRecognition`
 
 If success, all requirements are satisfied.
 
 3. Build and install QualCoder, from the downloaded folder type
 
-`sudo python3 setup.py install`
+`sudo python setup.py install`
 
 4. To run type:
 
 `qualcoder`
+
+Or install from AUR as follows:
+
+`yay -S qualcoder`
 
 ### Fedora/CentOS/RHEL linux
 
