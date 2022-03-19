@@ -30,11 +30,13 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
 import os
+import re
 import sys
 import logging
 import traceback
 
-from .GUI.ui_dialog_memo import Ui_Dialog_memo
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_view_text import Ui_Dialog_view_text
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -64,12 +66,14 @@ class DialogEditTextFile(QtWidgets.QDialog):
     prev_text = ""
     no_codes_annotes_cases = True
     code_deletions = []
+    # Variables for searching through the text file
+    search_indices = []  # A list of tuples of (match.start, match length)
+    search_index = 0
 
-    def __init__(self, app, fid, clear_button="show"):
+    def __init__(self, app, fid):
         """ """
 
         super(DialogEditTextFile, self).__init__(parent=None)  # overrride accept method
-
         sys.excepthook = exception_handler
         self.app = app
         self.fid = fid
@@ -81,40 +85,36 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.text = res[0]
         title = res[1]
         self.code_deletions = []
-        self.ui = Ui_Dialog_memo()
+        self.ui = Ui_Dialog_view_text()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
-        msg = _(
-            "Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
-        msg += " " + _("Positions may not correctly adjust.") + " "
-        msg += " " + _("Do not code this text until you reload Coding - Code Text from the menu bar.")
-        label = QtWidgets.QLabel(msg)
-        label.setWordWrap(True)
-
-        tt = _(
-            "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
-        tt += _(
-            "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
-        label.setToolTip(tt)
-        self.ui.gridLayout.addWidget(label, 2, 0, 1, 1)
-        if clear_button == "hide":
-            self.ui.pushButton_clear.hide()
+        '''if clear_button == "hide":
+            self.ui.pushButton_clear.hide()'''
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
         self.get_cases_codings_annotations()
         self.ui.textEdit.setPlainText(self.text)
         self.ui.textEdit.setFocus()
-        '''print("FILE:", title)
-        if self.casetext:
-            print("CASE\n", self.casetext)
-        if self.annotations:
-            print("ANNOTE\n", self.annotations)
-        if self.codetext:
-            print("CODETEXT\n", self.codetext)'''
+        # Gui elements
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
+        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_previous.setEnabled(False)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
+        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next.setEnabled(False)
+        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.prev_text = copy(self.text)
+        self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+
         self.highlight()
         self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
@@ -153,6 +153,75 @@ class DialogEditTextFile(QtWidgets.QDialog):
     def clear_contents(self):
         """ Clear all text """
         self.ui.textEdit.setPlainText("")
+
+    # Functions to search though the text
+    def search_for_text(self):
+        """ On text changed in lineEdit_search, find indices of matching text.
+        Only where text is three or more characters long.
+        Resets current search_index.
+        """
+
+        if not self.search_indices:
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+        self.search_indices = []
+        self.search_index = -1
+        search_term = self.ui.lineEdit_search.text()
+        self.ui.label_search_totals.setText("0 / 0")
+        if len(search_term) < 3:
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+            return
+        pattern = None
+        flags = 0
+        try:
+            pattern = re.compile(search_term, flags)
+        except:
+            logger.warning('Bad escape re.compile: ' + search_term)
+        if pattern is None:
+            return
+        self.search_indices = []
+        try:
+            for match in pattern.finditer(self.text):
+                # Get result as first dictionary item
+                self.search_indices.append((match.start(), len(match.group(0))))
+        except Exception as e:
+            print(e)
+            logger.exception('Failed searching text file for %s', search_term)
+        if len(self.search_indices) > 0:
+            self.ui.pushButton_next.setEnabled(True)
+            self.ui.pushButton_previous.setEnabled(True)
+        self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+
+    def move_to_previous_search_text(self):
+        """ Push button pressed to move to previous search text position. """
+
+        if not self.search_indices:
+            return
+        self.search_index -= 1
+        if self.search_index < 0:
+            self.search_index = len(self.search_indices) - 1
+        cursor = self.ui.textEdit.textCursor()
+        prev_result = self.search_indices[self.search_index]
+        cursor.setPosition(prev_result[1])
+        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
+    def move_to_next_search_text(self):
+        """ Push button pressed to move to next search text position. """
+
+        if not self.search_indices:
+            return
+        self.search_index += 1
+        if self.search_index == len(self.search_indices):
+            self.search_index = 0
+        cursor = self.ui.textEdit.textCursor()
+        next_result = self.search_indices[self.search_index]
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
