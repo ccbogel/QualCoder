@@ -3197,8 +3197,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:") \
                                     + _("\nCode: ") + item.text(0)
-                                    + _("\nWith text fragment: ") + text + _(
-            "\nUsing line ending: ") + ending + "\n" + msg)
+                                    + _("\nWith text fragment: ") 
+                                    + text.decode("utf-8") 
+                                    + _("\nUsing line ending: ") 
+                                    + ending + "\n" + msg)
         self.app.delete_backup = False
         # Update tooltip filter and code tree code counts
         self.get_coded_text_update_eventfilter_tooltips()
