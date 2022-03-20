@@ -1241,6 +1241,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             # remove excess line endings, include those with one blank space on a line
             text = text.replace('\n \n', '\n')
             text = text.replace('\n\n\n', '\n\n')
+            # Fix Pdfminer recognizing invalid unicode characters.
+            text = text.replace(u"\uE002", "Th")
+            text = text.replace(u"\uFB01", "fi")
 
         # import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
