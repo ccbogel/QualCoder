@@ -73,7 +73,7 @@ class DialogJournals(QtWidgets.QDialog):
     parent_textEdit = None
     textDialog = None
     # variables for searching through journal(s)
-    search_indices = []   # A list of tuples of (journal name, match.start, match length)
+    search_indices = []  # A list of tuples of (journal name, match.start, match length)
     search_index = 0
 
     def __init__(self, app, parent_text_edit, parent=None):
@@ -278,10 +278,10 @@ class DialogJournals(QtWidgets.QDialog):
 
         # Update database
         journal = {'name': name, 'jentry': '', 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid': None}
+                   'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid': None}
         cur = self.app.conn.cursor()
         cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-            (journal['name'], journal['jentry'], journal['owner'], journal['date']))
+                    (journal['name'], journal['jentry'], journal['owner'], journal['date']))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         jid = cur.fetchone()[0]
@@ -371,9 +371,10 @@ class DialogJournals(QtWidgets.QDialog):
                 # update journals list and database
                 cur = self.app.conn.cursor()
                 cur.execute("update journal set name=? where name=?",
-                    (new_name, self.journals[row]['name']))
+                            (new_name, self.journals[row]['name']))
                 self.app.conn.commit()
-                self.parent_textEdit.append(_("Journal name changed from: ") + self.journals[row]['name'] + " to: " + new_name)
+                self.parent_textEdit.append(
+                    _("Journal name changed from: ") + self.journals[row]['name'] + " to: " + new_name)
                 self.journals[row]['name'] = new_name
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
             else:  # Put the original text in the cell
@@ -389,7 +390,7 @@ class DialogJournals(QtWidgets.QDialog):
         NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
         """
 
-        if self.jid is None and not(self.ui.checkBox_search_all_journals.isChecked()):
+        if self.jid is None and not (self.ui.checkBox_search_all_journals.isChecked()):
             return
         if not self.search_indices:
             self.ui.pushButton_next.setEnabled(False)
@@ -404,7 +405,7 @@ class DialogJournals(QtWidgets.QDialog):
         flags = 0
         try:
             pattern = re.compile(search_term, flags)
-        except:
+        except re.error:
             logger.warning('Bad escape')
         if pattern is None:
             return
