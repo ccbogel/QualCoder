@@ -1091,13 +1091,20 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if link_path == "":
                     try:
                         self.load_file_text(f)
+                    except Exception as e_:
+                        print(e_)
+                        logger.warning(str(e_))
+                    try:
                         copyfile(f, destination)
-                    except Exception:
+                    except OSError as e_:
+                        logger.warning(str(e_))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
                 else:
                     try:
                         self.load_file_text(f, "docs:" + link_path)
-                    except Exception:
+                    except Exception as e_:
+                        print(e_)
+                        logger.warning(str(e_))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
         if pdf_msg != "":
             self.parent_text_edit.append(pdf_msg)
