@@ -40,7 +40,7 @@ from PyQt5.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect
-from .color_selector import colors
+from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
@@ -236,12 +236,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         for row in results:
             self.code_areas.append(dict(zip(keys, row)))
 
-    def get_files(self, ids=[]):
+    def get_files(self, ids=None):
         """ Load the image file data. Exclude those image file data where there are bad links.
         Fill List widget with the files.
         param:
             ids : list of Integer ids to restrict files """
 
+        if ids is None:
+            ids = []
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
         for bl in bad_links:
@@ -434,6 +436,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                color = TextColor(c['color']).recommendation
+                top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(
                     Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -453,6 +457,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    color = TextColor(c['color']).recommendation
+                    child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
@@ -851,7 +857,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), txt)
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
         QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
@@ -889,14 +895,14 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.ui.horizontalSlider.setValue(v)
                 return True
 
-        if object is self.ui.treeWidget.viewport():
+        if object_ is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Drop:
                 item = self.ui.treeWidget.currentItem()
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
                 self.update_dialog_codes_and_categories()
 
-        if object is self.scene:
+        if object_ is self.scene:
             if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
                 #
                 pos = event.buttonDownScenePos(1)
@@ -1001,7 +1007,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         cur.execute("update code_image set x1=?,y1=?,width=?,height=? where imid=?",
-            (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
+                    (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
         self.app.conn.commit()
         self.redraw_scene()
         self.fill_coded_area_label(item)
@@ -1519,7 +1525,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.app.conn.commit()
             old_name = self.codes[found]['name']
             self.update_dialog_codes_and_categories()
-            self.parent_textEdit.append(_("Code renamed: ") + \
+            self.parent_textEdit.append(_("Code renamed: ") +
                                         old_name + " ==> " + new_name)
             self.app.delete_backup = False
             return
@@ -1550,7 +1556,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             old_name = self.categories[found]['name']
             # self.categories[found]['name'] = new_name
             # selected.setData(0, QtCore.Qt.DisplayRole, new_name)
-            self.parent_textEdit.append(_("Category renamed from: ") + \
+            self.parent_textEdit.append(_("Category renamed from: ") +
                                         old_name + " ==> " + new_name)
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
@@ -1666,7 +1672,7 @@ class DialogViewImage(QtWidgets.QDialog):
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object_, event):
         """ Using this event filter to apply key events.
         Key events on scene
         + and- keys
