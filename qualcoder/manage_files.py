@@ -1598,7 +1598,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Get linked transcript file id
-            cur.execute("select av_text_id from source where id=?")
+            cur.execute("select av_text_id from source where id=?",[file_id])
             res = cur.fetchone()
             av_text_id = res[0]
             # Remove avid links in code_text
