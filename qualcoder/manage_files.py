@@ -223,15 +223,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in self.source:
             if s['id'] == id_:
                 mediapath = s['mediapath']
-
-        '''text_ = None
-        try:
-            text_ = str(self.ui.tableWidget.item(row, col).text())
-            # some blanks cells contain None and some contain blank strings
-            if text_ == "":
-                text_ = None
-        except:
-            pass'''
         # Action cannot be None otherwise may default to one of the actions below depending on column clicked
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -253,6 +244,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if col > self.CASE_COLUMN:
             action_equals_value = menu.addAction(_("Show this value"))
             action_order_by_value = menu.addAction(_("Order by attribute"))
+        action_rename = menu.addAction(_("Rename database entry"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
@@ -278,6 +270,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.export()
         if action == action_delete:
             self.delete()
+        if action == action_rename:
+            self.rename_database_entry()
         if action == action_alphabetic:
             self.load_file_data()
         if action == action_date:
@@ -304,6 +298,30 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def rename_database_entry(self):
+        """ Rename the database entry of the file. """
+
+        row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            return
+        existing_name = self.ui.tableWidget.item(row, self.NAME_COLUMN).text()
+        filenames = []
+        for s in self.source:
+            filenames.append({'name': s['name']})
+        ui = DialogAddItemName(self.app, filenames, _("Rename database entry"), existing_name)
+        ui.exec_()
+        new_name = ui.get_new_name()
+        if new_name is None:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update source set name=? where name=?", [new_name, existing_name])
+        self.app.conn.commit()
+        self.parent_text_edit.append(_("Renamed database file entry: ") + existing_name + " -> " + new_name)
+        self.load_file_data()
+        self.fill_table()
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
 
     def button_export_file_as_linked_file(self):
         """ User presses button to export current row's file.
@@ -790,7 +808,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
 
-        # update attribute value
+        # Update attribute value
         if y > self.CASE_COLUMN:
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
@@ -814,7 +832,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                         (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
             self.app.delete_backup = False
-            # logger.debug("updating: " + attribute_name + " , " + value)
             self.ui.tableWidget.resizeColumnsToContents()
 
     def view(self):
@@ -836,13 +853,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             if len(self.source[x]['mediapath']) > 5 and self.source[x]['mediapath'][:6] in ("/audio", "audio:"):
                 self.view_av(x)
                 return
-        '''# Important. Fulltext may need to be updated, if transcribed files have been edited via viewAV
-        cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
-        res = cur.fetchone()
-        fulltext = ""
-        if res is not None:
-            fulltext = res[0]
-        self.source[x]['fulltext'] = fulltext'''
         ui = DialogEditTextFile(self.app, self.source[x]['id'])
         ui.exec_()
         # Get fulltext if changed (for metadata)
@@ -907,7 +917,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         ui = DialogViewImage(self.app, self.source[x])
         ui.exec_()
-        memo = ui.ui.text_edit.toPlainText()
+        memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
             cur = self.app.conn.cursor()
@@ -946,7 +956,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
         entry['id'] = id_
-
         ui = DialogEditTextFile(self.app, id_)
         ui.exec_()
         filetext = ui.text
