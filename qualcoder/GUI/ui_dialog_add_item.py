@@ -2,28 +2,33 @@
 
 # Form implementation generated from reading ui file 'ui_dialog_add_item.ui'
 #
-# Created: Thu Jan  3 08:54:05 2019
-#      by: PyQt5 UI code generator 5.2.1
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_Dialog_add_item(object):
     def setupUi(self, Dialog_add_item):
         Dialog_add_item.setObjectName("Dialog_add_item")
         Dialog_add_item.resize(400, 142)
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_add_item)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(Dialog_add_item)
+        self.label.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.label.setWordWrap(True)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
+        self.lineEdit = QtWidgets.QLineEdit(Dialog_add_item)
+        self.lineEdit.setObjectName("lineEdit")
+        self.verticalLayout.addWidget(self.lineEdit)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog_add_item)
-        self.buttonBox.setGeometry(QtCore.QRect(170, 90, 201, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.lineEdit = QtWidgets.QLineEdit(Dialog_add_item)
-        self.lineEdit.setGeometry(QtCore.QRect(20, 40, 351, 27))
-        self.lineEdit.setObjectName("lineEdit")
-        self.label = QtWidgets.QLabel(Dialog_add_item)
-        self.label.setGeometry(QtCore.QRect(20, 20, 141, 17))
-        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.buttonBox)
 
         self.retranslateUi(Dialog_add_item)
         self.buttonBox.accepted.connect(Dialog_add_item.accept)
@@ -45,4 +50,3 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_add_item)
     Dialog_add_item.show()
     sys.exit(app.exec_())
-
