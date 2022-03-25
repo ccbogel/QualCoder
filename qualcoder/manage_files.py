@@ -213,7 +213,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
-        #id_ = None
         mediapath = None
         try:
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
@@ -958,7 +957,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         entry['id'] = id_
         ui = DialogEditTextFile(self.app, id_)
         ui.exec_()
-        filetext = ui.text
         icon, metadata = self.get_icon_and_metadata(id_)
         entry['icon'] = icon
         entry['metadata'] = metadata
@@ -1356,7 +1354,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(msg)
         self.source.append(entry)
 
-    def convert_odt_to_text(self, import_file):
+    @staticmethod
+    def convert_odt_to_text(import_file):
         """ Convert odt to very rough equivalent with headings, list items and tables for
         html display in qTextEdits. """
 
@@ -1607,7 +1606,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Delete image, audio or video source
         if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
             # Get linked transcript file id
-            cur.execute("select av_text_id from source where id=?",[file_id])
+            cur.execute("select av_text_id from source where id=?", [file_id])
             res = cur.fetchone()
             av_text_id = res[0]
             # Remove avid links in code_text
