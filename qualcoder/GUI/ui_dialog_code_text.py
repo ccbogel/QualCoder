@@ -159,6 +159,17 @@ class Ui_Dialog_code_text(object):
         self.pushButton_edit.setGeometry(QtCore.QRect(540, 40, 28, 28))
         self.pushButton_edit.setText("")
         self.pushButton_edit.setObjectName("pushButton_edit")
+        self.label_exports = QtWidgets.QLabel(self.groupBox)
+        self.label_exports.setGeometry(QtCore.QRect(572, 43, 24, 24))
+        self.label_exports.setText("")
+        self.label_exports.setObjectName("label_exports")
+        self.comboBox_export = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_export.setGeometry(QtCore.QRect(602, 40, 91, 30))
+        self.comboBox_export.setObjectName("comboBox_export")
+        self.comboBox_export.addItem("")
+        self.comboBox_export.setItemText(0, "")
+        self.comboBox_export.addItem("")
+        self.comboBox_export.addItem("")
         self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(Dialog_code_text)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
@@ -303,6 +314,10 @@ class Ui_Dialog_code_text(object):
 "Avoid selecting text to delete or paste over if the selected text is underlined:\n"
 "(coded - red, annotated - yellow, case-assigned - green)\n"
 "As all assigned positions may be incorrect. "))
+        self.label_exports.setToolTip(_translate("Dialog_code_text", "Export"))
+        self.comboBox_export.setToolTip(_translate("Dialog_code_text", "Export"))
+        self.comboBox_export.setItemText(1, _translate("Dialog_code_text", "html"))
+        self.comboBox_export.setItemText(2, _translate("Dialog_code_text", "odt"))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
         self.pushButton_next_file.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Next file</p></body></html>"))
@@ -317,13 +332,3 @@ class Ui_Dialog_code_text(object):
         self.pushButton_journal.setToolTip(_translate("Dialog_code_text", "Current journal"))
         self.pushButton_project_memo.setToolTip(_translate("Dialog_code_text", "Project memo"))
         self.label_info.setText(_translate("Dialog_code_text", "."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_code_text = QtWidgets.QDialog()
-    ui = Ui_Dialog_code_text()
-    ui.setupUi(Dialog_code_text)
-    Dialog_code_text.show()
-    sys.exit(app.exec_())
