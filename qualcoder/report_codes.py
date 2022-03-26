@@ -499,6 +499,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.export_text_file()
         if text_ == "csv":
             self.export_csv_file()
+        self.ui.comboBox_export.setCurrentIndex(0)
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.

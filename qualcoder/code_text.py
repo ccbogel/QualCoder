@@ -1678,6 +1678,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.export_html_file()
         if text_ == "odt":
             self.export_odt_file()
+        self.ui.comboBox_export.setCurrentIndex(0)
 
     def export_odt_file(self):
         """ Export text to open document format with .odt ending.
