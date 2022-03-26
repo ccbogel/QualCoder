@@ -39,14 +39,14 @@ import webbrowser
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QHelpEvent
-from PyQt5.QtCore import Qt  # for context menu
+from PyQt5.QtCore import Qt, QTextCodec
 from PyQt5.QtGui import QBrush, QColor
 
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks
+from .helpers import Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks, ExportDirectoryPathDialog
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
@@ -257,6 +257,9 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.label_exports.setPixmap(pm.scaled(22, 22))
         # Right hand side splitter buttons
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(coding_icon), "png")
@@ -334,6 +337,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
+        self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         self.ui.splitter.setSizes([150, 400])
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
@@ -717,7 +721,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
-    # RHS splitter details for code rule, curent journal, project memo
+    # RHS splitter details for code rule, current journal, project memo
     def show_code_rule(self):
         """ Show current journal text in right-hand side splitter pane. """
 
@@ -858,8 +862,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 logger.warning('Bad escape')'''
         try:
             pattern = re.compile(self.search_term, flags)
-        except:
-            logger.warning('Bad escape')
+        except re.error as e_:
+            logger.warning('re error Bad escape ' + str(e_))
         if pattern is None:
             return
         self.search_indices = []
@@ -1663,6 +1667,60 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.overlaps_at_pos) < 2:
             self.overlaps_at_pos = []
             self.overlaps_at_pos_idx = 0
+
+    def export_option_selected(self):
+        """ ComboBox export option selected. """
+
+        text_ = self.ui.comboBox_export.currentText()
+        if text_ == "":
+            return
+        if text_ == "html":
+            self.export_html_file()
+        if text_ == "odt":
+            self.export_odt_file()
+
+    def export_odt_file(self):
+        """ Export text to open document format with .odt ending.
+        QTextWriter supports plaintext, ODF and HTML.
+        Cannot export tooltips.
+        Called by export_option_selected
+        """
+
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
+        filename = self.file_['name'] + ".odt"
+        exp_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filepath)
+        tw.setFormat(b'ODF')  # byte array needed for Windows 10
+        tw.write(self.ui.textEdit.document())
+        msg = _("Coded text file exported: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Coded text file exported'), msg, "information").exec_()
+
+    def export_html_file(self):
+        """ Export text to html file.
+        Called by export_option_selected.
+        TODO export tooltips. """
+
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
+        html_filename = self.file_['name'] + ".html"
+        exp_dir = ExportDirectoryPathDialog(self.app, html_filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filepath)
+        tw.setFormat(b'HTML')  # byte array needed for Windows 10
+        tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
+        tw.write(self.ui.textEdit.document())
+        msg = _("Coded text file exported to: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Coded text file exported'), msg, "information").exec_()
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.

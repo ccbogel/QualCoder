@@ -547,6 +547,50 @@ As all assigned positions may be incorrect. </string>
        <string/>
       </property>
      </widget>
+     <widget class="QLabel" name="label_exports">
+      <property name="geometry">
+       <rect>
+        <x>572</x>
+        <y>43</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_export">
+      <property name="geometry">
+       <rect>
+        <x>602</x>
+        <y>40</y>
+        <width>91</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>html</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>odt</string>
+       </property>
+      </item>
+     </widget>
     </widget>
    </item>
    <item row="2" column="0">
