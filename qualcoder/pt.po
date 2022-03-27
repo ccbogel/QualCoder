@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-18 11:42+1100\n"
-"PO-Revision-Date: 2022-01-19 08:41+1100\n"
+"POT-Creation-Date: 2022-03-27 18:32+1100\n"
+"PO-Revision-Date: 2022-03-27 19:16+1100\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -43,7 +43,8 @@ msgstr "Excepção não cautelosa"
 #: manage_links.py:56 memo.py:48 report_attributes.py:51 report_codes.py:62
 #: report_compare_coder_file.py:71 report_file_summary.py:51 reports.py:59
 #: report_sql.py:57 select_items.py:49 settings.py:50 special_functions.py:55
-#: view_av.py:109 view_image.py:69 view_graph.py:60
+#: view_av.py:109 view_image.py:69 view_graph.py:60 helpers.py:54
+#: manage_files.py:102
 msgid "Uncaught Exception"
 msgstr "Exceção sem instrução"
 
@@ -75,7 +76,8 @@ msgstr "Exceção sem instrução:"
 #: reports.py:2524 attributes.py:281 qualcoder.py:1489 reports.py:1598
 #: reports.py:2546 __main__.py:1655 report_codes.py:837 report_codes.py:2161
 #: __main__.py:1753 report_codes.py:844 report_codes.py:1032 __main__.py:1778
-#: attributes.py:125 attributes.py:283 report_codes.py:968
+#: attributes.py:125 attributes.py:283 report_codes.py:968 __main__.py:1794
+#: report_codes.py:969
 msgid "Attributes: "
 msgstr "Atributos: "
 
@@ -87,7 +89,8 @@ msgstr "Atributo adicionado: "
 #: code_text.py:1764 code_text.py:349 code_text.py:2198 code_text.py:2253
 #: code_text.py:383 code_text.py:413 code_text.py:2477 code_text.py:2530
 #: attributes.py:173 attributes.py:275 code_text.py:395 code_text.py:421
-#: code_text.py:2445 code_text.py:2497
+#: code_text.py:2445 code_text.py:2497 code_text.py:399 code_text.py:425
+#: code_text.py:2504 code_text.py:2556
 msgid " to "
 msgstr " para "
 
@@ -142,7 +145,11 @@ msgstr "Memo para Atributo "
 #: report_code_summary.py:150 report_code_summary.py:168
 #: report_code_summary.py:189 view_av.py:577 view_av.py:655 view_image.py:380
 #: view_image.py:934 view_image.py:1409 view_image.py:1433 view_image.py:381
-#: view_image.py:935 view_image.py:1459 view_image.py:1483
+#: view_image.py:935 view_image.py:1459 view_image.py:1483 code_text.py:594
+#: code_text.py:607 code_text.py:646 code_text.py:668 code_text.py:2309
+#: code_text.py:2333 manage_files.py:577 manage_files.py:893
+#: manage_files.py:929 manage_files.py:1678 view_image.py:383 view_image.py:941
+#: view_image.py:1465 view_image.py:1489
 msgid "Memo"
 msgstr "Memo"
 
@@ -165,7 +172,8 @@ msgstr "Atributo renomeado de: "
 #: view_image.py:361 code_text.py:615 manage_files.py:558 report_codes.py:381
 #: view_av.py:606 view_image.py:386 code_by_case.py:750 attributes.py:288
 #: code_text.py:590 code_by_case.py:709 manage_files.py:601 report_codes.py:372
-#: view_av.py:577 view_image.py:380 view_image.py:381
+#: view_av.py:577 view_image.py:380 view_image.py:381 code_text.py:594
+#: manage_files.py:577 view_image.py:383
 msgid "Name"
 msgstr "Nome"
 
@@ -200,14 +208,15 @@ msgstr "Sim"
 #: memo.py:47 report_attributes.py:48 report_codes.py:61
 #: report_compare_coder_file.py:70 reports.py:58 report_sql.py:56 rqda.py:50
 #: select_items.py:48 settings.py:49 special_functions.py:54 view_av.py:106
-#: view_image.py:66 view_graph.py:57
+#: view_image.py:66 view_graph.py:57 helpers.py:53 manage_files.py:99
 msgid "Uncaught exception: "
 msgstr "Exceção sem instrução: "
 
 #: case_file_manager.py:108 helpers.py:192 helpers.py:296 helpers.py:371
 #: report_codes.py:1564 helpers.py:215 helpers.py:339 helpers.py:414
 #: report_codes.py:1697 helpers.py:217 helpers.py:341 helpers.py:417
-#: report_codes.py:963 report_codes.py:1696
+#: report_codes.py:963 report_codes.py:1696 helpers.py:218 helpers.py:344
+#: helpers.py:420 report_codes.py:964
 msgid "Case: "
 msgstr "Caso: "
 
@@ -260,7 +269,7 @@ msgstr "Cópia"
 #: view_av.py:2448 view_image.py:922 code_text.py:1038 view_av.py:2487
 #: view_image.py:947 code_by_case.py:1043 code_by_case.py:3031
 #: code_text.py:1014 code_by_case.py:997 code_by_case.py:2934 view_av.py:2451
-#: view_image.py:935 view_image.py:936
+#: view_image.py:935 view_image.py:936 code_text.py:1018 view_image.py:942
 msgid "Unmark"
 msgstr "Desmarcar"
 
@@ -303,11 +312,15 @@ msgstr "Este segmento já foi vinculado a este caso"
 #: manage_files.py:1331 refi.py:1086 report_attributes.py:196
 #: report_attributes.py:200 report_attributes.py:203 report_attributes.py:211
 #: report_codes.py:774 view_av.py:2748 view_av.py:2752 view_av.py:2899
+#: code_text.py:2837 code_text.py:2841 code_text.py:2965 code_text.py:3073
+#: code_text.py:3076 code_text.py:3089 code_text.py:3183 code_text.py:3274
+#: manage_files.py:828 manage_files.py:1303 manage_files.py:1307
+#: manage_files.py:1311 report_codes.py:775
 msgid "Warning"
 msgstr "Advertência"
 
 #: case_file_manager.py:564 code_text.py:2840 code_text.py:3043
-#: case_file_manager.py:563 code_text.py:3030
+#: case_file_manager.py:563 code_text.py:3030 code_text.py:3089
 msgid "Cannot have blank text marks"
 msgstr "Não pode ter marcas de texto em branco"
 
@@ -316,7 +329,7 @@ msgid "Auto assign text to case: "
 msgstr "Atribuição automática de texto ao caso: "
 
 #: case_file_manager.py:567 code_text.py:2845 code_text.py:3047
-#: case_file_manager.py:566 code_text.py:3034
+#: case_file_manager.py:566 code_text.py:3034 code_text.py:3093
 msgid ""
 "\n"
 "Using "
@@ -325,7 +338,7 @@ msgstr ""
 "Usando "
 
 #: case_file_manager.py:567 code_text.py:2845 code_text.py:3047
-#: case_file_manager.py:566 code_text.py:3034
+#: case_file_manager.py:566 code_text.py:3034 code_text.py:3093
 msgid " and "
 msgstr " e "
 
@@ -356,7 +369,7 @@ msgstr " seções encontradas."
 #: cases.py:182 cases.py:674 qualcoder.py:1419 reports.py:1568 cases.py:185
 #: cases.py:677 qualcoder.py:1477 reports.py:1590 __main__.py:1643 cases.py:196
 #: cases.py:673 report_codes.py:829 __main__.py:1741 report_codes.py:836
-#: __main__.py:1766 cases.py:189 cases.py:668
+#: __main__.py:1766 cases.py:189 cases.py:668 __main__.py:1782
 msgid "Cases: "
 msgstr "Casos: "
 
@@ -365,7 +378,7 @@ msgstr "Casos: "
 #: reports.py:310 reports.py:552 report_relations.py:498 cases.py:196
 #: journals.py:242 refi.py:1576 helpers.py:121 manage_files.py:338 refi.py:1886
 #: helpers.py:143 manage_files.py:342 codebook.py:147 helpers.py:144
-#: manage_files.py:372 refi.py:1907
+#: manage_files.py:372 refi.py:1907 helpers.py:145 manage_files.py:360
 msgid "Select directory to save file"
 msgstr "Selecione o diretório para salvar o arquivo"
 
@@ -389,6 +402,7 @@ msgstr "Sobregravar?"
 #: cases.py:231 cases.py:229 manage_files.py:494 report_relations.py:526
 #: reports.py:317 manage_files.py:498 report_relations.py:686 reports.py:335
 #: cases.py:222 manage_files.py:540 report_relations.py:663 reports.py:326
+#: manage_files.py:517 report_relations.py:664
 msgid "Csv file Export"
 msgstr "Exportação de arquivo Csv"
 
@@ -443,7 +457,7 @@ msgid "Cannot import from csv, only one row in file"
 msgstr "Não é possível importar do csv, apenas uma fileira em arquivo"
 
 #: cases.py:487 cases.py:490 cases.py:488 manage_files.py:552
-#: manage_files.py:558 cases.py:479 manage_files.py:601
+#: manage_files.py:558 cases.py:479 manage_files.py:601 manage_files.py:577
 msgid "Case"
 msgstr "Caso"
 
@@ -457,6 +471,7 @@ msgstr "Caso adicionado: "
 
 #: cases.py:589 manage_files.py:747 cases.py:592 manage_files.py:746
 #: manage_files.py:800 manage_files.py:810 cases.py:576 manage_files.py:858
+#: manage_files.py:827
 msgid "This attribute is numeric"
 msgstr "Este atributo é numérico"
 
@@ -483,6 +498,8 @@ msgstr "Visualização do texto do caso: "
 #: code_text.py:3209 helpers.py:213 helpers.py:416 report_codes.py:1693
 #: report_codes.py:1817 cases.py:762 code_text.py:3192 helpers.py:215
 #: helpers.py:419 report_codes.py:958 report_codes.py:1692 report_codes.py:1798
+#: code_text.py:3251 helpers.py:216 helpers.py:422 report_codes.py:959
+#: report_codes.py:1799
 msgid "File: "
 msgstr "Arquivo: "
 
@@ -493,7 +510,7 @@ msgstr " Texto: "
 #: cases.py:765 view_image.py:477 cases.py:768 cases.py:782
 #: report_code_summary.py:369 view_image.py:591 report_code_summary.py:401
 #: view_image.py:616 cases.py:779 report_code_summary.py:390 view_image.py:608
-#: view_image.py:609
+#: view_image.py:609 view_image.py:615
 msgid "Image: "
 msgstr "Imagem: "
 
@@ -506,7 +523,7 @@ msgid "Open"
 msgstr "Aberto"
 
 #: code_text.py:321 view_image.py:580 code_text.py:330 view_image.py:690
-#: view_image.py:715 view_image.py:705 view_image.py:706
+#: view_image.py:715 view_image.py:705 view_image.py:706 view_image.py:712
 msgid "NO CODE SELECTED"
 msgstr "NENHUM CÓDIGO SELECIONADO"
 
@@ -517,6 +534,8 @@ msgstr "NENHUM CÓDIGO SELECIONADO"
 #: report_relations.py:556 view_av.py:606 view_image.py:386 code_by_case.py:750
 #: code_text.py:590 code_by_case.py:709 manage_files.py:601
 #: report_relations.py:544 view_av.py:577 view_image.py:380 view_image.py:381
+#: code_text.py:594 manage_files.py:577 report_relations.py:545
+#: view_image.py:383
 msgid "Id"
 msgstr "Id"
 
@@ -526,56 +545,62 @@ msgstr "Id"
 #: view_image.py:361 code_text.py:615 report_codes.py:381 view_av.py:606
 #: view_image.py:386 code_by_case.py:750 code_text.py:590 code_by_case.py:709
 #: report_codes.py:372 view_av.py:577 view_image.py:380 view_image.py:381
+#: code_text.py:594 view_image.py:383
 msgid "Count"
 msgstr "Conde"
 
 #: code_text.py:517 code_text.py:527 code_text.py:683 code_text.py:839
-#: code_text.py:813
+#: code_text.py:813 code_text.py:817
 msgid "Delete all codings in this file made by "
 msgstr "Eliminar todas as codificações deste arquivo feitas por "
 
 #: code_text.py:528 code_text.py:538 code_text.py:694 code_text.py:850
-#: code_text.py:824
+#: code_text.py:824 code_text.py:828
 msgid "All codes by "
 msgstr "Todos os códigos por "
 
 #: code_text.py:528 code_text.py:538 code_text.py:694 code_text.py:850
-#: code_text.py:824
+#: code_text.py:824 code_text.py:828
 msgid " deleted from "
 msgstr " eliminado de "
 
 #: code_text.py:668 code_text.py:678 code_text.py:841 code_text.py:1039
-#: code_by_case.py:1044 code_text.py:1015 code_by_case.py:998
+#: code_by_case.py:1044 code_text.py:1015 code_by_case.py:998 code_text.py:1019
 msgid "Memo coded text (M)"
 msgstr "Texto codificado por memo (M)"
 
 #: code_text.py:669 view_av.py:2101 code_text.py:679 view_av.py:2104
 #: code_text.py:842 view_av.py:2450 code_text.py:1040 view_av.py:2489
 #: code_by_case.py:1045 code_text.py:1016 code_by_case.py:999 view_av.py:2453
+#: code_text.py:1020
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
 msgstr "Mudar posição inicial (SHIFT LEFT/ALT RIGHT)"
 
 #: code_text.py:670 view_av.py:2102 code_text.py:680 view_av.py:2105
 #: code_text.py:843 view_av.py:2451 code_text.py:1041 view_av.py:2490
 #: code_by_case.py:1046 code_text.py:1017 code_by_case.py:1000 view_av.py:2454
+#: code_text.py:1021
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "Mudar a posição final (SHIFT RIGHT/ALT LEFT)"
 
 #: code_text.py:674 view_av.py:2106 code_text.py:684 view_av.py:2109
 #: code_text.py:864 view_av.py:2473 code_text.py:1062 view_av.py:2512
 #: code_by_case.py:1066 code_text.py:1037 code_by_case.py:1020 view_av.py:2476
+#: code_text.py:1041
 msgid "Mark (Q)"
 msgstr "Marca (Q)"
 
 #: code_text.py:677 view_av.py:2109 code_text.py:687 view_av.py:2112
 #: code_text.py:867 view_av.py:2476 code_text.py:1065 view_av.py:2515
 #: code_by_case.py:1069 code_text.py:1040 code_by_case.py:1023 view_av.py:2479
+#: code_text.py:1044
 msgid "Mark with recent code (R)"
 msgstr "Marca com código recente (R)"
 
 #: code_text.py:680 view_av.py:2112 code_text.py:690 view_av.py:2115
 #: code_text.py:870 view_av.py:2479 code_text.py:1068 view_av.py:2518
 #: code_by_case.py:1072 code_text.py:1043 code_by_case.py:1026 view_av.py:2482
+#: code_text.py:1047
 msgid "Annotate (A)"
 msgstr "Anotar (A)"
 
@@ -583,31 +608,35 @@ msgstr "Anotar (A)"
 #: code_text.py:871 report_codes.py:1621 report_codes.py:2112 view_av.py:2480
 #: code_text.py:1069 report_codes.py:1754 report_codes.py:2245 view_av.py:2519
 #: code_by_case.py:1073 code_text.py:1044 code_by_case.py:1027
-#: report_codes.py:1743 report_codes.py:2231 view_av.py:2483
+#: report_codes.py:1743 report_codes.py:2231 view_av.py:2483 code_text.py:1048
+#: report_codes.py:1744 report_codes.py:2232
 msgid "Copy to clipboard"
 msgstr "Cópia para prancheta"
 
 #: code_text.py:682 code_text.py:692 code_text.py:874 code_text.py:1072
-#: code_text.py:1047
+#: code_text.py:1047 code_text.py:1051
 msgid "Set bookmark (B)"
 msgstr "Definir marcador de página (B)"
 
 #: code_text.py:737 view_av.py:609 view_image.py:364 code_text.py:748
 #: view_av.py:612 code_text.py:993 view_av.py:753 view_image.py:478
 #: code_text.py:1191 view_av.py:778 view_image.py:503 code_text.py:1167
-#: view_av.py:749 view_image.py:495 view_image.py:496
+#: view_av.py:749 view_image.py:495 view_image.py:496 code_text.py:1171
+#: view_image.py:502
 msgid "Memo for file: "
 msgstr "Memo para arquivo: "
 
 #: code_text.py:774 view_av.py:2189 code_text.py:785 view_av.py:2192
 #: code_text.py:1030 view_av.py:2611 code_text.py:1228 view_av.py:2650
 #: code_by_case.py:1209 code_text.py:1204 code_by_case.py:1163 view_av.py:2614
+#: code_text.py:1208
 msgid "Select code to memo"
 msgstr "Selecione o código para memo"
 
 #: code_text.py:784 view_av.py:2199 code_text.py:795 view_av.py:2202
 #: code_text.py:1039 view_av.py:2620 code_text.py:1237 view_av.py:2659
 #: code_by_case.py:1218 code_text.py:1213 code_by_case.py:1172 view_av.py:2623
+#: code_text.py:1217
 msgid "Memo for Coded text: "
 msgstr "Memo para texto codificado: "
 
@@ -615,11 +644,13 @@ msgstr "Memo para texto codificado: "
 #: view_av.py:2233 code_text.py:2689 view_av.py:2651 view_av.py:2820
 #: code_text.py:2891 view_av.py:2695 view_av.py:2866 code_by_case.py:2787
 #: code_text.py:2877 code_by_case.py:2694 view_av.py:2660 view_av.py:2869
+#: code_text.py:2936
 msgid "Select code to unmark"
 msgstr "Selecione o código para desmarcar"
 
 #: code_text.py:829 code_text.py:840 code_text.py:1084 code_text.py:1282
 #: code_by_case.py:1266 code_text.py:1261 code_by_case.py:1220
+#: code_text.py:1265
 msgid ""
 "Key shortcuts\n"
 "Shift left Arrow\n"
@@ -636,22 +667,26 @@ msgstr ""
 #: code_text.py:836 view_av.py:2244 code_text.py:847 view_av.py:2247
 #: code_text.py:1091 view_av.py:2665 code_text.py:1288 view_av.py:2709
 #: code_by_case.py:1273 code_text.py:1267 code_by_case.py:1225 view_av.py:2673
+#: code_text.py:1271
 msgid "Change start position"
 msgstr "Mudar a posição inicial"
 
 #: code_text.py:836 code_text.py:847 code_text.py:1091 code_text.py:1288
 #: code_by_case.py:1274 code_text.py:1268 code_by_case.py:1226
+#: code_text.py:1272
 msgid "Change start character position. Positive or negative number:"
 msgstr "Mudar a posição inicial dos caracteres. Número positivo ou negativo:"
 
 #: code_text.py:843 view_av.py:2252 code_text.py:854 view_av.py:2255
 #: code_text.py:1098 view_av.py:2673 code_text.py:1294 view_av.py:2717
 #: code_by_case.py:1281 code_text.py:1275 code_by_case.py:1232 view_av.py:2680
+#: code_text.py:1279
 msgid "Change end position"
 msgstr "Mudar a posição final"
 
 #: code_text.py:843 code_text.py:854 code_text.py:1098 code_text.py:1294
 #: code_by_case.py:1282 code_text.py:1276 code_by_case.py:1233
+#: code_text.py:1280
 msgid "Change end character position. Positive or negative number:"
 msgstr "Alterar a posição do caractere final. Número positivo ou negativo:"
 
@@ -659,7 +694,7 @@ msgstr "Alterar a posição do caractere final. Número positivo ou negativo:"
 #: view_av.py:1184 code_text.py:1138 view_av.py:1356 view_image.py:716
 #: code_text.py:1334 view_av.py:1382 view_image.py:741 code_by_case.py:1324
 #: code_text.py:1318 code_by_case.py:1276 view_av.py:1353 view_image.py:729
-#: view_image.py:730
+#: view_image.py:730 code_text.py:1322 view_image.py:736
 msgid "Add new code to category"
 msgstr "Adicionar novo código à categoria"
 
@@ -667,7 +702,7 @@ msgstr "Adicionar novo código à categoria"
 #: view_av.py:1185 code_text.py:1139 view_av.py:1357 view_image.py:717
 #: code_text.py:1335 view_av.py:1383 view_image.py:742 code_by_case.py:1325
 #: code_text.py:1319 code_by_case.py:1277 view_av.py:1354 view_image.py:730
-#: view_image.py:731
+#: view_image.py:731 code_text.py:1323 view_image.py:737
 msgid "Add a new category to category"
 msgstr "Adicionar uma nova categoria à categoria"
 
@@ -675,7 +710,7 @@ msgstr "Adicionar uma nova categoria à categoria"
 #: view_av.py:1186 code_text.py:1141 view_av.py:1359 view_image.py:719
 #: code_text.py:1337 view_av.py:1385 view_image.py:744 code_by_case.py:1327
 #: code_text.py:1321 code_by_case.py:1279 view_av.py:1356 view_image.py:732
-#: view_image.py:733
+#: view_image.py:733 code_text.py:1325 view_image.py:739
 msgid "Add a new code"
 msgstr "Acrescentar um novo código"
 
@@ -683,7 +718,7 @@ msgstr "Acrescentar um novo código"
 #: view_av.py:1187 code_text.py:1142 view_av.py:1360 view_image.py:720
 #: code_text.py:1338 view_av.py:1386 view_image.py:745 code_by_case.py:1328
 #: code_text.py:1322 code_by_case.py:1280 view_av.py:1357 view_image.py:733
-#: view_image.py:734
+#: view_image.py:734 code_text.py:1326 view_image.py:740
 msgid "Add a new category"
 msgstr "Adicionar uma nova categoria"
 
@@ -691,7 +726,7 @@ msgstr "Adicionar uma nova categoria"
 #: view_av.py:1188 code_text.py:1143 view_av.py:1361 view_image.py:721
 #: code_text.py:1339 view_av.py:1387 view_image.py:746 code_by_case.py:1329
 #: code_text.py:1323 code_by_case.py:1281 view_av.py:1358 view_image.py:734
-#: view_image.py:735
+#: view_image.py:735 code_text.py:1327 view_image.py:741
 msgid "Rename"
 msgstr "Renomear"
 
@@ -699,7 +734,7 @@ msgstr "Renomear"
 #: view_av.py:1189 code_text.py:1144 view_av.py:1362 view_image.py:722
 #: code_text.py:1340 view_av.py:1388 view_image.py:747 code_by_case.py:1330
 #: code_text.py:1324 code_by_case.py:1282 view_av.py:1359 view_image.py:735
-#: view_image.py:736
+#: view_image.py:736 code_text.py:1328 view_image.py:742
 msgid "View or edit memo"
 msgstr "Ver ou editar memo"
 
@@ -709,7 +744,8 @@ msgstr "Ver ou editar memo"
 #: code_text.py:1341 manage_files.py:253 report_sql.py:401 view_av.py:1389
 #: view_image.py:748 code_by_case.py:1331 code_text.py:1325
 #: code_by_case.py:1283 manage_files.py:267 report_sql.py:399 view_av.py:1360
-#: view_image.py:736 view_image.py:737
+#: view_image.py:736 view_image.py:737 code_text.py:1329 manage_files.py:248
+#: view_image.py:743
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -717,12 +753,13 @@ msgstr "Eliminar"
 #: view_av.py:1192 code_text.py:1150 view_av.py:1365 view_image.py:728
 #: code_text.py:1346 view_av.py:1391 view_image.py:753 code_by_case.py:1336
 #: code_text.py:1330 code_by_case.py:1288 view_av.py:1362 view_image.py:741
-#: view_image.py:742
+#: view_image.py:742 code_text.py:1334 view_image.py:748
 msgid "Change code color"
 msgstr "Mudar a cor do código"
 
 #: code_text.py:895 code_text.py:907 code_text.py:1151 code_text.py:1347
 #: code_by_case.py:1337 code_text.py:1331 code_by_case.py:1289
+#: code_text.py:1335
 msgid "Show coded files"
 msgstr "Mostrar arquivos codificados"
 
@@ -730,7 +767,7 @@ msgstr "Mostrar arquivos codificados"
 #: view_av.py:1193 code_text.py:1152 view_av.py:1366 view_image.py:729
 #: code_text.py:1348 view_av.py:1392 view_image.py:754 code_by_case.py:1338
 #: code_text.py:1332 code_by_case.py:1290 view_av.py:1363 view_image.py:742
-#: view_image.py:743
+#: view_image.py:743 code_text.py:1336 view_image.py:749
 msgid "Move code to"
 msgstr "Mover código para"
 
@@ -738,7 +775,7 @@ msgstr "Mover código para"
 #: view_av.py:1195 code_text.py:1153 view_av.py:1368 view_image.py:731
 #: code_text.py:1349 view_av.py:1394 view_image.py:756 code_by_case.py:1339
 #: code_text.py:1333 code_by_case.py:1291 view_av.py:1365 view_image.py:744
-#: view_image.py:745
+#: view_image.py:745 code_text.py:1337 view_image.py:751
 msgid "Show codes like"
 msgstr "Mostrar códigos como"
 
@@ -749,17 +786,20 @@ msgstr "Mostrar códigos como"
 #: view_image.py:1221 code_by_case.py:1432 code_by_case.py:1471
 #: code_text.py:1402 code_text.py:1441 code_by_case.py:1383
 #: code_by_case.py:1422 view_av.py:1432 view_av.py:2030 view_image.py:809
-#: view_image.py:810 view_image.py:1271
+#: view_image.py:810 view_image.py:1271 code_text.py:1406 code_text.py:1445
+#: view_image.py:816 view_image.py:1277
 msgid "Select blank or category"
 msgstr "Selecione branco ou categoria"
 
 #: code_text.py:962 code_text.py:974 code_text.py:1284 code_text.py:1537
 #: code_by_case.py:1487 code_text.py:1517 code_by_case.py:1438
+#: code_text.py:1521
 msgid "Show some codes"
 msgstr "Mostrar alguns códigos"
 
 #: code_text.py:965 code_text.py:977 code_text.py:1287 code_text.py:1540
 #: code_by_case.py:1490 code_text.py:1520 code_by_case.py:1441
+#: code_text.py:1524
 msgid "Show codes containing the text. (Blank for all)"
 msgstr "Mostrar códigos contendo o texto. (Em branco para todos)"
 
@@ -767,12 +807,13 @@ msgstr "Mostrar códigos contendo o texto. (Em branco para todos)"
 #: view_av.py:1737 code_text.py:1800 view_av.py:2064 view_image.py:1229
 #: code_text.py:2079 view_av.py:2096 view_image.py:1256 code_by_case.py:2037
 #: code_text.py:2061 code_by_case.py:1981 view_av.py:2062 view_image.py:1253
-#: view_image.py:1303
+#: view_image.py:1303 code_text.py:2120 view_image.py:1309
 msgid "Merge code: "
 msgstr "Fundir código: "
 
 #: code_text.py:1364 code_text.py:1383 code_text.py:1800 code_text.py:2079
 #: code_by_case.py:2037 code_text.py:2061 code_by_case.py:1981
+#: code_text.py:2120
 msgid " into code: "
 msgstr " em código: "
 
@@ -780,7 +821,7 @@ msgstr " em código: "
 #: view_av.py:1739 code_text.py:1801 view_av.py:2066 view_image.py:1231
 #: code_text.py:2080 view_av.py:2098 view_image.py:1258 code_by_case.py:2038
 #: code_text.py:2062 code_by_case.py:1982 view_av.py:2063 view_image.py:1254
-#: view_image.py:1304
+#: view_image.py:1304 code_text.py:2121 view_image.py:1310
 msgid "Merge codes"
 msgstr "Fundir códigos"
 
@@ -797,19 +838,21 @@ msgstr "Não pode fundir-se"
 #: view_av.py:1770 code_text.py:1836 view_av.py:2099 view_image.py:1261
 #: code_text.py:2115 view_av.py:2126 view_image.py:1288 code_by_case.py:2073
 #: code_text.py:2092 code_by_case.py:2017 view_av.py:2091 view_image.py:1284
-#: view_image.py:1334
+#: view_image.py:1334 code_text.py:2151 view_image.py:1340
 msgid "Add new code"
 msgstr "Adicionar novo código"
 
 #: code_text.py:1398 view_image.py:1038 code_text.py:1417 code_text.py:1836
 #: view_image.py:1261 code_text.py:2115 view_image.py:1288 code_by_case.py:2073
 #: code_text.py:2092 code_by_case.py:2017 view_image.py:1284 view_image.py:1334
+#: code_text.py:2151 view_image.py:1340
 msgid "Code name"
 msgstr "Nome de código"
 
 #: code_text.py:1415 view_image.py:1051 code_text.py:1434 code_text.py:1853
 #: view_image.py:1274 code_text.py:2132 view_image.py:1301 code_by_case.py:2090
 #: code_text.py:2109 code_by_case.py:2034 view_image.py:1298 view_image.py:1348
+#: code_text.py:2168 view_image.py:1354
 msgid "New code: "
 msgstr "Novo código: "
 
@@ -817,7 +860,7 @@ msgstr "Novo código: "
 #: view_av.py:1792 code_text.py:1899 view_av.py:2121 view_image.py:1283
 #: code_text.py:2178 view_av.py:2148 view_image.py:1310 code_by_case.py:2136
 #: code_text.py:2146 code_by_case.py:2071 view_av.py:2114 view_image.py:1307
-#: view_image.py:1357
+#: view_image.py:1357 code_text.py:2205 view_image.py:1363
 msgid "Category"
 msgstr "Categoria"
 
@@ -825,13 +868,14 @@ msgstr "Categoria"
 #: view_av.py:1792 code_text.py:1899 view_av.py:2121 view_image.py:1283
 #: code_text.py:2178 view_av.py:2148 view_image.py:1310 code_by_case.py:2136
 #: code_text.py:2146 code_by_case.py:2071 view_av.py:2114 view_image.py:1307
-#: view_image.py:1357
+#: view_image.py:1357 code_text.py:2205 view_image.py:1363
 msgid "Category name"
 msgstr "Nome da categoria"
 
 #: code_text.py:1472 view_image.py:1074 code_text.py:1494 code_text.py:1913
 #: view_image.py:1297 code_text.py:2192 view_image.py:1324 code_by_case.py:2150
 #: code_text.py:2160 code_by_case.py:2085 view_image.py:1321 view_image.py:1371
+#: code_text.py:2219 view_image.py:1377
 msgid "New category: "
 msgstr "Nova categoria: "
 
@@ -842,7 +886,8 @@ msgstr "Nova categoria: "
 #: view_av.py:2189 view_image.py:717 view_image.py:1353 code_by_case.py:2173
 #: code_text.py:1465 code_text.py:2183 code_by_case.py:2108 codebook.py:172
 #: reports.py:289 view_av.py:2155 view_image.py:707 view_image.py:1350
-#: view_image.py:708 view_image.py:1400
+#: view_image.py:708 view_image.py:1400 code_text.py:1469 code_text.py:2242
+#: view_image.py:714 view_image.py:1406
 msgid "Code: "
 msgstr "Código: "
 
@@ -850,7 +895,7 @@ msgstr "Código: "
 #: view_av.py:1839 code_text.py:1949 view_av.py:2168 view_image.py:1330
 #: code_text.py:2228 view_av.py:2199 view_image.py:1357 code_by_case.py:2186
 #: code_text.py:2195 code_by_case.py:2120 view_av.py:2165 view_image.py:1354
-#: view_image.py:1404
+#: view_image.py:1404 code_text.py:2254 view_image.py:1410
 msgid "Code deleted: "
 msgstr "Código eliminado: "
 
@@ -859,7 +904,8 @@ msgstr "Código eliminado: "
 #: reports.py:275 view_av.py:2184 view_image.py:1354 code_text.py:2247
 #: reports.py:293 view_av.py:2217 view_image.py:1381 code_by_case.py:2205
 #: code_text.py:2214 code_by_case.py:2138 codebook.py:166 reports.py:286
-#: view_av.py:2182 view_image.py:1377 view_image.py:1427
+#: view_av.py:2182 view_image.py:1377 view_image.py:1427 code_text.py:2273
+#: view_image.py:1433
 msgid "Category: "
 msgstr "Categoria: "
 
@@ -867,28 +913,32 @@ msgstr "Categoria: "
 #: view_av.py:1864 code_text.py:1980 view_av.py:2193 view_image.py:1358
 #: code_text.py:2259 view_av.py:2226 view_image.py:1385 code_by_case.py:2217
 #: code_text.py:2225 code_by_case.py:2149 view_av.py:2191 view_image.py:1381
-#: view_image.py:1431
+#: view_image.py:1431 code_text.py:2284 view_image.py:1437
 msgid "Category deleted: "
 msgstr "Categoria excluída: "
 
 #: code_text.py:1552 code_text.py:1574 code_text.py:1993 code_text.py:2272
 #: code_by_case.py:2230 code_text.py:2238 code_by_case.py:2162
+#: code_text.py:2297
 msgid "Memo for Code: "
 msgstr "Memo para o Código: "
 
 #: code_text.py:1565 code_text.py:1587 code_text.py:2006 code_text.py:2285
 #: code_by_case.py:2243 code_text.py:2251 code_by_case.py:2175
+#: code_text.py:2310
 msgid "Memo for code: "
 msgstr "Memo para o código: "
 
 #: code_text.py:1575 view_image.py:1181 code_text.py:1597 code_text.py:2016
 #: view_image.py:1404 code_text.py:2295 view_image.py:1431 code_by_case.py:2253
 #: code_text.py:2261 code_by_case.py:2185 view_image.py:1426 view_image.py:1476
+#: code_text.py:2320 view_image.py:1482
 msgid "Memo for Category: "
 msgstr "Memo para Categoria: "
 
 #: code_text.py:1588 code_text.py:1610 code_text.py:2029 code_text.py:2308
 #: code_by_case.py:2266 code_text.py:2275 code_by_case.py:2198
+#: code_text.py:2334
 msgid "Memo for category: "
 msgstr "Memo para categoria: "
 
@@ -896,7 +946,7 @@ msgstr "Memo para categoria: "
 #: view_av.py:1926 code_text.py:2039 view_av.py:2255 view_image.py:1428
 #: code_text.py:2318 view_av.py:2292 view_image.py:1455 code_by_case.py:2276
 #: code_text.py:2285 code_by_case.py:2208 view_av.py:2257 view_image.py:1450
-#: view_image.py:1500
+#: view_image.py:1500 code_text.py:2344 view_image.py:1506
 msgid "Rename code"
 msgstr "Renomear código"
 
@@ -904,7 +954,7 @@ msgstr "Renomear código"
 #: view_av.py:1926 code_text.py:2040 view_av.py:2255 view_image.py:1428
 #: code_text.py:2319 view_av.py:2292 view_image.py:1455 code_by_case.py:2277
 #: code_text.py:2286 code_by_case.py:2209 view_av.py:2257 view_image.py:1450
-#: view_image.py:1500
+#: view_image.py:1500 code_text.py:2345 view_image.py:1506
 msgid "New code name:"
 msgstr "Novo nome de código:"
 
@@ -912,17 +962,19 @@ msgstr "Novo nome de código:"
 #: view_av.py:1933 code_text.py:2046 view_av.py:2262 view_image.py:1435
 #: code_text.py:2325 view_av.py:2299 view_image.py:1462 code_by_case.py:2283
 #: code_text.py:2293 code_by_case.py:2215 view_av.py:2264 view_image.py:1457
-#: view_image.py:1507
+#: view_image.py:1507 code_text.py:2352 view_image.py:1513
 msgid "Name in use"
 msgstr "Nome em uso"
 
 #: code_text.py:1606 code_text.py:1628 code_text.py:2047 code_text.py:2326
 #: code_by_case.py:2284 code_text.py:2294 code_by_case.py:2216
+#: code_text.py:2353
 msgid " is already in use, choose another name."
 msgstr " já está em uso, escolha outro nome."
 
 #: code_text.py:1626 code_text.py:1648 code_text.py:2067 code_text.py:2346
 #: code_by_case.py:2304 code_text.py:2314 code_by_case.py:2236
+#: code_text.py:2373
 msgid "Code renamed from: "
 msgstr "Código renomeado de: "
 
@@ -930,6 +982,7 @@ msgstr "Código renomeado de: "
 #: code_text.py:2067 code_text.py:2097 code_text.py:2346 code_text.py:2376
 #: code_by_case.py:2304 code_by_case.py:2334 code_text.py:2314
 #: code_text.py:2344 code_by_case.py:2236 code_by_case.py:2266
+#: code_text.py:2373 code_text.py:2403
 msgid " to: "
 msgstr " para: "
 
@@ -937,7 +990,7 @@ msgstr " para: "
 #: view_av.py:1952 code_text.py:2072 view_av.py:2281 view_image.py:1458
 #: code_text.py:2351 view_av.py:2318 view_image.py:1485 code_by_case.py:2309
 #: code_text.py:2319 code_by_case.py:2241 view_av.py:2284 view_image.py:1478
-#: view_image.py:1528
+#: view_image.py:1528 code_text.py:2378 view_image.py:1534
 msgid "Rename category"
 msgstr "Renomear categoria"
 
@@ -945,47 +998,52 @@ msgstr "Renomear categoria"
 #: view_av.py:1952 code_text.py:2072 view_av.py:2281 view_image.py:1458
 #: code_text.py:2351 view_av.py:2318 view_image.py:1485 code_by_case.py:2309
 #: code_text.py:2319 code_by_case.py:2241 view_av.py:2284 view_image.py:1478
-#: view_image.py:1528
+#: view_image.py:1528 code_text.py:2378 view_image.py:1534
 msgid "New category name:"
 msgstr "Novo nome de categoria:"
 
 #: code_text.py:1638 code_text.py:1660 code_text.py:2079 code_text.py:2358
 #: code_by_case.py:2316 code_text.py:2326 code_by_case.py:2248
+#: code_text.py:2385
 msgid "This code name is already in use."
 msgstr "Este nome de código já está em uso."
 
 #: code_text.py:1639 code_text.py:1661 code_text.py:2080 code_text.py:2359
 #: code_by_case.py:2317 code_text.py:2327 code_by_case.py:2249
+#: code_text.py:2386
 msgid "Duplicate code name"
 msgstr "Duplicar o nome de código"
 
 #: code_text.py:1656 view_image.py:1260 code_text.py:1678 code_text.py:2097
 #: view_image.py:1483 code_text.py:2376 view_image.py:1510 code_by_case.py:2334
 #: code_text.py:2344 code_by_case.py:2266 view_image.py:1503 view_image.py:1553
+#: code_text.py:2403 view_image.py:1559
 msgid "Category renamed from: "
 msgstr "Categoria renomeada de: "
 
 #: code_text.py:1697 view_av.py:571 view_image.py:423 code_text.py:1732
 #: view_av.py:574 code_text.py:2151 view_av.py:715 view_image.py:537
 #: code_text.py:2430 view_av.py:740 view_image.py:562 code_text.py:2398
-#: view_av.py:711 view_image.py:554 view_image.py:555
+#: view_av.py:711 view_image.py:554 view_image.py:555 code_text.py:2457
+#: view_image.py:561
 msgid "Next file"
 msgstr "Próximo arquivo"
 
 #: code_text.py:1698 view_av.py:572 view_image.py:424 code_text.py:1733
 #: view_av.py:575 code_text.py:2152 view_av.py:716 view_image.py:538
 #: code_text.py:2431 view_av.py:741 view_image.py:563 code_text.py:2399
-#: view_av.py:712 view_image.py:555 view_image.py:556
+#: view_av.py:712 view_image.py:555 view_image.py:556 code_text.py:2458
+#: view_image.py:562
 msgid "File with latest coding"
 msgstr "Arquivo com a última codificação"
 
 #: code_text.py:1699 code_text.py:1736 code_text.py:2157 code_text.py:2436
-#: code_text.py:2404
+#: code_text.py:2404 code_text.py:2463
 msgid "Go to bookmark"
 msgstr "Ir para o marcador de página"
 
 #: code_text.py:1790 code_text.py:1863 code_text.py:2363 code_text.py:2644
-#: code_text.py:2610
+#: code_text.py:2610 code_text.py:2669
 msgid "Code text: "
 msgstr "Texto do código: "
 
@@ -1000,7 +1058,8 @@ msgstr "códigos sobrepostos. Selecione para destacar."
 #: code_text.py:1998 code_text.py:2102 code_text.py:2079 code_text.py:2190
 #: code_text.py:2607 code_text.py:2718 code_text.py:2827 code_text.py:2808
 #: code_text.py:2921 code_text.py:3030 code_by_case.py:2814 code_text.py:2778
-#: code_text.py:2906 code_text.py:3017 code_by_case.py:2721
+#: code_text.py:2906 code_text.py:3017 code_by_case.py:2721 code_text.py:2837
+#: code_text.py:2965 code_text.py:3076
 msgid "No file was selected"
 msgstr "Nenhum arquivo foi selecionado"
 
@@ -1011,6 +1070,7 @@ msgstr "Nenhum arquivo foi selecionado"
 #: view_av.py:2746 code_text.py:2812 code_text.py:3142 code_text.py:3229
 #: view_av.py:2790 code_by_case.py:2712 code_text.py:2782 code_text.py:3014
 #: code_text.py:3124 code_text.py:3213 code_by_case.py:2619 view_av.py:2752
+#: code_text.py:2841 code_text.py:3073 code_text.py:3183 code_text.py:3274
 msgid "No code was selected"
 msgstr "Nenhum código foi selecionado"
 
@@ -1032,13 +1092,15 @@ msgstr "Este segmento já foi codificado com este código por "
 #: code_text.py:1508 code_text.py:2958 code_text.py:2978 view_av.py:2919
 #: view_av.py:2940 code_by_case.py:2855 code_by_case.py:2875 code_text.py:1490
 #: code_text.py:2944 code_text.py:2965 code_by_case.py:2762
-#: code_by_case.py:2782 view_av.py:2923 view_av.py:2944
+#: code_by_case.py:2782 view_av.py:2923 view_av.py:2944 code_text.py:1494
+#: code_text.py:3003 code_text.py:3024
 msgid "Annotation: "
 msgstr "Anotação: "
 
 #: code_text.py:2143 view_av.py:2505 code_text.py:2231 view_av.py:2508
 #: code_text.py:2769 view_av.py:2887 code_text.py:2972 view_av.py:2933
 #: code_by_case.py:2869 code_text.py:2958 code_by_case.py:2776 view_av.py:2937
+#: code_text.py:3017
 msgid "Annotation added at position: "
 msgstr "Anotação adicionada na posição: "
 
@@ -1048,34 +1110,35 @@ msgstr "Anotação adicionada na posição: "
 #: code_text.py:2973 code_text.py:3001 view_av.py:2934 view_av.py:2961
 #: code_by_case.py:2870 code_by_case.py:2898 code_text.py:2959
 #: code_text.py:2988 code_by_case.py:2777 code_by_case.py:2805 view_av.py:2938
-#: view_av.py:2965
+#: view_av.py:2965 code_text.py:3018 code_text.py:3047
 msgid " for: "
 msgstr " para: "
 
 #: code_text.py:2154 view_av.py:2516 code_text.py:2242 view_av.py:2519
 #: code_text.py:2797 view_av.py:2914 code_text.py:3000 view_av.py:2960
 #: code_by_case.py:2897 code_text.py:2987 code_by_case.py:2804 view_av.py:2964
+#: code_text.py:3046
 msgid "Annotation removed from position "
 msgstr "Anotação removida da posição "
 
 #: code_text.py:2184 code_text.py:2272 code_text.py:2912 code_text.py:3114
-#: code_text.py:3096
+#: code_text.py:3096 code_text.py:3155
 msgid "Select auto-codings to undo"
 msgstr "Selecione auto-codificações para desfazer"
 
 #: code_text.py:2196 code_text.py:2284 code_text.py:2924 code_text.py:3126
-#: code_text.py:3108
+#: code_text.py:3108 code_text.py:3167
 msgid "Undo autocoding: "
 msgstr "Desfazer autocodificação: "
 
 #: code_text.py:2220 code_text.py:2233 code_text.py:2308 code_text.py:2321
 #: code_text.py:2945 code_text.py:2958 code_text.py:3147 code_text.py:3160
-#: code_text.py:3129 code_text.py:3142
+#: code_text.py:3129 code_text.py:3142 code_text.py:3188 code_text.py:3201
 msgid "Code sentence"
 msgstr "Sentença de código"
 
 #: code_text.py:2223 code_text.py:2311 code_text.py:2948 code_text.py:3150
-#: code_text.py:3132
+#: code_text.py:3132 code_text.py:3191
 msgid "Auto code sentence using this text fragment:"
 msgstr "Sentença de código automático usando este fragmento de texto:"
 
@@ -1089,17 +1152,17 @@ msgstr "Definir final de sentença ( Default is period space. ):"
 
 #: code_text.py:2278 code_text.py:2370 code_text.py:2366 code_text.py:2458
 #: code_text.py:3004 code_text.py:3092 code_text.py:3206 code_text.py:3294
-#: code_text.py:3189 code_text.py:3276
+#: code_text.py:3189 code_text.py:3276 code_text.py:3248 code_text.py:3337
 msgid "Autocode insert error "
 msgstr "Erro de inserção de código automático "
 
 #: code_text.py:2281 code_text.py:2369 code_text.py:3007 code_text.py:3209
-#: code_text.py:3192
+#: code_text.py:3192 code_text.py:3251
 msgid " added codes"
 msgstr " códigos adicionados"
 
 #: code_text.py:2283 code_text.py:2371 code_text.py:3009 code_text.py:3211
-#: code_text.py:3194
+#: code_text.py:3194 code_text.py:3253
 msgid "Sentence coding: "
 msgstr "Codificação da sentença: "
 
@@ -1107,7 +1170,8 @@ msgstr "Codificação da sentença: "
 #: code_text.py:2376 code_text.py:2463 code_text.py:2890 code_text.py:3009
 #: code_text.py:3014 code_text.py:3097 code_text.py:3092 code_text.py:3211
 #: code_text.py:3216 code_text.py:3299 code_text.py:3076 code_text.py:3194
-#: code_text.py:3199 code_text.py:3281
+#: code_text.py:3199 code_text.py:3281 code_text.py:3135 code_text.py:3253
+#: code_text.py:3258 code_text.py:3342
 msgid ""
 "\n"
 "Code: "
@@ -1117,7 +1181,7 @@ msgstr ""
 
 #: code_text.py:2284 code_text.py:2376 code_text.py:2372 code_text.py:2464
 #: code_text.py:3010 code_text.py:3098 code_text.py:3212 code_text.py:3300
-#: code_text.py:3195 code_text.py:3282
+#: code_text.py:3195 code_text.py:3282 code_text.py:3254 code_text.py:3343
 msgid ""
 "\n"
 "With: "
@@ -1127,7 +1191,7 @@ msgstr ""
 
 #: code_text.py:2284 code_text.py:2289 code_text.py:2372 code_text.py:2377
 #: code_text.py:3010 code_text.py:3015 code_text.py:3212 code_text.py:3217
-#: code_text.py:3195 code_text.py:3201
+#: code_text.py:3195 code_text.py:3201 code_text.py:3254 code_text.py:3261
 msgid ""
 "\n"
 "Using line ending: "
@@ -1136,12 +1200,12 @@ msgstr ""
 "Usando fim de linha: "
 
 #: code_text.py:2287 code_text.py:2375 code_text.py:3013 code_text.py:3215
-#: code_text.py:3198
+#: code_text.py:3198 code_text.py:3257
 msgid "Automatic code sentence in files:"
 msgstr "Sentença de código automático em arquivos:"
 
 #: code_text.py:2289 code_text.py:2377 code_text.py:3015 code_text.py:3217
-#: code_text.py:3200
+#: code_text.py:3200 code_text.py:3259
 msgid ""
 "\n"
 "With text fragment: "
@@ -1150,37 +1214,37 @@ msgstr ""
 "Com fragmento de texto: "
 
 #: code_text.py:2311 code_text.py:2399 code_text.py:3033 code_text.py:3235
-#: code_text.py:3219
+#: code_text.py:3219 code_text.py:3280
 msgid "Automatic coding"
 msgstr "Codificação automática"
 
 #: code_text.py:2314 code_text.py:2402 code_text.py:3036 code_text.py:3238
-#: code_text.py:3222
+#: code_text.py:3222 code_text.py:3283
 msgid "Use | to code multiple texts"
 msgstr "Use | para codificar vários textos"
 
 #: code_text.py:2315 code_text.py:2403 code_text.py:3037 code_text.py:3239
-#: code_text.py:3223
+#: code_text.py:3223 code_text.py:3284
 msgid "Auto code files with the current code for this text:"
 msgstr "Arquivos de código automático com o código atual para este texto:"
 
 #: code_text.py:2331 code_text.py:2419 code_text.py:3053 code_text.py:3255
-#: code_text.py:3239
+#: code_text.py:3239 code_text.py:3300
 msgid "Select files to code"
 msgstr "Selecione arquivos para codificar"
 
 #: code_text.py:2372 code_text.py:2460 code_text.py:3094 code_text.py:3296
-#: code_text.py:3278
+#: code_text.py:3278 code_text.py:3339
 msgid "Automatic coding in files: "
 msgstr "Codificação automática em arquivos: "
 
 #: code_text.py:2373 code_text.py:2461 code_text.py:3095 code_text.py:3297
-#: code_text.py:3279
+#: code_text.py:3279 code_text.py:3340
 msgid ". with text: "
 msgstr ". com texto: "
 
 #: code_text.py:2375 code_text.py:2463 code_text.py:3097 code_text.py:3299
-#: code_text.py:3281
+#: code_text.py:3281 code_text.py:3342
 msgid "Text coding: "
 msgstr "Codificação de texto: "
 
@@ -1195,7 +1259,9 @@ msgstr "Codificação de texto: "
 #: code_by_case.py:4271 code_text.py:566 code_text.py:1467 code_text.py:3727
 #: code_by_case.py:685 code_by_case.py:3853 code_by_case.py:4081
 #: codebook.py:181 helpers.py:387 helpers.py:589 report_codes.py:255
-#: report_codes.py:1671 view_av.py:3014 view_av.py:3290
+#: report_codes.py:1671 view_av.py:3014 view_av.py:3290 code_text.py:570
+#: code_text.py:1471 code_text.py:3788 helpers.py:390 helpers.py:586
+#: report_codes.py:1672
 msgid "Memo: "
 msgstr "Memo: "
 
@@ -1259,6 +1325,7 @@ msgid " rows updated"
 msgstr " linhas atualizadas"
 
 #: dialog_sql.py:287 report_sql.py:271 report_sql.py:293 report_sql.py:291
+#: special_functions.py:126 special_functions.py:129
 msgid "Error"
 msgstr "Erro"
 
@@ -1302,14 +1369,17 @@ msgstr "Ordenação decrescente"
 
 #: dialog_sql.py:424 dialog_sql.py:430 report_sql.py:409 report_sql.py:415
 #: report_sql.py:502 report_sql.py:508 report_sql.py:500 report_sql.py:506
+#: report_sql.py:499 report_sql.py:505
 msgid " rows ["
 msgstr " linhas ["
 
 #: dialog_sql.py:424 report_sql.py:409 report_sql.py:502 report_sql.py:500
+#: report_sql.py:499
 msgid " asc]"
 msgstr " asc]"
 
 #: dialog_sql.py:430 report_sql.py:415 report_sql.py:508 report_sql.py:506
+#: report_sql.py:505
 msgid " desc]"
 msgstr " desc]"
 
@@ -1317,6 +1387,7 @@ msgstr " desc]"
 #: report_sql.py:420 report_sql.py:433 report_sql.py:522 report_sql.py:533
 #: report_sql.py:513 report_sql.py:526 report_sql.py:615 report_sql.py:626
 #: report_sql.py:511 report_sql.py:525 report_sql.py:617 report_sql.py:627
+#: report_sql.py:510 report_sql.py:524 report_sql.py:625
 msgid "Text filter"
 msgstr "Filtro de texto"
 
@@ -1324,16 +1395,18 @@ msgstr "Filtro de texto"
 #: report_sql.py:420 report_sql.py:433 report_sql.py:522 report_sql.py:533
 #: report_sql.py:513 report_sql.py:526 report_sql.py:615 report_sql.py:626
 #: report_sql.py:511 report_sql.py:525 report_sql.py:617 report_sql.py:627
+#: report_sql.py:510 report_sql.py:524 report_sql.py:625
 msgid "Text contains:"
 msgstr "O texto contém:"
 
 #: dialog_sql.py:441 dialog_sql.py:454 dialog_sql.py:465 report_sql.py:426
 #: report_sql.py:439 report_sql.py:450 report_sql.py:519 report_sql.py:532
-#: report_sql.py:543 report_sql.py:517 report_sql.py:531
+#: report_sql.py:543 report_sql.py:517 report_sql.py:531 report_sql.py:516
+#: report_sql.py:530 report_sql.py:542
 msgid " rows [filtered]"
 msgstr " fileiras [filtradas]"
 
-#: dialog_sql.py:456 report_sql.py:441 report_sql.py:534
+#: dialog_sql.py:456 report_sql.py:441 report_sql.py:534 report_sql.py:533
 msgid " starts with: "
 msgstr " começa com: "
 
@@ -1508,7 +1581,7 @@ msgstr " Já em uso"
 #: journals.py:102 journals.py:212 journals.py:287 qualcoder.py:1435
 #: journals.py:213 journals.py:288 qualcoder.py:1493 __main__.py:1659
 #: journals.py:197 __main__.py:1757 journals.py:194 __main__.py:1782
-#: journals.py:195
+#: journals.py:195 __main__.py:1798
 msgid "Journals: "
 msgstr "Jornais: "
 
@@ -1550,6 +1623,7 @@ msgstr "Jornal deletado: "
 #: journals.py:296 journals.py:346 journals.py:297 journals.py:347
 #: journals.py:204 journals.py:342 journals.py:377 journals.py:201
 #: journals.py:340 journals.py:375 journals.py:202 journals.py:378
+#: journals.py:379
 msgid "Journal: "
 msgstr "Jornal: "
 
@@ -1566,88 +1640,90 @@ msgid "Journal name in use"
 msgstr "Nome do jornal em uso"
 
 #: journals.py:344 journals.py:345 journals.py:375 journals.py:373
-#: journals.py:376
+#: journals.py:376 journals.py:377
 msgid "Journal name changed from: "
 msgstr "Nome do jornal mudou de: "
 
-#: manage_files.py:62 manage_files.py:63 manage_files.py:81
+#: manage_files.py:62 manage_files.py:63 manage_files.py:81 manage_files.py:87
 msgid "pdfminer is not installed."
 msgstr "o pdfminer não está instalado."
 
 #: manage_files.py:227 manage_files.py:232 manage_files.py:234
-#: manage_files.py:247
+#: manage_files.py:247 manage_files.py:228
 msgid "View"
 msgstr "Ver"
 
 #: manage_files.py:237 manage_files.py:243 manage_files.py:245
-#: manage_files.py:259
+#: manage_files.py:259 manage_files.py:239
 msgid "Alphabetic order"
 msgstr "Ordem alfabética"
 
 #: manage_files.py:238 manage_files.py:244 manage_files.py:246
-#: manage_files.py:260
+#: manage_files.py:260 manage_files.py:240
 msgid "Date order"
 msgstr "Ordem de data"
 
 #: manage_files.py:239 manage_files.py:245 manage_files.py:247
-#: manage_files.py:261
+#: manage_files.py:261 manage_files.py:241
 msgid "File type order"
 msgstr "Ordem do tipo de arquivo"
 
 #: manage_files.py:241 manage_files.py:248 manage_files.py:250
-#: manage_files.py:264
+#: manage_files.py:264 manage_files.py:244
 msgid "Show this value"
 msgstr "Mostrar este valor"
 
 #: manage_files.py:242 manage_files.py:249 manage_files.py:251
-#: manage_files.py:265
+#: manage_files.py:265 manage_files.py:245
 msgid "Order by attribute"
 msgstr "Ordem por atributo"
 
 #: manage_files.py:243 manage_files.py:250 manage_files.py:252
-#: manage_files.py:266
+#: manage_files.py:266 manage_files.py:247
 msgid "Export"
 msgstr "Exportação"
 
 #: manage_files.py:246 manage_files.py:253 manage_files.py:255
-#: manage_files.py:269
+#: manage_files.py:269 manage_files.py:250
 msgid "Show all rows"
 msgstr "Mostrar todas as filas"
 
 #: manage_files.py:248 manage_files.py:255 manage_files.py:257
-#: manage_files.py:271
+#: manage_files.py:271 manage_files.py:252
 msgid "Move file to externally linked file"
 msgstr "Mover arquivo para arquivo vinculado externamente"
 
 #: manage_files.py:250 manage_files.py:257 manage_files.py:259
-#: manage_files.py:273
+#: manage_files.py:273 manage_files.py:254
 msgid "Import linked file"
 msgstr "Importar arquivo vinculado"
 
 #: manage_files.py:333 manage_files.py:1600 manage_files.py:1608
 #: manage_files.py:355 manage_files.py:1394 manage_files.py:359
 #: manage_files.py:1411 manage_files.py:401 manage_files.py:1457
+#: manage_files.py:378 manage_files.py:1441
 msgid "Export to "
 msgstr "Exportar para "
 
 #: manage_files.py:338 manage_files.py:1582 manage_files.py:360
 #: manage_files.py:1375 manage_files.py:364 manage_files.py:1392
-#: manage_files.py:406 manage_files.py:1438
+#: manage_files.py:406 manage_files.py:1438 manage_files.py:383
+#: manage_files.py:1422
 msgid "Cannot export"
 msgstr "Não é possível exportar"
 
 #: manage_files.py:338 manage_files.py:360 manage_files.py:364
-#: manage_files.py:406
+#: manage_files.py:406 manage_files.py:383
 msgid "Cannot export as linked file\n"
 msgstr "Não é possível exportar como arquivo vinculado\n"
 
 #: manage_files.py:475 manage_files.py:493 manage_files.py:497
-#: manage_files.py:539
+#: manage_files.py:539 manage_files.py:516
 msgid "File attributes csv file exported to: "
 msgstr "Atributos do arquivo csv exportado para: "
 
 #: manage_files.py:522 manage_files.py:552 manage_files.py:558
-#: manage_files.py:601
+#: manage_files.py:601 manage_files.py:577
 msgid "Date"
 msgstr "Data"
 
@@ -1656,24 +1732,25 @@ msgstr "Data"
 #: manage_files.py:649 manage_files.py:666 manage_files.py:629
 #: manage_files.py:642 manage_files.py:663 manage_files.py:676
 #: manage_files.py:678 manage_files.py:691 manage_files.py:712
-#: manage_files.py:725
+#: manage_files.py:725 manage_files.py:648 manage_files.py:661
+#: manage_files.py:682 manage_files.py:695
 msgid "Cannot locate media. "
 msgstr "Não é possível localizar a mídia. "
 
 #: manage_files.py:683 manage_files.py:682 manage_files.py:736
-#: manage_files.py:746 manage_files.py:794
+#: manage_files.py:746 manage_files.py:794 manage_files.py:764
 msgid "Attribute added to files: "
 msgstr "Atributo adicionado aos arquivos: "
 
 #: manage_files.py:683 manage_files.py:682 manage_files.py:736
-#: manage_files.py:746 manage_files.py:794
+#: manage_files.py:746 manage_files.py:794 manage_files.py:764
 msgid "type"
 msgstr "tipo"
 
 #: manage_files.py:703 manage_files.py:711 manage_files.py:702
 #: manage_files.py:710 manage_files.py:756 manage_files.py:764
 #: manage_files.py:766 manage_files.py:774 manage_files.py:814
-#: manage_files.py:822
+#: manage_files.py:822 manage_files.py:783 manage_files.py:791
 msgid "Memo for file "
 msgstr "Memo para arquivo "
 
@@ -1749,22 +1826,23 @@ msgstr " fim:"
 
 #: manage_files.py:1079 manage_files.py:1117 manage_files.py:863
 #: manage_files.py:897 manage_files.py:873 manage_files.py:906
-#: manage_files.py:920 manage_files.py:953
+#: manage_files.py:920 manage_files.py:953 manage_files.py:882
+#: manage_files.py:915
 msgid "Bad link or non-existent file "
 msgstr "Link ruim ou arquivo inexistente "
 
 #: manage_files.py:1099 manage_files.py:879 manage_files.py:888
-#: manage_files.py:935
+#: manage_files.py:935 manage_files.py:897
 msgid "view AV error"
 msgstr "ver erro AV"
 
 #: manage_files.py:1138 manage_files.py:920 manage_files.py:929
-#: manage_files.py:976
+#: manage_files.py:976 manage_files.py:938
 msgid "New File"
 msgstr "Novo arquivo"
 
 #: manage_files.py:1138 manage_files.py:920 manage_files.py:929
-#: manage_files.py:976
+#: manage_files.py:976 manage_files.py:938
 msgid "Enter file name"
 msgstr "Digite o nome do arquivo"
 
@@ -1773,21 +1851,22 @@ msgid "Creating a new file: "
 msgstr "Criação de um novo arquivo: "
 
 #: manage_files.py:1172 manage_files.py:956 manage_files.py:965
-#: manage_files.py:1013
+#: manage_files.py:1013 manage_files.py:975
 msgid "File created: "
 msgstr "Arquivo criado: "
 
 #: manage_files.py:1197 manage_files.py:987 manage_files.py:996
+#: manage_files.py:1006
 msgid "Open file"
 msgstr "Abrir arquivo"
 
 #: manage_files.py:1229 manage_files.py:1019 manage_files.py:1029
-#: manage_files.py:1077
+#: manage_files.py:1077 manage_files.py:1039
 msgid "pdf miner is not installed"
 msgstr "o mineiro pdf não está instalado"
 
 #: manage_files.py:1247 manage_files.py:1037 manage_files.py:1047
-#: manage_files.py:1097
+#: manage_files.py:1097 manage_files.py:1059
 msgid ""
 "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying "
 "to load the pdf"
@@ -1803,29 +1882,33 @@ msgstr "Se ocorrer erro de importação"
 #: manage_files.py:1072 manage_files.py:1081 manage_files.py:1086
 #: manage_files.py:1082 manage_files.py:1091 manage_files.py:1096
 #: manage_files.py:1132 manage_files.py:1140 manage_files.py:1145
+#: manage_files.py:1094 manage_files.py:1108 manage_files.py:1115
 msgid "Unknown file type"
 msgstr "Tipo de arquivo desconhecido"
 
 #: manage_files.py:1283 manage_files.py:1073 manage_files.py:1083
-#: manage_files.py:1133
+#: manage_files.py:1133 manage_files.py:1095
 msgid "Trying to import as text"
 msgstr "Tentando importar como texto"
 
 #: manage_files.py:1291 manage_files.py:1296 manage_files.py:1081
 #: manage_files.py:1086 manage_files.py:1091 manage_files.py:1096
-#: manage_files.py:1140 manage_files.py:1145
+#: manage_files.py:1140 manage_files.py:1145 manage_files.py:1108
+#: manage_files.py:1115
 msgid "Cannot import file"
 msgstr "Não é possível importar arquivo"
 
 #: manage_files.py:1336 manage_files.py:1482 manage_files.py:1126
 #: manage_files.py:1274 manage_files.py:1138 manage_files.py:1291
-#: manage_files.py:1187 manage_files.py:1337
+#: manage_files.py:1187 manage_files.py:1337 manage_files.py:1157
+#: manage_files.py:1318
 msgid "Duplicate file"
 msgstr "Arquivo duplicado"
 
 #: manage_files.py:1336 manage_files.py:1483 manage_files.py:1126
 #: manage_files.py:1275 manage_files.py:1138 manage_files.py:1292
-#: manage_files.py:1187 manage_files.py:1338
+#: manage_files.py:1187 manage_files.py:1338 manage_files.py:1157
+#: manage_files.py:1319
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
@@ -1835,55 +1918,58 @@ msgstr ""
 
 #: manage_files.py:1349 manage_files.py:1514 manage_files.py:1139
 #: manage_files.py:1306 manage_files.py:1152 manage_files.py:1323
-#: manage_files.py:1202 manage_files.py:1370
+#: manage_files.py:1202 manage_files.py:1370 manage_files.py:1173
+#: manage_files.py:1353
 msgid " linked"
 msgstr " link"
 
 #: manage_files.py:1351 manage_files.py:1141 manage_files.py:1154
-#: manage_files.py:1204
+#: manage_files.py:1204 manage_files.py:1175
 msgid " imported."
 msgstr " importados."
 
 #: manage_files.py:1378 qualcoder.py:1180 qualcoder.py:1211 __main__.py:1318
 #: manage_files.py:1168 __main__.py:1378 manage_files.py:1185 __main__.py:1403
-#: manage_files.py:1237
+#: manage_files.py:1237 __main__.py:1419 manage_files.py:1208
 msgid " created."
 msgstr " criado."
 
 #: manage_files.py:1447 manage_files.py:1472 manage_files.py:1473
 #: manage_files.py:1239 manage_files.py:1264 manage_files.py:1265
 #: manage_files.py:1256 manage_files.py:1281 manage_files.py:1282
-#: manage_files.py:1326 manage_files.py:1327
+#: manage_files.py:1326 manage_files.py:1327 manage_files.py:1307
+#: manage_files.py:1308
 msgid " lines not imported"
 msgstr " linhas não importadas"
 
 #: manage_files.py:1469 refi.py:923 refi.py:950 manage_files.py:1261
 #: refi.py:1085 manage_files.py:1278 manage_files.py:1322 refi.py:1086
+#: manage_files.py:1303
 msgid "Cannot import"
 msgstr "Não pode importar"
 
 #: manage_files.py:1476 manage_files.py:1268 manage_files.py:1285
-#: manage_files.py:1331
+#: manage_files.py:1331 manage_files.py:1312
 msgid "Cannot import "
 msgstr "Não pode importar "
 
 #: manage_files.py:1512 manage_files.py:1304 manage_files.py:1321
-#: manage_files.py:1368
+#: manage_files.py:1368 manage_files.py:1351
 msgid " imported"
 msgstr " importado"
 
 #: manage_files.py:1580 manage_files.py:1373 manage_files.py:1390
-#: manage_files.py:1436
+#: manage_files.py:1436 manage_files.py:1420
 msgid "This is an external linked file"
 msgstr "Este é um arquivo vinculado externo"
 
 #: manage_files.py:1588 manage_files.py:1381 manage_files.py:1398
-#: manage_files.py:1444
+#: manage_files.py:1444 manage_files.py:1428
 msgid "This is a linked file. Will export text representation."
 msgstr "Este é um arquivo vinculado. Irá exportar a representação do texto."
 
 #: manage_files.py:1590 manage_files.py:1383 manage_files.py:1400
-#: manage_files.py:1446
+#: manage_files.py:1446 manage_files.py:1430
 msgid "Can export text"
 msgstr "Pode exportar texto"
 
@@ -1892,23 +1978,25 @@ msgid "Export files"
 msgstr "Arquivos de exportação"
 
 #: manage_files.py:1644 manage_files.py:1424 manage_files.py:1441
-#: manage_files.py:1486
+#: manage_files.py:1486 manage_files.py:1472
 msgid "Files exported"
 msgstr "Arquivos exportados"
 
 #: manage_files.py:1645 manage_files.py:1425 manage_files.py:1442
-#: manage_files.py:1487
+#: manage_files.py:1487 manage_files.py:1473
 msgid " exported to "
 msgstr " exportados para "
 
 #: manage_files.py:1654 manage_files.py:1437 manage_files.py:1454
-#: manage_files.py:1499 special_functions.py:109
+#: manage_files.py:1499 special_functions.py:109 manage_files.py:1485
+#: special_functions.py:150
 msgid "Delete files"
 msgstr "Eliminar arquivos"
 
 #: manage_files.py:1672 manage_files.py:1809 manage_files.py:1455
 #: manage_files.py:1597 manage_files.py:1472 manage_files.py:1614
-#: manage_files.py:1517 manage_files.py:1659
+#: manage_files.py:1517 manage_files.py:1659 manage_files.py:1503
+#: manage_files.py:1645
 msgid "Deleted file: "
 msgstr "Arquivo deletado: "
 
@@ -1917,19 +2005,20 @@ msgstr "Arquivo deletado: "
 #: manage_files.py:1549 manage_files.py:1574 manage_files.py:1479
 #: manage_files.py:1507 manage_files.py:1566 manage_files.py:1595
 #: manage_files.py:1524 manage_files.py:1552 manage_files.py:1611
-#: manage_files.py:1640
+#: manage_files.py:1640 manage_files.py:1510 manage_files.py:1538
+#: manage_files.py:1597 manage_files.py:1626
 msgid "Deleting file error: "
 msgstr "Eliminação de erro de arquivo: "
 
 #: manage_files.py:1817 qualcoder.py:1415 reports.py:1563 qualcoder.py:1473
 #: reports.py:1585 __main__.py:1639 manage_files.py:1605 report_codes.py:824
 #: __main__.py:1737 manage_files.py:1622 report_codes.py:831 __main__.py:1762
-#: manage_files.py:1667
+#: manage_files.py:1667 __main__.py:1778 manage_files.py:1653
 msgid "Files: "
 msgstr "Arquivos: "
 
 #: manage_files.py:1833 manage_files.py:1621 manage_files.py:1638
-#: manage_files.py:1683
+#: manage_files.py:1683 manage_files.py:1669
 msgid ""
 "\n"
 "Externally linked file:\n"
@@ -1942,88 +2031,93 @@ msgid "Uncaught exception : "
 msgstr "Exceção não cautelosa : "
 
 #: qualcoder.py:825 qualcoder.py:842 __main__.py:941 __main__.py:973
-#: __main__.py:972
+#: __main__.py:972 __main__.py:979
 msgid "Settings"
 msgstr "Configurações"
 
 #: qualcoder.py:827 qualcoder.py:844 __main__.py:943 __main__.py:975
-#: __main__.py:974
+#: __main__.py:974 __main__.py:981
 msgid "Coder"
 msgstr "Codificador"
 
 #: qualcoder.py:828 qualcoder.py:845 __main__.py:944 __main__.py:976
-#: __main__.py:975
+#: __main__.py:975 __main__.py:982
 msgid "Font"
 msgstr "Fonte"
 
 #: qualcoder.py:829 qualcoder.py:846 __main__.py:945 __main__.py:977
-#: __main__.py:976
+#: __main__.py:976 __main__.py:983
 msgid "Tree font size"
 msgstr "Tamanho da fonte da árvore"
 
 #: qualcoder.py:830 qualcoder.py:847 __main__.py:946 __main__.py:978
-#: __main__.py:977
+#: __main__.py:977 __main__.py:984
 msgid "Working directory"
 msgstr "Diretório de trabalho"
 
 #: qualcoder.py:831 qualcoder.py:848 __main__.py:947 __main__.py:979
-#: __main__.py:978
+#: __main__.py:978 __main__.py:985
 msgid "Show IDs"
 msgstr "Mostrar IDs"
 
 #: qualcoder.py:832 qualcoder.py:849 __main__.py:948 __main__.py:980
-#: __main__.py:979
+#: __main__.py:979 __main__.py:986
 msgid "Language"
 msgstr "Idioma"
 
 #: qualcoder.py:833 qualcoder.py:850 __main__.py:949 __main__.py:981
-#: __main__.py:980
+#: __main__.py:980 __main__.py:987
 msgid "Timestamp format"
 msgstr "Formato de carimbo da hora"
 
 #: qualcoder.py:834 qualcoder.py:851 __main__.py:950 __main__.py:982
-#: __main__.py:981
+#: __main__.py:981 __main__.py:988
 msgid "Speaker name format"
 msgstr "Formato do nome do palestrante"
 
 #: qualcoder.py:835 qualcoder.py:852 __main__.py:951 __main__.py:983
-#: __main__.py:982
+#: __main__.py:982 __main__.py:989
 msgid "Backup on open"
 msgstr "Cópia de segurança em aberto"
 
 #: qualcoder.py:836 qualcoder.py:853 __main__.py:952 __main__.py:984
-#: __main__.py:983
+#: __main__.py:983 __main__.py:990
 msgid "Backup AV files"
 msgstr "Arquivos AV de backup"
 
 #: qualcoder.py:838 qualcoder.py:1443 qualcoder.py:855 qualcoder.py:1501
 #: __main__.py:954 __main__.py:1667 __main__.py:986 __main__.py:1765
-#: __main__.py:985 __main__.py:1790
+#: __main__.py:985 __main__.py:1790 __main__.py:992 __main__.py:1806
 msgid "Directory (folder) paths / represents \\"
 msgstr "Diretório (pasta) caminhos / representa \\"
 
 #: qualcoder.py:976 qualcoder.py:1007 __main__.py:1106 __main__.py:1145
-#: __main__.py:1160
+#: __main__.py:1160 __main__.py:1156 __main__.py:1171
 msgid "This project contains no text files."
 msgstr "Este projeto não contém arquivos de texto."
 
 #: qualcoder.py:977 qualcoder.py:1008 __main__.py:1107 __main__.py:1146
+#: __main__.py:1157
 msgid "No text files"
 msgstr "Nenhum arquivo de texto"
 
 #: qualcoder.py:990 qualcoder.py:1021 __main__.py:1120 __main__.py:1176
+#: __main__.py:1187
 msgid "This project contains no image files."
 msgstr "Este projeto não contém arquivos de imagem."
 
 #: qualcoder.py:991 qualcoder.py:1022 __main__.py:1121 __main__.py:1177
+#: __main__.py:1188
 msgid "No image files"
 msgstr "Nenhum arquivo de imagem"
 
 #: qualcoder.py:999 qualcoder.py:1030 __main__.py:1129 __main__.py:1185
+#: __main__.py:1196
 msgid "This project contains no audio/video files."
 msgstr "Este projeto não contém arquivos de áudio/vídeo."
 
 #: qualcoder.py:1000 qualcoder.py:1031 __main__.py:1130 __main__.py:1186
+#: __main__.py:1197
 msgid "No a/v files"
 msgstr "Sem arquivos a/v"
 
@@ -2032,12 +2126,12 @@ msgid "REFI QDA Project export"
 msgstr "REFI-QDA Projeto exportação"
 
 #: qualcoder.py:1072 qualcoder.py:1103 __main__.py:1200 __main__.py:1256
-#: __main__.py:1254
+#: __main__.py:1254 __main__.py:1267
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "PROJETO REFI-QDA DE IMPORTAÇÃO"
 
 #: qualcoder.py:1074 qualcoder.py:1105 __main__.py:1202 __main__.py:1258
-#: __main__.py:1256
+#: __main__.py:1256 __main__.py:1269
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -2046,29 +2140,29 @@ msgstr ""
 "Etapa 2: Será solicitado o arquivo QDPX."
 
 #: qualcoder.py:1075 qualcoder.py:1106 __main__.py:1203 __main__.py:1259
-#: __main__.py:1257
+#: __main__.py:1257 __main__.py:1270
 msgid "REFI-QDA import steps"
 msgstr "Etapas de importação do REFI-QDA"
 
 #: qualcoder.py:1079 qualcoder.py:1095 qualcoder.py:1110 qualcoder.py:1126
 #: __main__.py:1207 __main__.py:1223 __main__.py:1263 __main__.py:1279
-#: __main__.py:1261 __main__.py:1278
+#: __main__.py:1261 __main__.py:1278 __main__.py:1274 __main__.py:1291
 msgid "Project creation"
 msgstr "Criação do projeto"
 
 #: qualcoder.py:1079 qualcoder.py:1095 qualcoder.py:1156 qualcoder.py:1110
 #: qualcoder.py:1126 qualcoder.py:1187 __main__.py:1223 __main__.py:1279
-#: __main__.py:1278
+#: __main__.py:1278 __main__.py:1291
 msgid "Project not successfully created"
 msgstr "Projeto não criado com sucesso"
 
 #: qualcoder.py:1089 qualcoder.py:1120 __main__.py:1217 __main__.py:1273
-#: __main__.py:1271
+#: __main__.py:1271 __main__.py:1284
 msgid "IMPORTING RQDA PROJECT"
 msgstr "PROJETO RQDA DE IMPORTAÇÃO"
 
 #: qualcoder.py:1090 qualcoder.py:1121 __main__.py:1218 __main__.py:1274
-#: __main__.py:1273
+#: __main__.py:1273 __main__.py:1286
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -2077,156 +2171,159 @@ msgstr ""
 "Etapa 2: Será solicitado o arquivo RQDA."
 
 #: qualcoder.py:1091 qualcoder.py:1122 __main__.py:1219 __main__.py:1275
-#: __main__.py:1274
+#: __main__.py:1274 __main__.py:1287
 msgid "RQDA import steps"
 msgstr "Etapas de importação do RQDA"
 
 #: qualcoder.py:1109 qualcoder.py:1140 __main__.py:1237 __main__.py:1293
-#: __main__.py:1292
+#: __main__.py:1292 __main__.py:1305
 msgid "Are you sure you want to quit?"
 msgstr "Você tem certeza de que quer desistir?"
 
 #: qualcoder.py:1142 qualcoder.py:1173 __main__.py:1271 __main__.py:1330
-#: __main__.py:1329
+#: __main__.py:1329 __main__.py:1342
 msgid "Enter project name"
 msgstr "Digite o nome do projeto"
 
 #: qualcoder.py:1144 qualcoder.py:1156 refi.py:1468 refi.py:1474
 #: qualcoder.py:1175 qualcoder.py:1187 refi.py:1495 refi.py:1501
 #: __main__.py:1273 __main__.py:1293 refi.py:1795 refi.py:1801 __main__.py:1332
-#: __main__.py:1352 __main__.py:1351 refi.py:1817 refi.py:1823
+#: __main__.py:1352 __main__.py:1351 refi.py:1817 refi.py:1823 __main__.py:1345
+#: __main__.py:1364
 msgid "Project"
 msgstr "Projeto"
 
 #: qualcoder.py:1144 qualcoder.py:1175 __main__.py:1273 __main__.py:1332
+#: __main__.py:1345
 msgid "No project created."
 msgstr "Nenhum projeto criado."
 
 #: qualcoder.py:1155 qualcoder.py:1186 __main__.py:1292 __main__.py:1351
-#: __main__.py:1350
+#: __main__.py:1350 __main__.py:1363
 msgid "Project creation error "
 msgstr "Erro de criação do projeto "
 
 #: qualcoder.py:1180 qualcoder.py:1211 __main__.py:1318 __main__.py:1378
-#: __main__.py:1403
+#: __main__.py:1403 __main__.py:1419
 msgid "New project: "
 msgstr "Novo projeto: "
 
 #: qualcoder.py:1182 qualcoder.py:1213 __main__.py:1320 __main__.py:1380
-#: __main__.py:1404
+#: __main__.py:1404 __main__.py:1420
 msgid "Opening: "
 msgstr "Abertura: "
 
 #: qualcoder.py:1192 qualcoder.py:1223 __main__.py:1330 __main__.py:1390
-#: __main__.py:1414
+#: __main__.py:1414 __main__.py:1430
 msgid "New Project Created"
 msgstr "Novo Projeto Criado"
 
 #: qualcoder.py:1193 qualcoder.py:1224 __main__.py:1331 __main__.py:1391
-#: __main__.py:1415
+#: __main__.py:1415 __main__.py:1431
 msgid "DB Version:"
 msgstr "Versão DB:"
 
 #: qualcoder.py:1194 reports.py:277 reports.py:568 qualcoder.py:1225
 #: __main__.py:1332 report_file_summary.py:173 reports.py:262 reports.py:529
 #: __main__.py:1392 reports.py:280 reports.py:547 __main__.py:1416
-#: report_file_summary.py:170 reports.py:273 reports.py:534
+#: report_file_summary.py:170 reports.py:273 reports.py:534 __main__.py:1432
 msgid "Date: "
 msgstr "Data: "
 
 #: qualcoder.py:1195 qualcoder.py:1226 __main__.py:1333 __main__.py:1393
-#: __main__.py:1417
+#: __main__.py:1417 __main__.py:1433
 msgid "About: "
 msgstr "Sobre: "
 
 #: qualcoder.py:1196 qualcoder.py:1227 __main__.py:1334 report_codes.py:907
 #: __main__.py:1394 report_codes.py:914 __main__.py:1418 report_codes.py:823
+#: __main__.py:1434 report_codes.py:824
 msgid "Coder:"
 msgstr "Codificador:"
 
 #: qualcoder.py:1199 qualcoder.py:1230 __main__.py:1337 __main__.py:1397
-#: __main__.py:1421
+#: __main__.py:1421 __main__.py:1437
 msgid "Problem creating database "
 msgstr "Problema na criação do banco de dados "
 
 #: qualcoder.py:1223 qualcoder.py:1254 __main__.py:1379 __main__.py:1438
-#: __main__.py:1462
+#: __main__.py:1462 __main__.py:1478
 msgid "Coder name changed to: "
 msgstr "O nome do codificador mudou para: "
 
 #: qualcoder.py:1248 qualcoder.py:1279 __main__.py:1404 __main__.py:1462
-#: __main__.py:1486
+#: __main__.py:1486 __main__.py:1502
 msgid "Memo for project "
 msgstr "Memorando para o projeto "
 
 #: qualcoder.py:1254 qualcoder.py:1285 __main__.py:1410 __main__.py:1468
-#: __main__.py:1492
+#: __main__.py:1492 __main__.py:1508
 msgid "Project memo entered."
 msgstr "Memorando do projeto inserido."
 
 #: qualcoder.py:1275 qualcoder.py:1306 __main__.py:1431 __main__.py:1491
-#: __main__.py:1515
+#: __main__.py:1515 __main__.py:1531 special_functions.py:120
 msgid "Open project directory"
 msgstr "Abrir diretório de projetos"
 
 #: qualcoder.py:1297 qualcoder.py:1328 __main__.py:1453 __main__.py:1513
-#: __main__.py:1537
+#: __main__.py:1537 __main__.py:1553
 msgid "Cannot open file"
 msgstr "Não é possível abrir o arquivo"
 
 #: qualcoder.py:1323 qualcoder.py:1354 __main__.py:1479 __main__.py:1540
-#: __main__.py:1564
+#: __main__.py:1564 __main__.py:1580
 msgid "Default coder name changed to: "
 msgstr "O nome padrão do codificador mudou para: "
 
 #: qualcoder.py:1354 qualcoder.py:1385 __main__.py:1551 __main__.py:1644
-#: __main__.py:1672
+#: __main__.py:1672 __main__.py:1688
 msgid "Project Opened: "
 msgstr "Projeto Aberto: "
 
 #: qualcoder.py:1374 qualcoder.py:1432 __main__.py:1598 __main__.py:1696
-#: __main__.py:1724
+#: __main__.py:1724 __main__.py:1740
 msgid "There is already a backup with this name"
 msgstr "Já existe um backup com este nome"
 
 #: qualcoder.py:1381 qualcoder.py:1439 __main__.py:1605 __main__.py:1703
-#: __main__.py:1731
+#: __main__.py:1731 __main__.py:1747
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
 "ADVERTÊNCIA: arquivos de áudio e vídeo NÃO têm backup. Veja as configurações."
 
 #: qualcoder.py:1382 qualcoder.py:1440 __main__.py:1606 __main__.py:1704
-#: __main__.py:1732
+#: __main__.py:1732 __main__.py:1748
 msgid "Project backup created: "
 msgstr "Criação de backup do projeto: "
 
 #: qualcoder.py:1401 qualcoder.py:1459 __main__.py:1625 __main__.py:1723
-#: __main__.py:1749
+#: __main__.py:1749 __main__.py:1765
 msgid "PROJECT SUMMARY"
 msgstr "RESUMO DO PROJETO"
 
 #: qualcoder.py:1403 qualcoder.py:1461 __main__.py:1627 __main__.py:1725
-#: __main__.py:1751
+#: __main__.py:1751 __main__.py:1767
 msgid "Date time now: "
 msgstr "Data hora agora: "
 
 #: qualcoder.py:1405 qualcoder.py:1463 __main__.py:1629 __main__.py:1727
-#: __main__.py:1753
+#: __main__.py:1753 __main__.py:1769
 msgid "Project path: "
 msgstr "Caminho do projeto: "
 
 #: qualcoder.py:1407 qualcoder.py:1465 __main__.py:1631 __main__.py:1729
-#: __main__.py:1754
+#: __main__.py:1754 __main__.py:1770
 msgid "Project date: "
 msgstr "Data do projeto: "
 
 #: qualcoder.py:1411 qualcoder.py:1469 __main__.py:1635 __main__.py:1733
-#: __main__.py:1758
+#: __main__.py:1758 __main__.py:1774
 msgid "Project memo: "
 msgstr "Memorando do projeto: "
 
 #: qualcoder.py:1423 qualcoder.py:1481 __main__.py:1647 __main__.py:1745
-#: __main__.py:1770
+#: __main__.py:1770 __main__.py:1786
 msgid "Code categories: "
 msgstr "Categorias de código: "
 
@@ -2236,31 +2333,32 @@ msgstr "Categorias de código: "
 #: __main__.py:1749 report_codes.py:826 report_codes.py:1088
 #: report_codes.py:1091 report_relations.py:134 __main__.py:1774
 #: report_codes.py:1020 report_codes.py:1026 report_relations.py:132
+#: __main__.py:1790 report_codes.py:1021 report_codes.py:1027
 msgid "Codes: "
 msgstr "Códigos: "
 
 #: qualcoder.py:1448 qualcoder.py:1506 __main__.py:1672 __main__.py:1770
-#: __main__.py:1795
+#: __main__.py:1795 __main__.py:1811
 msgid "Bad links to files"
 msgstr "Maus links para arquivos"
 
 #: qualcoder.py:1540 qualcoder.py:1598 __main__.py:1764 __main__.py:1862
-#: __main__.py:1887
+#: __main__.py:1887 __main__.py:1901
 msgid "Deleting: "
 msgstr "Eliminação: "
 
 #: qualcoder.py:1552 qualcoder.py:1610 __main__.py:1776 __main__.py:1874
-#: __main__.py:1899
+#: __main__.py:1899 __main__.py:1913
 msgid "This version: "
 msgstr "Esta versão: "
 
 #: qualcoder.py:1559 qualcoder.py:1617 __main__.py:1783 __main__.py:1881
-#: __main__.py:1906
+#: __main__.py:1906 __main__.py:1920
 msgid "Newer release available: "
 msgstr "Lançamento mais recente disponível: "
 
 #: qualcoder.py:1564 qualcoder.py:1622 __main__.py:1788 __main__.py:1886
-#: __main__.py:1911
+#: __main__.py:1911 __main__.py:1925
 msgid "Latest Release: "
 msgstr "Último lançamento: "
 
@@ -2470,7 +2568,7 @@ msgstr "Livro de código NÃO exportado"
 #: view_av.py:3037 helpers.py:508 refi.py:2764 view_av.py:889 view_av.py:3550
 #: helpers.py:551 view_av.py:914 view_av.py:3608 code_by_case.py:3202
 #: code_by_case.py:3104 helpers.py:553 refi.py:2791 view_av.py:881
-#: view_av.py:3599
+#: view_av.py:3599 helpers.py:552
 msgid "Media not found"
 msgstr "Mídia não encontrada"
 
@@ -2519,6 +2617,7 @@ msgstr "Arquivo de texto de freqüências de codificação exportado para: "
 #: report_relations.py:556 reports.py:315 reports.py:347 reports.py:680
 #: report_compare_coder_file.py:749 report_compare_coder_file.py:743
 #: report_relations.py:544 reports.py:308 reports.py:338 reports.py:660
+#: report_relations.py:545
 msgid "Code Tree"
 msgstr "Árvore de código"
 
@@ -2603,7 +2702,8 @@ msgstr "Arquivo de texto\n"
 #: code_text.py:387 code_text.py:415 code_by_case.py:544 manage_files.py:638
 #: manage_files.py:646 manage_files.py:652 report_codes.py:220
 #: report_compare_coder_file.py:182 report_file_summary.py:125
-#: report_file_summary.py:424
+#: report_file_summary.py:424 code_text.py:391 code_text.py:419
+#: manage_files.py:616 manage_files.py:622
 msgid "Characters: "
 msgstr "Personagens: "
 
@@ -2709,7 +2809,8 @@ msgstr "Salvar arquivo de texto"
 #: report_codes.py:534 report_codes.py:554 report_codes.py:653
 #: report_codes.py:538 report_codes.py:558 report_codes.py:657
 #: report_compare_coder_file.py:280 report_codes.py:523 report_codes.py:543
-#: report_codes.py:633 report_compare_coder_file.py:285
+#: report_codes.py:633 report_compare_coder_file.py:285 report_codes.py:524
+#: report_codes.py:544 report_codes.py:634
 msgid "Report exported: "
 msgstr "Relatório exportado: "
 
@@ -2719,7 +2820,8 @@ msgstr "Relatório exportado: "
 #: report_codes.py:777 report_codes.py:539 report_codes.py:560
 #: report_codes.py:658 report_codes.py:781 report_compare_coder_file.py:282
 #: report_codes.py:524 report_codes.py:545 report_codes.py:634
-#: report_codes.py:736 report_compare_coder_file.py:287
+#: report_codes.py:736 report_compare_coder_file.py:287 report_codes.py:525
+#: report_codes.py:546 report_codes.py:635 report_codes.py:737
 msgid "Report exported"
 msgstr "Relatório exportado"
 
@@ -2736,12 +2838,12 @@ msgid "Save html file"
 msgstr "Salvar arquivo html"
 
 #: reports.py:1441 reports.py:1445 report_codes.py:690 report_codes.py:694
-#: report_codes.py:669
+#: report_codes.py:669 report_codes.py:670
 msgid "html folder creation error "
 msgstr "erro de criação de pasta html "
 
 #: reports.py:1442 reports.py:1446 report_codes.py:691 report_codes.py:695
-#: report_codes.py:670
+#: report_codes.py:670 report_codes.py:671
 msgid "Folder creation"
 msgstr "Criação de pastas"
 
@@ -2750,7 +2852,7 @@ msgid " error"
 msgstr "erro"
 
 #: reports.py:1449 reports.py:1453 report_codes.py:698 report_codes.py:702
-#: report_codes.py:676
+#: report_codes.py:676 report_codes.py:677
 msgid "html file reading error:"
 msgstr "erro de leitura do arquivo html:"
 
@@ -2759,52 +2861,52 @@ msgid "HTML file creation exception"
 msgstr "Exceção à criação de arquivo HTML"
 
 #: reports.py:1525 reports.py:1529 report_codes.py:773 report_codes.py:777
-#: report_codes.py:732
+#: report_codes.py:732 report_codes.py:733
 msgid "Report exported to: "
 msgstr "Relatório exportado para: "
 
 #: reports.py:1527 reports.py:1531 report_codes.py:775 report_codes.py:779
-#: report_codes.py:734
+#: report_codes.py:734 report_codes.py:735
 msgid "Media folder: "
 msgstr "Pasta de mídia: "
 
 #: reports.py:1606 reports.py:1628 report_codes.py:939 report_codes.py:1059
-#: report_codes.py:995
+#: report_codes.py:995 report_codes.py:996
 msgid "No codes"
 msgstr "Sem códigos"
 
 #: reports.py:1607 reports.py:1629 report_codes.py:938 report_codes.py:1058
-#: report_codes.py:994
+#: report_codes.py:994 report_codes.py:995
 msgid "No codes have been selected."
 msgstr "Nenhum código foi selecionado."
 
 #: reports.py:1615 reports.py:1637 report_codes.py:943 report_codes.py:1063
-#: report_codes.py:999
+#: report_codes.py:999 report_codes.py:1000
 msgid "Nothing selected"
 msgstr "Nada selecionado"
 
 #: reports.py:1616 reports.py:1638 report_codes.py:942 report_codes.py:1062
-#: report_codes.py:998
+#: report_codes.py:998 report_codes.py:999
 msgid "No files, cases or attributes have been selected."
 msgstr "Nenhum arquivo, caso ou atributo foi selecionado."
 
 #: reports.py:1629 reports.py:1651 report_codes.py:963 report_codes.py:1083
-#: report_codes.py:1015
+#: report_codes.py:1015 report_codes.py:1016
 msgid "Search parameters"
 msgstr "Parâmetros de busca"
 
 #: reports.py:1631 reports.py:1653 report_codes.py:965 report_codes.py:1085
-#: report_codes.py:1017
+#: report_codes.py:1017 report_codes.py:1018
 msgid "Coding by: All coders"
 msgstr "Codificação por: Todos os codificadores"
 
 #: reports.py:1633 reports.py:1655 report_codes.py:967 report_codes.py:1087
-#: report_codes.py:1019
+#: report_codes.py:1019 report_codes.py:1020
 msgid "Coding by: "
 msgstr "Codificação por: "
 
 #: reports.py:1649 reports.py:1671 report_codes.py:984 report_codes.py:1108
-#: report_codes.py:1042
+#: report_codes.py:1042 report_codes.py:1043
 msgid ""
 "\n"
 "Attributes:\n"
@@ -2813,7 +2915,7 @@ msgstr ""
 "Atributos:\n"
 
 #: reports.py:1656 reports.py:1678 report_codes.py:991 report_codes.py:1110
-#: report_codes.py:1044
+#: report_codes.py:1044 report_codes.py:1045
 msgid ""
 "\n"
 "Files:\n"
@@ -2822,7 +2924,7 @@ msgstr ""
 "Arquivos:\n"
 
 #: reports.py:1662 reports.py:1684 report_codes.py:997 report_codes.py:1117
-#: report_codes.py:1051
+#: report_codes.py:1051 report_codes.py:1052
 msgid ""
 "\n"
 "Cases:\n"
@@ -2832,7 +2934,7 @@ msgstr ""
 
 #: reports.py:1670 reports.py:1692 report_codes.py:897 report_codes.py:1005
 #: report_codes.py:904 report_codes.py:1124 report_codes.py:811
-#: report_codes.py:1058
+#: report_codes.py:1058 report_codes.py:812 report_codes.py:1059
 msgid "Search text: "
 msgstr "Texto de busca: "
 
@@ -2843,7 +2945,7 @@ msgstr "Nenhum nome de mídia nos resultados AV"
 
 #: reports.py:2184 reports.py:2206 report_codes.py:1555 report_codes.py:1680
 #: report_codes.py:1688 report_codes.py:1813 report_codes.py:1687
-#: report_codes.py:1794
+#: report_codes.py:1794 report_codes.py:1795
 msgid "[VIEW] "
 msgstr "[VER] "
 
@@ -2955,7 +3057,7 @@ msgstr "Não é possível importar vlc"
 
 #: view_av.py:269 view_av.py:272 report_codes.py:895 report_codes.py:1571
 #: view_av.py:289 report_codes.py:902 report_codes.py:1704 report_codes.py:809
-#: report_codes.py:1703 view_av.py:293
+#: report_codes.py:1703 view_av.py:293 report_codes.py:810
 msgid "Coder: "
 msgstr "Codificador:"
 
@@ -3021,19 +3123,19 @@ msgstr "Segmento: "
 
 #: view_av.py:1191 view_image.py:618 view_av.py:1194 view_av.py:1367
 #: view_image.py:730 view_av.py:1393 view_image.py:755 view_av.py:1364
-#: view_image.py:743 view_image.py:744
+#: view_image.py:743 view_image.py:744 view_image.py:750
 msgid "Show coded text and media"
 msgstr "Mostrar texto codificado e mídia"
 
 #: view_av.py:1271 view_image.py:696 view_av.py:1274 view_av.py:1450
 #: view_image.py:811 view_av.py:1476 view_image.py:836 view_av.py:1447
-#: view_image.py:824 view_image.py:825
+#: view_image.py:824 view_image.py:825 view_image.py:831
 msgid "Show codes containing"
 msgstr "Mostrar códigos contendo"
 
 #: view_av.py:1274 view_image.py:699 view_av.py:1277 view_av.py:1453
 #: view_image.py:814 view_av.py:1479 view_image.py:839 view_av.py:1450
-#: view_image.py:827 view_image.py:828
+#: view_image.py:827 view_image.py:828 view_image.py:834
 msgid ""
 "Show codes containing text.\n"
 "(Blank for all)"
@@ -3067,7 +3169,7 @@ msgstr "Código adicionado: "
 
 #: view_av.py:1877 view_image.py:1157 view_av.py:1880 view_av.py:2209
 #: view_image.py:1380 view_av.py:2244 view_image.py:1407 view_image.py:1402
-#: view_image.py:1452
+#: view_image.py:1452 view_image.py:1458
 msgid "Memo for Code "
 msgstr "Memo para o Código "
 
@@ -3082,19 +3184,19 @@ msgstr " Nome já em uso, escolha outro."
 
 #: view_av.py:1943 view_image.py:1229 view_av.py:1946 view_av.py:2275
 #: view_image.py:1452 view_av.py:2312 view_image.py:1479 view_av.py:2278
-#: view_image.py:1472 view_image.py:1522
+#: view_image.py:1472 view_image.py:1522 view_image.py:1528
 msgid "Code renamed: "
 msgstr "Código renomeado: "
 
 #: view_av.py:1956 view_image.py:1242 view_av.py:1959 view_av.py:2288
 #: view_image.py:1465 view_av.py:2325 view_image.py:1492 view_av.py:2291
-#: view_image.py:1485 view_image.py:1535
+#: view_image.py:1485 view_image.py:1535 view_image.py:1541
 msgid "This category name is already in use"
 msgstr "Este nome de categoria já está em uso"
 
 #: view_av.py:1957 view_image.py:1243 view_av.py:1960 view_av.py:2289
 #: view_image.py:1466 view_av.py:2326 view_image.py:1493 view_av.py:2292
-#: view_image.py:1486 view_image.py:1536
+#: view_image.py:1486 view_image.py:1536 view_image.py:1542
 msgid "Duplicate category name"
 msgstr "Duplicar o nome da categoria"
 
@@ -3218,12 +3320,13 @@ msgstr "Nome:"
 
 #: view_image.py:129 view_image.py:455 view_image.py:136 view_image.py:569
 #: view_image.py:594 view_image.py:135 view_image.py:586 view_image.py:587
+#: view_image.py:593
 msgid "Image coding"
 msgstr "Codificação de imagens"
 
 #: view_image.py:471 view_image.py:585 view_image.py:610 code_by_case.py:2927
 #: report_compare_coder_file.py:471 code_by_case.py:2833 view_image.py:602
-#: view_image.py:603
+#: view_image.py:603 view_image.py:609
 msgid "Image Error"
 msgstr "Erro de imagem"
 
@@ -3233,51 +3336,54 @@ msgstr "Erro de imagem"
 #: report_compare_coder_file.py:471 report_compare_coder_file.py:868
 #: code_by_case.py:2833 helpers.py:638 report_compare_coder_file.py:351
 #: report_compare_coder_file.py:854 view_image.py:602 view_image.py:1573
-#: view_image.py:603 view_image.py:1623
+#: view_image.py:603 view_image.py:1623 helpers.py:635 view_image.py:609
+#: view_image.py:1629
 msgid "Cannot open: "
 msgstr "Não pode abrir: "
 
 #: view_image.py:546 helpers.py:652 view_image.py:650 helpers.py:695
 #: view_image.py:675 code_by_case.py:2978 report_compare_coder_file.py:941
 #: code_by_case.py:2882 helpers.py:694 report_compare_coder_file.py:926
-#: view_image.py:666 view_image.py:667
+#: view_image.py:666 view_image.py:667 helpers.py:703 view_image.py:673
 msgid "Scale: "
 msgstr "Escala: "
 
 #: view_image.py:851 view_image.py:1011 view_image.py:1036 code_by_case.py:3098
 #: code_by_case.py:3000 view_image.py:1021 view_image.py:1071
+#: view_image.py:1077
 msgid "Memo for coded area of "
 msgstr "Memo para área codificada de "
 
 #: view_image.py:1022 view_image.py:1245 view_image.py:1272 view_image.py:1268
-#: view_image.py:1318
+#: view_image.py:1318 view_image.py:1324
 msgid "Cannot merge codes. Unmark overlapping text."
 msgstr "Não é possível fundir códigos. Texto sem sobreposição de marcas."
 
 #: view_image.py:1212 view_image.py:1435 view_image.py:1462 view_image.py:1457
-#: view_image.py:1507
+#: view_image.py:1507 view_image.py:1513
 msgid " Choose another name"
 msgstr " Escolha outro nome"
 
 #: view_image.py:1330 helpers.py:593 view_image.py:1553 helpers.py:636
 #: view_image.py:1580 report_compare_coder_file.py:868 helpers.py:638
 #: report_compare_coder_file.py:854 view_image.py:1573 view_image.py:1623
+#: helpers.py:635 view_image.py:1629
 msgid "Image error"
 msgstr "Erro de imagem"
 
 #: view_image.py:1364 report_file_summary.py:378 view_image.py:1596
 #: view_image.py:1623 report_file_summary.py:373 view_image.py:1615
-#: view_image.py:1665
+#: view_image.py:1665 view_image.py:1671
 msgid "Width: "
 msgstr "Largura: "
 
 #: view_image.py:1364 view_image.py:1596 view_image.py:1623 view_image.py:1615
-#: view_image.py:1665
+#: view_image.py:1665 view_image.py:1671
 msgid " Height: "
 msgstr " Altura: "
 
 #: view_image.py:1365 view_image.py:1597 view_image.py:1624 view_image.py:1616
-#: view_image.py:1666
+#: view_image.py:1666 view_image.py:1672
 msgid " Scale: "
 msgstr " Escala: "
 
@@ -3296,58 +3402,63 @@ msgstr ""
 "Use Ctrl ou Shift e clique no mouse"
 
 #: report_relations.py:355 report_relations.py:340 report_relations.py:486
-#: report_relations.py:478
+#: report_relations.py:478 report_relations.py:479
 msgid "Proximity"
 msgstr "Proximidade"
 
 #: report_relations.py:357 report_relations.py:342 report_relations.py:459
 #: report_relations.py:461 report_relations.py:488 report_relations.py:646
 #: report_relations.py:453 report_relations.py:454 report_relations.py:456
-#: report_relations.py:480 report_relations.py:634
+#: report_relations.py:480 report_relations.py:634 report_relations.py:455
+#: report_relations.py:457 report_relations.py:481 report_relations.py:635
 msgid "Overlap"
 msgstr "Sobreposição"
 
 #: report_relations.py:359 report_relations.py:344 report_relations.py:490
-#: report_relations.py:482
+#: report_relations.py:482 report_relations.py:483
 msgid "Exact"
 msgstr "Exato"
 
 #: report_relations.py:361 report_relations.py:346 report_relations.py:492
-#: report_relations.py:484
+#: report_relations.py:484 report_relations.py:485
 msgid "Inclusion"
 msgstr "Inclusão"
 
 #: report_relations.py:555 report_relations.py:525 report_relations.py:685
-#: report_relations.py:662
+#: report_relations.py:662 report_relations.py:663
 msgid "Code relations csv file exported to: "
 msgstr "Arquivo csv de relações de código exportado para: "
 
 #: code_text.py:304 code_text.py:348 code_text.py:382 code_text.py:412
-#: code_text.py:394 code_text.py:420
+#: code_text.py:394 code_text.py:420 code_text.py:398 code_text.py:424
 msgid "Codings: "
 msgstr "Codificações: "
 
 #: code_text.py:305 code_text.py:1764 code_text.py:349 code_text.py:2198
 #: code_text.py:2253 code_text.py:383 code_text.py:413 code_text.py:2477
 #: code_text.py:2530 code_text.py:395 code_text.py:421 code_text.py:2445
-#: code_text.py:2497
+#: code_text.py:2497 code_text.py:399 code_text.py:425 code_text.py:2504
+#: code_text.py:2556
 msgid "From: "
 msgstr "De: "
 
 #: code_text.py:826 code_text.py:1070 code_text.py:1268 code_by_case.py:1252
-#: code_text.py:1247 code_by_case.py:1206
+#: code_text.py:1247 code_by_case.py:1206 code_text.py:1251
 msgid "Select code for change"
 msgstr "Selecione o código para mudança"
 
 #: code_text.py:1735 code_text.py:2154 code_text.py:2433 code_text.py:2401
+#: code_text.py:2460
 msgid " next  characters"
 msgstr " próximos caracteres"
 
 #: code_text.py:1814 code_text.py:2303 code_text.py:2582 code_text.py:2549
+#: code_text.py:2608
 msgid "Entire text file will be loaded"
 msgstr "Todo o arquivo de texto será carregado"
 
 #: code_text.py:1815 code_text.py:2304 code_text.py:2583 code_text.py:2550
+#: code_text.py:2609
 msgid "Information"
 msgstr "Informações"
 
@@ -3369,19 +3480,22 @@ msgstr "Nome do campo inválido"
 
 #: manage_files.py:633 manage_files.py:663 report_file_summary.py:278
 #: report_file_summary.py:331 manage_files.py:673 manage_files.py:722
-#: report_file_summary.py:275 report_file_summary.py:328
+#: report_file_summary.py:275 report_file_summary.py:328 manage_files.py:692
 msgid "Duration: "
 msgstr "Duração: "
 
 #: qualcoder.py:1395 __main__.py:1561 __main__.py:1653 __main__.py:1681
+#: __main__.py:1697
 msgid "Deleting code_text coding to deleted files: "
 msgstr "Exclusão da codificação code_text para arquivos excluídos: "
 
 #: qualcoder.py:1402 __main__.py:1568 __main__.py:1660 __main__.py:1688
+#: __main__.py:1704
 msgid "Deleting code_image coding to deleted files: "
 msgstr "Eliminação da codificação da imagem_código para arquivos eliminados: "
 
 #: qualcoder.py:1409 __main__.py:1575 __main__.py:1667 __main__.py:1695
+#: __main__.py:1711
 msgid "Deleting code_av coding to deleted files: "
 msgstr "Eliminação da codificação code_av para arquivos eliminados: "
 
@@ -3389,16 +3503,16 @@ msgstr "Eliminação da codificação code_av para arquivos eliminados: "
 msgid "Project Import"
 msgstr "Importação de projetos"
 
-#: __main__.py:1207 __main__.py:1263 __main__.py:1261
+#: __main__.py:1207 __main__.py:1263 __main__.py:1261 __main__.py:1274
 msgid "REFI-QDA Project not successfully created"
 msgstr "Projecto REFI-QDA não criado com sucesso"
 
-#: __main__.py:1293 __main__.py:1352 __main__.py:1351
+#: __main__.py:1293 __main__.py:1352 __main__.py:1351 __main__.py:1364
 msgid " not successfully created"
 msgstr " não criado com sucesso"
 
 #: cases.py:905 report_codes.py:2198 cases.py:906 report_codes.py:2304
-#: cases.py:902 report_codes.py:2289
+#: cases.py:902 report_codes.py:2289 report_codes.py:2290
 msgid "Right click to view"
 msgstr "Clique direito para ver"
 
@@ -3408,6 +3522,7 @@ msgstr "EDITING TEXT MODE (Ctrl+E)"
 
 #: code_text.py:142 edit_textfile.py:94 view_av.py:3423 code_text.py:156
 #: view_av.py:3469 code_text.py:159 edit_textfile.py:95 view_av.py:3444
+#: edit_textfile.py:99
 msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
@@ -3419,6 +3534,7 @@ msgstr ""
 
 #: code_text.py:144 edit_textfile.py:95 view_av.py:3424 code_text.py:158
 #: view_av.py:3470 code_text.py:161 edit_textfile.py:96 view_av.py:3446
+#: edit_textfile.py:101
 msgid ""
 "Positions of the underlying codes / annotations / case-assigned may not "
 "correctly adjust if text is typed over or deleted."
@@ -3431,30 +3547,32 @@ msgstr ""
 #: view_image.py:282 view_image.py:296 code_text.py:446 code_text.py:458
 #: view_av.py:448 view_av.py:460 view_image.py:297 view_image.py:309
 #: code_text.py:456 code_text.py:463 view_av.py:456 view_av.py:463
-#: view_image.py:304 view_image.py:298 view_image.py:305
+#: view_image.py:304 view_image.py:298 view_image.py:305 code_text.py:460
+#: code_text.py:467 view_image.py:300 view_image.py:307
 msgid "Show files with file attributes"
 msgstr "Mostrar ficheiros com atributos de ficheiro"
 
 #: code_text.py:447 view_av.py:501 view_image.py:352 code_text.py:523
 #: view_av.py:526 view_image.py:375 code_text.py:528 view_av.py:528
-#: view_image.py:369 view_image.py:370
+#: view_image.py:369 view_image.py:370 code_text.py:532 view_image.py:372
 msgid "Show files:"
 msgstr "Mostrar ficheiros:"
 
 #: code_text.py:468 view_av.py:515 view_image.py:221 code_text.py:1523
 #: view_av.py:540 code_by_case.py:695 code_text.py:1503 code_by_case.py:657
-#: view_av.py:542 view_image.py:218 view_image.py:219
+#: view_av.py:542 view_image.py:218 view_image.py:219 code_text.py:1507
 msgid "Showing important codings"
 msgstr "Mostrando codificações importantes"
 
 #: code_text.py:471 view_av.py:518 view_image.py:224 code_text.py:1526
 #: view_av.py:543 code_by_case.py:698 code_text.py:1506 code_by_case.py:660
-#: view_av.py:545 view_image.py:221 view_image.py:222
+#: view_av.py:545 view_image.py:221 view_image.py:222 code_text.py:1510
 msgid "Show codings flagged important"
 msgstr "Mostrar codificações assinaladas como importantes"
 
 #: code_text.py:845 view_av.py:2454 code_text.py:1043 view_av.py:2493
 #: code_by_case.py:1048 code_text.py:1019 code_by_case.py:1002 view_av.py:2457
+#: code_text.py:1023
 msgid "Add important mark (I)"
 msgstr "Adicionar marca importante (I)"
 
@@ -3463,39 +3581,42 @@ msgstr "Adicionar marca importante (I)"
 #: code_by_case.py:1050 code_by_case.py:3037 code_by_case.py:4093
 #: code_text.py:1021 code_by_case.py:1004 code_by_case.py:2940
 #: code_by_case.py:3978 view_av.py:2459 view_av.py:3144 view_image.py:941
-#: view_image.py:943
+#: view_image.py:943 code_text.py:1025 view_image.py:949
 msgid "Remove important mark"
 msgstr "Remover marca importante"
 
 #: code_text.py:873 view_av.py:2482 code_text.py:1071 view_av.py:2521
 #: code_by_case.py:1075 code_text.py:1046 code_by_case.py:1029 view_av.py:2485
+#: code_text.py:1050
 msgid "Edit annotation"
 msgstr "Editar anotação"
 
 #: code_text.py:970 view_av.py:2574 code_text.py:1168 view_av.py:2613
 #: code_by_case.py:1170 code_text.py:1142 code_by_case.py:1123 view_av.py:2575
+#: code_text.py:1146
 msgid "Select codes"
 msgstr "Seleccionar códigos"
 
 #: code_text.py:1140 view_av.py:1358 view_image.py:718 code_text.py:1336
 #: view_av.py:1384 view_image.py:743 code_by_case.py:1326 code_text.py:1320
 #: code_by_case.py:1278 view_av.py:1355 view_image.py:731 view_image.py:732
+#: code_text.py:1324 view_image.py:738
 msgid "Merge category into category"
 msgstr "Fundir categoria em categoria"
 
-#: code_text.py:2156 code_text.py:2435 code_text.py:2403
+#: code_text.py:2156 code_text.py:2435 code_text.py:2403 code_text.py:2462
 msgid " previous  characters"
 msgstr " caracteres anteriores"
 
-#: code_text.py:2844 code_text.py:3046 code_text.py:3033
+#: code_text.py:2844 code_text.py:3046 code_text.py:3033 code_text.py:3092
 msgid "Code text using start and end marks: "
 msgstr "Texto de código usando marcas de início e fim: "
 
-#: code_text.py:2890 code_text.py:3092 code_text.py:3076
+#: code_text.py:2890 code_text.py:3092 code_text.py:3076 code_text.py:3135
 msgid "Coding using start and end marks"
 msgstr "Codificação usando marcas de início e fim"
 
-#: code_text.py:2891 code_text.py:3093 code_text.py:3077
+#: code_text.py:2891 code_text.py:3093 code_text.py:3077 code_text.py:3136
 msgid ""
 "\n"
 "With start mark: "
@@ -3503,7 +3624,7 @@ msgstr ""
 "\n"
 "Com marca de partida: "
 
-#: code_text.py:2891 code_text.py:3093 code_text.py:3077
+#: code_text.py:2891 code_text.py:3093 code_text.py:3077 code_text.py:3136
 msgid ""
 "\n"
 "End mark: "
@@ -3511,15 +3632,15 @@ msgstr ""
 "\n"
 "Marca final: "
 
-#: code_text.py:2898 code_text.py:3100 code_text.py:3083
+#: code_text.py:2898 code_text.py:3100 code_text.py:3083 code_text.py:3142
 msgid " new coded sections found."
 msgstr " novas secções codificadas encontradas."
 
-#: code_text.py:2900 code_text.py:3102 code_text.py:3085
+#: code_text.py:2900 code_text.py:3102 code_text.py:3085 code_text.py:3144
 msgid "previously coded."
 msgstr "previamente codificado."
 
-#: code_text.py:2962 code_text.py:3164 code_text.py:3146
+#: code_text.py:2962 code_text.py:3164 code_text.py:3146 code_text.py:3205
 msgid ""
 "Define sentence ending. Default is period space.\n"
 "Use \\n for line ending:"
@@ -3529,11 +3650,13 @@ msgstr ""
 
 #: code_text.py:3525 view_av.py:2949 code_text.py:3730 view_av.py:2995
 #: code_by_case.py:3933 code_text.py:3697 code_by_case.py:3824 view_av.py:2999
+#: code_text.py:3758
 msgid "Press O to cycle overlapping codes"
 msgstr "Prima O para fazer o ciclo de códigos sobrepostos"
 
 #: code_text.py:3569 view_av.py:2979 code_text.py:3774 view_av.py:3025
 #: code_by_case.py:3977 code_text.py:3741 code_by_case.py:3868 view_av.py:3029
+#: code_text.py:3802
 msgid "ANNOTATED"
 msgstr "ANNOTATADO"
 
@@ -3557,21 +3680,22 @@ msgstr ""
 "Evitar seleccionar combinações de texto de secções de texto não marcadas e "
 "secções codificadas/anotadas/case-atribuídas."
 
-#: helpers.py:254 helpers.py:297 helpers.py:299
+#: helpers.py:254 helpers.py:297 helpers.py:299 helpers.py:300
 msgid "Coded files: "
 msgstr "Ficheiros codificados: "
 
-#: helpers.py:256 helpers.py:299 helpers.py:301
+#: helpers.py:256 helpers.py:299 helpers.py:301 helpers.py:302
 msgid "Coded cases: "
 msgstr "Casos codificados: "
 
 #: helpers.py:294 helpers.py:296 helpers.py:332 helpers.py:334 helpers.py:371
 #: helpers.py:337 helpers.py:339 helpers.py:375 helpers.py:377 helpers.py:414
-#: helpers.py:341 helpers.py:379 helpers.py:417
+#: helpers.py:341 helpers.py:379 helpers.py:417 helpers.py:342 helpers.py:344
+#: helpers.py:380 helpers.py:382 helpers.py:420
 msgid " File: "
 msgstr " Ficheiro: "
 
-#: helpers.py:332 helpers.py:375 helpers.py:377
+#: helpers.py:332 helpers.py:375 helpers.py:377 helpers.py:380
 msgid " Case: "
 msgstr " Caso: "
 
@@ -3592,10 +3716,12 @@ msgid "Journals exported"
 msgstr "Revistas exportadas"
 
 #: manage_files.py:246 manage_files.py:248 manage_files.py:262
+#: manage_files.py:242
 msgid "Case order"
 msgstr "Encomenda do caso"
 
 #: manage_files.py:681 manage_files.py:691 manage_files.py:740
+#: manage_files.py:710
 msgid "Case linked:"
 msgstr "Caso ligado:"
 
@@ -3621,7 +3747,7 @@ msgid " Path: "
 msgstr "Caminho"
 
 #: manage_links.py:184 report_relations.py:643 manage_links.py:198
-#: report_relations.py:631
+#: report_relations.py:631 report_relations.py:632
 msgid "Filename"
 msgstr "Nome do ficheiro"
 
@@ -3687,6 +3813,7 @@ msgid "Annotations"
 msgstr "Anotações"
 
 #: report_codes.py:691 report_codes.py:695 report_codes.py:670
+#: report_codes.py:671
 msgid " error "
 msgstr " erro "
 
@@ -3695,38 +3822,47 @@ msgid "HTML folder creation error"
 msgstr "Erro de criação de pasta HTML"
 
 #: report_codes.py:861 report_codes.py:868 report_codes.py:774
+#: report_codes.py:775
 msgid "No files selected for annotations"
 msgstr "Nenhum ficheiro seleccionado para anotações"
 
 #: report_codes.py:891 report_codes.py:898 report_codes.py:805
+#: report_codes.py:806
 msgid "Annotation search parameters"
 msgstr "Parâmetros de pesquisa de anotações"
 
 #: report_codes.py:893 report_codes.py:900 report_codes.py:807
+#: report_codes.py:808
 msgid "Coder: All coders"
 msgstr "Codificador: Todos os codificadores"
 
 #: report_codes.py:898 report_codes.py:905 report_codes.py:812
+#: report_codes.py:813
 msgid "Files:"
 msgstr "Ficheiros:"
 
 #: report_codes.py:907 report_codes.py:914 report_codes.py:822
+#: report_codes.py:823
 msgid "File"
 msgstr "Ficheiro"
 
 #: report_codes.py:907 report_codes.py:914 report_codes.py:822
+#: report_codes.py:823
 msgid "Date:"
 msgstr "Data:"
 
 #: report_codes.py:908 report_codes.py:915 report_codes.py:824
+#: report_codes.py:825
 msgid "Position"
 msgstr "Posição"
 
 #: report_codes.py:909 report_codes.py:916 report_codes.py:825
+#: report_codes.py:826
 msgid "TEXT"
 msgstr "TEXTO"
 
 #: report_codes.py:910 report_codes.py:917 report_codes.py:826
+#: report_codes.py:827
 msgid "ANNOTATION"
 msgstr "ANOTAÇÃO"
 
@@ -3740,32 +3876,40 @@ msgstr "Projecto de backup então: eliminar do code_av onde "
 #: report_codes.py:2048 report_codes.py:2192 report_codes.py:1600
 #: report_codes.py:1894 report_codes.py:1913 report_codes.py:2026
 #: report_codes.py:2046 report_codes.py:2169 report_codes.py:2189
+#: report_codes.py:1601 report_codes.py:1895 report_codes.py:1914
+#: report_codes.py:2027 report_codes.py:2047 report_codes.py:2170
+#: report_codes.py:2190
 msgid "Coded memo: "
 msgstr "Memorando codificado: "
 
 #: report_codes.py:1559 report_codes.py:1683 report_codes.py:1692
 #: report_codes.py:1816 report_codes.py:1691 report_codes.py:1797
+#: report_codes.py:1798
 msgid "Code memo: "
 msgstr "Memorando de código: "
 
 #: report_codes.py:1562 report_codes.py:1686 report_codes.py:1695
 #: report_codes.py:1819 report_codes.py:1694 report_codes.py:1800
+#: report_codes.py:1801
 msgid " File memo: "
 msgstr " Memorando de arquivo: "
 
 #: report_codes.py:1570 report_codes.py:1694 report_codes.py:1703
 #: report_codes.py:1827 report_codes.py:1702 report_codes.py:1808
+#: report_codes.py:1809
 msgid "Case memo: "
 msgstr "Memorando de caso: "
 
 #: report_codes.py:1617 report_codes.py:2109 report_codes.py:1750
 #: report_codes.py:2242 report_relations.py:401 report_codes.py:1740
-#: report_codes.py:2228 report_relations.py:396
+#: report_codes.py:2228 report_relations.py:396 report_codes.py:1741
+#: report_codes.py:2229
 msgid "View in context"
 msgstr "Ver em contexto"
 
 #: report_codes.py:1622 report_codes.py:2113 report_codes.py:1755
 #: report_codes.py:2246 report_codes.py:1744 report_codes.py:2232
+#: report_codes.py:1745 report_codes.py:2233
 msgid "Copy all to clipboard"
 msgstr "Copiar tudo para a prancheta"
 
@@ -3870,7 +4014,8 @@ msgstr "CÓDIGOS DE IMAGENS: "
 #: report_codes.py:1437 report_codes.py:1502 report_code_summary.py:391
 #: report_code_summary.py:436 report_file_summary.py:290
 #: report_file_summary.py:343 report_file_summary.py:408
-#: report_file_summary.py:464
+#: report_file_summary.py:464 report_codes.py:1376 report_codes.py:1438
+#: report_codes.py:1503
 msgid "Count: "
 msgstr "Contar: "
 
@@ -4035,63 +4180,63 @@ msgstr "Reiniciar QualCoder"
 msgid "Restart QualCoder to enact some changes"
 msgstr "Reiniciar o QualCoder para promulgar algumas alterações"
 
-#: special_functions.py:93 special_functions.py:157
+#: special_functions.py:93 special_functions.py:157 special_functions.py:198
 msgid "Change ALL text code start positions in ALL text files by "
 msgstr ""
 "Alterar TODAS as posições iniciais do código de texto em TODOS os ficheiros "
 "de texto por "
 
 #: special_functions.py:94 special_functions.py:137 special_functions.py:158
-#: special_functions.py:201
+#: special_functions.py:201 special_functions.py:199 special_functions.py:244
 msgid " characters.\n"
 msgstr "caracteres.\n"
 
 #: special_functions.py:95 special_functions.py:138 special_functions.py:159
-#: special_functions.py:202
+#: special_functions.py:202 special_functions.py:200 special_functions.py:245
 msgid "Made by coder: "
 msgstr "Feito por codificador: "
 
 #: special_functions.py:96 special_functions.py:139 special_functions.py:160
-#: special_functions.py:203
+#: special_functions.py:203 special_functions.py:201 special_functions.py:246
 msgid " to change."
 msgstr " para mudar."
 
 #: special_functions.py:97 special_functions.py:140 special_functions.py:161
-#: special_functions.py:204
+#: special_functions.py:204 special_functions.py:202 special_functions.py:247
 msgid "Backup project before performing this function.\n"
 msgstr "Projecto de backup antes de executar esta função.\n"
 
 #: special_functions.py:98 special_functions.py:141 special_functions.py:162
-#: special_functions.py:205
+#: special_functions.py:205 special_functions.py:203 special_functions.py:248
 msgid "Press OK to continue."
 msgstr "Prima OK para continuar."
 
-#: special_functions.py:99 special_functions.py:163
+#: special_functions.py:99 special_functions.py:163 special_functions.py:204
 msgid "Change code start positions"
 msgstr "Alterar as posições iniciais do código"
 
 #: special_functions.py:119 special_functions.py:162 special_functions.py:183
-#: special_functions.py:226
+#: special_functions.py:226 special_functions.py:225 special_functions.py:270
 msgid "All text codings by "
 msgstr "Todas as codificações de texto por "
 
 #: special_functions.py:119 special_functions.py:162 special_functions.py:183
-#: special_functions.py:226
+#: special_functions.py:226 special_functions.py:225 special_functions.py:270
 msgid " resized by "
 msgstr " redimensionado por "
 
 #: special_functions.py:119 special_functions.py:162 special_functions.py:183
-#: special_functions.py:226
+#: special_functions.py:226 special_functions.py:271
 msgid " characters."
 msgstr "caracteres."
 
-#: special_functions.py:136 special_functions.py:200
+#: special_functions.py:136 special_functions.py:200 special_functions.py:243
 msgid "Change ALL text code end positions in ALL text files by "
 msgstr ""
 "Alterar TODAS as posições finais do código de texto em TODOS os ficheiros de "
 "texto por "
 
-#: special_functions.py:142 special_functions.py:206
+#: special_functions.py:142 special_functions.py:206 special_functions.py:249
 msgid "Change code end positions"
 msgstr "Alterar as posições finais do código"
 
@@ -4102,6 +4247,7 @@ msgstr "Ligar segmento ao texto seleccionado"
 #: view_av.py:3094 view_image.py:925 view_av.py:3140 view_image.py:950
 #: code_by_case.py:3034 code_by_case.py:4091 code_by_case.py:2937
 #: code_by_case.py:3976 view_av.py:3142 view_image.py:938 view_image.py:940
+#: view_image.py:946
 msgid "Add important mark"
 msgstr "Adicionar marca importante"
 
@@ -4113,6 +4259,7 @@ msgstr "TEXTO LIGADO: "
 #: view_av.py:3328 view_image.py:670 view_av.py:3374 view_image.py:695
 #: code_by_case.py:2999 code_by_case.py:4325 code_by_case.py:2902
 #: code_by_case.py:4135 view_av.py:3347 view_image.py:685 view_image.py:686
+#: view_image.py:692
 msgid "IMPORTANT"
 msgstr "IMPORTANTE"
 
@@ -4123,126 +4270,135 @@ msgstr ""
 "Área de Transcrição: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl"
 "+D"
 
-#: __main__.py:1162
+#: __main__.py:1162 __main__.py:1173
 msgid "This project contains no cases."
 msgstr "Este projecto não contém casos."
 
-#: __main__.py:1163
+#: __main__.py:1163 __main__.py:1174
 msgid "No cases or files"
 msgstr "Nenhum caso ou ficheiro"
 
 #: __main__.py:1564 __main__.py:1593 __main__.py:1611 __main__.py:1635
 #: __main__.py:1588 __main__.py:1617 __main__.py:1637 __main__.py:1662
+#: __main__.py:1604 __main__.py:1633 __main__.py:1653 __main__.py:1678
 msgid "Updating database to version"
 msgstr "Actualização da base de dados para versão"
 
-#: code_text.py:772 code_text.py:746
+#: code_text.py:772 code_text.py:746 code_text.py:750
 msgid "Examples:"
 msgstr "Exemplos:"
 
-#: code_text.py:808 code_text.py:782
+#: code_text.py:808 code_text.py:782 code_text.py:786
 msgid "Project memo"
 msgstr "Memo do projecto"
 
 #: code_text.py:964 code_by_case.py:970 code_text.py:938 code_by_case.py:922
+#: code_text.py:942
 msgid "Automatic search 3 or more characters"
 msgstr "Pesquisa automática de 3 ou mais caracteres"
 
 #: code_text.py:965 code_by_case.py:971 code_text.py:939 code_by_case.py:923
+#: code_text.py:943
 msgid "Automatic search 5 or more characters"
 msgstr "Pesquisa automática de 5 ou mais caracteres"
 
 #: code_text.py:966 code_by_case.py:972 code_text.py:940 code_by_case.py:924
+#: code_text.py:944
 msgid "Press Enter to search"
 msgstr "Pressione Enter para pesquisar"
 
 #: code_text.py:1483 code_text.py:1507 code_text.py:1466 code_text.py:1489
+#: code_text.py:1470 code_text.py:1493
 msgid "Text: "
 msgstr "Texto: "
 
-#: code_text.py:1485 code_text.py:1468
+#: code_text.py:1485 code_text.py:1468 code_text.py:1472
 msgid "Memos for file: "
 msgstr "Memos para ficheiro:"
 
-#: code_text.py:1510 code_text.py:1491
+#: code_text.py:1510 code_text.py:1491 code_text.py:1495
 msgid "Annotations for file: "
 msgstr "Anotações para ficheiro:"
 
 #: code_text.py:1871 code_text.py:1946 code_by_case.py:1828
 #: code_by_case.py:1904 code_text.py:1854 code_text.py:1929
-#: code_by_case.py:1773 code_by_case.py:1849
+#: code_by_case.py:1773 code_by_case.py:1849 code_text.py:1913
+#: code_text.py:1988
 msgid "Code:"
 msgstr "Código:"
 
 #: code_text.py:1897 code_text.py:1974 code_text.py:1995 code_by_case.py:1854
 #: code_by_case.py:1932 code_by_case.py:1953 code_text.py:1880
 #: code_text.py:1956 code_text.py:1977 code_by_case.py:1799
-#: code_by_case.py:1876 code_by_case.py:1897
+#: code_by_case.py:1876 code_by_case.py:1897 code_text.py:1939
+#: code_text.py:2015 code_text.py:2036
 msgid "Show previous coding of selected code"
 msgstr "Mostrar a codificação anterior do código seleccionado"
 
 #: code_text.py:1900 code_text.py:1980 code_text.py:2000 code_by_case.py:1857
 #: code_by_case.py:1938 code_by_case.py:1958 code_text.py:1883
 #: code_text.py:1962 code_text.py:1982 code_by_case.py:1802
-#: code_by_case.py:1882 code_by_case.py:1902
+#: code_by_case.py:1882 code_by_case.py:1902 code_text.py:1942
+#: code_text.py:2021 code_text.py:2041
 msgid "Show next coding of selected code"
 msgstr "Mostrar a próxima codificação do código seleccionado"
 
-#: manage_files.py:593 manage_files.py:636
+#: manage_files.py:593 manage_files.py:636 manage_files.py:612
 msgid "Transcript for: "
 msgstr "Transcrição para: "
 
-#: report_codes.py:1115 report_codes.py:1049
+#: report_codes.py:1115 report_codes.py:1049 report_codes.py:1050
 msgid " Files: "
 msgstr " Ficheiros: "
 
-#: report_relations.py:459 report_relations.py:453
+#: report_relations.py:459 report_relations.py:453 report_relations.py:454
 msgid "Code"
 msgstr "Código"
 
 #: report_relations.py:460 report_relations.py:646 report_relations.py:647
 #: report_relations.py:455 report_relations.py:634 report_relations.py:635
+#: report_relations.py:456 report_relations.py:636
 msgid "Union"
 msgstr "União"
 
 #: report_relations.py:461 report_relations.py:647 report_relations.py:456
-#: report_relations.py:635
+#: report_relations.py:635 report_relations.py:457 report_relations.py:636
 msgid "Distance"
 msgstr "Distância"
 
 #: report_relations.py:461 report_relations.py:647 report_relations.py:456
-#: report_relations.py:635
+#: report_relations.py:635 report_relations.py:457 report_relations.py:636
 msgid "Text before"
 msgstr "Texto antes"
 
 #: report_relations.py:461 report_relations.py:647 report_relations.py:456
-#: report_relations.py:635
+#: report_relations.py:635 report_relations.py:457 report_relations.py:636
 msgid "Text after"
 msgstr "Texto após"
 
 #: report_relations.py:461 report_relations.py:647 report_relations.py:456
-#: report_relations.py:635
+#: report_relations.py:635 report_relations.py:457 report_relations.py:636
 msgid "Owner"
 msgstr "Proprietário"
 
 #: report_relations.py:643 report_relations.py:644 report_relations.py:631
-#: report_relations.py:632
+#: report_relations.py:632 report_relations.py:633
 msgid "name"
 msgstr "nome"
 
-#: report_relations.py:645 report_relations.py:633
+#: report_relations.py:645 report_relations.py:633 report_relations.py:634
 msgid "Relation"
 msgstr "Relação"
 
-#: report_relations.py:645 report_relations.py:633
+#: report_relations.py:645 report_relations.py:633 report_relations.py:634
 msgid "Minimum"
 msgstr "Mínimo"
 
-#: report_relations.py:645 report_relations.py:633
+#: report_relations.py:645 report_relations.py:633 report_relations.py:634
 msgid "Maximum"
 msgstr "Máximo"
 
-#: report_relations.py:647 report_relations.py:635
+#: report_relations.py:647 report_relations.py:635 report_relations.py:636
 msgid "Text overlap"
 msgstr "Sobreposição de texto"
 
@@ -4481,7 +4637,7 @@ msgstr "Intersecção: "
 msgid "Proportion: "
 msgstr "Proporção: "
 
-#: __main__.py:1195
+#: __main__.py:1195 __main__.py:1206
 msgid "A/V Coding"
 msgstr "Codificação A/V"
 
@@ -4533,48 +4689,51 @@ msgstr "Códigos por caso"
 msgid "Codes by file"
 msgstr "Códigos por ficheiro"
 
-#: report_codes.py:596 report_codes.py:610
+#: report_codes.py:596 report_codes.py:610 report_codes.py:597
+#: report_codes.py:611
 msgid "NO MEMO"
 msgstr "SEM MEMO"
 
 #: report_codes.py:851 report_codes.py:870 report_codes.py:881
-#: report_codes.py:1297
+#: report_codes.py:1297 report_codes.py:852 report_codes.py:871
+#: report_codes.py:882 report_codes.py:1298
 msgid "Attributes"
 msgstr "Atributos"
 
-#: report_codes.py:1373
+#: report_codes.py:1373 report_codes.py:1374
 msgid "Text code statistics:"
 msgstr "Estatísticas de código de texto:"
 
 #: report_codes.py:1376 report_codes.py:1438 report_codes.py:1503
+#: report_codes.py:1377 report_codes.py:1439 report_codes.py:1504
 msgid "Percent of file: "
 msgstr "Percentagem de ficheiro: "
 
-#: report_codes.py:1435
+#: report_codes.py:1435 report_codes.py:1436
 msgid "Image code statistics:"
 msgstr "Estatísticas de código de imagem:"
 
-#: report_codes.py:1500
+#: report_codes.py:1500 report_codes.py:1501
 msgid "A/V code statistics:"
 msgstr "Estatísticas de código A/V:"
 
-#: report_codes.py:1541
+#: report_codes.py:1541 report_codes.py:1542
 msgid "Code count totals"
 msgstr "Totais de contagem de códigos"
 
-#: report_codes.py:1613
+#: report_codes.py:1613 report_codes.py:1614
 msgid "No case matrix"
 msgstr "Sem matriz de casos"
 
-#: report_codes.py:1613
+#: report_codes.py:1613 report_codes.py:1614
 msgid "Cases not selected"
 msgstr "Casos não seleccionados"
 
-#: report_codes.py:1615
+#: report_codes.py:1615 report_codes.py:1616
 msgid "No file matrix"
 msgstr "Sem matriz de ficheiro"
 
-#: report_codes.py:1615
+#: report_codes.py:1615 report_codes.py:1616
 msgid "Cases are selected"
 msgstr "Os casos são seleccionados"
 
@@ -4587,31 +4746,33 @@ msgstr "Percentagem: "
 msgid "Current coder: "
 msgstr "Codificador actual: Codificador actual: "
 
-#: special_functions.py:115 special_functions.py:139
+#: special_functions.py:115 special_functions.py:139 special_functions.py:156
+#: special_functions.py:180
 msgid "Select text file to replace"
 msgstr "Seleccione o ficheiro de texto a substituir"
 
-#: special_functions.py:117
+#: special_functions.py:117 special_functions.py:158
 msgid "Replacing: "
 msgstr "Substituição: "
 
-#: special_functions.py:123
+#: special_functions.py:123 special_functions.py:164
 msgid "Replacement file"
 msgstr "Ficheiro de substituição"
 
-#: special_functions.py:126 special_functions.py:141
+#: special_functions.py:126 special_functions.py:141 special_functions.py:167
+#: special_functions.py:182
 msgid "Select replacement text file"
 msgstr "Seleccionar ficheiro de texto de substituição"
 
-#: special_functions.py:129
+#: special_functions.py:129 special_functions.py:170
 msgid "Replacment: "
 msgstr "Substituição: "
 
-#: special_functions.py:135
+#: special_functions.py:135 special_functions.py:176
 msgid "No files selected"
 msgstr "Nenhum ficheiro seleccionado"
 
-#: special_functions.py:135
+#: special_functions.py:135 special_functions.py:176
 msgid "No existing or replacement file selected"
 msgstr "Nenhum ficheiro existente ou de substituição seleccionado"
 
@@ -4623,10 +4784,73 @@ msgstr ""
 "Discurso para texto desactivado.\n"
 "Transcrição contém texto."
 
-#: view_image.py:937
+#: view_image.py:937 view_image.py:943
 msgid "Move or resize"
 msgstr "Mudar ou redimensionar"
 
 #: view_graph.py:157
 msgid "Image exported"
 msgstr "Imagem exportadaImagem exportada"
+
+#: code_text.py:1701
+msgid "Coded text file exported: "
+msgstr "Ficheiro de texto codificado exportado: "
+
+#: code_text.py:1703 code_text.py:1724
+msgid "Coded text file exported"
+msgstr "Ficheiro de texto codificado exportado"
+
+#: code_text.py:1722
+msgid "Coded text file exported to: "
+msgstr "Ficheiro de texto codificado exportado para: "
+
+#: edit_textfile.py:93
+msgid "Positions may not correctly adjust."
+msgstr "As posições podem não se ajustar correctamente."
+
+#: edit_textfile.py:94
+msgid ""
+"Do not code this text until you reload Coding - Code Text from the menu bar."
+msgstr ""
+"Não codifique este texto até voltar a carregar Codificação - Codificar Texto "
+"a partir da barra de menu."
+
+#: helpers.py:307
+msgid "Click on heading for coding in context"
+msgstr "Clique no título para codificação em contexto"
+
+#: manage_files.py:246 manage_files.py:311
+msgid "Rename database entry"
+msgstr "Renomear entrada na base de dados"
+
+#: manage_files.py:319
+msgid "Renamed database file entry: "
+msgstr "Renomeado entrada de ficheiro na base de dados: "
+
+#: special_functions.py:123
+msgid "No project selected"
+msgstr "Nenhum projecto seleccionado"
+
+#: special_functions.py:126
+msgid "Not a QualCoder project"
+msgstr "Não é um projecto QualCoder"
+
+#: special_functions.py:129
+msgid "The same project"
+msgstr "O mesmo projecto"
+
+#: special_functions.py:131
+msgid "Merge"
+msgstr "Fundir"
+
+#: special_functions.py:131
+msgid "into"
+msgstr "em"
+
+#: special_functions.py:132
+msgid "Press Run Button to merge projects"
+msgstr "Botão Press Run Button para fundir projectos"
+
+#: special_functions.py:133
+msgid "Merge projects"
+msgstr "Fundir projectos"
