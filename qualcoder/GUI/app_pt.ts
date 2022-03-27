@@ -354,12 +354,12 @@ pt-AU</translation>
 <context>
     <name>Dialog_add_item</name>
     <message>
-        <location filename="ui_dialog_add_item.py" line="36"/>
+        <location filename="ui_dialog_add_item.py" line="41"/>
         <source>Add Code</source>
         <translation>Acrescentar Código</translation>
     </message>
     <message>
-        <location filename="ui_dialog_add_item.py" line="37"/>
+        <location filename="ui_dialog_add_item.py" line="42"/>
         <source>Enter text below:</source>
         <translation>Insira o texto abaixo:</translation>
     </message>
@@ -912,22 +912,22 @@ pt-AU</translation>
 <context>
     <name>Dialog_code_text</name>
     <message>
-        <location filename="ui_dialog_code_text.py" line="274"/>
+        <location filename="ui_dialog_code_text.py" line="285"/>
         <source>Code Text</source>
         <translation>Texto do Código</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="276"/>
+        <location filename="ui_dialog_code_text.py" line="287"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Código automático com texto exato</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="277"/>
+        <location filename="ui_dialog_code_text.py" line="288"/>
         <source>Coder:</source>
         <translation>Codificador:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="315"/>
+        <location filename="ui_dialog_code_text.py" line="330"/>
         <source>Right click below to create new codes and categories</source>
         <translation>Clique com o botão direito do rato abaixo para criar novos códigos e categorias</translation>
     </message>
@@ -937,17 +937,17 @@ pt-AU</translation>
         <translation type="obsolete">Busca de texto. Verificar Busca de maiúsculas e minúsculas para busca de maiúsculas e minúsculas. Verifique todos os arquivos para pesquisar todos os arquivos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="280"/>
+        <location filename="ui_dialog_code_text.py" line="291"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>sensível a casos de busca</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="281"/>
+        <location filename="ui_dialog_code_text.py" line="292"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>pesquisar todos os arquivos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="282"/>
+        <location filename="ui_dialog_code_text.py" line="293"/>
         <source>0 / 0</source>
         <translation></translation>
     </message>
@@ -957,57 +957,57 @@ pt-AU</translation>
         <translation type="obsolete">Sem sobreposição de códigos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="283"/>
+        <location filename="ui_dialog_code_text.py" line="294"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Anterior</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="284"/>
+        <location filename="ui_dialog_code_text.py" line="295"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Próximo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="285"/>
+        <location filename="ui_dialog_code_text.py" line="296"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Texto de busca. Todos os arquivos de texto.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="286"/>
+        <location filename="ui_dialog_code_text.py" line="297"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Texto de busca. Sensível a maiúsculas e minúsculas</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="287"/>
+        <location filename="ui_dialog_code_text.py" line="298"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Fragmento de texto para frases de código automático. Este arquivo.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="288"/>
+        <location filename="ui_dialog_code_text.py" line="299"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Fragmento de texto para frases de código automático. Todos os arquivos.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="289"/>
+        <location filename="ui_dialog_code_text.py" line="300"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Desfazer a codificação automática</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="290"/>
+        <location filename="ui_dialog_code_text.py" line="301"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Eliminar todos os códigos por este codificador deste arquivo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="291"/>
+        <location filename="ui_dialog_code_text.py" line="302"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Seleção de anotados</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="292"/>
+        <location filename="ui_dialog_code_text.py" line="303"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Memo para esta seção codificada</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="294"/>
+        <location filename="ui_dialog_code_text.py" line="305"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Tamanho da fonte do texto</translation>
     </message>
@@ -1017,118 +1017,108 @@ pt-AU</translation>
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search usa funções Regex. &lt;/p&gt;&gt;&lt;p&gt;Um ponto â.â é usado como um wild card, por exemplo, â.orelhasâ irá coincidir com os â.ursosâ e â.anosâ. &lt;/p&gt;&lt;p&gt;p&gt;Um â?â?depois de um carácter coincidirá uma ou nenhuma vez com esse carácter, por exemplo â.orelhasââââ e â.orelhasâ &lt;/p&gt;&lt;p&gt;&gt;estilo de fundo=&quot; cor:transparente;&quot;&gt;Um â?â*â depois de um carácter coincidirá zero ou mais vezes. &lt;/span&gt;&lt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;. corresponderá ao símbolo do ponto, â\an â\an â\an â\an â\an â\an â\an â\an â\an â\an â\an â\an â\an â\an â\anâ â\nâ coincidirá com o símbolo de fim de linha. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;estilo de varredura=&quot; decoração de texto: sublinhado; cor:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="306"/>
+        <location filename="ui_dialog_code_text.py" line="321"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Arquivo com a última codificação</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="307"/>
+        <location filename="ui_dialog_code_text.py" line="322"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Ir para o marcador de página</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="308"/>
+        <location filename="ui_dialog_code_text.py" line="323"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Próximo arquivo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="309"/>
+        <location filename="ui_dialog_code_text.py" line="324"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Memo de arquivo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="311"/>
+        <location filename="ui_dialog_code_text.py" line="326"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Mostrar todas as codificações</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="312"/>
+        <location filename="ui_dialog_code_text.py" line="327"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Mostrar a codificação anterior do código selecionado</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="313"/>
+        <location filename="ui_dialog_code_text.py" line="328"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Mostrar a próxima codificação do código selecionado.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="293"/>
+        <location filename="ui_dialog_code_text.py" line="304"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tamanho de letra de texto.&lt;/p&gt;&lt;p&gt;Um tamanho por defeito pode ser definido em Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="296"/>
+        <location filename="ui_dialog_code_text.py" line="307"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Código automático usando marcas de início e fim.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="297"/>
+        <location filename="ui_dialog_code_text.py" line="308"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="310"/>
+        <location filename="ui_dialog_code_text.py" line="325"/>
         <source>Show files with file attributes</source>
         <translation>Mostrar ficheiros com atributos de ficheiro</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="314"/>
+        <location filename="ui_dialog_code_text.py" line="329"/>
         <source>Show codings flagged important</source>
         <translation>Mostrar codificações assinaladas como importantes</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="278"/>
+        <location filename="ui_dialog_code_text.py" line="289"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Pesquisa de texto. Sensível a maiúsculas e minúsculas, Todos os ficheiros. Clique com o botão direito do rato para alterar as opções de pesquisa automática.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="275"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ?.? is used as a wild card, e.g. ?.ears? will match ?bears? and ?years?. &lt;/p&gt;&lt;p&gt;A ??? after a character will match one or none times that character, e.g. ?bears?? will match ?bear? and ?bears? &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ?*? after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;?&lt;/span&gt;\. will match the dot symbol, ?\?? will match the question mark. ?\n? will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">A pesquisa utiliza as funções Regex.</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="298"/>
+        <location filename="ui_dialog_code_text.py" line="309"/>
         <source>Show memos</source>
         <translation>Mostrar memorandos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="299"/>
+        <location filename="ui_dialog_code_text.py" line="310"/>
         <source>Show annotations</source>
         <translation>Mostrar anotações</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="316"/>
+        <location filename="ui_dialog_code_text.py" line="331"/>
         <source>Code rule with examples</source>
         <translation>Regra de código com exemplos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="317"/>
+        <location filename="ui_dialog_code_text.py" line="332"/>
         <source>Current journal</source>
         <translation>Revista actual</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="318"/>
+        <location filename="ui_dialog_code_text.py" line="333"/>
         <source>Project memo</source>
         <translation>Memo do projecto</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="319"/>
+        <location filename="ui_dialog_code_text.py" line="334"/>
         <source>.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="275"/>
+        <location filename="ui_dialog_code_text.py" line="286"/>
         <source>Exit Edit text </source>
         <translation>Sair Editar texto </translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="295"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="300"/>
+        <location filename="ui_dialog_code_text.py" line="311"/>
         <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -1143,6 +1133,26 @@ Evitar seleccionar texto para apagar ou colar se o texto seleccionado estiver su
 Uma vez que todas as posições atribuídas podem estar incorrectas. 
 
 Traduzido com a versão gratuita do tradutor - www.DeepL.com/Translator</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="306"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="318"/>
+        <source>Export</source>
+        <translation type="unfinished">Exportação</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="319"/>
+        <source>html</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="320"/>
+        <source>odt</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2004,18 +2014,28 @@ Deve guardar estes ficheiros noutro local.</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="119"/>
-        <source>Merge projects</source>
-        <translation type="unfinished"></translation>
+        <source>Merge project into this project</source>
+        <translation>Fundir o projecto neste projecto</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="122"/>
+        <location filename="ui_special_functions.py" line="121"/>
         <source>Select project to merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione o projecto a fundir</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="123"/>
         <source>Change text positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterar as posições do texto</translation>
+    </message>
+    <message>
+        <location filename="ui_special_functions.py" line="114"/>
+        <source>Run update text content</source>
+        <translation>Executar actualização do conteúdo do texto</translation>
+    </message>
+    <message>
+        <location filename="ui_special_functions.py" line="120"/>
+        <source>Run merge projects</source>
+        <translation>Executar projectos de fusão</translation>
     </message>
 </context>
 <context>
@@ -2296,6 +2316,62 @@ Sublinhado vermelho = Atribuído a código ou anotação</translation>
         <location filename="ui_dialog_view_image.py" line="52"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_view_text</name>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="74"/>
+        <source>View and Edit Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="75"/>
+        <source>Clear all text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="76"/>
+        <source>Clear</source>
+        <translation type="unfinished">Clear</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="77"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">Próximo</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="78"/>
+        <source>Search for text.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="79"/>
+        <source>0 / 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="80"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="81"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">Anterior</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="82"/>
+        <source>Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).
+Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.
+Do not code this text until you reload Coding - Code Text from the menu bar.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_view_text.py" line="85"/>
+        <source>Do not select sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned). Positions of the underlying codes / annotations / case-assigned may not correctly adjust if selected text is typed over or deleted.
+Do not code this text until you reload Coding - Code Text from the menu bar.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
