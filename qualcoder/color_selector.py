@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from .GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
 
@@ -105,7 +105,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()
         self.setup_ui()
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -145,7 +145,7 @@ class DialogColorSelect(QtWidgets.QDialog):
     def setup_ui(self):
         """ Eight rows of ten columns of colours. """
 
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionBehavior.SingleSelection)
         self.ui.tableWidget.setColumnCount(COLS)
         self.ui.tableWidget.setRowCount(ROWS)
         self.ui.tableWidget.verticalHeader().setVisible(False)
@@ -165,6 +165,6 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item.setToolTip(ttip)
                 item.setBackground(QtGui.QBrush(QtGui.QColor(code_color)))
                 item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
