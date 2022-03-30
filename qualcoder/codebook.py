@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,9 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
+
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -142,7 +144,7 @@ class Codebook:
         """ Export codes to a plain text file, filename will have .txt ending. """
 
         filename = "codebook.txt"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
             _("Select directory to save file"), self.app.settings['directory'], options)
         if directory == "":
@@ -185,13 +187,7 @@ class Codebook:
         f = open(filename, 'w')
         f.write(filedata)
         f.close()
-        mb = QtWidgets.QMessageBox()
-        mb.setIcon(QtWidgets.QMessageBox.Warning)
-        mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        mb.setWindowTitle(_('Codebook exported'))
-        msg = filename
-        mb.setText(msg)
-        mb.exec_()
+        Message(self.app, _('Codebook exported'), _("Text representation of codebook exported:") + "\n" + filename).exec()
         self.parent_textEdit.append(_("Codebook exported to ") + filename)
 
     def depthgauge(self, item):
