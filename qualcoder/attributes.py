@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import sys
 import logging
 import traceback
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
@@ -44,11 +44,6 @@ from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-PTH = os.path.realpath(__file__)
-PTH = os.path.dirname(PTH) + "/"
-if platform.system() == "Windows":
-    PTH = ""
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -80,12 +75,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.get_attributes()
-        self.fill_tableWidget()
+        self.fill_table_widget()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         pm = QtGui.QPixmap()
@@ -99,7 +94,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
-        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_attributes(self):
@@ -132,7 +127,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
         check_names.extend(self.attributes)
         ui = DialogAddAttribute(self.app, check_names)
-        ui.exec_()  # ok = ui.exec_() does not pick up pressing the cancel button
+        ui.exec()  # ok = ui.exec_() does not pick up pressing the cancel button
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
@@ -140,11 +135,11 @@ class DialogManageAttributes(QtWidgets.QDialog):
         dialog_assign = QtWidgets.QDialog()
         ui = Ui_Dialog_assignAttribute()
         ui.setupUi(dialog_assign)
-        dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         dialog_assign.setStyleSheet(font)
-        dialog_assign.exec_()
+        dialog_assign.exec()
         case_or_file = "case"
         if ui.radioButton_files.isChecked():
             case_or_file = "file"
@@ -169,7 +164,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.app.settings['codername']))
         self.app.conn.commit()
-        self.fill_tableWidget()
+        self.fill_table_widget()
         self.parent_textEdit.append(_("Attribute added: ") + item['name'] + _(" to ") + _(case_or_file))
 
     def delete_attribute(self):
@@ -184,7 +179,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         if len(names_to_delete) == 0:
             return
         ui = DialogConfirmDelete(self.app, "\n".join(names_to_delete))
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         cur = self.app.conn.cursor()
@@ -201,7 +196,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         keys = 'name', 'date', 'owner', 'memo', 'caseOrFile', 'valuetype'
         for row in result:
             self.attributes.append(dict(zip(keys, row)))
-        self.fill_tableWidget()
+        self.fill_table_widget()
         self.parent_textEdit.append(_("Attributes deleted: ") + ",".join(names_to_delete))
 
     def cell_selected(self):
@@ -214,7 +209,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for Attribute ") + self.attributes[x]['name'],
             self.attributes[x]['memo'])
-            ui.exec_()
+            ui.exec()
             memo = ui.memo
             if memo != self.attributes[x]['memo']:
                 self.attributes[x]['memo'] = memo
@@ -240,7 +235,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         action_to_character = None
         if col == 2 and text_ == _("numeric"):
             action_to_character = menu.addAction(_("Change to character"))
-        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
         if action == action_to_character:
@@ -250,7 +245,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             cur.execute('update attribute_type set valuetype="character" where name=?', [attr_name])
             self.app.conn.commit()
             self.get_attributes()
-            self.fill_tableWidget()
+            self.fill_table_widget()
 
     def cell_modified(self):
         """ If the attribute name has been changed in the table widget and update the database. """
@@ -277,7 +272,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             else:  # Put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.attributes[x]['name'])
 
-    def fill_tableWidget(self):
+    def fill_table_widget(self):
         """ Fill the table widget with attribute details. """
 
         self.ui.label.setText(_("Attributes: ") + str(len(self.attributes)))
@@ -292,17 +287,17 @@ class DialogManageAttributes(QtWidgets.QDialog):
             item.setToolTip(a['date'] + "\n" + a['owner'])
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(a['caseOrFile'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_FILE_COLUMN, item)
             m_text = ""
             mtmp = a['memo']
             if mtmp is not None and mtmp != "":
                 m_text = _("Yes")
             item = QtWidgets.QTableWidgetItem(m_text)
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(a['valuetype'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.VALUETYPE_COLUMN, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()

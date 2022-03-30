@@ -30,7 +30,7 @@ import sys
 import logging
 import traceback
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 
 from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 
@@ -70,7 +70,7 @@ class DialogAddItemName(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_add_item()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
         self.setWindowTitle(title)
         self.ui.label.setText(text)

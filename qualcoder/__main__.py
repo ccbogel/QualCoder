@@ -44,7 +44,7 @@ import urllib.request
 import webbrowser
 from copy import copy
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
@@ -118,7 +118,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
     mb.setText(msg)
-    mb.exec_()
+    mb.exec()
 
 
 class App(object):
@@ -848,27 +848,27 @@ class MainWindow(QtWidgets.QMainWindow):
             if len(r.split("|")) == 2:
                 display_name = r.split("|")[1]
             if i == 0:
-                action0 = QtWidgets.QAction(display_name, self)
+                action0 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action0)
                 action0.triggered.connect(self.project0)
             if i == 1:
-                action1 = QtWidgets.QAction(display_name, self)
+                action1 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action1)
                 action1.triggered.connect(self.project1)
             if i == 2:
-                action2 = QtWidgets.QAction(display_name, self)
+                action2 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action2)
                 action2.triggered.connect(self.project2)
             if i == 3:
-                action3 = QtWidgets.QAction(display_name, self)
+                action3 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action3)
                 action3.triggered.connect(self.project3)
             if i == 4:
-                action4 = QtWidgets.QAction(display_name, self)
+                action4 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action4)
                 action4.triggered.connect(self.project4)
             if i == 5:
-                action5 = QtWidgets.QAction(display_name, self)
+                action5 = QtGui.QAction(display_name, self)
                 self.ui.menuOpen_Recent_Project.addAction(action5)
                 action5.triggered.connect(self.project5)
 
@@ -992,7 +992,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
         self.ui.textEdit.append(msg)
-        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.End)
+        self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):
@@ -1077,13 +1077,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """ About dialog. """
 
         ui = DialogInformation(self.app, "About", "")
-        ui.exec_()
+        ui.exec()
 
     def special_functions(self):
         """ User requested special functions dialog. """
 
         ui = DialogSpecialFunctions(self.app, self.ui.textEdit, self.ui.tab_coding)
-        ui.exec_()
+        ui.exec()
         if ui.projects_merged:
             self.tab_layout_helper(self.ui.tab_manage, None)
             self.tab_layout_helper(self.ui.tab_coding, None)
@@ -1103,7 +1103,7 @@ class MainWindow(QtWidgets.QMainWindow):
         coding and review. Modal dialog. """
 
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
-        ui.exec_()
+        ui.exec()
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def manage_cases(self):
@@ -1154,7 +1154,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no text files.")
-            Message(self.app, _('No text files'), msg).exec_()
+            Message(self.app, _('No text files'), msg).exec()
 
     def code_by_case(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to
@@ -1171,7 +1171,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = _("This project contains no text files.")
             if len(cases) == 0:
                 msg = _("This project contains no cases.")
-            Message(self.app, _('No cases or files'), msg).exec_()
+            Message(self.app, _('No cases or files'), msg).exec()
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
@@ -1185,7 +1185,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no image files.")
-            Message(self.app, _('No image files'), msg).exec_()
+            Message(self.app, _('No image files'), msg).exec()
 
     def av_coding(self):
         """ Create edit and delete codes. Apply and remove codes to segments of the
@@ -1194,7 +1194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         files = self.app.get_av_filenames()
         if len(files) == 0:
             msg = _("This project contains no audio/video files.")
-            Message(self.app, _('No a/v files'), msg).exec_()
+            Message(self.app, _('No a/v files'), msg).exec()
             return
         self.ui.label_coding.hide()
         try:
@@ -1203,7 +1203,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_layout_helper(self.ui.tab_coding, ui)
         except Exception as e_:
             logger.debug(str(e_))
-            Message(self.app, _("A/V Coding"), str(e_), "warning").exec_()
+            Message(self.app, _("A/V Coding"), str(e_), "warning").exec()
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -1267,11 +1267,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
         msg = _(
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the QDPX file.")
-        Message(self.app, _('REFI-QDA import steps'), msg).exec_()
+        Message(self.app, _('REFI-QDA import steps'), msg).exec()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec_()
+            Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec()
             return
 
         RefiImport(self.app, self.ui.textEdit, "qdpx")
@@ -1284,11 +1284,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(_("IMPORTING RQDA PROJECT"))
         msg = _(
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
-        Message(self.app, _('RQDA import steps'), msg).exec_()
+        Message(self.app, _('RQDA import steps'), msg).exec()
         self.new_project()
         # check project created successfully
         if self.app.project_name == "":
-            Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec_()
+            Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec()
             return
         RqdaImport(self.app, self.ui.textEdit)
         self.project_summary_report()
@@ -1304,8 +1304,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if not self.force_quit:
             quit_msg = _("Are you sure you want to quit?")
             reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
-                                                   QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-            if reply == QtWidgets.QMessageBox.Yes:
+                                                   QtWidgets.QMessageBox.StandardButton.Yes,
+                                                   QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
                 # self.dialog_list = None
@@ -1315,7 +1316,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.app.conn.close()
                     except Exception as e_:
                         print("closeEvent", e_)
-                QtWidgets.qApp.quit()
+                QtWidgets.QApplication.instance().quit
+                #QtWidgets.qApp.quit()
                 return
             if event is False:
                 return
@@ -1342,7 +1344,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                                              _("Enter project name"), self.app.settings['directory'],
                                                              ".qda")[0]
         if project_path == "":
-            Message(self.app, _("Project"), _("No project created."), "critical").exec_()
+            Message(self.app, _("Project"), _("No project created."), "critical").exec()
             return
         # Add suffix to project name if it already exists
         counter = 0
@@ -1361,7 +1363,7 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.app.project_path + "/documents")
         except Exception as e_:
             logger.critical(_("Project creation error ") + str(e_))
-            Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec_()
+            Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
             self.app = App()
             return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
@@ -1468,7 +1470,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
-        ui.exec_()
+        ui.exec()
         self.settings_report()
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -1501,7 +1503,7 @@ class MainWindow(QtWidgets.QMainWindow):
         memo = cur.fetchone()[0]
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
                         memo)
-        ui.exec_()
+        ui.exec()
         if memo != ui.memo:
             cur.execute('update project set memo=?', (ui.memo,))
             self.app.conn.commit()
@@ -1550,7 +1552,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug(msg)
         if self.app.conn is None:
             msg += "\n" + proj_path
-            Message(self.app, _("Cannot open file"), msg, "critical").exec_()
+            Message(self.app, _("Cannot open file"), msg, "critical").exec()
             self.app.project_path = ""
             self.app.project_name = ""
             return
@@ -1815,9 +1817,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
-        tc = self.ui.textEdit.textCursor()
-        tc.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveAnchor)
-        self.ui.textEdit.setTextCursor(tc)
+        #tc = self.ui.textEdit.textCursor()
+        #tc.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveAnchor)
+        #self.ui.textEdit.setTextCursor(tc)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def close_project(self):
@@ -2012,7 +2014,7 @@ def gui():
         if len(split_) == 2:
             proj_path = split_[1]
         ex.open_project(path_=proj_path)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 def install_language(lang):

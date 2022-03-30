@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -72,7 +72,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogAddAttribute()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -88,7 +88,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         duplicate = False
         if new_name in self.existing_names:
             duplicate = True
-            Message(self.app, _("Duplicated"), _("This already exists"), "warning").exec_()
+            Message(self.app, _("Duplicated"), _("This already exists"), "warning").exec()
             self.new_name = ""
             self.done(0)
         if duplicate is False:

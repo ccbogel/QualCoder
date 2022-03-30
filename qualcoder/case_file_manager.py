@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ import sys
 import logging
 import traceback
 
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
+from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import Qt
 
 
 from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
@@ -94,16 +94,16 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 self.resize(w, h)
         except KeyError:
             pass
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         font2 = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(font2)
-        self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget.doubleClicked.connect(self.double_clicked_to_view)
-        self.ui.tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.label_case.setText(_("Case: ") + self.case['name'])
         self.ui.pushButton_view.clicked.connect(self.view_file)
@@ -112,7 +112,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.pushButton_remove.clicked.connect(self.remove_files_from_case)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
-        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.textBrowser_menu)
         self.ui.textBrowser.setOpenLinks(False)
         try:
@@ -155,7 +155,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_add = menu.addAction(_("Add files to case"))
         action_remove = menu.addAction(_("Remove files from case"))
-        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_add:
             self.add_files_to_case()
         if action == action_remove:
@@ -182,7 +182,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # Update messages and table widget
         self.get_files()
         self.fill_table()
-        Message(self.app, _("File added to case"), msg, "information").exec_()
+        Message(self.app, _("File added to case"), msg, "information").exec()
         self.parent_textEdit.append(msg)
         self.app.delete_backup = False
 
@@ -234,7 +234,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             selected_files.append(self.allfiles[r])
             remove_msg += "\n" + self.allfiles[r][1]
         del_ui = DialogConfirmDelete(self.app, remove_msg)
-        ok = del_ui.exec_()
+        ok = del_ui.exec()
         if not ok:
             return
         cur = self.app.conn.cursor()
@@ -247,7 +247,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             except Exception as e:
                 print(e)
                 logger.debug(str(e))
-        # update assigned files and table widget
+        # Update assigned files and table widget
         self.get_files()
         self.fill_table()
         self.app.delete_backup = False
@@ -265,10 +265,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         for row, f in enumerate(self.allfiles):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(str(f[0]))
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 0, item)
             item = QtWidgets.QTableWidgetItem(f[1])
-            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 1, item)
             # Mark Yes if assigned
             assigned = ""
@@ -276,7 +276,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if f[0] == i[0]:
                     assigned = _("Yes")
             item = QtWidgets.QTableWidgetItem(assigned)
-            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 2, item)
 
         self.ui.tableWidget.hideColumn(0)
@@ -335,7 +335,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if not os.path.exists(abs_path):
                     return
             ui_av = DialogViewAV(self.app, dictionary)
-            ui_av.exec_()
+            ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:6] in ("/audio", "audio:"):
             if self.allfiles[index][MEDIAPATH][0:6] == "audio:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
@@ -346,7 +346,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if not os.path.exists(abs_path):
                     return
             ui_av = DialogViewAV(self.app, dictionary)
-            ui_av.exec_()
+            ui_av.exec()
         if self.allfiles[index][MEDIAPATH][:7] in ("/images", "images:"):
             if self.allfiles[index][MEDIAPATH][0:7] == "images:":
                 abs_path = self.allfiles[index][MEDIAPATH].split(':')[1]
@@ -358,7 +358,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     return
             # Requires {name, mediapath, owner, id, date, memo, fulltext}
             ui_img = DialogViewImage(self.app, dictionary)
-            ui_img.exec_()
+            ui_img.exec()
 
     def load_case_text(self):
         """ Load case text for selected_text_file """
@@ -397,7 +397,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
                 break
-        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
+        action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
         if action is None:
             return
         if action == action_mark:
@@ -425,8 +425,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
 
         selected_text = self.ui.textBrowser.textCursor().selectedText()
         cb = QtWidgets.QApplication.clipboard()
-        cb.clear(mode=cb.Clipboard)
-        cb.setText(selected_text, mode=cb.Clipboard)
+        cb.setText(selected_text)
 
     def unlight(self):
         """ Remove all text highlighting from current file. """
@@ -437,8 +436,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             return
         cursor = self.ui.textBrowser.textCursor()
         try:
-            cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
-            cursor.setPosition(len(self.selected_text_file[FULLTEXT]) - 1, QtGui.QTextCursor.KeepAnchor)
+            cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(len(self.selected_text_file[FULLTEXT]) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.setCharFormat(QtGui.QTextCharFormat())
         except Exception as e:
             logger.debug((str(e) + "\n unlight, text length" + str(len(self.ui.textBrowser.toPlainText()))))
@@ -456,10 +455,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.textCursor()
         for item in self.case_text:
             try:
-                cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(int(item['pos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['pos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
-                format_.setUnderlineColor(QtCore.Qt.red)
+                format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
             except:
                 msg = "highlight, text length " + str(len(self.ui.textBrowser.toPlainText()))
@@ -493,7 +492,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         result = cur.fetchall()
         if len(result) > 0:
             Message(self.app, _("Already Linked"),
-                _("This segment has already been linked to this case"), "warning").exec_()
+                _("This segment has already been linked to this case"), "warning").exec()
             return
         cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
                 (item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
@@ -554,13 +553,13 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 selected_files.append(self.allfiles[r])
                 filenames += self.allfiles[r][1] + " "
         ui_se = DialogGetStartAndEndMarks(self.case['name'], filenames)
-        ok = ui_se.exec_()
+        ok = ui_se.exec()
         if not ok:
             return
         start_mark = ui_se.get_start_mark()
         end_mark = ui_se.get_end_mark()
         if start_mark == "" or end_mark == "":
-            Message(self.app, _("Warning"), _('Cannot have blank text marks'), "warning").exec_()
+            Message(self.app, _("Warning"), _('Cannot have blank text marks'), "warning").exec()
             return
         msg = _("Auto assign text to case: ") + self.case['name']
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + _("\nIn files:\n")
@@ -611,14 +610,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.load_case_text()
         self.highlight()
         msg += "\n" + str(entries) + _(" sections found.")
-        Message(self.app, _("File added to case"), msg + "\n" + warning_msg + "\n" + already_assigned).exec_()
+        Message(self.app, _("File added to case"), msg + "\n" + warning_msg + "\n" + already_assigned).exec()
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(warning_msg)
         self.app.delete_backup = False
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogCaseFileManager("app", "text", "case")
-    ui.show()
-    sys.exit(app.exec_())
