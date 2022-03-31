@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets, QtGui
 import datetime
 import os
 import re
@@ -61,7 +61,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text_)
-    mb.exec_()
+    mb.exec()
 
 
 class DialogJournals(QtWidgets.QDialog):
@@ -94,14 +94,14 @@ class DialogJournals(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         try:
             s0 = int(self.app.settings['dialogjournals_splitter0'])
             s1 = int(self.app.settings['dialogjournals_splitter1'])
@@ -172,13 +172,13 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.tableWidget.insertRow(row)
             self.ui.tableWidget.setItem(row, NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
             item = QtWidgets.QTableWidgetItem(details['date'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, DATE_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(details['owner'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, OWNER_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(str(details['jid']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag,ItemIsEditable)
             self.ui.tableWidget.setItem(row, JID_COLUMN, item)
 
         self.ui.tableWidget.verticalHeader().setVisible(False)
@@ -214,7 +214,7 @@ class DialogJournals(QtWidgets.QDialog):
         f.close()
         msg = _("Collated journals exported as text file to: ") + filepath
         self.parent_textEdit.append(msg)
-        Message(self.app, _("Journals exported"), msg).exec_()
+        Message(self.app, _("Journals exported"), msg).exec()
 
     def view(self):
         """ View and edit journal contents in the textEdit """
@@ -260,22 +260,16 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.clearSelection()
 
         ui = DialogAddItemName(self.app, self.journals, _('New Journal'), _('Journal name'))
-        ui.exec_()
+        ui.exec()
         name = ui.get_new_name()
         if name is None:
             return
         # Check for unusual characters in filename that would affect exporting
         valid = re.match('^[\ \w-]+$', name) is not None
         if not valid:
-            mb = QtWidgets.QMessageBox()
-            mb.setIcon(QtWidgets.QMessageBox.Warning)
-            mb.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            mb.setWindowTitle(_('Warning - invalid characters'))
             msg = _("In the journal name use only: a-z, A-z 0-9 - space")
-            mb.setText(msg)
-            mb.exec_()
+            Message(self.app, _('Warning - invalid characters'), msg, "warning").exec()
             return
-
         # Update database
         journal = {'name': name, 'jentry': '', 'owner': self.app.settings['codername'],
                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid': None}
@@ -313,7 +307,7 @@ class DialogJournals(QtWidgets.QDialog):
         f.write(data)
         f.close()
         msg = _("Journal exported to: ") + str(filepath)
-        Message(self.app, _("Journal export"), msg, "information").exec_()
+        Message(self.app, _("Journal export"), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def delete(self):
@@ -324,7 +318,7 @@ class DialogJournals(QtWidgets.QDialog):
             return
         journalname = self.journals[row]['name']
         ui = DialogConfirmDelete(self.app, self.journals[row]['name'])
-        ok = ui.exec_()
+        ok = ui.exec()
         if ok:
             cur = self.app.conn.cursor()
             cur.execute("delete from journal where name = ?", [journalname])
@@ -355,17 +349,17 @@ class DialogJournals(QtWidgets.QDialog):
             # check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
-                Message(self.app, _('Warning'), _("No name was entered"), "warning").exec_()
+                Message(self.app, _('Warning'), _("No name was entered"), "warning").exec()
                 update = False
             for c in self.journals:
                 if c['name'] == new_name:
-                    Message(self.app, _('Warning'), _("Journal name in use"), "warning").exec_()
+                    Message(self.app, _('Warning'), _("Journal name in use"), "warning").exec()
                     update = False
             # Check for unusual characters in filename that would affect exporting
             valid = re.match('^[\ \w-]+$', new_name) is not None
             if not valid:
                 Message(self.app, _('Warning - invalid characters'),
-                        _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec_()
+                        _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec()
                 update = False
             if update:
                 # update journals list and database
@@ -455,7 +449,7 @@ class DialogJournals(QtWidgets.QDialog):
                     # This will also load the jentry into the textEdit
                     break
         cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
@@ -479,6 +473,6 @@ class DialogJournals(QtWidgets.QDialog):
                     # This will also load the jentry into the textEdit
                     break
         cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))

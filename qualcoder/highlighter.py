@@ -40,8 +40,8 @@
 """
 
 
-from PyQt5.QtGui import QSyntaxHighlighter, QTextCharFormat, QBrush, QFont, QColor
-from PyQt5.QtCore import *
+from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QBrush, QFont, QColor
+from PyQt6.QtCore import *
 
 
 class Highlighter(QSyntaxHighlighter):
@@ -84,11 +84,11 @@ class Highlighter(QSyntaxHighlighter):
             tmp.append(k.lower() + " ")
         keywords = tmp
         keyword_format = QTextCharFormat()
-        brush = QBrush(Qt.darkRed, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.darkRed, Qt.BrushStyle.SolidPattern)
         if dark:
-            brush = QBrush(QColor("#FFAF0A"), Qt.SolidPattern)
+            brush = QBrush(QColor("#FFAF0A"), Qt.BrushStyle.SolidPattern)
         keyword_format.setForeground(brush)
-        keyword_format.setFontWeight(QFont.Bold)
+        keyword_format.setFontWeight(QFont.Weight.Bold)
         self.highlighting_rules = [(QRegExp(word), keyword_format)
                                    for word in keywords]
 
@@ -102,9 +102,9 @@ class Highlighter(QSyntaxHighlighter):
             tmp.append(" " + k.lower())
         data_types = tmp    
         data_types_format = QTextCharFormat()
-        brush = QBrush(Qt.darkGreen, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.darkGreen, Qt.BrushStyle.SolidPattern)
         data_types_format.setForeground(brush)
-        data_types_format.setFontWeight(QFont.Bold)
+        data_types_format.setFontWeight(QFont.Weight.Bold)
         self.highlighting_rules += [(QRegExp(word), data_types_format)
                                     for word in data_types]
 
@@ -117,45 +117,45 @@ class Highlighter(QSyntaxHighlighter):
             tmp.append(" " + k.lower())
         function_words = tmp    
         functions_format = QTextCharFormat()
-        brush = QBrush(Qt.darkBlue, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.darkBlue, Qt.BrushStyle.SolidPattern)
         if dark:
-            brush = QBrush(QColor("#00BFFF"), Qt.SolidPattern)
+            brush = QBrush(QColor("#00BFFF"), Qt.BrushStyle.SolidPattern)
         functions_format.setForeground(brush)
-        functions_format.setFontWeight(QFont.Bold)
-        self.highlighting_rules += [(QRegExp(word), functions_format)
+        functions_format.setFontWeight(QFont.Weight.Bold)
+        self.highlighting_rules += [(QRegularExpression(word), functions_format)
                                     for word in function_words]
 
         # In-line comment
         comment_format = QTextCharFormat()
-        brush = QBrush(QColor("#00BFFF"), Qt.SolidPattern)
+        brush = QBrush(QColor("#00BFFF"), Qt.BrushStyle.SolidPattern)
         if dark:
-            brush = QBrush(Qt.yellow, Qt.SolidPattern)
+            brush = QBrush(Qt.yellow, Qt.BrushStyle.SolidPattern)
         comment_format.setForeground(brush)
-        self.highlighting_rules += [(QRegExp("--[^\n]*"), comment_format)]
+        self.highlighting_rules += [(QRegularExpression("--[^\n]*"), comment_format)]
 
         # Multi-line comment
         multi_comment_format = QTextCharFormat()
-        brush = QBrush(Qt.blue, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.blue, Qt.BrushStyle.SolidPattern)
         if dark:
-            brush = QBrush(Qt.yellow, Qt.SolidPattern)
+            brush = QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.SolidPattern)
         multi_comment_format.setForeground(brush)
-        self.highlighting_rules += [(QRegExp("/*.*/"), multi_comment_format)]
+        self.highlighting_rules += [(QRegularExpression("/*.*/"), multi_comment_format)]
 
         # Double quoted string
         string_format = QTextCharFormat()
-        brush = QBrush(Qt.magenta, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.magenta, Qt.BrushStyle.SolidPattern)
         string_format.setForeground(brush)
-        self.highlighting_rules += [(QRegExp("\".*\""), string_format)]
+        self.highlighting_rules += [(QRegularExpression("\".*\""), string_format)]
 
         # Single quoted String
         string2_format = QTextCharFormat()
-        brush = QBrush(Qt.magenta, Qt.SolidPattern)
+        brush = QBrush(Qt.GlobalColor.magenta, Qt.BrushStyle.SolidPattern)
         string2_format.setForeground(brush)
-        self.highlighting_rules += [(QRegExp("\'.*\'"), string2_format)]
+        self.highlighting_rules += [(QRegularExpression("\'.*\'"), string2_format)]
 
     def highlightBlock(self, text):
         for pattern, format_ in self.highlighting_rules:
-            expression = QRegExp(pattern)
+            expression = QRegularExpression(pattern)
             index = expression.indexIn(text)
             while index >= 0:
                 length = expression.matchedLength()
