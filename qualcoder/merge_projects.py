@@ -31,7 +31,7 @@ import os
 import shutil
 import sqlite3
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from .helpers import Message
 
@@ -103,11 +103,11 @@ class MergeProjects:
             self.insert_attributes()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _("Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
-            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec_()
+            Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
             self.projects_merged = True
             self.app.delete_backup = False
         else:
-            Message(self.app, _('Project not merged'), _("Project not merged")).exec_()
+            Message(self.app, _('Project not merged'), _("Project not merged")).exec()
 
     def insert_categories(self):
         """ Insert categories into destination code_cat table.

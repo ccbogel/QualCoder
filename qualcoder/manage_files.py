@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,16 +28,14 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
-
-import PIL
 import ebooklib
 from ebooklib import epub
 # noinspection PyUnresolvedReferences
 import logging
 # noinspection PyUnresolvedReferences
 import os
+import PIL
 from PIL import Image
-# from PIL.ExifTags import TAGS
 import platform
 # noinspection PyUnresolvedReferences
 import sys
@@ -48,7 +46,7 @@ import traceback
 import webbrowser
 import zipfile
 
-from PyQt5 import QtCore, QtGui  # , QtWidgets
+from PyQt6 import QtCore, QtGui
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -101,7 +99,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text_)
-    mb.exec_()
+    mb.exec()
 
 
 class DialogManageFiles(QtWidgets.QDialog):
@@ -141,7 +139,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -192,7 +190,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
-        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.load_file_data()
@@ -309,7 +307,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in self.source:
             filenames.append({'name': s['name']})
         ui = DialogAddItemName(self.app, filenames, _("Rename database entry"), existing_name)
-        ui.exec_()
+        ui.exec()
         new_name = ui.get_new_name()
         if new_name is None:
             return
@@ -380,7 +378,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             move(self.app.project_path + mediapath, destination)
         except Exception as e_:
             logger.debug(str(e_))
-            Message(self.app, _("Cannot export"), _("Cannot export as linked file\n") + str(e_), "warning").exec_()
+            Message(self.app, _("Cannot export"), _("Cannot export as linked file\n") + str(e_), "warning").exec()
             return
         new_mediapath = ""
         if file_directory == "documents":
@@ -514,7 +512,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     data.append(cell)
                 writer.writerow(data)
         msg = _("File attributes csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec_()
+        Message(self.app, _('Csv file Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
     def load_file_data(self, order_by=""):
@@ -737,7 +735,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
         check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
         ui = DialogAddAttribute(self.app, check_names)
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         name = ui.new_name
@@ -782,7 +780,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                                 self.source[x]['memo'])
-                ui.exec_()
+                ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
@@ -790,7 +788,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             else:
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                                 self.source[x]['memo'])
-                ui.exec_()
+                ui.exec()
                 self.source[x]['memo'] = ui.memo
                 cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
@@ -825,7 +823,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, y).setText("")
                     value = ""
                     msg = _("This attribute is numeric")
-                    Message(self.app, _("Warning"), msg, "warning").exec_()
+                    Message(self.app, _("Warning"), msg, "warning").exec()
 
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
                         (value, self.source[x]['id'], attribute_name))
@@ -853,7 +851,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.view_av(x)
                 return
         ui = DialogEditTextFile(self.app, self.source[x]['id'])
-        ui.exec_()
+        ui.exec()
         # Get fulltext if changed (for metadata)
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [self.source[x]['id']])
@@ -894,7 +892,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         except Exception as e_:
             logger.debug(e_)
             print(e_)
-            Message(self.app, _('view AV error'), str(e_), "warning").exec_()
+            Message(self.app, _('view AV error'), str(e_), "warning").exec()
             self.av_dialog_open = None
             return
 
@@ -915,7 +913,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
             return
         ui = DialogViewImage(self.app, self.source[x])
-        ui.exec_()
+        ui.exec()
         memo = ui.ui.textEdit.toPlainText()
         if self.source[x]['memo'] != memo:
             self.source[x]['memo'] = memo
@@ -936,7 +934,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         ui = DialogAddItemName(self.app, self.source, _('New File'), _('Enter file name'))
-        ui.exec_()
+        ui.exec()
         name = ui.get_new_name()
         if name is None:
             return
@@ -956,7 +954,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         id_ = cur.fetchone()[0]
         entry['id'] = id_
         ui = DialogEditTextFile(self.app, id_)
-        ui.exec_()
+        ui.exec()
         icon, metadata = self.get_icon_and_metadata(id_)
         entry['icon'] = icon
         entry['metadata'] = metadata
@@ -1036,7 +1034,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if pdfminer_installed is False:
                     text_ = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
                     text_ += "For Windows run the following in the command prompt: pip install pdfminer.six"
-                    Message(self.app, _("pdf miner is not installed"), _(text_), "critical").exec_()
+                    Message(self.app, _("pdf miner is not installed"), _(text_), "critical").exec()
                     return
                 destination += "/documents/" + filename
                 # Try and remove encryption from pdf if a simple encryption, for Linux
@@ -1301,15 +1299,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                         text_ = text_[6:]
             except Exception as e_:
                 Message(self.app, _("Warning"), _("Cannot import") + str(import_file) + "\n" + str(e_),
-                        "warning").exec_()
+                        "warning").exec()
                 return
             if import_errors > 0:
-                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec_()
+                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
                 logger.warning(import_file + ": " + str(import_errors) + _(" lines not imported"))
         # Import of text file did not work
         if text_ == "":
             Message(self.app, _("Warning"),
-                    _("Cannot import ") + str(import_file) + "\nPlease check if the file is empty.", "warning").exec_()
+                    _("Cannot import ") + str(import_file) + "\nPlease check if the file is empty.", "warning").exec()
             return
         # Final checks: check for duplicated filename and update model, widget and database
         name_split = import_file.split("/")
@@ -1419,7 +1417,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 and (self.source[rows[0]]['fulltext'] is None or self.source[rows[0]]['fulltext'] == ""):
             msg = _("This is an external linked file") + "\n"
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            Message(self.app, _('Cannot export'), msg, "warning").exec_()
+            Message(self.app, _('Cannot export'), msg, "warning").exec()
             return
         # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
         text_rep = False
@@ -1427,7 +1425,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 and self.source[rows[0]]['fulltext'] != "":
             msg = _("This is a linked file. Will export text representation.") + "\n"
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            Message(self.app, _("Can export text"), msg, "warning").exec_()
+            Message(self.app, _("Can export text"), msg, "warning").exec()
             text_rep = True
         # Currently can only export ONE file at time, due to tableWidget single selection mode
         row = rows[0]
@@ -1469,7 +1467,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             f.write(filedata)
             f.close()
             msg += destination + "\n"
-        Message(self.app, _("Files exported"), msg).exec_()
+        Message(self.app, _("Files exported"), msg).exec()
         self.parent_text_edit.append(filename + _(" exported to ") + msg)
 
     def delete_button_multiple_files(self):
@@ -1483,7 +1481,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         ui = DialogSelectItems(self.app, self.source, _("Delete files"), "multi")
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         selection = ui.get_selected()
@@ -1493,7 +1491,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in selection:
             names = names + s['name'] + "\n"
         ui = DialogConfirmDelete(self.app, names)
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
 
@@ -1581,7 +1579,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         names = ""
         names = names + self.source[rows[0]]['name'] + "\n"
         ui = DialogConfirmDelete(self.app, names)
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
 
@@ -1662,7 +1660,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             name_item = QtWidgets.QTableWidgetItem(data['name'])
             name_item.setIcon(icon)
             # Having un-editable file names helps with assigning icons
-            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             # Externally linked - add link details to tooltip
             name_tt = data['metadata']
             if data['mediapath'] is not None and ':' in data['mediapath']:
@@ -1671,7 +1669,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             name_item.setToolTip(name_tt)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, name_item)
             date_item = QtWidgets.QTableWidgetItem(data['date'])
-            date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            date_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.DATE_COLUMN, date_item)
             memo_string = ""
             if data['memo'] is not None and data['memo'] != "":
@@ -1679,16 +1677,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             memo_item = QtWidgets.QTableWidgetItem(memo_string)
             if data['memo'] is not None and data['memo'] != "":
                 memo_item.setToolTip(data['memo'])
-            memo_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            memo_item.setFlags(date_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, memo_item)
             fid = data['id']
             if fid is None:
                 fid = ""
             iditem = QtWidgets.QTableWidgetItem(str(fid))
-            iditem.setFlags(iditem.flags() ^ QtCore.Qt.ItemIsEditable)
+            iditem.setFlags(iditem.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, iditem)
             case_item = QtWidgets.QTableWidgetItem(data['case'])
-            case_item.setFlags(case_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            case_item.setFlags(case_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
 
             # Add the attribute values
