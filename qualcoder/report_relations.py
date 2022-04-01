@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,9 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.base64_helper import *
@@ -76,7 +76,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         try:
             s0 = int(self.app.settings['dialogcodecrossovers_splitter0'])
             s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
@@ -91,7 +91,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_codes.setStyleSheet(font)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
@@ -101,7 +101,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
-        self.ui.tableWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_code_data(self):
@@ -126,7 +126,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 code_ids += "," + i.text(1)[4:]
         if len(sel_codes) < 2:
             msg = _("Select 2 or more codes\nUse Ctrl or Shift and mouse click")
-            Message(self.app, _('Selection warning'), msg, "warning").exec_()
+            Message(self.app, _('Selection warning'), msg, "warning").exec()
             return
         code_ids = code_ids[1:]
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
@@ -394,7 +394,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             # No table for table menu
             return
         action_show_context = menu.addAction(_("View in context"))
-        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_show_context:
             self.show_context()
 
@@ -416,7 +416,8 @@ class DialogReportRelations(QtWidgets.QDialog):
             if c['cid'] == d['cid1']:
                 codename1 = c['name']
                 color1 = c['color']
-        # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case, textedit_start, textedit_end
+        # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
+        # textedit_start, textedit_end
         data0 = {'codename': codename0, 'color': color0, 'file_or_casename': d['file_name'],
                  'pos0': d['c0_pos0'], 'pos1': d['c0_pos1'],
                  'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
@@ -425,7 +426,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                  'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
         ui = DialogCodeInText(self.app, data0)
         ui.add_coded_text(data1)
-        ui.exec_()
+        ui.exec()
         return
 
     def display_relations(self):
@@ -462,19 +463,19 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r, i in enumerate(self.result_relations):
             self.ui.tableWidget.insertRow(r)
             item = QtWidgets.QTableWidgetItem(str(i['fid']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['file_name'])
             self.ui.tableWidget.setItem(r, fid, item)
             item = QtWidgets.QTableWidgetItem(str(i['cid0']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
             self.ui.tableWidget.setItem(r, code0, item)
             item = QtWidgets.QTableWidgetItem(str(i['cid1']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
             self.ui.tableWidget.setItem(r, code1, item)
             item = QtWidgets.QTableWidgetItem(str(i['relation']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             ttip = _("Proximity")
             if i['relation'] == "O":
                 ttip = _("Overlap")
@@ -485,7 +486,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             item.setToolTip(ttip)
             self.ui.tableWidget.setItem(r, relation_type, item)
             item = QtWidgets.QTableWidgetItem(str(i['whichmin']).replace("None", ""))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             if i['whichmin'] is not None:
                 ttip = i['c0_name']
                 if i['whichmin'] == i['cid1']:
@@ -494,7 +495,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(r, min_, item)
 
             item = QtWidgets.QTableWidgetItem(str(i['whichmax']).replace("None", ""))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             if i['whichmax'] is not None:
                 ttip = i['c0_name']
                 if i['whichmax'] == i['cid1']:
@@ -503,32 +504,32 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(r, max_, item)
             if i['overlapindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, overlap0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, overlap1, item)
             if i['unionindex'] is not None:
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][0]))
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, union0, item)
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, union1, item)
             item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, distance, item)
             item = QtWidgets.QTableWidgetItem(str(i['owner']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, owner, item)
             item = QtWidgets.QTableWidgetItem(i['text_before'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, text_before, item)
             item = QtWidgets.QTableWidgetItem(i['text_overlap'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, text_overlap, item)
             item = QtWidgets.QTableWidgetItem(i['text_after'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, text_after, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
@@ -548,7 +549,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)'''
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
         remove_list = []
@@ -589,10 +590,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -605,10 +606,10 @@ class DialogReportRelations(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -660,7 +661,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 writer.writerow(row)
 
         msg = _("Code relations csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg, "information").exec_()
+        Message(self.app, _('Csv file Export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def closeEvent(self, event):

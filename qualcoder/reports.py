@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,9 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.base64_helper import *
@@ -81,7 +81,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
@@ -98,7 +98,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
@@ -110,7 +110,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if len(filenames) == 0:
             return
         ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
-        ok = ui.exec_()
+        ok = ui.exec()
         tooltip = _("Files selected: ")
         self.file_ids = []
         if ok:
@@ -293,7 +293,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f.write(text_)
         f.close()
         msg = _("Coding frequencies text file exported to: ") + filepath
-        Message(self.app, _('Text file Export'), msg).exec_()
+        Message(self.app, _('Text file Export'), msg).exec()
         self.parent_textEdit.append(msg)
 
     def export_csv_file(self):
@@ -323,7 +323,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         f.write(data)
         f.close()
         msg = _("Coding frequencies csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec_()
+        Message(self.app, _('Csv file Export'), msg).exec()
         self.parent_textEdit.append(msg)
 
     def fill_tree(self):
@@ -345,7 +345,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
         remove_list = []
@@ -389,10 +389,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 for i in c['display_list']:
                     display_list.append(str(i))
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -408,10 +408,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     for i in c['display_list']:
                         display_list.append(str(i))
                     child = QtWidgets.QTreeWidgetItem(display_list)
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -442,7 +442,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
         pm = QtGui.QPixmap()
@@ -466,7 +466,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         self.fill_tree()
@@ -535,7 +535,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         f.write(self.comparisons)
         f.close()
         msg = _("Coder comparison text file exported to: ") + filepath
-        Message(self.app, _('Text file export'), msg, "information").exec_()
+        Message(self.app, _('Text file export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def calculate_statistics(self):
@@ -661,7 +661,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -696,10 +696,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -712,10 +712,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -727,7 +727,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
 
         ui = DialogInformation(self.app, "Statistics information", "")
         ui.setHtml(info)
-        ui.exec_()
+        ui.exec()
 
 
 info = "<b>Agree %</b>" \

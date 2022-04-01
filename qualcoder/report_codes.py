@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,10 +35,10 @@ from shutil import copyfile
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.Qt import QHelpEvent
-from PyQt5.QtCore import Qt, QTextCodec
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtGui import QHelpEvent
+from PyQt6.QtCore import Qt  #, QTextCodec
+from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.base64_helper import *
@@ -105,7 +105,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -118,11 +118,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setStyleSheet(treefont)
         self.ui.listWidget_files.installEventFilter(self)  # For H key
-        self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.installEventFilter(self)  # For H key
-        self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_search.clicked.connect(self.search)
@@ -157,7 +157,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_export.setEnabled(False)
         self.ui.textEdit.installEventFilter(self)  # for H key
         self.ui.textEdit.setReadOnly(True)
-        self.ui.textEdit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.splitter.setSizes([100, 200, 0])
         try:
@@ -174,9 +174,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.splitter_vert.splitterMoved.connect(self.splitter_sizes)
         self.get_files_and_cases()
-        self.ui.listWidget_files.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
-        self.ui.listWidget_cases.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget_cases.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
@@ -300,7 +300,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_all_files = menu.addAction(_("Select all files"))
         action_files_like = menu.addAction(_("Select files like"))
         action_files_none = menu.addAction(_("Select none"))
-        action = menu.exec_(self.ui.listWidget_files.mapToGlobal(position))
+        action = menu.exec(self.ui.listWidget_files.mapToGlobal(position))
         if action == action_all_files:
             self.ui.listWidget_files.selectAll()
             self.ui.listWidget_files.item(0).setSelected(False)
@@ -312,11 +312,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             dialog = QtWidgets.QInputDialog(None)
             dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             dialog.setWindowTitle(_("Select some files"))
-            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-            dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
             dialog.setLabelText(_("Show files containing text"))
             dialog.resize(200, 20)
-            ok = dialog.exec_()
+            ok = dialog.exec()
             if not ok:
                 return
             dlg_text = str(dialog.textValue())
@@ -335,7 +335,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_all_cases = menu.addAction(_("Select all cases"))
         action_cases_like = menu.addAction(_("Select cases like"))
         action_cases_none = menu.addAction(_("Select none"))
-        action = menu.exec_(self.ui.listWidget_cases.mapToGlobal(position))
+        action = menu.exec(self.ui.listWidget_cases.mapToGlobal(position))
         if action == action_all_cases:
             self.ui.listWidget_cases.selectAll()
             self.ui.listWidget_cases.item(0).setSelected(False)
@@ -347,11 +347,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             dialog = QtWidgets.QInputDialog(None)
             dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             dialog.setWindowTitle(_("Select some cases"))
-            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-            dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
             dialog.setLabelText(_("Select cases containing text"))
             dialog.resize(200, 20)
-            ok = dialog.exec_()
+            ok = dialog.exec()
             if not ok:
                 return
             text_ = str(dialog.textValue())
@@ -375,7 +375,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -424,10 +424,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -445,10 +445,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                     if c['memo'] != "":
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -522,7 +522,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         f.write(data)
         f.close()
         msg = _('Report exported: ') + filepath
-        Message(self.app, _('Report exported'), msg, "information").exec_()
+        Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def export_odt_file(self):
@@ -543,7 +543,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw.write(self.ui.textEdit.document())
         msg = _("Report exported: ") + filepath
         self.parent_textEdit.append(msg)
-        Message(self.app, _('Report exported'), msg, "information").exec_()
+        Message(self.app, _('Report exported'), msg, "information").exec()
 
     def export_csv_file(self):
         """ Export report to csv file.
@@ -632,7 +632,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for row in csv_data:
                 filewriter.writerow(row)
         msg = _('Report exported: ') + filepath
-        Message(self.app, _('Report exported'), msg, "information").exec_()
+        Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def export_html_file(self):
@@ -650,9 +650,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
-        tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
+        print("Trying without QTextCodec")
+        #tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
-
         need_media_folders = False
         for item in self.html_links:
             if item['image'] is not None or item['avname'] is not None:
@@ -668,7 +668,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 os.mkdir(html_folder_name + "/video")
             except Exception as e:
                 logger.warning(_("html folder creation error ") + str(e))
-                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(e), "critical").exec_()
+                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(e), "critical").exec()
                 return
         try:
             with open(filepath, 'r') as f:
@@ -734,7 +734,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if need_media_folders:
             msg += "\n" + _("Media folder: ") + html_folder_name
         self.parent_textEdit.append(msg)
-        Message(self.app, _('Report exported'), msg, "information").exec_()
+        Message(self.app, _('Report exported'), msg, "information").exec()
 
     def eventFilter(self, object_, event):
         """ Used to detect key events in the textedit.
@@ -746,7 +746,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                                self.ui.listWidget_cases.hasFocus()):
             key = event.key()
             # Hide unHide top groupbox
-            if key == QtCore.Qt.Key_H:
+            if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
                 return True
         return False
@@ -772,7 +772,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         search_text = self.ui.lineEdit.text()
         self.get_selected_files_and_cases()
         if self.file_ids == "":
-            Message(self.app, _("Warning"), _("No files selected for annotations")).exec_()
+            Message(self.app, _("Warning"), _("No files selected for annotations")).exec()
             return
         self.ui.treeWidget.clearSelection()
         self.ui.listWidget_cases.clearSelection()
@@ -862,7 +862,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         ui.fill_parameters(self.attributes)
         temp_attributes = deepcopy(self.attributes)
         self.attributes = []
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
             pm = QtGui.QPixmap()
@@ -934,7 +934,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     case_file_ids.append(i[0])
 
         if file_ids == [] and case_file_ids == []:
-            Message(self.app, "Nothing found", "Nothing found").exec_()
+            Message(self.app, "Nothing found", "Nothing found").exec()
             return
         set_ids = {}
         set_file_ids = set(file_ids)
@@ -993,11 +993,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         items = self.ui.treeWidget.selectedItems()
         if len(items) == 0:
             msg = _("No codes have been selected.")
-            Message(self.app, _('No codes'), msg, "warning").exec_()
+            Message(self.app, _('No codes'), msg, "warning").exec()
             return
         if self.file_ids == "" and self.case_ids == "" and self.attributes == []:
             msg = _("No files, cases or attributes have been selected.")
-            Message(self.app, _('Nothing selected'), msg, "warning").exec_()
+            Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
         # Prepare results table and results lists
@@ -1567,9 +1567,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Add textedit positioning for context on clicking appropriate heading in results
         # Fill text edit with heading, text, image or
         fmt_normal = QtGui.QTextCharFormat()
-        fmt_normal.setFontWeight(QtGui.QFont.Normal)
+        fmt_normal.setFontWeight(QtGui.QFont.Weight.Normal)
         fmt_bold = QtGui.QTextCharFormat()
-        fmt_bold.setFontWeight(QtGui.QFont.Bold)
+        fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
         choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
             self.heading(row)
@@ -1579,21 +1579,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['pretext'])
                 pos1 = len(self.ui.textEdit.toPlainText())
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(fmt_normal)
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['text'])
                 pos1 = len(self.ui.textEdit.toPlainText())
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 if self.ui.checkBox_text_context.isChecked():
                     cursor.setCharFormat(fmt_bold)
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['posttext'])
                 pos1 = len(self.ui.textEdit.toPlainText())
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 if self.ui.checkBox_text_context.isChecked():
                     cursor.setCharFormat(fmt_normal)
                 self.ui.textEdit.insertPlainText("\n")
@@ -1611,9 +1611,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(0)
         matrix_option = self.ui.comboBox_matrix.currentText()
         if matrix_option in ("Categories by case", "Top categories by case", "Codes by case") and self.case_ids == "":
-            Message(self.app, _("No case matrix"), _("Cases not selected")).exec_()
+            Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
         if matrix_option in ("Categories by file", "Top categories by file", "Codes by file") and self.case_ids != "":
-            Message(self.app, _("No file matrix"), _("Cases are selected")).exec_()
+            Message(self.app, _("No file matrix"), _("Cases are selected")).exec()
         if matrix_option == "Categories by case" and self.case_ids != "":
             self.matrix_fill_by_categories(self.results, self.case_ids, "case")
         if matrix_option == "Categories by file" and self.case_ids == "":
@@ -1658,7 +1658,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # imagename is now: 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
 
         url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource, url, QtCore.QVariant(image))
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
         image_format.setWidth(image.width() * scaler)
@@ -1708,9 +1708,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         pos0 = len(self.ui.textEdit.toPlainText())
         item['textedit_start'] = pos0
         self.ui.textEdit.append(head)
-        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
         pos1 = len(self.ui.textEdit.toPlainText())
-        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         brush = QBrush(QtGui.QColor(item['color']))
         fmt.setBackground(brush)
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
@@ -1743,20 +1743,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_all = menu.addAction(_("Copy all to clipboard"))
-        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
         if action == action_view:
             self.show_context_from_text_edit(cursor_context_pos)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
-            cb.setText(selected_text, mode=cb.Clipboard)
+            cb.setText(selected_text)
         if action == action_copy_all:
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
             te_text = self.ui.textEdit.toPlainText()
-            cb.setText(te_text, mode=cb.Clipboard)
+            cb.setText(te_text)
 
     def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
@@ -1770,13 +1768,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 if row['result_type'] == 'text':
                     ui = DialogCodeInText(self.app, row)
-                    ui.exec_()
+                    ui.exec()
                 if row['result_type'] == 'image':
                     ui = DialogCodeInImage(self.app, row)
-                    ui.exec_()
+                    ui.exec()
                 if row['result_type'] == 'av':
                     ui = DialogCodeInAV(self.app, row)
-                    ui.exec_()
+                    ui.exec()
 
     def matrix_heading(self, item, text_edit):
         """ Takes a dictionary item and creates a heading for the coded text portion.
@@ -1813,9 +1811,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         pos0 = len(text_edit.toPlainText())
         item['textedit_start'] = pos0
         text_edit.append(head)
-        cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
         pos1 = len(text_edit.toPlainText())
-        cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         brush = QBrush(QtGui.QColor(item['color']))
         fmt.setBackground(brush)
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
@@ -1875,7 +1873,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
@@ -1923,9 +1921,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
         if self.ui.tableWidget.columnCount() == 1:
-            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
-            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_categories(self, results_, ids, type_="file"):
@@ -1985,7 +1983,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         vertical_labels = []
         for c in id_and_name:
             vertical_labels.append(c[1])
-
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
@@ -2006,7 +2003,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
@@ -2056,9 +2053,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
         if self.ui.tableWidget.columnCount() == 1:
-            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
-            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_top_categories(self, results_, ids, type_="file"):
@@ -2147,7 +2144,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             for _ in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
-                tedit.setContextMenuPolicy(Qt.CustomContextMenu)
+                tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 tedit.customContextMenuRequested.connect(self.table_text_edit_menu)
                 column_list.append(tedit)
             self.te.append(column_list)
@@ -2198,9 +2195,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         # Maximise the space from one column or one row
         if self.ui.tableWidget.columnCount() == 1:
-            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
-            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+            self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def table_text_edit_menu(self, position):
@@ -2231,32 +2228,30 @@ class DialogReportCodes(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_all = menu.addAction(_("Copy all to clipboard"))
-        action = menu.exec_(te.mapToGlobal(position))
+        action = menu.exec(te.mapToGlobal(position))
         if action is None:
             return
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
-            cb.setText(selected_text, mode=cb.Clipboard)
+            cb.setText(selected_text)
         if action == action_copy_all:
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
             te_text = te.toPlainText()
-            cb.setText(te_text, mode=cb.Clipboard)
+            cb.setText(te_text)
         if action == action_view:
             for m in self.matrix_links:
                 if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
                     if 'mediapath' not in m:
                         ui = DialogCodeInText(self.app, m)
-                        ui.exec_()
+                        ui.exec()
                         return
                     if m['mediapath'][0:7] in ('images:', '/images'):
                         ui = DialogCodeInImage(self.app, m)
-                        ui.exec_()
+                        ui.exec()
                         return
                     if m['mediapath'][0:6] in ('audio:', 'video:', '/audio', '/video'):
                         ui = DialogCodeInAV(self.app, m)
-                        ui.exec_()
+                        ui.exec()
                         return
 
 
@@ -2278,7 +2273,7 @@ class ToolTipEventFilter(QtCore.QObject):
 
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        if event.type() == QtCore.QEvent.ToolTip:
+        if event.type() == QtCore.QEvent.Type.ToolTip:
             help_event = QHelpEvent(event)
             cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()

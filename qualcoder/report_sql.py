@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-from PyQt5 import QtCore, QtGui
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt6 import QtCore, QtGui
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import Qt
 
 import csv
 from datetime import datetime
@@ -90,7 +90,7 @@ class DialogSQL(QtWidgets.QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -98,19 +98,19 @@ class DialogSQL(QtWidgets.QDialog):
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget_results.setStyleSheet(doc_font)
 
-        self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         highlighter = Highlighter(self.ui.textEdit_sql)
         if self.app.settings['stylesheet'] == "dark":
             highlighter.create_rules(dark=True)
-        self.ui.textEdit_sql.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textEdit_sql.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit_sql.customContextMenuRequested.connect(self.sql_menu)
-        self.ui.tableWidget_results.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.tableWidget_results.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_results.customContextMenuRequested.connect(self.table_menu)
 
         # Add tables and fields to treeWidget
         self.get_schema_update_tree_widget()
         self.ui.treeWidget.itemClicked.connect(self.get_item)
-        self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
 
         self.ui.pushButton_runSQL.clicked.connect(self.run_sql)
@@ -159,7 +159,7 @@ class DialogSQL(QtWidgets.QDialog):
         try:
             cur.execute(sql)
         except Exception as e:
-            Message(self.app, _("SQL error"), str(e), "warning").exec_()
+            Message(self.app, _("SQL error"), str(e), "warning").exec()
             return
         results = cur.fetchall()
         header = []
@@ -187,7 +187,7 @@ class DialogSQL(QtWidgets.QDialog):
         msg = _("SQL Results exported to: ") + filepath
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(_("Query:") + "\n" + sql)
-        Message(self.app, _("CSV file export"), msg, "information").exec_()
+        Message(self.app, _("CSV file export"), msg, "information").exec()
 
     def get_item(self):
         """ Get the selected table name or tablename.fieldname and add to the sql text
@@ -276,7 +276,7 @@ class DialogSQL(QtWidgets.QDialog):
                     if value is None:
                         value = ""
                     cell = QtWidgets.QTableWidgetItem(str(value))
-                    cell.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                    cell.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
                     self.ui.tableWidget_results.setItem(row, col, cell)
             self.ui.tableWidget_results.resizeColumnsToContents()
             # Keep column widths reasonable, 450 pixels max
@@ -288,7 +288,7 @@ class DialogSQL(QtWidgets.QDialog):
             if sql_string.find("CREATE ") == 0 or sql_string.find("DROP ") == 0 or sql_string.find("ALTER ") == 0:
                 self.get_schema_update_tree_widget()
         except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
-            Message(self.app, _("Error"), str(e), "warning").exec_()
+            Message(self.app, _("Error"), str(e), "warning").exec()
             self.ui.label.setText(_("SQL Error"))
             self.ui.label.setToolTip(str(e))
         self.results = None
@@ -327,14 +327,14 @@ class DialogSQL(QtWidgets.QDialog):
             result = cur.execute("SELECT type FROM sqlite_master WHERE name='" + table_name + "' ")
             table_or_view = result.fetchone()[0]
             if table_or_view == "view":
-                top_item.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
+                top_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
             self.ui.treeWidget.addTopLevelItem(top_item)
             for field in self.schema[table_name]:
                 field_item = QtWidgets.QTreeWidgetItem()
                 if table_or_view == "view":
-                    field_item.setBackground(0, QtGui.QBrush(Qt.yellow, Qt.Dense6Pattern))
+                    field_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
                 if field[5] > 0:
-                    field_item.setForeground(0, QtGui.QBrush(Qt.red))
+                    field_item.setForeground(0, QtGui.QBrush(Qt.GlobalColor.red))
                 field_item.setText(0, field[1])
                 top_item.addChild(field_item)
 
@@ -375,7 +375,7 @@ class DialogSQL(QtWidgets.QDialog):
         for i in self.stored_sqls:
             if i['index'] == index:
                 delete_sql = menu.addAction(_("Delete stored sql"))
-        action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None and action == delete_sql:
             for i in range(len(self.stored_sqls)):
                 if self.stored_sqls[i]['index'] == index:
@@ -401,7 +401,7 @@ class DialogSQL(QtWidgets.QDialog):
         action_save_query = None
         if len(self.ui.textEdit_sql.toPlainText()) > 2:
             action_save_query = menu.addAction(_("Save query"))
-        action = menu.exec_(self.ui.textEdit_sql.mapToGlobal(position))
+        action = menu.exec(self.ui.textEdit_sql.mapToGlobal(position))
         cursor = self.ui.textEdit_sql.textCursor()
         if action is None:
             return
@@ -430,7 +430,7 @@ class DialogSQL(QtWidgets.QDialog):
         if action == action_select_all:
             cursor.setPosition(0)
             cursor.setPosition(len(self.ui.textEdit_sql.toPlainText()),
-                QtGui.QTextCursor.KeepAnchor)
+                QtGui.QTextCursor.MoveMode.KeepAnchor)
             self.ui.textEdit_sql.setTextCursor(cursor)
         if action == action_select_all_from:
             cursor.insertText("SELECT * FROM ")
@@ -445,11 +445,11 @@ class DialogSQL(QtWidgets.QDialog):
         ui_save = DialogSaveSql(self.app)
         ui_save.ui.label.hide()
         ui_save.ui.lineEdit_group.hide()
-        ui_save.exec_()
+        ui_save.exec()
         title = ui_save.name
         if title == "":
             msg = _("The query must have a name")
-            Message(self.app, _("Cannot save"), msg).exec_()
+            Message(self.app, _("Cannot save"), msg).exec()
             return
         grouper = ui_save.grouper
         description = ui_save.description
@@ -459,7 +459,7 @@ class DialogSQL(QtWidgets.QDialog):
             cur.execute(sql, [title, description, grouper, ssql])
             self.app.conn.commit()
         except Exception as e:
-            Message(self.app, _("Cannot save"), str(e)).exec_()
+            Message(self.app, _("Cannot save"), str(e)).exec()
         self.get_schema_update_tree_widget()
 
     # Start of table results context menu section
@@ -488,27 +488,27 @@ class DialogSQL(QtWidgets.QDialog):
         action_sort_ascending.triggered.connect(self.sort_ascending)
         action_sort_descending = menu.addAction(_("Sort descending"))
         action_sort_descending.triggered.connect(self.sort_descending)
-        action = menu.exec_(self.ui.tableWidget_results.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget_results.mapToGlobal(position))
     # TODO need to add numerical filters
     # TODO need to store or determine type of data to do this
 
     def sort_ascending(self):
         """ Sort rows on selected column in ascending order. """
 
-        self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.AscendingOrder)
+        self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.SortOrder.AscendingOrder)
         self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" asc]"))
 
     def sort_descending(self):
         """ Sort rows on selected column in descending order. """
 
-        self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.DescendingOrder)
+        self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.SortOrder.DescendingOrder)
         self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" desc]"))
 
     def filter_text_like(self):
         """ Hide rows where cells in the column do not contain the text fragment. """
 
         text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cell_value))
+        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().find(text_) == -1:
@@ -522,7 +522,7 @@ class DialogSQL(QtWidgets.QDialog):
         """ Hide rows where cells in the column do not contain the text start fragment. """
 
         text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cell_value))
+        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().startswith(text_) is False:
@@ -552,16 +552,6 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.label.setText(str(len(self.file_data) - 1) + _(" rows"))
         self.queryFilters = ""
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_sql = QtWidgets.QDialog()
-    ui = Ui_Dialog_sql()
-    ui.setupUi(Dialog_sql)
-    Dialog_sql.show()
-    sys.exit(app.exec_())
 
 
 class NewTableWidget(QtWidgets.QTableWidget):
@@ -602,18 +592,18 @@ class NewTableWidget(QtWidgets.QTableWidget):
     def sort_ascending(self):
         """ Sort rows on selected column in ascending order. """
 
-        self.sortItems(self.col, QtCore.Qt.AscendingOrder)
+        self.sortItems(self.col, QtCore.Qt.SortOrder.AscendingOrder)
 
     def sort_descending(self):
         """ Sort rows on selected column in descending order. """
 
-        self.sortItems(self.col, QtCore.Qt.DescendingOrder)
+        self.sortItems(self.col, QtCore.Qt.SortOrder.DescendingOrder)
 
     def filter_text_like(self):
         """ Hide rows where cells in the column do not contain the text fragment. """
 
         text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cell_value))
+        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.rowCount()):
                 if str(self.item(r, self.col).text()).find(text_) == -1:
@@ -623,7 +613,7 @@ class NewTableWidget(QtWidgets.QTableWidget):
         """ Hide rows where cells in the column do not contain the text start fragment. """
 
         text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.Normal, str(self.cell_value))
+        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.rowCount()):
                 if str(self.item(r, self.col).text()).startswith(text_) is False:
@@ -656,12 +646,12 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 
         if isinstance(other, TableWidgetItem):
             try:
-                self_value = float(str(self.data(QtCore.Qt.EditRole)))
-                other_value = float(str(other.data(QtCore.Qt.EditRole)))
+                self_value = float(str(self.data(QtCore.Qt.ItemDataRole.EditRole)))
+                other_value = float(str(other.data(QtCore.Qt.ItemDataRole.EditRole)))
                 return self_value < other_value
             except ValueError:
-                self_value = str(self.data(QtCore.Qt.EditRole))
-                other_value = str(other.data(QtCore.Qt.EditRole))
+                self_value = str(self.data(QtCore.Qt.ItemDataRole.EditRole))
+                other_value = str(other.data(QtCore.Qt.ItemDataRole.EditRole))
                 return self_value < other_value
         else:
             return QtWidgets.QTableWidgetItem.__lt__(self, other)

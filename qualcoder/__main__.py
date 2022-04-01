@@ -1064,7 +1064,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_reports.hide()
         ui = ViewGraph(self.app)
-        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     @staticmethod
@@ -1139,7 +1139,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
-        ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def text_coding(self):
@@ -1150,7 +1150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(files) > 0:
             self.ui.label_coding.hide()
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no text files.")
@@ -1165,7 +1165,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(files) > 0 and len(cases) > 0:
             self.ui.label_coding.hide()
             ui = DialogCodeByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no text files.")
@@ -1181,7 +1181,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(files) > 0:
             self.ui.label_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
         else:
             msg = _("This project contains no image files.")
@@ -1199,7 +1199,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
         except Exception as e_:
             logger.debug(str(e_))

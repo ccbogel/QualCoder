@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import sys
 import traceback
 import qualcoder.vlc as vlc
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 
@@ -74,7 +74,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_file_summary()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -91,7 +91,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.listWidget.setStyleSheet(treefont)
-        self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.get_files()
         self.ui.listWidget.itemClicked.connect(self.fill_text_edit)
 

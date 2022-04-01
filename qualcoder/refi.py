@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ except ImportError:
     pass
 import zipfile
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 
 from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
@@ -153,9 +153,9 @@ class RefiImport:
                     # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 Message(self.app, _("Codebook imported"),
-                        str(counter) + _(" categories and codes imported from ") + self.file_path).exec_()
+                        str(counter) + _(" categories and codes imported from ") + self.file_path).exec()
                 return
-        Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec_()
+        Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec()
 
     def sub_codes(self, parent, cat_id):
         """ Get subcode elements, if any.
@@ -333,7 +333,7 @@ class RefiImport:
                 self.sources_name = "/sources"
         num_sources = len(os.listdir(self.folder_name + self.sources_name))
         self.pd = QtWidgets.QProgressDialog(_("Project Import"), "", 0, num_sources, None)
-        self.pd.setWindowModality(QtCore.Qt.WindowModal)
+        self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
 
         # Parse xml for users, codebook, sources, journals, project description, variable names
@@ -426,7 +426,7 @@ class RefiImport:
         msg += _("All variables are stored as text. Cast as text or float for SQL operations.\n")
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
-        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
+        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec()
 
     def parse_cases_for_file_variables(self, root):
         """ Parse Cases element for each Case. Look for any file variables (No case name and only one sourceref).
@@ -559,7 +559,7 @@ class RefiImport:
                 variable['id'] = cur.fetchone()[0]
             except sqlite3.IntegrityError:
                 Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name,
-                        "warning").exec_()
+                        "warning").exec()
             # Refer to the variables later
             # To update caseOrFile and to assign attributes
             self.variables.append(variable)
@@ -1083,7 +1083,7 @@ class RefiImport:
                 if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
         except Exception as e:
-            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec_()
+            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec()
 
         memo = ""
         if name is not None:
@@ -1649,7 +1649,7 @@ class RefiImport:
             self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
         except sqlite3.IntegrityError:
-            Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
+            Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec()
             return
 
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
@@ -1738,7 +1738,7 @@ class RefiLineEndings(QtWidgets.QDialog):
         super().__init__(parent)
         self.ui = Ui_Dialog_refi_export_line_endings()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -1814,19 +1814,19 @@ class RefiExport(QtWidgets.QDialog):
             os.mkdir(prep_path + "/Sources")
         except Exception as e:
             logger.error(_("Project export error ") + str(e))
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec()
             return
         try:
             with open(prep_path + '/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as e:
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec()
             logger.debug(str(e))
             return
 
         add_line_ending_for_maxqda = False
         ui = RefiLineEndings(self.app)
-        ui.exec_()
+        ui.exec()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
         txt_errors = ""
@@ -1895,14 +1895,14 @@ class RefiExport(QtWidgets.QDialog):
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
-        Message(self.app, _("Project exported"), _(msg)).exec_()
+        Message(self.app, _("Project exported"), _(msg)).exec()
         self.parent_textEdit.append(_("Project exported") + "\n" + _(msg))
 
     def export_codebook(self):
         """ Export REFI format codebook. """
 
         filename = "Codebook-" + self.app.project_name[:-4] + ".qdc"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
                                                                self.app.settings['directory'], options)
@@ -1915,11 +1915,11 @@ class RefiExport(QtWidgets.QDialog):
             f.close()
             msg = _("Codebook has been exported to ")
             msg += filename
-            Message(self.app, _("Codebook exported"), _(msg)).exec_()
+            Message(self.app, _("Codebook exported"), _(msg)).exec()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
-            Message(self.app, _("Codebook NOT exported"), str(e)).exec_()
+            Message(self.app, _("Codebook NOT exported"), str(e)).exec()
             self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(e)))
 
     def user_guid(self, username):
@@ -2455,7 +2455,6 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
             xml += '</Coding>\n'
-
             xml += '</PlainTextSelection>\n'
         return xml
 
@@ -2491,7 +2490,6 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" >\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
-
             xml += '</PictureSelection>\n'
         return xml
 
@@ -2704,7 +2702,6 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         text = media['fulltext']
-
         if len(text) == 0 or text is None:
             return []
 
@@ -2788,10 +2785,9 @@ class RefiExport(QtWidgets.QDialog):
             if media_length == -1:
                 media_length = 0
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, _("Media not found"),
-                                          str(e) + "\n" + media_name)
+            msg_ = str(e) + "\n" + media_name
+            Message(self.app, _("Media not found"), msg, "warning").exec()
         time_pos.append([len(text) - 1, media_length])
-
         # Order the list by character positions
         time_pos = sorted(time_pos, key=itemgetter(0))
         return time_pos
@@ -2917,7 +2913,6 @@ class RefiExport(QtWidgets.QDialog):
 
         if not self.codes:
             return ""
-
         xml = '<CodeBook>\n'
         xml += '<Codes>\n'
         cats = copy(self.categories)
