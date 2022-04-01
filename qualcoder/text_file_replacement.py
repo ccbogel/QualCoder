@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ class ReplaceTextFile:
         for f in filenames:
             if f['name'] == new_filename and not self.matching_filename:
                 msg = _(" New file name matches another existing file name")
-                Message(self.app, _("Warning"), msg, "warning").exec_()
+                Message(self.app, _("Warning"), msg, "warning").exec()
                 return
         self.get_codings_annotations_case()
         self.load_file_text()
@@ -104,7 +104,7 @@ class ReplaceTextFile:
         msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.\n")
         msg += _("Function works by identifying the first matching text segment for each coding and annotation.")
         msg += "\n" + errs
-        Message(self.app, _("File replaced"), msg).exec_()
+        Message(self.app, _("File replaced"), msg).exec()
 
     def update_case_positions(self):
         """ Update case if all file is assigned to case or portions assigned to case. """
@@ -322,15 +322,15 @@ class ReplaceTextFile:
                         text = text[6:]
             except Exception as e:
                 msg = _("Cannot import") + str(self.new_file_path) + "\n" + str(e)
-                Message(self.app, _("Warning"), msg, "warning").exec_()
+                Message(self.app, _("Warning"), msg, "warning").exec()
                 return
             if import_errors > 0:
-                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec_()
+                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
                 logger.warning(self.new_file_path + ": " + str(import_errors) + _(" lines not imported"))
         # Import of text file did not work
         if text == "":
             msg = str(self.new_file_path) + _("\nPlease check if the file is empty.")
-            Message(self.app, _("Warning"), _("Cannot import ") + msg, "warning").exec_()
+            Message(self.app, _("Warning"), _("Cannot import ") + msg, "warning").exec()
             return
 
         name_split = self.new_file_path.split("/")

@@ -34,8 +34,8 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QDialog
+from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6.QtWidgets import QDialog
 
 from .color_selector import TextColor
 from .GUI.base64_helper import *
@@ -59,7 +59,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(txt)
-    mb.exec_()
+    mb.exec()
 
 
 class ViewGraph(QDialog):
@@ -90,7 +90,7 @@ class ViewGraph(QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font_size_list = []
         for i in range(8, 22, 2):
             font_size_list.append(str(i))
@@ -103,7 +103,7 @@ class ViewGraph(QDialog):
         # Set the scene
         self.scene = GraphicsScene(self)
         self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
         self.ui.comboBox_fontsize.currentIndexChanged.connect(self.show_graph_type)
@@ -145,16 +145,16 @@ class ViewGraph(QDialog):
         # Scene size is too big.
         max_x, max_y = self.scene.suggested_scene_size()
         rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
-        image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format_ARGB32_Premultiplied)
+        image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format.Format_ARGB32_Premultiplied)
         # image = QtGui.QImage(int(self.scene.width()), int(self.scene.height()), QtGui.QImage.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # self.scene.render(painter)
         # render method requires QRectF NOT QRect
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
         painter.end()
         image.save(filepath)
-        Message(self.app, _("Image exported"), filepath).exec_()
+        Message(self.app, _("Image exported"), filepath).exec()
 
     def create_initial_model(self):
         """ Create initial model
@@ -488,16 +488,16 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
-        self.setFlags(QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemIsFocusable |
-                      QtWidgets.QGraphicsItem.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextEditable)
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         if self.code_or_cat['cid'] is not None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Normal)
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Normal)
             self.setFont(self.font)
             self.setPlainText(self.code_or_cat['name'])
         if self.code_or_cat['cid'] is None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Bold)
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Bold)
             self.setFont(self.font)
             self.setPlainText(self.code_or_cat['name'])
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
@@ -510,7 +510,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             https://doc.qt.io/qt-5/qpainter.html """
 
         color = QtGui.QColor(self.code_or_cat['color'])
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.SolidPattern))
+        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.setFont(self.font)
         fm = painter.fontMetrics()
@@ -537,7 +537,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.code_or_cat['cid'] is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
-        action = menu.exec_(QtGui.QCursor.pos())
+        action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
         if action.text() == 'Memo':
@@ -552,14 +552,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         if self.code_or_cat['cid'] is not None:
             ui = DialogMemo(self.app, "Memo for Code " + self.code_or_cat['name'], self.code_or_cat['memo'])
-            ui.exec_()
+            ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
         if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
             ui = DialogMemo(self.app, "Memo for Category " + self.code_or_cat['name'], self.code_or_cat['memo'])
-            ui.exec_()
+            ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_cat set memo=? where catid=?", (self.code_or_cat['memo'], self.code_or_cat['catid']))
@@ -587,8 +587,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_widget = None
     to_pos = None
     line_width = 1.5
-    line_type = QtCore.Qt.SolidLine
-    line_color = QtCore.Qt.black
+    line_type = QtCore.Qt.PenStyle.SolidLine
+    line_color = QtCore.Qt.GlobalColor.black
     corners_only = False  # True for list graph
 
     def __init__(self, app, from_widget, to_widget, corners_only=False):
@@ -597,11 +597,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.from_widget = from_widget
         self.to_widget = to_widget
         self.corners_only = corners_only
-        self.setFlags(QtWidgets.QGraphicsItem.ItemIsSelectable)
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.line_color = QtCore.Qt.black
+        self.line_color = QtCore.Qt.GlobalColor.black
         if app.settings['stylesheet'] == "dark":
-            self.line_color = QtCore.Qt.white
+            self.line_color = QtCore.Qt.GlobalColor.white
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -609,7 +609,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction('Thinner')
         menu.addAction('Dotted')
         menu.addAction('Red')
-        action = menu.exec_(QtGui.QCursor.pos())
+        action = menu.exec(QtGui.QCursor.pos())
         if action.text() == 'Thicker':
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
@@ -621,10 +621,10 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
                 self.line_width = 1
             self.redraw()
         if action.text() == 'Dotted':
-            self.line_type = QtCore.Qt.DotLine
+            self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
         if action.text() == 'Red':
-            self.line_color = QtCore.Qt.red
+            self.line_color = QtCore.Qt.GlobalColor.red
             self.redraw()
 
     def redraw(self):
