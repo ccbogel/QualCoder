@@ -78,6 +78,7 @@ from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 3.0"
+print("USING QT6")
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
