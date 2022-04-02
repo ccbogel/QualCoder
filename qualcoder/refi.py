@@ -82,7 +82,8 @@ class RefiImport:
     cases = []
     sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
     sources_name = "/Sources"  # Sources folder can be named Sources or sources
-    variables = []  # List of Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    # List of Dictionaries of Variable guid, name, variable application (cases or files), last_insert_id, text or other
+    variables = []
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
     annotations = []  # Text source annotation references
     parent_textEdit = None
@@ -114,15 +115,20 @@ class RefiImport:
         if import_type == "qdc":
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                                                                        _('Select REFI-QDA file'),
-                                                                       self.app.settings['directory'], "(*.qdc *.QDC)")
+                                                                       self.app.settings['directory'],
+                                                                       "(*.qdc *.QDC)",
+                                                                       options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                                       )
             if not ok or self.file_path == "":
                 return
             self.import_codebook()
         else:
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                                       _('Select REFI-QDA file'),
+                                                                       _('Select REFI-QDA qdpx file'),
                                                                        self.app.settings['directory'],
-                                                                       "(*.qdpx *.QDPX)")
+                                                                       "(*.qdpx *.QDPX)",
+                                                                       options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                                       )
             if not ok or self.file_path == "":
                 return
             self.import_project()
@@ -324,7 +330,7 @@ class RefiImport:
         project_zip.close()
 
         # Set up progress dialog
-        # Source loading can be slow, so use this for he progress dialog
+        # Source loading can be slow, so use this for the progress dialog
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
         self.sources_name = "/Sources"
@@ -698,7 +704,11 @@ class RefiImport:
         """ Parse the Sources element.
         This contains text and media sources as well as variables describing the source and coding information.
         Example format:
-        <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
+        <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna"
+        richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx"
+        plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt"
+        creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z"
+        modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
         If during import it detects that the external file is not found, it should
         check file location and if not found ask user for the new file location.
@@ -1045,7 +1055,7 @@ class RefiImport:
         if plain_text_path[0:11] == "internal://":
             plain_text_path = plain_text_path[11:]
         else:
-            logger.debug("Cannot import plain text transcription file - not internal")
+            logger.debug("Cannot import plain text transcription file - not internal. " + plain_text_path)
             return
 
         # Copy plain text file into documents folder, or if .srt into audio or video folder.
@@ -1059,12 +1069,17 @@ class RefiImport:
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
         # Not Used: contents = os.listdir(self.folder_name)
-        source_path = self.folder_name + self.sources_name + plain_text_path
-        # print("Source path: ", source_path)
-        # print("Destination: ", destination)
+        source_path = self.folder_name + self.sources_name
+        if source_path[-1] != "/":
+            source_path += "/"
+        source_path += plain_text_path
+        #print("Source path: ", source_path)
+        #print("Destination: ", destination)
         try:
             shutil.copyfile(source_path, destination)
-        except Exception as e:
+        except shutil.Error as e:
+            print("shutil.copyfile(source_path, destination)\n", source_path, "\n", destination, "\n", e)
+            logger.debug(str(e))
             self.parent_textEdit.append(
                 _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         # Load transcription text into database with filename matching and suffixed with .txt
@@ -1083,6 +1098,9 @@ class RefiImport:
                 if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
         except Exception as e:
+            print("Opening destination to load text\n", destination)
+            print(e)
+            logger.debug(str(e))
             Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec()
 
         memo = ""
@@ -1160,10 +1178,13 @@ class RefiImport:
     def load_codings_for_audio_video(self, id_, element):
         """ Load coded segments for audio and video
         Example format:
-        <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100" guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
-        creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z" name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
+        <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100"
+        guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
+        creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z"
+        name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
         <Description>Memo to video file</Description>
-        <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z">
+        <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C"
+        creationDateTime="2020-11-10T18:01:23Z">
         <CodeRef targetGUID="86392BC1-A364-4904-A406-87A7E025EBF7"/>
         </Coding>
         </VideoSelection>
@@ -1324,7 +1345,8 @@ class RefiImport:
                 source['fulltext'] = fulltext
                 # ADding split()
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo, creating_user, create_date))
+                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo,
+                             creating_user, create_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 id_ = cur.fetchone()[0]
@@ -1337,7 +1359,7 @@ class RefiImport:
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             print("project path", self.app.project_path)
-            print("name", name) # ISSUE HERE
+            print("name", name)  # ISSUE HERE
             print("source_path", source_path)
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
             print("destination", destination)
@@ -2049,7 +2071,13 @@ class RefiExport(QtWidgets.QDialog):
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
         Called by: notes_xml
         Format:
-        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
+        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo"
+        richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx"
+        plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt"
+        creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        creationDateTime="2019-06-04T06:11:56Z"
+        modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        modifiedDateTime="2019-06-17T08:00:58Z">
        <Description></Description>
        </Note>
 
@@ -2090,11 +2118,18 @@ class RefiExport(QtWidgets.QDialog):
         <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
 
-        Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>  Liks to the annotation detail.
+        Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>
+        Links to the annotation detail.
 
         :param ann: Dictionaries of anid, fid, pos0, pos1, memo, owner, date,  NoteRef_guid
         :returns a guid for a NoteRef
         """
+
+        # Temporary hack fix for NoteRef_guid, unsure of the cuase so far, might be ajournal entry
+        try:
+            ann['NoteRef_guid']
+        except KeyError:
+            ann['NoteRef_guid'] = self.create_guid()
 
         xml = '<Note guid="' + ann['NoteRef_guid'] + '" '
         user = ""
@@ -2616,6 +2651,7 @@ class RefiExport(QtWidgets.QDialog):
             for sp in sync_list:
                 if sp[2] == coded[0]:
                     xml += sp[0]
+                    break  # To avoid a quirky double up of guid
             xml += '" toSyncPoint="'
             doubleup = False
             for sp in sync_list:
@@ -2786,7 +2822,7 @@ class RefiExport(QtWidgets.QDialog):
                 media_length = 0
         except Exception as e:
             msg_ = str(e) + "\n" + media_name
-            Message(self.app, _("Media not found"), msg, "warning").exec()
+            Message(self.app, _("Media not found"), msg_, "warning").exec()
         time_pos.append([len(text) - 1, media_length])
         # Order the list by character positions
         time_pos = sorted(time_pos, key=itemgetter(0))
