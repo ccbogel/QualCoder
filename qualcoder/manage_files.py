@@ -267,14 +267,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_order_by_value:
             self.load_file_data("attribute:" + self.header_labels[col])
         if action == action_equals_value:
-            # Hide rows that do not match this value, text can be None type
-            # Cell items can be None or exist with ''
+            # Hide rows that do not match this value
+            item_to_compare = self.ui.tableWidget.item(row, col)
+            compare_text = item_to_compare.text()
             for r in range(0, self.ui.tableWidget.rowCount()):
                 item = self.ui.tableWidget.item(r, col)
-                # items can be None or appear to be None when item text == ''
-                if text is None and (item is not None and len(item.text()) > 0):
-                    self.ui.tableWidget.setRowHidden(r, True)
-                if text is not None and (item is None or item.text().find(text) == -1):
+                text_ = item.text()
+                if compare_text != text_:
+                    print(compare_text, text_)
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
         if action == action_show_all:
@@ -527,20 +527,20 @@ class DialogManageFiles(QtWidgets.QDialog):
         if order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by mediapath"
         if order_by == "casename":
-            sql = 'select distinct source.name, source.id, source.fulltext, source.mediapath, source.memo, source.owner, \
-                    source.date, , av_text_id \
-                    from source left join case_text on source.id=case_text.fid \
-                    left join cases on cases.caseid=case_text.caseid \
-                   order by cases.name, source.name '
+            sql = 'select distinct source.name, source.id, source.fulltext, source.mediapath, source.memo, '
+            sql += 'source.owner, source.date, av_text_id '
+            sql += 'from source left join case_text on source.id=case_text.fid '
+            sql += 'left join cases on cases.caseid=case_text.caseid '
+            sql += 'order by cases.name, source.name '
 
         if order_by[:10] == "attribute:":
             attribute_name = order_by[10:]
             # two types of ordering character or numeric
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
-            sql = 'select source.name, source.id, fulltext, mediapath, source.memo, source.owner, source.date, av_text_id \
-                from source  join attribute on attribute.id = source.id \
-                where attribute.attr_type = "file" and attribute.name=? '
+            sql = 'select source.name, source.id, fulltext, mediapath, source.memo, source.owner, source.date,'
+            sql += 'av_text_id from source join attribute on attribute.id = source.id '
+            sql += ' where attribute.attr_type = "file" and attribute.name=? '
             if attr_type == "character":
                 sql += 'order by lower(attribute.value) asc '
             else:
@@ -1502,7 +1502,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Delete image, audio or video source
             if s['mediapath'] is not None and 'docs:' not in s['mediapath']:
                 # Get linked transcript file id
-                cur.execute("select av_text_id from source where id=?")
+                cur.execute("select av_text_id from source where id=?", [s['id']])
                 res = cur.fetchone()
                 av_text_id = res[0]
                 # Remove avid links in code_text
