@@ -77,7 +77,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.radioButton_character.setChecked(True)
-        self.ui.lineEdit_name.setFocus(True)
+        self.ui.lineEdit_name.setFocus()
 
     def accept(self):
         """ On pressing accept button, check there is no duplicate name.
