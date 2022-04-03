@@ -127,7 +127,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
         check_names.extend(self.attributes)
         ui = DialogAddAttribute(self.app, check_names)
-        ui.exec()  # ok = ui.exec_() does not pick up pressing the cancel button
+        ui.exec()  # ok = ui.exec() does not pick up pressing the cancel button
         name = ui.new_name
         value_type = ui.value_type
         if name == "":
