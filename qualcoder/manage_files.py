@@ -988,7 +988,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
-                                                           self.default_import_directory)
+                                                           self.default_import_directory,
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                          )
         imports = response[0]
         if not imports:
             return
