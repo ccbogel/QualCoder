@@ -339,7 +339,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
                                                                self.app.last_export_directory, options)
@@ -987,9 +987,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        imports, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
-                                                             self.default_import_directory)
-        if not ok or imports == []:
+        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
+                                                           self.default_import_directory)
+        imports = response[0]
+        if not imports:
             return
         known_file_type = False
         name_split = imports[0].split("/")
