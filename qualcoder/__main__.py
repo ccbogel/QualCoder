@@ -78,7 +78,6 @@ from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
 qualcoder_version = "QualCoder 3.0"
-print("USING QT6")
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1270,11 +1269,10 @@ class MainWindow(QtWidgets.QMainWindow):
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the QDPX file.")
         Message(self.app, _('REFI-QDA import steps'), msg).exec()
         self.new_project()
-        # check project created successfully
+        # Check project created successfully
         if self.app.project_name == "":
             Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec()
             return
-
         RefiImport(self.app, self.ui.textEdit, "qdpx")
         self.project_summary_report()
 
@@ -1317,7 +1315,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.app.conn.close()
                     except Exception as e_:
                         print("closeEvent", e_)
-                QtWidgets.QApplication.instance().quit
+                QtWidgets.QApplication.instance().quit()
                 #QtWidgets.qApp.quit()
                 return
             if event is False:
@@ -1343,7 +1341,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.settings['directory'] = os.path.expanduser('~')
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'],
-                                                             ".qda")[0]
+                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        project_path = project_path[0]
         if project_path == "":
             Message(self.app, _("Project"), _("No project created."), "critical").exec()
             return
@@ -1351,7 +1350,7 @@ class MainWindow(QtWidgets.QMainWindow):
         counter = 0
         extension = ""
         while os.path.exists(project_path + extension + ".qda"):
-            print("C", counter, project_path + extension + ".qda")
+            #print("C", counter, project_path + extension + ".qda")
             if counter > 0:
                 extension = "_" + str(counter)
             counter += 1
@@ -1728,7 +1727,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def save_backup(self):
         """ Save a date and hours stamped backup.
         Do not backup if the name already exists.
-        A back up can be generated in the subsequent hour."""
+        A backup can be generated in the subsequent hour."""
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%M-%S")
         backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
@@ -1818,10 +1817,8 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.textEdit.append("\n========\n")
-        #tc = self.ui.textEdit.textCursor()
-        #tc.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveAnchor)
-        #self.ui.textEdit.setTextCursor(tc)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def close_project(self):
         """ Close an open project.
@@ -1864,6 +1861,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("QualCoder")
         self.app.write_config_ini(self.app.settings)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
@@ -1967,7 +1965,7 @@ def gui():
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
         # qt translator applies to ui designed GUI widgets only
-        qt_locale_dir = os.path.join(locale_dir, lang)
+        # qt_locale_dir = os.path.join(locale_dir, lang)
         # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
         # print("qt qm translation file: ", qt_locale_file)
         qt_translator = QtCore.QTranslator()

@@ -30,23 +30,19 @@ import csv
 import datetime
 import ebooklib
 from ebooklib import epub
-# noinspection PyUnresolvedReferences
 import logging
-# noinspection PyUnresolvedReferences
 import os
 import PIL
 from PIL import Image
 import platform
-# noinspection PyUnresolvedReferences
 import sys
 from shutil import copyfile, move
 import subprocess
-# noinspection PyUnresolvedReferences
 import traceback
 import webbrowser
 import zipfile
 
-from PyQt6 import QtCore, QtGui
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -64,25 +60,15 @@ from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for 
 from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
 from .report_codes import DialogReportCodes  # for isInstance()
 
-vlc_msg = ""
-try:
-    import qualcoder.vlc as vlc
-except ModuleNotFoundError as e:
-    vlc_msg = str(e)
+import qualcoder.vlc as vlc
 
-pdfminer_installed = True
-try:
-    from pdfminer.pdfpage import PDFPage
-    from pdfminer.pdfparser import PDFParser
-    from pdfminer.pdfdocument import PDFDocument
-    from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-    from pdfminer.converter import PDFPageAggregator
-    from pdfminer.layout import LAParams, LTTextBox, LTTextLine
-except ModuleNotFoundError:
-    pdfminer_installed = False
-    text = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
-    text += "For Windows run the following in the command prompt: pip install pdfminer.six"
-    QtWidgets.QMessageBox.critical(None, _('pdfminer is not installed.'), _(text))
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -105,8 +91,7 @@ def exception_handler(exception_type, value, tb_obj):
 class DialogManageFiles(QtWidgets.QDialog):
     """ View, import, export, rename and delete text files.
     Files are normally imported into the qda project folder.
-    Option to link to external A/V files.
-    Notes regards icons in buttons:
+    Option to link to external files.
     """
 
     source = []
@@ -130,16 +115,17 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.default_import_directory = self.app.settings['directory']
         self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding
         self.tab_reports = tab_reports
-        self.attributes = []
-        self.av_dialog_open = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+
+        self.default_import_directory = self.app.settings['directory']
+        self.attributes = []
+        self.av_dialog_open = None
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -192,13 +178,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.load_file_data()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
 
-    @staticmethod
+    # @staticmethod
     def help():
         """ Open help for transcribe section in browser. """
 
@@ -250,7 +236,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
         else:
             action_import_linked = menu.addAction(_("Import linked file"))
-        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
         if action == action_view:
@@ -881,7 +867,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         try:
             ui = DialogViewAV(self.app, self.source[x])
-            # ui.exec_()  # this dialog does not display well on Windows 10 so trying .show()
+            # ui.exec()  # this dialog does not display well on Windows 10 so trying .show()
             # The vlc window becomes unmovable and not resizable
             self.av_dialog_open = ui
             ui.show()
@@ -1031,11 +1017,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.load_file_text(f, "docs:" + link_path)
                 known_file_type = True
             if f.split('.')[-1].lower() == 'pdf':
-                if pdfminer_installed is False:
+                '''if pdfminer_installed is False:
                     text_ = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
                     text_ += "For Windows run the following in the command prompt: pip install pdfminer.six"
                     Message(self.app, _("pdf miner is not installed"), _(text_), "critical").exec()
-                    return
+                    return'''
                 destination += "/documents/" + filename
                 # Try and remove encryption from pdf if a simple encryption, for Linux
                 if platform.system() == "Linux":
@@ -1054,8 +1040,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
                     pdf_msg = _(
-                        "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf")  # + ":\n" + f
-                    # Message(self.app, _('If import error occurs'), msg, "warning").exec_()
+                        "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf")
+                    # Message(self.app, _('If import error occurs'), msg, "warning").exec()
                     if link_path == "":
                         copyfile(f, destination)
                         self.load_file_text(f)
@@ -1352,7 +1338,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(msg)
         self.source.append(entry)
 
-    @staticmethod
+    # @staticmethod
     def convert_odt_to_text(import_file):
         """ Convert odt to very rough equivalent with headings, list items and tables for
         html display in qTextEdits. """
