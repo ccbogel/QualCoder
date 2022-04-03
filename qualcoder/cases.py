@@ -89,11 +89,11 @@ class DialogCases(QtWidgets.QDialog):
     display_text_links = []  # Clickable links for A/V images as dictionaries of pos0, pos1, file id
     attributes = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_text_edit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
@@ -818,7 +818,8 @@ class DialogCases(QtWidgets.QDialog):
 
         for item in self.display_text_links:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
-                try:
+                #try:
+                if True:
                     ui = None
                     if item['mediapath'][:6] == "video:":
                         abs_path = item['mediapath'].split(':')[1]
@@ -851,10 +852,10 @@ class DialogCases(QtWidgets.QDialog):
                             return
                         ui = DialogViewImage(self.app, item)
                     ui.exec()
-                except Exception as e:
+                '''except Exception as e:
                     logger.debug(str(e))
                     print(e)
-                    Message(self.app, 'view av/images error', str(e), "warning").exec()
+                    Message(self.app, 'view av/images error', str(e), "warning").exec()'''
 
     def textEdit_menu(self, position):
         """ Context menu for textEdit. Select all, Copy. """
@@ -891,7 +892,7 @@ class ToolTipEventFilter(QtCore.QObject):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         # Added check for media_data, it may be None
         if event.type() == QtCore.QEvent.Type.ToolTip and self.media_data:
-            help_event = QHelpEvent(event)
+            help_event = event  #TODO QHelpEvent(event)
             # cursor = QtGui.QTextCursor()
             cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
