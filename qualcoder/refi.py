@@ -155,7 +155,7 @@ class RefiImport:
             if cb.tag in ("{urn:QDA-XML:codebook:1:0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = cb.getchildren()
-                for _ in code_elements:
+                for el_ in code_elements:
                     # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 Message(self.app, _("Codebook imported"),

@@ -178,7 +178,7 @@ class DialogJournals(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, OWNER_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(str(details['jid']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag,ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, JID_COLUMN, item)
 
         self.ui.tableWidget.verticalHeader().setVisible(False)
