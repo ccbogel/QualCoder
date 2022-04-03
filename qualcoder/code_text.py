@@ -648,7 +648,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QColor(c['color']), Qt.PenStyle.SolidPattern))
+                top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QColor(color)))
                 top_item.setFlags(
@@ -669,7 +669,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QColor(c['color']), Qt.PenStyle.SolidPattern))
+                    child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
                     child.setToolTip(2, c['memo'])

@@ -74,7 +74,7 @@ class DialogAddItemName(QtWidgets.QDialog):
         self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
         self.setWindowTitle(title)
         self.ui.label.setText(text)
-        self.ui.lineEdit.setFocus(True)
+        self.ui.lineEdit.setFocus()
 
     def accept(self):
         """ On pressing accept button, check there is no duplicate.
