@@ -300,9 +300,12 @@ class DialogCases(QtWidgets.QDialog):
 
         if self.cases:
             logger.warning(_("Cases have already been created."))
-        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select cases file'),
-                                                         self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[
-            0]
+        filename, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                                                         _('Select cases file'),
+                                                         self.app.settings['directory'],
+                                                         "(*.csv *.CSV *.xlsx *.XLSX)",
+                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                         )
         if filename == "":
             return
         if filename[-4:].lower() == ".csv":
