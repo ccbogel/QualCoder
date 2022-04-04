@@ -2272,10 +2272,8 @@ class ToolTipEventFilter(QtCore.QObject):
         self.media_data = media_data
 
     def eventFilter(self, receiver, event):
-        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         if event.type() == QtCore.QEvent.Type.ToolTip:
-            help_event = QHelpEvent(event)
-            cursor = receiver.cursorForPosition(help_event.pos())
+            cursor = receiver.cursorForPosition(event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             if self.media_data is None:
