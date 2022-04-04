@@ -1740,7 +1740,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if object_ is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
-                parent = self.ui.treeWidget.itemAt(event.pos())
+                # event position is QPointF, itemAt requires toPoint
+                parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
                 return True
         # Change start and end code positions using alt arrow left and alt arrow right
@@ -2138,8 +2139,7 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
-        # Update filter for tooltip
-        self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations, self.file_['start'])
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def add_code(self, catid=None):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for

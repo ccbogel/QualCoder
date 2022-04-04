@@ -898,9 +898,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if object_ is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
-                #TODO AttributeError: 'QDropEvent' object has no attribute 'pos'
-                print("TO FIX ")
-                parent = self.ui.treeWidget.itemAt(event.pos())
+                # event position is QPointF, itemAt requires toPoint
+                parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
                 self.update_dialog_codes_and_categories()
                 return True

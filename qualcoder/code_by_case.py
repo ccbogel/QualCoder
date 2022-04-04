@@ -1599,7 +1599,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if object is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
-                parent = self.ui.treeWidget.itemAt(event.pos())
+                # event position is QPointF, itemAt requires toPoint
+                parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
                 return True
         # Change start and end code positions using alt arrow left and alt arrow right

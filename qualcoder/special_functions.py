@@ -89,7 +89,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_select_text_file.setFocus(True)
+        self.ui.pushButton_select_text_file.setFocus()
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()

@@ -1605,9 +1605,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if object is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
-                parent = self.ui.treeWidget.itemAt(event.pos())
+                # event position is QPointF, itemAt requires toPoint
+                parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
-
         if event.type() != 7 or self.media is None:
             return False
         key = event.key()
