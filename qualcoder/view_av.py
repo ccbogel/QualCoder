@@ -921,7 +921,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # vlc. Different platforms have different functions for this
         if platform.system() == "Linux":  # for Linux using the X Server
             # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
-            self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
+            self.mediaplayer.set_xwindow(int(self.ddialog.winId()))
         elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
         elif platform.system() == "Darwin":  # for MacOS
@@ -1614,7 +1614,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         mods = event.modifiers()
 
         # Restore unmarked code(s) if undo code is present
-        if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             if not self.undo_deleted_codes:
                 return True
             try:
@@ -1640,16 +1640,16 @@ class DialogCodeAV(QtWidgets.QDialog):
                 now = datetime.datetime.now()
                 diff = now - self.code_resize_timer
                 self.code_resize_timer = datetime.datetime.now()
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.Modifier.ALT and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier and diff.microseconds > msec_gap:
                     self.shrink_to_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.Modifier.ALT and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier and diff.microseconds > msec_gap:
                     self.shrink_to_right(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.Modifier.SHIFT and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier and diff.microseconds > msec_gap:
                     self.extend_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.Modifier.SHIFT and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier and diff.microseconds > msec_gap:
                     self.extend_right(codes_here[0])
                     return True
             selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -1681,22 +1681,22 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return True'''
 
         #  Ctrl S or Ctrl + P pause/play toggle
-        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and mods == QtCore.Qt.Modifier.CTRL:
+        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.play_pause()
         # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.Modifier.ALT:
+        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.forward_30_seconds()
         # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.Modifier.ALT:
+        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
         # Rewind 5 seconds Ctrl R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.rewind_5_seconds()
         # Increase play rate  Ctrl + Shift + >
-        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.Modifier.SHIFT) and (mods and QtCore.Qt.Modifier.CTRL):
+        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.increase_play_rate()
         # Decrease play rate  Ctrl + Shift + <
-        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.Modifier.SHIFT) and (mods and QtCore.Qt.Modifier.CTRL):
+        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.decrease_play_rate()
         return False
 
@@ -3774,36 +3774,36 @@ class DialogViewAV(QtWidgets.QDialog):
         mods = event.modifiers()
         # print("KEY ", key, "MODS ", mods)
         #  ctrl S or ctrl P pause/play toggle
-        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and mods == QtCore.Qt.Modifier.CTRL:
+        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.play_pause()
         # Rewind 5 seconds   Ctrl + R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.rewind_5_seconds()
         # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.Modifier.ALT:
+        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
         # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.Modifier.ALT:
+        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
-        if key == QtCore.Qt.Key.Key_T and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_T and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.insert_timestamp()
         # Insert speaker  Ctrl 1 .. 8
-        if key in range(49, 57) and mods == QtCore.Qt.Modifier.CTRL:
+        if key in range(49, 57) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.insert_speakername(key)
         # Add new speaker to list  Ctrl n
-        if key == QtCore.Qt.Key.Key_N and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_N and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.pause()
             self.add_speakername()
         # Delete speaker name(s) from list
-        if key == QtCore.Qt.Key.Key_D and mods == QtCore.Qt.Modifier.CTRL:
+        if key == QtCore.Qt.Key.Key_D and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.pause()
             self.delete_speakernames()
         # Increase play rate  Ctrl + Shift + >
-        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.Modifier.SHIFT) and (mods and QtCore.Qt.Modifier.CTRL):
+        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.increase_play_rate()
         # Decrease play rate  Ctrl + Shift + <
-        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.Modifier.SHIFT) and (mods and QtCore.Qt.Modifier.CTRL):
+        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.decrease_play_rate()
         return True
 

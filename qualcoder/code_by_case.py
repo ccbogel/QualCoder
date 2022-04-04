@@ -1497,7 +1497,6 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     cursor_pos + text_pos0 <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 codes_here.append(item)
-
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate()

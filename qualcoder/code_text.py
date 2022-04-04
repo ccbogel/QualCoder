@@ -354,7 +354,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
-        #self.setAttribute(Qt.WA_QuitOnClose, False)
 
     @staticmethod
     def help():
@@ -1717,7 +1716,6 @@ class DialogCodeText(QtWidgets.QWidget):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
-        print("Trying without QTextCodec")
         #tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
         msg = _("Coded text file exported to: ") + filepath
@@ -1751,7 +1749,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.Modifier.CTRL:
+            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.undo_last_unmarked_code()
                 return True
         if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
@@ -1763,7 +1761,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if diff.microseconds < 100000:
                 return False
             # Ctrl + E Edit mode
-            if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.Modifier.CTRL:
+            if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.edit_mode_toggle()
                 return True
             # Ignore all other key events if edit mode is active
@@ -1779,16 +1777,16 @@ class DialogCodeText(QtWidgets.QWidget):
             if len(codes_here) == 1:
                 # Key event can be too sensitive, adjusted  for 150 millisecond gap
                 self.code_resize_timer = datetime.datetime.now()
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.Modifier.ALT:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
                     self.shrink_to_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.Modifier.ALT:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier:
                     self.shrink_to_right(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.Modifier.SHIFT:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
                     self.extend_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.Modifier.SHIFT:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
                     self.extend_right(codes_here[0])
                     return True
         return False
