@@ -89,7 +89,7 @@ class Highlighter(QSyntaxHighlighter):
             brush = QBrush(QColor("#FFAF0A"), Qt.BrushStyle.SolidPattern)
         keyword_format.setForeground(brush)
         keyword_format.setFontWeight(QFont.Weight.Bold)
-        self.highlighting_rules = [(QRegExp(word), keyword_format)
+        self.highlighting_rules = [(QRegularExpression(word), keyword_format)
                                    for word in keywords]
 
         # Data types
@@ -105,7 +105,7 @@ class Highlighter(QSyntaxHighlighter):
         brush = QBrush(Qt.GlobalColor.darkGreen, Qt.BrushStyle.SolidPattern)
         data_types_format.setForeground(brush)
         data_types_format.setFontWeight(QFont.Weight.Bold)
-        self.highlighting_rules += [(QRegExp(word), data_types_format)
+        self.highlighting_rules += [(QRegularExpression(word), data_types_format)
                                     for word in data_types]
 
         # Functions
@@ -154,11 +154,12 @@ class Highlighter(QSyntaxHighlighter):
         self.highlighting_rules += [(QRegularExpression("\'.*\'"), string2_format)]
 
     def highlightBlock(self, text):
+        """ from https://doc.qt.io/qtforpython/PySide6/QtCore/QRegularExpressionMatchIterator.html """
+        
         for pattern, format_ in self.highlighting_rules:
-            expression = QRegularExpression(pattern)
-            index = expression.indexIn(text)
-            while index >= 0:
-                length = expression.matchedLength()
-                self.setFormat(index, length, format_)
-                index = expression.indexIn(text, index + length)
-        self.setCurrentBlockState(0)
+            reg_exp = QRegularExpression(pattern)
+            i = reg_exp.globalMatch(text)
+            while i.hasNext():
+                match = i.next()
+                self.setFormat(match.capturedStart(), match.capturedLength(), format_)
+
