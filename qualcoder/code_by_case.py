@@ -405,7 +405,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         webbrowser.open(self.help_url)
 
-    def get_cases(self, ids=[]):
+    def get_cases(self, ids=None):
         """ Get cases with additional details (file texts and case attributes) and fill list widget.
          Called by: init, get_cases_from_attributes
          param:
@@ -420,6 +420,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
          'vars': [{'varname': 'Age', 'value': '45', 'valuetype': 'numeric'}], 'file_index': 0}
          """
 
+        if ids is None:
+            ids = []
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
         cur.execute("select caseid, name, memo from cases order by lower(name)")
@@ -2872,7 +2874,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if self.pixmap is None:
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
-        height = self.scale * self.pixmap.height()
+        height = int(self.scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
@@ -3133,7 +3135,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         # vlc. Different platforms have different functions for this
         if platform.system() == "Linux":  # for Linux using the X Server
             # self.mediaplayer.set_xwindow(int(self.ui.frame.winId()))
-            self.mediaplayer.set_xwindow(int(self.ddialog.dframe.winId()))
+            self.mediaplayer.set_xwindow(int(self.ddialog.winId()))
         elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.ddialog.winId()))
         elif platform.system() == "Darwin":  # for MacOS
@@ -3363,9 +3365,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
 
         text_ = self.ui.comboBox_tracks.currentText()
         if text_ == "":
-            text_ = 1
-        success = self.mediaplayer.audio_set_track(int(text))
-        # print("changed audio ", success)
+            text_ = "1"
+        success = self.mediaplayer.audio_set_track(int(text_))
 
     def play_pause(self):
         """ Toggle play or pause status. """
