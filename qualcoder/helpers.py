@@ -583,7 +583,10 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
-        msg += "\n" + _("Memo: ") + self.data['memo']
+        try:
+            msg += "\n" + _("Memo: ") + self.data['memo']
+        except KeyError:
+            pass
         self.setToolTip(msg)
         if self.data['pos1'] < msecs:
             self.mediaplayer.stop()
