@@ -1638,11 +1638,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     self.extend_right(codes_here[0])
                     return True
         if object is self.scene:
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
-                # pos = event.buttonDownScenePos(1)
-                # logger.debug(event.type(), type(event))
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.LeftButton:
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
-                    p0 = event.buttonDownScenePos(1)  # left mouse button, point
+                    p0 = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                     # logger.debug("rectangle press:" + str(p0.x()) + ", " + str(p0.y()))
                     self.selection = p0
                     return True
@@ -1651,9 +1649,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     # logger.debug("rectangle release: " + str(p1.x()) +", " + str(p1.y()))
                     self.img_create_coded_area(p1)
                     return True
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 2:  # right mouse
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.RightButton:
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
-                    p = event.buttonDownScenePos(2)
+                    p = event.buttonDownScenePos(Qt.MouseButton.RightButton)
                     self.scene_context_menu(p)
                     return True
         return False

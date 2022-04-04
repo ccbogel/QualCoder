@@ -178,7 +178,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -876,7 +875,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.Modifier.CTRL:
+            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.undo_last_unmarked_code()
                 return True
             if key == QtCore.Qt.Key.Key_H:
@@ -896,30 +895,30 @@ class DialogCodeImage(QtWidgets.QDialog):
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-
         if object_ is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
+                #TODO AttributeError: 'QDropEvent' object has no attribute 'pos'
+                print("TO FIX ")
                 parent = self.ui.treeWidget.itemAt(event.pos())
                 self.item_moved_update_data(item, parent)
                 self.update_dialog_codes_and_categories()
-
+                return True
         if object_ is self.scene:
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
-                #
-                pos = event.buttonDownScenePos(1)
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.LeftButton:
+                pos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                 self.fill_coded_area_label(self.find_coded_areas_for_pos(pos))
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
-                    p0 = event.buttonDownScenePos(1)  # left mouse button
+                    p0 = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                     self.selection = p0
                     return True
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMouseRelease:
                     p1 = event.lastScenePos()
                     self.create_code_area(p1)
                     return True
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 2:  # right mouse
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.RightButton:
                 if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
-                    p = event.buttonDownScenePos(2)
+                    p = event.buttonDownScenePos(Qt.MouseButton.RightButton)
                     self.scene_context_menu(p)
                     return True
         return False
