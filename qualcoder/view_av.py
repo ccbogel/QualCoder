@@ -2995,8 +2995,7 @@ class ToolTipEventFilter(QtCore.QObject):
         """ Tool tip event filter for ?textEdit """
 
         if event.type() == QtCore.QEvent.Type.ToolTip:
-            help_event = QHelpEvent(event)
-            cursor = receiver.cursorForPosition(help_event.pos())
+            cursor = receiver.cursorForPosition(event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             txt = ""
