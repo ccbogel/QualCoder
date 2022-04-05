@@ -2421,7 +2421,7 @@ class DialogCodeText(QtWidgets.QWidget):
         new_color = ui.get_color()
         if new_color is None:
             return
-        selected.setBackground(0, QBrush(QColor(new_color), Qt.PenStyle.SolidPattern))
+        selected.setBackground(0, QBrush(QColor(new_color), Qt.BrushStyle.SolidPattern))
         # Update codes list, database and color markings
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()

@@ -145,7 +145,7 @@ class DialogColorSelect(QtWidgets.QDialog):
     def setup_ui(self):
         """ Eight rows of ten columns of colours. """
 
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionBehavior.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.tableWidget.setColumnCount(COLS)
         self.ui.tableWidget.setRowCount(ROWS)
         self.ui.tableWidget.verticalHeader().setVisible(False)
