@@ -1637,7 +1637,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             path_ = img['mediapath'][7:]
         document = text_edit.document()
         image = QtGui.QImageReader(path_).read()
-        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # Scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
@@ -1658,7 +1658,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # imagename is now: 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
 
         url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource, url, QtCore.QVariant(image))
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
         image_format.setWidth(image.width() * scaler)

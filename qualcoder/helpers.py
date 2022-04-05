@@ -448,7 +448,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             path_ = img['mediapath'][7:]
         document = text_edit.document()
         image = QtGui.QImageReader(path_).read()
-        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
@@ -463,7 +463,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Need unique image names or the same image from the same path is reproduced
         imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource, url, QtCore.QVariant(image))
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
+        # https://doc.qt.io/qt-6/qtextdocument.html#addResource
+        # The image can be inserted into the document using the QTextCursor API:
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
         image_format.setWidth(image.width() * scaler)
