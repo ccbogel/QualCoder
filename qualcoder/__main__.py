@@ -1088,6 +1088,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_layout_helper(self.ui.tab_manage, None)
             self.tab_layout_helper(self.ui.tab_coding, None)
             self.tab_layout_helper(self.ui.tab_reports, None)
+            self.project_summary_report()
 
     def manage_attributes(self):
         """ Create, edit, delete, rename attributes. """

@@ -132,7 +132,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         msg += _("Press Run Button to merge projects")
         Message(self.app, _("Merge projects"), msg).exec()
         self.ui.pushButton_merge.setEnabled(True)
-        self.ui.pushButton_merge.setFocus(True)
+        self.ui.pushButton_merge.setFocus()
 
     def merge_projects(self):
         """ Merge selected project into this project. """
