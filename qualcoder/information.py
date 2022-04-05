@@ -96,9 +96,9 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python at least 3.6, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
+<p>Depends on python at least 3.6, pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
 <p>A recent version of VLC (64 bit) needs to be installed.</p>\
-<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS. Used on other Linux distros.</p>\
+<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
