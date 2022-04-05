@@ -102,6 +102,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.groupBox_text_positions.hide()
         self.ui.pushButton_select_text_file.pressed.connect(self.select_original_text_file)
         self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
+        self.ui.pushButton_text_update.setEnabled(False)
         self.ui.pushButton_text_update.pressed.connect(self.replace_file_update_codings)
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
@@ -156,21 +157,29 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             self.ui.pushButton_select_text_file.setToolTip(_("Select text file to replace"))
             return
         self.ui.pushButton_select_text_file.setToolTip(_("Replacing: ") + self.file_to_replace['name'])
+        if self.file_to_replace and self.file_replacement:
+            self.ui.pushButton_text_update.setEnabled(True)
 
     def select_replacement_text_file(self):
         """ Select replacement updated text file. """
 
         file_types = "Text Files (*.docx *.epub *.html *.htm *.md *.odt *.pdf *.txt)"
         filepath, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Replacement file'),
-                                                              self.app.settings['directory'], file_types)
+                                                              self.app.settings['directory'], file_types,
+                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if not ok or filepath == []:
             self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
             return
         self.file_replacement = filepath[0]
-        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Replacment: ") + self.file_replacement)
+        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Replacement file: ") + self.file_replacement)
+        if self.file_to_replace and self.file_replacement:
+            self.ui.pushButton_text_update.setEnabled(True)
+            self.ui.pushButton_text_update.setToolTip(_("Press to replace the text file"))
 
     def replace_file_update_codings(self):
-        """  """
+        """ Requires two files - original and replacement to be selected before button is enabled.
+        Called by:
+         pushButton_text_update """
 
         if self.file_to_replace is None or self.file_replacement is None:
             Message(self.app, _("No files selected"), _("No existing or replacement file selected")).exec()
