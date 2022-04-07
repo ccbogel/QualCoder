@@ -1,7 +1,7 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt6.
+QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and Qt6..
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
@@ -9,6 +9,8 @@ This project has been tested under Ubuntu 20.04 and Windows 10. It has been used
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
 _NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions. You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
+
+**LATEST (APRIL 2022) MAJOR CHANGE QUALCODER NOW USES Qt6 GRAPHICAL FRAMEWORK. I HAVE DONE A LOT OF TESTING AND BUG HUNTING TO TRACK DOWN ANY ISSUES IN THIS UPDATE. I MIGHT HAVE MISSED SOME, SO PELASE POST ANY ERROR ISSUES. I MIGHT THEN WAIT A MONTH AND THEN PUT THIS OUT AS A 3.0 RELEASE.**
 
 ## INSTALLATION 
 
