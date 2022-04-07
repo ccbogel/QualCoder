@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,9 @@ import sys
 import traceback
 import webbrowser
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.Qt import QHelpEvent
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QHelpEvent
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -58,14 +58,14 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
-    mb.exec_()
+    mb.setText(text_)
+    mb.exec()
 
 
 class DialogCases(QtWidgets.QDialog):
@@ -79,7 +79,7 @@ class DialogCases(QtWidgets.QDialog):
     FILES_COLUMN = 3
     header_labels = []
     app = None
-    parent_textEdit = None
+    parent_text_edit = None
     source = []
     sourceText = ""
     cases = []
@@ -89,15 +89,15 @@ class DialogCases(QtWidgets.QDialog):
     display_text_links = []  # Clickable links for A/V images as dictionaries of pos0, pos1, file id
     attributes = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_text_edit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_text_edit = parent_text_edit
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -137,12 +137,12 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
-        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
-        self.ui.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui.textBrowser.customContextMenuRequested.connect(self.textEdit_menu)
+        self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.textBrowser.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
-        self.fill_tableWidget()
+        self.fill_table_widget()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 1])
@@ -172,7 +172,7 @@ class DialogCases(QtWidgets.QDialog):
 
     def count_selected_items(self):
         """ Update label with the count of selected rows.
-         Also clear the textedit if multiple rows are selected.
+         Also clear the text edit if multiple rows are selected.
          :return
             item_count """
 
@@ -219,8 +219,8 @@ class DialogCases(QtWidgets.QDialog):
                     data.append(cell)
                 writer.writerow(data)
         msg = _("Case attributes csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec_()
-        self.parent_textEdit.append(msg)
+        Message(self.app, _('Csv file Export'), msg).exec()
+        self.parent_text_edit.append(msg)
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
@@ -231,11 +231,12 @@ class DialogCases(QtWidgets.QDialog):
         self.case_text = []
 
         cur = self.app.conn.cursor()
-        cur.execute("select name, id, fulltext, mediapath, memo, owner, date from source")
+        cur.execute("select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source")
         result = cur.fetchall()
         for row in result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
-                                'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6]})
+                                'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
+                                'av_text_id': row[7]})
         cur.execute("select name, memo, owner, date, caseid from cases")
         result = cur.fetchall()
         for row in result:
@@ -271,7 +272,7 @@ class DialogCases(QtWidgets.QDialog):
             attribute_names.append({'name': a[0]})
         check_names = attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'caseid'}, {'name': 'date'}]
         add_ui = DialogAddAttribute(self.app, check_names)
-        ok = add_ui.exec_()
+        ok = add_ui.exec()
         if not ok or add_ui.new_name == "":
             return
         name = add_ui.new_name
@@ -290,8 +291,8 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute(sql, (name, "", id_[0], 'case', now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_tableWidget()
-        self.parent_textEdit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
+        self.fill_table_widget()
+        self.parent_text_edit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
@@ -299,9 +300,12 @@ class DialogCases(QtWidgets.QDialog):
 
         if self.cases:
             logger.warning(_("Cases have already been created."))
-        filename = QtWidgets.QFileDialog.getOpenFileName(None, _('Select cases file'),
-                                                         self.app.settings['directory'], "(*.csv *.CSV *.xlsx *.XLSX)")[
-            0]
+        filename, ok = QtWidgets.QFileDialog.getOpenFileName(None,
+                                                         _('Select cases file'),
+                                                         self.app.settings['directory'],
+                                                         "(*.csv *.CSV *.xlsx *.XLSX)",
+                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                         )
         if filename == "":
             return
         if filename[-4:].lower() == ".csv":
@@ -388,10 +392,10 @@ class DialogCases(QtWidgets.QDialog):
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_tableWidget()
+        self.fill_table_widget()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
-        self.parent_textEdit.append(msg)
+        self.parent_text_edit.append(msg)
         logger.info(msg)
 
     def import_csv(self, filepath):
@@ -464,10 +468,10 @@ class DialogCases(QtWidgets.QDialog):
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_tableWidget()
+        self.fill_table_widget()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
-        self.parent_textEdit.append(msg)
+        self.parent_text_edit.append(msg)
         logger.info(msg)
 
     def add_case(self):
@@ -477,7 +481,7 @@ class DialogCases(QtWidgets.QDialog):
         Attribute placeholders are assigned to the database for this new case. """
 
         ui = DialogAddItemName(self.app, self.cases, _("Case"), _("Enter case name"))
-        ui.exec_()
+        ui.exec()
         case_name = ui.get_new_name()
         if case_name is None:
             return
@@ -499,8 +503,8 @@ class DialogCases(QtWidgets.QDialog):
                         (att[0], "case", "", item['caseid'], item['date'], item['owner']))
         self.app.conn.commit()
         self.cases.append(item)
-        self.fill_tableWidget()
-        self.parent_textEdit.append(_("Case added: ") + item['name'])
+        self.fill_table_widget()
+        self.parent_text_edit.append(_("Case added: ") + item['name'])
         self.app.delete_backup = False
 
     def delete_case(self):
@@ -520,7 +524,7 @@ class DialogCases(QtWidgets.QDialog):
         if len(case_names_to_delete) == 0:
             return
         ui = DialogConfirmDelete(self.app, case_names_to_delete)
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         for id_ in ids_to_delete:
@@ -531,10 +535,10 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("delete from case_text where caseid=?", [id_])
                     cur.execute("delete from attribute where id=? and attr_type='case'", [id_])
                     self.app.conn.commit()
-                    self.parent_textEdit.append("Case deleted: " + c['name'])
+                    self.parent_text_edit.append("Case deleted: " + c['name'])
         self.load_cases_and_attributes()
         self.app.delete_backup = False
-        self.fill_tableWidget()
+        self.fill_table_widget()
 
     def cell_modified(self):
         """ If the case name has been changed in the table widget update the database.
@@ -574,7 +578,7 @@ class DialogCases(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, y).setText("")
                     value = ""
                     msg = _("This attribute is numeric")
-                    Message(self.app, _("Warning"), msg, "warning").exec_()
+                    Message(self.app, _("Warning"), msg, "warning").exec()
             # Check attribute row is present before updating
             cur.execute("select value from attribute where id=? and name=? and attr_type='case'",
                         [self.cases[x]['caseid'], attribute_name])
@@ -630,7 +634,7 @@ class DialogCases(QtWidgets.QDialog):
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
                             self.cases[x]['memo'])
-            ui.exec_()
+            ui.exec()
             self.cases[x]['memo'] = ui.memo
             cur = self.app.conn.cursor()
             cur.execute('update cases set memo=? where caseid=?', (self.cases[x]['memo'], self.cases[x]['caseid']))
@@ -650,8 +654,8 @@ class DialogCases(QtWidgets.QDialog):
         x = self.ui.tableWidget.currentRow()
         if x == -1:
             return
-        ui = DialogCaseFileManager(self.app, self.parent_textEdit, self.cases[x])
-        ui.exec_()
+        ui = DialogCaseFileManager(self.app, self.parent_text_edit, self.cases[x])
+        ui.exec()
         # reload files count
         cur = self.app.conn.cursor()
         sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where "
@@ -659,9 +663,9 @@ class DialogCases(QtWidgets.QDialog):
         cur.execute(sql, [self.cases[x]['caseid'], ])
         files = cur.fetchall()
         self.cases[x]['files'] = files
-        self.fill_tableWidget()
+        self.fill_table_widget()
 
-    def fill_tableWidget(self):
+    def fill_table_widget(self):
         """ Fill the table widget with case details. """
 
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
@@ -685,11 +689,11 @@ class DialogCases(QtWidgets.QDialog):
             if cid is None:
                 cid = ""
             item = QtWidgets.QTableWidgetItem(str(cid))
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, item)
             # Number of files assigned to case
             item = QtWidgets.QTableWidgetItem(str(len(c['files'])))
-            item.setFlags(QtCore.Qt.ItemIsEnabled)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
             # 0Add attribute values to their columns
@@ -727,6 +731,7 @@ class DialogCases(QtWidgets.QDialog):
             case_text = ""
             filename = ""
             mediapath = ""
+            av_text_id = None
             for src in self.source:
                 if src['id'] == row[1] and src['fulltext'] is not None:
                     case_text = src['fulltext'][int(row[2]):int(row[3])]
@@ -734,25 +739,27 @@ class DialogCases(QtWidgets.QDialog):
                 if src['id'] == row[1] and src['fulltext'] is None:
                     filename = src['name']
                     mediapath = src['mediapath']
+                    av_text_id = src['av_text_id']
             display_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
                                  'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6],
-                                 'text': case_text, 'name': filename, 'mediapath': mediapath})
+                                 'text': case_text, 'name': filename, 'mediapath': mediapath,
+                                 'av_text_id': av_text_id})
 
         format_reg = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
+        brush = QtGui.QBrush(QtGui.QColor(QtCore.Qt.GlobalColor.black))
         if self.app.settings['stylesheet'] == 'dark':
             brush = QtGui.QBrush(QtGui.QColor("#eeeeee"))
         format_reg.setForeground(brush)
 
         format_bold = QtGui.QTextCharFormat()
-        format_bold.setFontWeight(QtGui.QFont.Bold)
-        brush_bold = QtGui.QBrush(QtGui.QColor(QtCore.Qt.black))
+        format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+        brush_bold = QtGui.QBrush(QtGui.QColor(QtCore.Qt.GlobalColor.black))
         if self.app.settings['stylesheet'] == 'dark':
             brush_bold = QtGui.QBrush(QtGui.QColor("#eeeeee"))
         format_bold.setForeground(brush_bold)
 
         format_blue = QtGui.QTextCharFormat()
-        format_blue.setFontWeight(QtGui.QFont.Bold)
+        format_blue.setFontWeight(QtGui.QFont.Weight.Bold)
         # This blue colour good on dark and light background
         format_blue.setForeground(QtGui.QBrush(QtGui.QColor("#9090e3")))
 
@@ -764,24 +771,24 @@ class DialogCases(QtWidgets.QDialog):
                 header += ", " + _("Characters: ") + str(c['pos1'] - c['pos0'])
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_bold)
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(c['text'])
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_reg)
 
             if c['mediapath'][:7] in ("/images", "images:"):
                 header = "\n" + _('Image: ') + c['name']
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
                         'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
@@ -791,12 +798,13 @@ class DialogCases(QtWidgets.QDialog):
                 header = "\n" + _('AV media: ') + c['name']
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
-                cursor.setPosition(pos0, QtGui.QTextCursor.MoveAnchor)
+                cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 pos1 = len(self.ui.textBrowser.toPlainText())
-                cursor.setPosition(pos1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 cursor.setCharFormat(format_blue)
                 data = {'pos0': pos0, 'pos1': pos1, 'id': c['fid'], 'mediapath': c['mediapath'],
-                        'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name']}
+                        'owner': c['owner'], 'date': c['date'], 'memo': c['memo'], 'name': c['name'],
+                        'av_text_id': c['av_text_id']}
                 self.display_text_links.append(data)
         self.eventFilterTT.set_positions(self.display_text_links)  # uses pos0, pos1
 
@@ -812,64 +820,58 @@ class DialogCases(QtWidgets.QDialog):
         for item in self.display_text_links:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_link = menu.addAction(_("Open"))
-        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
+        action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
         if action is None:
             return
 
         for item in self.display_text_links:
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
-                try:
-                    ui = None
-                    if item['mediapath'][:6] == "video:":
-                        abs_path = item['mediapath'].split(':')[1]
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][:6] == "/video":
-                        abs_path = self.app.project_path + item['mediapath']
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][:6] == "audio:":
-                        abs_path = item['mediapath'].split(':')[1]
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][0:6] == "/audio":
-                        abs_path = self.app.project_path + item['mediapath']
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewAV(self.app, item)
-                    if item['mediapath'][0:7] == "images:":
-                        abs_path = item['mediapath'].split(':')[1]
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewImage(self.app, item)
-                    if item['mediapath'][0:7] == "/images":
-                        abs_path = self.app.project_path + item['mediapath']
-                        if not os.path.exists(abs_path):
-                            return
-                        ui = DialogViewImage(self.app, item)
-                    ui.exec_()
-                except Exception as e:
-                    logger.debug(str(e))
-                    print(e)
-                    Message(self.app, 'view av/images error', str(e), "warning").exec_()
+                ui = None
+                if item['mediapath'][:6] == "video:":
+                    abs_path = item['mediapath'].split(':')[1]
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewAV(self.app, item)
+                if item['mediapath'][:6] == "/video":
+                    abs_path = self.app.project_path + item['mediapath']
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewAV(self.app, item)
+                if item['mediapath'][:6] == "audio:":
+                    abs_path = item['mediapath'].split(':')[1]
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewAV(self.app, item)
+                if item['mediapath'][0:6] == "/audio":
+                    abs_path = self.app.project_path + item['mediapath']
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewAV(self.app, item)
+                if item['mediapath'][0:7] == "images:":
+                    abs_path = item['mediapath'].split(':')[1]
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewImage(self.app, item)
+                if item['mediapath'][0:7] == "/images":
+                    abs_path = self.app.project_path + item['mediapath']
+                    if not os.path.exists(abs_path):
+                        return
+                    ui = DialogViewImage(self.app, item)
+                ui.exec()
 
-    def textEdit_menu(self, position):
-        """ Context menu for textEdit. Select all, Copy. """
+    def text_edit_menu(self, position):
+        """ Context menu for text Edit. Select all, Copy. """
 
         menu = QtWidgets.QMenu()
         action_select_all = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
-        action = menu.exec_(self.ui.textBrowser.mapToGlobal(position))
+        action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
         if action == action_select_all:
             self.ui.textBrowser.selectAll()
         if action == action_copy:
             selected_text = self.ui.textBrowser.textCursor().selectedText()
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
-            cb.setText(selected_text, mode=cb.Clipboard)
+            cb.setText(selected_text)
 
 
 class ToolTipEventFilter(QtCore.QObject):
@@ -891,8 +893,8 @@ class ToolTipEventFilter(QtCore.QObject):
     def eventFilter(self, receiver, event):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         # Added check for media_data, it may be None
-        if event.type() == QtCore.QEvent.ToolTip and self.media_data:
-            help_event = QHelpEvent(event)
+        if event.type() == QtCore.QEvent.Type.ToolTip and self.media_data:
+            help_event = event  #TODO QHelpEvent(event)
             # cursor = QtGui.QTextCursor()
             cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()

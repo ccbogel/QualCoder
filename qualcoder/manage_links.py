@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .code_text import DialogCodeText  # for isinstance()
 from .GUI.ui_dialog_manage_links import Ui_Dialog_manage_links
@@ -55,7 +55,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
-    mb.exec_()
+    mb.exec()
 
 
 class DialogManageLinks(QtWidgets.QDialog):
@@ -82,14 +82,14 @@ class DialogManageLinks(QtWidgets.QDialog):
                 self.resize(w, h)
         except KeyError:
             pass
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.links = self.app.check_bad_file_links()
         home = os.path.expanduser('~')
         for link in self.links:
@@ -119,11 +119,11 @@ class DialogManageLinks(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         action_open_file_dialog = menu.addAction(_("Select file"))
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action = menu.exec_(self.ui.tableWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
         if action == action_open_file_dialog:
-            self.file_selection(row)
+            self.file_dialog_selection_selection(row)
 
     def file_dialog_selection(self, row):
         """ Select a file using  a file dialog to replace the bad link.
@@ -141,7 +141,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         new_file_name = file_path.split('/')[-1]
         if self.links[row]['name'] != new_file_name:
             msg = _("Filename does not match.") + "\n" + self.links[row]['name'] + "\n" + new_file_name
-            Message(self.app, _('Wrong file'), msg, "warning").exec_()
+            Message(self.app, _('Wrong file'), msg, "warning").exec()
             return
         self.update_database(file_path, row)
 
@@ -203,23 +203,23 @@ class DialogManageLinks(QtWidgets.QDialog):
             self.ui.tableWidget.insertRow(row)
             type_and_path = item['mediapath'].split(':')
             type_item = QtWidgets.QTableWidgetItem(type_and_path[0])
-            type_item.setFlags(type_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            type_item.setFlags(type_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, 0, type_item)
             name_item = QtWidgets.QTableWidgetItem(item['name'])
-            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            name_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, 1, name_item)
             path_item = QtWidgets.QTableWidgetItem(type_and_path[1])
-            path_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+            path_item.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             if not os.path.exists(type_and_path[1]):
                 path_item.setForeground(QtGui.QBrush(QtGui.QColor("Red")))
             self.ui.tableWidget.setItem(row, 2, path_item)
             if len(item['filepaths']) > 0:
                 suggestion1 = QtWidgets.QTableWidgetItem(item['filepaths'][0])
-                suggestion1.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+                suggestion1.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, 3, suggestion1)
             if len(item['filepaths']) > 1:
                 suggestion2 = QtWidgets.QTableWidgetItem(item['filepaths'][1])
-                suggestion2.setFlags(name_item.flags() ^ QtCore.Qt.ItemIsEditable)
+                suggestion2.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, 4, suggestion2)
         self.ui.tableWidget.hideColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()

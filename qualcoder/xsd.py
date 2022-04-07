@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2020 Colin Curtain
+"""
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ This file contains hardcoded versions of the REFI-QDA XSD files for:
 
 
 Hard-coding reduces potential problems when pyinstaller tries to import data files.
-'''
+"""
 
 
 codebook = '<?xml version="1.0" encoding="UTF-8"?>\

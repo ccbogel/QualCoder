@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import platform
 import sys
 import traceback
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 import qualcoder.vlc as vlc
 from .color_selector import TextColor
@@ -119,11 +119,11 @@ class Message(QtWidgets.QMessageBox):
         self.setWindowTitle(title)
         self.setText(text)
         if icon == "warning":
-            self.setIcon(QtWidgets.QMessageBox.Warning)
+            self.setIcon(QtWidgets.QMessageBox.Icon.Warning)
         if icon == "Information":
-            self.setIcon(QtWidgets.QMessageBox.Information)
+            self.setIcon(QtWidgets.QMessageBox.Icon.Information)
         if icon == "critical":
-            self.setIcon(QtWidgets.QMessageBox.Critical)
+            self.setIcon(QtWidgets.QMessageBox.Icon.Critical)
 
 
 class ExportDirectoryPathDialog:
@@ -140,7 +140,7 @@ class ExportDirectoryPathDialog:
 
         extension = filename.split('.')[-1]
         filename_only = filename[0:-len(extension) - 1]
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
                                                                app.last_export_directory, options)
@@ -204,7 +204,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -225,8 +225,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         grid_layout.addWidget(self.te, 1, 0)
         self.resize(400, 300)
         cursor = self.te.textCursor()
-        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(data['color']))
         fmt.setBackground(brush)
@@ -248,8 +248,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         Called in report_relations.show_context """
 
         cursor = self.te.textCursor()
-        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(data['pos1'], QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
         brush = QtGui.QBrush(QtGui.QColor(data['color']))
         fmt.setBackground(brush)
@@ -294,8 +294,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.resize(550, 580)
         # Enable custom window hint to enable customizing window controls
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
 
         title = _("Coded files: ") + self.code_dict['name']
         if case_or_file == "Case":
@@ -428,7 +428,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("Memo: " + row['memo'] + "\n\n")
         self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
-        self.exec_()
+        self.exec()
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -448,7 +448,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             path_ = img['mediapath'][7:]
         document = text_edit.document()
         image = QtGui.QImageReader(path_).read()
-        image = image.copy(img['x1'], img['y1'], img['width'], img['height'])
+        image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
@@ -463,7 +463,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Need unique image names or the same image from the same path is reproduced
         imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
         url = QtCore.QUrl(imagename)
-        document.addResource(QtGui.QTextDocument.ImageResource, url, QtCore.QVariant(image))
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
+        # https://doc.qt.io/qt-6/qtextdocument.html#addResource
+        # The image can be inserted into the document using the QTextCursor API:
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
         image_format.setWidth(image.width() * scaler)
@@ -484,19 +486,19 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.text_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInText(self.app, row)
-                ui.exec_()
+                ui.exec()
                 return
         # Check the position for an image result
         for row in self.image_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInImage(self.app, row)
-                ui.exec_()
+                ui.exec()
                 return
         # Check the position for an a/v result
         for row in self.av_results:
             if pos >= row['textedit_start'] and pos < row['textedit_end']:
                 ui = DialogCodeInAV(self.app, row)
-                ui.exec_()
+                ui.exec()
                 break
 
 
@@ -529,7 +531,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.resize(400, 300)
         # Enable custom window hint to enable customizing window controls
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
@@ -547,10 +549,10 @@ class DialogCodeInAV(QtWidgets.QDialog):
             if self.data['mediapath'][0:6] in ('/audio', '/video'):
                 self.media = self.instance.media_new(self.app.project_path + self.data['mediapath'])
             if self.data['mediapath'][0:6] in ('audio:', 'video:'):
-                self.media = self.instance.media_new(self.file_['mediapath'][6:])
+                self.media = self.instance.media_new(self.data['mediapath'][6:])
         except Exception as e:
             Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.data['mediapath'],
-                    "warning").exec_()
+                    "warning").exec()
             self.close()
             return
         self.mediaplayer.set_media(self.media)
@@ -583,7 +585,10 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
-        msg += "\n" + _("Memo: ") + self.data['memo']
+        try:
+            msg += "\n" + _("Memo: ") + self.data['memo']
+        except KeyError:
+            pass
         self.setToolTip(msg)
         if self.data['pos1'] < msecs:
             self.mediaplayer.stop()
@@ -632,12 +637,12 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.setWindowTitle(abs_path)
         image = QtGui.QImage(abs_path)
         if image.isNull():
-            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec()
             self.close()
             return
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.installEventFilter(self)
 
         self.pixmap = QtGui.QPixmap.fromImage(image)
@@ -682,7 +687,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         width = self.data['width'] * self.scale
         height = self.data['height'] * self.scale
         rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.DashLine))
+        rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.PenStyle.DashLine))
         rect_item.setToolTip(tooltip)
         self.scene.addItem(rect_item)
 
@@ -694,7 +699,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = self.scale * self.pixmap.height()
-        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -717,14 +722,14 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
-            if key == QtCore.Qt.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():

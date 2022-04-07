@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2020 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -70,7 +70,7 @@ class DialogInformation(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
         font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -96,9 +96,9 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python at least 3.6, pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
+<p>Depends on python at least 3.6, pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
 <p>A recent version of VLC (64 bit) needs to be installed.</p>\
-<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS. Used on other Linux distros.</p>\
+<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
@@ -115,7 +115,7 @@ images, audio and video. It also contains the sqlite database, named data.qda, t
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
-<p>QualCoder is written in python 3.8 using Qt5 for the graphical interface.</p>\
+<p>QualCoder is written in python 3.8 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
@@ -137,9 +137,3 @@ SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,<br />\
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR<br />\
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR<br />\
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>'
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    ui = DialogInformation(None, "a title", "")
-    ui.show()
-    sys.exit(app.exec_())

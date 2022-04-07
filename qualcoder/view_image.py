@@ -34,9 +34,9 @@ from random import randint
 import sys
 import traceback
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
 from .color_selector import DialogColorSelect
@@ -61,14 +61,14 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(txt)
-    logger.error(_("Uncaught exception: ") + txt)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
-    mb.exec_()
+    mb.setText(text_)
+    mb.exec()
 
 
 class DialogCodeImage(QtWidgets.QDialog):
@@ -117,13 +117,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.RubberBandDrag)
+        self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
         # Need this otherwise small images are centred on screen, and affect context menu position points
-        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.scene.installEventFilter(self)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -141,17 +141,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_memo.setEnabled(False)
-        self.ui.listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.get_files()
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
-        self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.listWidget.installEventFilter(self)
-        self.ui.treeWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
@@ -178,7 +178,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -292,7 +291,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         ui = DialogSelectAttributeParameters(self.app, "file")
         ui.fill_parameters(self.attributes)
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             self.attributes = []
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
@@ -346,7 +345,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for i in case_result:
                     case_file_ids.append(i[0])
         if file_ids == [] and case_file_ids == []:
-            Message(self.app, "Nothing found", "Nothing found").exec_()
+            Message(self.app, "Nothing found", "Nothing found").exec()
             return
         set_ids = {}
         set_file_ids = set(file_ids)
@@ -385,7 +384,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -435,11 +434,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(
-                    Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
+                    Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -456,12 +456,13 @@ class DialogCodeImage(QtWidgets.QDialog):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
-                        Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                        Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
+                        Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
                 it += 1
@@ -500,7 +501,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.file_ is None:
             return
         ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
-        ui.exec_()
+        ui.exec()
         memo = ui.memo
         if memo == self.file_['memo']:
             return
@@ -560,7 +561,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
-        action = menu.exec_(self.ui.listWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action == action_next:
             self.go_to_next_file()
             return
@@ -606,7 +607,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         image = QtGui.QImage(source)
         if image.isNull():
             self.clear_file()
-            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec()
             logger.warning("Cannot open image: " + source)
             return
         items = list(self.scene.items())
@@ -663,8 +664,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.pixmap is None:
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
-        height = self.scale * self.pixmap.height()
-        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        height = int(self.scale * self.pixmap.height())
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -696,7 +697,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 width = item['width'] * self.scale
                 height = item['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-                rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
+                rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
                 rect_item.setToolTip(tooltip)
                 if item['owner'] == self.app.settings['codername']:
                     if self.important and item['important'] == 1:
@@ -717,7 +718,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if current.text(0) == c['name']:
                 palette = self.ui.label_code.palette()
                 code_color = QtGui.QColor(c['color'])
-                palette.setColor(QtGui.QPalette.Window, code_color)
+                palette.setColor(QtGui.QPalette.ColorRole.Window, code_color)
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
                 break
@@ -749,7 +750,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
-        action = menu.exec_(self.ui.treeWidget.mapToGlobal(position))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
@@ -814,7 +815,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for r in res:
             category_list.append({'name': r[0], 'catid': r[1]})
         ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         category = ui.get_selected()
@@ -829,11 +830,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Show codes containing"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
         dialog.resize(200, 20)
-        ok = dialog.exec_()
+        ok = dialog.exec()
         if not ok:
             return
         txt = str(dialog.textValue())
@@ -874,50 +875,49 @@ class DialogCodeImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
-            if key == QtCore.Qt.Key_Z and mod == QtCore.Qt.ControlModifier:
+            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.undo_last_unmarked_code()
                 return True
-            if key == QtCore.Qt.Key_H:
+            if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                 return True
-            if key == QtCore.Qt.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-
         if object_ is self.ui.treeWidget.viewport():
-            if event.type() == QtCore.QEvent.Drop:
+            if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
-                parent = self.ui.treeWidget.itemAt(event.pos())
+                # event position is QPointF, itemAt requires toPoint
+                parent = self.ui.treeWidget.itemAt(event.position().toPoint())
                 self.item_moved_update_data(item, parent)
                 self.update_dialog_codes_and_categories()
-
+                return True
         if object_ is self.scene:
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 1:  # left mouse
-                #
-                pos = event.buttonDownScenePos(1)
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.LeftButton:
+                pos = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                 self.fill_coded_area_label(self.find_coded_areas_for_pos(pos))
-                if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
-                    p0 = event.buttonDownScenePos(1)  # left mouse button
+                if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
+                    p0 = event.buttonDownScenePos(Qt.MouseButton.LeftButton)
                     self.selection = p0
                     return True
-                if event.type() == QtCore.QEvent.GraphicsSceneMouseRelease:
+                if event.type() == QtCore.QEvent.Type.GraphicsSceneMouseRelease:
                     p1 = event.lastScenePos()
                     self.create_code_area(p1)
                     return True
-            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == 2:  # right mouse
-                if event.type() == QtCore.QEvent.GraphicsSceneMousePress:
-                    p = event.buttonDownScenePos(2)
+            if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == Qt.MouseButton.RightButton:
+                if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
+                    p = event.buttonDownScenePos(Qt.MouseButton.RightButton)
                     self.scene_context_menu(p)
                     return True
         return False
@@ -948,7 +948,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if item['important'] == 1:
             action_not_important = menu.addAction(_("Remove important mark"))
         self.fill_coded_area_label(item)
-        action = menu.exec_(global_pos)
+        action = menu.exec(global_pos)
         if action is None:
             return
         if action == action_memo:
@@ -977,7 +977,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         """
 
         ui = DialogMoveResizeRectangle(self.app)
-        ui.exec_()
+        ui.exec()
         item['x1'] += ui.move_x
         if item['x1'] < 0:
             item['x1'] = 0
@@ -1076,7 +1076,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         ui = DialogMemo(self.app, _("Memo for coded area of ") + self.file_['name'],
                         item['memo'])
-        ui.exec_()
+        ui.exec()
         memo = ui.memo
         if memo != item['memo']:
             item['memo'] = memo
@@ -1177,7 +1177,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if color is None:
             print("ERROR")
             return
-        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.DashLine))
+        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
         rect_item.setToolTip(code_.text(0))
         self.scene.addItem(rect_item)
         self.selection = None
@@ -1275,7 +1275,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for r in res:
             category_list.append({'name': r[0], 'catid': r[1], "supercatid": r[2]})
         ui = DialogSelectItems(self.app, category_list, _("Select blank or category"), "single")
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         category = ui.get_selected()
@@ -1308,8 +1308,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
-                                               msg, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.No:
+                                               msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                               QtWidgets.QMessageBox.StandardButton.No)
+        if reply == QtWidgets.QMessageBox.StandardButton.No:
             return
         cur = self.app.conn.cursor()
         old_cid = item['cid']
@@ -1320,9 +1321,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
             self.app.conn.commit()
         except Exception as e:
-            e = str(e)
-            msg = _("Cannot merge codes. Unmark overlapping text.") + "\n" + e
-            QtWidgets.QInformationDialog(None, "Cannot merge", msg)
+            msg = _("Cannot merge codes. Unmark overlapping text.") + "\n" + str(e)
+            Message(self.app, _("Cannot merge"), msg).exec()
             return
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
@@ -1338,7 +1338,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             catid : None to add to without category, catid to add to to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
-        ui.exec_()
+        ui.exec()
         new_code_name = ui.get_new_name()
         if new_code_name is None:
             return
@@ -1361,7 +1361,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             suoercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
-        ui.exec_()
+        ui.exec()
         new_category_text = ui.get_new_name()
         if new_category_text is None:
             return
@@ -1404,7 +1404,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         code_ = self.codes[found]
         ui = DialogConfirmDelete(self.app, _("Code: ") + selected.text(0))
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
@@ -1431,7 +1431,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         category = self.categories[found]
         ui = DialogConfirmDelete(self.app, _("Category: ") + selected.text(0))
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
@@ -1457,12 +1457,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return
             ui = DialogMemo(self.app, _("Memo for Code ") + self.codes[found]['name'],
                             self.codes[found]['memo'])
-            ui.exec_()
+            ui.exec()
             memo = ui.memo
             if memo == "":
-                selected.setData(2, QtCore.Qt.DisplayRole, "")
+                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
+                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
             # update codes list and database
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
@@ -1481,12 +1481,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return
             ui = DialogMemo(self.app, _("Memo for Category: ") + self.categories[found]['name'],
                             self.categories[found]['memo'])
-            ui.exec_()
+            ui.exec()
             memo = ui.memo
             if memo == "":
-                selected.setData(2, QtCore.Qt.DisplayRole, "")
+                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
-                selected.setData(2, QtCore.Qt.DisplayRole, _("Memo"))
+                selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
             # update codes list and database
             if memo != self.categories[found]['memo']:
                 self.categories[found]['memo'] = memo
@@ -1504,13 +1504,13 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if selected.text(1)[0:3] == 'cid':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
-                                                          QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
-                    Message(self.app, _("Name in use"), new_name + _(" Choose another name"), "warning").exec_()
+                    Message(self.app, _("Name in use"), new_name + _(" Choose another name"), "warning").exec()
                     return
             # Find the code in the list
             found = -1
@@ -1532,14 +1532,14 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if selected.text(1)[0:3] == 'cat':
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:"),
-                                                          QtWidgets.QLineEdit.Normal, selected.text(0))
+                                                          QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
             # check that no other category has this text
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
-                    Message(self.app, _("Duplicate category name"), msg, "warning").exec_()
+                    Message(self.app, _("Duplicate category name"), msg, "warning").exec()
                     return
             # find the category in the list
             found = -1
@@ -1574,13 +1574,13 @@ class DialogCodeImage(QtWidgets.QDialog):
         if found == -1:
             return
         ui = DialogColorSelect(self.app, self.codes[found])  # ['color'])
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         new_color = ui.get_color()
         if new_color is None:
             return
-        selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.SolidPattern))
+        selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.BrushStyle.SolidPattern))
         # update codes list and database
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
@@ -1626,14 +1626,14 @@ class DialogViewImage(QtWidgets.QDialog):
         self.setWindowTitle(abs_path)
         image = QtGui.QImage(abs_path)
         if image.isNull():
-            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec()
             self.close()
             return
 
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         # Need this otherwise small images are centred on screen, and affect context menu position points
-        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.scene.installEventFilter(self)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
@@ -1661,8 +1661,8 @@ class DialogViewImage(QtWidgets.QDialog):
         if self.pixmap is None:
             return
         scale = (self.ui.horizontalSlider.value() + 1) / 100
-        height = scale * self.pixmap.height()
-        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        height = int(scale * self.pixmap.height())
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -1681,14 +1681,14 @@ class DialogViewImage(QtWidgets.QDialog):
         # Hide / unHide top groupbox
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            if key == QtCore.Qt.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():

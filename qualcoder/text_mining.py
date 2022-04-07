@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-'''
-Copyright (c) 2019 Colin Curtain
+"""
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,18 +24,17 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
-'''
+"""
 
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtGui, QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 import os
 import sys
 from copy import copy
 import logging
 import traceback
 
-from .select_file import DialogSelectFile
 from .GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -52,9 +51,9 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogTextMining(QtWidgets.QDialog):
-    ''' Mine text using a range of variables.
+    """ Mine text using a range of variables.
     NOT CURRENTLY IMPLEMENTED FOR FUTURE EXPANSION
-    '''
+    """
 
     settings = None
     parent_textEdit = None
@@ -76,14 +75,14 @@ class DialogTextMining(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_text_mining()
         self.ui.setupUi(self)
-        self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Normal)
+        self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        newfont = QtGui.QFont(settings['font'], settings['fontsize'], QtGui.QFont.Weight.Normal)
         self.setFont(newfont)
-        newfont = QtGui.QFont(settings['font'], 6, QtGui.QFont.Normal)
+        newfont = QtGui.QFont(settings['font'], 6, QtGui.QFont.Weight.Normal)
         self.ui.label_selections.setFont(newfont)
-        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Normal)
+        treefont = QtGui.QFont(settings['font'], settings['treefontsize'], QtGui.QFont.Weight.Normal)
         self.ui.treeWidget.setFont(treefont)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.ExtendedSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         items = ["Bag of words", "Vocabulary and frequency"]
         self.ui.comboBox_analysis.addItems(items)
@@ -97,8 +96,8 @@ class DialogTextMining(QtWidgets.QDialog):
         self.fill_table()
 
     def get_data(self):
-        ''' Called from init.Case text sections for each case are prefixed with
-        <<<filename>>>\n and suffixed with \n. '''
+        """ Called from init.Case text sections for each case are prefixed with
+        <<<filename>>>\n and suffixed with \n. """
 
         cur = self.settings['conn'].cursor()
         self.categories = []
@@ -152,7 +151,7 @@ class DialogTextMining(QtWidgets.QDialog):
         self.fill_table()
 
     def fill_table(self):
-        ''' Fill table with source names OR case names '''
+        """ Fill table with source names OR case names. """
 
         self.ui.tableWidget.setColumnCount(2)
         rows = self.ui.tableWidget.rowCount()
@@ -188,7 +187,7 @@ class DialogTextMining(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(2)
         self.ui.treeWidget.setHeaderLabels(["Name", "Id"])
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
         remove_list = []
@@ -234,8 +233,8 @@ class DialogTextMining(QtWidgets.QDialog):
                 #logger.debug("add unlinked code as top level item:" + c['name'])
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
                 top_item.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -249,9 +248,9 @@ class DialogTextMining(QtWidgets.QDialog):
                 #logger.debug("" + item.text(0) + "|" + item.text(1) + ", c[cid]:" + str(c['cid']) + "c[catid]:" + str(c['catid']))
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     child.setIcon(0, QtGui.QIcon("GUI/icon_code.png"))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -268,7 +267,7 @@ class DialogTextMining(QtWidgets.QDialog):
         f = open(fileName, 'w')
         f.write(self.plain_text_results)
         f.close()
-        self.log += "Coding Report Results exported to " + fileName + "\n"
+        #self.log += "Coding Report Results exported to " + fileName + "\n"
         QtWidgets.QMessageBox.information(None, "Text file Export", fileName + " exported")
 
     def recursive_set_selected(self, item):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 import os
 import sys
 import logging
@@ -69,8 +69,8 @@ class DialogSettings(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Normal)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
         self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # Get coder names from all tables
@@ -213,7 +213,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['backup_num'] = self.ui.spinBox_backups.value()
         self.save_settings()
         if restart_qualcoder:
-            Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec_()
+            Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
         self.close()
 
     def save_settings(self):

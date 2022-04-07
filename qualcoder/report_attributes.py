@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import logging
 import os
 import sys
@@ -50,7 +50,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(text)
-    mb.exec_()
+    mb.exec()
 
 
 class DialogSelectAttributeParameters(QtWidgets.QDialog):
@@ -96,7 +96,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_report_attribute_parameters()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -208,7 +208,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 try:
                     float(v)
                 except ValueError:
-                    Message(self.app, _('Warning'), v + _(" is not a number"), "warning").exec_()
+                    Message(self.app, _('Warning'), v + _(" is not a number"), "warning").exec()
                     self.ui.tableWidget.item(x, y).setText("")
         self.ui.tableWidget.blockSignals(False)
 
@@ -240,13 +240,13 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.ui.tableWidget.insertRow(row)
             item = QtWidgets.QTableWidgetItem(a['name'])
             item.setToolTip(a['memo'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(a['caseOrFile'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_OR_FILE_COLUMN, item)
             item = QtWidgets.QTableWidgetItem(a['valuetype'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemIsEditable)
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.TYPE_COLUMN, item)
             cb = QtWidgets.QComboBox()
             cb.setMinimumWidth(100)  # To show 'between' wording

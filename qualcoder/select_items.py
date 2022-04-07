@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import os
 import sys
 import logging
@@ -80,7 +80,7 @@ class DialogSelectItems(QtWidgets.QDialog):
         font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
         font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
         self.selection_mode = selection_mode
         # Check data exists
@@ -100,9 +100,9 @@ class DialogSelectItems(QtWidgets.QDialog):
         self.model = ListModel(self.dict_list)
         self.ui.listView.setModel(self.model)
         if self.selection_mode == "single":
-            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         else:
-            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+            self.ui.listView.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.listView.doubleClicked.connect(self.accept)
 
     def get_selected(self):
@@ -132,11 +132,12 @@ class ListModel(QtCore.QAbstractListModel):
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.list)
 
+    # TODO Signature of method ListModel.data() does not match signature of the base method in class QAbstractItemModel
     def data(self, index, role):
-        if role == QtCore.Qt.DisplayRole:  # show just the name
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:  # show just the name
             rowitem = self.list[index.row()]
             return QtCore.QVariant(rowitem['name'])
-        elif role == QtCore.Qt.UserRole:  # return the whole python object
+        elif role == QtCore.Qt.ItemDataRole.UserRole:  # return the whole python object
             rowitem = self.list[index.row()]
             return rowitem
         return QtCore.QVariant()

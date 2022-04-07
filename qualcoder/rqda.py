@@ -33,7 +33,7 @@ import sqlite3
 import sys
 import traceback
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from .color_selector import colors
 

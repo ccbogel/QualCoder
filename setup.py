@@ -41,7 +41,7 @@ else:
 
 setup(
     name='Qualcoder',
-    version='2.9',
+    version='3.0',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
     author_email='ccbogel@hotmail.com',
@@ -57,7 +57,7 @@ setup(
     packages=find_packages(include=['qualcoder','qualcoder.*']),
     python_requires='>=3.6',
     install_requires=[
-        'pyqt5',
+        'pyqt6',
         'lxml',
         'Pillow', 
         'ebooklib',

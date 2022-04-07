@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
 import os
@@ -83,7 +83,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.code_deletions = []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -116,7 +116,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             print("CODETEXT\n", self.codetext)'''
         self.prev_text = copy(self.text)
         self.highlight()
-        self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
         self.ui.textEdit.textChanged.connect(self.update_positions)
         self.ui.textEdit.installEventFilter(self)
@@ -345,24 +345,24 @@ class DialogEditTextFile(QtWidgets.QDialog):
         cursor = self.ui.textEdit.textCursor()
         for item in self.casetext:
             if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
-                format_.setUnderlineColor(QtCore.Qt.green)
+                format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.annotations:
             if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
-                format_.setUnderlineColor(QtCore.Qt.yellow)
+                format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
                 cursor.setCharFormat(format_)
         for item in self.codetext:
             if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
-                format_.setUnderlineColor(QtCore.Qt.red)
+                format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
 
@@ -375,8 +375,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         format_.setFontFamily(self.app.settings['font'])
         format_.setFontPointSize(self.app.settings['docfontsize'])
         cursor = self.ui.textEdit.textCursor()
-        cursor.setPosition(0, QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
         self.ui.textEdit.blockSignals(False)
 
@@ -446,7 +446,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if action == action_copy:
             selected_text = self.ui.textEdit.textCursor().selectedText()
             cb = QtWidgets.QApplication.clipboard()
-            cb.clear(mode=cb.Clipboard)
-            cb.setText(selected_text, mode=cb.Clipboard)
+            cb.setText(selected_text)
         if action == action_select_all:
             self.ui.textEdit.selectAll()

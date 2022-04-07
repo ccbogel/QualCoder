@@ -33,8 +33,8 @@ import sys
 import traceback
 import qualcoder.vlc as vlc
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
@@ -70,7 +70,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_summary()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -87,7 +87,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.treeWidget.setStyleSheet(treefont)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.fill_tree()
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
 
@@ -118,7 +118,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories
         remove_list = []
@@ -168,10 +168,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
+                                  Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -188,11 +189,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
                     child.setToolTip(2, c['memo'])
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
+                                   Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
                 it += 1

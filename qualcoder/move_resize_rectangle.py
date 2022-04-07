@@ -25,7 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets, QtGui
 import os
 import sys
 import logging
@@ -66,7 +66,7 @@ class DialogMoveResizeRectangle(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_move_resize_rect()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)

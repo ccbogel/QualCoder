@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,9 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush
+from PyQt6 import QtGui, QtWidgets, QtCore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .GUI.base64_helper import *
@@ -101,7 +101,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCompareCoderFile()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.get_data()
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.results)
@@ -126,7 +126,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.listWidget_files.setStyleSheet(font)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SingleSelection)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         if len(self.coders) == 3:  # includes empty slot
@@ -141,7 +141,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
         ui = DialogInformation(self.app, "Statistics information", "")
         ui.setHtml(info)
-        ui.exec_()
+        ui.exec()
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, files.
@@ -284,7 +284,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         tw.write(self.ui.textEdit.document())
         msg_ = _("Report exported: ") + filepath
         self.parent_textEdit.append(msg_)
-        Message(self.app, _('Report exported'), msg_, "information").exec_()
+        Message(self.app, _('Report exported'), msg_, "information").exec()
 
     def results(self):
         """ Iterate through tree widget, for all cids
@@ -308,8 +308,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # Format the first coder color, yellow
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
-        cursor.setPosition(c1_pos0, QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(c1_pos1, QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(c1_pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(c1_pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         color = "#F4FA58"
         brush = QBrush(QtGui.QColor(color))
         fmt.setBackground(brush)
@@ -317,8 +317,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
         # Format the second coder color, blue
-        cursor.setPosition(c1_pos1, QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(c2_pos1, QtGui.QTextCursor.KeepAnchor)
+        cursor.setPosition(c1_pos1, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(c2_pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
         color = "#81BEF7"
         brush = QBrush(QtGui.QColor(color))
         fmt.setBackground(brush)
@@ -350,7 +350,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         except Exception as e_:
             msg_ = _("Cannot open: ") + source + "\n" + str(e_)
             logger.debug(msg_)
-            Message(self.app, _("A/V Error"), msg_, "warning").exec_()
+            Message(self.app, _("A/V Error"), msg_, "warning").exec()
             logger.warning(msg_)
             return
         self.ui.textEdit.append(duration_txt)
@@ -468,7 +468,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             source = self.file_['mediapath'][7:]
         image = QtGui.QImage(source)
         if image.isNull():
-            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec_()
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec()
             logger.warning("Cannot open image: " + source)
             return
         self.pixmap = QtGui.QPixmap.fromImage(image)
@@ -586,7 +586,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 txt += "\n" + _("Count of intersections: ") + str(len(r['intersections'])) + "\n"
                 txt += str(r['intersections']) + " " + _("Total: ") + str(sum(r['intersections'])) + " " + _("pixels")
             self.ui.textEdit.append(txt)
-        DialogDualCodedImage(self.app, self.file_, res0, res1).exec_()
+        DialogDualCodedImage(self.app, self.file_, res0, res1).exec()
 
     def agreement_text_file(self):
         """ Calculate the two-coder statistics for this code_
@@ -697,7 +697,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         overall += "FULLTEXT"
         self.ui.textEdit.append(overall)
         cursor = self.ui.textEdit.textCursor()
-        cursor.movePosition(QtGui.QTextCursor.End)
+        cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
         pos = cursor.position()
         self.ui.textEdit.append(fulltext[0])
         # Apply brush, yellow for coder 1, blue for coder 2 and green for dual coded
@@ -706,8 +706,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         # Foreground depends on the defined need_white_text color in color_selector
         for i, c in enumerate(char_list_coders):
             if c == 'b':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#81BEF7"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
@@ -715,8 +715,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
             if c == 'g':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#81F781"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
@@ -724,8 +724,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
             if c == 'y':
-                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveAnchor)
-                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.KeepAnchor)
+                cursor.setPosition(pos + i, QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(pos + i + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = "#F4FA58"
                 brush = QBrush(QtGui.QColor(color))
                 fmt.setBackground(brush)
@@ -744,7 +744,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -779,10 +779,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -795,10 +795,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -851,12 +851,12 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         self.setWindowTitle(abs_path)
         image = QtGui.QImage(abs_path)
         if image.isNull():
-            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec_()
+            Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec()
             self.close()
             return
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
         pixmap_item.setPos(0, 0)
@@ -905,7 +905,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         width = coded['width'] * self.scale
         height = coded['height'] * self.scale
         rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        rect_item.setPen(QtGui.QPen(QtGui.QColor(color), 2, QtCore.Qt.DashLine))
+        rect_item.setPen(QtGui.QPen(QtGui.QColor(color), 2, QtCore.Qt.PenStyle.DashLine))
         rect_item.setToolTip(tooltip)
         self.scene.addItem(rect_item)
 
@@ -917,7 +917,7 @@ class DialogDualCodedImage(QtWidgets.QDialog):
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = self.scale * self.pixmap.height()
-        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.FastTransformation)
+        pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()

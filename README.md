@@ -1,14 +1,14 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt5.
+QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and pyqt6.
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
 This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-_NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions (2.7 and earlier). You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
+_NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions. You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
 
 ## INSTALLATION 
 
@@ -19,7 +19,7 @@ You will need to have a python3.6 or newer version installed and a 64 bit VLC pl
 
 Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
-The 2.9 Release contains an exe file (created on Windows 10, 64 bit).Double-click to run. This does work on older Windows versions (e.g. Win 7). I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+Newer releases contain an exe file (created on Windows 10, 64 bit).Double-click to run. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (5 March 2022). Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
 If you are uncomfortable with these warnings install from source as detailed next.
 
@@ -34,7 +34,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`py -m pip install wheel pyqt5 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition`
+`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition`
 
  Wait, until all modules are installed .
  
@@ -42,7 +42,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 `py setup.py install`
 
-The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.8`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.9`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 5. Run QualCoder from cmd.exe
 Move to the QualCoder-master folder, then type 
@@ -75,7 +75,7 @@ Note: To exit venv type `deactivate`
 
 4. Install the needed python modules.
 
-`pip install lxml ply six pdfminer chardet pyqt5 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
+`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
 5. Install QualCoder, type the following, the dot is important:
 
@@ -88,7 +88,7 @@ You may get a warning which can be ignored: WARNING: Building wheel for Qualcode
 `qualcoder`
 
 After all this is done, you can `deactivate` to exit the virtual environment.
-At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder-2.9 release folder), then type:
+At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder release folder), then type:
 `source qualcoder/bin/activate`
 Then type
 `qualcoder`
@@ -101,11 +101,11 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 1. Install modules from the command line
 
-`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pdfminer python-pillow python-ply python-pyqt5 python-pip`
+`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pillow python-ply python-pyqt6 python-pip`
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib pydub SpeechRecognition`
+`sudo python3 -m pip install ebooklib pdfminer.six pydub SpeechRecognition`
 
 If success, all requirements are satisfied.
 
@@ -157,7 +157,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyqt5 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition
+pip install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -177,10 +177,10 @@ From the QualCoder-Master directory run the setup script:
 `python3 setup.py install`
 
 
-Assuming you downloaded the 2.8 version. You can now run with:
+Assuming you downloaded the 3.0 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-2.8/qualcoder/__main__.py
+python3 /applications/QualCoder-3.0/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -213,15 +213,15 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.6+ version, PyQt5, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2021) QualCoder 2.8 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/2.8
+Curtain, C. (2021) QualCoder 3.0 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.0
 
 
 ## Leave a review

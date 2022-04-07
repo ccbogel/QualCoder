@@ -39,7 +39,7 @@ import sys
 import logging
 import traceback
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .helpers import Message, msecs_to_mins_and_secs
 from .GUI.base64_helper import *
@@ -95,7 +95,7 @@ class SpeechToText(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogSpeechToText()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -170,7 +170,7 @@ class SpeechToText(QtWidgets.QDialog):
         if self.flac_filepath is not None:
             self.convert_to_text()
         else:
-            Message(self.app, _("Processing error"), _("Cannot process file")).exec_()
+            Message(self.app, _("Processing error"), _("Cannot process file")).exec()
         for s in self.strings:
             self.text += s
 

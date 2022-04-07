@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ except ImportError:
     pass
 import zipfile
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore
 
 from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
@@ -82,7 +82,8 @@ class RefiImport:
     cases = []
     sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
     sources_name = "/Sources"  # Sources folder can be named Sources or sources
-    variables = []  # List of Dictionary of Variable guid, name, variable application (cases or files/sources), last_insert_id, text or other
+    # List of Dictionaries of Variable guid, name, variable application (cases or files), last_insert_id, text or other
+    variables = []
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
     annotations = []  # Text source annotation references
     parent_textEdit = None
@@ -114,15 +115,20 @@ class RefiImport:
         if import_type == "qdc":
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                                                                        _('Select REFI-QDA file'),
-                                                                       self.app.settings['directory'], "(*.qdc *.QDC)")
+                                                                       self.app.settings['directory'],
+                                                                       "(*.qdc *.QDC)",
+                                                                       options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                                       )
             if not ok or self.file_path == "":
                 return
             self.import_codebook()
         else:
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                                       _('Select REFI-QDA file'),
+                                                                       _('Select REFI-QDA qdpx file'),
                                                                        self.app.settings['directory'],
-                                                                       "(*.qdpx *.QDPX)")
+                                                                       "(*.qdpx *.QDPX)",
+                                                                       options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                                       )
             if not ok or self.file_path == "":
                 return
             self.import_project()
@@ -149,13 +155,13 @@ class RefiImport:
             if cb.tag in ("{urn:QDA-XML:codebook:1:0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = cb.getchildren()
-                for _ in code_elements:
+                for el_ in code_elements:
                     # recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 Message(self.app, _("Codebook imported"),
-                        str(counter) + _(" categories and codes imported from ") + self.file_path).exec_()
+                        str(counter) + _(" categories and codes imported from ") + self.file_path).exec()
                 return
-        Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec_()
+        Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec()
 
     def sub_codes(self, parent, cat_id):
         """ Get subcode elements, if any.
@@ -324,7 +330,7 @@ class RefiImport:
         project_zip.close()
 
         # Set up progress dialog
-        # Source loading can be slow, so use this for he progress dialog
+        # Source loading can be slow, so use this for the progress dialog
         # Sources folder name can be capital or lower case, check and get the correct one
         contents = os.listdir(self.folder_name)
         self.sources_name = "/Sources"
@@ -333,7 +339,7 @@ class RefiImport:
                 self.sources_name = "/sources"
         num_sources = len(os.listdir(self.folder_name + self.sources_name))
         self.pd = QtWidgets.QProgressDialog(_("Project Import"), "", 0, num_sources, None)
-        self.pd.setWindowModality(QtCore.Qt.WindowModal)
+        self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
 
         # Parse xml for users, codebook, sources, journals, project description, variable names
@@ -426,7 +432,7 @@ class RefiImport:
         msg += _("All variables are stored as text. Cast as text or float for SQL operations.\n")
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
-        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec_()
+        Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec()
 
     def parse_cases_for_file_variables(self, root):
         """ Parse Cases element for each Case. Look for any file variables (No case name and only one sourceref).
@@ -559,7 +565,7 @@ class RefiImport:
                 variable['id'] = cur.fetchone()[0]
             except sqlite3.IntegrityError:
                 Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name,
-                        "warning").exec_()
+                        "warning").exec()
             # Refer to the variables later
             # To update caseOrFile and to assign attributes
             self.variables.append(variable)
@@ -698,7 +704,11 @@ class RefiImport:
         """ Parse the Sources element.
         This contains text and media sources as well as variables describing the source and coding information.
         Example format:
-        <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna" richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx" plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
+        <TextSource guid="a2b94468-80a5-412f-92d6-e900d97b55a6" name="Anna"
+        richTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.docx"
+        plainTextPath="internal://a2b94468-80a5-412f-92d6-e900d97b55a6.txt"
+        creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T05:25:16Z"
+        modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-04T05:25:16Z">
 
         If during import it detects that the external file is not found, it should
         check file location and if not found ask user for the new file location.
@@ -1045,7 +1055,7 @@ class RefiImport:
         if plain_text_path[0:11] == "internal://":
             plain_text_path = plain_text_path[11:]
         else:
-            logger.debug("Cannot import plain text transcription file - not internal")
+            logger.debug("Cannot import plain text transcription file - not internal. " + plain_text_path)
             return
 
         # Copy plain text file into documents folder, or if .srt into audio or video folder.
@@ -1059,12 +1069,17 @@ class RefiImport:
             destination = self.app.project_path + "/documents/" + name
         # Sources folder name can be capital or lower case, check and get the correct one
         # Not Used: contents = os.listdir(self.folder_name)
-        source_path = self.folder_name + self.sources_name + plain_text_path
-        # print("Source path: ", source_path)
-        # print("Destination: ", destination)
+        source_path = self.folder_name + self.sources_name
+        if source_path[-1] != "/":
+            source_path += "/"
+        source_path += plain_text_path
+        #print("Source path: ", source_path)
+        #print("Destination: ", destination)
         try:
             shutil.copyfile(source_path, destination)
-        except Exception as e:
+        except shutil.Error as e:
+            print("shutil.copyfile(source_path, destination)\n", source_path, "\n", destination, "\n", e)
+            logger.debug(str(e))
             self.parent_textEdit.append(
                 _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(e))
         # Load transcription text into database with filename matching and suffixed with .txt
@@ -1083,7 +1098,10 @@ class RefiImport:
                 if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
         except Exception as e:
-            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec_()
+            print("Opening destination to load text\n", destination)
+            print(e)
+            logger.debug(str(e))
+            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec()
 
         memo = ""
         if name is not None:
@@ -1160,10 +1178,13 @@ class RefiImport:
     def load_codings_for_audio_video(self, id_, element):
         """ Load coded segments for audio and video
         Example format:
-        <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100" guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
-        creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z" name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
+        <VideoSelection begin="115" modifyingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" end="1100"
+        guid="BB652E1B-5CCC-4AA3-9C7F-E5D9BD99F6BF"
+        creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z"
+        name="(115,0),(1100,0)" modifiedDateTime="2020-11-10T18:01:23Z">
         <Description>Memo to video file</Description>
-        <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C" creationDateTime="2020-11-10T18:01:23Z">
+        <Coding guid="2E0A7A4D-453B-4A1B-9784-4FC5B8432816" creatingUser="5D2B49D0-9562-4DD3-9EE3-CE2B965E413C"
+        creationDateTime="2020-11-10T18:01:23Z">
         <CodeRef targetGUID="86392BC1-A364-4904-A406-87A7E025EBF7"/>
         </Coding>
         </VideoSelection>
@@ -1324,7 +1345,8 @@ class RefiImport:
                 source['fulltext'] = fulltext
                 # ADding split()
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo, creating_user, create_date))
+                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo,
+                             creating_user, create_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 id_ = cur.fetchone()[0]
@@ -1337,7 +1359,7 @@ class RefiImport:
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             print("project path", self.app.project_path)
-            print("name", name) # ISSUE HERE
+            print("name", name)  # ISSUE HERE
             print("source_path", source_path)
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
             print("destination", destination)
@@ -1649,7 +1671,7 @@ class RefiImport:
             self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
         except sqlite3.IntegrityError:
-            Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec_()
+            Message(self.app, _("Variable import error"), _("Variable name already exists: ") + name, "warning").exec()
             return
 
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)"
@@ -1738,7 +1760,7 @@ class RefiLineEndings(QtWidgets.QDialog):
         super().__init__(parent)
         self.ui = Ui_Dialog_refi_export_line_endings()
         self.ui.setupUi(self)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -1814,19 +1836,19 @@ class RefiExport(QtWidgets.QDialog):
             os.mkdir(prep_path + "/Sources")
         except Exception as e:
             logger.error(_("Project export error ") + str(e))
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec()
             return
         try:
             with open(prep_path + '/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as e:
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec_()
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e), "warning").exec()
             logger.debug(str(e))
             return
 
         add_line_ending_for_maxqda = False
         ui = RefiLineEndings(self.app)
-        ui.exec_()
+        ui.exec()
         if ui.ui.radioButton_maxqda.isChecked():
             add_line_ending_for_maxqda = True
         txt_errors = ""
@@ -1895,14 +1917,14 @@ class RefiExport(QtWidgets.QDialog):
         if txt_errors != "":
             msg += "\nErrors: "
             msg += txt_errors
-        Message(self.app, _("Project exported"), _(msg)).exec_()
+        Message(self.app, _("Project exported"), _(msg)).exec()
         self.parent_textEdit.append(_("Project exported") + "\n" + _(msg))
 
     def export_codebook(self):
         """ Export REFI format codebook. """
 
         filename = "Codebook-" + self.app.project_name[:-4] + ".qdc"
-        options = QtWidgets.QFileDialog.DontResolveSymlinks | QtWidgets.QFileDialog.ShowDirsOnly
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
                                                                self.app.settings['directory'], options)
@@ -1915,11 +1937,11 @@ class RefiExport(QtWidgets.QDialog):
             f.close()
             msg = _("Codebook has been exported to ")
             msg += filename
-            Message(self.app, _("Codebook exported"), _(msg)).exec_()
+            Message(self.app, _("Codebook exported"), _(msg)).exec()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
         except Exception as e:
             logger.debug(str(e))
-            Message(self.app, _("Codebook NOT exported"), str(e)).exec_()
+            Message(self.app, _("Codebook NOT exported"), str(e)).exec()
             self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(e)))
 
     def user_guid(self, username):
@@ -2049,7 +2071,13 @@ class RefiExport(QtWidgets.QDialog):
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
         Called by: notes_xml
         Format:
-        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo" richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx" plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt" creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime="2019-06-04T06:11:56Z" modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime="2019-06-17T08:00:58Z">
+        <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo"
+        richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx"
+        plainTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.txt"
+        creatingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        creationDateTime="2019-06-04T06:11:56Z"
+        modifyingUser="5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        modifiedDateTime="2019-06-17T08:00:58Z">
        <Description></Description>
        </Note>
 
@@ -2090,11 +2118,18 @@ class RefiExport(QtWidgets.QDialog):
         <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
 
-        Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>  Liks to the annotation detail.
+        Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>
+        Links to the annotation detail.
 
         :param ann: Dictionaries of anid, fid, pos0, pos1, memo, owner, date,  NoteRef_guid
         :returns a guid for a NoteRef
         """
+
+        # Temporary hack fix for NoteRef_guid, unsure of the cuase so far, might be ajournal entry
+        try:
+            ann['NoteRef_guid']
+        except KeyError:
+            ann['NoteRef_guid'] = self.create_guid()
 
         xml = '<Note guid="' + ann['NoteRef_guid'] + '" '
         user = ""
@@ -2455,7 +2490,6 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
             xml += '</Coding>\n'
-
             xml += '</PlainTextSelection>\n'
         return xml
 
@@ -2491,7 +2525,6 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" >\n'
             xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
             xml += '</Coding>\n'
-
             xml += '</PictureSelection>\n'
         return xml
 
@@ -2618,6 +2651,7 @@ class RefiExport(QtWidgets.QDialog):
             for sp in sync_list:
                 if sp[2] == coded[0]:
                     xml += sp[0]
+                    break  # To avoid a quirky double up of guid
             xml += '" toSyncPoint="'
             doubleup = False
             for sp in sync_list:
@@ -2704,7 +2738,6 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         text = media['fulltext']
-
         if len(text) == 0 or text is None:
             return []
 
@@ -2788,10 +2821,9 @@ class RefiExport(QtWidgets.QDialog):
             if media_length == -1:
                 media_length = 0
         except Exception as e:
-            QtWidgets.QMessageBox.warning(None, _("Media not found"),
-                                          str(e) + "\n" + media_name)
+            msg_ = str(e) + "\n" + media_name
+            Message(self.app, _("Media not found"), msg_, "warning").exec()
         time_pos.append([len(text) - 1, media_length])
-
         # Order the list by character positions
         time_pos = sorted(time_pos, key=itemgetter(0))
         return time_pos
@@ -2917,7 +2949,6 @@ class RefiExport(QtWidgets.QDialog):
 
         if not self.codes:
             return ""
-
         xml = '<CodeBook>\n'
         xml += '<Codes>\n'
         cats = copy(self.categories)

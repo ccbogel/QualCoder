@@ -30,7 +30,7 @@ import os
 import sys
 import traceback
 
-from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt6 import QtGui, QtWidgets, QtCore
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
@@ -81,7 +81,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -89,7 +89,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_select_text_file.setFocus(True)
+        self.ui.pushButton_select_text_file.setFocus()
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
@@ -102,6 +102,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.groupBox_text_positions.hide()
         self.ui.pushButton_select_text_file.pressed.connect(self.select_original_text_file)
         self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
+        self.ui.pushButton_text_update.setEnabled(False)
         self.ui.pushButton_text_update.pressed.connect(self.replace_file_update_codings)
         self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
@@ -120,19 +121,19 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                                                                              _('Open project directory'),
                                                                              default_directory)
         if self.merge_project_path is False or len(self.merge_project_path) < 5:
-            Message(self.app, _(""), _("No project selected")).exec_()
+            Message(self.app, _(""), _("No project selected")).exec()
             return
         if self.merge_project_path[-4:] != ".qda":
-            Message(self.app, _("Error"), _("Not a QualCoder project")).exec_()
+            Message(self.app, _("Error"), _("Not a QualCoder project")).exec()
             return
         if self.merge_project_path == self.app.project_path:
-            Message(self.app, _("Error"), _("The same project")).exec_()
+            Message(self.app, _("Error"), _("The same project")).exec()
             return
         msg = _("Merge") + "\n" + self.merge_project_path + "\n" + _("into") + "\n" + self.app.project_path + "\n"
         msg += _("Press Run Button to merge projects")
-        Message(self.app, _("Merge projects"), msg).exec_()
+        Message(self.app, _("Merge projects"), msg).exec()
         self.ui.pushButton_merge.setEnabled(True)
-        self.ui.pushButton_merge.setFocus(True)
+        self.ui.pushButton_merge.setFocus()
 
     def merge_projects(self):
         """ Merge selected project into this project. """
@@ -148,7 +149,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.file_to_replace = []
         file_texts = self.app.get_file_texts()
         ui = DialogSelectItems(self.app, file_texts, _("Delete files"), "single")
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         self.file_to_replace = ui.get_selected()
@@ -156,24 +157,32 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
             self.ui.pushButton_select_text_file.setToolTip(_("Select text file to replace"))
             return
         self.ui.pushButton_select_text_file.setToolTip(_("Replacing: ") + self.file_to_replace['name'])
+        if self.file_to_replace and self.file_replacement:
+            self.ui.pushButton_text_update.setEnabled(True)
 
     def select_replacement_text_file(self):
         """ Select replacement updated text file. """
 
         file_types = "Text Files (*.docx *.epub *.html *.htm *.md *.odt *.pdf *.txt)"
         filepath, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Replacement file'),
-                                                              self.app.settings['directory'], file_types)
+                                                              self.app.settings['directory'], file_types,
+                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if not ok or filepath == []:
             self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
             return
         self.file_replacement = filepath[0]
-        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Replacment: ") + self.file_replacement)
+        self.ui.pushButton_select_replacement_text_file.setToolTip(_("Replacement file: ") + self.file_replacement)
+        if self.file_to_replace and self.file_replacement:
+            self.ui.pushButton_text_update.setEnabled(True)
+            self.ui.pushButton_text_update.setToolTip(_("Press to replace the text file"))
 
     def replace_file_update_codings(self):
-        """  """
+        """ Requires two files - original and replacement to be selected before button is enabled.
+        Called by:
+         pushButton_text_update """
 
         if self.file_to_replace is None or self.file_replacement is None:
-            Message(self.app, _("No files selected"), _("No existing or replacement file selected")).exec_()
+            Message(self.app, _("No files selected"), _("No existing or replacement file selected")).exec()
             return
         ReplaceTextFile(self.app, self.file_to_replace, self.file_replacement)
         self.file_to_replace = None
@@ -202,7 +211,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         msg += _("Backup project before performing this function.\n")
         msg += _("Press OK to continue.")
         ui = DialogConfirmDelete(self.app, msg, _("Change code start positions"))
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         for r in res:
@@ -247,7 +256,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         msg += _("Backup project before performing this function.\n")
         msg += _("Press OK to continue.")
         ui = DialogConfirmDelete(self.app, msg, _("Change code end positions"))
-        ok = ui.exec_()
+        ok = ui.exec()
         if not ok:
             return
         for r in res:
