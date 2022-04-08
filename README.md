@@ -75,17 +75,21 @@ Note: To exit venv type `deactivate`
 
 `source qualcoder/bin/activate`
 
-4. Install the needed python modules.
+4. Update pip so that it installs the most recent python packages.
+
+`pip install --upgrade pip`
+
+5. Install the needed python modules.
 
 `pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
 
-5. Install QualCoder, type the following, the dot is important:
+6. Install QualCoder, type the following, the dot is important:
 
 `python3 -m pip install .`
 
 You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
 
-6. To run type
+7. To run type
 
 `qualcoder`
 
