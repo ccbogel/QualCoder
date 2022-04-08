@@ -10,7 +10,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 
 _NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions. You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
 
-**LATEST MAJOR CHANGE (APRIL 2022) QUALCODER NOW USES Qt6 GRAPHICAL FRAMEWORK. I HAVE DONE A LOT OF TESTING AND BUG HUNTING TO TRACK DOWN ANY ISSUES IN THIS UPDATE. I MIGHT HAVE MISSED SOME, SO PLEASE POST ANY ERROR ISSUES. I MIGHT THEN WAIT A MONTH AND THEN PUT THIS OUT AS A 3.0 RELEASE.**
+**LATEST MAJOR CHANGE (8 APRIL 2022) QUALCODER NOW USES Qt6 GRAPHICAL FRAMEWORK. I HAVE DONE A LOT OF TESTING AND BUG HUNTING TO TRACK DOWN ANY ISSUES IN THIS UPDATE. I MIGHT HAVE MISSED SOME, SO PLEASE POST ANY ERROR ISSUES. I MIGHT THEN WAIT A MONTH AND THEN PUT THIS OUT AS A 3.0 RELEASE.**
 
 ## INSTALLATION 
 
