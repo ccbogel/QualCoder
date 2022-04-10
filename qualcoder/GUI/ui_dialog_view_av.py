@@ -13,6 +13,7 @@ class Ui_Dialog_view_av(object):
     def setupUi(self, Dialog_view_av):
         Dialog_view_av.setObjectName("Dialog_view_av")
         Dialog_view_av.resize(1021, 450)
+        Dialog_view_av.setMaximumSize(QtCore.QSize(1021, 16777215))
         self.gridLayout = QtWidgets.QGridLayout(Dialog_view_av)
         self.gridLayout.setObjectName("gridLayout")
         self.textEdit = QtWidgets.QTextEdit(Dialog_view_av)
@@ -144,6 +145,12 @@ class Ui_Dialog_view_av(object):
         self.label_note.setText("")
         self.label_note.setObjectName("label_note")
         self.gridLayout.addWidget(self.label_note, 8, 0, 1, 1)
+        self.label_waveform = QtWidgets.QLabel(Dialog_view_av)
+        self.label_waveform.setMinimumSize(QtCore.QSize(0, 60))
+        self.label_waveform.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.label_waveform.setText("")
+        self.label_waveform.setObjectName("label_waveform")
+        self.gridLayout.addWidget(self.label_waveform, 1, 0, 1, 1)
 
         self.retranslateUi(Dialog_view_av)
         QtCore.QMetaObject.connectSlotsByName(Dialog_view_av)
