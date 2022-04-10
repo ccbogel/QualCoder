@@ -3667,25 +3667,46 @@ class DialogViewAV(QtWidgets.QDialog):
 
     def get_waveform(self):
         """ Create waveform image in the audio folder. Apply image to label_waveform.
+        If a video file has multiple tracks only the first one is used for this method.
          Requires installed ffmpeg """
 
-        img_path = self.app.project_path + "/audio/waveform.png"
-        if os.path.exists(img_path):
-            os.remove(img_path)
+        waveform_path = self.app.project_path + "/audio/waveform.png"
+        if os.path.exists(waveform_path):
+            os.remove(waveform_path)
         command = 'ffmpeg -i "' + self.abs_path + '"'
         command += ' -filter_complex'
-        command += ' "aformat=channel_layouts=mono,compand,showwavespic=s=640x120'
+        #command += ' "aformat=channel_layouts=mono,compand,showwavespic=s=1020x100'
+        command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
+
         if self.app.settings['stylesheet'] == "dark":
             command += ':colors=#f89407"'
         else:
             command += ':colors=#0A0A0A"'
         command += ' -frames:v 1 '
-        command += '"' + self.app.project_path + '/audio/waveform.png"'
+        command += '"' + waveform_path + '"'
         subprocess.run(command, shell=True)
-        #print(subprocess.run(command, shell=True))
+        # https://www.cloudacm.com/?p=3105
+        spec_path = self.app.project_path + "/audio/spectrogram.png"
+        if os.path.exists(spec_path):
+            os.remove(spec_path)
+        '''command2 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200 '
+        command2 += '"' + spec_path + '"'
+
+        command2 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200 '
+        command2 += '"' + spec_path + '"'
+        subprocess.run(command2, shell=True)
+
+        command3 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200:legend=disabled '
+        command3 += '"' + spec_path + '"'
+        subprocess.run(command3, shell=True)
         pm = QtGui.QPixmap()
-        pm.load(img_path)
+        pm.load(spec_path)'''
+
+        pm = QtGui.QPixmap()
+        pm.load(waveform_path)
         self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
+        if not os.path.exists(waveform_path):
+            self.ui.label_waveform.hide()
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -4098,6 +4119,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if txt == "":
             txt = 1
         success = self.mediaplayer.audio_set_track(int(txt))
+        #self.get_waveform()
 
     def play_pause(self):
         """ Toggle play or pause status. """
