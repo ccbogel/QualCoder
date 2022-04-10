@@ -34,6 +34,7 @@ import os
 import platform
 from random import randint
 import re
+import subprocess
 import sys
 import time
 import traceback
@@ -3452,6 +3453,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self)
         self.installEventFilter(self)  # for rewind, play/stop
 
+        # Get waveform
+        self.get_waveform()
+
         # Get the transcription text and fill textedit
         self.transcription = None
         cur = self.app.conn.cursor()
@@ -3660,6 +3664,28 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.pushButton_speechtotext.setEnabled(True)
         else:
             self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
+
+    def get_waveform(self):
+        """ Create waveform image in the audio folder. Apply image to label_waveform.
+         Requires installed ffmpeg """
+
+        img_path = self.app.project_path + "/audio/waveform.png"
+        if os.path.exists(img_path):
+            os.remove(img_path)
+        command = 'ffmpeg -i "' + self.abs_path + '"'
+        command += ' -filter_complex'
+        command += ' "aformat=channel_layouts=mono,compand,showwavespic=s=640x120'
+        if self.app.settings['stylesheet'] == "dark":
+            command += ':colors=#f89407"'
+        else:
+            command += ':colors=#0A0A0A"'
+        command += ' -frames:v 1 '
+        command += '"' + self.app.project_path + '/audio/waveform.png"'
+        subprocess.run(command, shell=True)
+        #print(subprocess.run(command, shell=True))
+        pm = QtGui.QPixmap()
+        pm.load(img_path)
+        self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
