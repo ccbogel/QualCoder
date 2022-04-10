@@ -15,7 +15,7 @@ _NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file
 ## INSTALLATION 
 
 ### Prerequisites
-You will need to have a python3.6 or newer version installed and a 64 bit VLC player installed. 
+You will need to have a python3.6 or newer version installed and a 64 bit VLC player installed. Optional: ffmpeg installed for speech to text and waveform image.
 
 ### Windows
 
