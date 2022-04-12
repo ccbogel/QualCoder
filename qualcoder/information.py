@@ -106,6 +106,7 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
 <p>ebooklib: Aleksandar Erkalović https://github.com/aerkalov</p>\
 <p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
+<p>The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images.</p>\
 <p>Julius Reich for creating the cool QualCoder logo.</p>\
 <p>To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
