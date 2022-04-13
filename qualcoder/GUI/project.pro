@@ -2,6 +2,7 @@ SOURCES         = ui_dialog_add_item.py \
 ui_dialog_assign_attribute.py \
 ui_dialog_cases.py \
 ui_case_file_manager.py \
+ui_dialog_charts.py \
 ui_dialog_code_av.py \
 ui_dialog_code_by_case.py \
 ui_dialog_code_image.py \
