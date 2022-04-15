@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>600</height>
+    <width>918</width>
+    <height>364</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,23 +31,7 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_export">
-      <property name="geometry">
-       <rect>
-        <x>840</x>
-        <y>6</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Export image</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_chart_types">
+     <widget class="QLabel" name="label_pie_chart">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -57,32 +41,65 @@
        </rect>
       </property>
       <property name="text">
-       <string>Chart types:</string>
+       <string>Pie charts:</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_chart_types">
+     <widget class="QComboBox" name="comboBox_pie_charts">
       <property name="geometry">
        <rect>
-        <x>117</x>
-        <y>6</y>
+        <x>10</x>
+        <y>40</y>
         <width>271</width>
         <height>25</height>
        </rect>
       </property>
      </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGraphicsView" name="graphicsView">
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
-     </property>
+     <widget class="QLabel" name="label_bar_chart">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>9</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bar charts:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_bar_charts">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>40</y>
+        <width>271</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_tree_chart">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>9</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bar charts:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_tree_charts">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>40</y>
+        <width>271</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
