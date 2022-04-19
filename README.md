@@ -107,11 +107,11 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 1. Install modules from the command line
 
-`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pillow python-ply python-pyqt6 python-pip`
+`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pdfminer python-pandas python-pillow python-ply python-pyqt6 python-pip`
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib pdfminer.six pandas plotly pydub SpeechRecognition`
+`sudo python3 -m pip install ebooklib plotly pydub SpeechRecognition`
 
 If success, all requirements are satisfied.
 
