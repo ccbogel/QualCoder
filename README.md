@@ -27,7 +27,7 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 **Alternatively install from source:**
 
-Consider using a virtual environment, I have not tested using venv on a Windows intallation yet.
+Consider using a virtual environment, I have not tested using venv on a Windows intallation yet. Not using a virtual environment may affect other python software you may has installed.
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
