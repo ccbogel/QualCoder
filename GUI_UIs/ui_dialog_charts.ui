@@ -6,103 +6,200 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>918</width>
-    <height>364</height>
+    <width>858</width>
+    <height>419</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Charts</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox_header">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>70</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>70</height>
-      </size>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QLabel" name="label_pie_chart">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>9</y>
-        <width>101</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Pie charts:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_pie_charts">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>40</y>
-        <width>271</width>
-        <height>25</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_bar_chart">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>9</y>
-        <width>101</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bar charts:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_bar_charts">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>40</y>
-        <width>271</width>
-        <height>25</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_tree_chart">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>9</y>
-        <width>101</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bar charts:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_tree_charts">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>40</y>
-        <width>271</width>
-        <height>25</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-   </item>
-  </layout>
+  <widget class="QLabel" name="label_info">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>481</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Charts are displayed in the default browser</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_pie">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>42</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Pie charts</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>157</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bar charts</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_tree">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>219</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Tree charts</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_pie_charts">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>65</y>
+     <width>291</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_bar_charts">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>185</y>
+     <width>291</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_tree_charts">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>249</y>
+     <width>291</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_sunburst_charts">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>123</y>
+     <width>291</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_hierarchy">
+   <property name="geometry">
+    <rect>
+     <x>14</x>
+     <y>98</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sunburst and treemap charts</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_coder">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>40</y>
+     <width>151</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select coder</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_coders">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>64</y>
+     <width>231</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_file">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>124</y>
+     <width>231</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_select_file">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>100</y>
+     <width>231</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select file</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_case">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>184</y>
+     <width>231</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_select_case">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>160</y>
+     <width>231</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select case - all files </string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_attributes">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>220</y>
+     <width>231</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select attributes</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
