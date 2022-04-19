@@ -36,7 +36,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
-`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition`
+`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
 
  Wait, until all modules are installed .
  
@@ -81,7 +81,7 @@ Note: To exit venv type `deactivate`
 
 5. Install the needed python modules.
 
-`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pydub SpeechRecognition`
+`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pandas plotly pydub SpeechRecognition`
 
 6. Install QualCoder, type the following, the dot is important:
 
@@ -107,11 +107,11 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 1. Install modules from the command line
 
-`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pillow python-ply python-pyqt6 python-pip`
+`sudo pacman -S python python-chardet python-lxml python-openpyxl python-pdfminer python-pandas python-pillow python-ply python-pyqt6 python-pip`
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib pdfminer.six pydub SpeechRecognition`
+`sudo python3 -m pip install ebooklib plotly pydub SpeechRecognition`
 
 If success, all requirements are satisfied.
 
@@ -163,7 +163,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition
+pip install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -219,7 +219,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.

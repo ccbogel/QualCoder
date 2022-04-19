@@ -166,6 +166,8 @@ class Ui_MainWindow(object):
         self.actionCoding_comparison_by_file.setObjectName("actionCoding_comparison_by_file")
         self.actionCode_by_case = QtGui.QAction(MainWindow)
         self.actionCode_by_case.setObjectName("actionCode_by_case")
+        self.actionCharts = QtGui.QAction(MainWindow)
+        self.actionCharts.setObjectName("actionCharts")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -199,10 +201,11 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionCoding_comparison)
         self.menuReports.addAction(self.actionCoding_comparison_by_file)
         self.menuReports.addAction(self.actionCode_frequencies)
-        self.menuReports.addAction(self.actionView_Graph)
-        self.menuReports.addAction(self.actionCode_relations)
         self.menuReports.addAction(self.actionFile_summary)
         self.menuReports.addAction(self.actionCode_summary)
+        self.menuReports.addAction(self.actionCode_relations)
+        self.menuReports.addAction(self.actionView_Graph)
+        self.menuReports.addAction(self.actionCharts)
         self.menuReports.addAction(self.actionText_mining)
         self.menuReports.addAction(self.actionSQL_statements)
         self.menuReports.addSeparator()
@@ -285,6 +288,7 @@ class Ui_MainWindow(object):
         self.actionCode_summary.setText(_translate("MainWindow", "Code summary"))
         self.actionCoding_comparison_by_file.setText(_translate("MainWindow", "Coding comparison by file"))
         self.actionCode_by_case.setText(_translate("MainWindow", "Code by case"))
+        self.actionCharts.setText(_translate("MainWindow", "Charts"))
 
 
 if __name__ == "__main__":

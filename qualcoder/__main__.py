@@ -74,6 +74,7 @@ from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
 # from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
+from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
@@ -809,6 +810,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionView_Graph.setShortcut('Ctrl+G')
+        self.ui.actionCharts.triggered.connect(self.view_charts)
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
         self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
@@ -928,6 +930,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_summary.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
+        self.ui.actionCharts.setEnabled(False)
         # help menu
         self.ui.actionSpecial_functions.setEnabled(False)
 
@@ -966,6 +969,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_summary.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
+        self.ui.actionCharts.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
 
@@ -1064,6 +1068,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_reports.hide()
         ui = ViewGraph(self.app)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def view_charts(self):
+        """ Show charts of codes and categories. """
+
+        self.ui.label_reports.hide()
+        ui = ViewCharts(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 

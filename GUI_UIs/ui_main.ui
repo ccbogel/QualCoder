@@ -170,10 +170,11 @@
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCoding_comparison_by_file"/>
     <addaction name="actionCode_frequencies"/>
-    <addaction name="actionView_Graph"/>
-    <addaction name="actionCode_relations"/>
     <addaction name="actionFile_summary"/>
     <addaction name="actionCode_summary"/>
+    <addaction name="actionCode_relations"/>
+    <addaction name="actionView_Graph"/>
+    <addaction name="actionCharts"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
     <addaction name="separator"/>
@@ -432,6 +433,11 @@
   <action name="actionCode_by_case">
    <property name="text">
     <string>Code by case</string>
+   </property>
+  </action>
+  <action name="actionCharts">
+   <property name="text">
+    <string>Charts</string>
    </property>
   </action>
  </widget>
