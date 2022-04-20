@@ -61,6 +61,12 @@ class Ui_DialogCharts(object):
         self.pushButton_attributes = QtWidgets.QPushButton(DialogCharts)
         self.pushButton_attributes.setGeometry(QtCore.QRect(340, 220, 231, 25))
         self.pushButton_attributes.setObjectName("pushButton_attributes")
+        self.label_filter = QtWidgets.QLabel(DialogCharts)
+        self.label_filter.setGeometry(QtCore.QRect(10, 290, 201, 17))
+        self.label_filter.setObjectName("label_filter")
+        self.lineEdit_filter = QtWidgets.QLineEdit(DialogCharts)
+        self.lineEdit_filter.setGeometry(QtCore.QRect(212, 290, 91, 25))
+        self.lineEdit_filter.setObjectName("lineEdit_filter")
 
         self.retranslateUi(DialogCharts)
         QtCore.QMetaObject.connectSlotsByName(DialogCharts)
@@ -68,7 +74,7 @@ class Ui_DialogCharts(object):
     def retranslateUi(self, DialogCharts):
         _translate = QtCore.QCoreApplication.translate
         DialogCharts.setWindowTitle(_translate("DialogCharts", "Charts"))
-        self.label_info.setText(_translate("DialogCharts", "Charts are displayed in the default browser"))
+        self.label_info.setText(_translate("DialogCharts", "Charts are displayed in the default web browser"))
         self.label_pie.setText(_translate("DialogCharts", "Pie charts"))
         self.label_bar.setText(_translate("DialogCharts", "Bar charts"))
         self.label_tree.setText(_translate("DialogCharts", "Tree charts"))
@@ -77,6 +83,8 @@ class Ui_DialogCharts(object):
         self.label_select_file.setText(_translate("DialogCharts", "Select file"))
         self.label_select_case.setText(_translate("DialogCharts", "Select case - all files "))
         self.pushButton_attributes.setText(_translate("DialogCharts", "Select attributes"))
+        self.label_filter.setText(_translate("DialogCharts", "Filter out values below:"))
+        self.lineEdit_filter.setToolTip(_translate("DialogCharts", "Enter number for filter cut off"))
 
 
 if __name__ == "__main__":
