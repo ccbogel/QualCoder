@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Charts are displayed in the default browser</string>
+    <string>Charts are displayed in the default web browser</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_pie">
@@ -198,6 +198,32 @@
    </property>
    <property name="text">
     <string>Select attributes</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_filter">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>290</y>
+     <width>201</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Filter out values below:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_filter">
+   <property name="geometry">
+    <rect>
+     <x>212</x>
+     <y>290</y>
+     <width>91</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Enter number for filter cut off</string>
    </property>
   </widget>
  </widget>
