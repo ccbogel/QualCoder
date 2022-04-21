@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>858</width>
-    <height>419</height>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>9</x>
      <y>9</y>
      <width>481</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="text">
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>42</y>
+     <y>64</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>157</y>
+     <y>180</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -52,25 +52,12 @@
     <string>Bar charts</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_tree">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>219</y>
-     <width>291</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Tree charts</string>
-   </property>
-  </widget>
   <widget class="QComboBox" name="comboBox_pie_charts">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>65</y>
-     <width>291</width>
+     <y>87</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -79,18 +66,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>185</y>
-     <width>291</width>
-     <height>25</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboBox_tree_charts">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>249</y>
-     <width>291</width>
+     <y>207</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -99,8 +76,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>123</y>
-     <width>291</width>
+     <y>145</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -109,7 +86,7 @@
    <property name="geometry">
     <rect>
      <x>14</x>
-     <y>98</y>
+     <y>120</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -121,8 +98,8 @@
   <widget class="QLabel" name="label_coder">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>40</y>
+     <x>10</x>
+     <y>293</y>
      <width>151</width>
      <height>22</height>
     </rect>
@@ -134,9 +111,9 @@
   <widget class="QComboBox" name="comboBox_coders">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>64</y>
-     <width>231</width>
+     <x>10</x>
+     <y>320</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -144,9 +121,9 @@
   <widget class="QComboBox" name="comboBox_file">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>124</y>
-     <width>231</width>
+     <x>10</x>
+     <y>380</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -154,8 +131,8 @@
   <widget class="QLabel" name="label_select_file">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>100</y>
+     <x>10</x>
+     <y>350</y>
      <width>231</width>
      <height>22</height>
     </rect>
@@ -167,31 +144,39 @@
   <widget class="QComboBox" name="comboBox_case">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>184</y>
-     <width>231</width>
+     <x>10</x>
+     <y>440</y>
+     <width>321</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
+Codings from the entire text file are used for the calculations.</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_select_case">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>160</y>
-     <width>231</width>
+     <x>10</x>
+     <y>410</y>
+     <width>211</width>
      <height>22</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
+Codings from the entire text file are used for the calculations.</string>
+   </property>
    <property name="text">
-    <string>Select case - all files </string>
+    <string>Select case</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_attributes">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>220</y>
+     <x>10</x>
+     <y>540</y>
      <width>231</width>
      <height>25</height>
     </rect>
@@ -203,10 +188,10 @@
   <widget class="QLabel" name="label_filter">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>290</y>
+     <x>8</x>
+     <y>266</y>
      <width>201</width>
-     <height>17</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="text">
@@ -216,14 +201,91 @@
   <widget class="QLineEdit" name="lineEdit_filter">
    <property name="geometry">
     <rect>
-     <x>212</x>
-     <y>290</y>
+     <x>210</x>
+     <y>267</y>
      <width>91</width>
      <height>25</height>
     </rect>
    </property>
    <property name="toolTip">
     <string>Enter number for filter cut off</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_filters">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;b&gt;Data filters&lt;/b&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_chart_options">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>38</y>
+     <width>261</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;b&gt;Chart options&lt;/b&gt;</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_category">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>500</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_category">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>470</y>
+     <width>151</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select category</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>50</y>
+     <width>20</width>
+     <height>521</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
    </property>
   </widget>
  </widget>
