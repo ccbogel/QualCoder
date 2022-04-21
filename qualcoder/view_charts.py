@@ -88,9 +88,9 @@ class ViewCharts(QDialog):
         self.ui.lineEdit_filter.setValidator(integers)
 
         # Temporary hide widgets
-        self.ui.label_tree.hide()
-        self.ui.comboBox_tree_charts.hide()
         self.ui.pushButton_attributes.hide()
+        self.ui.label_category.hide()
+        self.ui.comboBox_category.hide()
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
