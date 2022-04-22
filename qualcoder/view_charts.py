@@ -39,7 +39,8 @@ from PyQt6.QtWidgets import QDialog
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
-# from .helpers import Message
+from .helpers import Message
+from .report_attributes import DialogSelectAttributeParameters
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -71,6 +72,8 @@ class ViewCharts(QDialog):
     files = []
     cases = []
     dialog_list = []
+    attribute_file_ids = []
+    attributes_msg = ""
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -80,20 +83,18 @@ class ViewCharts(QDialog):
         self.app = app
         self.settings = app.settings
         self.conn = app.conn
+        self.attribute_file_ids = []
+        self.attributes_msg = ""
         # Set up the user interface from Designer.
         self.ui = Ui_DialogCharts()
         self.ui.setupUi(self)
         integers = QtGui.QIntValidator()
         self.ui.lineEdit_filter.setValidator(integers)
-
-        # Temporary hide widget
-        self.ui.pushButton_attributes.hide()
-
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-
+        self.ui.pushButton_attributes.pressed.connect(self.select_attributes)
         # Get coder names from all tables
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
         sql += " union select owner from cases union select owner from journal union select owner from attribute "
@@ -120,8 +121,6 @@ class ViewCharts(QDialog):
         self.ui.comboBox_case.addItems(cases_combobox_list)
         self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
         self.ui.comboBox_file.currentIndexChanged.connect(self.clear_combobox_cases)
-
-        #self.codes, self.categories = app.get_codes_categories()
         self.get_selected_categories_and_codes()
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         pie_combobox_list = ['', _('Code frequency'),
@@ -154,21 +153,161 @@ class ViewCharts(QDialog):
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
     # DATA FILTERS SECTION
+    def select_attributes(self):
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
+        [0] attribute name,
+        [1] attribute type: character, numeric
+        [2] modifier: > < == != like between
+        [3] comparison value as list, one item or two items for between
+
+        DialogSelectAttributeParameters returns lists for each parameter selected of:
+        attribute name, file or case, character or numeric, operator, list of one or two comparator values
+        two comparator values are used with the 'between' operator
+        ['source', 'file', 'character', '==', ["'interview'"]]
+        ['case name', 'case', 'character', '==', ["'ID1'"]]
+
+        sqls are NOT parameterised.
+        Results from multiple parameters are intersected, an AND boolean function.
+        Results stored in attribute_file_ids as list of file_id integers
+        """
+
+        self.attribute_file_ids = []
+        self.attributes_msg = ""
+        ui = DialogSelectAttributeParameters(self.app)
+        # ui.fill_parameters(self.attributes)
+        ok = ui.exec()
+        if not ok:
+            self.ui.pushButton_attributes.setToolTip("")
+            return
+        attributes = ui.parameters
+        file_ids = []
+        case_file_ids = []
+        cur = self.app.conn.cursor()
+        # Run a series of sql based on each selected attribute
+        # Apply a set to the resulting ids to determine the final list of ids
+        for a in attributes:
+            # File attributes
+            file_sql = "select id from attribute where "
+            if a[1] == 'file':
+                file_sql += "attribute.name = '" + a[0] + "' "
+                file_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    file_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    file_sql += a[4][0]
+                if a[2] == 'numeric':
+                    file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                file_sql += " and attribute.attr_type='file'"
+                cur.execute(file_sql)
+                result = cur.fetchall()
+                for i in result:
+                    file_ids.append(i[0])
+            # Case attributes
+            if a[1] == 'case':
+                # Case text table also links av and images
+                case_sql = "select distinct case_text.fid from cases "
+                case_sql += "join case_text on case_text.caseid=cases.caseid "
+                case_sql += "join attribute on cases.caseid=attribute.id "
+                case_sql += " where "
+                case_sql += "attribute.name = '" + a[0] + "' "
+                case_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    case_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                if a[2] == 'numeric':
+                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                case_sql += " and attribute.attr_type='case'"
+                # print("Attribute selected: ", a)
+                # print(case_sql)
+                cur.execute(case_sql)
+                case_result = cur.fetchall()
+                for i in case_result:
+                    case_file_ids.append(i[0])
+        # Consolidate case and file ids
+        if file_ids == [] and case_file_ids == []:
+            Message(self.app, "Nothing found", "Nothing found").exec()
+            self.ui.pushButton_attributes.setToolTip("")
+            return
+        # Clear any visible file and case selections
+        self.ui.comboBox_file.setCurrentIndex(0)
+        self.ui.comboBox_case.setCurrentIndex(0)
+
+        set_ids = {}
+        set_file_ids = set(file_ids)
+        set_case_file_ids = set(case_file_ids)
+        # Intersect case file ids and file ids
+        if file_ids != [] and case_file_ids != []:
+            set_ids = set_file_ids.intersection(set_case_file_ids)
+        if file_ids != [] and case_file_ids == []:
+            set_ids = set_file_ids
+        if file_ids == [] and case_file_ids != []:
+            set_ids = set_case_file_ids
+        self.attribute_file_ids = list(set_ids)
+        # print("Attribute file ids", self.attribute_file_ids)
+        # Prepare message for button
+        file_msg = ""
+        case_msg = ""
+        for a in attributes:
+            if a[1] == 'file':
+                file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        if len(file_msg) > 4:
+            file_msg = "(" + _("File: ") + file_msg[3:] + ")"
+        for a in attributes:
+            if a[1] == 'case':
+                case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        if len(case_msg) > 5:
+            case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
+        if file_msg != "" and case_msg != "":
+            self.attributes_msg = file_msg + " and " + case_msg
+        else:
+            self.attributes_msg = file_msg + case_msg
+        self.ui.pushButton_attributes.setToolTip(self.attributes_msg)
+        '''print("Attribute file ids\n===========")
+        for a in self.attribute_file_ids:
+            print(a)'''
+
     def clear_combobox_files(self):
+        """ Clear file selection if a case is selected.
+        Clear any attributes selected.
+        Called on combobox_case index change. """
         self.ui.comboBox_file.blockSignals(True)
         self.ui.comboBox_file.setCurrentIndex(0)
         self.ui.comboBox_file.blockSignals(False)
+        self.attribute_file_ids = []
+        self.attributes_msg = ""
+        self.ui.pushButton_attributes.setToolTip("")
 
     def clear_combobox_cases(self):
+        """ Clear case selection if a file is selected.
+        Clear any attributes selected.
+        Called on combobox_file index change. """
+
         self.ui.comboBox_case.blockSignals(True)
         self.ui.comboBox_case.setCurrentIndex(0)
         self.ui.comboBox_case.blockSignals(False)
+        self.attribute_file_ids = []
+        self.attributes_msg = ""
+        self.ui.pushButton_attributes.setToolTip("")
 
     def get_file_ids(self):
-        """ Get file ids based on file selection or case election.
+        """ Get file ids based on file selection or case selection.
+        Also 'gets' and returns attribute file ids.
+        Called by: all pie, bar, hierarchy charts
         return:
             case or file name, sql string of '' or file_ids comma separated as in (,,,) or =id
         """
+
+        if self.attribute_file_ids:
+            file_ids = ""
+            for id in self.attribute_file_ids:
+                file_ids += "," + str(id)
+            return _("Attributes: ") + self.attributes_msg + " ", " in (" + file_ids[1:] + ")"
 
         file_name = self.ui.comboBox_file.currentText()
         case_name = self.ui.comboBox_case.currentText()

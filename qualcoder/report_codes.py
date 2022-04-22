@@ -829,8 +829,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_export.setEnabled(True)
 
     def select_attributes(self):
-        """ Trim the files list to files identified by attributes.
-        Attribute dialing results are a dictionary of:
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
         [0] attribute name,
         [1] attribute type: character, numeric
         [2] modifier: > < == != like between
@@ -842,7 +842,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         ['source', 'file', 'character', '==', ["'interview'"]]
         ['case name', 'case', 'character', '==', ["'ID1'"]]
 
-        Note, sqls are NOT parameterised.
+        sqls are NOT parameterised.
         Results from multiple parameters are intersected, an AND boolean function.
         """
 
@@ -932,14 +932,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                 case_result = cur.fetchall()
                 for i in case_result:
                     case_file_ids.append(i[0])
-
+        # Consolidate csse and file ids
         if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec()
             return
         set_ids = {}
         set_file_ids = set(file_ids)
         set_case_file_ids = set(case_file_ids)
-        # Need to intersect case file ids and file ids
+        # Intersect case file ids and file ids
         if file_ids != [] and case_file_ids != []:
             set_ids = set_file_ids.intersection(set_case_file_ids)
         if file_ids != [] and case_file_ids == []:
