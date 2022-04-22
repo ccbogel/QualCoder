@@ -96,19 +96,22 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python at least 3.6, pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pydub SpeechRecognition</p>\
-<p>A recent version of VLC (64 bit) needs to be installed.</p>\
+<p>Depends on python minimum version 3.6 (I recommend 3.10). \
+<p>Modules required: pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub \
+SpeechRecognition</p>\
+<p>A recent version of VLC (64 bit) needs to be installed. \
+ffmpeg is optional, but recommended to be installed for speech to text and waveform images.</p>\
 <p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
-<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.</p>\
-<p>Mike MacCana for the source code for the docx module.</p>\
-<p>User: bit4 on stackoverflow who presented the source code to convert html to text.</p>\
-<p>ebooklib: Aleksandar Erkalović https://github.com/aerkalov</p>\
-<p>The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc</p>\
-<p>The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images.</p>\
-<p>Julius Reich for creating the cool QualCoder logo.</p>\
-<p>To various members on github for supporting this project.</p>\
+<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software. \
+Mike MacCana for the source code for the docx module. \
+User: bit4 on stackoverflow who presented the source code to convert html to text. \
+ebooklib: Aleksandar Erkalović https://github.com/aerkalov. \
+The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc. \
+The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images. \
+Julius Reich for creating the cool QualCoder logo. \
+ To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
@@ -116,8 +119,8 @@ images, audio and video. It also contains the sqlite database, named data.qda, t
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
-<p>QualCoder is written in python 3.8 using Qt6 for the graphical interface.</p>\
-<p>The REFI-QDA Project import and export are experimental and should not be relied upon. </p>\
+<p>QualCoder is written in python using Qt6 for the graphical interface.</p>\
+<p>The REFI-QDA Project import and export seem to work ok, but should not be fully relied upon. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
 <p>Copyright (c) 2022 Colin Curtain</p>\
