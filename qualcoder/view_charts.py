@@ -31,7 +31,6 @@ import logging
 import os
 import pandas as pd
 import plotly.express as px
-import plotly.figure_factory as ff
 import sys
 import traceback
 
@@ -68,7 +67,7 @@ class ViewCharts(QDialog):
     conn = None
     settings = None
     categories = []
-    code_names = []
+    codes = []
     files = []
     cases = []
     dialog_list = []
@@ -87,10 +86,8 @@ class ViewCharts(QDialog):
         integers = QtGui.QIntValidator()
         self.ui.lineEdit_filter.setValidator(integers)
 
-        # Temporary hide widgets
+        # Temporary hide widget
         self.ui.pushButton_attributes.hide()
-        self.ui.label_category.hide()
-        self.ui.comboBox_category.hide()
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -114,19 +111,18 @@ class ViewCharts(QDialog):
         self.files = self.app.get_filenames()
         files_combobox_list = [""]
         for f in self.files:
-            #print(f)
             files_combobox_list.append(f['name'])
         self.ui.comboBox_file.addItems(files_combobox_list)
         self.cases = self.app.get_casenames()
         cases_combobox_list = [""]
         for f in self.cases:
-            #print(f)
             cases_combobox_list.append(f['name'])
         self.ui.comboBox_case.addItems(cases_combobox_list)
         self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
         self.ui.comboBox_file.currentIndexChanged.connect(self.clear_combobox_cases)
 
-        self.code_names, self.categories = app.get_codes_categories()
+        #self.codes, self.categories = app.get_codes_categories()
+        self.get_selected_categories_and_codes()
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         pie_combobox_list = ['', _('Code frequency'),
                              _('Code by characters'),
@@ -152,7 +148,12 @@ class ViewCharts(QDialog):
                              _('Code by audio/video segments')
                              ]
         self.ui.comboBox_bar_charts.addItems(bar_combobox_list)
+        categories_combobox_list = [""]
+        for c in self.categories:
+            categories_combobox_list.append(c['name'])
+        self.ui.comboBox_category.addItems(categories_combobox_list)
 
+    # DATA FILTERS SECTION
     def clear_combobox_files(self):
         self.ui.comboBox_file.blockSignals(True)
         self.ui.comboBox_file.setCurrentIndex(0)
@@ -193,6 +194,72 @@ class ViewCharts(QDialog):
             return "", ""
         return _("Case: ") + case_name + " ", " in (" + file_ids[1:] + ")"
 
+    def get_selected_categories_and_codes(self):
+        """ The base state contains all categories and codes.
+        A selected category, via combo box selection, restricts the categories and codes.
+        """
+
+        self.codes, self.categories = self.app.get_codes_categories()
+        # Extra keys for hierarchy charts
+        for code in self.codes:
+            code['count'] = 0
+            code['parentname'] = ""
+        for cat in self.categories:
+            cat['count'] = 0
+            cat['parentname'] = ""
+
+        node = self.ui.comboBox_category.currentText()
+        if node == "":
+            return
+        for category in self.categories:
+            if category['name'] == node:
+                node = category
+                node['supercatid'] = None
+                break
+        """ Create a list of this category (node) and all its category children.
+        Note, maximum depth of 100. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while self.categories != [] and new_model_changed and i < 100:
+            new_model_changed = False
+            append_list = []
+            for n in selected_categories:
+                for m in self.categories:
+                    if m['supercatid'] == n['catid']:
+                        append_list.append(m)
+            for n in append_list:
+                selected_categories.append(n)
+                self.categories.remove(n)
+                new_model_changed = True
+            i += 1
+        self.categories = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for cat in self.categories:
+            for code in self.codes:
+                if code['catid'] == cat['catid']:
+                    selected_codes.append(code)
+        self.codes = selected_codes
+
+    # CHART DISPLAYS SECTION
+    def owner_and_subtitle_helper(self):
+        """ Create initial subtitle and get owner
+         return:
+            String owner
+            String subtitle
+         """
+
+        subtitle = "<br><sup>"
+        owner = self.ui.comboBox_coders.currentText()
+        if owner == "":
+            owner = '%'
+        else:
+            subtitle += _("Coder: ") + owner + " "
+        if self.ui.comboBox_category.currentText() != "":
+            subtitle += _("Category: ") + self.ui.comboBox_category.currentText()
+        return owner, subtitle
+
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
         """
@@ -200,6 +267,7 @@ class ViewCharts(QDialog):
         chart_type = self.ui.comboBox_bar_charts.currentText()
         if chart_type == "":
             return
+        self.get_selected_categories_and_codes()
         if chart_type == "Code frequency":
             self.barchart_code_frequency()
         if chart_type == "Code by characters":
@@ -215,19 +283,14 @@ class ViewCharts(QDialog):
         """
 
         title = _('Code count - text, images and Audio/Video')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select count(cid) from code_text where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
@@ -261,19 +324,14 @@ class ViewCharts(QDialog):
         """ Count of codes in files text by character volume. """
 
         title = _('Code text by character count')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
@@ -296,19 +354,14 @@ class ViewCharts(QDialog):
         """ Codes by image area volume. """
 
         title = _('Code volume by image area (pixels)')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ? and id" + file_ids
@@ -331,19 +384,14 @@ class ViewCharts(QDialog):
         """ Codes by audio/video segment volume. """
 
         title = _('Code volume by audio/video segments (milliseconds)')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ? and id" + file_ids
@@ -368,6 +416,7 @@ class ViewCharts(QDialog):
         chart_type = self.ui.comboBox_pie_charts.currentText()
         if chart_type == "":
             return
+        self.get_selected_categories_and_codes()
         if chart_type == "Code frequency":
             self.piechart_code_frequency()
         if chart_type == "Code by characters":
@@ -383,19 +432,14 @@ class ViewCharts(QDialog):
         """
 
         title = _('Code count - text, images and Audio/Video')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select count(cid) from code_text where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select count(cid) from code_text where cid=? and owner like ? and fid" + file_ids
@@ -428,19 +472,14 @@ class ViewCharts(QDialog):
         """ Count of codes in files text by character volume. """
 
         title = _('Code text by character count')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
+        owner, subtitle = self.owner_and_subtitle_helper()
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
-        for c in self.code_names:
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
             sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(pos1 - pos0) from code_text where cid=? and owner like ? and fid" + file_ids
@@ -463,19 +502,14 @@ class ViewCharts(QDialog):
         """ Codes by image area volume. """
 
         title = _('Code volume by image area (pixels)')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        owner, subtitle = self.owner_and_subtitle_helper()
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         cur = self.app.conn.cursor()
         values = []
         labels = []
-        for c in self.code_names:
+        for c in self.codes:
             sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(cast(width as int) * cast(height as int)) from code_image where cid=? and owner like ? and id" + file_ids
@@ -498,19 +532,14 @@ class ViewCharts(QDialog):
         """ Codes by audio/video segment volume. """
 
         title = _('Code volume by audio/video segments (milliseconds)')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        owner, subtitle = self.owner_and_subtitle_helper()
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         values = []
         labels = []
         cur = self.app.conn.cursor()
-        for c in self.code_names:
+        for c in self.codes:
             sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ?"
             if file_ids != "":
                 sql = "select sum(pos1 - pos0) from code_av where cid=? and owner like ? and id" + file_ids
@@ -537,6 +566,7 @@ class ViewCharts(QDialog):
         chart_type = self.ui.comboBox_sunburst_charts.currentText()
         if chart_type == "":
             return
+        self.get_selected_categories_and_codes()
         if chart_type == "Code frequency sunburst":
             self.hierarchy_code_frequency("sunburst")
         if chart_type == "Code frequency treemap":
@@ -555,45 +585,17 @@ class ViewCharts(QDialog):
             self.hierarchy_code_volume_by_segments("treemap")
         self.ui.comboBox_sunburst_charts.setCurrentIndex(0)
 
-    def get_categories_and_codes_herarchy_helper(self):
-        """ Get categories and coes for use in hierarchy charts
-        returns lists of categories and codes """
-
-        cur = self.app.conn.cursor()
-        categories = []
-        cur.execute("select name, catid, supercatid from code_cat order by lower(name)")
-        result = cur.fetchall()
-        for row in result:
-            categories.append({'name': row[0], 'catid': row[1],
-                                  'supercatid': row[2],
-                                  'count': 0, 'parentname': ""})
-        codes = []
-        cur.execute("select name, cid, catid, color from code_name order by lower(name)")
-        result = cur.fetchall()
-        for row in result:
-            codes.append({'name': row[0],
-                             'cid': row[1], 'catid': row[2], 'color': row[3],
-                             'count': 0, 'parentname': ""})
-        return categories, codes
-
     def hierarchy_code_frequency(self, chart="sunburst"):
         """ Count of codes across text, images and A/V.
         Calculates code count and category count and displays in sunburst or treemap chart.
         """
 
         title = chart + _(' chart of counts of codes and categories')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-        categories, codes = self.get_categories_and_codes_herarchy_helper()
-
+        owner, subtitle = self.owner_and_subtitle_helper()
         # Get all the coded data
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         coded_data = []
         cur = self.app.conn.cursor()
         sql_t = "select cid from code_text where owner like ?"
@@ -618,19 +620,19 @@ class ViewCharts(QDialog):
         for row in result:
             coded_data.append(row)
         # Calculate the frequency of each code
-        for code_ in codes:
+        for code_ in self.codes:
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += 1
         # Add the code count directly to each parent category, add parentname to each code
-        for category in categories:
-            for code_ in codes:
+        for category in self.categories:
+            for code_ in self.codes:
                 if code_['catid'] == category['catid']:
                     category['count'] += code_['count']
                     code_['parentname'] = category['name']
         # Find leaf categories, add to parent categories, and gradually remove leaves
         # Until only top categories remain
-        sub_categories = copy(categories)
+        sub_categories = copy(self.categories)
         counter = 0
         while len(sub_categories) > 0 or counter < 5000:
             # Identify parent categories
@@ -647,12 +649,12 @@ class ViewCharts(QDialog):
                     leaf_list.append(category)
             # Add counts for each leaf category to higher category
             for leaf_category in leaf_list:
-                for cat in categories:
+                for cat in self.categories:
                     if cat['catid'] == leaf_category['supercatid']:
                         cat['count'] += leaf_category['count']
                 sub_categories.remove(leaf_category)
             counter += 1
-        combined = categories + codes
+        combined = self.categories + self.codes
         items = []
         values = []
         parents = []
@@ -683,18 +685,11 @@ class ViewCharts(QDialog):
         """
 
         title = chart + _(' chart of counts of coded text - total characters')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-
-        categories, codes = self.get_categories_and_codes_herarchy_helper()
+        owner, subtitle = self.owner_and_subtitle_helper()
         # Get all the coded data
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         coded_data = []
         cur = self.app.conn.cursor()
         sql = "select cid, pos1-pos0 from code_text where owner like ?"
@@ -705,19 +700,19 @@ class ViewCharts(QDialog):
         for row in result:
             coded_data.append(row)
         # Calculate the frequency of each code
-        for code_ in codes:
+        for code_ in self.codes:
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
         # Add the code count directly to each parent category, add parentname to each code
-        for category in categories:
-            for code_ in codes:
+        for category in self.categories:
+            for code_ in self.codes:
                 if code_['catid'] == category['catid']:
                     category['count'] += code_['count']
                     code_['parentname'] = category['name']
         # Find leaf categories, add to parent categories, and gradually remove leaves
         # Until only top categories remain
-        sub_categories = copy(categories)
+        sub_categories = copy(self.categories)
         counter = 0
         while len(sub_categories) > 0 or counter < 5000:
             # Identify parent categories
@@ -734,12 +729,12 @@ class ViewCharts(QDialog):
                     leaf_list.append(category)
             # Add counts for each leaf category to higher category
             for leaf_category in leaf_list:
-                for cat in categories:
+                for cat in self.categories:
                     if cat['catid'] == leaf_category['supercatid']:
                         cat['count'] += leaf_category['count']
                 sub_categories.remove(leaf_category)
             counter += 1
-        combined = categories + codes
+        combined = self.categories + self.codes
         items = []
         values = []
         parents = []
@@ -770,18 +765,11 @@ class ViewCharts(QDialog):
         """
 
         title = chart + _(' chart of coded image areas - pixels')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-
-        categories, codes = self.get_categories_and_codes_herarchy_helper()
+        owner, subtitle = self.owner_and_subtitle_helper()
         # Get all the coded data
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         coded_data = []
         cur = self.app.conn.cursor()
         sql = "select cid, cast(width as int) * cast(height as int) from code_image where owner like ?"
@@ -792,19 +780,19 @@ class ViewCharts(QDialog):
         for row in result:
             coded_data.append(row)
         # Calculate the frequency of each code
-        for code_ in codes:
+        for code_ in self.codes:
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
         # Add the code count directly to each parent category, add parentname to each code
-        for category in categories:
-            for code_ in codes:
+        for category in self.categories:
+            for code_ in self.codes:
                 if code_['catid'] == category['catid']:
                     category['count'] += code_['count']
                     code_['parentname'] = category['name']
         # Find leaf categories, add to parent categories, and gradually remove leaves
         # Until only top categories remain
-        sub_categories = copy(categories)
+        sub_categories = copy(self.categories)
         counter = 0
         while len(sub_categories) > 0 or counter < 5000:
             # Identify parent categories
@@ -821,12 +809,12 @@ class ViewCharts(QDialog):
                     leaf_list.append(category)
             # Add counts for each leaf category to higher category
             for leaf_category in leaf_list:
-                for cat in categories:
+                for cat in self.categories:
                     if cat['catid'] == leaf_category['supercatid']:
                         cat['count'] += leaf_category['count']
                 sub_categories.remove(leaf_category)
             counter += 1
-        combined = categories + codes
+        combined = self.categories + self.codes
         items = []
         values = []
         parents = []
@@ -857,18 +845,11 @@ class ViewCharts(QDialog):
         """
 
         title = chart + _(' chart of coded audio/video segments - milliseconds')
-        subtitle = "<br><sup>"
-        owner = self.ui.comboBox_coders.currentText()
-        if owner == "":
-            owner = '%'
-        else:
-            subtitle += _("Coder: ") + owner + " "
-
-        categories, codes = self.get_categories_and_codes_herarchy_helper()
+        owner, subtitle = self.owner_and_subtitle_helper()
         # Get all the coded data
-        name, file_ids = self.get_file_ids()
-        if name != "":
-            subtitle += name
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
         coded_data = []
         cur = self.app.conn.cursor()
         sql = "select cid, pos1-pos0 from code_av where owner like ?"
@@ -879,19 +860,19 @@ class ViewCharts(QDialog):
         for row in result:
             coded_data.append(row)
         # Calculate the frequency of each code
-        for code_ in codes:
+        for code_ in self.codes:
             for coded_item in coded_data:
                 if coded_item[0] == code_['cid']:
                     code_['count'] += coded_item[1]
         # Add the code count directly to each parent category, add parentname to each code
-        for category in categories:
-            for code_ in codes:
+        for category in self.categories:
+            for code_ in self.codes:
                 if code_['catid'] == category['catid']:
                     category['count'] += code_['count']
                     code_['parentname'] = category['name']
         # Find leaf categories, add to parent categories, and gradually remove leaves
         # Until only top categories remain
-        sub_categories = copy(categories)
+        sub_categories = copy(self.categories)
         counter = 0
         while len(sub_categories) > 0 or counter < 5000:
             # Identify parent categories
@@ -908,12 +889,12 @@ class ViewCharts(QDialog):
                     leaf_list.append(category)
             # Add counts for each leaf category to higher category
             for leaf_category in leaf_list:
-                for cat in categories:
+                for cat in self.categories:
                     if cat['catid'] == leaf_category['supercatid']:
                         cat['count'] += leaf_category['count']
                 sub_categories.remove(leaf_category)
             counter += 1
-        combined = categories + codes
+        combined = self.categories + self.codes
         items = []
         values = []
         parents = []
