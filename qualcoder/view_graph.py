@@ -122,15 +122,6 @@ class ViewGraph(QDialog):
         else:
             self.circular_graph()
 
-    '''def contextMenuEvent(self, event):
-        menu = QtWidgets.QMenu()
-        action_export_image = menu.addAction(_("Export image"))
-        menu.addAction(action_export_image)
-        action = menu.exec_(event.globalPos())
-        if action == action_export_image:
-            self.export_image()
-            return'''
-
     def export_image(self):
         """ Export the QGraphicsScene as a png image with transparent background.
         Called by QButton.
@@ -141,16 +132,13 @@ class ViewGraph(QDialog):
         filepath = e_dir.filepath
         if filepath is None:
             return
-        # print("supported formats:", QtGui.QImageWriter.supportedImageFormats())
         # Scene size is too big.
         max_x, max_y = self.scene.suggested_scene_size()
         rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
         image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format.Format_ARGB32_Premultiplied)
-        # image = QtGui.QImage(int(self.scene.width()), int(self.scene.height()), QtGui.QImage.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        # self.scene.render(painter)
-        # render method requires QRectF NOT QRect
+        # Render method requires QRectF NOT QRect
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
         painter.end()
         image.save(filepath)
@@ -222,6 +210,44 @@ class ViewGraph(QDialog):
 
         return catid_counts, model
 
+    def named_children_of_node(self, node):
+        """ Get child categories and codes of this category node.
+        Only keep the category or code name.  Used to reposition TextGraphicsItems on moving a category. """
+
+        if node['cid'] is not None:
+            return []
+        child_names = []
+        codes, categories = self.app.get_codes_categories()
+        """ Create a list of this category (node) and all its category children.
+        Note, maximum depth of 100. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories != [] and new_model_changed and i < 100:
+            new_model_changed = False
+            append_list = []
+            for n in selected_categories:
+                for m in categories:
+                    if m['supercatid'] == n['catid']:
+                        append_list.append(m)
+                        child_names.append(m['name'])
+            for n in append_list:
+                selected_categories.append(n)
+                categories.remove(n)
+                new_model_changed = True
+            i += 1
+        categories = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for cat in categories:
+            for code in codes:
+                if code['catid'] == cat['catid']:
+                    selected_codes.append(code)
+        codes = selected_codes
+        for c in codes:
+            child_names.append(c['name'])
+        return child_names
+
     def list_graph(self):
         """ Create a list graph with the categories on the left and codes on the right
         """
@@ -230,7 +256,7 @@ class ViewGraph(QDialog):
         cats, codes, model = self.create_initial_model()
         catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
 
-        # order the model by supercatid, subcats, codes
+        # Order the model by supercatid, subcats, codes
         ordered_model = []
         # Top level categories
         for m in model:
@@ -255,10 +281,11 @@ class ViewGraph(QDialog):
             ordered_model[i]['y'] = i * (int(self.ui.comboBox_fontsize.currentText()) * 3)
         model = ordered_model
 
-        # expand scene width and height if needed
+        # Expand scene width and height if needed
         max_x = self.scene.get_width()
         max_y = self.scene.get_height()
         for m in model:
+            m['child_names'] = self.named_children_of_node(m)
             if m['x'] > max_x - 50:
                 max_x = m['x'] + 50
             if m['y'] > max_y - 20:
@@ -324,6 +351,7 @@ class ViewGraph(QDialog):
 
         # Fix out of view items
         for m in model:
+            m['child_names'] = self.named_children_of_node(m)
             if m['x'] < 2:
                 m['x'] = 2
             if m['y'] < 2:
@@ -348,14 +376,14 @@ class ViewGraph(QDialog):
 
     def get_node_with_children(self, node, model):
         """ Return a short list of this top node and all its children.
-        Note, maximum depth of 10. """
+        Note, maximum depth of 20. """
 
         if node is None:
             return model
         new_model = [node]
         i = 0  # for ensuring an exit from while loop
         new_model_changed = True
-        while model != [] and new_model_changed and i < 10:
+        while model != [] and new_model_changed and i < 20:
             new_model_changed = False
             append_list = []
             for n in new_model:
@@ -420,12 +448,26 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
         super(GraphicsScene, self).mousePressEvent(mouse_event)
 
+        x_diff = 0
+        y_diff = 0
+        child_names = []
         for item in self.items():
             if isinstance(item, TextGraphicsItem):
-                item.code_or_cat['x'] = item.pos().x()
-                item.code_or_cat['y'] = item.pos().y()
-                item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
-                break
+                if item.code_or_cat['x'] != item.pos().x() or item.code_or_cat['y'] != item.pos().y():
+                    x_diff = item.pos().x() - item.code_or_cat['x']
+                    item.code_or_cat['x'] = item.pos().x()
+                    y_diff = item.pos().y() - item.code_or_cat['y']
+                    item.code_or_cat['y'] = item.pos().y()
+                    item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
+                    child_names = item.code_or_cat['child_names']
+                    break
+        # Move child items of category
+        if x_diff != 0 or y_diff != 0:
+            for item in self.items():
+                if isinstance(item, TextGraphicsItem) and item.code_or_cat['name'] in child_names:
+                    item.code_or_cat['x'] += x_diff
+                    item.code_or_cat['y'] += y_diff
+                    item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
         for item in self.items():
             if isinstance(item, LinkGraphicsItem):
                 item.redraw()
