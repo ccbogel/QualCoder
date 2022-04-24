@@ -41,6 +41,10 @@ class Ui_DialogGraph(object):
         self.comboBox_fontsize = QtWidgets.QComboBox(self.groupBox_header)
         self.comboBox_fontsize.setGeometry(QtCore.QRect(290, 5, 71, 30))
         self.comboBox_fontsize.setObjectName("comboBox_fontsize")
+        self.label_zoom = QtWidgets.QLabel(self.groupBox_header)
+        self.label_zoom.setGeometry(QtCore.QRect(882, 7, 28, 28))
+        self.label_zoom.setText("")
+        self.label_zoom.setObjectName("label_zoom")
         self.gridLayout.addWidget(self.groupBox_header, 0, 0, 1, 1)
         self.graphicsView = QtWidgets.QGraphicsView(DialogGraph)
         self.graphicsView.setLayoutDirection(QtCore.Qt.LayoutDirection.RightToLeft)
@@ -62,6 +66,7 @@ class Ui_DialogGraph(object):
         self.label.setText(_translate("DialogGraph", "Font size"))
         self.checkBox_blackandwhite.setText(_translate("DialogGraph", "Black and white"))
         self.pushButton_export.setToolTip(_translate("DialogGraph", "Export image"))
+        self.label_zoom.setToolTip(_translate("DialogGraph", "Click on the graph area and press + or - to zoom in or zoom out."))
 
 
 if __name__ == "__main__":
