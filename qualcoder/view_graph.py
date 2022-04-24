@@ -72,7 +72,7 @@ class ViewGraph(QDialog):
     settings = None
     scene = None
     categories = []
-    code_names = []
+    codes = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -99,15 +99,21 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_image)
 
         # Set the scene
-        # Need reference to the graphicsView in the scene to zoom
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
+
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
         self.ui.comboBox_fontsize.currentIndexChanged.connect(self.show_graph_type)
-        self.code_names, self.categories = app.get_codes_categories()
-
+        self.codes, self.categories = app.get_codes_categories()
+        """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
+        This causes hierarchy to not work correctly (eg when moving a category).
+        Solution, add spaces after the code_name to separate it out. """
+        for code in self.codes:
+            for cat in self.categories:
+                if code['name'] == cat['name']:
+                    code['name'] = code['name'] + " "
         self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
         combobox_list = ['All']
         for c in self.categories:
@@ -149,7 +155,7 @@ class ViewGraph(QDialog):
         return: categories, codes, model  """
 
         cats = deepcopy(self.categories)
-        codes = deepcopy(self.code_names)
+        codes = deepcopy(self.codes)
 
         for c in codes:
             c['depth'] = 0
@@ -217,6 +223,14 @@ class ViewGraph(QDialog):
             return []
         child_names = []
         codes, categories = self.app.get_codes_categories()
+        """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
+        This causes hierarchy to not work correctly (eg when moving a category).
+        Solution, add spaces after the code_name to separate it out. """
+        for code in codes:
+            for cat in categories:
+                if code['name'] == cat['name']:
+                    code['name'] = code['name'] + " "
+
         """ Create a list of this category (node) and all its category children.
         Note, maximum depth of 100. """
         selected_categories = [node]
@@ -397,14 +411,17 @@ class ViewGraph(QDialog):
         return new_model
 
     def keyPressEvent(self, event):
+        """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
 
         key = event.key()
-        mod = event.modifiers()
-
-        if key == QtCore.Qt.Key.Key_I and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+        #mod = event.modifiers()
+        if key == QtCore.Qt.Key.Key_Plus:
+            if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
+                return
             self.ui.graphicsView.scale(1.1, 1.1)
-
-        if key == QtCore.Qt.Key.Key_O and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+        if key == QtCore.Qt.Key.Key_Minus:
+            if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
+                return
             self.ui.graphicsView.scale(0.9, 0.9)
 
     def reject(self):

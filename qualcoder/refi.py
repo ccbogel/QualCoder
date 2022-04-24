@@ -72,7 +72,7 @@ class RefiImport:
 
     # TODO load_audio_source - check it works, load transcript, transcript synchpoints, transcript codings
     # TODO load_video_source - check it works, load transcript, transcript synchpoints, transcript codings
-    # TODO check imports from different vendors, tried Quirkos, Maxqda
+    # TODO check imports from different vendors, tried Quirkos, Maxqda, Nvivo for text only so far
     # TODO reference external sources - relative or absolute paths
 
     file_path = None
@@ -137,15 +137,6 @@ class RefiImport:
         """ Import REFI-QDA standard codebook into opened project.
         Codebooks do not validate using the qdasoftware.org Codebook.xsd generated on 2017-10-05 16:17z"""
 
-        """
-        with open(self.file_path, "r") as xml_file:
-            self.xml = xml_file.read()
-        result = self.xml_validation("codebook")
-        print("PARSING: ", result)
-        # Typical error with codebook XSD validation:
-        # PARSING ERROR: StartTag: invalid element name, line 3, column 2 (Codebook.xsd, line 3)
-        """
-
         tree = etree.parse(self.file_path)  # get element tree object
         root = tree.getroot()
         # look for the Codes tag, which contains each Code element
@@ -156,7 +147,7 @@ class RefiImport:
                 counter = 0
                 code_elements = cb.getchildren()
                 for el_ in code_elements:
-                    # recursive search through each Code element
+                    # Recursive search through each Code element
                     counter += self.sub_codes(cb, None)
                 Message(self.app, _("Codebook imported"),
                         str(counter) + _(" categories and codes imported from ") + self.file_path).exec()
@@ -170,8 +161,8 @@ class RefiImport:
         or if a category, gives the category alignment to a super_category.
         Called from: import_project, import_codebook
 
-        Some software e.g. MAXQDA categories are also codes
-        in this case QualCoder will create a category, and also a code with the same name underneath that category
+        Some software e.g. MAXQDA, Nvivo categories are also codes
+        in this case QualCoder will create a category, and also a code with the same name underneath that category.
 
         Recursive, until no more child Codes found.
         Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
@@ -253,8 +244,7 @@ class RefiImport:
                 self.codes.append({'guid': parent.get('guid'), 'cid': last_insert_id})
                 counter += 1
             except sqlite3.IntegrityError:
-                pass
-                # Code name already exists
+                pass  # Code name already exists
             return counter
 
         # One child, a description so, insert this code into code_name table
@@ -277,14 +267,6 @@ class RefiImport:
             except sqlite3.IntegrityError:
                 pass
             return counter
-        # SHOULD NOT GET HERE
-        '''print("SHOULD NOT GET HERE")
-        print("tag:", e.tag, e.text, e.get("name"), e.get("color"), e.get("isCodable"))
-        logger.debug("REFI sub_codes import: SHOULD NOT GET HERE:")
-        logger.debug("tag:" + str(e.tag) + " " + str(e.text) + " name:" + str(e.get("name")) + " color:" +
-                     str(e.get("isCodable")))
-        QtWidgets.QMessageBox.warning(None, "tag: " + e.tag + "  " + e.text + " " + e.get("name") + " " +
-                                      e.get("color") + " " + e.get("isCodable"))'''
         return counter
 
     def import_project(self):
@@ -319,12 +301,11 @@ class RefiImport:
         path="absolute:///hiome/username/Documents/DF370983‐F009‐4D47‐8615‐711633FA9DE6.m4a"
         """
 
-        # Create extract folder
+        # Create temporary extract folder
         self.folder_name = self.file_path[:-4] + "_temporary"
         self.parent_textEdit.append(_("Reading from: ") + self.file_path)
         self.parent_textEdit.append(_("Creating temporary directory: ") + self.folder_name)
-
-        # Unzip folder
+        # Unzip qpdx folder
         project_zip = zipfile.ZipFile(self.file_path)
         project_zip.extractall(self.folder_name)
         project_zip.close()
@@ -533,7 +514,7 @@ class RefiImport:
         cur = self.app.conn.cursor()
         var_count = 0
         for e in element.getchildren():
-            print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
+            #print(e.tag, e.get("name"), e.get("guid"), e.get("typeOfVariable"))
             # <Variable name="Cases:something"> or ?
             name = e.get("name")
             valuetype = e.get("typeOfVariable")
@@ -1358,11 +1339,7 @@ class RefiImport:
 
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
-            print("project path", self.app.project_path)
-            print("name", name)  # ISSUE HERE
-            print("source_path", source_path)
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
-            print("destination", destination)
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as e:
