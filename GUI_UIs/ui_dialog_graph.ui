@@ -112,6 +112,22 @@
        </rect>
       </property>
      </widget>
+     <widget class="QLabel" name="label_zoom">
+      <property name="geometry">
+       <rect>
+        <x>882</x>
+        <y>7</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Click on the graph area and press + or - to zoom in or zoom out.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="0">
