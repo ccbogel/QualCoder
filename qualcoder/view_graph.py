@@ -68,13 +68,11 @@ class ViewGraph(QDialog):
     """
 
     app = None
-
     conn = None
     settings = None
     scene = None
     categories = []
     code_names = []
-    dialog_list = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -101,7 +99,8 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_image)
 
         # Set the scene
-        self.scene = GraphicsScene(self)
+        # Need reference to the graphicsView in the scene to zoom
+        self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
@@ -397,14 +396,23 @@ class ViewGraph(QDialog):
             i += 1
         return new_model
 
+    def keyPressEvent(self, event):
+
+        key = event.key()
+        mod = event.modifiers()
+
+        if key == QtCore.Qt.Key.Key_I and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+            self.ui.graphicsView.scale(1.1, 1.1)
+
+        if key == QtCore.Qt.Key.Key_O and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+            self.ui.graphicsView.scale(0.9, 0.9)
+
     def reject(self):
 
-        self.dialog_list = []
         super(ViewGraph, self).reject()
 
     def accept(self):
 
-        self.dialog_list = []
         super(ViewGraph, self).accept()
 
 
