@@ -97,6 +97,9 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.pressed.connect(self.export_image)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(zoom_icon), "png")
+        self.ui.label_zoom.setPixmap(pm.scaled(26, 26))
 
         # Set the scene
         self.scene = GraphicsScene()
