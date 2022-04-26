@@ -359,6 +359,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
+        # below - to test if work or delete it
         if platform.system() == "Darwin":  # For MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
         self.palette = self.ddialog.dframe.palette()
@@ -366,9 +367,9 @@ class DialogCodeByCase(QtWidgets.QWidget):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        # enable custom window hint - must be set to enable customizing window controls
+        # Enable custom window hint - must be set to enable customizing window controls
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
-        # disable close button, only close through closing the Ui_Dialog_view_av
+        # Disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowType.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         # Create a vlc instance with an empty vlc media player
@@ -456,6 +457,13 @@ class DialogCodeByCase(QtWidgets.QWidget):
                 case_vars.append(dict(zip(keys, v)))
             c['vars'] = case_vars
             c['file_index'] = 0  # Showing this file segment for this case
+
+        # Remove cases with no files
+        tmp_cases = []
+        for c in self.cases:
+            if c['files']:
+                tmp_cases.append(c)
+        self.cases = tmp_cases
 
         # Limited selection of cases
         if ids:
