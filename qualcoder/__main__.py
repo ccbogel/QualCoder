@@ -1174,17 +1174,19 @@ class MainWindow(QtWidgets.QMainWindow):
          files. Organised by Case. Useful for an imported survey. """
 
         cases = self.app.get_casenames()
-        files = self.app.get_text_filenames()
-        if len(files) > 0 and len(cases) > 0:
-            self.ui.label_coding.hide()
-            ui = DialogCodeByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
-            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-            self.tab_layout_helper(self.ui.tab_coding, ui)
-        else:
-            msg = _("This project contains no text files.")
-            if len(cases) == 0:
-                msg = _("This project contains no cases.")
-            Message(self.app, _('No cases or files'), msg).exec()
+        if len(cases) == 0:
+            msg = _("This project contains no cases.")
+            Message(self.app, _('No cases'), msg).exec()
+            return
+        files = self.app.get_filenames()
+        if len(files) == 0:
+            msg = _("This project contains no files.")
+            Message(self.app, _('No files'), msg).exec()
+            return
+        self.ui.label_coding.hide()
+        ui = DialogCodeByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
