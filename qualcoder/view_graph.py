@@ -73,6 +73,7 @@ class ViewGraph(QDialog):
     scene = None
     categories = []
     codes = []
+    extra_graphics_items = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -104,7 +105,10 @@ class ViewGraph(QDialog):
         # Set the scene
         self.scene = GraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
-        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
+        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
+        self.ui.graphicsView.viewport().installEventFilter(self)
+        self.extra_graphics_items = []
 
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
@@ -319,7 +323,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
                             m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        item = LinkGraphicsItem(self.app, m, n, True)  # corners only = True
+                        item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
                         self.scene.addItem(item)
 
     def circular_graph(self):
@@ -387,7 +391,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
                             m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        item = LinkGraphicsItem(self.app, m, n)
+                        item = LinkGraphicsItem(self.app, m, n, 1)
                         self.scene.addItem(item)
 
     def get_node_with_children(self, node, model):
@@ -434,6 +438,34 @@ class ViewGraph(QDialog):
     def accept(self):
 
         super(ViewGraph, self).accept()
+
+    def eventFilter(self, obj, event):
+        """ https://stackoverflow.com/questions/71993533/
+        how-to-initiate-context-menu-event-in-qgraphicsitem-from-qgraphicsview-context-m/72002453#72002453
+        This is required to forward context menu event to graphics view items """
+
+        if obj == self.ui.graphicsView.viewport() and event.type() == event.Type.ContextMenu:
+            self.ui.graphicsView.contextMenuEvent(event)
+            return event.isAccepted()
+        return super().eventFilter(obj, event)
+
+    def graphicsview_menu(self, position):
+        item = self.ui.graphicsView.itemAt(position)
+        if item is not None:
+            self.scene.sendEvent(item)
+            return
+        # Menu for blank graphics view area
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_add_text = QtGui.QAction(_("Insert Text object"))
+        menu.addAction(action_add_text)
+        action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
+        if action == action_add_text:
+            text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
+            if ok:
+                item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
+                self.extra_graphics_items.append(item)
+                self.scene.addItem(item)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -534,6 +566,66 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         return max_x, max_y
 
 
+class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
+    """ Free text to add to the scene. """
+
+    border_rect = None
+    app = None
+    font = None
+    settings = None
+    x = 10
+    y = 10
+    text = "text"
+
+    def __init__(self, app, x, y, text_):
+        """ Free text object.
+         param: app  : the main App class
+         """
+
+        super(FreeTextGraphicsItem, self).__init__(None)
+        self.app = app
+        self.x = x
+        self.y = y
+        self.text = text_
+        self.settings = app.settings
+        self.project_path = app.project_path
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # Foreground depends on the defined need_white_text color in color_selector
+        self.font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
+        self.setFont(self.font)
+        self.setPlainText(self.text)
+        self.setPos(self.x, self.y)
+        self.document().contentsChanged.connect(self.text_changed)
+
+    def paint(self, painter, option, widget):
+        """ see paint override method here:
+            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
+            see:
+            https://doc.qt.io/qt-5/qpainter.html """
+
+        color = QtCore.Qt.GlobalColor.white
+        if self.app.settings['stylesheet'] == 'dark':
+            color = QtCore.Qt.GlobalColor.black
+        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        painter.drawRect(self.boundingRect())
+        painter.setFont(self.font)
+        fm = painter.fontMetrics()
+        if self.app.settings['stylesheet'] == 'dark':
+            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
+        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
+        lines = self.text.split('\\n')
+        for row in range(0, len(lines)):
+            painter.drawText(5, fm.height() * (row + 1), lines[row])
+
+    def text_changed(self):
+        """ Text changed in a node. Redraw the border rectangle item to match. """
+
+        self.text = self.toPlainText()
+
+
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
     Categories are typically shown white, and category font sizes can be enlarged using a
@@ -558,7 +650,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
-        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
@@ -656,17 +749,19 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     from_pos = None
     to_widget = None
     to_pos = None
-    line_width = 1.5
+    line_width = 1
     line_type = QtCore.Qt.PenStyle.SolidLine
     line_color = QtCore.Qt.GlobalColor.black
     corners_only = False  # True for list graph
+    weighting = 1
 
-    def __init__(self, app, from_widget, to_widget, corners_only=False):
+    def __init__(self, app, from_widget, to_widget, weighting, corners_only=False):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
         self.corners_only = corners_only
+        self.weighting = weighting
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
         self.line_color = QtCore.Qt.GlobalColor.black
@@ -722,28 +817,28 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
                 to_x = to_x + self.to_widget.boundingRect().width() / 2
                 x_overlap = True
 
-        # fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
+        # Fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
         if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
             from_x = from_x + self.from_widget.boundingRect().width()
-        # fix to_x value to right-hand side if from_widget on the right of the to widget
+        # Fix to_x value to right-hand side if from_widget on the right of the to widget
         elif not x_overlap and from_x > to_x + self.to_widget.boundingRect().width():
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
         if not self.corners_only:
-            # fix from_y value to middle of from widget if to_widget overlaps in y position
+            # Fix from_y value to middle of from widget if to_widget overlaps in y position
             if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
                 from_y = from_y + self.from_widget.boundingRect().height() / 2
                 y_overlap = True
-            # fix from_y value to middle of to widget if from_widget overlaps in y position
+            # Fix from_y value to middle of to widget if from_widget overlaps in y position
             if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
                 to_y = to_y + self.to_widget.boundingRect().height() / 2
                 y_overlap = True
 
-        # fix from_y value if to_widget is above the from_widget
+        # Fix from_y value if to_widget is above the from_widget
         if not y_overlap and to_y > from_y:
             from_y = from_y + self.from_widget.boundingRect().height()
-        # fix to_y value if from_widget is below the to widget
+        # Fix to_y value if from_widget is below the to widget
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
 
