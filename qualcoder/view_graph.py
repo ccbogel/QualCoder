@@ -73,6 +73,7 @@ class ViewGraph(QDialog):
     scene = None
     categories = []
     codes = []
+    extra_graphics_items = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -107,6 +108,7 @@ class ViewGraph(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
+        self.extra_graphics_items = []
 
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
@@ -428,9 +430,6 @@ class ViewGraph(QDialog):
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
                 return
             self.ui.graphicsView.scale(0.9, 0.9)
-        # TODO test
-        if key == QtCore.Qt.Key.Key_I:
-            self.scene.addItem(FreeTextGraphicsItem(self.app))
 
     def reject(self):
 
@@ -458,9 +457,15 @@ class ViewGraph(QDialog):
         # Menu for blank graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_char3 = QtGui.QAction(_("Test"))
-        menu.addAction(action_char3)
+        action_add_text = QtGui.QAction(_("Insert Text object"))
+        menu.addAction(action_add_text)
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
+        if action == action_add_text:
+            text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
+            if ok:
+                item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
+                self.extra_graphics_items.append(item)
+                self.scene.addItem(item)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -572,14 +577,16 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     y = 10
     text = "text"
 
-    def __init__(self, app):
-        """ Show name and colour of text. Has context menu for various options.
+    def __init__(self, app, x, y, text_):
+        """ Free text object.
          param: app  : the main App class
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
-        self.conn = app.conn
+        self.x = x
+        self.y = y
+        self.text = text_
         self.settings = app.settings
         self.project_path = app.project_path
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
@@ -589,7 +596,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Foreground depends on the defined need_white_text color in color_selector
         self.font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
         self.setFont(self.font)
-        self.setPlainText("text")
+        self.setPlainText(self.text)
         self.setPos(self.x, self.y)
         self.document().contentsChanged.connect(self.text_changed)
 
@@ -600,11 +607,18 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             https://doc.qt.io/qt-5/qpainter.html """
 
         color = QtCore.Qt.GlobalColor.white
+        if self.app.settings['stylesheet'] == 'dark':
+            color = QtCore.Qt.GlobalColor.black
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.setFont(self.font)
-        painter.setPen(QtCore.Qt.GlobalColor.black)
-        painter.drawText(2, 2, self.text)
+        fm = painter.fontMetrics()
+        if self.app.settings['stylesheet'] == 'dark':
+            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
+        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
+        lines = self.text.split('\\n')
+        for row in range(0, len(lines)):
+            painter.drawText(5, fm.height() * (row + 1), lines[row])
 
     def text_changed(self):
         """ Text changed in a node. Redraw the border rectangle item to match. """
@@ -636,7 +650,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
-        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable | QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
@@ -679,7 +694,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         the Dialog screen position.
         """
 
-        print(event)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         menu.addAction('Memo')
