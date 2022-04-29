@@ -73,7 +73,6 @@ class ViewGraph(QDialog):
     scene = None
     categories = []
     codes = []
-    #extra_graphics_items = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -108,7 +107,6 @@ class ViewGraph(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        #self.extra_graphics_items = []
 
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
@@ -466,7 +464,6 @@ class ViewGraph(QDialog):
             text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
             if ok:
                 item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
-                #self.extra_graphics_items.append(item)
                 self.scene.addItem(item)
         if action == action_add_line:
             names = self.named_text_items()
@@ -493,7 +490,6 @@ class ViewGraph(QDialog):
             if from_item == to_item or from_item is None or to_item is None:
                 return
             line_item = FreeLineGraphicsItem(self.app, from_item, to_item)
-            #self.extra_graphics_items.append(line_item)
             self.scene.addItem(line_item)
 
     def named_text_items(self):
@@ -501,6 +497,7 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if isinstance(item, TextGraphicsItem):
                 names.append(item.text)
+                names.sort()
         return names
 
 
