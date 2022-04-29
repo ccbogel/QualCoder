@@ -73,7 +73,7 @@ class ViewGraph(QDialog):
     scene = None
     categories = []
     codes = []
-    extra_graphics_items = []
+    #extra_graphics_items = []
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -108,7 +108,7 @@ class ViewGraph(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        self.extra_graphics_items = []
+        #self.extra_graphics_items = []
 
         self.ui.checkBox_blackandwhite.stateChanged.connect(self.show_graph_type)
         self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
@@ -457,15 +457,51 @@ class ViewGraph(QDialog):
         # Menu for blank graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_add_text = QtGui.QAction(_("Insert Text object"))
+        action_add_text = QtGui.QAction(_("Insert Text"))
         menu.addAction(action_add_text)
+        action_add_line = QtGui.QAction(_("Insert Line"))
+        menu.addAction(action_add_line)
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_add_text:
             text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
             if ok:
                 item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
-                self.extra_graphics_items.append(item)
+                #self.extra_graphics_items.append(item)
                 self.scene.addItem(item)
+        if action == action_add_line:
+            names = self.named_text_items()
+            line_from = QtWidgets.QInputDialog()
+            line_from.setWindowTitle(_("Lne"))
+            line_from.setLabelText(_('From:'))
+            line_from.setComboBoxItems(names)
+            line_from.exec()
+            text_from = line_from.textValue()
+            line_to = QtWidgets.QInputDialog()
+            line_to.setWindowTitle(_("Lne"))
+            line_to.setLabelText(_('To:'))
+            line_to.setComboBoxItems(names)
+            line_to.exec()
+            text_to = line_to.textValue()
+            from_item = None
+            to_item = None
+            for item in self.scene.items():
+                if isinstance(item, TextGraphicsItem):
+                    if item.text == text_from:
+                        from_item = item
+                    if item.text == text_to:
+                        to_item = item
+            if from_item == to_item or from_item is None or to_item is None:
+                return
+            line_item = FreeLineGraphicsItem(self.app, from_item, to_item)
+            #self.extra_graphics_items.append(line_item)
+            self.scene.addItem(line_item)
+
+    def named_text_items(self):
+        names = []
+        for item in self.scene.items():
+            if isinstance(item, TextGraphicsItem):
+                names.append(item.text)
+        return names
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -529,8 +565,12 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     item.code_or_cat['y'] += y_diff
                     item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
         for item in self.items():
-            if isinstance(item, LinkGraphicsItem):
+            if isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
                 item.redraw()
+        for item in self.items():
+            if isinstance(item, FreeLineGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
+                if item.remove is True:
+                    self.removeItem(item)
         self.update()
 
     '''def mousePressEvent(self, mouseEvent):
@@ -576,10 +616,15 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     x = 10
     y = 10
     text = "text"
+    remove = False
 
     def __init__(self, app, x, y, text_):
         """ Free text object.
-         param: app  : the main App class
+         param:
+            app  : the main App class
+            x : Integer x position
+            y : Intger y position
+            text_ : String
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
@@ -589,16 +634,24 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.text = text_
         self.settings = app.settings
         self.project_path = app.project_path
+        self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         self.font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
         self.setFont(self.font)
         self.setPlainText(self.text)
         self.setPos(self.x, self.y)
         self.document().contentsChanged.connect(self.text_changed)
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+        menu.addAction(_('Remove'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action.text() == "Remove":
+            self.remove = True
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -626,6 +679,128 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.text = self.toPlainText()
 
 
+class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
+    """ Takes the coordinate from the two TextGraphicsItems. """
+
+    from_widget = None
+    from_pos = None
+    to_widget = None
+    to_pos = None
+    line_width = 2
+    line_type = QtCore.Qt.PenStyle.SolidLine
+    line_color = QtCore.Qt.GlobalColor.black
+    corners_only = False  # True for list graph
+    weighting = 1
+    tooltip = ""
+    remove = False
+
+    def __init__(self, app, from_widget, to_widget, corners_only=False):
+        super(FreeLineGraphicsItem, self).__init__(None)
+
+        self.from_widget = from_widget
+        self.to_widget = to_widget
+        self.corners_only = corners_only
+        self.weighting = 1
+        self.remove = False
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.calculate_points_and_draw()
+        self.line_color = QtCore.Qt.GlobalColor.black
+        if app.settings['stylesheet'] == "dark":
+            self.line_color = QtCore.Qt.GlobalColor.white
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+        menu.addAction(_('Thicker'))
+        menu.addAction(_('Thinner'))
+        menu.addAction(_('Dotted'))
+        menu.addAction(_('Red'))
+        menu.addAction(_('Yellow'))
+        menu.addAction(_('Green'))
+        menu.addAction(_('Blue'))
+        menu.addAction(_('Remove'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action.text() == 'Thicker':
+            self.line_width = self.line_width + 0.5
+            if self.line_width > 5:
+                self.line_width = 5
+            self.redraw()
+        if action.text() == 'Thinner':
+            self.line_width = self.line_width - 0.5
+            if self.line_width < 1:
+                self.line_width = 1
+            self.redraw()
+        if action.text() == 'Dotted':
+            self.line_type = QtCore.Qt.PenStyle.DotLine
+            self.redraw()
+        if action.text() == 'Red':
+            self.line_color = QtCore.Qt.GlobalColor.red
+            self.redraw()
+        if action.text() == 'Yellow':
+            self.line_color = QtCore.Qt.GlobalColor.yellow
+            self.redraw()
+        if action.text() == 'Green':
+            self.line_color = QtCore.Qt.GlobalColor.green
+            self.redraw()
+        if action.text() == 'Blue':
+            self.line_color = QtCore.Qt.GlobalColor.blue
+            self.redraw()
+        if action.text() == "Remove":
+            self.remove = True
+
+    def redraw(self):
+        """ Called from mouse move and release events. """
+
+        self.calculate_points_and_draw()
+
+    def calculate_points_and_draw(self):
+        """ Calculate the to x and y and from x and y points. Draw line between the
+        widgets. Join the line to appropriate side of widget. """
+
+        to_x = self.to_widget.pos().x()
+        to_y = self.to_widget.pos().y()
+        from_x = self.from_widget.pos().x()
+        from_y = self.from_widget.pos().y()
+
+        x_overlap = False
+        if not self.corners_only:
+            # fix from_x value to middle of from widget if to_widget overlaps in x position
+            if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+                from_x = from_x + self.from_widget.boundingRect().width() / 2
+                x_overlap = True
+            # fix to_x value to middle of to widget if from_widget overlaps in x position
+            if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+                to_x = to_x + self.to_widget.boundingRect().width() / 2
+                x_overlap = True
+
+        # Fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
+        if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
+            from_x = from_x + self.from_widget.boundingRect().width()
+        # Fix to_x value to right-hand side if from_widget on the right of the to widget
+        elif not x_overlap and from_x > to_x + self.to_widget.boundingRect().width():
+            to_x = to_x + self.to_widget.boundingRect().width()
+
+        y_overlap = False
+        if not self.corners_only:
+            # Fix from_y value to middle of from widget if to_widget overlaps in y position
+            if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+                from_y = from_y + self.from_widget.boundingRect().height() / 2
+                y_overlap = True
+            # Fix from_y value to middle of to widget if from_widget overlaps in y position
+            if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+                to_y = to_y + self.to_widget.boundingRect().height() / 2
+                y_overlap = True
+
+        # Fix from_y value if to_widget is above the from_widget
+        if not y_overlap and to_y > from_y:
+            from_y = from_y + self.from_widget.boundingRect().height()
+        # Fix to_y value if from_widget is below the to widget
+        elif not y_overlap and from_y > to_y:
+            to_y = to_y + self.to_widget.boundingRect().height()
+
+        self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
+        self.setLine(from_x, from_y, to_x, to_y)
+
+
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
     Categories are typically shown white, and category font sizes can be enlarged using a
@@ -638,6 +813,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     font = None
     settings = None
+    text = ""
 
     def __init__(self, app, code_or_cat):
         """ Show name and colour of text. Has context menu for various options.
@@ -650,10 +826,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
+        self.text = self.code_or_cat['name']
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         if self.code_or_cat['cid'] is not None:
             self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Normal)
@@ -700,6 +877,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.code_or_cat['cid'] is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
+            menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -709,6 +887,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.coded_media()
         if action.text() == 'Case text and media':
             self.case_media()
+        if action.text() == "Hide":
+            self.hide()
 
     def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
@@ -749,7 +929,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     from_pos = None
     to_widget = None
     to_pos = None
-    line_width = 1
+    line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
     line_color = QtCore.Qt.GlobalColor.black
     corners_only = False  # True for list graph
@@ -770,10 +950,15 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        menu.addAction('Thicker')
-        menu.addAction('Thinner')
-        menu.addAction('Dotted')
-        menu.addAction('Red')
+        menu.addAction(_('Thicker'))
+        menu.addAction(_('Thinner'))
+        menu.addAction(_('Dotted'))
+        menu.addAction(_('Red'))
+        menu.addAction(_('Yellow'))
+        menu.addAction(_('Green'))
+        menu.addAction(_('Blue'))
+        menu.addAction(_("Hide"))
+
         action = menu.exec(QtGui.QCursor.pos())
         if action.text() == 'Thicker':
             self.line_width = self.line_width + 0.5
@@ -791,6 +976,17 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action.text() == 'Red':
             self.line_color = QtCore.Qt.GlobalColor.red
             self.redraw()
+        if action.text() == 'Yellow':
+            self.line_color = QtCore.Qt.GlobalColor.yellow
+            self.redraw()
+        if action.text() == 'Green':
+            self.line_color = QtCore.Qt.GlobalColor.green
+            self.redraw()
+        if action.text() == 'Blue':
+            self.line_color = QtCore.Qt.GlobalColor.blue
+            self.redraw()
+        if action.text() == "Hide":
+            self.hide()
 
     def redraw(self):
         """ Called from mouse move and release events. """
