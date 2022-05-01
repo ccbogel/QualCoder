@@ -71,7 +71,7 @@ class ViewCharts(QDialog):
     codes = []
     files = []
     cases = []
-    dialog_list = []
+    attributes = []  # for charts of attributes
     attribute_file_ids = []
     attributes_msg = ""
 
@@ -108,6 +108,17 @@ class ViewCharts(QDialog):
             if row[0] != "":
                 coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
+
+        self.attributes = []
+        cur.execute("select name, memo, caseOrFile, valuetype from attribute_type")
+        result = cur.fetchall()
+        self.attributes = []
+        keys = 'name', 'memo', 'caseOrFile', 'valuetype'
+        for row in result:
+            self.attributes.append(dict(zip(keys, row)))
+        self.fill_combobox_attributes()
+        self.ui.radioButton_file.clicked.connect(self.fill_combobox_attributes)
+        self.ui.radioButton_case.clicked.connect(self.fill_combobox_attributes)
 
         self.files = self.app.get_filenames()
         files_combobox_list = [""]
@@ -151,6 +162,10 @@ class ViewCharts(QDialog):
         for c in self.categories:
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
+
+        # Attributes comboboxes. Initial radio button checked is Files
+        self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
+        self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
 
     # DATA FILTERS SECTION
     def select_attributes(self):
@@ -297,7 +312,7 @@ class ViewCharts(QDialog):
 
     def get_file_ids(self):
         """ Get file ids based on file selection or case selection.
-        Also 'gets' and returns attribute file ids.
+        Also returns attribute-selected file ids.
         Called by: all pie, bar, hierarchy charts
         return:
             case or file name, sql string of '' or file_ids comma separated as in (,,,) or =id
@@ -381,7 +396,7 @@ class ViewCharts(QDialog):
                     selected_codes.append(code)
         self.codes = selected_codes
 
-    # CHART DISPLAYS SECTION
+    # CODING CHARTS SECTION
     def owner_and_subtitle_helper(self):
         """ Create initial subtitle and get owner
          return:
@@ -706,6 +721,7 @@ class ViewCharts(QDialog):
         if chart_type == "":
             return
         self.get_selected_categories_and_codes()
+        self.helper_for_matching_category_and_code_name()
         if chart_type == "Code frequency sunburst":
             self.hierarchy_code_frequency("sunburst")
         if chart_type == "Code frequency treemap":
@@ -723,6 +739,18 @@ class ViewCharts(QDialog):
         if chart_type == "Code by A/V treemap":
             self.hierarchy_code_volume_by_segments("treemap")
         self.ui.comboBox_sunburst_charts.setCurrentIndex(0)
+
+    def helper_for_matching_category_and_code_name(self):
+        """ This is for qdpx imported projects.
+        Might be a quirk of importation, but category names and code names can match.
+         e.g. Maxqda, Nvivo allows a category name and a code name to be the same. (the same node).
+         This causes hierarchy charts to not display.
+         Solution, add spaces after the code_name to separate it out. """
+
+        for code in self.codes:
+            for cat in self.categories:
+                if code['name'] == cat['name']:
+                    code['name'] = code['name'] + " "
 
     def hierarchy_code_frequency(self, chart="sunburst"):
         """ Count of codes across text, images and A/V.
@@ -1057,3 +1085,86 @@ class ViewCharts(QDialog):
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
+
+    # ATTRIBUTES CHARTS SECTION
+    def fill_combobox_attributes(self):
+        """ Fill attributes if case or file is selected.
+            attribute keys = name, memo, caseOrFile, valuetype
+        """
+
+        list_char = [""]
+        list_num = [""]
+        if self.ui.radioButton_file.isChecked():
+            for a in self.attributes:
+                if a['caseOrFile'] == "file" and a['valuetype'] == "character":
+                    list_char.append(a['name'])
+                if a['caseOrFile'] == "file" and a['valuetype'] == "numeric":
+                    list_num.append(a['name'])
+        else:
+            for a in self.attributes:
+                if a['caseOrFile'] == "case" and a['valuetype'] == "character":
+                    list_char.append(a['name'])
+                if a['caseOrFile'] == "case" and a['valuetype'] == "numeric":
+                    list_num.append(a['name'])
+        self.ui.comboBox_num_attributes.blockSignals(True)
+        self.ui.comboBox_char_attributes.blockSignals(True)
+        self.ui.comboBox_num_attributes.clear()
+        self.ui.comboBox_char_attributes.clear()
+        self.ui.comboBox_char_attributes.addItems(list_char)
+        self.ui.comboBox_num_attributes.addItems(list_num)
+        self.ui.comboBox_num_attributes.blockSignals(False)
+        self.ui.comboBox_char_attributes.blockSignals(False)
+
+    def character_attribute_charts(self):
+        """ Character attributes are displayed as counts via bar charts. """
+
+        file_or_case = "case"
+        if self.ui.radioButton_file.isChecked():
+            file_or_case = "file"
+        attribute = self.ui.comboBox_char_attributes.currentText()
+        title = _("Attribute bar chart")
+        subtitle = "<br><sup>" + _(file_or_case) + _(" attribute: ") + attribute
+        self.ui.comboBox_char_attributes.blockSignals(True)
+        self.ui.comboBox_char_attributes.setCurrentIndex(0)
+        self.ui.comboBox_char_attributes.blockSignals(False)
+
+        cur = self.app.conn.cursor()
+        cur.execute("select value, count(value) from attribute where attr_type=? and name=? group by value order by upper(value)",
+                    [file_or_case, attribute])
+        res = cur.fetchall()
+        labels = []
+        values = []
+        for r in res:
+            labels.append(r[0])
+            values.append(r[1])
+        # Create pandas DataFrame
+        data = {'Value': labels, 'Count': values}
+        df = pd.DataFrame(data)
+        fig = px.bar(df, x='Count', y='Value', orientation='h', title=title + subtitle)
+        fig.show()
+
+    def numeric_attribute_charts(self):
+        """ Character attributes are displayed as boxplot charts. """
+
+        file_or_case = "case"
+        if self.ui.radioButton_file.isChecked():
+            file_or_case = "file"
+        attribute = self.ui.comboBox_num_attributes.currentText()
+        title = _("Attribute histogram")
+        subtitle = "<br><sup>" + _(file_or_case) + _(" attribute: ") + attribute
+        self.ui.comboBox_num_attributes.blockSignals(True)
+        self.ui.comboBox_num_attributes.setCurrentIndex(0)
+        self.ui.comboBox_num_attributes.blockSignals(False)
+
+        cur = self.app.conn.cursor()
+        cur.execute("select cast(value as int) from attribute where attr_type=? and name=?",
+                    [file_or_case, attribute])
+        res = cur.fetchall()
+        values = []
+        for r in res:
+            values.append(r[0])
+        # Create pandas DataFrame
+        data = {attribute: values}
+        df = pd.DataFrame(data)
+        fig = px.histogram(df, x=attribute, title=title + subtitle)
+        fig.show()
