@@ -43,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>123</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>207</y>
+     <y>150</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -76,7 +76,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>145</y>
+     <y>205</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -85,8 +85,8 @@
   <widget class="QLabel" name="label_hierarchy">
    <property name="geometry">
     <rect>
-     <x>14</x>
-     <y>120</y>
+     <x>10</x>
+     <y>180</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -249,7 +249,7 @@ Codings from the entire text file are used for the calculations.</string>
     </font>
    </property>
    <property name="text">
-    <string>&lt;b&gt;Chart options&lt;/b&gt;</string>
+    <string>&lt;b&gt;Coding charts&lt;/b&gt;</string>
    </property>
   </widget>
   <widget class="QComboBox" name="comboBox_category">
@@ -287,6 +287,132 @@ Codings from the entire text file are used for the calculations.</string>
    <property name="orientation">
     <enum>Qt::Vertical</enum>
    </property>
+  </widget>
+  <widget class="QLabel" name="label_chart_attributes">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>390</y>
+     <width>261</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;b&gt;Attribute charts&lt;/b&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_num_attr">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>516</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Numeric attributes</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_char_attr">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>457</y>
+     <width>291</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Character attributes</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_num_attributes">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>543</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_char_attributes">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>480</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>370</y>
+     <width>331</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>391</y>
+     <width>321</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QRadioButton" name="radioButton_file">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>File</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_case">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>30</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Case</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
