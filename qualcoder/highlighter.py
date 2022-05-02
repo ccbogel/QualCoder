@@ -56,7 +56,7 @@ class Highlighter(QSyntaxHighlighter):
         self.create_rules()
 
     def create_rules(self, dark=False):
-        """ Sets stling rules for SQL text.
+        """ Sets formatting rules for SQL text.
          param: dark = True - changes some text coloring """
 
         # Keywords
@@ -129,7 +129,7 @@ class Highlighter(QSyntaxHighlighter):
         comment_format = QTextCharFormat()
         brush = QBrush(QColor("#00BFFF"), Qt.BrushStyle.SolidPattern)
         if dark:
-            brush = QBrush(Qt.yellow, Qt.BrushStyle.SolidPattern)
+            brush = QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.SolidPattern)
         comment_format.setForeground(brush)
         self.highlighting_rules += [(QRegularExpression("--[^\n]*"), comment_format)]
 
@@ -155,11 +155,10 @@ class Highlighter(QSyntaxHighlighter):
 
     def highlightBlock(self, text):
         """ from https://doc.qt.io/qtforpython/PySide6/QtCore/QRegularExpressionMatchIterator.html """
-        
+
         for pattern, format_ in self.highlighting_rules:
             reg_exp = QRegularExpression(pattern)
             i = reg_exp.globalMatch(text)
             while i.hasNext():
                 match = i.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), format_)
-
