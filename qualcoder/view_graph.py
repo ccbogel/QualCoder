@@ -100,6 +100,11 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(zoom_icon), "png")
         self.ui.label_zoom.setPixmap(pm.scaled(26, 26))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
+        self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
+        self.ui.pushButton_reveal.hide()  # TODO TMP
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -415,6 +420,11 @@ class ViewGraph(QDialog):
             i += 1
         return new_model
 
+    def reveal_hidden_items(self):
+        """ Show list of hidden items to be revealed on selection """
+
+        pass
+
     def keyPressEvent(self, event):
         """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
 
@@ -647,6 +657,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu = QtWidgets.QMenu()
         menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
         if action.text() == "Remove":
             self.remove = True
 
@@ -663,9 +675,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         painter.drawRect(self.boundingRect())
         painter.setFont(self.font)
         fm = painter.fontMetrics()
+        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
         if self.app.settings['stylesheet'] == 'dark':
             painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
-        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
         lines = self.text.split('\\n')
         for row in range(0, len(lines)):
             painter.drawText(5, fm.height() * (row + 1), lines[row])
@@ -716,6 +728,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction(_('Blue'))
         menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
         if action.text() == 'Thicker':
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
@@ -957,6 +971,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction(_("Hide"))
 
         action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
         if action.text() == 'Thicker':
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
