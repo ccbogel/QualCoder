@@ -89,7 +89,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>870</x>
+        <x>830</x>
         <y>6</y>
         <width>28</width>
         <height>28</height>
@@ -115,7 +115,7 @@
      <widget class="QLabel" name="label_zoom">
       <property name="geometry">
        <rect>
-        <x>910</x>
+        <x>870</x>
         <y>7</y>
         <width>28</width>
         <height>28</height>
@@ -131,14 +131,30 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>832</x>
-        <y>6</y>
+        <x>190</x>
+        <y>40</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Show hidden items</string>
+       <string>Reveal hidden items</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_file">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show selected files</string>
       </property>
       <property name="text">
        <string/>
