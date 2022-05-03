@@ -42,6 +42,7 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
 from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
+from .select_items import DialogSelectItems
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -104,7 +105,6 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
         self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
-        self.ui.pushButton_reveal.hide()  # TODO TMP
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -150,7 +150,7 @@ class ViewGraph(QDialog):
         # Scene size is too big.
         max_x, max_y = self.scene.suggested_scene_size()
         rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
-        image = QtGui.QImage(max_x, max_y, QtGui.QImage.Format.Format_ARGB32_Premultiplied)
+        image = QtGui.QImage(int(max_x + 5), int(max_y + 5), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
         # Render method requires QRectF NOT QRect
@@ -423,7 +423,20 @@ class ViewGraph(QDialog):
     def reveal_hidden_items(self):
         """ Show list of hidden items to be revealed on selection """
 
-        pass
+        hidden = []
+        for item in self.scene.items():
+            if not item.isVisible():
+                if isinstance(item, TextGraphicsItem):
+                    hidden.append({"name": _("Text: ") + item.text, "item": item})
+                if isinstance(item, LinkGraphicsItem):
+                    hidden.append({"name": _("Link: ") + item.text, "item": item})
+        ui = DialogSelectItems(self.app, hidden, _("Reveal hidden items"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        for s in selected:
+            s['item'].show()
 
     def keyPressEvent(self, event):
         """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
@@ -945,12 +958,14 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     line_color = QtCore.Qt.GlobalColor.black
     corners_only = False  # True for list graph
     weighting = 1
+    text = ""
 
     def __init__(self, app, from_widget, to_widget, weighting, corners_only=False):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
+        self.text = from_widget.text + " - " + to_widget.text
         self.corners_only = corners_only
         self.weighting = weighting
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
