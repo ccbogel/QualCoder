@@ -105,6 +105,10 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
         self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
+        self.ui.pushButton_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file.pressed.connect(self.display_files)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -430,6 +434,8 @@ class ViewGraph(QDialog):
                     hidden.append({"name": _("Text: ") + item.text, "item": item})
                 if isinstance(item, LinkGraphicsItem):
                     hidden.append({"name": _("Link: ") + item.text, "item": item})
+        if not hidden:
+            return
         ui = DialogSelectItems(self.app, hidden, _("Reveal hidden items"), "multi")
         ok = ui.exec()
         if not ok:
@@ -522,6 +528,11 @@ class ViewGraph(QDialog):
                 names.append(item.text)
                 names.sort()
         return names
+
+    def display_files(self):
+        """ Display text boxes of file details, from selected files. """
+
+        Message(self.app, "TODO", "TODO").exec()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -624,6 +635,97 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 if i.pos().y() + i.boundingRect().height() > max_y:
                     max_y = i.pos().y() + i.boundingRect().height()
         return max_x, max_y
+
+
+class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
+    """ The item shows the file name and optionally attributes.
+    A custom context menu
+    """
+
+    border_rect = None
+    app = None
+    font = None
+    settings = None
+    file_name = ""
+    file_id = -1
+
+    #TODO
+    def __init__(self, app, file_data):
+        """ Show name and optionally attributes.
+         param: app  : the main App class
+         param:  """
+
+        super(FileTextGraphicsItem, self).__init__(None)
+        self.app = app
+        self.conn = app.conn
+        self.settings = app.settings
+        self.project_path = app.project_path
+        #TODO
+        self.file_id = ""
+        self.file_name = ""
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # Foreground depends on the defined need_white_text color in color_selector
+        '''if self.code_or_cat['cid'] is not None:
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Normal)
+            self.setFont(self.font)
+            self.setPlainText(self.code_or_cat['name'])
+        if self.code_or_cat['cid'] is None:
+            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Bold)
+            self.setFont(self.font)
+            self.setPlainText(self.code_or_cat['name'])
+        self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])'''
+        self.document().contentsChanged.connect(self.text_changed)
+
+    def paint(self, painter, option, widget):
+        """ see paint override method here:
+            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
+            see:
+            https://doc.qt.io/qt-5/qpainter.html """
+
+        color = QtCore.Qt.GlobalColor.white
+        if self.app.settings['stylesheet'] == 'dark':
+            color = QtCore.Qt.GlobalColor.black
+        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        painter.drawRect(self.boundingRect())
+        painter.setFont(self.font)
+        fm = painter.fontMetrics()
+        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
+        if self.app.settings['stylesheet'] == 'dark':
+            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
+        #TODO
+        text = "file name text"
+        lines = text.split('\\n')
+        for row in range(0, len(lines)):
+            painter.drawText(5, fm.height() * (row + 1), lines[row])
+
+    def text_changed(self):
+        """ Text changed in a node. Redraw the border rectangle item to match. """
+
+        pass
+        #self.code_or_cat['name'] = self.toPlainText()
+
+    def contextMenuEvent(self, event):
+        """
+        # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
+        I was not able to mapToGlobal position so, the menu maps to scene position plus
+        the Dialog screen position.
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.addAction('Memo')
+        '''if self.code_or_cat['cid'] is not None:
+            menu.addAction('Coded text and media')
+            menu.addAction('Case text and media')
+        menu.addAction('Hide')
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action.text() == "Hide":
+            self.hide()'''
 
 
 class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
@@ -913,7 +1015,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.case_media()
         if action.text() == "Hide":
             self.hide()
-
 
     def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
