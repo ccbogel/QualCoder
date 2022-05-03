@@ -901,7 +901,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.code_or_cat['cid'] is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
-            menu.addAction('Hide')
+        menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -913,6 +913,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.case_media()
         if action.text() == "Hide":
             self.hide()
+
 
     def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
