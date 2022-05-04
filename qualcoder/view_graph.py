@@ -488,6 +488,8 @@ class ViewGraph(QDialog):
         menu.addAction(action_add_text)
         action_add_line = QtGui.QAction(_("Insert Line"))
         menu.addAction(action_add_line)
+        action_add_files = QtGui.QAction(_("Show files"))
+        menu.addAction(action_add_files)
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_add_text:
             text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
@@ -520,6 +522,36 @@ class ViewGraph(QDialog):
                 return
             line_item = FreeLineGraphicsItem(self.app, from_item, to_item)
             self.scene.addItem(line_item)
+        if action == action_add_files:
+            self.add_files_to_graph()
+
+    def add_files_to_graph(self):
+        """ Add Text file items to graph. """
+
+        files = self.get_files()
+        ui = DialogSelectItems(self.app, files, _("Select files"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        for s in selected:
+            print(s)
+            file_item = FileTextGraphicsItem(self.app, s['name'], s['id'])
+            self.scene.addItem(file_item)
+
+    def get_files(self):
+        """ Get files.
+        return: list of dictionary of id and name"""
+
+        cur = self.app.conn.cursor()
+        sql = "select id, name from source order by source.name asc"
+        cur.execute(sql)
+        result = cur.fetchall()
+        keys = 'id', 'name'
+        res = []
+        for row in result:
+            res.append(dict(zip(keys, row)))
+        return res
 
     def named_text_items(self):
         names = []
@@ -599,7 +631,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
                 item.redraw()
         for item in self.items():
-            if isinstance(item, FreeLineGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
+            if isinstance(item, FreeLineGraphicsItem) or isinstance(item, FreeTextGraphicsItem) \
+                    or isinstance(item, FileTextGraphicsItem):
                 if item.remove is True:
                     self.removeItem(item)
         self.update()
@@ -648,35 +681,35 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     settings = None
     file_name = ""
     file_id = -1
+    attribute_text = ""
+    remove = False
+    text = ""
 
-    #TODO
-    def __init__(self, app, file_data):
+    def __init__(self, app, file_name, file_id):
         """ Show name and optionally attributes.
          param: app  : the main App class
          param:  """
 
         super(FileTextGraphicsItem, self).__init__(None)
+        self.setToolTip(_("File"))
         self.app = app
         self.conn = app.conn
         self.settings = app.settings
         self.project_path = app.project_path
-        #TODO
-        self.file_id = ""
-        self.file_name = ""
+        self.file_id = file_id
+        self.file_name = file_name
+        self.attribute_text = ""
+        self.text = self.file_name + self.attribute_text
+        self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
-        '''if self.code_or_cat['cid'] is not None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Normal)
-            self.setFont(self.font)
-            self.setPlainText(self.code_or_cat['name'])
-        if self.code_or_cat['cid'] is None:
-            self.font = QtGui.QFont(self.settings['font'], self.code_or_cat['fontsize'], QtGui.QFont.Weight.Bold)
-            self.setFont(self.font)
-            self.setPlainText(self.code_or_cat['name'])
-        self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])'''
+        self.font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
+        self.setFont(self.font)
+        self.setPlainText(self.text)
+        self.setPos(50, 50)
         self.document().contentsChanged.connect(self.text_changed)
 
     def paint(self, painter, option, widget):
@@ -695,17 +728,16 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
         if self.app.settings['stylesheet'] == 'dark':
             painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
-        #TODO
-        text = "file name text"
-        lines = text.split('\\n')
+        #text = self.file_name + self.attribute_text
+        #lines = self.text.split('\\n')
+        lines = self.text.split('<br>')
         for row in range(0, len(lines)):
             painter.drawText(5, fm.height() * (row + 1), lines[row])
 
     def text_changed(self):
         """ Text changed in a node. Redraw the border rectangle item to match. """
 
-        pass
-        #self.code_or_cat['name'] = self.toPlainText()
+        self.text = self.toPlainText()
 
     def contextMenuEvent(self, event):
         """
@@ -716,16 +748,31 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        menu.addAction('Memo')
-        '''if self.code_or_cat['cid'] is not None:
-            menu.addAction('Coded text and media')
-            menu.addAction('Case text and media')
-        menu.addAction('Hide')
+        #menu.addAction('Memo')
+
+        menu.addAction('Show attributes')
+        menu.addAction(_("Remove"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == "Hide":
-            self.hide()'''
+        if action.text() == "Remove":
+            self.remove = True
+        if action.text() == "Show attributes":
+            self.get_attributes()
+            #self.adjustSize()
+
+    def get_attributes(self):
+
+        self.attribute_text = ""
+        cur = self.app.conn.cursor()
+        sql = "select distinct a.name, value from attribute as a join attribute_type where caseOrFile='file' and id=? order by a.name"
+        cur.execute(sql, [self.file_id])
+        result = cur.fetchall()
+        for r in result:
+            self.attribute_text += '<br>' + r[0] + ": " + r[1]
+        print(self.attribute_text)
+
+        self.text = self.file_name + self.attribute_text
 
 
 class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
