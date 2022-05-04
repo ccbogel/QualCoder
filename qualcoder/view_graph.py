@@ -491,19 +491,19 @@ class ViewGraph(QDialog):
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_add_text:
             text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
-            if ok:
+            if ok and text_ not in self.named_text_items():
                 item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
                 self.scene.addItem(item)
         if action == action_add_line:
             names = self.named_text_items()
             line_from = QtWidgets.QInputDialog()
-            line_from.setWindowTitle(_("Lne"))
+            line_from.setWindowTitle(_("Line"))
             line_from.setLabelText(_('From:'))
             line_from.setComboBoxItems(names)
             line_from.exec()
             text_from = line_from.textValue()
             line_to = QtWidgets.QInputDialog()
-            line_to.setWindowTitle(_("Lne"))
+            line_to.setWindowTitle(_("Line"))
             line_to.setLabelText(_('To:'))
             line_to.setComboBoxItems(names)
             line_to.exec()
@@ -511,7 +511,7 @@ class ViewGraph(QDialog):
             from_item = None
             to_item = None
             for item in self.scene.items():
-                if isinstance(item, TextGraphicsItem):
+                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
                     if item.text == text_from:
                         from_item = item
                     if item.text == text_to:
@@ -524,9 +524,9 @@ class ViewGraph(QDialog):
     def named_text_items(self):
         names = []
         for item in self.scene.items():
-            if isinstance(item, TextGraphicsItem):
+            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
                 names.append(item.text)
-                names.sort()
+        names.sort()
         return names
 
     def display_files(self):
