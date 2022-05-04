@@ -600,7 +600,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
 class DialogCodeInImage(QtWidgets.QDialog):
     """ View coded section in original image.
 
-    Called by: reports.DialogReportCodes qhn results are produced
+    Called by: reports.DialogReportCodes, when results are produced
     """
 
     app = None
@@ -698,7 +698,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if self.pixmap is None:
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
-        height = self.scale * self.pixmap.height()
+        height = int(self.scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
