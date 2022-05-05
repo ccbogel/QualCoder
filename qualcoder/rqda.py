@@ -63,12 +63,13 @@ class RqdaImport:
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
-
-        self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                                   _('Select RQDA file'),
-                                                                   self.app.settings['directory'], "*.rqda")
-        if not ok or self.file_path == "":
+        response = QtWidgets.QFileDialog.getOpenFileName(None, _('Select RQDA file'),
+                                                         self.app.settings['directory'], "*.rqda",
+                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                         )
+        if response[0] == "":
             return
+        self.file_path = response[0]
         self.conn = sqlite3.connect(self.file_path)
         self.parent_textEdit.append(_("Beginning import from RQDA"))
         try:
