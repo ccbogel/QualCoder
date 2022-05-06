@@ -141,6 +141,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.link_clicked)
         self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.text_edit_menu)
+        self.insert_nonexisting_attribute_placeholders()
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.fill_table_widget()
         # Initial resize of table columns
@@ -155,6 +156,28 @@ class DialogCases(QtWidgets.QDialog):
             pass
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
+
+    def insert_nonexisting_attribute_placeholders(self):
+        """ Check attribute placeholder is present in attribute table.
+        An error in earlier qualcoder versions did not fill these placeholders.
+        Fix if not present.
+        Cases are a list of dictionaries.
+        Attributes are a list of tuples(name,value,id)
+        """
+
+        now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
+        cur = self.app.conn.cursor()
+        cur.execute("select name from attribute_type where caseOrFile='case'")
+        attribute_names = cur.fetchall()
+        for c in self.cases:
+            for att_name in attribute_names:
+                cur.execute("select value from attribute where id=? and name=? and attr_type='case'",
+                            [c['caseid'], att_name[0]])
+                res = cur.fetchone()
+                if res is None:
+                    cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
+                                ("", c['caseid'], att_name[0], now_date, self.app.settings['codername']))
+                    self.app.conn.commit()
 
     @staticmethod
     def help():
@@ -224,6 +247,8 @@ class DialogCases(QtWidgets.QDialog):
 
     def load_cases_and_attributes(self):
         """ Load case and attribute details from database. Display in tableWidget.
+        Cases are a list of dictionaries.
+        Attributes are a list of tuples(name,value,id)
         """
 
         self.source = []
@@ -563,6 +588,7 @@ class DialogCases(QtWidgets.QDialog):
             else:  # put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.cases[x]['name'])
         if y > 2:  # update attribute value
+            now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
@@ -584,11 +610,11 @@ class DialogCases(QtWidgets.QDialog):
                         [self.cases[x]['caseid'], attribute_name])
             res = cur.fetchone()
             if res is None:
-                cur.execute("insert into attribute (value,id,name,attr_type) values(?,?,?,'case')",
-                            (value, self.cases[x]['caseid'], attribute_name))
+                cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
+                            (value, self.cases[x]['caseid'], attribute_name, now_date, self.app.settings['codername']))
                 self.app.conn.commit()
-            cur.execute("update attribute set value=? where id=? and name=? and attr_type='case'",
-                        (value, self.cases[x]['caseid'], attribute_name))
+            cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
+                        (value, now_date, self.app.settings['codername'], self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
             # Reload attributes
             sql = "select attribute.name, value, id from attribute where attr_type='case'"
