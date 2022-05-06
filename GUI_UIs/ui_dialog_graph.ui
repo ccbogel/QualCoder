@@ -19,7 +19,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>40</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -35,10 +35,13 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>40</y>
+        <y>0</y>
         <width>141</width>
         <height>22</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Changing the view will undo user added features such at link formatting and added text items.</string>
       </property>
       <property name="text">
        <string>List view</string>
@@ -50,46 +53,17 @@
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>330</x>
         <y>5</y>
         <width>421</width>
         <height>30</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>185</x>
-        <y>10</y>
-        <width>101</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::RightToLeft</enum>
-      </property>
-      <property name="text">
-       <string>Font size</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_blackandwhite">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>6</y>
-        <width>181</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Black and white</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>830</x>
+        <x>760</x>
         <y>6</y>
         <width>28</width>
         <height>28</height>
@@ -102,21 +76,11 @@
        <string/>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_fontsize">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>5</y>
-        <width>71</width>
-        <height>30</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_zoom">
       <property name="geometry">
        <rect>
-        <x>870</x>
-        <y>7</y>
+        <x>200</x>
+        <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -131,30 +95,14 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>40</y>
+        <x>160</x>
+        <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
        <string>Reveal hidden items</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_file">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>40</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Show selected files</string>
       </property>
       <property name="text">
        <string/>
@@ -178,9 +126,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>checkBox_blackandwhite</tabstop>
   <tabstop>checkBox_listview</tabstop>
-  <tabstop>comboBox_fontsize</tabstop>
   <tabstop>comboBox</tabstop>
  </tabstops>
  <resources/>
