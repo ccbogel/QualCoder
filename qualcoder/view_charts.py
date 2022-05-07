@@ -167,6 +167,10 @@ class ViewCharts(QDialog):
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
         self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
 
+        # Heatmaps
+        self.ui.groupBox_heatmaps.hide()
+        self.ui.pushButton_heatmap.pressed.connect(self.make_heatmap)
+
     # DATA FILTERS SECTION
     def select_attributes(self):
         """ Select files based on attribute selections.
@@ -1193,3 +1197,9 @@ class ViewCharts(QDialog):
         fig = px.histogram(df, x=attribute, title=title + subtitle)
         fig.show()
         self.helper_export_html(fig)
+
+    # HEATMAP CHARTS SECTION
+    def make_heatmap(self):
+        """ Make a heat map based on cases or files and codes / categories. """
+
+        print("TODO HEATMAP")
