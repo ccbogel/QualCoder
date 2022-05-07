@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
+    <width>1011</width>
     <height>597</height>
    </rect>
   </property>
@@ -98,8 +98,8 @@
   <widget class="QLabel" name="label_coder">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>293</y>
+     <x>410</x>
+     <y>103</y>
      <width>151</width>
      <height>22</height>
     </rect>
@@ -111,8 +111,8 @@
   <widget class="QComboBox" name="comboBox_coders">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>320</y>
+     <x>410</x>
+     <y>130</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -121,8 +121,8 @@
   <widget class="QComboBox" name="comboBox_file">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>380</y>
+     <x>410</x>
+     <y>190</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -131,8 +131,8 @@
   <widget class="QLabel" name="label_select_file">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>350</y>
+     <x>410</x>
+     <y>160</y>
      <width>231</width>
      <height>22</height>
     </rect>
@@ -144,8 +144,8 @@
   <widget class="QComboBox" name="comboBox_case">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>440</y>
+     <x>410</x>
+     <y>250</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -158,8 +158,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_select_case">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>410</y>
+     <x>410</x>
+     <y>220</y>
      <width>211</width>
      <height>22</height>
     </rect>
@@ -175,8 +175,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_attributes">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>540</y>
+     <x>410</x>
+     <y>350</y>
      <width>231</width>
      <height>25</height>
     </rect>
@@ -188,8 +188,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_filter">
    <property name="geometry">
     <rect>
-     <x>8</x>
-     <y>266</y>
+     <x>408</x>
+     <y>76</y>
      <width>201</width>
      <height>22</height>
     </rect>
@@ -201,8 +201,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLineEdit" name="lineEdit_filter">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>267</y>
+     <x>640</x>
+     <y>77</y>
      <width>91</width>
      <height>25</height>
     </rect>
@@ -217,8 +217,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_filters">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>240</y>
+     <x>410</x>
+     <y>50</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -255,8 +255,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QComboBox" name="comboBox_category">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>500</y>
+     <x>410</x>
+     <y>310</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -265,8 +265,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_category">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>470</y>
+     <x>410</x>
+     <y>280</y>
      <width>151</width>
      <height>22</height>
     </rect>
@@ -278,7 +278,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="Line" name="line">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>360</x>
      <y>50</y>
      <width>20</width>
      <height>521</height>
@@ -291,7 +291,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_chart_attributes">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>390</y>
      <width>261</width>
      <height>22</height>
@@ -310,7 +310,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_num_attr">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>516</y>
      <width>291</width>
      <height>22</height>
@@ -323,7 +323,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_char_attr">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>457</y>
      <width>291</width>
      <height>22</height>
@@ -336,7 +336,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QComboBox" name="comboBox_num_attributes">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>543</y>
      <width>321</width>
      <height>25</height>
@@ -346,7 +346,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QComboBox" name="comboBox_char_attributes">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>480</y>
      <width>321</width>
      <height>25</height>
@@ -356,7 +356,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="Line" name="line_2">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>10</x>
      <y>370</y>
      <width>331</width>
      <height>16</height>
@@ -369,7 +369,7 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>10</x>
      <y>391</y>
      <width>321</width>
      <height>61</height>
@@ -430,8 +430,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_chart_options_2">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>50</y>
+     <x>10</x>
+     <y>260</y>
      <width>261</width>
      <height>22</height>
     </rect>
@@ -459,19 +459,113 @@ Codings from the entire text file are used for the calculations.</string>
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QGroupBox" name="groupBox_heatmaps">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>80</y>
-     <width>67</width>
-     <height>17</height>
+     <x>10</x>
+     <y>260</y>
+     <width>321</width>
+     <height>61</height>
     </rect>
    </property>
-   <property name="text">
-    <string>TODO</string>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QRadioButton" name="radioButton_heatmap_file">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>File</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_heatmap_case">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>30</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Case</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_heatmap">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>26</y>
+      <width>28</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </widget>
+  <widget class="Line" name="line_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>331</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
+  <zorder>groupBox</zorder>
+  <zorder>groupBox_heatmaps</zorder>
+  <zorder>label_info</zorder>
+  <zorder>label_pie</zorder>
+  <zorder>label_bar</zorder>
+  <zorder>comboBox_pie_charts</zorder>
+  <zorder>comboBox_bar_charts</zorder>
+  <zorder>comboBox_sunburst_charts</zorder>
+  <zorder>label_hierarchy</zorder>
+  <zorder>label_coder</zorder>
+  <zorder>comboBox_coders</zorder>
+  <zorder>comboBox_file</zorder>
+  <zorder>label_select_file</zorder>
+  <zorder>comboBox_case</zorder>
+  <zorder>label_select_case</zorder>
+  <zorder>pushButton_attributes</zorder>
+  <zorder>label_filter</zorder>
+  <zorder>lineEdit_filter</zorder>
+  <zorder>label_filters</zorder>
+  <zorder>label_chart_options</zorder>
+  <zorder>comboBox_category</zorder>
+  <zorder>label_category</zorder>
+  <zorder>line</zorder>
+  <zorder>label_chart_attributes</zorder>
+  <zorder>label_num_attr</zorder>
+  <zorder>label_char_attr</zorder>
+  <zorder>comboBox_num_attributes</zorder>
+  <zorder>comboBox_char_attributes</zorder>
+  <zorder>line_2</zorder>
+  <zorder>checkBox_export_html</zorder>
+  <zorder>label_chart_options_2</zorder>
+  <zorder>line_3</zorder>
+  <zorder>line_4</zorder>
  </widget>
  <resources/>
  <connections/>
