@@ -18,19 +18,19 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>481</width>
+     <width>341</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
-    <string>Charts are displayed in the default web browser</string>
+    <string>Charts displayed in the default web browser</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_pie">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>64</y>
+     <y>70</y>
      <width>291</width>
      <height>22</height>
     </rect>
@@ -56,7 +56,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>87</y>
+     <y>90</y>
      <width>321</width>
      <height>25</height>
     </rect>
@@ -237,7 +237,7 @@ Codings from the entire text file are used for the calculations.</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>38</y>
+     <y>50</y>
      <width>261</width>
      <height>22</height>
     </rect>
@@ -413,6 +413,64 @@ Codings from the entire text file are used for the calculations.</string>
      <string>Case</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_export_html">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>10</y>
+     <width>201</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Export HTML file</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_chart_options_2">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>50</y>
+     <width>261</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;b&gt;Heatmap charts&lt;/b&gt;</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>691</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>80</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TODO</string>
+   </property>
   </widget>
  </widget>
  <resources/>
