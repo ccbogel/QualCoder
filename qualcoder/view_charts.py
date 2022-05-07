@@ -39,7 +39,7 @@ from PyQt6.QtWidgets import QDialog
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
-from .helpers import Message
+from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -283,9 +283,6 @@ class ViewCharts(QDialog):
         else:
             self.attributes_msg = file_msg + case_msg
         self.ui.pushButton_attributes.setToolTip(self.attributes_msg)
-        '''print("Attribute file ids\n===========")
-        for a in self.attribute_file_ids:
-            print(a)'''
 
     def clear_combobox_files(self):
         """ Clear file selection if a case is selected.
@@ -414,6 +411,16 @@ class ViewCharts(QDialog):
             subtitle += _("Category: ") + self.ui.comboBox_category.currentText()
         return owner, subtitle
 
+    def helper_export_html(self, fig):
+        """ Export chart. """
+
+        if self.ui.checkBox_export_html.isChecked():
+            e = ExportDirectoryPathDialog(self.app, "Chart.html")
+            filepath = e.filepath
+            if filepath is None:
+                return
+            fig.write_html(filepath)
+
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
         """
@@ -473,6 +480,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.bar(df[mask], y='Code names', x='Count', orientation='h', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def barchart_code_volume_by_characters(self):
         """ Count of codes in files text by character volume. """
@@ -503,6 +511,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.bar(df[mask], x='Total characters', y='Code names', orientation='h', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def barchart_code_volume_by_area(self):
         """ Codes by image area volume. """
@@ -533,6 +542,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.bar(df[mask], x='Pixels', y='Code names', orientation='h', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def barchart_code_volume_by_segments(self):
         """ Codes by audio/video segment volume. """
@@ -563,6 +573,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.bar(df[mask], x='Total millisecs', y='Code names', orientation='h', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def show_pie_chart(self):
         """ Various pie chart options. """
@@ -621,6 +632,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.pie(df[mask], values='Count', names='Code names', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def piechart_code_volume_by_characters(self):
         """ Count of codes in files text by character volume. """
@@ -651,6 +663,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.pie(df[mask], values='Total characters', names='Code names', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def piechart_code_volume_by_area(self):
         """ Codes by image area volume. """
@@ -681,6 +694,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.pie(df[mask], values='Total pixels', names='Code names', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def piechart_code_volume_by_segments(self):
         """ Codes by audio/video segment volume. """
@@ -711,6 +725,7 @@ class ViewCharts(QDialog):
             subtitle += _("Values") + " >= " + cutoff
         fig = px.pie(df[mask], values='Total millisecs', names='Code names', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def show_hierarchy_chart(self):
         """
@@ -841,10 +856,12 @@ class ViewCharts(QDialog):
             fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
                               title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
         if chart == "treemap":
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
 
     def hierarchy_code_volume_by_characters(self, chart="sunburst"):
         """ Count of code characters across text files.
@@ -921,10 +938,12 @@ class ViewCharts(QDialog):
             fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
                               title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
         if chart == "treemap":
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
 
     def hierarchy_code_volume_by_area(self, chart="sunburst"):
         """ Count of coded image areas across image files.
@@ -1001,10 +1020,12 @@ class ViewCharts(QDialog):
             fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
                               title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
         if chart == "treemap":
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
 
     def hierarchy_code_volume_by_segments(self, chart="sunburst"):
         """ Count of codes segment durations across audio/video files.
@@ -1081,10 +1102,12 @@ class ViewCharts(QDialog):
             fig = px.sunburst(df[mask], names='item', parents='parent', values='value',
                               title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
         if chart == "treemap":
             fig = px.treemap(df[mask], names='item', parents='parent', values='value',
                              title=title + subtitle)
             fig.show()
+            self.helper_export_html(fig)
 
     # ATTRIBUTES CHARTS SECTION
     def fill_combobox_attributes(self):
@@ -1142,6 +1165,7 @@ class ViewCharts(QDialog):
         df = pd.DataFrame(data)
         fig = px.bar(df, x='Count', y='Value', orientation='h', title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
 
     def numeric_attribute_charts(self):
         """ Character attributes are displayed as boxplot charts. """
@@ -1168,3 +1192,4 @@ class ViewCharts(QDialog):
         df = pd.DataFrame(data)
         fig = px.histogram(df, x=attribute, title=title + subtitle)
         fig.show()
+        self.helper_export_html(fig)
