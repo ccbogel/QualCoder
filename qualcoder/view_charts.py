@@ -168,8 +168,9 @@ class ViewCharts(QDialog):
         self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
 
         # Heatmaps
-        self.ui.groupBox_heatmaps.hide()
-        self.ui.pushButton_heatmap.pressed.connect(self.make_heatmap)
+        heatmap_combobox_list = ["", "File", "Case"]
+        self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
+        self.ui.comboBox_heatmap.currentIndexChanged.connect(self.make_heatmap)
 
     # DATA FILTERS SECTION
     def select_attributes(self):
@@ -314,7 +315,7 @@ class ViewCharts(QDialog):
     def get_file_ids(self):
         """ Get file ids based on file selection or case selection.
         Also returns attribute-selected file ids.
-        Called by: all pie, bar, hierarchy charts
+        Called by: pie, bar, hierarchy charts
         return:
             case or file name, sql string of '' or file_ids comma separated as in (,,,) or =id
         """
@@ -1199,7 +1200,134 @@ class ViewCharts(QDialog):
         self.helper_export_html(fig)
 
     # HEATMAP CHARTS SECTION
-    def make_heatmap(self):
-        """ Make a heat map based on cases or files and codes / categories. """
+    def heatmap_counter_by_file_and_code(self, owner, fid, cid):
+        """ Get count of codings for this code and this file """
 
-        print("TODO HEATMAP")
+        count = 0
+        cur = self.app.conn.cursor()
+        sql_t = "select count(cid) from code_text where owner like ? and cid=? and fid=?"
+        cur.execute(sql_t, [owner, cid, fid])
+        result_t = cur.fetchone()
+        if result_t is not None:
+            count += result_t[0]
+        sql_i = "select count(cid) from code_image where owner like ? and cid=? and id=?"
+        cur.execute(sql_i, [owner, cid, fid])
+        result_i = cur.fetchone()
+        if result_i is not None:
+            count += result_i[0]
+        sql_av = "select count(cid) from code_av where owner like ? and cid=? and id=?"
+        cur.execute(sql_av, [owner, cid, fid])
+        result_av = cur.fetchone()
+        if result_av is not None:
+            count += result_av[0]
+        return count
+
+    def make_heatmap(self):
+        """ Make a heat map based on cases or files.
+        Use code count as the basic unit of measurement.
+        Filters: Coder, selected category.
+        Exclude from filters: Count ?; selected file; selected case
+        """
+
+        # Filters
+        heatmap_type = self.ui.comboBox_heatmap.currentText()
+        if heatmap_type == "":
+            return
+        title = heatmap_type + " " + _("Heatmap")
+        self.get_selected_categories_and_codes()
+        y_labels = []
+        for c in self.codes:
+            y_labels.append(c['name'])
+        category = self.ui.comboBox_category.currentText()
+        self.ui.lineEdit_filter.setText("")
+        self.ui.comboBox_case.setCurrentIndex(0)
+        self.ui.comboBox_file.setCurrentIndex(0)
+        owner, subtitle = self.owner_and_subtitle_helper()
+
+        # Get all the coded data
+        data = []
+        x_labels = []
+        cur = self.app.conn.cursor()
+        if heatmap_type == "File":
+            sql = "select id, name from source order by name"
+            cur.execute(sql)
+            files = cur.fetchall()
+            for f in files:
+                x_labels.append(f[1])
+            # Calculate the frequency of each code in each file
+            # Each row is a code, each column is a file
+            for code_ in self.codes:
+                code_counts = []
+                for f in files:
+                    code_counts.append(self.heatmap_counter_by_file_and_code(owner, f[0], code_['cid']))
+                data.append(code_counts)
+        if heatmap_type == "Case":
+            sql = "select caseid, name from cases order by name"
+            cur.execute(sql)
+            cases = cur.fetchall()
+            for c in cases:
+                x_labels.append(c[1])
+            # Calculate the frequency of each code in each file
+            # Each row is a code, each column is a file
+            for code_ in self.codes:
+                code_counts = []
+                for c in cases:
+                    cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
+                    fids = cur.fetchall()
+                    case_counts = 0
+                    for fid in fids:
+                        case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
+                    code_counts.append(case_counts)
+                data.append(code_counts)
+
+        '''for d in data:
+            print(d)'''
+        '''# Add the code count directly to each parent category, add parentname to each code
+        for category in self.categories:
+            category['count'] = None
+            for code_ in self.codes:
+                if code_['catid'] == category['catid']:
+                    category['count'] += code_['count']
+                    code_['parentname'] = category['name']
+        # Find leaf categories, add to parent categories, and gradually remove leaves
+        # Until only top categories remain
+        sub_categories = copy(self.categories)
+        counter = 0
+        while len(sub_categories) > 0 or counter < 5000:
+            # Identify parent categories
+            parent_list = []
+            for super_cat in sub_categories:
+                for child_cat in sub_categories:
+                    if super_cat['catid'] == child_cat['supercatid']:
+                        child_cat['parentname'] = super_cat['name']
+                        parent_list.append(super_cat)
+            # Identify leaf categories
+            leaf_list = []
+            for category in sub_categories:
+                if category not in parent_list:
+                    leaf_list.append(category)
+            # Add counts for each leaf category to higher category
+            for leaf_category in leaf_list:
+                for cat in self.categories:
+                    if cat['catid'] == leaf_category['supercatid']:
+                        cat['count'] += leaf_category['count']
+                sub_categories.remove(leaf_category)
+            counter += 1
+        combined = self.categories + self.codes'''
+
+        # Create the plot
+        fig = px.imshow(data,
+                        labels=dict(x=heatmap_type, y="Codes", color="Count"),
+                        x=x_labels,
+                        y=y_labels,
+                        title=title+subtitle
+                        )
+        fig.update_xaxes(side="top")
+        fig.show()
+        self.helper_export_html(fig)
+        self.ui.comboBox_heatmap.blockSignals(True)
+        self.ui.comboBox_heatmap.setCurrentIndex(0)
+        self.ui.comboBox_heatmap.blockSignals(False)
+
+
+
