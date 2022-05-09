@@ -459,67 +459,6 @@ Codings from the entire text file are used for the calculations.</string>
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_heatmaps">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>321</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>16777215</height>
-    </size>
-   </property>
-   <property name="title">
-    <string/>
-   </property>
-   <widget class="QRadioButton" name="radioButton_heatmap_file">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>30</y>
-      <width>112</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>File</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_heatmap_case">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>30</y>
-      <width>112</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Case</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_heatmap">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>26</y>
-      <width>28</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-  </widget>
   <widget class="Line" name="line_4">
    <property name="geometry">
     <rect>
@@ -533,8 +472,17 @@ Codings from the entire text file are used for the calculations.</string>
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
+  <widget class="QComboBox" name="comboBox_heatmap">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>290</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
-  <zorder>groupBox_heatmaps</zorder>
   <zorder>label_info</zorder>
   <zorder>label_pie</zorder>
   <zorder>label_bar</zorder>
@@ -566,6 +514,7 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>label_chart_options_2</zorder>
   <zorder>line_3</zorder>
   <zorder>line_4</zorder>
+  <zorder>comboBox_heatmap</zorder>
  </widget>
  <resources/>
  <connections/>
