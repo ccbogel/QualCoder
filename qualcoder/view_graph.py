@@ -44,7 +44,6 @@ from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -434,7 +433,7 @@ class ViewGraph(QDialog):
         """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
 
         key = event.key()
-        #mod = event.modifiers()
+        # mod = event.modifiers()
         if key == QtCore.Qt.Key.Key_Plus:
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
                 return
@@ -501,7 +500,8 @@ class ViewGraph(QDialog):
             from_item = None
             to_item = None
             for item in self.scene.items():
-                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
+                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
+                        isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                     if item.text == text_from:
                         from_item = item
                     if item.text == text_to:
@@ -570,9 +570,13 @@ class ViewGraph(QDialog):
         return res
 
     def named_text_items(self):
+        """ Used in the graphicsview_menu to get a list of all named FreeText and Case and File graphics items.
+         Use to allow links between these items based on the text name. """
+
         names = []
         for item in self.scene.items():
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem):
+            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
+                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                 names.append(item.text)
         names.sort()
         return names
@@ -640,6 +644,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
         for item in self.items():
             if isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
+                # isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                 item.redraw()
         for item in self.items():
             if isinstance(item, FreeLineGraphicsItem) or isinstance(item, FreeTextGraphicsItem) \
@@ -674,7 +679,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         max_y = 0
         for i in self.items():
             if isinstance(i, TextGraphicsItem) or isinstance(i, FreeTextGraphicsItem) or \
-                    isinstance(i, FileTextGraphicsItem):
+                    isinstance(i, FileTextGraphicsItem) or isinstance(i, CaseTextGraphicsItem):
                 if i.pos().x() + i.boundingRect().width() > max_x:
                     max_x = i.pos().x() + i.boundingRect().width()
                 if i.pos().y() + i.boundingRect().height() > max_y:
@@ -716,12 +721,17 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
         self.setFont(self.font)
         self.setPlainText(self.text)
         self.setPos(50 + x, 50 + y)
+        cur = self.app.conn.cursor()
+        cur.execute("select memo from cases where caseid=?", [case_id])
+        res = cur.fetchone()
+        if res:
+            self.setToolTip(res[0])
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -814,12 +824,17 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
         self.setFont(self.font)
         self.setPlainText(self.text)
         self.setPos(50 + x, 50 + y)
+        cur = self.app.conn.cursor()
+        cur.execute("select memo from source where id=?", [file_id])
+        res = cur.fetchone()
+        if res:
+            self.setToolTip(res[0])
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -910,7 +925,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
         self.setFont(self.font)
@@ -1105,7 +1120,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         # Foreground depends on the defined need_white_text color in color_selector
         if self.code_or_cat['cid'] is not None:
             self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
@@ -1180,16 +1195,17 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
-            cur.execute("update code_cat set memo=? where catid=?", (self.code_or_cat['memo'], self.code_or_cat['catid']))
+            cur.execute("update code_cat set memo=? where catid=?",
+                        (self.code_or_cat['memo'], self.code_or_cat['catid']))
             self.conn.commit()
 
-    def case_media(self,):
+    def case_media(self, ):
         """ Display all coded text and media for this code.
         Codings come from ALL files and ALL coders. """
 
         DialogCodeInAllFiles(self.app, self.code_or_cat, "Case")
 
-    def coded_media(self,):
+    def coded_media(self, ):
         """ Display all coded media for this code.
         Coded media comes from ALL files and current coder.
         """
