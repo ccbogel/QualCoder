@@ -71,9 +71,10 @@ class ViewCharts(QDialog):
     codes = []
     files = []
     cases = []
-    attributes = []  # for charts of attributes
-    attribute_file_ids = []
-    attributes_msg = ""
+    attributes = []  # For charts of attributes
+    attribute_file_ids = []  # For filtering based on attribute selection
+    attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
+    attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -192,6 +193,7 @@ class ViewCharts(QDialog):
         Results stored in attribute_file_ids as list of file_id integers
         """
 
+        self.attribute_case_ids = []
         self.attribute_file_ids = []
         self.attributes_msg = ""
         ui = DialogSelectAttributeParameters(self.app)
@@ -227,6 +229,29 @@ class ViewCharts(QDialog):
                     file_ids.append(i[0])
             # Case attributes
             if a[1] == 'case':
+                # Get case ids for heatmap charts
+                case_sql = "select distinct cases.caseid, cases.name from cases "
+                case_sql += "join case_text on case_text.caseid=cases.caseid "
+                case_sql += "join attribute on cases.caseid=attribute.id "
+                case_sql += " where "
+                case_sql += "attribute.name = '" + a[0] + "' "
+                case_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    case_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                if a[2] == 'numeric':
+                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                case_sql += " and attribute.attr_type='case'"
+                # print("Attribute selected: ", a)
+                # print(case_sql)
+                cur.execute(case_sql)
+                case_id_and_name_result = cur.fetchall()
+                for c in case_id_and_name_result:
+                    self.attribute_case_ids_and_names.append(c)
+
                 # Case text table also links av and images
                 case_sql = "select distinct case_text.fid from cases "
                 case_sql += "join case_text on case_text.caseid=cases.caseid "
@@ -316,8 +341,9 @@ class ViewCharts(QDialog):
         """ Get file ids based on file selection or case selection.
         Also returns attribute-selected file ids.
         Called by: pie, bar, hierarchy charts
-        return:
-            case or file name, sql string of '' or file_ids comma separated as in (,,,) or =id
+        return two String values:
+            attributes, case or file name;
+            sql string of '' or file_ids comma separated as in (,,,) or =id
         """
 
         if self.attribute_file_ids:
@@ -403,7 +429,7 @@ class ViewCharts(QDialog):
         """ Create initial subtitle and get owner
          return:
             String owner
-            String subtitle
+            String subtitle of category selected
          """
 
         subtitle = "<br><sup>"
@@ -1226,7 +1252,8 @@ class ViewCharts(QDialog):
         """ Make a heat map based on cases or files.
         Use code count as the basic unit of measurement.
         Filters: Coder, selected category.
-        Exclude from filters: Count ?; selected file; selected case
+        Exclude from filters: Count; selected file; selected case
+        TODO include in filters: Selected Attributes for Cases - uses attribute_file_ids and attributes_msg
         """
 
         # Filters
@@ -1249,9 +1276,16 @@ class ViewCharts(QDialog):
         x_labels = []
         cur = self.app.conn.cursor()
         if heatmap_type == "File":
-            sql = "select id, name from source order by name"
-            cur.execute(sql)
-            files = cur.fetchall()
+            if not self.attribute_file_ids:
+                sql = "select id, name from source order by name"
+                cur.execute(sql)
+                files = cur.fetchall()
+            else:
+                attr_msg, file_ids_txt = self.get_file_ids()
+                subtitle += attr_msg
+                sql = "select id, name from source where id " + file_ids_txt + " order by name"
+                cur.execute(sql)
+                files = cur.fetchall()
             for f in files:
                 x_labels.append(f[1])
             # Calculate the frequency of each code in each file
@@ -1262,27 +1296,46 @@ class ViewCharts(QDialog):
                     code_counts.append(self.heatmap_counter_by_file_and_code(owner, f[0], code_['cid']))
                 data.append(code_counts)
         if heatmap_type == "Case":
-            sql = "select caseid, name from cases order by name"
-            cur.execute(sql)
-            cases = cur.fetchall()
-            for c in cases:
-                x_labels.append(c[1])
-            # Calculate the frequency of each code in each file
-            # Each row is a code, each column is a file
-            for code_ in self.codes:
-                code_counts = []
+            if not self.attribute_case_ids_and_names:  #self.attribute_file_ids:
+                sql = "select caseid, name from cases order by name"
+                cur.execute(sql)
+                cases = cur.fetchall()
                 for c in cases:
-                    cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
-                    fids = cur.fetchall()
-                    case_counts = 0
-                    for fid in fids:
-                        case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
-                    code_counts.append(case_counts)
-                data.append(code_counts)
+                    x_labels.append(c[1])
+                # Calculate the frequency of each code in each file
+                # Each row is a code, each column is a file
+                for code_ in self.codes:
+                    code_counts = []
+                    for c in cases:
+                        cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
+                        fids = cur.fetchall()
+                        case_counts = 0
+                        for fid in fids:
+                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
+                        code_counts.append(case_counts)
+                    data.append(code_counts)
+            else:
+                attr_msg, file_ids_txt = self.get_file_ids()
+                print(self.attribute_case_ids_and_names)
+                for c in self.attribute_case_ids_and_names:
+                    x_labels.append(c[1])
+                subtitle += attr_msg
+                # Calculate the frequency of each code in each file
+                # Each row is a code, each column is a file
+                for code_ in self.codes:
+                    code_counts = []
+                    for c in self.attribute_case_ids_and_names:
+                        cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
+                        fids = cur.fetchall()
+                        # TODO revise fids if file parameters selected
+                        case_counts = 0
+                        for fid in fids:
+                            case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
+                        code_counts.append(case_counts)
+                    data.append(code_counts)
 
-        '''for d in data:
-            print(d)'''
         '''# Add the code count directly to each parent category, add parentname to each code
+        # MIGHT? MODIFY THIS TO SHOW CATEGORY COUNTS ?
         for category in self.categories:
             category['count'] = None
             for code_ in self.codes:
