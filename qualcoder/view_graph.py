@@ -731,7 +731,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cur.execute("select memo from cases where caseid=?", [case_id])
         res = cur.fetchone()
         if res:
-            self.setToolTip(res[0])
+            self.setToolTip(_("Case") + ": "+ res[0])
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -834,7 +834,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cur.execute("select memo from source where id=?", [file_id])
         res = cur.fetchone()
         if res:
-            self.setToolTip(res[0])
+            self.setToolTip(_("File") + ": " + res[0])
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
