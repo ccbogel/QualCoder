@@ -14,9 +14,6 @@
    <string>Files</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
-    <widget class="QTableWidget" name="tableWidget"/>
-   </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="minimumSize">
@@ -87,7 +84,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>570</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -185,7 +182,7 @@ Cannot export text transcription file associated with an audio or video as a lin
       <property name="geometry">
        <rect>
         <x>330</x>
-        <y>4</y>
+        <y>3</y>
         <width>30</width>
         <height>30</height>
        </rect>
@@ -200,8 +197,8 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>560</x>
-        <y>2</y>
+        <x>370</x>
+        <y>3</y>
         <width>30</width>
         <height>30</height>
        </rect>
@@ -213,12 +210,28 @@ Cannot export text transcription file associated with an audio or video as a lin
        <string/>
       </property>
      </widget>
+     <widget class="QLabel" name="label_fcount">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>7</y>
+        <width>121</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Files:</string>
+      </property>
+     </widget>
     </widget>
    </item>
+   <item row="3" column="0">
+    <widget class="QTableWidget" name="tableWidget"/>
+   </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_fcount">
+    <widget class="QLabel" name="label_file">
      <property name="text">
-      <string>Files:</string>
+      <string>File:</string>
      </property>
     </widget>
    </item>
