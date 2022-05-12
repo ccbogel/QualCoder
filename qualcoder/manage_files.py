@@ -184,7 +184,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.resizeRowsToContents()
 
-    # @staticmethod
+    @staticmethod
     def help():
         """ Open help for transcribe section in browser. """
 
@@ -761,6 +761,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
+        self.ui.label_file.setText(_("File") + ": " + self.source[x]['name'])
         if y == self.MEMO_COLUMN:
             name = self.source[x]['name'].lower()
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
