@@ -121,7 +121,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                                                                              _('Open project directory'),
                                                                              default_directory)
         if self.merge_project_path is False or len(self.merge_project_path) < 5:
-            Message(self.app, _(""), _("No project selected")).exec()
+            Message(self.app, _("Error"), _("No project selected")).exec()
             return
         if self.merge_project_path[-4:] != ".qda":
             Message(self.app, _("Error"), _("Not a QualCoder project")).exec()
