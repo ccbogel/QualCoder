@@ -3,6 +3,7 @@
 
 """
 Copyright (c) 2022 Colin Curtain
+Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1312,7 +1313,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Close all dialogs and database connection.
         If selected via menu option exit: event == False
         If selected via window x close: event == QtGui.QCloseEvent
-        Close project will also delete a backup if a backup was made and no changes occured.
+        Close project will also delete a backup if a backup was made and no changes occurred.
         """
 
         if not self.force_quit:
@@ -1330,6 +1331,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.app.conn.close()
                     except Exception as e_:
                         print("closeEvent", e_)
+                # TODO calls twice ?
                 QtWidgets.QApplication.instance().quit()
                 #QtWidgets.qApp.quit()
                 return
@@ -1856,15 +1858,15 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
-        # Added if statement for the first opening of QualCoder. Otherwise looks odd.
+        # Added if statement for the first opening of QualCoder. Otherwise looks odd closing a project that is not there.
         if self.app.project_name != "":
             self.ui.textEdit.append("Closing project: " + self.app.project_name)
             self.ui.textEdit.append("========\n")
+            self.app.append_recent_project(self.app.project_path)
         if self.app.conn is not None:
             self.app.conn.commit()
             self.app.conn.close()
         self.delete_backup_folders()
-        self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
         self.app.conn = None
         self.app.project_path = ""
