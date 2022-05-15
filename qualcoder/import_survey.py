@@ -109,7 +109,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.lineEdit_delimiter.setText(self.delimiter)
         self.ui.lineEdit_delimiter.textChanged.connect(self.options_changed)
-        self.ui.comboBox_quote.currentIndexChanged['QString'].connect(self.options_changed)
+        self.ui.comboBox_quote.currentIndexChanged.connect(self.options_changed)
         self.ui.tableWidget.setHorizontalHeaderLabels([""])
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_menu)
@@ -121,19 +121,26 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
         self.select_file()
-        self.prepare_fields()
-        self.fill_table_widget()
+        print("FILE ", self.filepath)
+        if self.filepath != "":
+            self.prepare_fields()
+            self.fill_table_widget()
+        else:
+            self.close()
 
     def select_file(self):
         """ Select csv or Excel file """
 
-        self.filepath, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                                  _('Select survey file'),
-                                                                  self.app.settings['directory'], "(*.csv *.xlsx)")
-        if not ok or self.filepath == "":
-            self.parent_textEdit.append(_("Survey not imported. Survey not a csv or xlsx file: ") + self.filepath)
+        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select survey file'),
+                                                           self.app.settings['directory'], "(*.csv *.xlsx)",
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                          )
+        self.filepath = response[0]
+        if self.filepath == []:
+            self.parent_textEdit.append(_("Survey not imported. Survey not a csv or xlsx file: "))
             self.success = False
             return
+        self.filepath = self.filepath[0]  # A list of one name
         # Copy file into project folder
         name_split = self.filepath.split("/")
         filename = name_split[-1]
