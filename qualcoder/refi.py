@@ -819,11 +819,11 @@ class RefiImport:
         # Parse PictureSelection and VariableValue elements to load codings and variables
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
-                self._load_codings_for_picture(id_, e)
+                self.load_codings_for_picture(id_, e)
             if e.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 self.parse_variable_value(e, id_, creating_user)
 
-    def _load_codings_for_picture(self, id_, element):
+    def load_codings_for_picture(self, id_, element):
         """ Load coded rectangles for pictures
         Example format:
         <PictureSelection guid="04980e59-b290-4481-8cb6-e732824440a1"
@@ -1176,13 +1176,11 @@ class RefiImport:
         create_date = element.get("creationDateTime")
         if create_date is None:
             create_date = element.get("modifiedDateTime")
-        try:
-            create_date = create_date.replace('T', ' ')
-            create_date = create_date.replace('Z', '')
-        except AttributeError as e:
-            # None type object ??
-            print("load_codings_for_audio_video", e)
+        if create_date is None:
+            # Create another date if no element is found
             create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
+        create_date = create_date.replace('T', ' ')
+        create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
         if creating_user_guid is None:
             creating_user_guid = element.get("modifyingUser")
@@ -1349,7 +1347,7 @@ class RefiImport:
         # Parse PlainTextSelection elements for Coding elements
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
-                self._load_codings_for_text(source, e)
+                self.load_codings_for_text(source, e)
         # Parse PlainTextSelection elements for NoteRef (annotation) elements
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}NoteRef":
@@ -1399,7 +1397,7 @@ class RefiImport:
         cur.execute(insert_sql, placeholders)
         self.app.conn.commit()
 
-    def _load_codings_for_text(self, source, element):
+    def load_codings_for_text(self, source, element):
         """ These are PlainTextSelection elements.
         These elements contain a Coding element and a Description element.
         The Description element is treated as a coding memo.
@@ -1994,7 +1992,10 @@ class RefiExport(QtWidgets.QDialog):
     def variables_xml(self):
         """ Variables are associated with Sources and Cases.
         Stores a list of the variables with guids for later use.
-        Called by project_xml
+        Called by project_xml.
+        TODO not sure how to handle empty (N/A) numeric variables. e.g.
+        <VariableRef targetGUID="7d936548-f82a-4819-9315-a7aa81b61bc3" />
+        <FloatValue></FloatValue></VariableValue>
 
         :returns xml string
         """
@@ -3052,6 +3053,7 @@ class RefiExport(QtWidgets.QDialog):
             return True
         except etree.XMLSyntaxError as err:
             print("PARSING ERROR:{0}".format(err))
+            logger.error("XML parsingerror: {0}".format(err))
             # May have problems with special characters e.g. &
             return False
 
