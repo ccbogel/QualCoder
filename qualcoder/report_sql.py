@@ -170,9 +170,6 @@ class DialogSQL(QtWidgets.QDialog):
         filepath = export_dir.filepath
         if filepath is None:
             return
-
-        print("FP", filepath)
-
         quote_option = csv.QUOTE_MINIMAL
         if self.ui.checkBox_quote.isChecked():
             quote_option = csv.QUOTE_ALL
