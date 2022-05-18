@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
+from copy import copy, deepcopy
 import logging
 import os
 import pandas as pd
@@ -1256,6 +1256,10 @@ class ViewCharts(QDialog):
         TODO include in filters: Selected Attributes for Cases - uses attribute_file_ids and attributes_msg
         """
 
+        codes = deepcopy(self.codes)
+        if len(codes) > 40:
+            codes = codes[:40]
+            Message(self.app, _("Too many codes"), _("Too many codes for display. Restricted to 40")).exec()
         # Filters
         heatmap_type = self.ui.comboBox_heatmap.currentText()
         if heatmap_type == "":
@@ -1263,7 +1267,7 @@ class ViewCharts(QDialog):
         title = heatmap_type + " " + _("Heatmap")
         self.get_selected_categories_and_codes()
         y_labels = []
-        for c in self.codes:
+        for c in codes:
             y_labels.append(c['name'])
         category = self.ui.comboBox_category.currentText()
         self.ui.lineEdit_filter.setText("")
@@ -1286,11 +1290,14 @@ class ViewCharts(QDialog):
                 sql = "select id, name from source where id " + file_ids_txt + " order by name"
                 cur.execute(sql)
                 files = cur.fetchall()
+            if len(files) > 40:
+                files = files[:40]
+                Message(self.app, _("Too many files"), _("Too many files for display. Restricted to 40")).exec()
             for f in files:
                 x_labels.append(f[1])
             # Calculate the frequency of each code in each file
             # Each row is a code, each column is a file
-            for code_ in self.codes:
+            for code_ in codes:
                 code_counts = []
                 for f in files:
                     code_counts.append(self.heatmap_counter_by_file_and_code(owner, f[0], code_['cid']))
@@ -1300,11 +1307,14 @@ class ViewCharts(QDialog):
                 sql = "select caseid, name from cases order by name"
                 cur.execute(sql)
                 cases = cur.fetchall()
+                if len(cases) > 40:
+                    cases = cases[:40]
+                    Message(self.app, _("Too many cases"), _("Too many cases for display. Restricted to 40")).exec()
                 for c in cases:
                     x_labels.append(c[1])
                 # Calculate the frequency of each code in each file
                 # Each row is a code, each column is a file
-                for code_ in self.codes:
+                for code_ in codes:
                     code_counts = []
                     for c in cases:
                         cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
@@ -1322,7 +1332,7 @@ class ViewCharts(QDialog):
                 subtitle += attr_msg
                 # Calculate the frequency of each code in each file
                 # Each row is a code, each column is a file
-                for code_ in self.codes:
+                for code_ in codes:
                     code_counts = []
                     for c in self.attribute_case_ids_and_names:
                         cur.execute("SELECT fid FROM case_text where caseid=?", [c[0]])
