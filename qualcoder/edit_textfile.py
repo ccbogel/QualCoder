@@ -442,7 +442,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_select_all = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
-        action = menu.exec_(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action == action_copy:
             selected_text = self.ui.textEdit.textCursor().selectedText()
             cb = QtWidgets.QApplication.clipboard()
