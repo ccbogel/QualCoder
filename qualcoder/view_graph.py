@@ -442,6 +442,10 @@ class ViewGraph(QDialog):
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
                 return
             self.ui.graphicsView.scale(0.9, 0.9)
+        if key == QtCore.Qt.Key.Key_H:
+            # print item x y
+            for i in self.scene.items():
+                print(i.__class__, i.pos())
 
     def reject(self):
 
@@ -651,6 +655,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     or isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                 if item.remove is True:
                     self.removeItem(item)
+        self.adjust_for_negative_positions()
+        self.suggested_scene_size()
         self.update()
 
     '''def mousePressEvent(self, mouseEvent):
@@ -672,6 +678,21 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 item.redraw()
         self.update(self.sceneRect())"""
 
+    def adjust_for_negative_positions(self):
+        """ Move all items if negative positions """
+
+        min_adjust_x = 0
+        min_adjust_y = 0
+        for i in self.items():
+            if i.pos().x() < min_adjust_x:
+                min_adjust_x = i.pos().x()
+            if i.pos().y() < min_adjust_x:
+                min_adjust_y = i.pos().y()
+        if min_adjust_x < 0 or min_adjust_y < 0:
+            for i in self.items():
+                if not(isinstance(i, LinkGraphicsItem) or isinstance(i, FreeLineGraphicsItem)):
+                    i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
+
     def suggested_scene_size(self):
         """ Calculate the maximum width and height from the current Text Items. """
 
@@ -684,6 +705,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     max_x = i.pos().x() + i.boundingRect().width()
                 if i.pos().y() + i.boundingRect().height() > max_y:
                     max_y = i.pos().y() + i.boundingRect().height()
+        self.setSceneRect(0, 0, max_x, max_y)
         return max_x, max_y
 
 
