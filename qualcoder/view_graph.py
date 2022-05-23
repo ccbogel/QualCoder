@@ -977,7 +977,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    line_color = QtCore.Qt.GlobalColor.black
+    line_color = QtCore.Qt.GlobalColor.gray
     corners_only = False  # True for list graph
     weighting = 1
     tooltip = ""
@@ -993,9 +993,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.line_color = QtCore.Qt.GlobalColor.black
-        if app.settings['stylesheet'] == "dark":
-            self.line_color = QtCore.Qt.GlobalColor.white
+        self.line_color = QtCore.Qt.GlobalColor.gray
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1006,6 +1004,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction(_('Yellow'))
         menu.addAction(_('Green'))
         menu.addAction(_('Blue'))
+        menu.addAction(_('Cyan'))
+        menu.addAction(_('Magenta'))
         menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
@@ -1034,6 +1034,12 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.redraw()
         if action.text() == 'Blue':
             self.line_color = QtCore.Qt.GlobalColor.blue
+            self.redraw()
+        if action.text() == 'Cyan':
+            self.line_color = QtCore.Qt.GlobalColor.cyan
+            self.redraw()
+        if action.text() == 'Magenta':
+            self.line_color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
         if action.text() == "Remove":
             self.remove = True
@@ -1222,7 +1228,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    line_color = QtCore.Qt.GlobalColor.black
+    line_color = QtCore.Qt.GlobalColor.gray
     corners_only = False  # True for list graph
     weighting = 1
     text = ""
@@ -1237,9 +1243,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.weighting = weighting
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.line_color = QtCore.Qt.GlobalColor.black
-        if app.settings['stylesheet'] == "dark":
-            self.line_color = QtCore.Qt.GlobalColor.white
+        self.line_color = QtCore.Qt.GlobalColor.gray
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1250,6 +1254,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         menu.addAction(_('Yellow'))
         menu.addAction(_('Green'))
         menu.addAction(_('Blue'))
+        menu.addAction(_('Cyan'))
+        menu.addAction(_('Magenta'))
         menu.addAction(_("Hide"))
 
         action = menu.exec(QtGui.QCursor.pos())
@@ -1279,6 +1285,12 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.redraw()
         if action.text() == 'Blue':
             self.line_color = QtCore.Qt.GlobalColor.blue
+            self.redraw()
+        if action.text() == 'Cyan':
+            self.line_color = QtCore.Qt.GlobalColor.cyan
+            self.redraw()
+        if action.text() == 'Magenta':
+            self.line_color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
         if action.text() == "Hide":
             self.hide()
