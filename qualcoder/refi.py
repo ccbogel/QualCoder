@@ -2455,20 +2455,22 @@ class RefiExport(QtWidgets.QDialog):
         cur.execute(sql, [id_, ])
         results = cur.fetchall()
         for r in results:
-            xml += '<PlainTextSelection guid="' + self.create_guid() + '" '
-            xml += 'startPosition="' + str(r[2]) + '" '
-            xml += 'endPosition="' + str(r[3]) + '" '
-            xml += 'name="' + self.convert_xml_predefined_entities(r[1]) + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
-            xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
-            if r[6] != "":  # Description element comes before coding element
-                memo = self.convert_xml_predefined_entities(r[6])
-                xml += '<Description>' + memo + '</Description>\n'
-            xml += '<Coding guid="' + self.create_guid() + '" '
-            xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[0]) + '" />\n'
-            xml += '</Coding>\n'
-            xml += '</PlainTextSelection>\n'
+            code_guid = self.code_guid(r[0])
+            if code_guid != "":  # Need a coding for this selection
+                xml += '<PlainTextSelection guid="' + self.create_guid() + '" '
+                xml += 'startPosition="' + str(r[2]) + '" '
+                xml += 'endPosition="' + str(r[3]) + '" '
+                xml += 'name="' + self.convert_xml_predefined_entities(r[1]) + '" '
+                xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
+                xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
+                if r[6] != "":  # Description element comes before coding element
+                    memo = self.convert_xml_predefined_entities(r[6])
+                    xml += '<Description>' + memo + '</Description>\n'
+                xml += '<Coding guid="' + self.create_guid() + '" '
+                xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
+                xml += '<CodeRef targetGUID="' + code_guid + '" />\n'
+                xml += '</Coding>\n'
+                xml += '</PlainTextSelection>\n'
         return xml
 
     def picture_selection_xml(self, id_):
@@ -2501,7 +2503,9 @@ class RefiExport(QtWidgets.QDialog):
                 xml += '<Description>' + memo + '</Description>\n'
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" >\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
+            code_guid = self.code_guid(r[1])
+            if code_guid != "":
+                xml += '<CodeRef targetGUID="' + code_guid + '"/>\n'
             xml += '</Coding>\n'
             xml += '</PictureSelection>\n'
         return xml
@@ -2544,7 +2548,9 @@ class RefiExport(QtWidgets.QDialog):
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(r[1]) + '"/>\n'
+            code_guid = self.code_guid(r[1])
+            if code_guid != "":
+                xml += '<CodeRef targetGUID="' + code_guid + '"/>\n'
             xml += '</Coding>\n'
             xml += '</' + mediatype + 'Selection>\n'
         return xml
@@ -2638,7 +2644,9 @@ class RefiExport(QtWidgets.QDialog):
                     doubleup = True
             xml += '">\n'
             xml += '<Coding guid="' + self.create_guid() + '" >\n'
-            xml += '<CodeRef targetGUID="' + self.code_guid(coded[2]) + '" />\n'
+            code_guid = self.code_guid(coded[2])
+            if code_guid != "":
+                xml += '<CodeRef targetGUID="' + code_guid + '" />\n'
             xml += '</Coding>\n'
             xml += '</TranscriptSelection>\n'
         return xml
