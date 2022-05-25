@@ -32,11 +32,14 @@
       <string/>
      </property>
      <widget class="QCheckBox" name="checkBox_listview">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>141</width>
+        <width>111</width>
         <height>22</height>
        </rect>
       </property>
@@ -51,11 +54,14 @@
       </property>
      </widget>
      <widget class="QComboBox" name="comboBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>330</x>
         <y>5</y>
-        <width>421</width>
+        <width>281</width>
         <height>30</height>
        </rect>
       </property>
@@ -63,8 +69,8 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>6</y>
+        <x>810</x>
+        <y>3</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -79,7 +85,7 @@
      <widget class="QLabel" name="label_zoom">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>850</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -103,6 +109,134 @@
       </property>
       <property name="toolTip">
        <string>Reveal hidden items</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_savegraph">
+      <property name="geometry">
+       <rect>
+        <x>710</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Save graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_loadgraph">
+      <property name="geometry">
+       <rect>
+        <x>742</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Load graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_deletegraph">
+      <property name="geometry">
+       <rect>
+        <x>772</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Delete graph</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_freetextitem">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add free text item</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_addcase">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add case items</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_addfile">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add file items</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_addline">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Add connecting line</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_selectbranch">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Select code branch</string>
       </property>
       <property name="text">
        <string/>
