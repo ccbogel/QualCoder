@@ -324,7 +324,7 @@ class RefiImport:
         self.pd_value = 0
 
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(self.folder_name + "/project.qde", "r", encoding='utf8') as xml_file:
+        with open(self.folder_name + "/project.qde", "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
         result = self.xml_validation("project")
         self.parent_textEdit.append("Project XML parsing successful: " + str(result))
@@ -1079,8 +1079,7 @@ class RefiImport:
                 if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
         except Exception as e:
-            print("Opening destination to load text\n", destination)
-            print(e)
+            print("Opening destination to load text\n", destination, "\n", e)
             logger.debug(str(e))
             Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e), "warning").exec()
 
@@ -1275,7 +1274,7 @@ class RefiImport:
         :type pdf_rep_date: String
          """
 
-        # TODO absolute and relative - ?
+        # TODO absolute and relative - not tested relative
         name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
             element)
         if pdf_rep_name != "":
@@ -1283,7 +1282,7 @@ class RefiImport:
         if pdf_rep_date != "":
             create_date = pdf_rep_date
         cur = self.app.conn.cursor()
-        # find Description to complete memo
+        # Find Description to complete memo
         memo = ""
         for e in element.getchildren():
             if e.tag == "{urn:QDA-XML:project:1.0}Description":
@@ -1322,9 +1321,11 @@ class RefiImport:
                 if fulltext is not None and add_ending:
                     fulltext = fulltext.replace('\n', '\n ')
                 source['fulltext'] = fulltext
-                # ADding split()
+                # Adding split()- DOnt know why ?? - Removed
+                # OLD CODE: name + "." + source_path.split('.')[-1]
+                # NEW CODE: name
                 cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
-                            (name + "." + source_path.split('.')[-1], fulltext, source['mediapath'], memo,
+                            (name, fulltext, source['mediapath'], memo,
                              creating_user, create_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
