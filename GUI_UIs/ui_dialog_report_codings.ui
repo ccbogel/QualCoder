@@ -188,7 +188,7 @@
      <widget class="QLabel" name="label_matrix">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>600</x>
         <y>20</y>
         <width>30</width>
         <height>30</height>
@@ -204,7 +204,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>631</x>
         <y>20</y>
         <width>281</width>
         <height>30</height>
@@ -278,7 +278,7 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>640</x>
         <y>60</y>
         <width>211</width>
         <height>23</height>
