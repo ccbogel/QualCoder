@@ -324,7 +324,7 @@ class RefiImport:
         self.pd_value = 0
 
         # Parse xml for users, codebook, sources, journals, project description, variable names
-        with open(self.folder_name + "/project.qde", "r") as xml_file:
+        with open(self.folder_name + "/project.qde", "r", encoding='utf8') as xml_file:
             self.xml = xml_file.read()
         result = self.xml_validation("project")
         self.parent_textEdit.append("Project XML parsing successful: " + str(result))
