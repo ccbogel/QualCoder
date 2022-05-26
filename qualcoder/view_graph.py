@@ -101,6 +101,38 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
         self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_selectbranch.setIcon(QtGui.QIcon(pm))
+        # TODO self.ui.pushButton_selectbranch.pressed.connect(self.)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
+        self.ui.pushButton_freetextitem.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_freetextitem.pressed.connect(self.add_text_item_to_graph)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
+        self.ui.pushButton_addfile.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addfile.pressed.connect(self.add_files_to_graph)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
+        self.ui.pushButton_addcase.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addcase.pressed.connect(self.add_cases_to_graph)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(line_icon), "png")
+        self.ui.pushButton_addline.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addline.pressed.connect(self.add_lines_to_graph)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_up_icon), "png")
+        self.ui.pushButton_loadgraph.setIcon(QtGui.QIcon(pm))
+        # TODO self.ui.pushButton_loadgraph.pressed.connect(self.)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_down_icon), "png")
+        self.ui.pushButton_savegraph.setIcon(QtGui.QIcon(pm))
+        # TODO self.ui.pushButton_savegraph.pressed.connect(self.)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_deletegraph.setIcon(QtGui.QIcon(pm))
+        # TODO self.ui.pushButton_deletegraph.pressed.connect(self.)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -108,7 +140,6 @@ class ViewGraph(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
         self.codes, self.categories = app.get_codes_categories()
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
@@ -117,11 +148,18 @@ class ViewGraph(QDialog):
             for cat in self.categories:
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
+
+        self.ui.comboBox.hide()
+        #TODO
         self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
         combobox_list = ['All']
         for c in self.categories:
             combobox_list.append(c['name'])
         self.ui.comboBox.addItems(combobox_list)
+        # TODO
+        self.ui.checkBox_listview.hide()
+        self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
+
 
     def show_graph_type(self):
 
@@ -458,7 +496,8 @@ class ViewGraph(QDialog):
     def eventFilter(self, obj, event):
         """ https://stackoverflow.com/questions/71993533/
         how-to-initiate-context-menu-event-in-qgraphicsitem-from-qgraphicsview-context-m/72002453#72002453
-        This is required to forward context menu event to graphics view items """
+        This is required to forward context menu event to graphics view items.
+        I dont understand how it works yet! """
 
         if obj == self.ui.graphicsView.viewport() and event.type() == event.Type.ContextMenu:
             self.ui.graphicsView.contextMenuEvent(event)
@@ -473,8 +512,8 @@ class ViewGraph(QDialog):
         # Menu for blank graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_add_text = QtGui.QAction(_("Insert Text"))
-        menu.addAction(action_add_text)
+        action_add_text_item = QtGui.QAction(_("Insert Text"))
+        menu.addAction(action_add_text_item)
         action_add_line = QtGui.QAction(_("Insert Line"))
         menu.addAction(action_add_line)
         action_add_files = QtGui.QAction(_("Show files"))
@@ -482,42 +521,79 @@ class ViewGraph(QDialog):
         action_add_cases = QtGui.QAction(_("Show cases"))
         menu.addAction(action_add_cases)
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
-        if action == action_add_text:
-            text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
-            if ok and text_ not in self.named_text_items():
-                item = FreeTextGraphicsItem(self.app, position.x(), position.y(), text_)
-                self.scene.addItem(item)
+        if action == action_add_text_item:
+            self.add_text_item_to_graph(position.x(), position.y())
         if action == action_add_line:
-            names = self.named_text_items()
-            line_from = QtWidgets.QInputDialog()
-            line_from.setWindowTitle(_("Line"))
-            line_from.setLabelText(_('From:'))
-            line_from.setComboBoxItems(names)
-            line_from.exec()
-            text_from = line_from.textValue()
-            line_to = QtWidgets.QInputDialog()
-            line_to.setWindowTitle(_("Line"))
-            line_to.setLabelText(_('To:'))
-            line_to.setComboBoxItems(names)
-            line_to.exec()
-            text_to = line_to.textValue()
-            from_item = None
-            to_item = None
-            for item in self.scene.items():
-                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                        isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
-                    if item.text == text_from:
-                        from_item = item
-                    if item.text == text_to:
-                        to_item = item
-            if from_item == to_item or from_item is None or to_item is None:
-                return
-            line_item = FreeLineGraphicsItem(self.app, from_item, to_item)
-            self.scene.addItem(line_item)
+            self.add_lines_to_graph()
         if action == action_add_files:
             self.add_files_to_graph()
         if action == action_add_cases:
             self.add_cases_to_graph()
+
+    def add_lines_to_graph(self):
+        """ Add one or more lines from an item to one or more destination items. """
+
+        # From item
+        names = self.named_text_items()
+        names_dict_list = []
+        for n in names:
+            names_dict_list.append({'name': n})
+        ui = DialogSelectItems(self.app, names_dict_list, _("Line start item"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        text_from = selected['name']
+        from_item = None
+        for item in self.scene.items():
+            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
+                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
+                if item.text == text_from:
+                    from_item = item
+
+        # To Items selection
+        names_dict_list.remove(selected)
+        ui = DialogSelectItems(self.app, names_dict_list, _("Line end item(s)"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        if not selected:
+            return
+
+        # Line color selection
+        names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow")]
+        names_dict_list = []
+        for n in names:
+            names_dict_list.append({'name': n})
+        ui = DialogSelectItems(self.app, names_dict_list, _("Line colour"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_color = ui.get_selected()
+        color = selected_color['name']
+
+        # Create To Item lines
+        for s in selected:
+            text_to = s['name']
+            to_item = None
+            for item in self.scene.items():
+                if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
+                        isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
+                    if item.text == text_to:
+                        to_item = item
+            if from_item != to_item and not(from_item is None or to_item is None):
+                #TODO line color, style, thickness
+                line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
+                self.scene.addItem(line_item)
+
+    def add_text_item_to_graph(self, x=20, y=20):
+        """ Add text item to graph. Ensure text is unique. """
+
+        text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
+        if ok and text_ not in self.named_text_items():
+            item = FreeTextGraphicsItem(self.app, x, y, text_)
+            self.scene.addItem(item)
 
     def add_files_to_graph(self):
         """ Add Text file items to graph. """
@@ -1005,7 +1081,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     tooltip = ""
     remove = False
 
-    def __init__(self, app, from_widget, to_widget, corners_only=False):
+    def __init__(self, app, from_widget, to_widget, color="gray", corners_only=False):
         super(FreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
@@ -1016,6 +1092,18 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
         self.line_color = QtCore.Qt.GlobalColor.gray
+        if color == "red":
+            self.line_color = QtCore.Qt.GlobalColor.red
+        if color == "blue":
+            self.line_color = QtCore.Qt.GlobalColor.blue
+        if color == "green":
+            self.line_color = QtCore.Qt.GlobalColor.green
+        if color == "cyan":
+            self.line_color = QtCore.Qt.GlobalColor.cyan
+        if color == "magenta":
+            self.line_color = QtCore.Qt.GlobalColor.magenta
+        if color == "yellow":
+            self.line_color = QtCore.Qt.GlobalColor.yellow
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
