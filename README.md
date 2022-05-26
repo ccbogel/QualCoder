@@ -8,10 +8,6 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-_NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions. You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
-
-**MAJOR CHANGE (8 APRIL 2022) QUALCODER NOW USES THE Qt6 GRAPHICAL FRAMEWORK. I HAVE DONE A LOT OF TESTING TO TRACK DOWN ANY ISSUES IN THIS UPDATE. I MIGHT HAVE MISSED SOME, SO PLEASE POST ANY ERROR ISSUES. I WILL WAIT A MONTH AND THEN PUT THIS OUT AS A 3.0 RELEASE.**
-
 ## INSTALLATION 
 
 ### Prerequisites
