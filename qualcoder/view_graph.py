@@ -104,7 +104,7 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_selectbranch.setIcon(QtGui.QIcon(pm))
-        # TODO self.ui.pushButton_selectbranch.pressed.connect(self.)
+        self.ui.pushButton_selectbranch.pressed.connect(self.select_tree_branch)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
         self.ui.pushButton_freetextitem.setIcon(QtGui.QIcon(pm))
@@ -151,49 +151,44 @@ class ViewGraph(QDialog):
 
         self.ui.comboBox.hide()
         #TODO
-        self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
-        combobox_list = ['All']
+        #self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
+        '''combobox_list = ['All']
         for c in self.categories:
             combobox_list.append(c['name'])
-        self.ui.comboBox.addItems(combobox_list)
+        self.ui.comboBox.addItems(combobox_list)'''
         # TODO
         self.ui.checkBox_listview.hide()
-        self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
+        #self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
 
-
-    def show_graph_type(self):
-
-        if self.ui.checkBox_listview.isChecked():
-            self.list_graph()
-        else:
-            self.circular_graph()
-
-    def export_image(self):
-        """ Export the QGraphicsScene as a png image with transparent background.
-        Called by QButton.
+    def select_tree_branch(self):
+        """ Selected tree branch for model of codes and categories.
+        Called by QButton_selectbranch
         """
 
-        filename = "Graph.png"
-        e_dir = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e_dir.filepath
-        if filepath is None:
+        selection_list = [{'name': 'All'}]
+        for c in self.categories:
+            selection_list.append({'name': c['name']})
+        ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
+        ok = ui.exec()
+        if not ok:
             return
-        # Scene size is too big.
-        max_x, max_y = self.scene.suggested_scene_size()
-        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
-        image = QtGui.QImage(int(max_x + 5), int(max_y + 5), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
-        painter = QtGui.QPainter(image)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        # Render method requires QRectF NOT QRect
-        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
-        painter.end()
-        image.save(filepath)
-        Message(self.app, _("Image exported"), filepath).exec()
+        selected = ui.get_selected()
+        if not selected:
+            node_text = "All"
+        else:
+            node_text = selected['name']
+        self.create_initial_model()
+        self.get_refined_model_with_depth_and_category_counts(, , node_text)
+
 
     def create_initial_model(self):
-        """ Create initial model
+        """ Create initial model of codes and categories.
+        model contains categories and codes combined.
 
-        return: categories, codes, model  """
+        return: categories : List of Dictionaries
+        return: codes : List of Dictionaries
+        return: model : List of Dictionaries
+        """
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
@@ -214,24 +209,24 @@ class ViewGraph(QDialog):
         model = cats + codes
         return cats, codes, model
 
-    def get_refined_model_with_depth_and_category_counts(self, cats, model):
+    def get_refined_model_with_depth_and_category_counts(self, cats, model, top_node_text):
         """ The default model contains all categories and codes.
         Can limit to a selected category, via combo box selection.
+        model contains categories and codes combined.
 
         param: cats - list of categories
         param: model - model containing all categories and codes
 
-        return: model
+        return: model : List of Dictionaries
         """
 
-        top_node = self.ui.comboBox.currentText()
-        if top_node == "All":
-            top_node = None
+        if top_node_text == "All":
+            top_node_text = None
         for c in cats:
-            if c['name'] == top_node:
+            if c['name'] == top_node_text:
                 top_node = c
                 top_node['supercatid'] = None  # must set this to None
-        model = self.get_node_with_children(top_node, model)
+        model = self.get_node_with_children(top_node_text, model)
 
         ''' Look at each category and determine the depth.
         Also determine the number of children for each catid. '''
@@ -249,7 +244,6 @@ class ViewGraph(QDialog):
                 c['depth'] = depth
                 count += 1
         catid_counts = Counter(supercatid_list)
-
         return catid_counts, model
 
     def named_children_of_node(self, node):
@@ -356,7 +350,7 @@ class ViewGraph(QDialog):
                         item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
                         self.scene.addItem(item)
 
-    def circular_graph(self):
+    '''def circular_graph(self):
         """ Create a circular acyclic graph
         """
 
@@ -371,10 +365,9 @@ class ViewGraph(QDialog):
                 if m['angle'] is None and m['supercatid'] == cat_key:
                     m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
                     segment += 1
-        ''' Calculate x y positions from central point outwards.
-        The 'central' x value is towards the left side rather than true center, because
-        the text boxes will draw to the right-hand side.
-        '''
+        # Calculate x y positions from central point outwards.
+        # The 'central' x value is towards the left side rather than true center, because
+        # the text boxes will draw to the right-hand side.
         c_x = self.scene.get_width() / 3
         c_y = self.scene.get_height() / 2
         r = 220
@@ -423,10 +416,20 @@ class ViewGraph(QDialog):
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n, 1)
                         self.scene.addItem(item)
+    
+    def show_graph_type(self):
+
+        if self.ui.checkBox_listview.isChecked():
+            self.list_graph()
+        else:
+            self.circular_graph()'''
 
     def get_node_with_children(self, node, model):
         """ Return a short list of this top node and all its children.
-        Note, maximum depth of 20. """
+        Note, maximum depth of 20.
+
+        return:
+        """
 
         if node is None:
             return model
@@ -583,7 +586,6 @@ class ViewGraph(QDialog):
                     if item.text == text_to:
                         to_item = item
             if from_item != to_item and not(from_item is None or to_item is None):
-                #TODO line color, style, thickness
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
                 self.scene.addItem(line_item)
 
@@ -594,6 +596,21 @@ class ViewGraph(QDialog):
         if ok and text_ not in self.named_text_items():
             item = FreeTextGraphicsItem(self.app, x, y, text_)
             self.scene.addItem(item)
+
+    def named_text_items(self):
+        """ Used to get a list of all named FreeText and Case and File graphics items.
+         Use to allow links between these items based on the text name.
+         Called by: add_text_item_to_graph
+         return: names : List of Strings
+         """
+
+        names = []
+        for item in self.scene.items():
+            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
+                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
+                names.append(item.text)
+        names.sort()
+        return names
 
     def add_files_to_graph(self):
         """ Add Text file items to graph. """
@@ -609,7 +626,8 @@ class ViewGraph(QDialog):
             self.scene.addItem(file_item)
 
     def get_files(self):
-        """ Get files.
+        """ Get list of files.
+        Called by add_files_to_graph.
         return: list of dictionary of id and name"""
 
         cur = self.app.conn.cursor()
@@ -636,7 +654,8 @@ class ViewGraph(QDialog):
             self.scene.addItem(case_item)
 
     def get_cases(self):
-        """ Get cases.
+        """ Get list of cases.
+        Called by: add_cases_to_graph
         return: list of dictionary of id and name"""
 
         cur = self.app.conn.cursor()
@@ -649,17 +668,27 @@ class ViewGraph(QDialog):
             res.append(dict(zip(keys, row)))
         return res
 
-    def named_text_items(self):
-        """ Used in the graphicsview_menu to get a list of all named FreeText and Case and File graphics items.
-         Use to allow links between these items based on the text name. """
+    def export_image(self):
+        """ Export the QGraphicsScene as a png image with transparent background.
+        Called by QButton_export.
+        """
 
-        names = []
-        for item in self.scene.items():
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
-                names.append(item.text)
-        names.sort()
-        return names
+        filename = "Graph.png"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
+            return
+        # Scene size is too big.
+        max_x, max_y = self.scene.suggested_scene_size()
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)
+        image = QtGui.QImage(int(max_x + 5), int(max_y + 5), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # Render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
+        painter.end()
+        image.save(filepath)
+        Message(self.app, _("Image exported"), filepath).exec()
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
