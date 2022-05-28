@@ -176,18 +176,19 @@ class ViewGraph(QDialog):
         if not selected:
             node_text = "All"
         else:
-            node_text = selected['name']
-        self.create_initial_model()
-        self.get_refined_model_with_depth_and_category_counts(, , node_text)
-
+            node_text = selected[0]['name']
+        cats, codes, model = self.create_initial_model()
+        #TODO is catid_count used ?
+        model, catid_counts = self.get_refined_model_with_category_counts(cats, model, node_text)
+        self.list_graph(model)
 
     def create_initial_model(self):
         """ Create initial model of codes and categories.
         model contains categories and codes combined.
 
-        return: categories : List of Dictionaries
-        return: codes : List of Dictionaries
-        return: model : List of Dictionaries
+        return: categories : List of Dictionaries of categories
+        return: codes : List of Dictionaries of codes
+        return: model : List of Dictionaries of codes and categories
         """
 
         cats = deepcopy(self.categories)
@@ -209,27 +210,30 @@ class ViewGraph(QDialog):
         model = cats + codes
         return cats, codes, model
 
-    def get_refined_model_with_depth_and_category_counts(self, cats, model, top_node_text):
-        """ The default model contains all categories and codes.
-        Can limit to a selected category, via combo box selection.
-        model contains categories and codes combined.
+    def get_refined_model_with_category_counts(self, cats, model, top_node_text):
+        """ The initial model contains all categories and codes.
+        The refined model method is called and based on a selected category, via QButton_selection.
+        The refined model also gets counts for nodes of each category
 
-        param: cats - list of categories
-        param: model - model containing all categories and codes
+        param: cats : List of Dictionaries of categories
+        param: model : List of Dictionaries of combined categories and codes
+        param: top_node_text : String name of the top category
 
         return: model : List of Dictionaries
         """
 
+        top_node = None
         if top_node_text == "All":
-            top_node_text = None
-        for c in cats:
-            if c['name'] == top_node_text:
-                top_node = c
-                top_node['supercatid'] = None  # must set this to None
-        model = self.get_node_with_children(top_node_text, model)
+            top_node = None
+        else:
+            for cat in cats:
+                if cat['name'] == top_node_text:
+                    top_node = cat
+                    top_node['supercatid'] = None  # Must set this to None
+        model = self.get_refined_model(top_node, model)
 
-        ''' Look at each category and determine the depth.
-        Also determine the number of children for each catid. '''
+        # Look at each category and determine the depth.
+        # Also determine the number of children for each catid.
         supercatid_list = []
         for c in model:
             depth = 0
@@ -243,12 +247,48 @@ class ViewGraph(QDialog):
                         supercatid = s['supercatid']
                 c['depth'] = depth
                 count += 1
+        #TODO is catid_counts used ?
         catid_counts = Counter(supercatid_list)
-        return catid_counts, model
+        return model, catid_counts
+
+    def get_refined_model(self, node, model):
+        """ Return a refined model of this top node and all its children.
+        Maximum depth is 20.
+        Called by: get_refined_model_with_category_counts
+
+        param: node : Dictionary of category, or None
+        param: model : List of Dictionaries - of categories and codes
+
+        return: new_model : List of Dictionaries of categories and codes
+        """
+
+        if node is None:
+            return model
+        refined_model = [node]
+        i = 0  # Ensure an exit from while loop
+        model_changed = True
+        while model != [] and model_changed and i < 20:
+            model_changed = False
+            append_list = []
+            for n in refined_model:
+                for m in model:
+                    if m['supercatid'] == n['catid']:
+                        append_list.append(m)
+            for n in append_list:
+                refined_model.append(n)
+                model.remove(n)
+                model_changed = True
+            i += 1
+        return refined_model
 
     def named_children_of_node(self, node):
         """ Get child categories and codes of this category node.
-        Only keep the category or code name.  Used to reposition TextGraphicsItems on moving a category. """
+        Only keep the category or code name.  Used to reposition TextGraphicsItems on moving a category.
+
+        param: node : Dictionary of category
+
+        return: child_names : List
+        """
 
         if node['cid'] is not None:
             return []
@@ -292,13 +332,11 @@ class ViewGraph(QDialog):
             child_names.append(c['name'])
         return child_names
 
-    def list_graph(self):
+    def list_graph(self, model):
         """ Create a list graph with the categories on the left and codes on the right
         """
 
-        self.scene.clear()
-        cats, codes, model = self.create_initial_model()
-        catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
+        #TODO self.scene.clear()
 
         # Order the model by supercatid, subcats, codes
         ordered_model = []
@@ -349,106 +387,6 @@ class ViewGraph(QDialog):
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
                         self.scene.addItem(item)
-
-    '''def circular_graph(self):
-        """ Create a circular acyclic graph
-        """
-
-        self.scene.clear()
-        cats, codes, model = self.create_initial_model()
-        catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
-
-        # assign angles to each item segment
-        for cat_key in catid_counts.keys():
-            segment = 1
-            for m in model:
-                if m['angle'] is None and m['supercatid'] == cat_key:
-                    m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
-                    segment += 1
-        # Calculate x y positions from central point outwards.
-        # The 'central' x value is towards the left side rather than true center, because
-        # the text boxes will draw to the right-hand side.
-        c_x = self.scene.get_width() / 3
-        c_y = self.scene.get_height() / 2
-        r = 220
-        rx_expander = c_x / c_y  # Screen is landscape, so stretch x position
-        x_is_none = True
-        i = 0
-        while x_is_none and i < 1000:
-            x_is_none = False
-            for m in model:
-                if m['x'] is None and m['supercatid'] is None:
-                    m['x'] = c_x + (math.cos(m['angle']) * (r * rx_expander))
-                    m['y'] = c_y + (math.sin(m['angle']) * r)
-                if m['x'] is None and m['supercatid'] is not None:
-                    for super_m in model:
-                        if super_m['catid'] == m['supercatid'] and super_m['x'] is not None:
-                            m['x'] = super_m['x'] + (math.cos(m['angle']) * (r * rx_expander) / (m['depth'] + 2))
-                            m['y'] = super_m['y'] + (math.sin(m['angle']) * r / (m['depth'] + 2))
-                            if abs(super_m['x'] - m['x']) < 20 and abs(super_m['y'] - m['y']) < 20:
-                                m['x'] += 20
-                                m['y'] += 20
-                if m['x'] is None:
-                    x_is_none = True
-            i += 1
-
-        # Fix out of view items
-        for m in model:
-            m['child_names'] = self.named_children_of_node(m)
-            if m['x'] < 2:
-                m['x'] = 2
-            if m['y'] < 2:
-                m['y'] = 2
-            if m['x'] > c_x * 2 - 20:
-                m['x'] = c_x * 2 - 20
-            if m['y'] > c_y * 2 - 20:
-                m['y'] = c_y * 2 - 20
-
-        # Add text items to the scene
-        for m in model:
-            self.scene.addItem(TextGraphicsItem(self.app, m))
-        # Add link which includes the scene text items and associated data, add links before text_items
-        for m in self.scene.items():
-            if isinstance(m, TextGraphicsItem):
-                for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
-                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
-                            n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        item = LinkGraphicsItem(self.app, m, n, 1)
-                        self.scene.addItem(item)
-    
-    def show_graph_type(self):
-
-        if self.ui.checkBox_listview.isChecked():
-            self.list_graph()
-        else:
-            self.circular_graph()'''
-
-    def get_node_with_children(self, node, model):
-        """ Return a short list of this top node and all its children.
-        Note, maximum depth of 20.
-
-        return:
-        """
-
-        if node is None:
-            return model
-        new_model = [node]
-        i = 0  # for ensuring an exit from while loop
-        new_model_changed = True
-        while model != [] and new_model_changed and i < 20:
-            new_model_changed = False
-            append_list = []
-            for n in new_model:
-                for m in model:
-                    if m['supercatid'] == n['catid']:
-                        append_list.append(m)
-            for n in append_list:
-                new_model.append(n)
-                model.remove(n)
-                new_model_changed = True
-            i += 1
-        return new_model
 
     def reveal_hidden_items(self):
         """ Show list of hidden items to be revealed on selection """
@@ -1486,3 +1424,77 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
+
+'''def circular_graph(self):
+    """ Create a circular acyclic graph
+    """
+
+    self.scene.clear()
+    cats, codes, model = self.create_initial_model()
+    catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
+
+    # assign angles to each item segment
+    for cat_key in catid_counts.keys():
+        segment = 1
+        for m in model:
+            if m['angle'] is None and m['supercatid'] == cat_key:
+                m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
+                segment += 1
+    # Calculate x y positions from central point outwards.
+    # The 'central' x value is towards the left side rather than true center, because
+    # the text boxes will draw to the right-hand side.
+    c_x = self.scene.get_width() / 3
+    c_y = self.scene.get_height() / 2
+    r = 220
+    rx_expander = c_x / c_y  # Screen is landscape, so stretch x position
+    x_is_none = True
+    i = 0
+    while x_is_none and i < 1000:
+        x_is_none = False
+        for m in model:
+            if m['x'] is None and m['supercatid'] is None:
+                m['x'] = c_x + (math.cos(m['angle']) * (r * rx_expander))
+                m['y'] = c_y + (math.sin(m['angle']) * r)
+            if m['x'] is None and m['supercatid'] is not None:
+                for super_m in model:
+                    if super_m['catid'] == m['supercatid'] and super_m['x'] is not None:
+                        m['x'] = super_m['x'] + (math.cos(m['angle']) * (r * rx_expander) / (m['depth'] + 2))
+                        m['y'] = super_m['y'] + (math.sin(m['angle']) * r / (m['depth'] + 2))
+                        if abs(super_m['x'] - m['x']) < 20 and abs(super_m['y'] - m['y']) < 20:
+                            m['x'] += 20
+                            m['y'] += 20
+            if m['x'] is None:
+                x_is_none = True
+        i += 1
+
+    # Fix out of view items
+    for m in model:
+        m['child_names'] = self.named_children_of_node(m)
+        if m['x'] < 2:
+            m['x'] = 2
+        if m['y'] < 2:
+            m['y'] = 2
+        if m['x'] > c_x * 2 - 20:
+            m['x'] = c_x * 2 - 20
+        if m['y'] > c_y * 2 - 20:
+            m['y'] = c_y * 2 - 20
+
+    # Add text items to the scene
+    for m in model:
+        self.scene.addItem(TextGraphicsItem(self.app, m))
+    # Add link which includes the scene text items and associated data, add links before text_items
+    for m in self.scene.items():
+        if isinstance(m, TextGraphicsItem):
+            for n in self.scene.items():
+                if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
+                        m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
+                        n.code_or_cat['depth'] < m.code_or_cat['depth']:
+                    item = LinkGraphicsItem(self.app, m, n, 1)
+                    self.scene.addItem(item)
+
+def show_graph_type(self):
+
+    if self.ui.checkBox_listview.isChecked():
+        self.list_graph()
+    else:
+        self.circular_graph()'''
