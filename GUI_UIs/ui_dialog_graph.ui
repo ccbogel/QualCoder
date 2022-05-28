@@ -37,8 +37,8 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
+        <x>390</x>
+        <y>6</y>
         <width>111</width>
         <height>22</height>
        </rect>
@@ -53,23 +53,10 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>5</y>
-        <width>281</width>
-        <height>30</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>810</x>
+        <x>260</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -85,7 +72,7 @@
      <widget class="QLabel" name="label_zoom">
       <property name="geometry">
        <rect>
-        <x>850</x>
+        <x>41</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -101,7 +88,7 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>193</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -117,7 +104,7 @@
      <widget class="QPushButton" name="pushButton_savegraph">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>308</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -133,7 +120,7 @@
      <widget class="QPushButton" name="pushButton_loadgraph">
       <property name="geometry">
        <rect>
-        <x>742</x>
+        <x>340</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -149,7 +136,7 @@
      <widget class="QPushButton" name="pushButton_deletegraph">
       <property name="geometry">
        <rect>
-        <x>772</x>
+        <x>370</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -165,7 +152,7 @@
      <widget class="QPushButton" name="pushButton_freetextitem">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>73</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -181,7 +168,7 @@
      <widget class="QPushButton" name="pushButton_addcase">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>103</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -197,7 +184,7 @@
      <widget class="QPushButton" name="pushButton_addfile">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>133</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -213,7 +200,7 @@
      <widget class="QPushButton" name="pushButton_addline">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>163</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -229,7 +216,7 @@
      <widget class="QPushButton" name="pushButton_selectbranch">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>10</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -237,6 +224,35 @@
       </property>
       <property name="toolTip">
        <string>Select code branch</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_clear">
+      <property name="geometry">
+       <rect>
+        <x>223</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Clear</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_loaded_graph">
+      <property name="geometry">
+       <rect>
+        <x>425</x>
+        <y>4</y>
+        <width>561</width>
+        <height>28</height>
+       </rect>
       </property>
       <property name="text">
        <string/>
@@ -261,7 +277,6 @@
  </widget>
  <tabstops>
   <tabstop>checkBox_listview</tabstop>
-  <tabstop>comboBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
