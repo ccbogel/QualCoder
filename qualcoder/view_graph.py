@@ -42,6 +42,7 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
 from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
+from .save_sql_query import DialogSaveSql
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -102,6 +103,10 @@ class ViewGraph(QDialog):
         self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
         pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
+        self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_clear.pressed.connect(self.clear_items)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_selectbranch.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_selectbranch.pressed.connect(self.select_tree_branch)
@@ -124,15 +129,15 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_up_icon), "png")
         self.ui.pushButton_loadgraph.setIcon(QtGui.QIcon(pm))
-        # TODO self.ui.pushButton_loadgraph.pressed.connect(self.)
+        self.ui.pushButton_loadgraph.pressed.connect(self.load_saved_graph)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_down_icon), "png")
         self.ui.pushButton_savegraph.setIcon(QtGui.QIcon(pm))
-        # TODO self.ui.pushButton_savegraph.pressed.connect(self.)
+        self.ui.pushButton_savegraph.pressed.connect(self.save_graph)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_deletegraph.setIcon(QtGui.QIcon(pm))
-        # TODO self.ui.pushButton_deletegraph.pressed.connect(self.)
+        self.ui.pushButton_deletegraph.pressed.connect(self.delete_saved_graph)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -149,20 +154,15 @@ class ViewGraph(QDialog):
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
 
-        self.ui.comboBox.hide()
-        #TODO
-        #self.ui.comboBox.currentIndexChanged.connect(self.show_graph_type)
-        '''combobox_list = ['All']
-        for c in self.categories:
-            combobox_list.append(c['name'])
-        self.ui.comboBox.addItems(combobox_list)'''
-        # TODO
-        self.ui.checkBox_listview.hide()
-        #self.ui.checkBox_listview.stateChanged.connect(self.show_graph_type)
+    def clear_items(self):
+        """ Clear all items from scene.
+        Called by pushButton_clear. """
+
+        self.scene.clear()
 
     def select_tree_branch(self):
         """ Selected tree branch for model of codes and categories.
-        Called by QButton_selectbranch
+        Called by pushButton_selectbranch
         """
 
         selection_list = [{'name': 'All'}]
@@ -178,7 +178,7 @@ class ViewGraph(QDialog):
         else:
             node_text = selected[0]['name']
         cats, codes, model = self.create_initial_model()
-        #TODO is catid_count used ?
+        # TODO is catid_count used ?
         model, catid_counts = self.get_refined_model_with_category_counts(cats, model, node_text)
         self.list_graph(model)
 
@@ -247,7 +247,7 @@ class ViewGraph(QDialog):
                         supercatid = s['supercatid']
                 c['depth'] = depth
                 count += 1
-        #TODO is catid_counts used ?
+        # TODO is catid_counts used ?
         catid_counts = Counter(supercatid_list)
         return model, catid_counts
 
@@ -283,7 +283,7 @@ class ViewGraph(QDialog):
 
     def named_children_of_node(self, node):
         """ Get child categories and codes of this category node.
-        Only keep the category or code name.  Used to reposition TextGraphicsItems on moving a category.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
 
         param: node : Dictionary of category
 
@@ -333,10 +333,12 @@ class ViewGraph(QDialog):
         return child_names
 
     def list_graph(self, model):
-        """ Create a list graph with the categories on the left and codes on the right
-        """
+        """ Create a list graph with the categories on the left and codes on the right.
+        Additive, adds another model of nodes to the scene.
+        Does not add nodes that are already existing in the scene.
 
-        #TODO self.scene.clear()
+        param: model : List of Dictionaries of categories and codes
+        """
 
         # Order the model by supercatid, subcats, codes
         ordered_model = []
@@ -363,21 +365,20 @@ class ViewGraph(QDialog):
             ordered_model[i]['y'] = i * self.font_size * 3
         model = ordered_model
 
-        # Expand scene width and height if needed
-        max_x = self.scene.get_width()
-        max_y = self.scene.get_height()
+        # Add text items to the scene, providing they are not already in the scene.
         for m in model:
             m['child_names'] = self.named_children_of_node(m)
-            if m['x'] > max_x - 50:
-                max_x = m['x'] + 50
-            if m['y'] > max_y - 20:
-                max_y = m['y'] + 40
-        self.scene.set_width(max_x)
-        self.scene.set_height(max_y)
+            add_to_scene = True
+            for i in self.scene.items():
+                if isinstance(i, TextGraphicsItem):
+                    if i.code_or_cat['name'] == m['name'] and \
+                            i.code_or_cat['catid'] == m['catid'] and \
+                            i.code_or_cat['cid'] == m['cid']:
+                        add_to_scene = False
+            if add_to_scene:
+                self.scene.addItem(TextGraphicsItem(self.app, m))
+                print(m)
 
-        # Add text items to the scene
-        for m in model:
-            self.scene.addItem(TextGraphicsItem(self.app, m))
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
@@ -387,6 +388,19 @@ class ViewGraph(QDialog):
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
                         self.scene.addItem(item)
+
+        # Expand scene width and height if needed
+        max_x, max_y = self.scene.suggested_scene_size()
+        '''max_x = self.scene.get_width()
+        max_y = self.scene.get_height()
+        for m in model:
+            m['child_names'] = self.named_children_of_node(m)
+            if m['x'] > max_x - 50:
+                max_x = m['x'] + 50
+            if m['y'] > max_y - 20:
+                max_y = m['y'] + 40'''
+        self.scene.set_width(max_x)
+        self.scene.set_height(max_y)
 
     def reveal_hidden_items(self):
         """ Show list of hidden items to be revealed on selection """
@@ -407,6 +421,48 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         for s in selected:
             s['item'].show()
+
+    def save_graph(self):
+        """ Save graph items. """
+
+        #TODO uncomment later
+        '''ui_save = DialogSaveSql(self.app)
+        ui_save.setWindowTitle(_("Save graph"))
+        ui_save.ui.label_name.setText(_("Graph name"))
+        ui_save.ui.label.hide()
+        ui_save.ui.lineEdit_group.hide()
+        ui_save.exec()
+        title = ui_save.name
+        if title == "":
+            msg = _("Must have a name")
+            Message(self.app, _("Cannot save"), msg).exec()
+            return
+        description = ui_save.description'''
+
+        print("TODO save graph items")
+        for i in self.scene.items():
+            if isinstance(i, TextGraphicsItem):
+                print("TextGraphicsItem")
+            if isinstance(i, FreeTextGraphicsItem):
+                print("FreeTextGraphicsItem")
+            if isinstance(i, FreeTextGraphicsItem):
+                print("CaseTextGraphicsItem")
+            if isinstance(i, FreeTextGraphicsItem):
+                print("FileTextGraphicsItem")
+            if isinstance(i, FreeTextGraphicsItem):
+                print("FreeLineGraphicsItem")
+            if isinstance(i, FreeTextGraphicsItem):
+                print("LineGraphicsItem")
+
+    def load_saved_graph(self):
+        """ Load saved graph. """
+
+        print("TODO load saved graph")
+
+    def delete_saved_graph(self):
+        """ Delete saved graph items. """
+
+        print("TODO delete saved graph ")
 
     def keyPressEvent(self, event):
         """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
@@ -491,7 +547,6 @@ class ViewGraph(QDialog):
                     isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                 if item.text == text_from:
                     from_item = item
-
         # To Items selection
         names_dict_list.remove(selected)
         ui = DialogSelectItems(self.app, names_dict_list, _("Line end item(s)"), "multi")
@@ -523,7 +578,7 @@ class ViewGraph(QDialog):
                         isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                     if item.text == text_to:
                         to_item = item
-            if from_item != to_item and not(from_item is None or to_item is None):
+            if from_item != to_item and not (from_item is None or to_item is None):
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
                 self.scene.addItem(line_item)
 
@@ -539,6 +594,7 @@ class ViewGraph(QDialog):
         """ Used to get a list of all named FreeText and Case and File graphics items.
          Use to allow links between these items based on the text name.
          Called by: add_text_item_to_graph
+
          return: names : List of Strings
          """
 
@@ -733,7 +789,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 min_adjust_y = i.pos().y()
         if min_adjust_x < 0 or min_adjust_y < 0:
             for i in self.items():
-                if not(isinstance(i, LinkGraphicsItem) or isinstance(i, FreeLineGraphicsItem)):
+                if not (isinstance(i, LinkGraphicsItem) or isinstance(i, FreeLineGraphicsItem)):
                     i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
 
     def suggested_scene_size(self):
@@ -796,7 +852,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cur.execute("select memo from cases where caseid=?", [case_id])
         res = cur.fetchone()
         if res:
-            self.setToolTip(_("Case") + ": "+ res[0])
+            self.setToolTip(_("Case") + ": " + res[0])
 
     def paint(self, painter, option, widget):
         """ see paint override method here:
@@ -1424,6 +1480,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
+
 
 '''def circular_graph(self):
     """ Create a circular acyclic graph

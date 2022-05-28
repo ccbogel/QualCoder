@@ -1701,6 +1701,29 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute(
                 "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
+        # TODO Database version 6
+        try:
+            cur.execute("select name, description, date from saved_graph")
+        except sqlite3.OperationalError:
+            pass
+            #TODO
+            '''cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, date text, unique(name));")
+            cur.execute("CREATE TABLE graph_items (griiid integer primary key, grid integer, item_type text,
+            x float, y float, line_color text, line_type text, line_thick integer???);")
+            item_text text, cc_name text, cc_memo text, cc_owner text, cc_date text, cc_cid integer, cc_catid integer, 
+            cc_supercatid integer, cc_color text, cc_depth integer, hide text)
+            
+            {'name': 'disliked Brighton', 'memo': '', 'owner': 'colin', 'date': '2019-08-05 23:55:47', 'cid': 16, 
+            'catid': 5, 'color': '#5882FA', 'depth': 1, 'x': 130, 'y': 135, 'supercatid': 5, 
+            'angle': None, 'child_names': []}
+            cc = code_or_category
+
+            '''
+            #TODO
+            #self.app.conn.commit()
+            #cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
+            #self.ui.textEdit.append(_("Updating database to version") + " v6")
+
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
@@ -1708,6 +1731,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)
