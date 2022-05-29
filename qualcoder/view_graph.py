@@ -1017,7 +1017,6 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ Free text to add to the scene. """
 
-    border_rect = None
     app = None
     font = None
     settings = None
@@ -1047,46 +1046,33 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        # Foreground depends on the defined need_white_text color in color_selector
-        self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
-        self.setFont(self.font)
+        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.text)
         self.setPos(self.x, self.y)
-        self.document().contentsChanged.connect(self.text_changed)
+        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+        if self.app.settings['stylesheet'] == 'dark':
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        menu.addAction(_('Remove'))
+        bold_action = menu.addAction(_("Bold"))
+        large_font_action = menu.addAction(_("Large font"))
+        remove_action = menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == "Remove":
+        if action == remove_action:
             self.remove = True
+        if action == bold_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
+        if action == large_font_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
 
-    def paint(self, painter, option, widget):
-        """ see paint override method here:
-            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
-            see:
-            https://doc.qt.io/qt-5/qpainter.html """
-
-        color = QtCore.Qt.GlobalColor.white
-        if self.app.settings['stylesheet'] == 'dark':
-            color = QtCore.Qt.GlobalColor.black
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+    def paint(self, painter, option, widget=None):
+        painter.save()
         painter.drawRect(self.boundingRect())
-        painter.setFont(self.font)
-        fm = painter.fontMetrics()
-        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
-        if self.app.settings['stylesheet'] == 'dark':
-            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
-        lines = self.text.split('\\n')
-        for row in range(0, len(lines)):
-            painter.drawText(5, fm.height() * (row + 1), lines[row])
-
-    def text_changed(self):
-        """ Text changed in a node. Redraw the border rectangle item to match. """
-
-        self.text = self.toPlainText()
+        painter.restore()
+        super().paint(painter, option, widget)
 
 
 class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
