@@ -1703,26 +1703,29 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
         # TODO Database version 6
         try:
-            cur.execute("select name, description, date from saved_graph")
+            cur.execute("select name, description, date from graph")
         except sqlite3.OperationalError:
-            pass
-            #TODO
-            '''cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, date text, unique(name));")
-            cur.execute("CREATE TABLE graph_items (griiid integer primary key, grid integer, item_type text,
-            x float, y float, line_color text, line_type text, line_thick integer???);")
-            item_text text, cc_name text, cc_memo text, cc_owner text, cc_date text, cc_cid integer, cc_catid integer, 
-            cc_supercatid integer, cc_color text, cc_depth integer, hide text)
-            
-            {'name': 'disliked Brighton', 'memo': '', 'owner': 'colin', 'date': '2019-08-05 23:55:47', 'cid': 16, 
-            'catid': 5, 'color': '#5882FA', 'depth': 1, 'x': 130, 'y': 135, 'supercatid': 5, 
-            'angle': None, 'child_names': []}
-            cc = code_or_category
-
-            '''
-            #TODO
-            #self.app.conn.commit()
-            #cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
-            #self.ui.textEdit.append(_("Updating database to version") + " v6")
+            # sqlite 0 is False 1 is True
+            cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
+                        "date text, unique(name));")
+            cur.execute("CREATE TABLE gr_text_item (gtextid integer primary key, x integer, y integer, "
+                        "supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer);")
+            cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, x integer, y integer, "
+                        "caseid integer, font_size integer, bold integer, color text);")
+            cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, x integer, y integer, "
+                        "fid integer, font_size integer, bold integer, color text);")
+            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, x integer, y integer, "
+                        "free_text text, font_size integer, bold integer, color text);")
+            # fromtype or totype is TextGraphicsItem, FreeTextGraphicsItem, CaseGraphicsItem, FileGraphicsItem
+            cur.execute("CREATE TABLE gr_line_item (glineid integer primary key, fromtype text, fromcatid integer, "
+                        "fromcid integer, totype text, tocatid integer, tocid integer, color text, thickness real, "
+                        "linetype text, hide integer, caseid integer, fid integer);")
+            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, fromtype text, fromcatid integer,"
+                        " fromcid integer, totype text, tocatid integer, tocid integer, color text, thickness real, "
+                        "linetype text, caseid integer, fid integer);")
+            self.app.conn.commit()
+            cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
+            self.ui.textEdit.append(_("Updating database to version") + " v6")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
