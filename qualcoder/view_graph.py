@@ -388,17 +388,8 @@ class ViewGraph(QDialog):
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
                         item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
                         self.scene.addItem(item)
-
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
-        '''max_x = self.scene.get_width()
-        max_y = self.scene.get_height()
-        for m in model:
-            m['child_names'] = self.named_children_of_node(m)
-            if m['x'] > max_x - 50:
-                max_x = m['x'] + 50
-            if m['y'] > max_y - 20:
-                max_y = m['y'] + 40'''
         self.scene.set_width(max_x)
         self.scene.set_height(max_y)
 
@@ -458,6 +449,12 @@ class ViewGraph(QDialog):
         """ Load saved graph. """
 
         print("TODO load saved graph")
+        ''' On load order: TextGraphicsItem, , FileGraphicsItem, CaseGraphicsItem
+        Fill extra details:
+        eg name, memo, date?, owner?, color, child_names?
+        
+        then FreeTextGraphicsItem
+        then LineGraphicsItem, Then FreeLineGraphicsItem '''
 
     def delete_saved_graph(self):
         """ Delete saved graph items. """
@@ -509,14 +506,10 @@ class ViewGraph(QDialog):
         # Menu for blank graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_add_text_item = QtGui.QAction(_("Insert Text"))
-        menu.addAction(action_add_text_item)
-        action_add_line = QtGui.QAction(_("Insert Line"))
-        menu.addAction(action_add_line)
-        action_add_files = QtGui.QAction(_("Show files"))
-        menu.addAction(action_add_files)
-        action_add_cases = QtGui.QAction(_("Show cases"))
-        menu.addAction(action_add_cases)
+        action_add_text_item = menu.addAction(_("Insert Text"))
+        action_add_line = menu.addAction(_("Insert Line"))
+        action_add_files = menu.addAction(_("Show files"))
+        action_add_cases = menu.addAction(_("Show cases"))
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
@@ -530,7 +523,7 @@ class ViewGraph(QDialog):
     def add_lines_to_graph(self):
         """ Add one or more lines from an item to one or more destination items. """
 
-        # From item
+        # From item selection
         names = self.named_text_items()
         names_dict_list = []
         for n in names:
@@ -778,7 +771,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         self.update(self.sceneRect())"""
 
     def adjust_for_negative_positions(self):
-        """ Move all items if negative positions """
+        """ Move all items if negative positions. """
 
         min_adjust_x = 0
         min_adjust_y = 0
@@ -815,15 +808,19 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     app = None
     settings = None
-    case_name = ""
+    text = ""
     case_id = -1
     remove = False
-    attribute_text = ""
+    show_attributes = False
 
     def __init__(self, app, case_name, case_id, x=0, y=0):
         """ Show name and optionally attributes.
-         param: app  : the main App class
-         param:  """
+        param: app  : the main App class
+        param: case_name : String
+        param: case_id : Integer
+        param: x : Integer
+        param: y : Integer
+        """
 
         super(CaseTextGraphicsItem, self).__init__(None)
         self.setToolTip(_("Case"))
@@ -832,9 +829,8 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.case_id = case_id
-        self.case_name = case_name
-        self.attribute_text = ""
-        self.text = self.case_name + self.attribute_text
+        self.text = case_name
+        self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
@@ -848,6 +844,104 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         res = cur.fetchone()
         if res:
             self.setToolTip(_("Case") + ": " + res[0])
+        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+        if self.app.settings['stylesheet'] == 'dark':
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+
+    def paint(self, painter, option, widget):
+        """ """
+
+        painter.save()
+        painter.drawRect(self.boundingRect())
+        painter.restore()
+        super().paint(painter, option, widget)
+
+    def contextMenuEvent(self, event):
+        """
+        # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
+        I was not able to mapToGlobal position so, the menu maps to scene position plus
+        the Dialog screen position.
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size: 9pt} ")
+        show_att_action = None
+        hide_att_action = None
+        large_font_action = menu.addAction("Large font")
+        if self.show_attributes:
+            hide_att_action = menu.addAction(_('Hide attributes'))
+        else:
+            show_att_action = menu.addAction(_('Show attributes'))
+        remove_action = menu.addAction(_("Remove"))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == large_font_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
+        if action == remove_action:
+            self.remove = True
+        if action == show_att_action:
+            self.show_attributes = True
+            self.setHtml(self.text + self.get_attributes())
+        if action == hide_att_action:
+            self.show_attributes = False
+            self.setPlainText(self.text)
+
+    def get_attributes(self):
+        """ Get attributes for the file.  Add to text document. """
+        attribute_text = ""
+        cur = self.app.conn.cursor()
+        sql = "SELECT name, value FROM  attribute where attr_type='case' and id=? order by name"
+        cur.execute(sql, [self.case_id])
+        result = cur.fetchall()
+        for r in result:
+            attribute_text += '<br>' + r[0] + ": " + r[1]
+        return attribute_text
+
+
+class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
+    """ The item shows the file name and optionally attributes.
+    A custom context menu
+    """
+
+    app = None
+    settings = None
+    file_name = ""
+    file_id = -1
+    remove = False
+    show_attributes = False
+    text = ""
+
+    def __init__(self, app, file_name, file_id, x=0, y=0):
+        """ Show name and optionally attributes.
+        param: app  : the main App class
+        param: file_name : String
+        param: file_od : Integer
+        param: x : Integer
+        param: y : Integer
+        """
+
+        super(FileTextGraphicsItem, self).__init__(None)
+        self.setToolTip(_("File"))
+        self.app = app
+        self.conn = app.conn
+        self.settings = app.settings
+        self.project_path = app.project_path
+        self.file_id = file_id
+        self.text = file_name
+        self.show_attributes = False
+        self.remove = False
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+        self.setPos(50 + x, 50 + y)
+        cur = self.app.conn.cursor()
+        cur.execute("select memo from source where id=?", [file_id])
+        res = cur.fetchone()
+        if res:
+            self.setToolTip(_("File") + ": " + res[0])
         self.setPlainText(self.text)
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
@@ -870,114 +964,31 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
-        if self.attribute_text == "":
-            menu.addAction(_('Show attributes'))
+        show_att_action = None
+        hide_att_action = None
+        large_font_action = menu.addAction("Large font")
+        if self.show_attributes:
+            hide_att_action = menu.addAction(_('Hide attributes'))
         else:
-            menu.addAction(_('Hide attributes'))
+            show_att_action = menu.addAction(_('Show attributes'))
         remove_action = menu.addAction(_("Remove"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == large_font_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
         if action == remove_action:
             self.remove = True
-        if action.text() == "Show attributes":
-            self.setHtml(self.case_name + self.get_attributes())
-        if action.text() == "Hide attributes":
-            self.attribute_text = ""
-            self.setPlainText(self.case_name)
+        if action == show_att_action:
+            self.setHtml(self.text + self.get_attributes())
+            self.show_attributes = True
+        if action == hide_att_action:
+            self.setPlainText(self.text)
+            self.show_attributes = False
 
     def get_attributes(self):
         """ Get attributes for the file.  Add to text document. """
-        attribute_text = ""
-        cur = self.app.conn.cursor()
-        sql = "SELECT name, value FROM  attribute where attr_type='case' and id=? order by name"
-        cur.execute(sql, [self.case_id])
-        result = cur.fetchall()
-        for r in result:
-            attribute_text += '<br>' + r[0] + ": " + r[1]
-        self.attribute_text = attribute_text
-        return attribute_text
 
-
-class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
-    """ The item shows the file name and optionally attributes.
-    A custom context menu
-    """
-
-    app = None
-    settings = None
-    file_name = ""
-    file_id = -1
-    remove = False
-    attribute_text = ""
-
-    def __init__(self, app, file_name, file_id, x=0, y=0):
-        """ Show name and optionally attributes.
-         param: app  : the main App class
-         param:  """
-
-        super(FileTextGraphicsItem, self).__init__(None)
-        self.setToolTip(_("File"))
-        self.app = app
-        self.conn = app.conn
-        self.settings = app.settings
-        self.project_path = app.project_path
-        self.file_id = file_id
-        self.file_name = file_name
-        self.attribute_text = ""
-        self.text = self.file_name + self.attribute_text
-        self.remove = False
-        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
-                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
-                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-        self.setPos(50 + x, 50 + y)
-        cur = self.app.conn.cursor()
-        cur.execute("select memo from source where id=?", [file_id])
-        res = cur.fetchone()
-        if res:
-            self.setToolTip(_("File") + ": " + res[0])
-        self.setPlainText(self.file_name)
-        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-        if self.app.settings['stylesheet'] == 'dark':
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
-
-    def paint(self, painter, option, widget):
-        """ """
-
-        painter.save()
-        painter.drawRect(self.boundingRect())
-        painter.restore()
-        super().paint(painter, option, widget)
-
-    def contextMenuEvent(self, event):
-        """
-        # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
-        I was not able to mapToGlobal position so, the menu maps to scene position plus
-        the Dialog screen position.
-        """
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size: 9pt} ")
-        if self.attribute_text == "":
-            menu.addAction(_('Show attributes'))
-        else:
-            menu.addAction(_('Hide attributes'))
-        remove_action = menu.addAction(_("Remove"))
-        action = menu.exec(QtGui.QCursor.pos())
-        if action is None:
-            return
-        if action == remove_action:
-            self.remove = True
-        if action.text() == "Show attributes":
-            self.setHtml(self.file_name + self.get_attributes())
-        if action.text() == "Hide attributes":
-            self.setPlainText(self.file_name)
-            self.attribute_text = ""
-
-    def get_attributes(self):
-        """ Get attributes for the file.  Add to text document. """
         attribute_text = ""
         cur = self.app.conn.cursor()
         sql = "SELECT name, value FROM  attribute where attr_type='file' and id=? order by name"
@@ -985,7 +996,6 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         result = cur.fetchall()
         for r in result:
             attribute_text += '<br>' + r[0] + ": " + r[1]
-        self.attribute_text = attribute_text
         return attribute_text
 
 
@@ -1047,7 +1057,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
 
 class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
-    """ Takes the coordinate from the two TextGraphicsItems. """
+    """ Takes the coordinate from two TextGraphicsItems. """
 
     from_widget = None
     from_pos = None
@@ -1245,18 +1255,23 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         memo_action = menu.addAction('Memo')
+        coded_action = None
+        case_action = None
+        large_font_action = menu.addAction(_("Large font"))
         if self.code_or_cat['cid'] is not None:
-            menu.addAction('Coded text and media')
-            menu.addAction('Case text and media')
+            coded_action = menu.addAction('Coded text and media')
+            case_action = menu.addAction('Case text and media')
         hide_action = menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == large_font_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
         if action == memo_action:
             self.add_edit_memo()
-        if action.text() == 'Coded text and media':
+        if action == coded_action:
             self.coded_media()
-        if action.text() == 'Case text and media':
+        if action == case_action:
             self.case_media()
         if action == hide_action:
             self.hide()
