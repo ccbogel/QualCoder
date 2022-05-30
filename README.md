@@ -61,7 +61,7 @@ I am using python3.9  you can choose another recent version if you prefer, and i
 2. Download and unzip the Qualcoder folder.
 
 3. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-2.9 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.0 folder.
 Inside the QualCoder-master folder:
 
 `python3.9 -m venv qualcoder`
@@ -141,7 +141,7 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/2.8 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.0 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
