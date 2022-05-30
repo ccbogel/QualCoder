@@ -31,28 +31,6 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QCheckBox" name="checkBox_listview">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>6</y>
-        <width>111</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Changing the view will undo user added features such at link formatting and added text items.</string>
-      </property>
-      <property name="text">
-       <string>List view</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
@@ -275,9 +253,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>checkBox_listview</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
