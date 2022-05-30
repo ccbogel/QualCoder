@@ -3,7 +3,6 @@
 
 """
 Copyright (c) 2022 Colin Curtain
-Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +78,7 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 3.0"
+qualcoder_version = "QualCoder 3.1"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1705,27 +1704,28 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             cur.execute("select name, description, date from graph")
         except sqlite3.OperationalError:
-            # sqlite 0 is False 1 is True
+            # Tables to store graph. sqlite 0 is False 1 is True
             cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
                         "date text, unique(name));")
-            cur.execute("CREATE TABLE gr_text_item (gtextid integer primary key, x integer, y integer, "
-                        "supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer);")
-            cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, x integer, y integer, "
-                        "caseid integer, font_size integer, bold integer, color text);")
-            cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, x integer, y integer, "
-                        "fid integer, font_size integer, bold integer, color text);")
-            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, x integer, y integer, "
-                        "free_text text, font_size integer, bold integer, color text);")
+            cur.execute("CREATE TABLE gr_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
+                        "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
+                        "hide integer);")
+            cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
+                        "y integer, caseid integer, font_size integer, bold integer, color text);")
+            cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
+                        "y integer, fid integer, font_size integer, bold integer, color text);")
+            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, x integer, "
+                        "y integer, free_text text, font_size integer, bold integer, color text);")
             # fromtype or totype is TextGraphicsItem, FreeTextGraphicsItem, CaseGraphicsItem, FileGraphicsItem
-            cur.execute("CREATE TABLE gr_line_item (glineid integer primary key, fromtype text, fromcatid integer, "
-                        "fromcid integer, totype text, tocatid integer, tocid integer, color text, thickness real, "
-                        "linetype text, hide integer, caseid integer, fid integer);")
-            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, fromtype text, fromcatid integer,"
-                        " fromcid integer, totype text, tocatid integer, tocid integer, color text, thickness real, "
-                        "linetype text, caseid integer, fid integer);")
+            cur.execute("CREATE TABLE gr_line_item (glineid integer primary key, grid integer, fromtype text, "
+                        "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
+                        "thickness real, linetype text, hide integer, caseid integer, fid integer);")
+            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtype text, "
+                        "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
+                        "thickness real, linetype text, caseid integer, fid integer);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
-            self.ui.textEdit.append(_("Updating database to version") + " v6")
+            self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
