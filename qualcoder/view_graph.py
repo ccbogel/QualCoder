@@ -813,15 +813,12 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     A custom context menu
     """
 
-    border_rect = None
     app = None
-    font = None
     settings = None
     case_name = ""
     case_id = -1
-    attribute_text = ""
     remove = False
-    text = ""
+    attribute_text = ""
 
     def __init__(self, app, case_name, case_id, x=0, y=0):
         """ Show name and optionally attributes.
@@ -843,9 +840,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        # Foreground depends on the defined need_white_text color in color_selector
-        self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
-        self.setFont(self.font)
+        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.text)
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
@@ -853,26 +848,18 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         res = cur.fetchone()
         if res:
             self.setToolTip(_("Case") + ": " + res[0])
+        self.setPlainText(self.text)
+        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+        if self.app.settings['stylesheet'] == 'dark':
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
 
     def paint(self, painter, option, widget):
-        """ see paint override method here:
-            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
-            see:
-            https://doc.qt.io/qt-5/qpainter.html """
+        """ """
 
-        color = QtCore.Qt.GlobalColor.white
-        if self.app.settings['stylesheet'] == 'dark':
-            color = QtCore.Qt.GlobalColor.black
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        painter.save()
         painter.drawRect(self.boundingRect())
-        painter.setFont(self.font)
-        fm = painter.fontMetrics()
-        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
-        if self.app.settings['stylesheet'] == 'dark':
-            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
-        lines = self.text.split('<br>')
-        for row in range(0, len(lines)):
-            painter.drawText(5, fm.height() * (row + 1), lines[row])
+        painter.restore()
+        super().paint(painter, option, widget)
 
     def contextMenuEvent(self, event):
         """
@@ -887,28 +874,29 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             menu.addAction(_('Show attributes'))
         else:
             menu.addAction(_('Hide attributes'))
-        menu.addAction(_("Remove"))
+        remove_action = menu.addAction(_("Remove"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == "Remove":
+        if action == remove_action:
             self.remove = True
         if action.text() == "Show attributes":
-            self.get_attributes()
+            self.setHtml(self.case_name + self.get_attributes())
         if action.text() == "Hide attributes":
             self.attribute_text = ""
-            self.text = self.case_name
+            self.setPlainText(self.case_name)
 
     def get_attributes(self):
         """ Get attributes for the file.  Add to text document. """
-        self.attribute_text = ""
+        attribute_text = ""
         cur = self.app.conn.cursor()
         sql = "SELECT name, value FROM  attribute where attr_type='case' and id=? order by name"
         cur.execute(sql, [self.case_id])
         result = cur.fetchall()
         for r in result:
-            self.attribute_text += '<br>' + r[0] + ": " + r[1]
-        self.text = self.case_name + self.attribute_text
+            attribute_text += '<br>' + r[0] + ": " + r[1]
+        self.attribute_text = attribute_text
+        return attribute_text
 
 
 class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
@@ -916,15 +904,12 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     A custom context menu
     """
 
-    border_rect = None
     app = None
-    font = None
     settings = None
     file_name = ""
     file_id = -1
-    attribute_text = ""
     remove = False
-    text = ""
+    attribute_text = ""
 
     def __init__(self, app, file_name, file_id, x=0, y=0):
         """ Show name and optionally attributes.
@@ -946,36 +931,25 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        # Foreground depends on the defined need_white_text color in color_selector
-        self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
-        self.setFont(self.font)
-        self.setPlainText(self.text)
+        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from source where id=?", [file_id])
         res = cur.fetchone()
         if res:
             self.setToolTip(_("File") + ": " + res[0])
+        self.setPlainText(self.file_name)
+        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+        if self.app.settings['stylesheet'] == 'dark':
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
 
     def paint(self, painter, option, widget):
-        """ see paint override method here:
-            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
-            see:
-            https://doc.qt.io/qt-5/qpainter.html """
+        """ """
 
-        color = QtCore.Qt.GlobalColor.white
-        if self.app.settings['stylesheet'] == 'dark':
-            color = QtCore.Qt.GlobalColor.black
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        painter.save()
         painter.drawRect(self.boundingRect())
-        painter.setFont(self.font)
-        fm = painter.fontMetrics()
-        painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.black))
-        if self.app.settings['stylesheet'] == 'dark':
-            painter.setPen(QtGui.QColor(QtCore.Qt.GlobalColor.white))
-        lines = self.text.split('<br>')
-        for row in range(0, len(lines)):
-            painter.drawText(5, fm.height() * (row + 1), lines[row])
+        painter.restore()
+        super().paint(painter, option, widget)
 
     def contextMenuEvent(self, event):
         """
@@ -990,28 +964,29 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             menu.addAction(_('Show attributes'))
         else:
             menu.addAction(_('Hide attributes'))
-        menu.addAction(_("Remove"))
+        remove_action = menu.addAction(_("Remove"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == "Remove":
+        if action == remove_action:
             self.remove = True
         if action.text() == "Show attributes":
-            self.get_attributes()
+            self.setHtml(self.file_name + self.get_attributes())
         if action.text() == "Hide attributes":
+            self.setPlainText(self.file_name)
             self.attribute_text = ""
-            self.text = self.file_name
 
     def get_attributes(self):
         """ Get attributes for the file.  Add to text document. """
-        self.attribute_text = ""
+        attribute_text = ""
         cur = self.app.conn.cursor()
         sql = "SELECT name, value FROM  attribute where attr_type='file' and id=? order by name"
         cur.execute(sql, [self.file_id])
         result = cur.fetchall()
         for r in result:
-            self.attribute_text += '<br>' + r[0] + ": " + r[1]
-        self.text = self.file_name + self.attribute_text
+            attribute_text += '<br>' + r[0] + ": " + r[1]
+        self.attribute_text = attribute_text
+        return attribute_text
 
 
 class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
@@ -1020,12 +995,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     font = None
     settings = None
-    x = 10
-    y = 10
     text = "text"
     remove = False
 
-    def __init__(self, app, x, y, text_):
+    def __init__(self, app, x=10, y=10, text_="text"):
         """ Free text object.
          param:
             app  : the main App class
@@ -1036,9 +1009,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
-        self.x = x
-        self.y = y
         self.text = text_
+        self.setPos(x, y)
         self.settings = app.settings
         self.project_path = app.project_path
         self.remove = False
@@ -1048,7 +1020,6 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.text)
-        self.setPos(self.x, self.y)
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
@@ -1116,51 +1087,51 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        menu.addAction(_('Thicker'))
-        menu.addAction(_('Thinner'))
-        menu.addAction(_('Dotted'))
-        menu.addAction(_('Red'))
-        menu.addAction(_('Yellow'))
-        menu.addAction(_('Green'))
-        menu.addAction(_('Blue'))
-        menu.addAction(_('Cyan'))
-        menu.addAction(_('Magenta'))
-        menu.addAction(_('Remove'))
+        thicker_action = menu.addAction(_('Thicker'))
+        thinner_action = menu.addAction(_('Thinner'))
+        dotted_action = menu.addAction(_('Dotted'))
+        red_action = menu.addAction(_('Red'))
+        yellow_action = menu.addAction(_('Yellow'))
+        green_action = menu.addAction(_('Green'))
+        blue_action = menu.addAction(_('Blue'))
+        cyan_action = menu.addAction(_('Cyan'))
+        magenta_action = menu.addAction(_('Magenta'))
+        remove_action = menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == 'Thicker':
+        if action == thicker_action:
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
                 self.line_width = 5
             self.redraw()
-        if action.text() == 'Thinner':
+        if action == thinner_action:
             self.line_width = self.line_width - 0.5
             if self.line_width < 1:
                 self.line_width = 1
             self.redraw()
-        if action.text() == 'Dotted':
+        if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
-        if action.text() == 'Red':
+        if action == red_action:
             self.line_color = QtCore.Qt.GlobalColor.red
             self.redraw()
-        if action.text() == 'Yellow':
+        if action == yellow_action:
             self.line_color = QtCore.Qt.GlobalColor.yellow
             self.redraw()
-        if action.text() == 'Green':
+        if action == green_action:
             self.line_color = QtCore.Qt.GlobalColor.green
             self.redraw()
-        if action.text() == 'Blue':
+        if action == blue_action:
             self.line_color = QtCore.Qt.GlobalColor.blue
             self.redraw()
-        if action.text() == 'Cyan':
+        if action == cyan_action:
             self.line_color = QtCore.Qt.GlobalColor.cyan
             self.redraw()
-        if action.text() == 'Magenta':
+        if action == magenta_action:
             self.line_color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
-        if action.text() == "Remove":
+        if action == remove_action:
             self.remove = True
 
     def redraw(self):
@@ -1241,43 +1212,28 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
+        self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.text = self.code_or_cat['name']
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        # Foreground depends on the defined need_white_text color in color_selector
+        self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         if self.code_or_cat['cid'] is not None:
-            self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal)
-            self.setFont(self.font)
-            self.setPlainText(self.code_or_cat['name'])
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         if self.code_or_cat['cid'] is None:
-            self.font = QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold)
-            self.setFont(self.font)
-            self.setPlainText(self.code_or_cat['name'])
-        self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
-        self.document().contentsChanged.connect(self.text_changed)
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
+        self.setPlainText(self.code_or_cat['name'])
 
     def paint(self, painter, option, widget):
-        """ see paint override method here:
-            https://github.com/jsdir/giza/blob/master/giza/widgets/nodeview/node.py
-            see:
-            https://doc.qt.io/qt-5/qpainter.html """
+        """  """
 
+        painter.save()
         color = QtGui.QColor(self.code_or_cat['color'])
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
-        painter.setFont(self.font)
-        fm = painter.fontMetrics()
-        painter.setPen(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
-        lines = self.code_or_cat['name'].split('\n')
-        for row in range(0, len(lines)):
-            painter.drawText(5, fm.height() * (row + 1), lines[row])
-
-    def text_changed(self):
-        """ Text changed in a node. Redraw the border rectangle item to match. """
-
-        self.code_or_cat['name'] = self.toPlainText()
+        painter.restore()
+        super().paint(painter, option, widget)
 
     def contextMenuEvent(self, event):
         """
@@ -1288,21 +1244,21 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        menu.addAction('Memo')
+        memo_action = menu.addAction('Memo')
         if self.code_or_cat['cid'] is not None:
             menu.addAction('Coded text and media')
             menu.addAction('Case text and media')
-        menu.addAction('Hide')
+        hide_action = menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == 'Memo':
+        if action == memo_action:
             self.add_edit_memo()
         if action.text() == 'Coded text and media':
             self.coded_media()
         if action.text() == 'Case text and media':
             self.case_media()
-        if action.text() == "Hide":
+        if action == hide_action:
             self.hide()
 
     def add_edit_memo(self):
@@ -1366,52 +1322,52 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        menu.addAction(_('Thicker'))
-        menu.addAction(_('Thinner'))
-        menu.addAction(_('Dotted'))
-        menu.addAction(_('Red'))
-        menu.addAction(_('Yellow'))
-        menu.addAction(_('Green'))
-        menu.addAction(_('Blue'))
-        menu.addAction(_('Cyan'))
-        menu.addAction(_('Magenta'))
-        menu.addAction(_("Hide"))
+        thicker_action = menu.addAction(_('Thicker'))
+        thinner_action = menu.addAction(_('Thinner'))
+        dotted_action = menu.addAction(_('Dotted'))
+        red_action = menu.addAction(_('Red'))
+        yellow_action = menu.addAction(_('Yellow'))
+        green_action = menu.addAction(_('Green'))
+        blue_action = menu.addAction(_('Blue'))
+        cyan_action = menu.addAction(_('Cyan'))
+        magenta_action = menu.addAction(_('Magenta'))
+        hide_action = menu.addAction(_('Hide'))
 
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action.text() == 'Thicker':
+        if action == thicker_action:
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
                 self.line_width = 5
             self.redraw()
-        if action.text() == 'Thinner':
+        if action == thinner_action:
             self.line_width = self.line_width - 0.5
             if self.line_width < 1:
                 self.line_width = 1
             self.redraw()
-        if action.text() == 'Dotted':
+        if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
-        if action.text() == 'Red':
+        if action == red_action:
             self.line_color = QtCore.Qt.GlobalColor.red
             self.redraw()
-        if action.text() == 'Yellow':
+        if action == yellow_action:
             self.line_color = QtCore.Qt.GlobalColor.yellow
             self.redraw()
-        if action.text() == 'Green':
+        if action == green_action:
             self.line_color = QtCore.Qt.GlobalColor.green
             self.redraw()
-        if action.text() == 'Blue':
+        if action == blue_action:
             self.line_color = QtCore.Qt.GlobalColor.blue
             self.redraw()
-        if action.text() == 'Cyan':
+        if action == cyan_action:
             self.line_color = QtCore.Qt.GlobalColor.cyan
             self.redraw()
-        if action.text() == 'Magenta':
+        if action == magenta_action:
             self.line_color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
-        if action.text() == "Hide":
+        if action == hide_action:
             self.hide()
 
     def redraw(self):
