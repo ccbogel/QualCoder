@@ -20,11 +20,6 @@ class Ui_DialogGraph(object):
         self.groupBox_header.setMaximumSize(QtCore.QSize(16777215, 70))
         self.groupBox_header.setTitle("")
         self.groupBox_header.setObjectName("groupBox_header")
-        self.checkBox_listview = QtWidgets.QCheckBox(self.groupBox_header)
-        self.checkBox_listview.setEnabled(False)
-        self.checkBox_listview.setGeometry(QtCore.QRect(390, 6, 111, 22))
-        self.checkBox_listview.setChecked(True)
-        self.checkBox_listview.setObjectName("checkBox_listview")
         self.pushButton_export = QtWidgets.QPushButton(self.groupBox_header)
         self.pushButton_export.setGeometry(QtCore.QRect(260, 3, 28, 28))
         self.pushButton_export.setText("")
@@ -91,8 +86,6 @@ class Ui_DialogGraph(object):
     def retranslateUi(self, DialogGraph):
         _translate = QtCore.QCoreApplication.translate
         DialogGraph.setWindowTitle(_translate("DialogGraph", "Graph Visualisation"))
-        self.checkBox_listview.setToolTip(_translate("DialogGraph", "Changing the view will undo user added features such at link formatting and added text items."))
-        self.checkBox_listview.setText(_translate("DialogGraph", "List view"))
         self.pushButton_export.setToolTip(_translate("DialogGraph", "Export image"))
         self.label_zoom.setToolTip(_translate("DialogGraph", "Click on the graph area and press + or - to zoom in or zoom out."))
         self.pushButton_reveal.setToolTip(_translate("DialogGraph", "Reveal hidden items"))
@@ -105,13 +98,3 @@ class Ui_DialogGraph(object):
         self.pushButton_addline.setToolTip(_translate("DialogGraph", "Add connecting line"))
         self.pushButton_selectbranch.setToolTip(_translate("DialogGraph", "Select code branch"))
         self.pushButton_clear.setToolTip(_translate("DialogGraph", "Clear"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    DialogGraph = QtWidgets.QDialog()
-    ui = Ui_DialogGraph()
-    ui.setupUi(DialogGraph)
-    DialogGraph.show()
-    sys.exit(app.exec())
