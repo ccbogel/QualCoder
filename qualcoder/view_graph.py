@@ -28,9 +28,11 @@ https://qualcoder.wordpress.com/
 
 from collections import Counter
 from copy import deepcopy
+import datetime
 import logging
 import math
 import os
+import sqlite3
 import sys
 import traceback
 
@@ -413,54 +415,6 @@ class ViewGraph(QDialog):
         for s in selected:
             s['item'].show()
 
-    def save_graph(self):
-        """ Save graph items. """
-
-        #TODO uncomment later
-        '''ui_save = DialogSaveSql(self.app)
-        ui_save.setWindowTitle(_("Save graph"))
-        ui_save.ui.label_name.setText(_("Graph name"))
-        ui_save.ui.label.hide()
-        ui_save.ui.lineEdit_group.hide()
-        ui_save.exec()
-        title = ui_save.name
-        if title == "":
-            msg = _("Must have a name")
-            Message(self.app, _("Cannot save"), msg).exec()
-            return
-        description = ui_save.description'''
-
-        print("TODO save graph items")
-        for i in self.scene.items():
-            if isinstance(i, TextGraphicsItem):
-                print("TextGraphicsItem")
-            if isinstance(i, FreeTextGraphicsItem):
-                print("FreeTextGraphicsItem")
-            if isinstance(i, FreeTextGraphicsItem):
-                print("CaseTextGraphicsItem")
-            if isinstance(i, FreeTextGraphicsItem):
-                print("FileTextGraphicsItem")
-            if isinstance(i, FreeTextGraphicsItem):
-                print("FreeLineGraphicsItem")
-            if isinstance(i, FreeTextGraphicsItem):
-                print("LineGraphicsItem")
-
-    def load_saved_graph(self):
-        """ Load saved graph. """
-
-        print("TODO load saved graph")
-        ''' On load order: TextGraphicsItem, , FileGraphicsItem, CaseGraphicsItem
-        Fill extra details:
-        eg name, memo, date?, owner?, color, child_names?
-        
-        then FreeTextGraphicsItem
-        then LineGraphicsItem, Then FreeLineGraphicsItem '''
-
-    def delete_saved_graph(self):
-        """ Delete saved graph items. """
-
-        print("TODO delete saved graph ")
-
     def keyPressEvent(self, event):
         """ Plus to zoom in and Minus to zoom out. Needs focus on the QGraphicsView widget. """
 
@@ -676,6 +630,81 @@ class ViewGraph(QDialog):
         painter.end()
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec()
+
+    def save_graph(self):
+        """ Save graph items. """
+
+        ui_save = DialogSaveSql(self.app)
+        ui_save.setWindowTitle(_("Save graph"))
+        ui_save.ui.label_name.setText(_("Graph name"))
+        ui_save.ui.label.hide()
+        ui_save.ui.lineEdit_group.hide()
+        ui_save.exec()
+        name = ui_save.name
+        if name == "":
+            msg = _("Must have a name")
+            Message(self.app, _("Cannot save"), msg).exec()
+            return
+        description = ui_save.description
+        cur = self.app.conn.cursor()
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            cur.execute("insert into graph (name, description, date) values(?,?,?)", [name, description, now_date])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            Message(self.app, _("Name error"),_("This name already used. Choose another name.")).exec()
+            return
+        cur.execute("select last_insert_rowid()")
+        grid = cur.fetchone()[0]
+        for i in self.scene.items():
+            if isinstance(i, TextGraphicsItem):
+                print("TextGraphicsItem")
+                '''gr_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
+                    supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer'''
+                #TODO
+            if isinstance(i, FreeTextGraphicsItem):
+                print("FreeTextGraphicsItem")
+                '''gr_free_text_item(gfreeid integer primary key, grid integer, x integer,
+                y integer, free_text text, font_size integer, bold integer, color text'''
+                #TODO
+            if isinstance(i, FreeTextGraphicsItem):
+                print("CaseTextGraphicsItem")
+                '''gr_case_text_item(gcaseid integer  primary key, grid  integer, x  integer,   
+                y integer, caseid integer, font_size integer, bold integer, color text)'''
+                #TODO
+            if isinstance(i, FreeTextGraphicsItem):
+                print("FileTextGraphicsItem")
+                '''gr_file_text_item(gfileid integer primary  key, grid integer, x integer, 
+                y integer, fid integer, font_size integer, bold integer, color text)'''
+                #TODO
+            if isinstance(i, LinkGraphicsItem):
+                print("LinkGraphicsItem")
+                '''gr_line_item(glineid integer primary key, grid integer, fromtype text, 
+                      fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, 
+                      thickness real, linetype text, hide integer, caseid integer, fid integer)'''
+                #TODO
+            if isinstance(i, FreeLineGraphicsItem):
+                print("FreeLineGraphicsItem")
+                '''gr_free_line_item(gflineid integer primary key, grid integer, fromtype  text,fromcatid integer, fromcid
+                integer, totype text, tocatid  integer, tocid integer, color text, thickness real, linetype text, caseid
+                integer, fid integer'''
+                #TODO
+
+    def load_saved_graph(self):
+        """ Load saved graph. """
+
+        print("TODO load saved graph")
+        ''' On load order: TextGraphicsItem, , FileGraphicsItem, CaseGraphicsItem
+        Fill extra details:
+        eg name, memo, date?, owner?, color, child_names?
+
+        then FreeTextGraphicsItem
+        then LineGraphicsItem, Then FreeLineGraphicsItem '''
+
+    def delete_saved_graph(self):
+        """ Delete saved graph items. """
+
+        print("TODO delete saved graph ")
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
