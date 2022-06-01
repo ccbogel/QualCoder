@@ -646,7 +646,7 @@ class ViewGraph(QDialog):
             Message(self.app, _("Cannot save"), msg).exec()
             return
         description = ui_save.description
-        cur = self.app.conn.cursor()
+        '''cur = self.app.conn.cursor()
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         try:
             cur.execute("insert into graph (name, description, date) values(?,?,?)", [name, description, now_date])
@@ -655,34 +655,48 @@ class ViewGraph(QDialog):
             Message(self.app, _("Name error"),_("This name already used. Choose another name.")).exec()
             return
         cur.execute("select last_insert_rowid()")
-        grid = cur.fetchone()[0]
+        grid = cur.fetchone()[0]'''
+        grid = 1
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
                 print("TextGraphicsItem")
                 '''gr_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
                     supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer'''
-                #TODO
+                #TODO bold ??
+                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid']
+                , "Fnt:",i.font_size, i.isVisible())
+
             if isinstance(i, FreeTextGraphicsItem):
                 print("FreeTextGraphicsItem")
                 '''gr_free_text_item(gfreeid integer primary key, grid integer, x integer,
-                y integer, free_text text, font_size integer, bold integer, color text'''
-                #TODO
-            if isinstance(i, FreeTextGraphicsItem):
+                y integer, free_text text, font_size integer, **bold integer, **color text'''
+                #TODO color bold
+                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.text
+                , "Fnt:",i.font_size, i.isVisible())
+
+            if isinstance(i, CaseTextGraphicsItem):
                 print("CaseTextGraphicsItem")
                 '''gr_case_text_item(gcaseid integer  primary key, grid  integer, x  integer,   
-                y integer, caseid integer, font_size integer, bold integer, color text)'''
-                #TODO
-            if isinstance(i, FreeTextGraphicsItem):
+                y integer, caseid integer, font_size integer, ***bold integer, ***color text)'''
+                #TODO color bold
+                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.case_id
+                , "Fnt:",i.font_size, i.isVisible())
+
+            if isinstance(i, FileTextGraphicsItem):
                 print("FileTextGraphicsItem")
                 '''gr_file_text_item(gfileid integer primary  key, grid integer, x integer, 
-                y integer, fid integer, font_size integer, bold integer, color text)'''
-                #TODO
+                y integer, fid integer, font_size integer, ***bold integer, ***color text)'''
+                #TODO color bold
+                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.file_id
+                , "Fnt:",i.font_size, i.isVisible())
+
             if isinstance(i, LinkGraphicsItem):
                 print("LinkGraphicsItem")
                 '''gr_line_item(glineid integer primary key, grid integer, fromtype text, 
                       fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, 
                       thickness real, linetype text, hide integer, caseid integer, fid integer)'''
                 #TODO
+                
             if isinstance(i, FreeLineGraphicsItem):
                 print("FreeLineGraphicsItem")
                 '''gr_free_line_item(gflineid integer primary key, grid integer, fromtype  text,fromcatid integer, fromcid
@@ -838,11 +852,12 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     settings = None
     text = ""
+    font_size = 9
     case_id = -1
     remove = False
     show_attributes = False
 
-    def __init__(self, app, case_name, case_id, x=0, y=0):
+    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: case_name : String
@@ -859,13 +874,14 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.case_id = case_id
         self.text = case_name
+        self.font_size = font_size
         self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.text)
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
@@ -896,7 +912,8 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        large_font_action = menu.addAction("Large font")
+        font12_action = menu.addAction("Large font")
+        font9_action = menu.addAction("Small font")
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -905,8 +922,12 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == large_font_action:
+        if action == font12_action:
             self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
+            self.font_size = 12
+        if action == font9_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+            self.font_size = 9
         if action == remove_action:
             self.remove = True
         if action == show_att_action:
@@ -940,8 +961,9 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     remove = False
     show_attributes = False
     text = ""
+    font_size = 9
 
-    def __init__(self, app, file_name, file_id, x=0, y=0):
+    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: file_name : String
@@ -958,13 +980,14 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.file_id = file_id
         self.text = file_name
+        self.font_size = font_size
         self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from source where id=?", [file_id])
@@ -995,7 +1018,8 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        large_font_action = menu.addAction("Large font")
+        font12_action = menu.addAction("Large font")
+        font9_action = menu.addAction("Small font")
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1004,8 +1028,12 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == large_font_action:
+        if action == font12_action:
             self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
+            self.font_size = 12
+        if action == font9_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+            self.font_size = 9
         if action == remove_action:
             self.remove = True
         if action == show_att_action:
@@ -1035,9 +1063,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font = None
     settings = None
     text = "text"
+    font_size = 9
     remove = False
 
-    def __init__(self, app, x=10, y=10, text_="text"):
+    def __init__(self, app, x=10, y=10, text_="text",font_size=9):
         """ Free text object.
          param:
             app  : the main App class
@@ -1049,6 +1078,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
         self.text = text_
+        self.font_size = font_size
         self.setPos(x, y)
         self.settings = app.settings
         self.project_path = app.project_path
@@ -1057,7 +1087,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.text)
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
@@ -1066,7 +1096,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         bold_action = menu.addAction(_("Bold"))
-        large_font_action = menu.addAction(_("Large font"))
+        font12_action = menu.addAction(_("Large font"))
+        font9_action = menu.addAction(_("Small font"))
         remove_action = menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
@@ -1075,8 +1106,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.remove = True
         if action == bold_action:
             self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
-        if action == large_font_action:
+        if action == font12_action:
             self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
+            self.font_size = 12
+        if action == font9_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+            self.font_size = 9
 
     def paint(self, painter, option, widget=None):
         painter.save()
@@ -1230,13 +1265,13 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
     Categories are typically shown white. A custom context menu
-    allows selection of a code/category memo an displaying the information.
+    allows selection of a code/category memo and displaying the information.
     """
 
     code_or_cat = None
     border_rect = None
     app = None
-    font = None
+    font_size = None  # Only for save/load item
     settings = None
     text = ""
 
@@ -1262,6 +1297,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         if self.code_or_cat['cid'] is None:
             self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
+        self.font_size = 9
         self.setPlainText(self.code_or_cat['name'])
 
     def paint(self, painter, option, widget):
@@ -1286,16 +1322,21 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         memo_action = menu.addAction('Memo')
         coded_action = None
         case_action = None
-        large_font_action = menu.addAction(_("Large font"))
         if self.code_or_cat['cid'] is not None:
             coded_action = menu.addAction('Coded text and media')
             case_action = menu.addAction('Case text and media')
+        font12_action = menu.addAction(_("Large font"))
+        font9_action = menu.addAction(_("Normal font"))
         hide_action = menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == large_font_action:
+        if action == font12_action:
             self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
+            self.font_size = 12
+        if action == font9_action:
+            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+            self.font_size = 9
         if action == memo_action:
             self.add_edit_memo()
         if action == coded_action:
