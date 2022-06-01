@@ -233,4 +233,6 @@ https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
 
+Also, if you like Qualcoder a lot, write an article about it.
+
 
