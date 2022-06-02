@@ -852,10 +852,13 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     settings = None
     text = ""
+    show_attributes = False
+    # For graph item storeage:
+    text_color = None
     font_size = 9
     case_id = -1
     remove = False
-    show_attributes = False
+    
 
     def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9):
         """ Show name and optionally attributes.
@@ -874,6 +877,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.case_id = case_id
         self.text = case_name
+        self.text_color = None
         self.font_size = font_size
         self.show_attributes = False
         self.remove = False
@@ -912,8 +916,13 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        font12_action = menu.addAction("Large font")
-        font9_action = menu.addAction("Small font")
+        font_larger_action = menu.addAction("Larger font")
+        font_smaller_action = menu.addAction("Smaller font")
+        red_action = menu.addAction(_("Red text"))
+        green_action = menu.addAction(_("Green text"))
+        yellow_action = menu.addAction(_("Yellow text"))
+        blue_action = menu.addAction(_("Blue text"))
+        default_color_action = menu.addAction(_("Default colour text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -922,12 +931,32 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == font12_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
-            self.font_size = 12
-        if action == font9_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-            self.font_size = 9
+        if action == font_larger_action:
+            self.font_size += 2
+            if self.font_size > 40:
+                self.font_size = 40
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == font_smaller_action:
+            self.font_size -= 2
+            if self.font_size < 6:
+                self.font_size = 6
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == red_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+            self.text_color = "red"
+        if action == green_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+            self.text_color = "green"
+        if action == yellow_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.text_color = "yellow"
+        if action == blue_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.text_color = "blue"
+        if action == default_color_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+            if self.app.settings['stylesheet'] == 'dark':
+                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
         if action == remove_action:
             self.remove = True
         if action == show_att_action:
@@ -1020,6 +1049,11 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         hide_att_action = None
         font12_action = menu.addAction("Large font")
         font9_action = menu.addAction("Small font")
+        red_action = menu.addAction(_("Red text"))
+        green_action = menu.addAction(_("Green text"))
+        yellow_action = menu.addAction(_("Yellow text"))
+        blue_action = menu.addAction(_("Blue text"))
+        default_color_action = menu.addAction(_("Default colour text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1036,6 +1070,18 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.font_size = 9
         if action == remove_action:
             self.remove = True
+        if action == red_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+        if action == green_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+        if action == yellow_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if action == blue_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+        if action == default_color_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+            if self.app.settings['stylesheet'] == 'dark':
+                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
         if action == show_att_action:
             self.setHtml(self.text + self.get_attributes())
             self.show_attributes = True
@@ -1099,6 +1145,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         font12_action = menu.addAction(_("Large font"))
         font9_action = menu.addAction(_("Small font"))
         remove_action = menu.addAction(_('Remove'))
+        red_action = menu.addAction(_("Red text"))
+        green_action = menu.addAction(_("Green text"))
+        yellow_action = menu.addAction(_("Yellow text"))
+        blue_action = menu.addAction(_("Blue text"))
+        default_color_action = menu.addAction(_("Default colour text"))
+
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1112,6 +1164,18 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == font9_action:
             self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
             self.font_size = 9
+        if action == red_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+        if action == green_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+        if action == yellow_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if action == blue_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+        if action == default_color_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
+            if self.app.settings['stylesheet'] == 'dark':
+                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
 
     def paint(self, painter, option, widget=None):
         painter.save()
