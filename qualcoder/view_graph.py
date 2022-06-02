@@ -1047,8 +1047,8 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        font12_action = menu.addAction("Large font")
-        font9_action = menu.addAction("Small font")
+        font_larger_action = menu.addAction("Larger font")
+        font_smaller_action = menu.addAction("Smaller font")
         red_action = menu.addAction(_("Red text"))
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
@@ -1062,12 +1062,16 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == font12_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
-            self.font_size = 12
-        if action == font9_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-            self.font_size = 9
+        if action == font_larger_action:
+            self.font_size += 2
+            if self.font_size > 40:
+                self.font_size = 40
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == font_smaller_action:
+            self.font_size -= 2
+            if self.font_size < 6:
+                self.font_size = 6
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         if action == remove_action:
             self.remove = True
         if action == red_action:
@@ -1142,8 +1146,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         bold_action = menu.addAction(_("Bold"))
-        font12_action = menu.addAction(_("Large font"))
-        font9_action = menu.addAction(_("Small font"))
+        font_larger_action = menu.addAction(_("Larger font"))
+        font_smaller_action = menu.addAction(_("Smaller font"))
         remove_action = menu.addAction(_('Remove'))
         red_action = menu.addAction(_("Red text"))
         green_action = menu.addAction(_("Green text"))
@@ -1158,12 +1162,16 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.remove = True
         if action == bold_action:
             self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
-        if action == font12_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
-            self.font_size = 12
-        if action == font9_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-            self.font_size = 9
+        if action == font_larger_action:
+            self.font_size += 2
+            if self.font_size > 40:
+                self.font_size = 40
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == font_smaller_action:
+            self.font_size -= 2
+            if self.font_size < 6:
+                self.font_size = 6
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         if action == red_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if action == green_action:
@@ -1338,8 +1346,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font_size = None  # Only for save/load item
     settings = None
     text = ""
+    font_size = 9
 
-    def __init__(self, app, code_or_cat):
+    def __init__(self, app, code_or_cat, font_size=9):
         """ Show name and colour of text. Has context menu for various options.
          param: app  : the main App class
          param: code_or_cat  : Dictionary of the code details: name, memo, color etc """
@@ -1350,6 +1359,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
+        self.font_size = font_size
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.text = self.code_or_cat['name']
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
@@ -1358,10 +1368,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         if self.code_or_cat['cid'] is not None:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         if self.code_or_cat['cid'] is None:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
-        self.font_size = 9
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         self.setPlainText(self.code_or_cat['name'])
 
     def paint(self, painter, option, widget):
@@ -1389,18 +1398,21 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.code_or_cat['cid'] is not None:
             coded_action = menu.addAction('Coded text and media')
             case_action = menu.addAction('Case text and media')
-        font12_action = menu.addAction(_("Large font"))
-        font9_action = menu.addAction(_("Normal font"))
+        font_larger_action = menu.addAction(_("Larger font"))
+        font_smaller_action = menu.addAction(_("Smaller font"))
         hide_action = menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        if action == font12_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 12, QtGui.QFont.Weight.Normal))
-            self.font_size = 12
-        if action == font9_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-            self.font_size = 9
+        if action == font_larger_action:
+            self.font_size += 2
+            if self.font_size > 40:
+                self.font_size = 40
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == font_smaller_action:
+            self.font_size -= 2
+            if self.font_size < 6:
+                self.font_size = 6
         if action == memo_action:
             self.add_edit_memo()
         if action == coded_action:
