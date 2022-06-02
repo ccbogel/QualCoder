@@ -646,7 +646,7 @@ class ViewGraph(QDialog):
             Message(self.app, _("Cannot save"), msg).exec()
             return
         description = ui_save.description
-        '''cur = self.app.conn.cursor()
+        cur = self.app.conn.cursor()
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         try:
             cur.execute("insert into graph (name, description, date) values(?,?,?)", [name, description, now_date])
@@ -655,40 +655,45 @@ class ViewGraph(QDialog):
             Message(self.app, _("Name error"),_("This name already used. Choose another name.")).exec()
             return
         cur.execute("select last_insert_rowid()")
-        grid = cur.fetchone()[0]'''
-        grid = 1
+        grid = cur.fetchone()[0]
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
                 print("TextGraphicsItem")
                 '''gr_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
                     supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer'''
-                #TODO bold ??
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid']
-                , "Fnt:",i.font_size, i.isVisible())
-
+                , "Fnt:", i.font_size, "bold",i.bold, "vis:",i.isVisible())
+                sql = "insert into gr_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,hide) values (?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid,i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
+                                  i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible()])
+                self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
                 print("FreeTextGraphicsItem")
                 '''gr_free_text_item(gfreeid integer primary key, grid integer, x integer,
-                y integer, free_text text, font_size integer, **bold integer, **color text'''
-                #TODO color bold
+                y integer, free_text text, font_size integer, bold integer, color text'''
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.text
-                , "Fnt:",i.font_size, i.isVisible())
-
+                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)
+                sql = "insert into gr_free_text_item (grid,x,y,free_text,font_size,bold,color) values (?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color])
+                self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
                 print("CaseTextGraphicsItem")
                 '''gr_case_text_item(gcaseid integer  primary key, grid  integer, x  integer,   
-                y integer, caseid integer, font_size integer, ***bold integer, ***color text)'''
-                #TODO color bold
+                y integer, caseid integer, font_size integer, bold integer, color text)'''
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.case_id
-                , "Fnt:",i.font_size, i.isVisible())
-
+                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)
+                sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color) values (?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color])
+                self.app.conn.commit()
             if isinstance(i, FileTextGraphicsItem):
                 print("FileTextGraphicsItem")
                 '''gr_file_text_item(gfileid integer primary  key, grid integer, x integer, 
-                y integer, fid integer, font_size integer, ***bold integer, ***color text)'''
-                #TODO color bold
+                y integer, fid integer, font_size integer, bold integer, color text)'''
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.file_id
-                , "Fnt:",i.font_size, i.isVisible())
+                , "Fnt:",i.font_size,  "bold", i.bold, "color", i.color)
+                sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color) values (?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color])
+                self.app.conn.commit()
 
             if isinstance(i, LinkGraphicsItem):
                 print("LinkGraphicsItem")
@@ -707,6 +712,7 @@ class ViewGraph(QDialog):
     def load_saved_graph(self):
         """ Load saved graph. """
 
+        #TODO
         print("TODO load saved graph")
         ''' On load order: TextGraphicsItem, , FileGraphicsItem, CaseGraphicsItem
         Fill extra details:
@@ -718,6 +724,7 @@ class ViewGraph(QDialog):
     def delete_saved_graph(self):
         """ Delete saved graph items. """
 
+        #TODO
         print("TODO delete saved graph ")
 
 
@@ -853,20 +860,22 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     settings = None
     text = ""
     show_attributes = False
-    # For graph item storeage:
-    text_color = None
+    remove = False
+    # For graph item storage
     font_size = 9
     case_id = -1
-    remove = False
-    
+    color = ""
+    bold = False
 
-    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9):
+    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="", bold=False):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: case_name : String
         param: case_id : Integer
         param: x : Integer
         param: y : Integer
+        param: color : String
+        param: bold : boolean
         """
 
         super(CaseTextGraphicsItem, self).__init__(None)
@@ -877,15 +886,19 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.case_id = case_id
         self.text = case_name
-        self.text_color = None
         self.font_size = font_size
+        self.color = color
+        self.bold = bold
         self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        fontweight = QtGui.QFont.Weight.Normal
+        if self.bold:
+            fontweight = QtGui.QFont.Weight.Bold
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPlainText(self.text)
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
@@ -896,6 +909,14 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+        if self.color == "red":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+        if self.color == "green":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+        if self.color == "blue":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+        if self.color == "yellow":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
 
     def paint(self, painter, option, widget):
         """ """
@@ -916,8 +937,9 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        font_larger_action = menu.addAction("Larger font")
-        font_smaller_action = menu.addAction("Smaller font")
+        font_larger_action = menu.addAction(_("Larger font"))
+        font_smaller_action = menu.addAction(_("Smaller font"))
+        bold_action = menu.addAction(_("Bold toggle"))
         red_action = menu.addAction(_("Red text"))
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
@@ -941,18 +963,24 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if self.font_size < 6:
                 self.font_size = 6
             self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if action == bold_action:
+            self.bold = not self.bold
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == red_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
-            self.text_color = "red"
+            self.color = "red"
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
-            self.text_color = "green"
+            self.color = "green"
         if action == yellow_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
-            self.text_color = "yellow"
+            self.color = "yellow"
         if action == blue_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
-            self.text_color = "blue"
+            self.color = "blue"
         if action == default_color_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
             if self.app.settings['stylesheet'] == 'dark':
@@ -986,19 +1014,24 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     settings = None
     file_name = ""
-    file_id = -1
     remove = False
     show_attributes = False
     text = ""
+    # For graph item storage
+    file_id = -1
     font_size = 9
+    color = ""
+    bold = False
 
-    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9):
+    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="", bold=False):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: file_name : String
         param: file_od : Integer
         param: x : Integer
         param: y : Integer
+        param: color : String
+        bold : boolean
         """
 
         super(FileTextGraphicsItem, self).__init__(None)
@@ -1010,13 +1043,17 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.file_id = file_id
         self.text = file_name
         self.font_size = font_size
+        self.color = color
         self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
-        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        fontweight = QtGui.QFont.Weight.Normal
+        if self.bold:
+            fontweight = QtGui.QFont.Weight.Bold
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPos(50 + x, 50 + y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from source where id=?", [file_id])
@@ -1027,6 +1064,14 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+        if self.color == "red":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+        if self.color == "green":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+        if self.color == "blue":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+        if self.color == "yellow":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
 
     def paint(self, painter, option, widget):
         """ """
@@ -1047,8 +1092,9 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
-        font_larger_action = menu.addAction("Larger font")
-        font_smaller_action = menu.addAction("Smaller font")
+        bold_action = menu.addAction(_("Bold toggle"))
+        font_larger_action = menu.addAction(_("Larger font"))
+        font_smaller_action = menu.addAction(_("Smaller font"))
         red_action = menu.addAction(_("Red text"))
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
@@ -1066,22 +1112,38 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.font_size += 2
             if self.font_size > 40:
                 self.font_size = 40
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == font_smaller_action:
             self.font_size -= 2
             if self.font_size < 6:
                 self.font_size = 6
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
+        if action == bold_action:
+            self.bold = not self.bold
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == remove_action:
             self.remove = True
         if action == red_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+            self.color = "red"
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+            self.color = "green"
         if action == yellow_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.color = "yellow"
         if action == blue_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.color = "blue"
         if action == default_color_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
             if self.app.settings['stylesheet'] == 'dark':
@@ -1112,24 +1174,31 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     app = None
     font = None
     settings = None
+    remove = False
+    # For graph item storage
     text = "text"
     font_size = 9
-    remove = False
+    color = ""
+    bold = False
 
-    def __init__(self, app, x=10, y=10, text_="text",font_size=9):
+    def __init__(self, app, x=10, y=10, text_="text", font_size=9, color="", bold=False):
         """ Free text object.
          param:
             app  : the main App class
             x : Integer x position
             y : Intger y position
             text_ : String
+            color : String
+            bold : boolean
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
+        self.setPos(x, y)
         self.text = text_
         self.font_size = font_size
-        self.setPos(x, y)
+        self.color = color
+        self.bold = bold
         self.settings = app.settings
         self.project_path = app.project_path
         self.remove = False
@@ -1142,10 +1211,18 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.app.settings['stylesheet'] == 'dark':
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+        if self.color == "red":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+        if self.color == "green":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+        if self.color == "blue":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+        if self.color == "yellow":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        bold_action = menu.addAction(_("Bold"))
+        bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
         remove_action = menu.addAction(_('Remove'))
@@ -1161,25 +1238,39 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == remove_action:
             self.remove = True
         if action == bold_action:
-            self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Bold))
+            self.bold = not self.bold
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == font_larger_action:
             self.font_size += 2
             if self.font_size > 40:
                 self.font_size = 40
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == font_smaller_action:
             self.font_size -= 2
             if self.font_size < 6:
                 self.font_size = 6
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == red_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
+            self.color = "red"
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
+            self.color = "green"
         if action == yellow_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.color = "yellow"
         if action == blue_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.color = "blue"
         if action == default_color_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
             if self.app.settings['stylesheet'] == 'dark':
@@ -1343,15 +1434,19 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     code_or_cat = None
     border_rect = None
     app = None
-    font_size = None  # Only for save/load item
     settings = None
     text = ""
+    # For graph item storage
     font_size = 9
+    bold = False
 
-    def __init__(self, app, code_or_cat, font_size=9):
+    def __init__(self, app, code_or_cat, font_size=9, bold=False):
         """ Show name and colour of text. Has context menu for various options.
          param: app  : the main App class
-         param: code_or_cat  : Dictionary of the code details: name, memo, color etc """
+         param: code_or_cat  : Dictionary of the code details: name, memo, color etc
+         param: font_size : Integer
+         param: bold : boolean
+         """
 
         super(TextGraphicsItem, self).__init__(None)
         self.app = app
@@ -1360,6 +1455,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.code_or_cat = code_or_cat
         self.font_size = font_size
+        self.bold = bold
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.text = self.code_or_cat['name']
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
@@ -1367,10 +1463,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
-        if self.code_or_cat['cid'] is not None:
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
-        if self.code_or_cat['cid'] is None:
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        fontweight = QtGui.QFont.Weight.Normal
+        if self.bold:
+            fontweight = QtGui.QFont.Weight.Bold
+        self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPlainText(self.code_or_cat['name'])
 
     def paint(self, painter, option, widget):
@@ -1400,19 +1496,33 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             case_action = menu.addAction('Case text and media')
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
+        bold_action = menu.addAction(_("Bold toggle"))
         hide_action = menu.addAction('Hide')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == bold_action:
+            self.bold = not self.bold
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == font_larger_action:
             self.font_size += 2
             if self.font_size > 40:
                 self.font_size = 40
-            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == font_smaller_action:
             self.font_size -= 2
             if self.font_size < 6:
                 self.font_size = 6
+            fontweight = QtGui.QFont.Weight.Normal
+            if self.bold:
+                fontweight = QtGui.QFont.Weight.Bold
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == memo_action:
             self.add_edit_memo()
         if action == coded_action:
