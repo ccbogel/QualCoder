@@ -698,9 +698,15 @@ class ViewGraph(QDialog):
             if isinstance(i, LinkGraphicsItem):
                 print("LinkGraphicsItem")
                 '''gr_line_item(glineid integer primary key, grid integer, fromtype text, 
-                      fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, 
-                      thickness real, linetype text, hide integer, caseid integer, fid integer)'''
+                      fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, 
+                      color text, thickness real, linetype text, hide integer, caseid integer, fid integer)'''
                 #TODO
+                print("grid:", grid, "fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
+                      "fromcid", i.from_widget.code_or_cat['cid'],
+                      "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
+                      "tocid", i.to_widget.code_or_cat['cid'],
+                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
+                #sql = "insert into gr_file_text_item (grid,,color) values (?,?,?,?,?,?,?)"
                 
             if isinstance(i, FreeLineGraphicsItem):
                 print("FreeLineGraphicsItem")
@@ -708,6 +714,13 @@ class ViewGraph(QDialog):
                 integer, totype text, tocatid  integer, tocid integer, color text, thickness real, linetype text, caseid
                 integer, fid integer'''
                 #TODO
+                print("grid:", grid,"fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
+                      "fromcid", i.from_widget.code_or_cat['cid'],
+                      "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
+                      "tocid", i.to_widget.code_or_cat['cid'],
+                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
+                print("TODO")
+                #sql = "insert into gr_file_text_item (grid,,color) values (?,?,?,?,?,?,?)"
 
     def load_saved_graph(self):
         """ Load saved graph. """
@@ -724,7 +737,7 @@ class ViewGraph(QDialog):
     def delete_saved_graph(self):
         """ Delete saved graph items. """
 
-        #TODO
+        #TODO need are you sure
         print("TODO delete saved graph ")
 
 
@@ -1292,35 +1305,34 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    line_color = QtCore.Qt.GlobalColor.gray
-    corners_only = False  # True for list graph
-    weighting = 1
+    color = QtCore.Qt.GlobalColor.gray
+    #corners_only = False  # True for list graph
     tooltip = ""
     remove = False
 
-    def __init__(self, app, from_widget, to_widget, color="gray", corners_only=False):
+    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2 ):  # , corners_only=False):
         super(FreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
-        self.corners_only = corners_only
-        self.weighting = 1
+        #self.corners_only = corners_only
+        self.line_width = line_width
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.line_color = QtCore.Qt.GlobalColor.gray
+        self.color = QtCore.Qt.GlobalColor.gray
         if color == "red":
-            self.line_color = QtCore.Qt.GlobalColor.red
+            self.color = QtCore.Qt.GlobalColor.red
         if color == "blue":
-            self.line_color = QtCore.Qt.GlobalColor.blue
+            self.color = QtCore.Qt.GlobalColor.blue
         if color == "green":
-            self.line_color = QtCore.Qt.GlobalColor.green
+            self.color = QtCore.Qt.GlobalColor.green
         if color == "cyan":
-            self.line_color = QtCore.Qt.GlobalColor.cyan
+            self.color = QtCore.Qt.GlobalColor.cyan
         if color == "magenta":
-            self.line_color = QtCore.Qt.GlobalColor.magenta
+            self.color = QtCore.Qt.GlobalColor.magenta
         if color == "yellow":
-            self.line_color = QtCore.Qt.GlobalColor.yellow
+            self.color = QtCore.Qt.GlobalColor.yellow
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1351,22 +1363,22 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
         if action == red_action:
-            self.line_color = QtCore.Qt.GlobalColor.red
+            self.color = QtCore.Qt.GlobalColor.red
             self.redraw()
         if action == yellow_action:
-            self.line_color = QtCore.Qt.GlobalColor.yellow
+            self.color = QtCore.Qt.GlobalColor.yellow
             self.redraw()
         if action == green_action:
-            self.line_color = QtCore.Qt.GlobalColor.green
+            self.color = QtCore.Qt.GlobalColor.green
             self.redraw()
         if action == blue_action:
-            self.line_color = QtCore.Qt.GlobalColor.blue
+            self.color = QtCore.Qt.GlobalColor.blue
             self.redraw()
         if action == cyan_action:
-            self.line_color = QtCore.Qt.GlobalColor.cyan
+            self.color = QtCore.Qt.GlobalColor.cyan
             self.redraw()
         if action == magenta_action:
-            self.line_color = QtCore.Qt.GlobalColor.magenta
+            self.color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
         if action == remove_action:
             self.remove = True
@@ -1386,7 +1398,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        if not self.corners_only:
+        if True: #not self.corners_only:
             # fix from_x value to middle of from widget if to_widget overlaps in x position
             if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
                 from_x = from_x + self.from_widget.boundingRect().width() / 2
@@ -1404,7 +1416,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        if not self.corners_only:
+        if True:  #not self.corners_only:
             # Fix from_y value to middle of from widget if to_widget overlaps in y position
             if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
                 from_y = from_y + self.from_widget.boundingRect().height() / 2
@@ -1421,7 +1433,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
 
-        self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
+        self.setPen(QtGui.QPen(self.color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
 
 
@@ -1574,25 +1586,28 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    line_color = QtCore.Qt.GlobalColor.gray
-    corners_only = False  # True for list graph
-    weighting = 1
+    color = QtCore.Qt.GlobalColor.gray
+    # corners_only = False  # True for list graph
     text = ""
 
-    def __init__(self, app, from_widget, to_widget, weighting, corners_only=False):
+    def __init__(self, app, from_widget, to_widget, line_width=2, color=""): #corners_only=False):
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
         self.text = from_widget.text + " - " + to_widget.text
-        self.corners_only = corners_only
-        self.weighting = weighting
+        #self.corners_only = corners_only
+        self.line_width = line_width
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.line_color = QtCore.Qt.GlobalColor.gray
+        self.color = QtCore.Qt.GlobalColor.gray
+        if color != "":
+            #TODO update line color
+            print("TODO UPDATE LINE COLOR ")
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
+
         thicker_action = menu.addAction(_('Thicker'))
         thinner_action = menu.addAction(_('Thinner'))
         dotted_action = menu.addAction(_('Dotted'))
@@ -1621,22 +1636,22 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
         if action == red_action:
-            self.line_color = QtCore.Qt.GlobalColor.red
+            self.color = QtCore.Qt.GlobalColor.red
             self.redraw()
         if action == yellow_action:
-            self.line_color = QtCore.Qt.GlobalColor.yellow
+            self.color = QtCore.Qt.GlobalColor.yellow
             self.redraw()
         if action == green_action:
-            self.line_color = QtCore.Qt.GlobalColor.green
+            self.color = QtCore.Qt.GlobalColor.green
             self.redraw()
         if action == blue_action:
-            self.line_color = QtCore.Qt.GlobalColor.blue
+            self.color = QtCore.Qt.GlobalColor.blue
             self.redraw()
         if action == cyan_action:
-            self.line_color = QtCore.Qt.GlobalColor.cyan
+            self.color = QtCore.Qt.GlobalColor.cyan
             self.redraw()
         if action == magenta_action:
-            self.line_color = QtCore.Qt.GlobalColor.magenta
+            self.color = QtCore.Qt.GlobalColor.magenta
             self.redraw()
         if action == hide_action:
             self.hide()
@@ -1656,7 +1671,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        if not self.corners_only:
+        if True: #not self.corners_only:
             # fix from_x value to middle of from widget if to_widget overlaps in x position
             if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
                 from_x = from_x + self.from_widget.boundingRect().width() / 2
@@ -1674,7 +1689,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        if not self.corners_only:
+        if True: #not self.corners_only:
             # Fix from_y value to middle of from widget if to_widget overlaps in y position
             if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
                 from_y = from_y + self.from_widget.boundingRect().height() / 2
@@ -1691,7 +1706,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
 
-        self.setPen(QtGui.QPen(self.line_color, self.line_width, self.line_type))
+        self.setPen(QtGui.QPen(self.color, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
 
 
