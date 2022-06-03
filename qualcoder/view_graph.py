@@ -40,6 +40,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
 
 from .color_selector import TextColor
+from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
 from .helpers import DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
@@ -721,6 +722,7 @@ class ViewGraph(QDialog):
                       "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
                 print("TODO")
                 #sql = "insert into gr_file_text_item (grid,,color) values (?,?,?,?,?,?,?)"
+        self.app.delete_backup = False
 
     def load_saved_graph(self):
         """ Load saved graph. """
@@ -735,10 +737,44 @@ class ViewGraph(QDialog):
         then LineGraphicsItem, Then FreeLineGraphicsItem '''
 
     def delete_saved_graph(self):
-        """ Delete saved graph items. """
+        """ Delete saved graph and its items.
+        Need a list of dictionaries with a dictionary item called 'name'. """
 
-        #TODO need are you sure
-        print("TODO delete saved graph ")
+        cur = self.app.conn.cursor()
+        cur.execute("select name, grid from graph order by upper(name)")
+        res = cur.fetchall()
+        names_list = []
+        for r in res:
+            names_list.append({'name': r[0], 'grid': r[1]})       
+        ui = DialogSelectItems(self.app, names_list, _("Delete stored graphs"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        names = ""
+        for s in selection:
+            names = names + s['name'] + "\n"
+        ui = DialogConfirmDelete(self.app, names)
+        ok = ui.exec()
+        if not ok:
+            return
+
+        # Delete graph entry and each item type entry
+        msg = _("Deleted stored graphs:") +"\n" + names + "========"
+        for s in selection:
+            msg += _("Deleted stored graph: ") + s['name'] + "\n"
+            cur.execute("delete from graph where grid = ?", [s['grid']])
+            cur.execute("delete from gr_case_text_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_file_text_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_free_line_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_free_text_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_line_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_text_item where grid = ?", [s['grid']])    
+            self.app.conn.commit()
+        #TODO self.parent_text_edit.append(msg)
+        self.app.delete_backup = False
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
