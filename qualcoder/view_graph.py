@@ -30,7 +30,6 @@ from collections import Counter
 from copy import deepcopy
 import datetime
 import logging
-import math
 import os
 import sqlite3
 import sys
@@ -380,7 +379,6 @@ class ViewGraph(QDialog):
                         add_to_scene = False
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, m))
-                print(m)
 
         # Add link which includes the scene text items and associated data, add links before text_items
         for m in self.scene.items():
@@ -660,11 +658,11 @@ class ViewGraph(QDialog):
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
                 print("TextGraphicsItem")
-                '''gr_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
-                    supercatid integer, catid integer, cid integer, font_size integer, bold integer, hide integer'''
+                '''gr_cdct_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
+                    supercatid integer, catid integer, cid integer, font_size integer, bold integer, isvisible integer'''
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid']
                 , "Fnt:", i.font_size, "bold",i.bold, "vis:",i.isVisible())
-                sql = "insert into gr_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,hide) values (?,?,?,?,?,?,?,?,?)"
+                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible) values (?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid,i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
                                   i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible()])
                 self.app.conn.commit()
@@ -698,36 +696,104 @@ class ViewGraph(QDialog):
 
             if isinstance(i, LinkGraphicsItem):
                 print("LinkGraphicsItem")
-                '''gr_line_item(glineid integer primary key, grid integer, fromtype text, 
-                      fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, 
-                      color text, linewidth real, linetype text, hide integer)'''
-                #TODO remove caseid and fid from gr_line_item, rename hide to isvisible thickness to linewidth
-                #TODO
-                print("grid:", grid, "fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
-                      "fromcid", i.from_widget.code_or_cat['cid'],
-                      "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
+                '''gr_cdct_line_item(glineid integer primary key, grid integer,  
+                      fromcatid integer, fromcid integer, tocatid integer, tocid integer, 
+                      color text, linewidth real, linetype text, isvisible integer)'''
+                print("grid:", grid, "fromcatid", i.from_widget.code_or_cat['catid'],
+                      "fromcid", i.from_widget.code_or_cat['cid'], "tocatid", i.to_widget.code_or_cat['catid'],
                       "tocid", i.to_widget.code_or_cat['cid'],
-                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
-                sql = "insert into gr_line_item (grid,TODO,color) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                #cur.execute(sql, [grid, i.from_widget.text,i.from_widget.code_or_cat['catid'],
-                #                  i.from_widget.code_or_cat['cid'],i.to_widget.text, "tocatid",
-                #                  i.to_widget.code_or_cat['catid'],i.color,i.line_width, i.linetype,i.isVisible()])
-                #self.app.conn.commit()
+                      "color", i.color, "width", i.line_width, "type", i.line_type, "isvisible", i.isVisible())
+                sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
+                      "isvisible) values (?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
+                                  i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                                  self.color_to_text(i.color), i.line_width, self.line_type_to_text(i.line_type),
+                                  i.isVisible()])
+                self.app.conn.commit()
                 
             if isinstance(i, FreeLineGraphicsItem):
                 print("FreeLineGraphicsItem")
-                '''gr_free_line_item(gflineid integer primary key, grid integer, fromtype  text,fromcatid integer, fromcid
-                integer, totype text, tocatid  integer, tocid integer, color text, thickness real, linetype text, caseid
-                integer, fid integer'''
-                #TODO
-                print("grid:", grid,"fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
+                from_catid = None
+                try:
+                    from_catid = i.from_widget.code_or_cat['catid']
+                except AttributeError:
+                    pass
+                from_cid = None
+                try:
+                    from_cid = i.from_widget.code_or_cat['cid']
+                except AttributeError:
+                    pass
+                to_catid = None
+                try:
+                    to_catid = i.to_widget.code_or_cat['catid']
+                except AttributeError:
+                    pass
+                to_cid = None
+                try:
+                    to_cid = i.to_widget.code_or_cat['cid']
+                except AttributeError:
+                    pass
+                from_case_id = None
+                try:
+                    from_case_id = i.from_widget.case_id
+                except AttributeError:
+                    pass
+                from_file_id = None
+                try:
+                    from_file_id = i.from_widget.file_id
+                except AttributeError:
+                    pass
+                to_case_id = None
+                try:
+                    to_case_id = i.to_widget.case_id
+                except AttributeError:
+                    pass
+                to_file_id = None
+                try:
+                    to_file_id = i.to_widget.file_id
+                except AttributeError:
+                    pass
+                ''' print("grid:", grid,"fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
                       "fromcid", i.from_widget.code_or_cat['cid'],
                       "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
                       "tocid", i.to_widget.code_or_cat['cid'],
-                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
-                print("TODO")
-                #sql = "insert into gr_free_line_item (grid,,color) values (?,?,?,?,?,?,?)"
+                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())'''
+
+                sql = "insert into gr_free_line_item (grid,fromtext,fromcatid,fromcid,fromcaseid,fromfileid, " \
+                      "totext,tocatid,tocid,tocaseid,tofileid,color, linewidth,linetype) " \
+                      "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.from_widget.text, from_catid, from_cid, from_case_id, from_file_id,
+                                  i.to_widget.text, to_catid, to_cid, to_case_id, to_file_id,
+                                  self.color_to_text(i.color), i.line_width, self.line_type_to_text(i.line_type)])
+                self.app.conn.commit()
         self.app.delete_backup = False
+
+    def color_to_text(self, global_color):
+        """ Convert global color to text.
+        For graph_line_items. """
+
+        text_color = "gray"
+        if global_color == QtCore.Qt.GlobalColor.blue:
+            text_color = "blue"
+        if global_color == QtCore.Qt.GlobalColor.cyan:
+            text_color = "cyan"
+        if global_color == QtCore.Qt.GlobalColor.green:
+            text_color = "green"
+        if global_color == QtCore.Qt.GlobalColor.magenta:
+            text_color = "magenta"
+        if global_color == QtCore.Qt.GlobalColor.red:
+            text_color = "red"
+        if global_color == QtCore.Qt.GlobalColor.yellow:
+            text_color = "yellow"
+        return text_color
+
+    def line_type_to_text(self, line_type):
+        """ Convert line type to text. for graph line items. """
+
+        text_ = "solid"
+        if line_type == QtCore.Qt.PenStyle.DotLine:
+            text_ = "Dotted"
+        return text_
 
     def load_saved_graph(self):
         """ Load saved graph. """
@@ -765,20 +831,16 @@ class ViewGraph(QDialog):
         ok = ui.exec()
         if not ok:
             return
-
-        # Delete graph entry and each item type entry
-        msg = _("Deleted stored graphs:") +"\n" + names + "========"
+        # Delete graph entry and all its items
         for s in selection:
-            msg += _("Deleted stored graph: ") + s['name'] + "\n"
             cur.execute("delete from graph where grid = ?", [s['grid']])
             cur.execute("delete from gr_case_text_item where grid = ?", [s['grid']])
             cur.execute("delete from gr_file_text_item where grid = ?", [s['grid']])
             cur.execute("delete from gr_free_line_item where grid = ?", [s['grid']])
             cur.execute("delete from gr_free_text_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_line_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_text_item where grid = ?", [s['grid']])    
+            cur.execute("delete from gr_cdct_line_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_cdct_text_item where grid = ?", [s['grid']])
             self.app.conn.commit()
-        #TODO self.parent_text_edit.append(msg)
         self.app.delete_backup = False
 
 
@@ -1642,9 +1704,18 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
         self.color = QtCore.Qt.GlobalColor.gray
-        if color != "":
-            #TODO update line color
-            print("TODO UPDATE LINE COLOR ")
+        if color == "blue":
+            self.color = QtCore.Qt.GlobalColor.blue
+        if color == "cyan":
+            self.color = QtCore.Qt.GlobalColor.cyan
+        if color == "green":
+            self.color = QtCore.Qt.GlobalColor.green
+        if color == "magenta":
+            self.color = QtCore.Qt.GlobalColor.magenta
+        if color == "red":
+            self.color = QtCore.Qt.GlobalColor.red
+        if color == "yellow":
+            self.color = QtCore.Qt.GlobalColor.yellow
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
