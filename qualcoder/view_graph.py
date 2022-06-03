@@ -700,14 +700,19 @@ class ViewGraph(QDialog):
                 print("LinkGraphicsItem")
                 '''gr_line_item(glineid integer primary key, grid integer, fromtype text, 
                       fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, 
-                      color text, thickness real, linetype text, hide integer, caseid integer, fid integer)'''
+                      color text, linewidth real, linetype text, hide integer)'''
+                #TODO remove caseid and fid from gr_line_item, rename hide to isvisible thickness to linewidth
                 #TODO
                 print("grid:", grid, "fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
                       "fromcid", i.from_widget.code_or_cat['cid'],
                       "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
                       "tocid", i.to_widget.code_or_cat['cid'],
                       "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
-                #sql = "insert into gr_file_text_item (grid,,color) values (?,?,?,?,?,?,?)"
+                sql = "insert into gr_line_item (grid,TODO,color) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                #cur.execute(sql, [grid, i.from_widget.text,i.from_widget.code_or_cat['catid'],
+                #                  i.from_widget.code_or_cat['cid'],i.to_widget.text, "tocatid",
+                #                  i.to_widget.code_or_cat['catid'],i.color,i.line_width, i.linetype,i.isVisible()])
+                #self.app.conn.commit()
                 
             if isinstance(i, FreeLineGraphicsItem):
                 print("FreeLineGraphicsItem")
@@ -721,7 +726,7 @@ class ViewGraph(QDialog):
                       "tocid", i.to_widget.code_or_cat['cid'],
                       "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())
                 print("TODO")
-                #sql = "insert into gr_file_text_item (grid,,color) values (?,?,?,?,?,?,?)"
+                #sql = "insert into gr_free_line_item (grid,,color) values (?,?,?,?,?,?,?)"
         self.app.delete_backup = False
 
     def load_saved_graph(self):
