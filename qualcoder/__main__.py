@@ -1431,22 +1431,22 @@ class MainWindow(QtWidgets.QMainWindow):
         # Tables to store graph. sqlite 0 is False 1 is True
         cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
                     "date text, unique(name));")
-        cur.execute("CREATE TABLE gr_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
+        cur.execute("CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                     "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
-                    "hide integer);")
+                    "isvisible integer);")
         cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
                     "y integer, caseid integer, font_size integer, bold integer, color text);")
         cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
                     "y integer, fid integer, font_size integer, bold integer, color text);")
         cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, x integer, "
                     "y integer, free_text text, font_size integer, bold integer, color text);")
-        # fromtype or totype is TextGraphicsItem, FreeTextGraphicsItem, CaseGraphicsItem, FileGraphicsItem
-        cur.execute("CREATE TABLE gr_line_item (glineid integer primary key, grid integer, fromtype text, "
-                    "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
-                    "thickness real, linetype text, hide integer, caseid integer, fid integer);")
-        cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtype text, "
-                    "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
-                    "thickness real, linetype text, caseid integer, fid integer);")
+        cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
+                    "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
+                    "linewidth real, linetype text, isvisible integer);")
+        cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
+                    "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
+                    "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
+                    "linewidth real, linetype text, caseid integer, fid integer);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1726,22 +1726,23 @@ class MainWindow(QtWidgets.QMainWindow):
             # Tables to store graph. sqlite 0 is False 1 is True
             cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
                         "date text, unique(name));")
-            cur.execute("CREATE TABLE gr_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
-                        "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
-                        "hide integer);")
+            cur.execute(
+                "CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
+                "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
+                "isvisible integer);")
             cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
                         "y integer, caseid integer, font_size integer, bold integer, color text);")
             cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
                         "y integer, fid integer, font_size integer, bold integer, color text);")
             cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, x integer, "
                         "y integer, free_text text, font_size integer, bold integer, color text);")
-            # fromtype or totype is TextGraphicsItem, FreeTextGraphicsItem, CaseGraphicsItem, FileGraphicsItem
-            cur.execute("CREATE TABLE gr_line_item (glineid integer primary key, grid integer, fromtype text, "
-                        "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
-                        "thickness real, linetype text, hide integer, caseid integer, fid integer);")
-            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtype text, "
-                        "fromcatid integer, fromcid integer, totype text, tocatid integer, tocid integer, color text, "
-                        "thickness real, linetype text, caseid integer, fid integer);")
+            cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
+                        "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
+                        "linewidth real, linetype text, isvisible integer);")
+            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
+                        "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
+                        "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
+                        "linewidth real, linetype text, caseid integer, fid integer);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
