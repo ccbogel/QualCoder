@@ -1430,7 +1430,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
         # Tables to store graph. sqlite 0 is False 1 is True
         cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
-                    "date text, unique(name));")
+                    "date text, scene_width integer, scene_height integer, unique(name));")
         cur.execute("CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                     "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
                     "isvisible integer);")
@@ -1725,7 +1725,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except sqlite3.OperationalError:
             # Tables to store graph. sqlite 0 is False 1 is True
             cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
-                        "date text, unique(name));")
+                        "date text, scene_width integer, scene_height integer, unique(name));")
             cur.execute(
                 "CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                 "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "

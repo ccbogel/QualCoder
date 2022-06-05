@@ -161,6 +161,10 @@ class ViewGraph(QDialog):
         Called by pushButton_clear. """
 
         self.scene.clear()
+        self.scene.set_width(990)
+        self.scene.set_height(650)
+        self.ui.label_loaded_graph.setText("")
+        self.ui.label_loaded_graph.setToolTip("")
 
     def select_tree_branch(self):
         """ Selected tree branch for model of codes and categories.
@@ -180,7 +184,7 @@ class ViewGraph(QDialog):
         else:
             node_text = selected[0]['name']
         cats, codes, model = self.create_initial_model()
-        # TODO is catid_count used ?
+        # TODO catid_count is NOT used
         model, catid_counts = self.get_refined_model_with_category_counts(cats, model, node_text)
         self.list_graph(model)
 
@@ -647,58 +651,46 @@ class ViewGraph(QDialog):
         description = ui_save.description
         cur = self.app.conn.cursor()
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        self.scene.adjust_for_negative_positions()
+        width, height = self.scene.suggested_scene_size()
+        self.scene.set_width(width)
+        self.scene.set_height(height)
         try:
-            cur.execute("insert into graph (name, description, date) values(?,?,?)", [name, description, now_date])
+            cur.execute("insert into graph (name, description, date, scene_width, scene_height) values(?,?,?,?,?)",
+                        [name, description, now_date, width, height])
             self.app.conn.commit()
         except sqlite3.IntegrityError:
-            Message(self.app, _("Name error"),_("This name already used. Choose another name.")).exec()
+            Message(self.app, _("Name error"), _("This name already used. Choose another name.")).exec()
             return
         cur.execute("select last_insert_rowid()")
         grid = cur.fetchone()[0]
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
-                print("TextGraphicsItem")
-                '''gr_cdct_text_item(gtextid integer primary key, grid integer, x integer, y integer, 
-                    supercatid integer, catid integer, cid integer, font_size integer, bold integer, isvisible integer'''
-                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid']
-                , "Fnt:", i.font_size, "bold",i.bold, "vis:",i.isVisible())
+                '''print("TextGraphicsItem")
+                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid'],
+                "Fnt:", i.font_size, "bold",i.bold, "vis:",i.isVisible())'''
                 sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible) values (?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid,i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
                                   i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible()])
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
-                print("FreeTextGraphicsItem")
-                '''gr_free_text_item(gfreeid integer primary key, grid integer, x integer,
-                y integer, free_text text, font_size integer, bold integer, color text'''
+                '''print("FreeTextGraphicsItem")
                 print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.text
-                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)
+                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)'''
                 sql = "insert into gr_free_text_item (grid,x,y,free_text,font_size,bold,color) values (?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
-                print("CaseTextGraphicsItem")
-                '''gr_case_text_item(gcaseid integer  primary key, grid  integer, x  integer,   
-                y integer, caseid integer, font_size integer, bold integer, color text)'''
-                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.case_id
-                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)
                 sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color) values (?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
             if isinstance(i, FileTextGraphicsItem):
-                print("FileTextGraphicsItem")
-                '''gr_file_text_item(gfileid integer primary  key, grid integer, x integer, 
-                y integer, fid integer, font_size integer, bold integer, color text)'''
-                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.file_id
-                , "Fnt:",i.font_size,  "bold", i.bold, "color", i.color)
                 sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color) values (?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
 
             if isinstance(i, LinkGraphicsItem):
                 print("LinkGraphicsItem")
-                '''gr_cdct_line_item(glineid integer primary key, grid integer,  
-                      fromcatid integer, fromcid integer, tocatid integer, tocid integer, 
-                      color text, linewidth real, linetype text, isvisible integer)'''
                 print("grid:", grid, "fromcatid", i.from_widget.code_or_cat['catid'],
                       "fromcid", i.from_widget.code_or_cat['cid'], "tocatid", i.to_widget.code_or_cat['catid'],
                       "tocid", i.to_widget.code_or_cat['cid'],
@@ -753,12 +745,7 @@ class ViewGraph(QDialog):
                     to_file_id = i.to_widget.file_id
                 except AttributeError:
                     pass
-                ''' print("grid:", grid,"fromtext", i.from_widget.text, "fromcatid", i.from_widget.code_or_cat['catid'],
-                      "fromcid", i.from_widget.code_or_cat['cid'],
-                      "totext", i.to_widget.text, "tocatid", i.to_widget.code_or_cat['catid'],
-                      "tocid", i.to_widget.code_or_cat['cid'],
-                      "color", "width", i.line_width, i.color, "type", i.line_type, "hide", i.isVisible())'''
-
+                """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
                 sql = "insert into gr_free_line_item (grid,fromtext,fromcatid,fromcid,fromcaseid,fromfileid, " \
                       "totext,tocatid,tocid,tocaseid,tofileid,color, linewidth,linetype) " \
                       "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -796,16 +783,121 @@ class ViewGraph(QDialog):
         return text_
 
     def load_saved_graph(self):
-        """ Load saved graph. """
-
-        #TODO
-        print("TODO load saved graph")
-        ''' On load order: TextGraphicsItem, , FileGraphicsItem, CaseGraphicsItem
-        Fill extra details:
+        """ Load a saved graph.
+        Load each text component first then link the cdct_line_items then link the free_lines_items.
+        For cdct_text_items, fill extra details:
         eg name, memo, date?, owner?, color, child_names?
+        """
 
-        then FreeTextGraphicsItem
-        then LineGraphicsItem, Then FreeLineGraphicsItem '''
+        cur = self.app.conn.cursor()
+        cur.execute("select name, grid, description, scene_width, scene_height from graph order by upper(name)")
+        res = cur.fetchall()
+        names_list = []
+        for r in res:
+            names_list.append({'name': r[0], 'grid': r[1], 'description': r[2], 'width': r[3], 'height': r[4]})
+        ui = DialogSelectItems(self.app, names_list, _("Delete stored graphs"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        graph = selection[0]
+        grid = graph['grid']
+        self.scene.clear()
+        self.scene.set_width(graph['width'])
+        self.scene.set_height(graph['height'])
+        self.load_graph_error_msg = ""
+        self.load_code_or_cat_text_graphics_items(grid)
+        self.load_file_text_graphics_items(grid)
+        self.load_case_text_graphics_items(grid)
+        self.load_free_text_graphics_items(grid)
+        if self.load_graph_error_msg != "":
+            print(self.load_graph_error_msg)
+        self.ui.label_loaded_graph.setText(graph['name'])
+        self.ui.label_loaded_graph.setToolTip(graph['description'])
+
+    def load_case_text_graphics_items(self, grid):
+        """ Load the case graphics items.
+        param: grid : Integer
+        """
+
+        sql_case = "select x, y, caseid,font_size, color, bold from gr_case_text_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql_case, [grid])
+        res_case = cur.fetchall()
+        for i in res_case:
+            cur.execute("select name, memo from cases where caseid=?", [i[2]])
+            res_name = cur.fetchone()
+            if res_name is not None:
+                self.scene.addItem(CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
+            else:
+                self.load_graph_error_msg += _("Case: ") + str(i[2]) + " "
+
+    def load_file_text_graphics_items(self, grid):
+        """ Load the file graphics items.
+        param: grid : Integer
+        """
+
+        sql_file = "select x, y, fid, font_size, bold, color from gr_file_text_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql_file, [grid])
+        res_file = cur.fetchall()
+        for i in res_file:
+            cur.execute("select name, memo from source where id=?", [i[2]])
+            res_name = cur.fetchone()
+            if res_name is not None:
+                self.scene.addItem(FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
+            else:
+                self.load_graph_error_msg += _("File: ") + str(i[2]) + " "
+
+    def load_free_text_graphics_items(self, grid):
+        """ Load the free text graphics items.
+        param: grid : Integer
+        """
+
+        sql = "select x, y, free_text, font_size, color, bold from gr_free_text_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [grid])
+        res = cur.fetchall()
+        for i in res:
+            self.scene.addItem(FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5]))
+
+    def load_code_or_cat_text_graphics_items(self, grid):
+        """ Load the code or category graphics items.
+        param: grid : Integer
+        """
+
+        sql_cdct = "select x, y, supercatid, catid, cid, font_size, bold, isvisible from gr_cdct_text_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql_cdct, [grid])
+        res_cdct = cur.fetchall()
+        for i in res_cdct:
+            name = ""
+            color = '#FFFFFF'  # Default / needed for category items
+            memo = ""
+            if i[4] is not None:
+                #print("cid", i[4])
+                cur.execute("select name, color, memo from code_name where cid=?", [i[4]])
+                res = cur.fetchone()
+                if res is not None:
+                    name = res[0]
+                    color = res[1]
+                    memo = res[2]
+            else:
+                #print("catid", i[3])
+                cur.execute("select name, memo from code_cat where catid=?", [i[3]])
+                res = cur.fetchone()
+                if res is not None:
+                    name = res[0]
+                    memo = res[1]
+                    color = '#FFFFFF'
+            if name != "":  # This code or category has been deleted
+                self.load_graph_error_msg += _("Code/Cat: ") + str(i[3]) + " " + str(i[4]) + " "
+                cdct = {'name': name, 'supercatid': i[2], 'catid': i[3], 'cid': i[4], 'x': i[0], 'y': i[1],
+                        'color': color, 'memo': memo}
+                cdct['child_names'] = self.named_children_of_node(cdct)
+                self.scene.addItem(TextGraphicsItem(self.app, cdct, i[5], i[6], i[7]))
 
     def delete_saved_graph(self):
         """ Delete saved graph and its items.
@@ -1016,7 +1108,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             fontweight = QtGui.QFont.Weight.Bold
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPlainText(self.text)
-        self.setPos(50 + x, 50 + y)
+        self.setPos(x, y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from cases where caseid=?", [case_id])
         res = cur.fetchone()
@@ -1170,7 +1262,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
-        self.setPos(50 + x, 50 + y)
+        self.setPos(x, y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from source where id=?", [file_id])
         res = cur.fetchone()
@@ -1542,7 +1634,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
 
 class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item show the name and color of the code or category
-    Categories are typically shown white. A custom context menu
+    Categories are shown white. A custom context menu
     allows selection of a code/category memo and displaying the information.
     """
 
@@ -1555,12 +1647,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font_size = 9
     bold = False
 
-    def __init__(self, app, code_or_cat, font_size=9, bold=False):
+    def __init__(self, app, code_or_cat, font_size=9, bold=False, isvisible=True):
         """ Show name and colour of text. Has context menu for various options.
          param: app  : the main App class
          param: code_or_cat  : Dictionary of the code details: name, memo, color etc
          param: font_size : Integer
          param: bold : boolean
+         parap: isvisible : boolean
          """
 
         super(TextGraphicsItem, self).__init__(None)
@@ -1583,6 +1676,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             fontweight = QtGui.QFont.Weight.Bold
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPlainText(self.code_or_cat['name'])
+        if not isvisible:
+            self.hide()
 
     def paint(self, painter, option, widget):
         """  """
