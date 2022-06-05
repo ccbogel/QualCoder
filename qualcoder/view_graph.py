@@ -131,7 +131,7 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_up_icon), "png")
         self.ui.pushButton_loadgraph.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_loadgraph.pressed.connect(self.load_saved_graph)
+        self.ui.pushButton_loadgraph.pressed.connect(self.load_graph)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_down_icon), "png")
         self.ui.pushButton_savegraph.setIcon(QtGui.QIcon(pm))
@@ -391,7 +391,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
                             m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
                             n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        item = LinkGraphicsItem(self.app, m, n, 1, True)  # corners only = True
+                        item = LinkGraphicsItem(self.app, m, n, 1, True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
@@ -666,17 +666,11 @@ class ViewGraph(QDialog):
         grid = cur.fetchone()[0]
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
-                '''print("TextGraphicsItem")
-                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.code_or_cat['catid'], i.code_or_cat['cid'],
-                "Fnt:", i.font_size, "bold",i.bold, "vis:",i.isVisible())'''
                 sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible) values (?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid,i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
                                   i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible()])
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
-                '''print("FreeTextGraphicsItem")
-                print("grid:", grid, "pos", i.pos().x(), i.pos().y(), i.text
-                , "Fnt:",i.font_size, "bold", i.bold, "color", i.color)'''
                 sql = "insert into gr_free_text_item (grid,x,y,free_text,font_size,bold,color) values (?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
@@ -688,13 +682,11 @@ class ViewGraph(QDialog):
                 sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color) values (?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
-
             if isinstance(i, LinkGraphicsItem):
-                print("LinkGraphicsItem")
-                print("grid:", grid, "fromcatid", i.from_widget.code_or_cat['catid'],
+                '''print("LinkGraphicsItem grid:", grid, "fromcatid", i.from_widget.code_or_cat['catid'],
                       "fromcid", i.from_widget.code_or_cat['cid'], "tocatid", i.to_widget.code_or_cat['catid'],
                       "tocid", i.to_widget.code_or_cat['cid'],
-                      "color", i.color, "width", i.line_width, "type", i.line_type, "isvisible", i.isVisible())
+                      "color", i.color, "width", i.line_width, "type", i.line_type, "isvisible", i.isVisible())'''
                 sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
                       "isvisible) values (?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
@@ -704,7 +696,7 @@ class ViewGraph(QDialog):
                 self.app.conn.commit()
                 
             if isinstance(i, FreeLineGraphicsItem):
-                print("FreeLineGraphicsItem")
+                print("Saving FreeLineGraphicsItem")
                 from_catid = None
                 try:
                     from_catid = i.from_widget.code_or_cat['catid']
@@ -779,12 +771,12 @@ class ViewGraph(QDialog):
 
         text_ = "solid"
         if line_type == QtCore.Qt.PenStyle.DotLine:
-            text_ = "Dotted"
+            text_ = "dotted"
         return text_
 
-    def load_saved_graph(self):
+    def load_graph(self):
         """ Load a saved graph.
-        Load each text component first then link the cdct_line_items then link the free_lines_items.
+        Load each text component first then link then the cdct_line_items then the free_lines_items.
         For cdct_text_items, fill extra details:
         eg name, memo, date?, owner?, color, child_names?
         """
@@ -807,21 +799,87 @@ class ViewGraph(QDialog):
         self.scene.clear()
         self.scene.set_width(graph['width'])
         self.scene.set_height(graph['height'])
-        self.load_graph_error_msg = ""
-        self.load_code_or_cat_text_graphics_items(grid)
-        self.load_file_text_graphics_items(grid)
-        self.load_case_text_graphics_items(grid)
-        self.load_free_text_graphics_items(grid)
-        if self.load_graph_error_msg != "":
-            print(self.load_graph_error_msg)
+        err_msg = ""
+        err_msg = self.load_code_or_cat_text_graphics_items(grid)
+        err_msg += self.load_file_text_graphics_items(grid)
+        err_msg += self.load_case_text_graphics_items(grid)
+        err_msg += self.load_free_text_graphics_items(grid)
+        err_msg += self.load_cdct_line_graphics_items(grid)
+        err_msg += self.load_free_line_graphics_items(grid)
+        if err_msg != "":
+            Message(self.app, _("Load graph errors"), err_msg).exec()
         self.ui.label_loaded_graph.setText(graph['name'])
         self.ui.label_loaded_graph.setToolTip(graph['description'])
+
+    def load_cdct_line_graphics_items(self, grid):
+        """ Find the to and from widgets using matching catid and cid.
+          Then when found add the line item. """
+
+        err_msg = ""
+        sql = "select fromcatid,fromcid,tocatid,tocid,linewidth,linetype,color," \
+              "isvisible from gr_cdct_line_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [grid])
+        res = cur.fetchall()
+        for line in res:
+            #print("CDCT_LINE:", line)
+            # Add link which includes the scene text items and associated data, add links before text_items
+            from_item = None
+            to_item = None
+            for i in self.scene.items():
+                if isinstance(i, TextGraphicsItem):
+                    if from_item is None and i.code_or_cat['catid'] == line[0] and i.code_or_cat['cid'] == line[1]:
+                        from_item = i
+                    if to_item is None and i.code_or_cat['catid'] == line[2] and i.code_or_cat['cid'] == line[3]:
+                        to_item = i
+            #print(from_item, to_item)
+            if from_item is not None and to_item is not None:
+                item = LinkGraphicsItem(self.app, from_item, to_item, line[4], line[5], line[6], line[7])
+                self.scene.addItem(item)
+            if from_item is None:
+                err_msg += "\n" + _("Link line. No from item. ") + "Catid:" + str(line[0]) + " Cid:" + str(line[1])
+            if to_item is None:
+                err_msg += "\n" + _("Link line. No to item. ") + "Catid:" + str(line[2]) + " Cid:" + str(line[3])
+        return err_msg
+
+    def load_free_line_graphics_items(self, grid):
+        """ Find the to and from widgets.
+        Several matching options: catid and cid; fileid; caseid; text (last option).
+        Then when found add the line item. """
+
+        err_msg = ""
+        sql = "select fromcatid,fromcid,tocatid,tocid,linewidth,linetype,color," \
+              "isvisible from gr_free_line_item where grid=?"
+        '''cur = self.app.conn.cursor()
+        cur.execute(sql, [grid])
+        res = cur.fetchall()
+        for line in res:
+            #print("Free_LINE:", line)
+            # Add link which includes the scene text items and associated data, add links before text_items
+            from_item = None
+            to_item = None
+            for i in self.scene.items():
+                if isinstance(i, TextGraphicsItem):
+                    if from_item is None and i.code_or_cat['catid'] == line[0] and i.code_or_cat['cid'] == line[1]:
+                        from_item = i
+                    if to_item is None and i.code_or_cat['catid'] == line[2] and i.code_or_cat['cid'] == line[3]:
+                        to_item = i
+            #print(from_item, to_item)
+            if from_item is not None and to_item is not None:
+                item = LinkGraphicsItem(self.app, from_item, to_item, line[4], line[5], line[6], line[7])
+                self.scene.addItem(item)
+            if from_item is None:
+                err_msg += "\n" + _("Link line. No from item. ") + "Catid:" + str(line[0]) + " Cid:" + str(line[1])
+            if to_item is None:
+                err_msg += "\n" + _("Link line. No to item. ") + "Catid:" + str(line[2]) + " Cid:" + str(line[3])'''
+        return err_msg
 
     def load_case_text_graphics_items(self, grid):
         """ Load the case graphics items.
         param: grid : Integer
         """
 
+        err_msg = ""
         sql_case = "select x, y, caseid,font_size, color, bold from gr_case_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_case, [grid])
@@ -832,13 +890,15 @@ class ViewGraph(QDialog):
             if res_name is not None:
                 self.scene.addItem(CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
             else:
-                self.load_graph_error_msg += _("Case: ") + str(i[2]) + " "
+                err_msg += _("Case: ") + str(i[2]) + " "
+        return err_msg
 
     def load_file_text_graphics_items(self, grid):
         """ Load the file graphics items.
         param: grid : Integer
         """
 
+        err_msg = ""
         sql_file = "select x, y, fid, font_size, bold, color from gr_file_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_file, [grid])
@@ -849,25 +909,30 @@ class ViewGraph(QDialog):
             if res_name is not None:
                 self.scene.addItem(FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
             else:
-                self.load_graph_error_msg += _("File: ") + str(i[2]) + " "
+                err_msg += _("File: ") + str(i[2]) + " "
+        return err_msg
 
     def load_free_text_graphics_items(self, grid):
         """ Load the free text graphics items.
         param: grid : Integer
         """
 
+        err_msg = ""
         sql = "select x, y, free_text, font_size, color, bold from gr_free_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
+            #TODO check for duplicated text
             self.scene.addItem(FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5]))
+        return err_msg
 
     def load_code_or_cat_text_graphics_items(self, grid):
         """ Load the code or category graphics items.
         param: grid : Integer
         """
 
+        err_msg = ""
         sql_cdct = "select x, y, supercatid, catid, cid, font_size, bold, isvisible from gr_cdct_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_cdct, [grid])
@@ -877,7 +942,6 @@ class ViewGraph(QDialog):
             color = '#FFFFFF'  # Default / needed for category items
             memo = ""
             if i[4] is not None:
-                #print("cid", i[4])
                 cur.execute("select name, color, memo from code_name where cid=?", [i[4]])
                 res = cur.fetchone()
                 if res is not None:
@@ -885,19 +949,24 @@ class ViewGraph(QDialog):
                     color = res[1]
                     memo = res[2]
             else:
-                #print("catid", i[3])
                 cur.execute("select name, memo from code_cat where catid=?", [i[3]])
                 res = cur.fetchone()
                 if res is not None:
                     name = res[0]
                     memo = res[1]
                     color = '#FFFFFF'
-            if name != "":  # This code or category has been deleted
-                self.load_graph_error_msg += _("Code/Cat: ") + str(i[3]) + " " + str(i[4]) + " "
+            if name != "":
                 cdct = {'name': name, 'supercatid': i[2], 'catid': i[3], 'cid': i[4], 'x': i[0], 'y': i[1],
                         'color': color, 'memo': memo}
                 cdct['child_names'] = self.named_children_of_node(cdct)
                 self.scene.addItem(TextGraphicsItem(self.app, cdct, i[5], i[6], i[7]))
+            else:
+                # Code or category has been deleted
+                cdcat = _("Category")
+                if i[4] is not None:
+                    cdcat = _("Code")
+                err_msg += cdcat + _(" does not exist: ") + str(i[3]) + " " + str(i[4]) + " "
+        return err_msg
 
     def delete_saved_graph(self):
         """ Delete saved graph and its items.
@@ -1501,16 +1570,14 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
     color = QtCore.Qt.GlobalColor.gray
-    #corners_only = False  # True for list graph
     tooltip = ""
     remove = False
 
-    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2 ):  # , corners_only=False):
+    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2):
         super(FreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
-        #self.corners_only = corners_only
         self.line_width = line_width
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -1551,8 +1618,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.redraw()
         if action == thinner_action:
             self.line_width = self.line_width - 0.5
-            if self.line_width < 1:
-                self.line_width = 1
+            if self.line_width < 2:
+                self.line_width = 2
             self.redraw()
         if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
@@ -1778,6 +1845,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Takes the coordinate from the two TextGraphicsItems. """
 
+    app = None  # not used yet
     from_widget = None
     from_pos = None
     to_widget = None
@@ -1785,16 +1853,24 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
     color = QtCore.Qt.GlobalColor.gray
-    # corners_only = False  # True for list graph
     text = ""
 
-    def __init__(self, app, from_widget, to_widget, line_width=2, color=""): #corners_only=False):
+    def __init__(self, app, from_widget, to_widget, line_width=2, line_type="solid",
+                 color="", isvisible=True):
+        """ app is not used yet.
+        param: app  : the main App class
+         param: from_widget  : TextGraphicsItem
+         param: to_widget : TextGraphicsItem
+         param: line_width : Real
+         param: line_type : String
+         param: color : String
+         param: isvisible : boolean
+        """
         super(LinkGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
         self.text = from_widget.text + " - " + to_widget.text
-        #self.corners_only = corners_only
         self.line_width = line_width
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
@@ -1811,6 +1887,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.color = QtCore.Qt.GlobalColor.red
         if color == "yellow":
             self.color = QtCore.Qt.GlobalColor.yellow
+        if not isvisible:
+            self.hide()
+        self.line_type = QtCore.Qt.PenStyle.SolidLine
+        if line_type == "dotted":
+            self.line_type = QtCore.Qt.PenStyle.DotLine
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1836,8 +1917,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.redraw()
         if action == thinner_action:
             self.line_width = self.line_width - 0.5
-            if self.line_width < 1:
-                self.line_width = 1
+            if self.line_width < 2:
+                self.line_width = 2
             self.redraw()
         if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
@@ -1878,15 +1959,15 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        if True: #not self.corners_only:
-            # fix from_x value to middle of from widget if to_widget overlaps in x position
-            if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
-                from_x = from_x + self.from_widget.boundingRect().width() / 2
-                x_overlap = True
-            # fix to_x value to middle of to widget if from_widget overlaps in x position
-            if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
-                to_x = to_x + self.to_widget.boundingRect().width() / 2
-                x_overlap = True
+        #if True:
+        # Fix from_x value to middle of from widget if to_widget overlaps in x position
+        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+            from_x = from_x + self.from_widget.boundingRect().width() / 2
+            x_overlap = True
+        # Fix to_x value to middle of to widget if from_widget overlaps in x position
+        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+            to_x = to_x + self.to_widget.boundingRect().width() / 2
+            x_overlap = True
 
         # Fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
         if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
@@ -1896,15 +1977,15 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        if True: #not self.corners_only:
-            # Fix from_y value to middle of from widget if to_widget overlaps in y position
-            if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
-                from_y = from_y + self.from_widget.boundingRect().height() / 2
-                y_overlap = True
-            # Fix from_y value to middle of to widget if from_widget overlaps in y position
-            if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
-                to_y = to_y + self.to_widget.boundingRect().height() / 2
-                y_overlap = True
+        #if True:
+        # Fix from_y value to middle of from widget if to_widget overlaps in y position
+        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+            from_y = from_y + self.from_widget.boundingRect().height() / 2
+            y_overlap = True
+        # Fix from_y value to middle of to widget if from_widget overlaps in y position
+        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+            to_y = to_y + self.to_widget.boundingRect().height() / 2
+            y_overlap = True
 
         # Fix from_y value if to_widget is above the from_widget
         if not y_overlap and to_y > from_y:
