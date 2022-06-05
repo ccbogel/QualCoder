@@ -848,17 +848,23 @@ class ViewGraph(QDialog):
         Then when found add the line item. """
 
         err_msg = ""
-        sql = "select fromcatid,fromcid,tocatid,tocid,linewidth,linetype,color," \
-              "isvisible from gr_free_line_item where grid=?"
-        '''cur = self.app.conn.cursor()
+        sql = "select fromtext,fromcatid,fromcid,fromcaseid,fromfileid,totext,tocatid,tocid,tocaseid,tofileid," \
+              "color, linewidth,linetype from gr_free_line_item where grid=?"
+        cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
-        res = cur.fetchall()
+        result = cur.fetchall()
+        res = []
+        keys = "fromtext", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "totext", "tocatid", "tocid", \
+               "tocaseid", "tofileid", "color", "linewidth", "linetype"
+        for row in result:
+            res.append(dict(zip(keys, row)))
         for line in res:
-            #print("Free_LINE:", line)
+            print("Free_LINE:", line)
             # Add link which includes the scene text items and associated data, add links before text_items
             from_item = None
             to_item = None
-            for i in self.scene.items():
+            #TODO check for each text item type
+            '''for i in self.scene.items():
                 if isinstance(i, TextGraphicsItem):
                     if from_item is None and i.code_or_cat['catid'] == line[0] and i.code_or_cat['cid'] == line[1]:
                         from_item = i

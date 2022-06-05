@@ -1446,7 +1446,7 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
                     "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
                     "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
-                    "linewidth real, linetype text, caseid integer, fid integer);")
+                    "linewidth real, linetype text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1742,7 +1742,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
                         "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
                         "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
-                        "linewidth real, linetype text, caseid integer, fid integer);")
+                        "linewidth real, linetype text);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
