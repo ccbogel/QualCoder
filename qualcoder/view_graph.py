@@ -160,6 +160,11 @@ class ViewGraph(QDialog):
         """ Clear all items from scene.
         Called by pushButton_clear. """
 
+        msg = _("Are you sure you want to clear the graph?")
+        ui = DialogConfirmDelete(self.app, msg)
+        ok = ui.exec()
+        if not ok:
+            return
         self.scene.clear()
         self.scene.set_width(990)
         self.scene.set_height(650)
@@ -784,14 +789,13 @@ class ViewGraph(QDialog):
         names_list = []
         for r in res:
             names_list.append({'name': r[0], 'grid': r[1], 'description': r[2], 'width': r[3], 'height': r[4]})
-        ui = DialogSelectItems(self.app, names_list, _("Delete stored graphs"), "multi")
+        ui = DialogSelectItems(self.app, names_list, _("Load graph"), "single")
         ok = ui.exec()
         if not ok:
             return
-        selection = ui.get_selected()
-        if not selection:
+        graph = ui.get_selected()
+        if not graph:
             return
-        graph = selection[0]
         grid = graph['grid']
         self.scene.clear()
         self.scene.set_width(graph['width'])
@@ -1480,6 +1484,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font_size = 9
     color = ""
     bold = False
+    MAX_WIDTH = 300
+    MAX_HEIGHT = 300
 
     def __init__(self, app, x=10, y=10, text_="text", font_size=9, color="", bold=False):
         """ Free text object.
@@ -1519,6 +1525,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
         if self.color == "yellow":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if self.boundingRect().width() > self.MAX_WIDTH:
+            self.setTextWidth(self.MAX_WIDTH)
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
