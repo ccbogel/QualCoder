@@ -201,17 +201,15 @@ class ViewGraph(QDialog):
         codes = deepcopy(self.codes)
 
         for code_ in codes:
-            code_['depth'] = 0
+            #code_['depth'] = 0
             code_['x'] = None
             code_['y'] = None
             code_['supercatid'] = code_['catid']
-            code_['angle'] = None
         for cat in cats:
-            cat['depth'] = 0
+            #cat['depth'] = 0
             cat['x'] = None
             cat['y'] = None
             cat['cid'] = None
-            cat['angle'] = None
             cat['color'] = '#FFFFFF'
         model = cats + codes
         return cats, codes, model
@@ -238,28 +236,26 @@ class ViewGraph(QDialog):
                     top_node['supercatid'] = None  # Must set this to None
         model = self.get_refined_model(top_node, model)
 
-        # Look at each category and determine the depth.
-        # Also determine the number of children for each catid.
+        # Determine the number of children for each catid.
         supercatid_list = []
         for c in model:
-            depth = 0
+            #depth = 0
             supercatid = c['supercatid']
             supercatid_list.append(c['supercatid'])
             count = 0
             while not (supercatid is None or count > 10000):
                 for s in cats:
                     if supercatid == s['catid']:
-                        depth += 1
+                        #depth += 1
                         supercatid = s['supercatid']
-                c['depth'] = depth
+                #c['depth'] = depth
                 count += 1
-        # TODO is catid_counts used ?
+        # TODO  catid_counts not used
         catid_counts = Counter(supercatid_list)
         return model, catid_counts
 
     def get_refined_model(self, node, model):
         """ Return a refined model of this top node and all its children.
-        Maximum depth is 20.
         Called by: get_refined_model_with_category_counts
 
         param: node : Dictionary of category, or None
@@ -309,11 +305,11 @@ class ViewGraph(QDialog):
                     code['name'] = code['name'] + " "
 
         """ Create a list of this category (node) and all its category children.
-        Note, maximum depth of 100. """
+        Maximum depth of 200. """
         selected_categories = [node]
         i = 0  # Ensure an exit from loop
         new_model_changed = True
-        while categories != [] and new_model_changed and i < 100:
+        while categories != [] and new_model_changed and i < 200:
             new_model_changed = False
             append_list = []
             for n in selected_categories:
@@ -356,7 +352,7 @@ class ViewGraph(QDialog):
         for om in ordered_model:
             model.remove(om)
 
-        # sub-categories and codes
+        # Sub-categories and codes
         i = 0
         while i < 1000 and len(model) > 0:
             for om in ordered_model:
@@ -384,15 +380,16 @@ class ViewGraph(QDialog):
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, m))
 
-        # Add link which includes the scene text items and associated data, add links before text_items
+        # Add link which includes the scene text items and associated data
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
-                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
-                            n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                        item = LinkGraphicsItem(self.app, m, n, 1, True)
-                        self.scene.addItem(item)
+                            m.code_or_cat['supercatid'] == n.code_or_cat['catid']:
+                        # Do not link Code item to Code item, may occur when adding a parent branch to the graph
+                        if m.code_or_cat['cid'] is None or n.code_or_cat['cid'] is None:
+                            item = LinkGraphicsItem(self.app, m, n, 1, True)
+                            self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
         self.scene.set_width(max_x)
@@ -478,7 +475,7 @@ class ViewGraph(QDialog):
             self.add_cases_to_graph()
 
     def add_lines_to_graph(self):
-        """ Add one or more lines from an item to one or more destination items. """
+        """ Add one or more free lines from an item to one or more destination items. """
 
         # From item selection
         names = self.named_text_items()
@@ -519,7 +516,7 @@ class ViewGraph(QDialog):
         selected_color = ui.get_selected()
         color = selected_color['name']
 
-        # Create To Item lines
+        # Create Free Item lines
         for s in selected:
             text_to = s['name']
             to_item = None
@@ -845,7 +842,7 @@ class ViewGraph(QDialog):
     def load_free_line_graphics_items(self, grid):
         """ Find the to and from widgets.
         Several matching options: catid and cid; fileid; caseid; text (last option).
-        Then when found add the line item. """
+        Then when found add the free line item. """
 
         err_msg = ""
         sql = "select fromtext,fromcatid,fromcid,fromcaseid,fromfileid,totext,tocatid,tocid,tocaseid,tofileid," \
@@ -859,25 +856,47 @@ class ViewGraph(QDialog):
         for row in result:
             res.append(dict(zip(keys, row)))
         for line in res:
-            print("Free_LINE:", line)
             # Add link which includes the scene text items and associated data, add links before text_items
             from_item = None
             to_item = None
-            #TODO check for each text item type
-            '''for i in self.scene.items():
-                if isinstance(i, TextGraphicsItem):
-                    if from_item is None and i.code_or_cat['catid'] == line[0] and i.code_or_cat['cid'] == line[1]:
+            # Check for each text item type and try to get a mathing characteristic
+            for i in self.scene.items():
+                if from_item is None and line['fromcaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
+                    if i.case_id == line['fromcaseid']:
                         from_item = i
-                    if to_item is None and i.code_or_cat['catid'] == line[2] and i.code_or_cat['cid'] == line[3]:
+                if from_item is None and line['fromfileid'] is not None and isinstance(i, FileTextGraphicsItem):
+                    if i.file_id == line['fromfileid']:
+                        from_item = i
+                if from_item is None and (line['fromcatid'] is not None or line['fromcid'] is not None) \
+                        and isinstance(i, TextGraphicsItem):
+                    if i.code_or_cat['catid'] == line['fromcatid'] and i.code_or_cat['cid'] == line['fromcid']:
+                        from_item = i
+                if from_item is None and line['fromcaseid'] is None and line['fromfileid'] is None and \
+                        line['fromcatid'] is None and line['fromcid'] is None and isinstance(i, FreeTextGraphicsItem):
+                    if line['fromtext'] == i.text:
+                        from_item = i
+                if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
+                    if i.case_id == line['tocaseid']:
                         to_item = i
-            #print(from_item, to_item)
+                if to_item is None and line['tofileid'] is not None and isinstance(i, FileTextGraphicsItem):
+                    if i.file_id == line['tofileid']:
+                        to_item = i
+                if to_item is None and (line['tocatid'] is not None or line['tocid'] is not None) \
+                        and isinstance(i, TextGraphicsItem):
+                    if i.code_or_cat['catid'] == line['tocatid'] and i.code_or_cat['cid'] == line['tocid']:
+                        to_item = i
+                if to_item is None and line['tocaseid'] is None and line['tofileid'] is None and \
+                        line['tocatid'] is None and line['tocid'] is None and isinstance(i, FreeTextGraphicsItem):
+                    if line['totext'] == i.text:
+                        to_item = i
             if from_item is not None and to_item is not None:
-                item = LinkGraphicsItem(self.app, from_item, to_item, line[4], line[5], line[6], line[7])
-                self.scene.addItem(item)
+                line_item = FreeLineGraphicsItem(self.app, from_item, to_item, line['color'], line['linewidth'],
+                                                 line['linetype'])
+                self.scene.addItem(line_item)
             if from_item is None:
-                err_msg += "\n" + _("Link line. No from item. ") + "Catid:" + str(line[0]) + " Cid:" + str(line[1])
+                err_msg += "\n" + _("Link Line. No From item. ")
             if to_item is None:
-                err_msg += "\n" + _("Link line. No to item. ") + "Catid:" + str(line[2]) + " Cid:" + str(line[3])'''
+                err_msg += "\n" + _("Link line. No To item. ")
         return err_msg
 
     def load_case_text_graphics_items(self, grid):
@@ -948,22 +967,20 @@ class ViewGraph(QDialog):
             color = '#FFFFFF'  # Default / needed for category items
             memo = ""
             if i[4] is not None:
-                cur.execute("select name, color, memo from code_name where cid=?", [i[4]])
+                cur.execute("select name, color from code_name where cid=?", [i[4]])
                 res = cur.fetchone()
                 if res is not None:
                     name = res[0]
                     color = res[1]
-                    memo = res[2]
             else:
-                cur.execute("select name, memo from code_cat where catid=?", [i[3]])
+                cur.execute("select name from code_cat where catid=?", [i[3]])
                 res = cur.fetchone()
                 if res is not None:
                     name = res[0]
-                    memo = res[1]
                     color = '#FFFFFF'
             if name != "":
                 cdct = {'name': name, 'supercatid': i[2], 'catid': i[3], 'cid': i[4], 'x': i[0], 'y': i[1],
-                        'color': color, 'memo': memo}
+                        'color': color}
                 cdct['child_names'] = self.named_children_of_node(cdct)
                 self.scene.addItem(TextGraphicsItem(self.app, cdct, i[5], i[6], i[7]))
             else:
@@ -1579,7 +1596,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     tooltip = ""
     remove = False
 
-    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2):
+    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2, line_type="solid"):
         super(FreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
@@ -1601,6 +1618,9 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.color = QtCore.Qt.GlobalColor.magenta
         if color == "yellow":
             self.color = QtCore.Qt.GlobalColor.yellow
+        self.line_type = QtCore.Qt.PenStyle.SolidLine
+        if line_type == "dotted":
+            self.line_type = QtCore.Qt.PenStyle.DotLine
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1666,15 +1686,14 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        if True: #not self.corners_only:
-            # fix from_x value to middle of from widget if to_widget overlaps in x position
-            if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
-                from_x = from_x + self.from_widget.boundingRect().width() / 2
-                x_overlap = True
-            # fix to_x value to middle of to widget if from_widget overlaps in x position
-            if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
-                to_x = to_x + self.to_widget.boundingRect().width() / 2
-                x_overlap = True
+        # fix from_x value to middle of from widget if to_widget overlaps in x position
+        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+            from_x = from_x + self.from_widget.boundingRect().width() / 2
+            x_overlap = True
+        # fix to_x value to middle of to widget if from_widget overlaps in x position
+        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+            to_x = to_x + self.to_widget.boundingRect().width() / 2
+            x_overlap = True
 
         # Fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
         if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
@@ -1684,15 +1703,14 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        if True:  #not self.corners_only:
-            # Fix from_y value to middle of from widget if to_widget overlaps in y position
-            if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
-                from_y = from_y + self.from_widget.boundingRect().height() / 2
-                y_overlap = True
-            # Fix from_y value to middle of to widget if from_widget overlaps in y position
-            if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
-                to_y = to_y + self.to_widget.boundingRect().height() / 2
-                y_overlap = True
+        # Fix from_y value to middle of from widget if to_widget overlaps in y position
+        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+            from_y = from_y + self.from_widget.boundingRect().height() / 2
+            y_overlap = True
+        # Fix from_y value to middle of to widget if from_widget overlaps in y position
+        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+            to_y = to_y + self.to_widget.boundingRect().height() / 2
+            y_overlap = True
 
         # Fix from_y value if to_widget is above the from_widget
         if not y_overlap and to_y > from_y:
@@ -1751,6 +1769,21 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setPlainText(self.code_or_cat['name'])
         if not isvisible:
             self.hide()
+        cur = self.app.conn.cursor()
+        if self.code_or_cat['cid'] is not None:
+            cur.execute("select memo from code_name where name=?", [self.code_or_cat['name']])
+            res = cur.fetchone()
+            if res:
+                self.setToolTip(_("Code") + ": " + res[0])
+            else:
+                self.setToolTip(_("Code"))
+        else:
+            cur.execute("select memo from code_cat where name=?", [self.code_or_cat['name']])
+            res = cur.fetchone()
+            if res:
+                self.setToolTip(_("Category") + ": " + res[0])
+            else:
+                self.setToolTip(_("Category"))
 
     def paint(self, painter, option, widget):
         """  """
