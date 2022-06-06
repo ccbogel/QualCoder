@@ -140,6 +140,10 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_deletegraph.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_deletegraph.pressed.connect(self.delete_saved_graph)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.pushButton_codes_of_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_codes_of_file.pressed.connect(self.show_codes_of_file)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -478,6 +482,11 @@ class ViewGraph(QDialog):
             self.add_files_to_graph()
         if action == action_add_cases:
             self.add_cases_to_graph()
+
+    def show_codes_of_file(self):
+        """ Show selected codes of selected file in free text items. """
+
+        print("TODO show codes of files")
 
     def add_lines_to_graph(self):
         """ Add one or more free lines from an item to one or more destination items. """
