@@ -389,16 +389,25 @@ class ViewGraph(QDialog):
             if add_to_scene:
                 self.scene.addItem(TextGraphicsItem(self.app, m))
 
-        # Add link which includes the scene text items and associated data
+        # Add link from Category to Category, which includes the scene text items and associated data
         for m in self.scene.items():
             if isinstance(m, TextGraphicsItem):
                 for n in self.scene.items():
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
-                            m.code_or_cat['supercatid'] == n.code_or_cat['catid']:
-                        # Do not link Code item to Code item, may occur when adding a parent branch to the graph
-                        if m.code_or_cat['cid'] is None or n.code_or_cat['cid'] is None:
-                            item = LinkGraphicsItem(self.app, m, n, 1, True)
-                            self.scene.addItem(item)
+                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
+                            (m.code_or_cat['cid'] is None and n.code_or_cat['cid'] is None):
+                        item = LinkGraphicsItem(self.app, m, n, 1, True)
+                        self.scene.addItem(item)
+        # Add links from Codes to Categories
+        for m in self.scene.items():
+            if isinstance(m, TextGraphicsItem):
+                for n in self.scene.items():
+                    # Link the n Codes to m Categories
+                    if isinstance(n, TextGraphicsItem) and n.code_or_cat['cid'] is not None and \
+                            m.code_or_cat['cid'] is None and \
+                            m.code_or_cat['catid'] == n.code_or_cat['catid']:
+                        item = LinkGraphicsItem(self.app, m, n, 1, True)
+                        self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
         self.scene.set_width(max_x)
