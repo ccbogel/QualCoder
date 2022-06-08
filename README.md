@@ -32,6 +32,8 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
+py -m pip install --upgrade pip
+
 `py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
 
  Wait, until all modules are installed .
