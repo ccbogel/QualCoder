@@ -26,7 +26,6 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from collections import Counter
 from copy import deepcopy
 import datetime
 import logging
@@ -144,6 +143,9 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_codes_of_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_codes_of_file.pressed.connect(self.show_codes_of_file)
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
+        self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_memos_of_file.pressed.connect(self.show_memos_of_file)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -193,8 +195,7 @@ class ViewGraph(QDialog):
         else:
             node_text = selected[0]['name']
         cats, codes, model = self.create_initial_model()
-        # TODO catid_count is NOT used
-        model, catid_counts = self.get_refined_model_with_category_counts(cats, model, node_text)
+        model = self.get_refined_model_with_category_counts(cats, model, node_text)
         self.list_graph(model)
 
     def create_initial_model(self):
@@ -210,12 +211,10 @@ class ViewGraph(QDialog):
         codes = deepcopy(self.codes)
 
         for code_ in codes:
-            #code_['depth'] = 0
             code_['x'] = None
             code_['y'] = None
             code_['supercatid'] = code_['catid']
         for cat in cats:
-            #cat['depth'] = 0
             cat['x'] = None
             cat['y'] = None
             cat['cid'] = None
@@ -246,22 +245,19 @@ class ViewGraph(QDialog):
         model = self.get_refined_model(top_node, model)
 
         # Determine the number of children for each catid.
-        supercatid_list = []
+        # catcounts not used
+        '''supercatid_list = []
         for c in model:
-            #depth = 0
             supercatid = c['supercatid']
             supercatid_list.append(c['supercatid'])
             count = 0
             while not (supercatid is None or count > 10000):
                 for s in cats:
                     if supercatid == s['catid']:
-                        #depth += 1
                         supercatid = s['supercatid']
-                #c['depth'] = depth
                 count += 1
-        # TODO  catid_counts not used
-        catid_counts = Counter(supercatid_list)
-        return model, catid_counts
+        catid_counts = Counter(supercatid_list)'''
+        return model
 
     def get_refined_model(self, node, model):
         """ Return a refined model of this top node and all its children.
@@ -396,7 +392,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
                             m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
                             (m.code_or_cat['cid'] is None and n.code_or_cat['cid'] is None):
-                        item = LinkGraphicsItem(self.app, m, n, 1, True)
+                        item = LinkGraphicsItem(self.app, m, n, 2, True)
                         self.scene.addItem(item)
         # Add links from Codes to Categories
         for m in self.scene.items():
@@ -406,7 +402,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and n.code_or_cat['cid'] is not None and \
                             m.code_or_cat['cid'] is None and \
                             m.code_or_cat['catid'] == n.code_or_cat['catid']:
-                        item = LinkGraphicsItem(self.app, m, n, 1, True)
+                        item = LinkGraphicsItem(self.app, m, n, 2, True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
@@ -493,9 +489,104 @@ class ViewGraph(QDialog):
             self.add_cases_to_graph()
 
     def show_codes_of_file(self):
-        """ Show selected codes of selected file in free text items. """
+        """ Show selected codes of selected text file in free text items. """
 
-        print("TODO show codes of files")
+        # Select one file
+        files_wth_names = self.app.get_text_filenames()
+        ui = DialogSelectItems(self.app, files_wth_names, _("Select one text file"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_file = ui.get_selected()
+        # Select one code
+        code_names = self.app.get_code_names()
+        ui = DialogSelectItems(self.app, code_names, _("Select one code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_code = ui.get_selected()
+        # Select one or more codings, or coding memos
+        cur = self.app.conn.cursor()
+        sql = "select cid,fid,seltext,memo from code_text where cid=? and fid=?"
+        cur.execute(sql, [selected_code['cid'], selected_file['id']])
+        res = cur.fetchall()
+        codings = []
+        for r in res:
+            codings.append({'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3]})
+        ui = DialogSelectItems(self.app, codings, _("Select coded text"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codings = ui.get_selected()
+        color = self.color_selection()
+        x = 10
+        y = 10
+        for s in selected_codings:
+            x += 10
+            y += 10
+            freetextid = 1
+            for item in self.scene.items():
+                if isinstance(item, FreeTextGraphicsItem):
+                    if item.freetextid > freetextid:
+                        freetextid = item.freetextid + 1
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            msg = _("File: ") + selected_file['name'] + "\n" + _("Code: ") + selected_code['name']
+            if s['memo'] != "":
+                msg += "\n" + _("Memo: ") + s['memo']
+            item.setToolTip(msg)
+            self.scene.addItem(item)
+
+    def show_memos_of_file(self):
+        """ Show selected memos of coded segments of selected file in free text items. """
+
+        # Select one file
+        files_wth_names = self.app.get_filenames()
+        ui = DialogSelectItems(self.app, files_wth_names, _("Select one text file"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_file = ui.get_selected()
+        # Select one code
+        code_names = self.app.get_code_names()
+        ui = DialogSelectItems(self.app, code_names, _("Select one code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_code = ui.get_selected()
+        # Select one or more codings, or coding memos
+        print(selected_file)
+        print(selected_code)
+        cur = self.app.conn.cursor()
+        sql = 'select cid,fid,seltext,memo, "text" from code_text where cid=? and fid=? and memo !="" order by pos0 asc'
+        cur.execute(sql, [selected_code['cid'], selected_file['id']])
+        res = cur.fetchall()
+        codings = []
+        for r in res:
+            codings.append({'cid': r[0], 'fid': r[1], 'text': r[2], 'name': r[3], 'filetype': r[4]})
+        #TODO image and A/V memos
+        ui = DialogSelectItems(self.app, codings, _("Select coding memo"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_memos = ui.get_selected()
+        color = self.color_selection()
+        x = 10
+        y = 10
+        for s in selected_memos:
+            x += 10
+            y += 10
+            freetextid = 1
+            for item in self.scene.items():
+                if isinstance(item, FreeTextGraphicsItem):
+                    if item.freetextid > freetextid:
+                        freetextid = item.freetextid + 1
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            msg = _("File: ") + selected_file['name'] + "\n" + _("Code: ") + selected_code['name']
+            if s['text'] != "":
+                msg += "\n" + _("Coded: ") + s['text']
+            item.setToolTip(msg)
+            self.scene.addItem(item)
+
 
     def add_lines_to_graph(self):
         """ Add one or more free lines from an item to one or more destination items. """
@@ -526,18 +617,7 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         if not selected:
             return
-
-        # Line color selection
-        names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow")]
-        names_dict_list = []
-        for n in names:
-            names_dict_list.append({'name': n})
-        ui = DialogSelectItems(self.app, names_dict_list, _("Line colour"), "single")
-        ok = ui.exec()
-        if not ok:
-            return
-        selected_color = ui.get_selected()
-        color = selected_color['name']
+        color = self.color_selection()
 
         # Create Free Item lines
         for s in selected:
@@ -552,18 +632,41 @@ class ViewGraph(QDialog):
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
                 self.scene.addItem(line_item)
 
+    def color_selection(self):
+        """ Get a color for Free text items and Free lines.
+         Called by: add_lines_to_graph, show_codes, show_memos
+
+         return: color : String """
+
+        # Line color selection
+        names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange")]
+        names_dict_list = []
+        for n in names:
+            names_dict_list.append({'name': n})
+        ui = DialogSelectItems(self.app, names_dict_list, _("Line colour"), "single")
+        ok = ui.exec()
+        if not ok:
+            return ""
+        selected_color = ui.get_selected()
+        return selected_color['name']
+
     def add_text_item_to_graph(self, x=20, y=20):
         """ Add text item to graph. Ensure text is unique. """
 
+        freetextid = 1
+        for item in self.scene.items():
+            if isinstance(item, FreeTextGraphicsItem):
+                if item.freetextid > freetextid:
+                    freetextid = item.freetextid + 1
         text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
-        if ok and text_ not in self.named_text_items():
-            item = FreeTextGraphicsItem(self.app, x, y, text_)
+        if ok:
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, text_)
             self.scene.addItem(item)
 
     def named_text_items(self):
         """ Used to get a list of all named FreeText and Case and File graphics items.
          Use to allow links between these items based on the text name.
-         Called by: add_text_item_to_graph
+         Called by: add_lines_to_graph
 
          return: names : List of Strings
          """
@@ -686,37 +789,35 @@ class ViewGraph(QDialog):
         grid = cur.fetchone()[0]
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
-                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible) values (?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid,i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
-                                  i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible()])
+                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible,displaytext) " \
+                      "values (?,?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
+                                  i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
-                sql = "insert into gr_free_text_item (grid,x,y,free_text,font_size,bold,color) values (?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color])
+                sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color) " \
+                      "values (?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color])
                 self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
-                sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color) values (?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color])
+                sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
+                      "values (?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, FileTextGraphicsItem):
-                sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color) values (?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color])
+                sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color, displaytext) " \
+                      "values (?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, LinkGraphicsItem):
-                '''print("LinkGraphicsItem grid:", grid, "fromcatid", i.from_widget.code_or_cat['catid'],
-                      "fromcid", i.from_widget.code_or_cat['cid'], "tocatid", i.to_widget.code_or_cat['catid'],
-                      "tocid", i.to_widget.code_or_cat['cid'],
-                      "color", i.color, "width", i.line_width, "type", i.line_type, "isvisible", i.isVisible())'''
                 sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
                       "isvisible) values (?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
                                   i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                                  self.color_to_text(i.color), i.line_width, self.line_type_to_text(i.line_type),
+                                  i.color, i.line_width, self.line_type_to_text(i.line_type),
                                   i.isVisible()])
                 self.app.conn.commit()
-                
             if isinstance(i, FreeLineGraphicsItem):
-                print("Saving FreeLineGraphicsItem")
                 from_catid = None
                 try:
                     from_catid = i.from_widget.code_or_cat['catid']
@@ -747,6 +848,11 @@ class ViewGraph(QDialog):
                     from_file_id = i.from_widget.file_id
                 except AttributeError:
                     pass
+                from_freetextid = None
+                try:
+                    from_freetextid = i.from_widget.freetextid
+                except AttributeError:
+                    pass
                 to_case_id = None
                 try:
                     to_case_id = i.to_widget.case_id
@@ -757,34 +863,20 @@ class ViewGraph(QDialog):
                     to_file_id = i.to_widget.file_id
                 except AttributeError:
                     pass
+                to_freetextid = None
+                try:
+                    to_freetextid = i.to_widget.freetextid
+                except AttributeError:
+                    pass
                 """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
-                sql = "insert into gr_free_line_item (grid,fromtext,fromcatid,fromcid,fromcaseid,fromfileid, " \
-                      "totext,tocatid,tocid,tocaseid,tofileid,color, linewidth,linetype) " \
+                sql = "insert into gr_free_line_item (grid,fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid, " \
+                      "tofreetextid,tocatid,tocid,tocaseid,tofileid,color, linewidth,linetype) " \
                       "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.from_widget.text, from_catid, from_cid, from_case_id, from_file_id,
-                                  i.to_widget.text, to_catid, to_cid, to_case_id, to_file_id,
-                                  self.color_to_text(i.color), i.line_width, self.line_type_to_text(i.line_type)])
+                cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id,
+                                  to_freetextid, to_catid, to_cid, to_case_id, to_file_id,
+                                  i.color, i.line_width, self.line_type_to_text(i.line_type)])
                 self.app.conn.commit()
         self.app.delete_backup = False
-
-    def color_to_text(self, global_color):
-        """ Convert global color to text.
-        For graph_line_items. """
-
-        text_color = "gray"
-        if global_color == QtCore.Qt.GlobalColor.blue:
-            text_color = "blue"
-        if global_color == QtCore.Qt.GlobalColor.cyan:
-            text_color = "cyan"
-        if global_color == QtCore.Qt.GlobalColor.green:
-            text_color = "green"
-        if global_color == QtCore.Qt.GlobalColor.magenta:
-            text_color = "magenta"
-        if global_color == QtCore.Qt.GlobalColor.red:
-            text_color = "red"
-        if global_color == QtCore.Qt.GlobalColor.yellow:
-            text_color = "yellow"
-        return text_color
 
     def line_type_to_text(self, line_type):
         """ Convert line type to text. for graph line items. """
@@ -867,14 +959,14 @@ class ViewGraph(QDialog):
         Then when found add the free line item. """
 
         err_msg = ""
-        sql = "select fromtext,fromcatid,fromcid,fromcaseid,fromfileid,totext,tocatid,tocid,tocaseid,tofileid," \
+        sql = "select fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid,tofreetextid,tocatid,tocid,tocaseid,tofileid," \
               "color, linewidth,linetype from gr_free_line_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         result = cur.fetchall()
         res = []
-        keys = "fromtext", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "totext", "tocatid", "tocid", \
-               "tocaseid", "tofileid", "color", "linewidth", "linetype"
+        keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "tofreetextid", "tocatid", \
+               "tocid", "tocaseid", "tofileid", "color", "linewidth", "linetype"
         for row in result:
             res.append(dict(zip(keys, row)))
         for line in res:
@@ -893,9 +985,8 @@ class ViewGraph(QDialog):
                         and isinstance(i, TextGraphicsItem):
                     if i.code_or_cat['catid'] == line['fromcatid'] and i.code_or_cat['cid'] == line['fromcid']:
                         from_item = i
-                if from_item is None and line['fromcaseid'] is None and line['fromfileid'] is None and \
-                        line['fromcatid'] is None and line['fromcid'] is None and isinstance(i, FreeTextGraphicsItem):
-                    if line['fromtext'] == i.text:
+                if from_item is None and line['fromfreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
+                    if i.freetextid == line['fromfreetextid']:
                         from_item = i
                 if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
                     if i.case_id == line['tocaseid']:
@@ -907,10 +998,10 @@ class ViewGraph(QDialog):
                         and isinstance(i, TextGraphicsItem):
                     if i.code_or_cat['catid'] == line['tocatid'] and i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
-                if to_item is None and line['tocaseid'] is None and line['tofileid'] is None and \
-                        line['tocatid'] is None and line['tocid'] is None and isinstance(i, FreeTextGraphicsItem):
-                    if line['totext'] == i.text:
+                if to_item is None and line['tofreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
+                    if i.freetextid == line['tofreetextid']:
                         to_item = i
+
             if from_item is not None and to_item is not None:
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, line['color'], line['linewidth'],
                                                  line['linetype'])
@@ -927,15 +1018,15 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql_case = "select x, y, caseid,font_size, color, bold from gr_case_text_item where grid=?"
+        sql_case = "select x, y, caseid,font_size, color, bold, displaytext from gr_case_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_case, [grid])
-        res_case = cur.fetchall()
-        for i in res_case:
+        res = cur.fetchall()
+        for i in res:
             cur.execute("select name, memo from cases where caseid=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
-                self.scene.addItem(CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
+                self.scene.addItem(CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
             else:
                 err_msg += _("Case: ") + str(i[2]) + " "
         return err_msg
@@ -946,15 +1037,15 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql_file = "select x, y, fid, font_size, bold, color from gr_file_text_item where grid=?"
+        sql_file = "select x, y, fid, font_size, color, bold, displaytext from gr_file_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_file, [grid])
-        res_file = cur.fetchall()
-        for i in res_file:
+        res = cur.fetchall()
+        for i in res:
             cur.execute("select name, memo from source where id=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
-                self.scene.addItem(FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5]))
+                self.scene.addItem(FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
             else:
                 err_msg += _("File: ") + str(i[2]) + " "
         return err_msg
@@ -965,13 +1056,12 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select x, y, free_text, font_size, color, bold from gr_free_text_item where grid=?"
+        sql = "select freetextid, x, y, free_text, font_size, color, bold from gr_free_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            #TODO check for duplicated text
-            self.scene.addItem(FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5]))
+            self.scene.addItem(FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6]))
         return err_msg
 
     def load_code_or_cat_text_graphics_items(self, grid):
@@ -980,14 +1070,13 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql_cdct = "select x, y, supercatid, catid, cid, font_size, bold, isvisible from gr_cdct_text_item where grid=?"
+        sql_cdct = "select x, y, supercatid, catid, cid, font_size, bold, isvisible, displaytext from gr_cdct_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_cdct, [grid])
         res_cdct = cur.fetchall()
         for i in res_cdct:
             name = ""
             color = '#FFFFFF'  # Default / needed for category items
-            memo = ""
             if i[4] is not None:
                 cur.execute("select name, color from code_name where cid=?", [i[4]])
                 res = cur.fetchone()
@@ -1002,7 +1091,7 @@ class ViewGraph(QDialog):
                     color = '#FFFFFF'
             if name != "":
                 cdct = {'name': name, 'supercatid': i[2], 'catid': i[3], 'cid': i[4], 'x': i[0], 'y': i[1],
-                        'color': color}
+                        'color': color, 'displaytext': i[8]}
                 cdct['child_names'] = self.named_children_of_node(cdct)
                 self.scene.addItem(TextGraphicsItem(self.app, cdct, i[5], i[6], i[7]))
             else:
@@ -1183,13 +1272,14 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     text = ""
     show_attributes = False
     remove = False
+    case_name = ""
     # For graph item storage
     font_size = 9
     case_id = -1
-    color = ""
+    color = "gray"
     bold = False
 
-    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="", bold=False):
+    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="gray", bold=False, displaytext=""):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: case_name : String
@@ -1198,6 +1288,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         param: y : Integer
         param: color : String
         param: bold : boolean
+        param: displaytext : Integer
         """
 
         super(CaseTextGraphicsItem, self).__init__(None)
@@ -1207,7 +1298,11 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.case_id = case_id
-        self.text = case_name
+        self.case_name = case_name
+        self.text = displaytext
+        if displaytext == "":
+            self.text = case_name
+        self.setPlainText(self.text)
         self.font_size = font_size
         self.color = color
         self.bold = bold
@@ -1216,29 +1311,32 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
-        self.setPlainText(self.text)
         self.setPos(x, y)
         cur = self.app.conn.cursor()
         cur.execute("select memo from cases where caseid=?", [case_id])
         res = cur.fetchone()
         if res:
             self.setToolTip(_("Case") + ": " + res[0])
-        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-        if self.app.settings['stylesheet'] == 'dark':
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
-        if self.color == "red":
+        self.setDefaultTextColor(QtGui.QColor("#808080"))  # gray
+        if color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
-        if self.color == "green":
+        if color == "green":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
-        if self.color == "blue":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
-        if self.color == "yellow":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if color == "cyan":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+        if color == "magenta":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+        if color == "yellow":
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
+        if color == "blue":
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
+        if color == "orange":
+            self.setDefaultTextColor( QtGui.QColor("#FFA500"))
 
     def paint(self, painter, option, widget):
         """ """
@@ -1266,6 +1364,9 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
         blue_action = menu.addAction(_("Blue text"))
+        orange_action = menu.addAction(_("Orange text"))
+        cyan_action = menu.addAction(_("Cyan text"))
+        magenta_action = menu.addAction(_("Magenta text"))
         default_color_action = menu.addAction(_("Default colour text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
@@ -1297,16 +1398,23 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
             self.color = "green"
+        if action == magenta_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+            self.color = "magenta"
+        if action == cyan_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+            self.color = "cyan"
         if action == yellow_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
             self.color = "yellow"
         if action == blue_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
+            self.color = "blue"
+        if action == orange_action:
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))  # orange
             self.color = "blue"
         if action == default_color_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-            if self.app.settings['stylesheet'] == 'dark':
-                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+            self.setDefaultTextColor(QtGui.QColor("#808080"))
         if action == remove_action:
             self.remove = True
         if action == show_att_action:
@@ -1342,10 +1450,10 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     # For graph item storage
     file_id = -1
     font_size = 9
-    color = ""
+    color = "#808080"
     bold = False
 
-    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="", bold=False):
+    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="#808080", bold=False, displaytext=""):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: file_name : String
@@ -1363,15 +1471,19 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.file_id = file_id
-        self.text = file_name
+        self.file_name = file_name
+        self.text = displaytext
+        if displaytext == "":
+            self.text = file_name
         self.font_size = font_size
         self.color = color
+        self.bold = bold
         self.show_attributes = False
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
@@ -1383,17 +1495,21 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if res:
             self.setToolTip(_("File") + ": " + res[0])
         self.setPlainText(self.text)
-        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-        if self.app.settings['stylesheet'] == 'dark':
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+        self.setDefaultTextColor(QtGui.QColor("#808080"))
         if self.color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if self.color == "green":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
-        if self.color == "blue":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
-        if self.color == "yellow":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if color == "cyan":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+        if color == "magenta":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+        if color == "yellow":
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
+        if color == "blue":
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
+        if color == "orange":
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))  # orange
 
     def paint(self, painter, option, widget):
         """ """
@@ -1421,6 +1537,9 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
         blue_action = menu.addAction(_("Blue text"))
+        magenta_action = menu.addAction(_("Magenta text"))
+        cyan_action = menu.addAction(_("Cyan text"))
+        orange_action = menu.addAction(_("Orange text"))
         default_color_action = menu.addAction(_("Default colour text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
@@ -1460,16 +1579,24 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
             self.color = "green"
+        if action == cyan_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+            self.color = "cyan"
+        if action == magenta_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+            self.color = "magenta"
         if action == yellow_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
             self.color = "yellow"
         if action == blue_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
             self.color = "blue"
+        if action == orange_action:
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))
+            self.color = "orange"
         if action == default_color_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-            if self.app.settings['stylesheet'] == 'dark':
-                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+            self.setDefaultTextColor(QtGui.QColor("#808080"))
+            self.color = "gray"
         if action == show_att_action:
             self.setHtml(self.text + self.get_attributes())
             self.show_attributes = True
@@ -1498,19 +1625,21 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     settings = None
     remove = False
     # For graph item storage
+    freetextid = -1
     text = "text"
     font_size = 9
-    color = ""
+    color = "#808080"
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
 
-    def __init__(self, app, x=10, y=10, text_="text", font_size=9, color="", bold=False):
+    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="#808080", bold=False):
         """ Free text object.
          param:
             app  : the main App class
+            freetextid : Integer
             x : Integer x position
-            y : Intger y position
+            y : Integer y position
             text_ : String
             color : String
             bold : boolean
@@ -1518,6 +1647,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
+        self.freetextid = freetextid
         self.setPos(x, y)
         self.text = text_
         self.font_size = font_size
@@ -1529,20 +1659,27 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
+        if bold:
+            self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Bold))
         self.setPlainText(self.text)
-        self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-        if self.app.settings['stylesheet'] == 'dark':
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+        self.setDefaultTextColor(QtGui.QColor("#808080"))
         if self.color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if self.color == "green":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
-        if self.color == "blue":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
-        if self.color == "yellow":
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+        if self.color == "cyan":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+        if self.color == "magenta":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+        # www.w3.org/TR/SVG11/types.html  # ColorKeywords
+        if color == "yellow":
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
+        if color == "blue":
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
+        if color == "orange":
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))
         if self.boundingRect().width() > self.MAX_WIDTH:
             self.setTextWidth(self.MAX_WIDTH)
 
@@ -1556,8 +1693,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         green_action = menu.addAction(_("Green text"))
         yellow_action = menu.addAction(_("Yellow text"))
         blue_action = menu.addAction(_("Blue text"))
+        cyan_action = menu.addAction(_("Cyan text"))
+        magenta_action = menu.addAction(_("Magenta text"))
+        orange_action = menu.addAction(_("Orange text"))
         default_color_action = menu.addAction(_("Default colour text"))
-
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1591,16 +1730,24 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == green_action:
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.green)
             self.color = "green"
+        if action == cyan_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.cyan)
+            self.color = "cyan"
+        if action == magenta_action:
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.magenta)
+            self.color = "magenta"
         if action == yellow_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.yellow)
+            self.setDefaultTextColor(QtGui.QColor("#FFD700"))  # gold
             self.color = "yellow"
         if action == blue_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.blue)
+            self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
             self.color = "blue"
+        if action == orange_action:
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))
+            self.color = "orange"
         if action == default_color_action:
-            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
-            if self.app.settings['stylesheet'] == 'dark':
-                self.setDefaultTextColor(QtCore.Qt.GlobalColor.white)
+            self.setDefaultTextColor(QtGui.QColor("#808080"))
+            self.color = "gray"
 
     def paint(self, painter, option, widget=None):
         painter.save()
@@ -1618,7 +1765,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    color = QtCore.Qt.GlobalColor.gray
+    color = "gray"
     tooltip = ""
     remove = False
 
@@ -1631,19 +1778,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.remove = False
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.color = QtCore.Qt.GlobalColor.gray
-        if color == "red":
-            self.color = QtCore.Qt.GlobalColor.red
-        if color == "blue":
-            self.color = QtCore.Qt.GlobalColor.blue
-        if color == "green":
-            self.color = QtCore.Qt.GlobalColor.green
-        if color == "cyan":
-            self.color = QtCore.Qt.GlobalColor.cyan
-        if color == "magenta":
-            self.color = QtCore.Qt.GlobalColor.magenta
-        if color == "yellow":
-            self.color = QtCore.Qt.GlobalColor.yellow
+        self.color = color
         self.line_type = QtCore.Qt.PenStyle.SolidLine
         if line_type == "dotted":
             self.line_type = QtCore.Qt.PenStyle.DotLine
@@ -1659,6 +1794,8 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         blue_action = menu.addAction(_('Blue'))
         cyan_action = menu.addAction(_('Cyan'))
         magenta_action = menu.addAction(_('Magenta'))
+        orange_action = menu.addAction(_("Orange"))
+        gray_action = menu.addAction(_("Gray"))
         remove_action = menu.addAction(_('Remove'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
@@ -1677,22 +1814,28 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
         if action == red_action:
-            self.color = QtCore.Qt.GlobalColor.red
+            self.color = "red"
             self.redraw()
         if action == yellow_action:
-            self.color = QtCore.Qt.GlobalColor.yellow
+            self.color = "yellow"
             self.redraw()
         if action == green_action:
-            self.color = QtCore.Qt.GlobalColor.green
+            self.color = "green"
             self.redraw()
         if action == blue_action:
-            self.color = QtCore.Qt.GlobalColor.blue
+            self.color = "blue"
+            self.redraw()
+        if action == orange_action:
+            self.color = "orange"
             self.redraw()
         if action == cyan_action:
-            self.color = QtCore.Qt.GlobalColor.cyan
+            self.color = "cyan"
             self.redraw()
         if action == magenta_action:
-            self.color = QtCore.Qt.GlobalColor.magenta
+            self.color = "magenta"
+            self.redraw()
+        if action == gray_action:
+            self.color = "gray"
             self.redraw()
         if action == remove_action:
             self.remove = True
@@ -1744,8 +1887,22 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         # Fix to_y value if from_widget is below the to widget
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
-
-        self.setPen(QtGui.QPen(self.color, self.line_width, self.line_type))
+        color_obj = QtGui.QColor("#808080")  # gray
+        if self.color == "red":
+            color_obj = QtCore.Qt.GlobalColor.red
+        if self.color == "yellow":
+            color_obj = QtGui.QColor("#FFD700")  # gold
+        if self.color == "green":
+            color_obj = QtCore.Qt.GlobalColor.green
+        if self.color == "blue":
+            color_obj = QtGui.QColor("#6495ED")  # cornflower blue
+        if self.color == "orange":
+            color_obj = QtGui.QColor("#FFA500")
+        if self.color == "cyan":
+            color_obj = QtCore.Qt.GlobalColor.cyan
+        if self.color == "magenta":
+            color_obj = QtCore.Qt.GlobalColor.magenta
+        self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
 
 
@@ -1764,7 +1921,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     font_size = 9
     bold = False
 
-    def __init__(self, app, code_or_cat, font_size=9, bold=False, isvisible=True):
+    def __init__(self, app, code_or_cat, font_size=9, bold=False, isvisible=True, displayed_text=""):
         """ Show name and colour of text. Has context menu for various options.
          param: app  : the main App class
          param: code_or_cat  : Dictionary of the code details: name, memo, color etc
@@ -1782,11 +1939,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.font_size = font_size
         self.bold = bold
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
-        self.text = self.code_or_cat['name']
+        self.text = displayed_text
+        if self.text == "":
+            self.text = self.code_or_cat['name']
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
@@ -1795,11 +1954,16 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setPlainText(self.code_or_cat['name'])
         if not isvisible:
             self.hide()
+        self.code_or_cat['memo'] = ""
+        self.get_memo()
+
+    def get_memo(self):
         cur = self.app.conn.cursor()
         if self.code_or_cat['cid'] is not None:
             cur.execute("select memo from code_name where name=?", [self.code_or_cat['name']])
             res = cur.fetchone()
             if res:
+                self.code_or_cat['memo'] = res[0]
                 self.setToolTip(_("Code") + ": " + res[0])
             else:
                 self.setToolTip(_("Code"))
@@ -1807,6 +1971,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             cur.execute("select memo from code_cat where name=?", [self.code_or_cat['name']])
             res = cur.fetchone()
             if res:
+                self.code_or_cat['memo'] = res[0]
                 self.setToolTip(_("Category") + ": " + res[0])
             else:
                 self.setToolTip(_("Category"))
@@ -1867,6 +2032,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         if action == memo_action:
             self.add_edit_memo()
+            self.get_memo()
         if action == coded_action:
             self.coded_media()
         if action == case_action:
@@ -1917,11 +2083,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     to_pos = None
     line_width = 2
     line_type = QtCore.Qt.PenStyle.SolidLine
-    color = QtCore.Qt.GlobalColor.gray
     text = ""
+    color = "gray"
 
     def __init__(self, app, from_widget, to_widget, line_width=2, line_type="solid",
-                 color="", isvisible=True):
+                 color="gray", isvisible=True):
         """ app is not used yet.
         param: app  : the main App class
          param: from_widget  : TextGraphicsItem
@@ -1939,24 +2105,13 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.line_width = line_width
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
-        self.color = QtCore.Qt.GlobalColor.gray
-        if color == "blue":
-            self.color = QtCore.Qt.GlobalColor.blue
-        if color == "cyan":
-            self.color = QtCore.Qt.GlobalColor.cyan
-        if color == "green":
-            self.color = QtCore.Qt.GlobalColor.green
-        if color == "magenta":
-            self.color = QtCore.Qt.GlobalColor.magenta
-        if color == "red":
-            self.color = QtCore.Qt.GlobalColor.red
-        if color == "yellow":
-            self.color = QtCore.Qt.GlobalColor.yellow
+        self.color = color
         if not isvisible:
             self.hide()
         self.line_type = QtCore.Qt.PenStyle.SolidLine
         if line_type == "dotted":
             self.line_type = QtCore.Qt.PenStyle.DotLine
+        self.redraw()
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
@@ -1970,6 +2125,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         blue_action = menu.addAction(_('Blue'))
         cyan_action = menu.addAction(_('Cyan'))
         magenta_action = menu.addAction(_('Magenta'))
+        orange_action = menu.addAction(_("Orange"))
+        gray_action = menu.addAction(_("Gray"))
         hide_action = menu.addAction(_('Hide'))
 
         action = menu.exec(QtGui.QCursor.pos())
@@ -1979,35 +2136,32 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.line_width = self.line_width + 0.5
             if self.line_width > 5:
                 self.line_width = 5
-            self.redraw()
         if action == thinner_action:
             self.line_width = self.line_width - 0.5
             if self.line_width < 2:
                 self.line_width = 2
-            self.redraw()
         if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
-            self.redraw()
         if action == red_action:
-            self.color = QtCore.Qt.GlobalColor.red
-            self.redraw()
+            self.color = "red"
         if action == yellow_action:
-            self.color = QtCore.Qt.GlobalColor.yellow
-            self.redraw()
+            self.color = "yellow"
         if action == green_action:
-            self.color = QtCore.Qt.GlobalColor.green
-            self.redraw()
+            self.color = "green"
         if action == blue_action:
-            self.color = QtCore.Qt.GlobalColor.blue
-            self.redraw()
+            self.color = "blue"
+        if action == orange_action:
+            self.color = "orange"
         if action == cyan_action:
-            self.color = QtCore.Qt.GlobalColor.cyan
+            self.color = ".cyan"
             self.redraw()
         if action == magenta_action:
-            self.color = QtCore.Qt.GlobalColor.magenta
-            self.redraw()
+            self.color = "magenta"
+        if action == gray_action:
+            self.color = "gray"
         if action == hide_action:
             self.hide()
+        self.redraw()
 
     def redraw(self):
         """ Called from mouse move and release events. """
@@ -2024,7 +2178,6 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         from_y = self.from_widget.pos().y()
 
         x_overlap = False
-        #if True:
         # Fix from_x value to middle of from widget if to_widget overlaps in x position
         if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
             from_x = from_x + self.from_widget.boundingRect().width() / 2
@@ -2042,7 +2195,6 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_x = to_x + self.to_widget.boundingRect().width()
 
         y_overlap = False
-        #if True:
         # Fix from_y value to middle of from widget if to_widget overlaps in y position
         if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
             from_y = from_y + self.from_widget.boundingRect().height() / 2
@@ -2058,81 +2210,21 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         # Fix to_y value if from_widget is below the to widget
         elif not y_overlap and from_y > to_y:
             to_y = to_y + self.to_widget.boundingRect().height()
-
-        self.setPen(QtGui.QPen(self.color, self.line_width, self.line_type))
+        color_obj = QtGui.QColor("#808080")  # gray
+        if self.color == "red":
+            color_obj = QtCore.Qt.GlobalColor.red
+        if self.color == "yellow":
+            color_obj = QtGui.QColor("#FFD700")  # gold
+        if self.color == "green":
+            color_obj = QtCore.Qt.GlobalColor.green
+        if self.color == "blue":
+            color_obj = QtGui.QColor("#6495ED")  # cornflower blue
+        if self.color == "orange":
+            color_obj = QtGui.QColor("#FFA500")
+        if self.color == "cyan":
+            color_obj = QtCore.Qt.GlobalColor.cyan
+        if self.color == "magenta":
+            color_obj = QtCore.Qt.GlobalColor.magenta
+        self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
 
-
-'''def circular_graph(self):
-    """ Create a circular acyclic graph
-    """
-
-    self.scene.clear()
-    cats, codes, model = self.create_initial_model()
-    catid_counts, model = self.get_refined_model_with_depth_and_category_counts(cats, model)
-
-    # assign angles to each item segment
-    for cat_key in catid_counts.keys():
-        segment = 1
-        for m in model:
-            if m['angle'] is None and m['supercatid'] == cat_key:
-                m['angle'] = (2 * math.pi / catid_counts[m['supercatid']]) * (segment + 1)
-                segment += 1
-    # Calculate x y positions from central point outwards.
-    # The 'central' x value is towards the left side rather than true center, because
-    # the text boxes will draw to the right-hand side.
-    c_x = self.scene.get_width() / 3
-    c_y = self.scene.get_height() / 2
-    r = 220
-    rx_expander = c_x / c_y  # Screen is landscape, so stretch x position
-    x_is_none = True
-    i = 0
-    while x_is_none and i < 1000:
-        x_is_none = False
-        for m in model:
-            if m['x'] is None and m['supercatid'] is None:
-                m['x'] = c_x + (math.cos(m['angle']) * (r * rx_expander))
-                m['y'] = c_y + (math.sin(m['angle']) * r)
-            if m['x'] is None and m['supercatid'] is not None:
-                for super_m in model:
-                    if super_m['catid'] == m['supercatid'] and super_m['x'] is not None:
-                        m['x'] = super_m['x'] + (math.cos(m['angle']) * (r * rx_expander) / (m['depth'] + 2))
-                        m['y'] = super_m['y'] + (math.sin(m['angle']) * r / (m['depth'] + 2))
-                        if abs(super_m['x'] - m['x']) < 20 and abs(super_m['y'] - m['y']) < 20:
-                            m['x'] += 20
-                            m['y'] += 20
-            if m['x'] is None:
-                x_is_none = True
-        i += 1
-
-    # Fix out of view items
-    for m in model:
-        m['child_names'] = self.named_children_of_node(m)
-        if m['x'] < 2:
-            m['x'] = 2
-        if m['y'] < 2:
-            m['y'] = 2
-        if m['x'] > c_x * 2 - 20:
-            m['x'] = c_x * 2 - 20
-        if m['y'] > c_y * 2 - 20:
-            m['y'] = c_y * 2 - 20
-
-    # Add text items to the scene
-    for m in model:
-        self.scene.addItem(TextGraphicsItem(self.app, m))
-    # Add link which includes the scene text items and associated data, add links before text_items
-    for m in self.scene.items():
-        if isinstance(m, TextGraphicsItem):
-            for n in self.scene.items():
-                if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
-                        m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
-                        n.code_or_cat['depth'] < m.code_or_cat['depth']:
-                    item = LinkGraphicsItem(self.app, m, n, 1)
-                    self.scene.addItem(item)
-
-def show_graph_type(self):
-
-    if self.ui.checkBox_listview.isChecked():
-        self.list_graph()
-    else:
-        self.circular_graph()'''

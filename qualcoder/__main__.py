@@ -1433,20 +1433,21 @@ class MainWindow(QtWidgets.QMainWindow):
                     "date text, scene_width integer, scene_height integer, unique(name));")
         cur.execute("CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                     "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
-                    "isvisible integer);")
+                    "isvisible integer, displaytext text);")
         cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
-                    "y integer, caseid integer, font_size integer, bold integer, color text);")
+                    "y integer, caseid integer, font_size integer, bold integer, color text, displaytext text);")
         cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
-                    "y integer, fid integer, font_size integer, bold integer, color text);")
-        cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, x integer, "
-                    "y integer, free_text text, font_size integer, bold integer, color text);")
+                    "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
+        cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
+                    "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
+                    "tooltip text);")
         cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                     "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                     "linewidth real, linetype text, isvisible integer);")
-        cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
-                    "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
-                    "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
-                    "linewidth real, linetype text);")
+        cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
+                    "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
+                    "fromfileid integer, tofreetextid integer, tocatid integer, tocid integer, tocaseid integer, "
+                    "tofileid integer, color text, linewidth real, linetype text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1549,12 +1550,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not backup on a newly created project, as it wont contain data.
-        A backup is created if settings backuop is True.
-        The backup is deleted, if no changes occured.
+        A backup is created if settings backup is True.
+        The backup is deleted, if no changes.
         Backups are created using the date and 24 hour suffix: _BKUP_yyyymmdd_hh
         Backups are not replaced within the same hour.
         Update older databases to current version mainly by adding columns and tables.
-        Table constraints are not updated (code_text dupliated codings).
+        Table constraints are not updated (code_text duplicated codings).
         param:
             path: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
@@ -1729,20 +1730,21 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute(
                 "CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                 "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
-                "isvisible integer);")
+                "isvisible integer, displaytext text);")
             cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
-                        "y integer, caseid integer, font_size integer, bold integer, color text);")
+                        "y integer, caseid integer, font_size integer, bold integer, color text, displaytext text);")
             cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
-                        "y integer, fid integer, font_size integer, bold integer, color text);")
-            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, x integer, "
-                        "y integer, free_text text, font_size integer, bold integer, color text);")
+                        "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
+            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
+                        "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
+                        "tooltip text);")
             cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                         "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                         "linewidth real, linetype text, isvisible integer);")
-            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, fromtext text, "
-                        "fromcatid integer, fromcid integer, fromcaseid integer,fromfileid integer, "
-                        "totext text, tocatid integer, tocid integer, tocaseid integer, tofileid integer, color text, "
-                        "linewidth real, linetype text);")
+            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
+                        "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
+                        "fromfileid integer, tofreetextid integer, tocatid integer, tocid integer, tocaseid integer, "
+                        "tofileid integer, color text, linewidth real, linetype text);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
