@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>258</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -82,7 +82,7 @@
      <widget class="QPushButton" name="pushButton_savegraph">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>360</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -98,7 +98,7 @@
      <widget class="QPushButton" name="pushButton_loadgraph">
       <property name="geometry">
        <rect>
-        <x>362</x>
+        <x>392</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -114,7 +114,7 @@
      <widget class="QPushButton" name="pushButton_deletegraph">
       <property name="geometry">
        <rect>
-        <x>392</x>
+        <x>422</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -210,7 +210,7 @@
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>260</x>
+        <x>330</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -226,9 +226,9 @@
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>425</x>
+        <x>460</x>
         <y>4</y>
-        <width>561</width>
+        <width>541</width>
         <height>28</height>
        </rect>
       </property>
@@ -247,6 +247,22 @@
       </property>
       <property name="toolTip">
        <string>Show selected codes of selected file</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_memos_of_file">
+      <property name="geometry">
+       <rect>
+        <x>225</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show selected coding memos of selected file</string>
       </property>
       <property name="text">
        <string/>
