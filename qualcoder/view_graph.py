@@ -1446,7 +1446,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable) - not a good approach
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
@@ -1492,6 +1492,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
+        edit_action = menu.addAction((_("Edit text")))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
         bold_action = menu.addAction(_("Bold toggle"))
@@ -1558,6 +1559,11 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == hide_att_action:
             self.show_attributes = False
             self.setPlainText(self.text)
+        if action == edit_action:
+            ui = DialogMemo(self.app, _("Edit text"), self.text)
+            ui.exec()
+            self.text = ui.memo
+            self.setPlainText(self.text)
 
     def get_attributes(self):
         """ Get attributes for the file.  Add to text document. """
@@ -1618,7 +1624,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable) not a good approach
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
@@ -1665,6 +1671,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
         hide_att_action = None
+        edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
@@ -1738,6 +1745,11 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == hide_att_action:
             self.setPlainText(self.text)
             self.show_attributes = False
+        if action == edit_action:
+            ui = DialogMemo(self.app, _("Edit text"), self.text)
+            ui.exec()
+            self.text = ui.memo
+            self.setPlainText(self.text)
 
     def get_attributes(self):
         """ Get attributes for the file.  Add to text document. """
@@ -1794,7 +1806,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # Not a good way to edit text
+        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         if bold:
             self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Bold))
@@ -1820,6 +1833,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
+        edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
@@ -1883,6 +1897,11 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == gray_action:
             self.setDefaultTextColor(QtGui.QColor("#808080"))
             self.color = "gray"
+        if action == edit_action:
+            ui = DialogMemo(self.app, _("Edit text"), self.text)
+            ui.exec()
+            self.text = ui.memo
+            self.setPlainText(self.text)
 
     def paint(self, painter, option, widget=None):
         painter.save()
@@ -2095,7 +2114,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         else:
             scaler = scaler_h
         pixmap = QtGui.QPixmap().fromImage(image)
-        pixmap = pixmap.scaled(image.width() * scaler,image.height() * scaler)
+        pixmap = pixmap.scaled(int(image.width() * scaler), int(image.height() * scaler))
         self.setPixmap(pixmap)
         self.setPos(x, y)
         self.settings = app.settings
