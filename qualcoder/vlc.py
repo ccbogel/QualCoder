@@ -47,15 +47,14 @@ import sys
 import functools
 
 # Used by EventManager in override.py
-from inspect import getargspec, signature
-
+import inspect as _inspect
 import logging
 logger = logging.getLogger(__name__)
 
-__version__ = "3.0.12118"
-__libvlc_version__ = "3.0.12"
-__generator_version__ = "1.18"
-build_date  = "Tue Apr 20 20:46:07 2021 3.0.12"
+__version__ = "3.0.16120"
+__libvlc_version__ = "3.0.16"
+__generator_version__ = "1.20"
+build_date  = "Mon Feb 28 20:29:27 2022 3.0.16"
 
 # The libvlc doc states that filenames are expected to be in UTF8, do
 # not rely on sys.getfilesystemencoding() which will be confused,
@@ -83,6 +82,12 @@ if sys.version_info[0] > 2:
             return b.decode(DEFAULT_ENCODING)
         else:
             return b
+
+    def len_args(func):
+        """Return number of positional arguments.
+        """
+        return len(_inspect.signature(func).parameters)
+
 else:
     str = str
     unicode = unicode
@@ -104,6 +109,11 @@ else:
             return unicode(b, DEFAULT_ENCODING)
         else:
             return b
+
+    def len_args(func):
+        """Return number of positional arguments.
+        """
+        return len(_inspect.getargspec(func).args)
 
 # Internal guard to prevent internal classes to be directly
 # instanciated.
@@ -1621,6 +1631,7 @@ class AudioEqualizer(_Ctype):
         return libvlc_audio_equalizer_new()
 
 
+
     def release(self):
         '''Release a previously created equalizer instance.
         The equalizer was previously created by using L{new}() or
@@ -1719,7 +1730,7 @@ class EventManager(_Ctype):
         if not hasattr(callback, '__call__'):  # callable()
             raise VLCException("%s required: %r" % ('callable', callback))
          # check that the callback expects arguments
-        if not any(getargspec(callback)[:2]):  # list(...)
+        if len_args(callback) < 1:  # list(...)
             raise VLCException("%s required: %r" % ('argument', callback))
 
         if self._callback_handler is None:
@@ -1867,11 +1878,9 @@ class Instance(_Ctype):
         """
         # API 3 vs 4: libvlc_media_list_new does not take any
         # parameter as input anymore.
-        if len(signature(libvlc_media_list_new).parameters) == 1:
-            # API <= 3
+        if len_args(libvlc_media_list_new) == 1:  # API <= 3
             l = libvlc_media_list_new(self)
-        else:
-            # API >= 4
+        else:  # API >= 4
             l = libvlc_media_list_new()
         # We should take the lock, but since we did not leak the
         # reference, nobody else can access it.
@@ -3314,7 +3323,7 @@ class MediaPlayer(_Ctype):
         @version: LibVLC 3.0.0 and later.
         '''
         chapterDescription_pp = ctypes.POINTER(ChapterDescription)()
-        n = libvlc_media_player_get_full_chapter_descriptions(self, ctypes.byref(chapterDescription_pp))
+        n = libvlc_media_player_get_full_chapter_descriptions(self, i_chapters_of_title, ctypes.byref(chapterDescription_pp))
         info = ctypes.cast(chapterDescription_pp, ctypes.POINTER(ctypes.POINTER(ChapterDescription) * n))
         try:
             contents = info.contents
@@ -8562,7 +8571,8 @@ if __name__ == '__main__':
         # Instance() call above, see <http://www.videolan.org/doc/play-howto/en/ch04.html>
         player.video_set_marquee_int(VideoMarqueeOption.Enable, 1)
         player.video_set_marquee_int(VideoMarqueeOption.Size, 24)  # pixels
-        player.video_set_marquee_int(VideoMarqueeOption.Position, Position.Bottom)
+        # FIXME: This crashes the module - it should be investigated
+        # player.video_set_marquee_int(VideoMarqueeOption.Position, Position.bottom)
         if False:  # only one marquee can be specified
             player.video_set_marquee_int(VideoMarqueeOption.Timeout, 5000)  # millisec, 0==forever
             t = media.get_mrl()  # movie
