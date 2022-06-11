@@ -481,11 +481,17 @@ class ViewGraph(QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_add_text_item = menu.addAction(_("Insert Text"))
         action_add_line = menu.addAction(_("Insert Line"))
+        action_add_coded_text = menu.addAction(_("Insert coded text items"))
+        action_add_coded_image = menu.addAction(_("Insert coded image items"))
         action_add_files = menu.addAction(_("Show files"))
         action_add_cases = menu.addAction(_("Show cases"))
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
+        if action == action_add_coded_text:
+            self.show_codes_of_text_files(position.x(), position.y())
+        if action == action_add_coded_image:
+            self.show_codes_of_image_files(position.x(), position.y())
         if action == action_add_line:
             self.add_lines_to_graph()
         if action == action_add_files:
@@ -493,7 +499,7 @@ class ViewGraph(QDialog):
         if action == action_add_cases:
             self.add_cases_to_graph()
 
-    def show_codes_of_image_files(self):
+    def show_codes_of_image_files(self, x=10, y=10):
         """ Show selected codes of selected image files as pixmap graphics items. """
 
         # Select files
@@ -538,8 +544,6 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected_codings = ui.get_selected()
-        x = 10
-        y = 10
         pixid = 1
         for s in selected_codings:
             x += 10
@@ -555,7 +559,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_codes_of_text_files(self):
+    def show_codes_of_text_files(self, x=10, y=10):
         """ Show selected codes of selected text files as free text graphics items. """
 
         # Select files
@@ -592,8 +596,6 @@ class ViewGraph(QDialog):
             return
         selected_codings = ui.get_selected()
         color = self.color_selection()
-        x = 10
-        y = 10
         for s in selected_codings:
             x += 10
             y += 10
@@ -1411,10 +1413,10 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     # For graph item storage
     font_size = 9
     case_id = -1
-    color = "gray"
+    color = "black"
     bold = False
 
-    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="gray", bold=False, displaytext=""):
+    def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="black", bold=False, displaytext=""):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: case_name : String
@@ -1446,7 +1448,6 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable) - not a good approach
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
@@ -1458,6 +1459,8 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if res:
             self.setToolTip(_("Case") + ": " + res[0])
         self.setDefaultTextColor(QtGui.QColor("#808080"))  # gray
+        if color == "black":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if color == "green":
@@ -1471,12 +1474,17 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if color == "blue":
             self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
         if color == "orange":
-            self.setDefaultTextColor( QtGui.QColor("#FFA500"))
+            self.setDefaultTextColor(QtGui.QColor("#FFA500"))
+        if color == "gray":
+            self.setDefaultTextColor(QtGui.QColor("#808080"))
 
     def paint(self, painter, option, widget):
         """ """
 
         painter.save()
+        if self.color == "black":
+            color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
         super().paint(painter, option, widget)
@@ -1504,6 +1512,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cyan_action = menu.addAction(_("Cyan text"))
         magenta_action = menu.addAction(_("Magenta text"))
         gray_action = menu.addAction(_("Gray text"))
+        black_action = menu.addAction(_("Black text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1550,7 +1559,11 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setDefaultTextColor(QtGui.QColor("#FFA500"))  # orange
             self.color = "blue"
         if action == gray_action:
+            self.color = "gray"
             self.setDefaultTextColor(QtGui.QColor("#808080"))
+        if action == black_action:
+            self.color = "black"
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if action == remove_action:
             self.remove = True
         if action == show_att_action:
@@ -1591,10 +1604,10 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     # For graph item storage
     file_id = -1
     font_size = 9
-    color = "#808080"
+    color = "black"
     bold = False
 
-    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="#808080", bold=False, displaytext=""):
+    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="black", bold=False, displaytext=""):
         """ Show name and optionally attributes.
         param: app  : the main App class
         param: file_name : String
@@ -1624,7 +1637,6 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable) not a good approach
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
             fontweight = QtGui.QFont.Weight.Bold
@@ -1637,6 +1649,8 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setToolTip(_("File") + ": " + res[0])
         self.setPlainText(self.text)
         self.setDefaultTextColor(QtGui.QColor("#808080"))
+        if color == "black":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if self.color == "green":
@@ -1651,11 +1665,16 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
         if color == "orange":
             self.setDefaultTextColor(QtGui.QColor("#FFA500"))  # orange
+        if color == "gray":
+            self.setDefaultTextColor(QtGui.QColor("#808080"))  # orange
 
     def paint(self, painter, option, widget):
         """ """
 
         painter.save()
+        if self.color == "black":
+            color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
         super().paint(painter, option, widget)
@@ -1683,6 +1702,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cyan_action = menu.addAction(_("Cyan text"))
         orange_action = menu.addAction(_("Orange text"))
         gray_action = menu.addAction(_("Gray text"))
+        black_action = menu.addAction(_("Black text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1739,6 +1759,9 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == gray_action:
             self.setDefaultTextColor(QtGui.QColor("#808080"))
             self.color = "gray"
+        if action == black_action:
+            self.color = "black"
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if action == show_att_action:
             self.setHtml(self.text + self.get_attributes())
             self.show_attributes = True
@@ -1775,12 +1798,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     freetextid = -1
     text = "text"
     font_size = 9
-    color = "#808080"
+    color = "black"
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
 
-    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="#808080", bold=False):
+    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False):
         """ Free text object.
          param:
             app  : the main App class
@@ -1806,13 +1829,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # Not a good way to edit text
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Normal))
         if bold:
             self.setFont(QtGui.QFont(self.settings['font'], self.font_size, QtGui.QFont.Weight.Bold))
         self.setPlainText(self.text)
         self.setDefaultTextColor(QtGui.QColor("#808080"))
+        if color == "black":
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if self.color == "red":
             self.setDefaultTextColor(QtCore.Qt.GlobalColor.red)
         if self.color == "green":
@@ -1828,6 +1851,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setDefaultTextColor(QtGui.QColor("#6495ED"))  # cornflowerblue
         if color == "orange":
             self.setDefaultTextColor(QtGui.QColor("#FFA500"))
+        if color == "gray":
+            self.setDefaultTextColor( QtGui.QColor("#808080"))
         if self.boundingRect().width() > self.MAX_WIDTH:
             self.setTextWidth(self.MAX_WIDTH)
 
@@ -1845,7 +1870,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cyan_action = menu.addAction(_("Cyan text"))
         magenta_action = menu.addAction(_("Magenta text"))
         orange_action = menu.addAction(_("Orange text"))
-        gray_action = menu.addAction(_("Default colour text"))
+        gray_action = menu.addAction(_("Gray text"))
+        black_action = menu.addAction(_("Black text"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1897,6 +1923,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == gray_action:
             self.setDefaultTextColor(QtGui.QColor("#808080"))
             self.color = "gray"
+        if action == black_action:
+            self.color = "black"
+            self.setDefaultTextColor(QtCore.Qt.GlobalColor.black)
         if action == edit_action:
             ui = DialogMemo(self.app, _("Edit text"), self.text)
             ui.exec()
@@ -1905,6 +1934,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def paint(self, painter, option, widget=None):
         painter.save()
+        if self.color == "black":
+            color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
         super().paint(painter, option, widget)
@@ -1936,6 +1968,23 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.line_type = QtCore.Qt.PenStyle.SolidLine
         if line_type == "dotted":
             self.line_type = QtCore.Qt.PenStyle.DotLine
+        color_obj = QtGui.QColor("#808080")  # gray
+        if self.color == "red":
+            color_obj = QtCore.Qt.GlobalColor.red
+        if self.color == "green":
+            color_obj = QtCore.Qt.GlobalColor.green
+        if self.color == "cyan":
+            color_obj = QtCore.Qt.GlobalColor.cyan
+        if self.color == "magenta":
+            color_obj = QtCore.Qt.GlobalColor.magenta
+        # www.w3.org/TR/SVG11/types.html  # ColorKeywords
+        if color == "yellow":
+            color_obj = QtGui.QColor("#FFD700")  # gold
+        if color == "blue":
+            color_obj = QtGui.QColor("#6495ED") # cornflowerblue
+        if color == "orange":
+            color_obj = QtGui.QColor("#FFA500")
+        self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
