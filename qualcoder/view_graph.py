@@ -76,6 +76,7 @@ class ViewGraph(QDialog):
     categories = []
     codes = []
     font_size = 9
+    load_graph_menu_option = "Alphabet ascending"
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -130,6 +131,8 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_up_icon), "png")
         self.ui.pushButton_loadgraph.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_loadgraph.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.pushButton_loadgraph.customContextMenuRequested.connect(self.load_graph_menu)
         self.ui.pushButton_loadgraph.pressed.connect(self.load_graph)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_down_icon), "png")
@@ -994,6 +997,28 @@ class ViewGraph(QDialog):
             text_ = "dotted"
         return text_
 
+    def load_graph_menu(self):
+        """ Menu on load graph button to choose load order of graph names. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size: 9pt} ")
+        alphabet_asc_action = menu.addAction((_("Alphabet ascending")))
+        alphabet_desc_action = menu.addAction((_("Alphabet descending")))
+        date_asc_action = menu.addAction((_("Oldest to newest")))
+        date_desc_action = menu.addAction((_("Newest to oldest")))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == alphabet_asc_action:
+            self.load_graph_menu_option = _("Alphabet ascending")
+        if action == alphabet_desc_action:
+            self.load_graph_menu_option = _("Alphabet descending")
+        if action == date_desc_action:
+            self.load_graph_menu_option = _("Oldest to newest")
+        if action == date_asc_action:
+            self.load_graph_menu_option = _("Newest to oldest")
+        self.ui.pushButton_loadgraph.setToolTip(_("Load graph") + "\n" + self.load_graph_menu_option)
+
     def load_graph(self):
         """ Load a saved graph.
         Load each text component first then link then the cdct_line_items then the free_lines_items.
@@ -1002,7 +1027,14 @@ class ViewGraph(QDialog):
         """
 
         cur = self.app.conn.cursor()
-        cur.execute("select name, grid, description, scene_width, scene_height from graph order by upper(name)")
+        sql = "select name, grid, description, scene_width, scene_height from graph order by upper(name) asc"
+        if self.load_graph_menu_option == "Alphabet descending":
+            sql = "select name, grid, description, scene_width, scene_height from graph order by upper(name) desc"
+        if self.load_graph_menu_option == "Oldest to newest":
+            sql = "select name, grid, description, scene_width, scene_height from graph order by date desc"
+        if self.load_graph_menu_option == "Newest to oldest":
+            sql = "select name, grid, description, scene_width, scene_height from graph order by date asc"
+        cur.execute(sql)
         res = cur.fetchall()
         names_list = []
         for r in res:
