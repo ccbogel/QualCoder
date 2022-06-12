@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>350</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_reveal">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>320</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -82,7 +82,7 @@
      <widget class="QPushButton" name="pushButton_savegraph">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>420</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -98,7 +98,7 @@
      <widget class="QPushButton" name="pushButton_loadgraph">
       <property name="geometry">
        <rect>
-        <x>422</x>
+        <x>452</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -115,7 +115,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_deletegraph">
       <property name="geometry">
        <rect>
-        <x>452</x>
+        <x>482</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -211,7 +211,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>390</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -227,9 +227,9 @@ Right-click for options</string>
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>490</x>
+        <x>520</x>
         <y>4</y>
-        <width>511</width>
+        <width>481</width>
         <height>28</height>
        </rect>
       </property>
@@ -256,7 +256,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_memos_of_file">
       <property name="geometry">
        <rect>
-        <x>257</x>
+        <x>287</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -280,6 +280,22 @@ Right-click for options</string>
       </property>
       <property name="toolTip">
        <string>Show coded areas of image files</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_codes_of_av">
+      <property name="geometry">
+       <rect>
+        <x>256</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Show coded av segments</string>
       </property>
       <property name="text">
        <string/>
