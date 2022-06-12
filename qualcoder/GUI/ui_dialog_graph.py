@@ -101,7 +101,8 @@ class Ui_DialogGraph(object):
         self.label_zoom.setToolTip(_translate("DialogGraph", "Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out."))
         self.pushButton_reveal.setToolTip(_translate("DialogGraph", "Reveal hidden items"))
         self.pushButton_savegraph.setToolTip(_translate("DialogGraph", "Save graph"))
-        self.pushButton_loadgraph.setToolTip(_translate("DialogGraph", "Load graph"))
+        self.pushButton_loadgraph.setToolTip(_translate("DialogGraph", "Load graph\n"
+"Right-click for options"))
         self.pushButton_deletegraph.setToolTip(_translate("DialogGraph", "Delete graph"))
         self.pushButton_freetextitem.setToolTip(_translate("DialogGraph", "Add free text item"))
         self.pushButton_addcase.setToolTip(_translate("DialogGraph", "Add case items"))
