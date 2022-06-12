@@ -41,7 +41,7 @@ from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
-from .helpers import DialogCodeInImage, DialogCodeInAllFiles, ExportDirectoryPathDialog, Message
+from .helpers import DialogCodeInImage, DialogCodeInAllFiles, DialogCodeInText, ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .save_sql_query import DialogSaveSql
 from .select_items import DialogSelectItems
@@ -593,12 +593,12 @@ class ViewGraph(QDialog):
         cur = self.app.conn.cursor()
         for file_ in selected_files:
             for code in selected_codes:
-                sql = "select cid,fid,seltext,memo from code_text where cid=? and fid=?"
+                sql = "select cid,fid,seltext,memo, ctid from code_text where cid=? and fid=?"
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
                     codings.append({'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3], 'filename': file_['name'],
-                                    'codename': code['name']})
+                                    'codename': code['name'], 'ctid': r[4]})
         if not codings:
             Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
             return
@@ -617,6 +617,7 @@ class ViewGraph(QDialog):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            item.ctid = s['ctid']
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['memo'] != "":
                 msg += "\n" + _("Memo: ") + s['memo']
@@ -643,12 +644,12 @@ class ViewGraph(QDialog):
         cur = self.app.conn.cursor()
         for file_ in selected_files:
             for code in selected_codes:
-                sql = 'select cid,fid,seltext,memo from code_text where cid=? and fid=? and memo !="" order by pos0 asc'
+                sql = 'select cid,fid,seltext,memo,ctid from code_text where cid=? and fid=? and memo !="" order by pos0 asc'
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
-                                  'codename': code['name'], 'filename': file_['name']})
+                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4]})
                 sql_img = 'select cid,id,x1,y1,width,height,memo from code_image where cid=? and id=? and memo !=""'
                 cur.execute(sql_img, [code['cid'], file_['id']])
                 res_img = cur.fetchall()
@@ -753,7 +754,7 @@ class ViewGraph(QDialog):
         return selected_color['name']
 
     def add_text_item_to_graph(self, x=20, y=20):
-        """ Add text item to graph. Ensure text is unique. """
+        """ Add text item to graph. """
 
         freetextid = 1
         for item in self.scene.items():
@@ -1784,6 +1785,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     # For graph item storage
     freetextid = -1
     text = "text"
+    ctid = -1  # Used for a coded text display to show code in context
     font_size = 9
     color = "black"
     bold = False
@@ -1813,6 +1815,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.remove = False
+        self.ctid = -1
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -1827,6 +1830,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         edit_action = menu.addAction(_("Edit text"))
+        context_action = None
+        if self.ctid != -1:
+            context_action = menu.addAction(_("Code in context"))
         bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
@@ -1843,6 +1849,22 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == context_action:
+            '''{codename, color, file_or_casename, x1, y1, width, height, coder,
+             mediapath, fid, memo, file_or_case}'''
+            cur = self.app.conn.cursor()
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_text.owner,code_text.memo,"
+                        "pos0, pos1, source.name, source.id "
+                        "from code_text join code_name on code_name.cid=code_text.cid join source on "
+                        "source.id=code_text.fid where code_text.ctid=?",
+                        [self.ctid])
+            res = cur.fetchone()
+            if res is None:
+                Message(self.app, _("Error"), _("Cannot find text coding in database")).exec()
+                return
+            data = {'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4],
+                    'pos0': res[5], 'pos1': res[6], 'file_or_casename':res[7], 'fid': res[8], 'file_or_case': 'file'}
+            DialogCodeInText(self.app, data).exec()
         if action == remove_action:
             self.remove = True
         if action == bold_action:
@@ -2129,8 +2151,6 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                         [self.imid])
             res = cur.fetchone()
             if res is None:
-                print("imid", self.imid)
-                print("=========")
                 Message(self.app, _("Error"), _("Cannot find image coding in database")).exec()
                 return
             data = {'x1': self.px, 'y1': self.py, 'width': self.pwidth, 'height': self.pheight,

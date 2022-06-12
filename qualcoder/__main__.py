@@ -1440,7 +1440,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
         cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
                     "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
-                    "tooltip text);")
+                    "tooltip text, ctid integer);")
         cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                     "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                     "linewidth real, linetype text, isvisible integer);")
@@ -1742,7 +1742,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
             cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
                         "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
-                        "tooltip text);")
+                        "tooltip text, ctid integer);")
             cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                         "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                         "linewidth real, linetype text, isvisible integer);")
