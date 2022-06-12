@@ -57,7 +57,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Click on the graph area and press + or - to zoom in or zoom out.</string>
+       <string>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</string>
       </property>
       <property name="text">
        <string/>
@@ -233,7 +233,7 @@
        </rect>
       </property>
       <property name="text">
-       <string/>
+       <string>Changing to another report will clear an unsaved graph.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_codes_of_text">
@@ -262,7 +262,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Show selected coding memos of selected file</string>
+       <string>Show coding memos of coded segments</string>
       </property>
       <property name="text">
        <string/>
