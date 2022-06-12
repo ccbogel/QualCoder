@@ -1450,7 +1450,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     "tocaseid integer, tofileid integer, topixid integer, color text, linewidth real, linetype text);")
         cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, pixid integer,"
                     "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
-                    "tooltip text);")
+                    "tooltip text, imid integer);")
+        cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avitemid integer,"
+                    "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, avid integer);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1750,7 +1752,9 @@ class MainWindow(QtWidgets.QMainWindow):
                         "tocaseid integer, tofileid integer, topixid integer, color text, linewidth real, linetype text);")
             cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, pixid integer,"
                         "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
-                        "tooltip text);")
+                        "tooltip text, imid integer);")
+            cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avitemid integer,"
+                        "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, avid integer);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
