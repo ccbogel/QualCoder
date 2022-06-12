@@ -70,7 +70,6 @@ class Ui_DialogGraph(object):
         self.pushButton_clear.setObjectName("pushButton_clear")
         self.label_loaded_graph = QtWidgets.QLabel(self.groupBox_header)
         self.label_loaded_graph.setGeometry(QtCore.QRect(490, 4, 511, 28))
-        self.label_loaded_graph.setText("")
         self.label_loaded_graph.setObjectName("label_loaded_graph")
         self.pushButton_codes_of_text = QtWidgets.QPushButton(self.groupBox_header)
         self.pushButton_codes_of_text.setGeometry(QtCore.QRect(193, 3, 28, 28))
@@ -99,7 +98,7 @@ class Ui_DialogGraph(object):
         _translate = QtCore.QCoreApplication.translate
         DialogGraph.setWindowTitle(_translate("DialogGraph", "Graph Visualisation"))
         self.pushButton_export.setToolTip(_translate("DialogGraph", "Export image"))
-        self.label_zoom.setToolTip(_translate("DialogGraph", "Click on the graph area and press + or - to zoom in or zoom out."))
+        self.label_zoom.setToolTip(_translate("DialogGraph", "Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out."))
         self.pushButton_reveal.setToolTip(_translate("DialogGraph", "Reveal hidden items"))
         self.pushButton_savegraph.setToolTip(_translate("DialogGraph", "Save graph"))
         self.pushButton_loadgraph.setToolTip(_translate("DialogGraph", "Load graph"))
@@ -110,8 +109,9 @@ class Ui_DialogGraph(object):
         self.pushButton_addline.setToolTip(_translate("DialogGraph", "Add connecting line"))
         self.pushButton_selectbranch.setToolTip(_translate("DialogGraph", "Select code branch"))
         self.pushButton_clear.setToolTip(_translate("DialogGraph", "Clear"))
+        self.label_loaded_graph.setText(_translate("DialogGraph", "Changing to another report will clear an unsaved graph."))
         self.pushButton_codes_of_text.setToolTip(_translate("DialogGraph", "Show coded segments of text files"))
-        self.pushButton_memos_of_file.setToolTip(_translate("DialogGraph", "Show selected coding memos of selected file"))
+        self.pushButton_memos_of_file.setToolTip(_translate("DialogGraph", "Show coding memos of coded segments"))
         self.pushButton_codes_of_images.setToolTip(_translate("DialogGraph", "Show coded areas of image files"))
 
 
