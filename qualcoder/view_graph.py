@@ -616,7 +616,7 @@ class ViewGraph(QDialog):
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
             item.ctid = s['ctid']
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['memo'] != "":
@@ -893,16 +893,17 @@ class ViewGraph(QDialog):
         grid = cur.fetchone()[0]
         for i in self.scene.items():
             if isinstance(i, TextGraphicsItem):
-                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible,displaytext) " \
-                      "values (?,?,?,?,?,?,?,?,?,?)"
+                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible," \
+                      "displaytext) values (?,?,?,?,?,?,?,?,?,?)"
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
                                   i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
-                sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip) " \
-                      "values (?,?,?,?,?,?,?,?,?)"
+                sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
+                      "ctid) values (?,?,?,?,?,?,?,?,?,?)"
                 tt = i.toolTip()
-                cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color, tt])
+                cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
+                                  tt, i.ctid])
                 self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
                 sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
@@ -915,8 +916,10 @@ class ViewGraph(QDialog):
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, PixmapGraphicsItem):
-                sql = "insert into gr_pix_item (grid,pixid,x,y,px,py,w,h,filepath,tooltip, imid) values (?,?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pixid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_, i.toolTip(), i.imid])
+                sql = "insert into gr_pix_item (grid,pixid,x,y,px,py,w,h,filepath,tooltip, imid) values " \
+                      "(?,?,?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.pixid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
+                                  i.toolTip(), i.imid])
                 self.app.conn.commit()
             if isinstance(i, LinkGraphicsItem):
                 sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
@@ -1210,12 +1213,13 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select freetextid, x, y, free_text, font_size, color, bold, tooltip from gr_free_text_item where grid=?"
+        sql = "select freetextid, x, y, free_text, font_size, color, bold, tooltip, ctid from gr_free_text_item " \
+              "where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6])
+            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8])
             if i[7] != "":
                 item.setToolTip(i[7])
             self.scene.addItem(item)
@@ -1310,6 +1314,8 @@ class ViewGraph(QDialog):
             cur.execute("delete from gr_free_text_item where grid = ?", [s['grid']])
             cur.execute("delete from gr_cdct_line_item where grid = ?", [s['grid']])
             cur.execute("delete from gr_cdct_text_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_pix_item where grid = ?", [s['grid']])
+            cur.execute("delete from gr_av_item where grid = ?", [s['grid']])
             self.app.conn.commit()
         self.app.delete_backup = False
 
@@ -1792,7 +1798,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
 
-    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False):
+    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1):
         """ Free text object.
          param:
             app  : the main App class
@@ -1802,6 +1808,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             text_ : String
             color : String
             bold : boolean
+            ctid : Integer : code_text identifier for coded file and memo segments
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
@@ -1815,7 +1822,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.settings = app.settings
         self.project_path = app.project_path
         self.remove = False
-        self.ctid = -1
+        self.ctid = ctid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -1850,8 +1857,6 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action is None:
             return
         if action == context_action:
-            '''{codename, color, file_or_casename, x1, y1, width, height, coder,
-             mediapath, fid, memo, file_or_case}'''
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_text.owner,code_text.memo,"
                         "pos0, pos1, source.name, source.id "
@@ -1863,7 +1868,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 Message(self.app, _("Error"), _("Cannot find text coding in database")).exec()
                 return
             data = {'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4],
-                    'pos0': res[5], 'pos1': res[6], 'file_or_casename':res[7], 'fid': res[8], 'file_or_case': 'file'}
+                    'pos0': res[5], 'pos1': res[6], 'file_or_casename': res[7], 'fid': res[8], 'file_or_case': 'File'}
             DialogCodeInText(self.app, data).exec()
         if action == remove_action:
             self.remove = True
@@ -1918,7 +1923,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def paint(self, painter, option, widget=None):
         painter.save()
-        if self.color == "black":
+        if self.color in("black", "gray"):
             color = QtGui.QColor("#fafafa")
             painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
