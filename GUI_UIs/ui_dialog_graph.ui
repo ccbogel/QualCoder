@@ -105,7 +105,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Load graph</string>
+       <string>Load graph
+Right-click for options</string>
       </property>
       <property name="text">
        <string/>
