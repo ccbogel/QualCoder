@@ -41,7 +41,8 @@ from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
-from .helpers import DialogCodeInImage, DialogCodeInAllFiles, DialogCodeInText, ExportDirectoryPathDialog, Message
+from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInAllFiles, DialogCodeInText, \
+    ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .save_sql_query import DialogSaveSql
 from .select_items import DialogSelectItems
@@ -156,6 +157,10 @@ class ViewGraph(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
         self.ui.pushButton_codes_of_images.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_codes_of_images.pressed.connect(self.show_codes_of_image_files)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_codes_of_av.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_codes_of_av.pressed.connect(self.show_codes_of_av_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
@@ -510,6 +515,62 @@ class ViewGraph(QDialog):
             self.add_files_to_graph()
         if action == action_add_cases:
             self.add_cases_to_graph()
+
+    def show_codes_of_av_files(self, x=10, y=10):
+        """ Show selected codes of selected audio/video files as av graphics items. """
+
+        # Select files
+        files_wth_names = self.app.get_av_filenames()
+        ui = DialogSelectItems(self.app, files_wth_names, _("Select audio/video files"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_files = ui.get_selected()
+        # Select codes
+        code_names = self.app.get_code_names()
+        ui = DialogSelectItems(self.app, code_names, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codes = ui.get_selected()
+        # Select one or more codings, or coding memos
+        codings = []
+        cur = self.app.conn.cursor()
+        for file_ in selected_files:
+            cur.execute("select mediapath from source where id=?", [file_['id']])
+            file_['path'] = ""
+            p = cur.fetchone()
+            if p:
+                file_['path'] = p[0]
+            for code in selected_codes:
+                sql = "select cid,id,pos0,pos1, memo, avid from code_av where cid=? and id=?"
+                cur.execute(sql, [code['cid'], file_['id']])
+                res = cur.fetchall()
+                for r in res:
+                    name = file_['name'] + ' x:' + str(int(r[2])) + ' y:' + str(int(r[3]))
+
+                    codings.append({'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
+                                    'memo': r[4], 'filename': file_['name'],
+                                    'codename': code['name'], 'name': name,
+                                    'path': file_['path'], 'avid': r[5]})
+        if not codings:
+            Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
+            return
+        ui = DialogSelectItems(self.app, codings, _("Select coded segment"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_codings = ui.get_selected()
+        for s in selected_codings:
+            x += 10
+            y += 10
+            item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
+            msg = "AVID:" + str(s['avid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            msg += "\n" + str(s['pos0']) + " - " + str(s['pos1']) + _("msecs")
+            if s['memo'] != "":
+                msg += "\n" + _("Memo: ") + s['memo']
+            item.setToolTip(msg)
+            self.scene.addItem(item)
 
     def show_codes_of_image_files(self, x=10, y=10):
         """ Show selected codes of selected image files as pixmap graphics items. """
@@ -2067,6 +2128,87 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
         color_obj = colors[self.color]
         self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
+
+
+class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
+    """ Coded audio video item.
+    """
+
+    app = None
+    font = None
+    settings = None
+    remove = False
+    # For graph item storage
+    text = ""
+    avid = -1  # code_av
+    px = 0
+    py = 0
+    path_ = ""
+    abs_path = ""
+
+    def __init__(self, app, avid=-1, x=10, y=10, pos0=0, pos1=0, path_=""):
+        """ pixmap object.
+         param:
+            app  : the main App class
+            avid : Integer  code_av primary key
+            x : Integer x position of graphics item
+            y : Integer y position of graphics item
+            pos0 : Integer
+            pos1 : Integer
+         """
+
+        super(AVGraphicsItem, self).__init__(None)
+        self.app = app
+        self.avid = avid
+        self.text = "AVID:" + str(self.avid)
+        self.pos0 = pos0
+        self.pos1 = pos1
+        self.path_ = path_
+        self.abs_path_ = self.app.project_path + path_
+        if path_[0:7] in("audio:", "video:"):
+            self.abs_path_ = path_[7:]
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.setPixmap(pm)
+        self.setPos(x, y)
+        self.settings = app.settings
+        self.project_path = app.project_path
+        self.remove = False
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
+                      QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+        context_action = menu.addAction(_("View in context"))
+        remove_action = menu.addAction(_('Remove'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == context_action:
+            '''{codename, color, file_or_casename, pos0, pos1, coder, text,
+                    mediapath, fid, memo, file_or_case}'''
+            cur = self.app.conn.cursor()
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,code_av.memo "
+                        "from code_av join code_name on code_name.cid=code_av.cid where code_av.avid=?",
+                        [self.avid])
+            res = cur.fetchone()
+            if res is None:
+                Message(self.app, _("Error"), _("Cannot find audio/video coding in database")).exec()
+                return
+            data = {'pos0': self.pos0, 'pos1': self.pos1, 'file_or_casename': self.path_, 'mediapath': self.path_,
+                    'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4]}
+            DialogCodeInAV(self.app, data).exec()
+        if action == remove_action:
+            self.remove = True
+
+    def paint(self, painter, option, widget=None):
+        painter.save()
+        color = QtGui.QColor("#fafafa")
+        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        painter.drawRect(self.boundingRect())
+        painter.restore()
+        super().paint(painter, option, widget)
 
 
 class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
