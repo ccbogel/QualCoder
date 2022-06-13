@@ -1341,8 +1341,6 @@ class ViewGraph(QDialog):
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            # app, avid = -1, x = 10, y = 10, pos0 = 0, pos1 = 0, path_ = "", color = "white"
-            print(i)
             item = AVGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[7])
             if i[6] != "":
                 item.setToolTip(i[6])
