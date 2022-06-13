@@ -652,7 +652,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
         self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
-
+        self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         self.ui.scrollArea.setWidget(self.label)
         self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
         self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
