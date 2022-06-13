@@ -135,6 +135,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
+        self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         # Icon images are 32x32 pixels within 36x36 pixel button
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
@@ -881,14 +882,14 @@ class DialogCodeImage(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                 return True
-            if key == QtCore.Qt.Key.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus  or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():
@@ -1642,6 +1643,7 @@ class DialogViewImage(QtWidgets.QDialog):
         self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
+        self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         self.ui.textEdit.setText(self.image_data['memo'])
 
         # Scale initial picture by height to mostly fit inside scroll area
@@ -1681,14 +1683,14 @@ class DialogViewImage(QtWidgets.QDialog):
         # Hide / unHide top groupbox
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            if key == QtCore.Qt.Key.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():
