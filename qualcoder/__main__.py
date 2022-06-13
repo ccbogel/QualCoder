@@ -3,7 +3,6 @@
 
 """
 Copyright (c) 2022 Colin Curtain
-Copyright (c) 2022 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +78,7 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 3.0"
+qualcoder_version = "QualCoder 3.1"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -1429,6 +1428,32 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("CREATE TABLE journal (jid integer primary key, name text, jentry text, date text, owner text, "
                     "unique(name))")
         cur.execute("CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title))")
+        # Tables to store graph. sqlite 0 is False 1 is True
+        cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
+                    "date text, scene_width integer, scene_height integer, unique(name));")
+        cur.execute("CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
+                    "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
+                    "isvisible integer, displaytext text);")
+        cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
+                    "y integer, caseid integer, font_size integer, bold integer, color text, displaytext text);")
+        cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
+                    "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
+        cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
+                    "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
+                    "tooltip text, ctid integer);")
+        cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
+                    "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
+                    "linewidth real, linetype text, isvisible integer);")
+        cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
+                    "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
+                    "fromfileid integer, fromimid integer, fromavid integer, tofreetextid integer, tocatid integer, "
+                    "tocid integer, tocaseid integer, tofileid integer, toimid integer, toavid integer, color text,"
+                    "linewidth real, linetype text);")
+        cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, imid integer,"
+                    "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
+                    "tooltip text);")
+        cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
+                    "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
                     ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
@@ -1531,12 +1556,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
         Do not backup on a newly created project, as it wont contain data.
-        A backup is created if settings backuop is True.
-        The backup is deleted, if no changes occured.
+        A backup is created if settings backup is True.
+        The backup is deleted, if no changes.
         Backups are created using the date and 24 hour suffix: _BKUP_yyyymmdd_hh
         Backups are not replaced within the same hour.
         Update older databases to current version mainly by adding columns and tables.
-        Table constraints are not updated (code_text dupliated codings).
+        Table constraints are not updated (code_text duplicated codings).
         param:
             path: if path is "" then get the path from a dialog, otherwise use the supplied path
             newproject: yes or no  if yes then do not make an initial backup
@@ -1701,6 +1726,41 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute(
                 "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
+        # TODO Database version 6
+        try:
+            cur.execute("select name, description, date from graph")
+        except sqlite3.OperationalError:
+            # Tables to store graph. sqlite 0 is False 1 is True
+            cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
+                        "date text, scene_width integer, scene_height integer, unique(name));")
+            cur.execute(
+                "CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
+                "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
+                "isvisible integer, displaytext text);")
+            cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
+                        "y integer, caseid integer, font_size integer, bold integer, color text, displaytext text);")
+            cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
+                        "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
+            cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
+                        "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
+                        "tooltip text, ctid integer);")
+            cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
+                        "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
+                        "linewidth real, linetype text, isvisible integer);")
+            cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
+                        "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
+                        "fromfileid integer, fromimid integer, fromavid integer, tofreetextid integer, tocatid integer,"
+                        "tocid integer, tocaseid integer, tofileid integer, toimid integer, toavid integer, color text,"
+                        " linewidth real, linetype text);")
+            cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, imid integer,"
+                        "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
+                        "tooltip text);")
+            cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
+                        "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
+            self.app.conn.commit()
+            cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
+            self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
+
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
@@ -1708,6 +1768,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
         cur.execute(sql)

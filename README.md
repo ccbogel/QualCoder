@@ -8,10 +8,6 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-_NOTE_ Transcriptions created with QualCoder 2.8 and newer will have a .txt file ending. These transcription files will not be recoginsed in older QualCoder versions. You will have to change the transcription name ending from '.txt' to '.transcribed' before opening any audio/video files to view or code if opening the project in older versions. In Sql Statements run this to have older versions recognise transcriptions (replace video.mp4 with the actual filename you have): `update source set name='video.mp4.transcribed' where name='video.mp4.txt'`
-
-**MAJOR CHANGE (8 APRIL 2022) QUALCODER NOW USES THE Qt6 GRAPHICAL FRAMEWORK. I HAVE DONE A LOT OF TESTING TO TRACK DOWN ANY ISSUES IN THIS UPDATE. I MIGHT HAVE MISSED SOME, SO PLEASE POST ANY ERROR ISSUES. I WILL WAIT A MONTH AND THEN PUT THIS OUT AS A 3.0 RELEASE.**
-
 ## INSTALLATION 
 
 ### Prerequisites
@@ -35,6 +31,8 @@ Consider using a virtual environment, I have not tested using venv on a Windows 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
+
+py -m pip install --upgrade pip
 
 `py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
 
@@ -65,7 +63,7 @@ I am using python3.9  you can choose another recent version if you prefer, and i
 2. Download and unzip the Qualcoder folder.
 
 3. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-2.9 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.0 folder.
 Inside the QualCoder-master folder:
 
 `python3.9 -m venv qualcoder`
@@ -145,7 +143,7 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/2.8 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.0 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -236,5 +234,7 @@ If you like QualCoder and found it useful for your work. Please leave a review o
 https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
+
+Also, if you like Qualcoder a lot, write an article about it.
 
 
