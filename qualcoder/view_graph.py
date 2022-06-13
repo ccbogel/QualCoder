@@ -55,7 +55,7 @@ colors = {"red": QtCore.Qt.GlobalColor.red, "green": QtCore.Qt.GlobalColor.green
            "cyan": QtCore.Qt.GlobalColor.cyan, "magenta": QtCore.Qt.GlobalColor.magenta,
            "yellow": QtGui.QColor("#FFD700"), "blue": QtGui.QColor("#6495ED"),
            "orange": QtGui.QColor("#FFA500"), "gray": QtGui.QColor("#808080"),
-           "black": QtCore.Qt.GlobalColor.black}
+           "black": QtCore.Qt.GlobalColor.black, "white": QtCore.Qt.GlobalColor.white}
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -497,6 +497,7 @@ class ViewGraph(QDialog):
         action_add_line = menu.addAction(_("Insert Line"))
         action_add_coded_text = menu.addAction(_("Insert coded text items"))
         action_add_coded_image = menu.addAction(_("Insert coded image items"))
+        action_add_coded_av = menu.addAction(_("Insert coded A/V items"))
         action_add_files = menu.addAction(_("Show files"))
         action_add_cases = menu.addAction(_("Show cases"))
         action_memos = menu.addAction(_("Show memos of coded segments"))
@@ -507,6 +508,8 @@ class ViewGraph(QDialog):
             self.show_codes_of_text_files(position.x(), position.y())
         if action == action_add_coded_image:
             self.show_codes_of_image_files(position.x(), position.y())
+        if action == action_add_coded_av:
+            self.show_codes_of_av_files(position.x(), position.y())
         if action == action_memos:
             self.show_memos_of_file(position.x(), position.y())
         if action == action_add_line:
@@ -539,9 +542,9 @@ class ViewGraph(QDialog):
         for file_ in selected_files:
             cur.execute("select mediapath from source where id=?", [file_['id']])
             file_['path'] = ""
-            p = cur.fetchone()
-            if p:
-                file_['path'] = p[0]
+            pth = cur.fetchone()
+            if pth:
+                file_['path'] = pth[0]
             for code in selected_codes:
                 sql = "select cid,id,pos0,pos1, memo, avid from code_av where cid=? and id=?"
                 cur.execute(sql, [code['cid'], file_['id']])
@@ -617,16 +620,11 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected_codings = ui.get_selected()
-        pixid = 1
         for s in selected_codings:
             x += 10
             y += 10
-            for item in self.scene.items():
-                if isinstance(item, PixmapGraphicsItem):
-                    if item.pixid >= pixid:
-                        pixid = item.pixid + 1
-            item = PixmapGraphicsItem(self.app, pixid, x, y, s['x'], s['y'], s['width'], s['height'], s['path'], s['imid'])
-            msg = "PID:" + str(pixid) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
+            msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['memo'] != "":
                 msg += "\n" + _("Memo: ") + s['memo']
             item.setToolTip(msg)
@@ -668,7 +666,7 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected_codings = ui.get_selected()
-        color = self.color_selection()
+        color = self.color_selection("text")
         for s in selected_codings:
             x += 10
             y += 10
@@ -734,7 +732,7 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected_memos = ui.get_selected()
-        color = self.color_selection()
+        color = self.color_selection("text")
         for s in selected_memos:
             x += 10
             y += 10
@@ -768,7 +766,7 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
                     isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem):
+                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                 if item.text == text_from:
                     from_item = item
         # To Items selection
@@ -780,7 +778,7 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         if not selected:
             return
-        color = self.color_selection()
+        color = self.color_selection("line")
 
         # Create Free Item lines
         for s in selected:
@@ -789,25 +787,30 @@ class ViewGraph(QDialog):
             for item in self.scene.items():
                 if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
                         isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                        isinstance(item, PixmapGraphicsItem):
+                        isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                     if item.text == text_to:
                         to_item = item
             if from_item != to_item and not (from_item is None or to_item is None):
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
                 self.scene.addItem(line_item)
 
-    def color_selection(self):
+    def color_selection(self, obj_type="line"):
         """ Get a color for Free text items and Free lines.
-         Called by: add_lines_to_graph, show_codes, show_memos
+         Called by: add_lines_to_graph, show_codes, show_memos.
+         Ifobj_type is line, limit choices, otherwise include black and white.
+         param: obj_type : String
 
          return: color : String """
 
         # Line color selection
         names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange")]
+        if obj_type != "line":
+            names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange"),
+                     _("white"), _("black")]
         names_dict_list = []
         for n in names:
             names_dict_list.append({'name': n})
-        ui = DialogSelectItems(self.app, names_dict_list, _("Line colour"), "single")
+        ui = DialogSelectItems(self.app, names_dict_list, _("Colour"), "single")
         ok = ui.exec()
         if not ok:
             return ""
@@ -829,7 +832,7 @@ class ViewGraph(QDialog):
 
     def named_text_items(self):
         """ Used to get a list of all named FreeText and Case and File graphics items.
-         Use to allow links between these items based on the text name.
+         Use to show names in a dialog, to allow links between these items.
          Called by: add_lines_to_graph
 
          return: names : List of Strings
@@ -839,7 +842,7 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
                     isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem):
+                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                 names.append(item.text)
         names.sort()
         return names
@@ -977,10 +980,15 @@ class ViewGraph(QDialog):
                 cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, PixmapGraphicsItem):
-                sql = "insert into gr_pix_item (grid,pixid,x,y,px,py,w,h,filepath,tooltip, imid) values " \
-                      "(?,?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pixid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
-                                  i.toolTip(), i.imid])
+                sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip) values " \
+                      "(?,?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.imid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
+                                  i.toolTip()])
+                self.app.conn.commit()
+            if isinstance(i, AVGraphicsItem):
+                sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
+                      "(?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
                 self.app.conn.commit()
             if isinstance(i, LinkGraphicsItem):
                 sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
@@ -1026,14 +1034,24 @@ class ViewGraph(QDialog):
                     from_freetextid = i.from_widget.freetextid
                 except AttributeError:
                     pass
-                from_pixid = None
+                from_imid = None
                 try:
-                    from_pixid = i.from_widget.pixid
+                    from_imid = i.from_widget.imid
                 except AttributeError:
                     pass
-                to_pixid = None
+                from_avid = None
                 try:
-                    to_pixid = i.to_widget.pixid
+                    from_avid = i.from_widget.avid
+                except AttributeError:
+                    pass
+                to_imid = None
+                try:
+                    to_imid = i.to_widget.imid
+                except AttributeError:
+                    pass
+                to_avid = None
+                try:
+                    to_avid = i.to_widget.avid
                 except AttributeError:
                     pass
                 to_case_id = None
@@ -1053,10 +1071,10 @@ class ViewGraph(QDialog):
                     pass
                 """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
                 sql = "insert into gr_free_line_item (grid,fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid, " \
-                      "frompixid,tofreetextid,tocatid,tocid,tocaseid,tofileid, topixid,color, linewidth,linetype) " \
-                      "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_pixid,
-                                  to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_pixid,
+                      "fromimid,fromavid,tofreetextid,tocatid,tocid,tocaseid,tofileid, toimid,toavid,color, " \
+                      "linewidth,linetype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
+                                  from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
                                   i.color, i.line_width, self.line_type_to_text(i.line_type)])
                 self.app.conn.commit()
         self.app.delete_backup = False
@@ -1128,6 +1146,7 @@ class ViewGraph(QDialog):
         err_msg += self.load_case_text_graphics_items(grid)
         err_msg += self.load_free_text_graphics_items(grid)
         err_msg += self.load_pixmap_graphics_items(grid)
+        err_msg += self.load_av_graphics_items(grid)
         # Now load lines
         err_msg += self.load_cdct_line_graphics_items(grid)
         err_msg += self.load_free_line_graphics_items(grid)
@@ -1167,18 +1186,20 @@ class ViewGraph(QDialog):
 
     def load_free_line_graphics_items(self, grid):
         """ Find the to and from widgets.
-        Several matching options: catid and cid; fileid; caseid; text (last option).
+        Several matching options: catid and cid; fileid; caseid; imid; avid; freetextid.
         Then when found add the free line item. """
 
         err_msg = ""
-        sql = "select fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid,frompixid,tofreetextid,tocatid,tocid," \
-              "tocaseid,tofileid, topixid, color, linewidth,linetype from gr_free_line_item where grid=?"
+        sql = "select fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid,fromimid,fromavid," \
+              "tofreetextid,tocatid,tocid, tocaseid,tofileid, toimid, toavid,color, linewidth,linetype " \
+              "from gr_free_line_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         result = cur.fetchall()
         res = []
-        keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "frompixid", "tofreetextid", \
-               "tocatid", "tocid", "tocaseid", "tofileid", "topixid", "color", "linewidth", "linetype"
+        keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "fromimid","fromavid", \
+               "tofreetextid", "tocatid", "tocid", "tocaseid", "tofileid", "toimid", "toavid", "color", \
+               "linewidth", "linetype"
         for row in result:
             res.append(dict(zip(keys, row)))
         for line in res:
@@ -1200,8 +1221,11 @@ class ViewGraph(QDialog):
                 if from_item is None and line['fromfreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
                     if i.freetextid == line['fromfreetextid']:
                         from_item = i
-                if from_item is None and line['frompixid'] is not None and isinstance(i, PixmapGraphicsItem):
-                    if i.pixid == line['frompixid']:
+                if from_item is None and line['fromimid'] is not None and isinstance(i, PixmapGraphicsItem):
+                    if i.imid == line['fromimid']:
+                        from_item = i
+                if from_item is None and line['fromavid'] is not None and isinstance(i, AVGraphicsItem):
+                    if i.avid == line['fromavid']:
                         from_item = i
                 if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
                     if i.case_id == line['tocaseid']:
@@ -1216,8 +1240,11 @@ class ViewGraph(QDialog):
                 if to_item is None and line['tofreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
                     if i.freetextid == line['tofreetextid']:
                         to_item = i
-                if to_item is None and line['topixid'] is not None and isinstance(i, PixmapGraphicsItem):
-                    if i.pixid == line['topixid']:
+                if to_item is None and line['toimid'] is not None and isinstance(i, PixmapGraphicsItem):
+                    if i.imid == line['toimid']:
+                        to_item = i
+                if to_item is None and line['toavid'] is not None and isinstance(i, AVGraphicsItem):
+                    if i.avid == line['toavid']:
                         to_item = i
 
             if from_item is not None and to_item is not None:
@@ -1292,14 +1319,33 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select pixid, x, y, px,py,w,h,filepath, tooltip,imid from gr_pix_item where grid=?"
+        sql = "select imid, x, y, px,py,w,h,filepath, tooltip from gr_pix_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = PixmapGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[9])
+            item = PixmapGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
             if i[8] != "":
                 item.setToolTip(i[8])
+            self.scene.addItem(item)
+        return err_msg
+
+    def load_av_graphics_items(self, grid):
+        """ Load audio/video graphics items.
+        param: grid : Integer
+        """
+
+        err_msg = ""
+        sql = "select avid, x, y, pos0,pos1,filepath, tooltip, color from gr_av_item where grid=?"
+        cur = self.app.conn.cursor()
+        cur.execute(sql, [grid])
+        res = cur.fetchall()
+        for i in res:
+            # app, avid = -1, x = 10, y = 10, pos0 = 0, pos1 = 0, path_ = "", color = "white"
+            print(i)
+            item = AVGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[7])
+            if i[6] != "":
+                item.setToolTip(i[6])
             self.scene.addItem(item)
         return err_msg
 
@@ -1571,8 +1617,11 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ """
 
         painter.save()
-        if self.color == "black":
+        if self.color in ("black", "gray"):
             color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        if self.color == "white":
+            color = QtGui.QColor("#101010")
             painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
@@ -1602,6 +1651,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         magenta_action = menu.addAction(_("Magenta text"))
         gray_action = menu.addAction(_("Gray text"))
         black_action = menu.addAction(_("Black text"))
+        white_action = menu.addAction(_("White text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1644,6 +1694,8 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.color = "gray"
         if action == black_action:
             self.color = "black"
+        if action == white_action:
+            self.color = "white"
         self.setDefaultTextColor(colors[self.color])
         if action == remove_action:
             self.remove = True
@@ -1735,8 +1787,11 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ """
 
         painter.save()
-        if self.color == "black":
+        if self.color in ("black", "gray"):
             color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        if self.color == "white":
+            color = QtGui.QColor("#101010")
             painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
@@ -1766,6 +1821,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         orange_action = menu.addAction(_("Orange text"))
         gray_action = menu.addAction(_("Gray text"))
         black_action = menu.addAction(_("Black text"))
+        white_action = menu.addAction(_("White text"))
         if self.show_attributes:
             hide_att_action = menu.addAction(_('Hide attributes'))
         else:
@@ -1816,6 +1872,8 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.color = "gray"
         if action == black_action:
             self.color = "black"
+        if action == white_action:
+            self.color = "white"
         self.setDefaultTextColor(colors[self.color])
         if action == show_att_action:
             self.setHtml(self.text + self.get_attributes())
@@ -1914,6 +1972,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         orange_action = menu.addAction(_("Orange text"))
         gray_action = menu.addAction(_("Gray text"))
         black_action = menu.addAction(_("Black text"))
+        white_action = menu.addAction(_("White text"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -1973,6 +2032,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.color = "gray"
         if action == black_action:
             self.color = "black"
+        if action == white_action:
+            self.color = "white"
         self.setDefaultTextColor(colors[self.color])
         if action == edit_action:
             ui = DialogMemo(self.app, _("Edit text"), self.text)
@@ -1986,6 +2047,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         painter.save()
         if self.color in("black", "gray"):
             color = QtGui.QColor("#fafafa")
+            painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        if self.color == "white":
+            color = QtGui.QColor("#101010")
             painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
@@ -2141,13 +2205,14 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     # For graph item storage
     text = ""
     avid = -1  # code_av
-    px = 0
-    py = 0
+    pos0 = 0
+    pos1 = 0
     path_ = ""
     abs_path = ""
+    color = "white"
 
-    def __init__(self, app, avid=-1, x=10, y=10, pos0=0, pos1=0, path_=""):
-        """ pixmap object.
+    def __init__(self, app, avid=-1, x=10, y=10, pos0=0, pos1=0, path_="", color="white"):
+        """ A/V graphics object.
          param:
             app  : the main App class
             avid : Integer  code_av primary key
@@ -2155,6 +2220,8 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             y : Integer y position of graphics item
             pos0 : Integer
             pos1 : Integer
+            path : String
+            color : String
          """
 
         super(AVGraphicsItem, self).__init__(None)
@@ -2164,6 +2231,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.pos0 = pos0
         self.pos1 = pos1
         self.path_ = path_
+        self.color = color
         self.abs_path_ = self.app.project_path + path_
         if path_[0:7] in("audio:", "video:"):
             self.abs_path_ = path_[7:]
@@ -2182,6 +2250,15 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         menu = QtWidgets.QMenu()
         context_action = menu.addAction(_("View in context"))
         remove_action = menu.addAction(_('Remove'))
+        red_action = menu.addAction(_("Red"))
+        green_action = menu.addAction(_("Green"))
+        yellow_action = menu.addAction(_("Yellow"))
+        blue_action = menu.addAction(_("Blue"))
+        magenta_action = menu.addAction(_("Magenta"))
+        cyan_action = menu.addAction(_("Cyan"))
+        orange_action = menu.addAction(_("Orange"))
+        gray_action = menu.addAction(_("Gray"))
+        white_action = menu.addAction(_("White"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
@@ -2201,11 +2278,29 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             DialogCodeInAV(self.app, data).exec()
         if action == remove_action:
             self.remove = True
+        if action == red_action:
+            self.color = "red"
+        if action == green_action:
+            self.color = "green"
+        if action == cyan_action:
+            self.color = "cyan"
+        if action == magenta_action:
+            self.color = "magenta"
+        if action == yellow_action:
+            self.color = "yellow"
+        if action == blue_action:
+            self.color = "blue"
+        if action == orange_action:
+            self.color = "orange"
+        if action == gray_action:
+            self.color = "gray"
+        if action == white_action:
+            self.color = "white"
 
     def paint(self, painter, option, widget=None):
         painter.save()
-        color = QtGui.QColor("#fafafa")
-        painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
+        color_obj = colors[self.color]
+        painter.setBrush(QtGui.QBrush(color_obj, style=QtCore.Qt.BrushStyle.SolidPattern))
         painter.drawRect(self.boundingRect())
         painter.restore()
         super().paint(painter, option, widget)
@@ -2221,8 +2316,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     remove = False
     # For graph item storage
     text = ""
-    pixid = -1
-    imid = -1  # code_image imid
+    imid = -1  # code_image table imid i=unique fo r the coded image area
     px = 0
     py = 0
     pwidth = 0
@@ -2231,7 +2325,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
 
-    def __init__(self, app, pixid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", imid=-1):
+    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_=""):
         """ pixmap object.
          param:
             app  : the main App class
@@ -2247,14 +2341,13 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
 
         super(PixmapGraphicsItem, self).__init__(None)
         self.app = app
-        self.pixid = pixid
-        self.text = "PID:" + str(self.pixid)
+        self.imid = imid
+        self.text = "IMID:" + str(self.imid)
         self.px = px
         self.py = py
         self.pwidth = pwidth
         self.pheight = pheight
         self.path_ = path_
-        self.imid = imid
         abs_path_ = self.app.project_path + path_
         if path_[0:7] == "images:":
             abs_path_ = path_[7:]
