@@ -611,7 +611,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     scene = None
 
     def __init__(self, app, data, parent=None):
-        """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
+        """ Image_data contains details to show the image and the coded section.
         mediapath may be a link as: 'images:path'
         param:
             app : class containing app details such as database connection
@@ -705,7 +705,9 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_area()
-        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+        msg = _("Key + or W zoom in. Key - or Q zoom out") + "\n"
+        msg += _("Scale: ") + str(int(self.scale * 100)) + "%"
+        self.ui.horizontalSlider.setToolTip(msg)
 
     def eventFilter(self, object, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -722,14 +724,14 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_Minus:
+            if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
-            if key == QtCore.Qt.Key.Key_Plus:
+            if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
                 v = self.ui.horizontalSlider.value()
                 v += 3
                 if v > self.ui.horizontalSlider.maximum():
