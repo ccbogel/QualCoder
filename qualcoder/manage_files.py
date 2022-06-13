@@ -764,12 +764,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.label_file.setText(_("File") + ": " + self.source[x]['name'])
         if y == self.MEMO_COLUMN:
             name = self.source[x]['name'].lower()
+            cur = self.app.conn.cursor()
+            # Need to dynamically get the memo text in case it has been changed in a coding dialog
+            cur.execute('select memo from source where id=?', [self.source[x]['id']])
+            self.source[x]['memo'] = cur.fetchone()[0]
             if name[-5:] == ".jpeg" or name[-4:] in ('.jpg', '.png', '.gif'):
                 ui = DialogMemo(self.app, _("Memo for file ") + self.source[x]['name'],
                                 self.source[x]['memo'])
                 ui.exec()
                 self.source[x]['memo'] = ui.memo
-                cur = self.app.conn.cursor()
                 cur.execute('update source set memo=? where id=?', (ui.memo, self.source[x]['id']))
                 self.app.conn.commit()
             else:
