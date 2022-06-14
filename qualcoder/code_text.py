@@ -39,7 +39,7 @@ import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QHelpEvent
-from PyQt6.QtCore import Qt  #, QTextCodec
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
 from .add_item_name import DialogAddItemName
@@ -185,7 +185,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -208,7 +208,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
@@ -1163,26 +1163,37 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def file_memo(self):
-        """ Open file memo to view or edit. """
+    def active_file_memo(self):
+        """ Send active file to file_memo method.
+        Called by pushButton_document_memo for loaded text.
+        """
 
-        if self.file_ is None:
+        self.file_memo(self.file_)
+
+    def file_memo(self, file_):
+        """ Open file memo to view or edit.
+        Called by pushButton_document_memo for loaded text, via active_file_memo
+        and through file_menu for any file.
+        param: file_ : Dictionary of file values
+        """
+
+        if file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])
         ui.exec()
         memo = ui.memo
-        if memo == self.file_['memo']:
+        if memo == file_['memo']:
             return
-        self.file_['memo'] = memo
+        file_['memo'] = memo
         cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
+        cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
-        self.filenames = self.app.get_text_filenames()
-        self.ui.listWidget.clear()
-        for f in self.filenames:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
-            self.ui.listWidget.addItem(item)
+        items = self.ui.listWidget.findItems(file_['name'], Qt.MatchFlag.MatchExactly)
+        if len(items) == 1:
+            tt = items[0].toolTip()
+            memo_pos = (tt.find(_("Memo:")))
+            new_tt = tt[:memo_pos] + _("Memo: ") + file_['memo']
+            items[0].setToolTip(new_tt)
         self.app.delete_backup = False
 
     def coded_text_memo(self, position=None):
@@ -2431,7 +2442,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
 
-    def viewfile_menu(self, position):
+    def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder.
         Each file dictionary item in self.filenames contains:
@@ -2446,33 +2457,35 @@ class DialogCodeText(QtWidgets.QWidget):
         for f in self.filenames:
             if selected.text() == f['name']:
                 file_ = f
-
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_next = None
-        action_latest = None
-        action_next_chars = None
-        action_prev_chars = None
+        next_action = None
+        latest_action = None
+        next_chars_action = None
+        prev_chars_action = None
+        memo_action = menu.addAction(_("Open memo"))
         if len(self.filenames) > 1:
-            action_next = menu.addAction(_("Next file"))
-            action_latest = menu.addAction(_("File with latest coding"))
+            next_action = menu.addAction(_("Next file"))
+            latest_action = menu.addAction(_("File with latest coding"))
         if file_['characters'] > CHAR_LIMIT:
-            action_next_chars = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
+            next_chars_action = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
             if file_['start'] > 0:
-                action_prev_chars = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
-        action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
+                prev_chars_action = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
+        go_to_bookmark_action = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
-        if action == action_next:
+        if action == memo_action:
+            self.file_memo(file_)
+        if action == next_action:
             self.go_to_next_file()
-        if action == action_latest:
+        if action == latest_action:
             self.go_to_latest_coded_file()
-        if action == action_go_to_bookmark:
+        if action == go_to_bookmark_action:
             self.go_to_bookmark()
-        if action == action_next_chars:
+        if action == next_chars_action:
             self.next_chars(file_, selected)
-        if action == action_prev_chars:
+        if action == prev_chars_action:
             self.prev_chars(file_, selected)
 
     def prev_chars(self, file_, selected):

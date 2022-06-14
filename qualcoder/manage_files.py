@@ -274,7 +274,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 item = self.ui.tableWidget.item(r, col)
                 text_ = item.text()
                 if compare_text != text_:
-                    print(compare_text, text_)
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
         if action == action_show_all:
