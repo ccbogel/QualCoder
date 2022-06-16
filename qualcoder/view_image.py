@@ -79,7 +79,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     tab_reports = None  # Tab widget reports, used for updates to codes
     pixmap = None
     scene = None
-    files = []
+    files = []  # List of Dictionaries
     file_ = None  # Dictionary with name, memo, id, mediapath?
     codes = []
     categories = []
@@ -140,10 +140,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
         self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_memo.pressed.connect(self.file_memo)
+        self.ui.pushButton_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_memo.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.listWidget.customContextMenuRequested.connect(self.viewfile_menu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.get_files()
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
@@ -167,7 +167,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_coded_area_icon.setPixmap(pm)
@@ -496,19 +496,30 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
-    def file_memo(self):
-        """ Open file memo to view or edit. """
+    def active_file_memo(self):
+        """ Send active file to file_memo method.
+        Called by pushButton_document_memo for loaded text.
+        """
 
-        if self.file_ is None:
+        self.file_memo(self.file_)
+
+    def file_memo(self, file_):
+        """ Open file memo to view or edit.
+        Called by pushButton_document_memo for loaded text, via active_file_memo
+        and through file_menu for any file.
+        param: file_ : Dictionary of file values
+        """
+
+        if file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])
         ui.exec()
         memo = ui.memo
-        if memo == self.file_['memo']:
+        if memo == file_['memo']:
             return
-        self.file_['memo'] = memo
+        file_['memo'] = memo
         cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
+        cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
         self.get_files()
         self.ui.listWidget.clear()
@@ -552,17 +563,25 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.load_file()
                 return
 
-    def viewfile_menu(self, position):
+    def file_menu(self, position):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
 
-        if len(self.files) < 2:
+        if len(self.files) == 0:
             return
+        selected = self.ui.listWidget.currentItem()
+        file_ = None
+        for f in self.files:
+            if selected.text() == f['name']:
+                file_ = f
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        memo_action = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
+        if action == memo_action:
+            self.file_memo(file_)
         if action == action_next:
             self.go_to_next_file()
             return

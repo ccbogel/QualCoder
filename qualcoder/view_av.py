@@ -63,7 +63,7 @@ from .speech_to_text import SpeechToText
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-# https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
+'''# https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
 if sys.platform.startswith("win"):
     try:
         # Older x86 32 bit location
@@ -81,9 +81,9 @@ if sys.platform.startswith("win"):
         logger.debug(str(e))
 vlc_msg = ""
 imp = True
-try:
-    import qualcoder.vlc as vlc
-except Exception as e:
+try:'''
+import qualcoder.vlc as vlc
+'''except Exception as e:
     vlc_msg = str(e) + "\n"
     if sys.platform.startswith("win"):
         imp = False
@@ -94,7 +94,7 @@ except Exception as e:
         msg += "32 bit python AND 32 bit VLC installed."
         print(msg)
         vlc_msg = msg
-    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
+    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)'''
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -164,8 +164,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app = app
         self.tab_reports = tab_reports
         self.parent_textEdit = parent_text_edit
-        if vlc_msg != "":
-            self.parent_textEdit.append(vlc_msg)
         self.codes = []
         self.recent_codes = []
         self.categories = []
@@ -255,7 +253,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+        self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
@@ -296,7 +294,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
-
         self.ui.listWidget.itemClicked.connect(self.listwidgetitem_load_file)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -709,13 +706,23 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
 
-        if len(self.files) < 2:
+        if len(self.files) == 0:
             return
+        selected = self.ui.listWidget.currentItem()
+        file_ = None
+        for f in self.files:
+            if selected.text() == f['name']:
+                file_ = f
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        memo_action = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
+        if action is None:
+            return
+        if action == memo_action:
+            self.file_memo(file_)
         if action == action_next:
             if self.file_ is None:
                 self.file_ = self.files[0]
@@ -746,19 +753,30 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.fill_code_counts_in_tree()
                     return
 
-    def file_memo(self):
-        """ Open file memo to view or edit. """
+    def active_file_memo(self):
+        """ Send active file to file_memo method.
+        Called by pushButton_document_memo for loaded text.
+        """
 
-        if self.file_ is None:
+        self.file_memo(self.file_)
+
+    def file_memo(self, file_):
+        """ Open file memo to view or edit.
+        Called by pushButton_document_memo for loaded text, via active_file_memo
+        and through file_menu for any file.
+        param: file_ : Dictionary of file values
+        """
+
+        if file_ is None:
             return
-        ui = DialogMemo(self.app, _("Memo for file: ") + self.file_['name'], self.file_['memo'])
+        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])
         ui.exec()
         memo = ui.memo
-        if memo == self.file_['memo']:
+        if memo == file_['memo']:
             return
-        self.file_['memo'] = memo
+        file_['memo'] = memo
         cur = self.app.conn.cursor()
-        cur.execute("update source set memo=? where id=?", (memo, self.file_['id']))
+        cur.execute("update source set memo=? where id=?", (memo, file_['id']))
         self.app.conn.commit()
         self.get_files()
         self.app.delete_backup = False
