@@ -504,7 +504,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.ui.pushButton_run.setEnabled(True)
 
     def clear_selection(self):
-        """ Clear the coder selection and tree widget statistics. """
+        """ Clear the coder selection and tree widget statistics.
+        text(1) Catid/cid, text(2) Agree%, text(3) A and B %, text(4) Not A Not B %
+        text (5) Disagree %, text(6) AgreeCodedOnly%, text(7) Kappa
+        """
 
         self.selected_coders = []
         self.ui.pushButton_run.setEnabled(False)
@@ -517,6 +520,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 item.setText(4, "")
                 item.setText(5, "")
                 item.setText(6, "")
+                item.setText(7, "")
             it += 1
             item = it.value()
         self.ui.label_selections.setText(_("No coders selected"))
@@ -553,12 +557,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 item.setText(3, str(agreement['dual_percent']) + "%")
                 item.setText(4, str(agreement['uncoded_percent']) + "%")
                 item.setText(5, str(agreement['disagreement']) + "%")
-                item.setText(6, str(agreement['kappa']))
+                item.setText(6, str(agreement['agree_coded_only']) + "%")
+                item.setText(7, str(agreement['kappa']))
                 self.comparisons += "\n" + item.text(0) + " (" + item.text(1) + ")\n"
                 self.comparisons += _("agreement: ") + str(agreement['agreement']) + "%"
                 self.comparisons += _(", dual coded: ") + str(agreement['dual_percent']) + "%"
                 self.comparisons += _(", uncoded: ") + str(agreement['uncoded_percent']) + "%"
                 self.comparisons += _(", disagreement: ") + str(agreement['disagreement']) + "%"
+                self.comparisons+= _(", agree coded only: ") + str(agreement['agree_coded_only']) + "%"
                 self.comparisons += ", Kappa: " + str(agreement['kappa'])
             it += 1
             item = it.value()
@@ -570,11 +576,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         Look at each file separately to ge the commonly coded text.
         Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
         where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
-        'Disagree%':'','A not B':'','B not A':'','K':''
+        'Disagree%':'','A not B':'','B not A':'', coded only:'' ,'K':''
         """
 
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
-        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0}
+        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0, 'agree_coded_only': 0}
         # Loop through each source file
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
@@ -611,6 +617,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
         total['uncoded_percent'] = round(100 * total['uncoded'] / total['characters'], 2)
         total['disagreement'] = round(100 - total['agreement'], 2)
+        try:
+            total['agree_coded_only'] = round(100 * total['dual_coded'] / (total['dual_coded'] + total['single_coded']), 2)
+        except ZeroDivisionError:
+            total['agree_coded_only'] = "zero div"
         # Cohen's Kappa
         '''
         https://en.wikipedia.org/wiki/Cohen%27s_kappa
@@ -657,7 +667,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
         self.ui.treeWidget.setHeaderLabels(
-            [_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Kappa"])
+            [_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"])
         self.ui.treeWidget.hideColumn(1)
         if self.app.settings['showids'] == 'True':
             self.ui.treeWidget.showColumn(1)
@@ -735,5 +745,7 @@ info = "<b>Agree %</b>" \
        "<b>A and B %</b><p>Calculated as the total dual coded characters / total characters</p>" \
        "<b>Not A Not B %</b><p>The characters not coded by either coder / total characters</p>" \
        "<b>Disagree %</b><p>Is 100% minus the total agreement percent.</p>" \
+       "<b>Agree coded only %</b><p>Is the dual coded characters divided by the dual coded and single coded characters" \
+       "</p>" \
        "<b>Kappa</b><p>Used to measure inter-rater reliability. " \
        "Calculations are based on this site https://en.wikipedia.org/wiki/Cohen%27s_kappa</p>"
