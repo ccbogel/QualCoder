@@ -1598,9 +1598,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         Also use eventFilter for QGraphicsView.
 
         Options are:
-            Ctrl + R rewind 30 seconds
-            Alt + R to rewind 5 seconds.
-            Alt +F forward 30 seconds
+            Alt + R rewind 30 seconds
+            Ctrl + R to rewind 5 seconds.
+            Alt + F forward 30 seconds
             Ctrl + S OR Ctrl + p to start/pause On start rewind 1 second
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
