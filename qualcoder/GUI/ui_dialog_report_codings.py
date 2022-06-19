@@ -96,6 +96,10 @@ class Ui_Dialog_reportCodings(object):
         self.label_search_results.setGeometry(QtCore.QRect(592, 54, 181, 20))
         self.label_search_results.setWordWrap(True)
         self.label_search_results.setObjectName("label_search_results")
+        self.pushButton_search_next = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_search_next.setGeometry(QtCore.QRect(780, 80, 34, 30))
+        self.pushButton_search_next.setText("")
+        self.pushButton_search_next.setObjectName("pushButton_search_next")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog_reportCodings)
         self.groupBox_2.setTitle("")
@@ -158,6 +162,7 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "Text context"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_reportCodings", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_reportCodings", "Search Results for:"))
+        self.pushButton_search_next.setToolTip(_translate("Dialog_reportCodings", "Search for next occurence in results"))
 
 
 if __name__ == "__main__":
