@@ -251,7 +251,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rewind 30 seconds. Alt + R</string>
       </property>
       <property name="text">
        <string/>
@@ -267,7 +267,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Shift + F&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Forward 30 seconds. Alt + F</string>
       </property>
       <property name="text">
        <string/>
@@ -315,7 +315,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Rewind 5 seconds. Ctrl + R</string>
       </property>
       <property name="text">
        <string/>
