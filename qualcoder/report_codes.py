@@ -31,6 +31,7 @@ import csv
 import logging
 import os
 from PIL import Image
+import re
 from shutil import copyfile
 import sys
 import traceback
@@ -135,6 +136,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.label_matrix.setPixmap(pm)
@@ -932,7 +937,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 case_result = cur.fetchall()
                 for i in case_result:
                     case_file_ids.append(i[0])
-        # Consolidate csse and file ids
+        # Consolidate case and file ids
         if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec()
             return
@@ -1548,6 +1553,35 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.append(img_msg)
         if av_msg != "":
             self.ui.textEdit.append(av_msg)
+
+    def search_results_next(self):
+        """ Search textedit results for text """
+
+        search_text = self.ui.lineEdit_search_results.text()
+        if search_text == "":
+            return
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            self.ui.textEdit.setTextCursor(cursor)
+        te_text = self.ui.textEdit.toPlainText()
+        pattern = None
+        flags = 0
+        try:
+            pattern = re.compile(search_text, flags)
+        except re.error as e_:
+            logger.warning('re error Bad escape ' + str(e_))
+        if pattern is None:
+            return
+        for match in pattern.finditer(te_text):
+            if match.start() > self.ui.textEdit.textCursor().position():
+                cursor = self.ui.textEdit.textCursor()
+                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                self.ui.textEdit.setTextCursor(cursor)
+                break
 
     def fill_text_edit_with_search_results(self):
         """ The textEdit.document is filled with the search results.
