@@ -333,6 +333,22 @@
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_search_next">
+      <property name="geometry">
+       <rect>
+        <x>780</x>
+        <y>80</y>
+        <width>34</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search for next occurence in results</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
