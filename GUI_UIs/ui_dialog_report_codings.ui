@@ -205,7 +205,7 @@
       <property name="geometry">
        <rect>
         <x>631</x>
-        <y>20</y>
+        <y>21</y>
         <width>281</width>
         <height>30</height>
        </rect>
@@ -278,8 +278,8 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>640</x>
-        <y>60</y>
+        <x>632</x>
+        <y>0</y>
         <width>211</width>
         <height>23</height>
        </rect>
@@ -302,6 +302,35 @@
       </property>
       <property name="text">
        <string>Text context</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_search_results">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>80</y>
+        <width>181</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search results for text</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_results">
+      <property name="geometry">
+       <rect>
+        <x>592</x>
+        <y>54</y>
+        <width>181</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Search Results for:</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
