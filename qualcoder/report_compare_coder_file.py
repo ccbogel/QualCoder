@@ -115,6 +115,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_export_odt.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_odt.pressed.connect(self.export_odt_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
@@ -273,6 +274,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
+        print("here 1")
         filename = "Coder_comparison_by_file.odt"
         e_ = ExportDirectoryPathDialog(self.app, filename)
         filepath = e_.filepath
