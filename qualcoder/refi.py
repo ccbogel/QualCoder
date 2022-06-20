@@ -1455,10 +1455,15 @@ class RefiImport:
                 for c in self.codes:
                     if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                    memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
+                try:
+                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                        memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
                                                           seltext, pos0, pos1, creating_user, memo, create_date))
-                self.app.conn.commit()
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    self.parent_textEdit.append(_("Duplicated text coding for code and coder. Only one loaded.") + 
+                                        " cid:" + str(cid) + " fid: " + str(source['id']) + _(" Positions:") + 
+                                        str(pos0) + " - " + str(pos1))
         if annotation:
             sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
             cur.execute(sql, [source['id'], int(pos0), int(pos1), memo, creating_user, create_date])
