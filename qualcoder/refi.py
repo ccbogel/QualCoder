@@ -863,10 +863,13 @@ class RefiImport:
                 for c in self.codes:
                     if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
-                cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,\
-                    date, owner) values(?,?,?,?,?,?,?,?,?)", (id_, first_x, first_y,
-                                                              width, height, cid, memo, create_date, creating_user))
-                self.app.conn.commit()
+                try:
+                    cur.execute("insert into code_image (id,x1,y1,width,height,cid,memo,\
+                        date, owner) values(?,?,?,?,?,?,?,?,?)", (id_, first_x, first_y,
+                                                                  width, height, cid, memo, create_date, creating_user))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
 
     def load_audio_source(self, element):
         """ Load audio source into .
@@ -1203,10 +1206,13 @@ class RefiImport:
                 for c in self.codes:
                     if c['guid'] == code_ref.get("targetGUID"):
                         cid = c['cid']
-                cur.execute("insert into code_av (id,pos0,pos1,cid,memo,\
-                    date, owner) values(?,?,?,?,?,?,?)", (id_, seg_start, seg_end,
-                                                          cid, memo, create_date, creating_user))
-                self.app.conn.commit()
+                try:
+                    cur.execute("insert into code_av (id,pos0,pos1,cid,memo,\
+                        date, owner) values(?,?,?,?,?,?,?)", (id_, seg_start, seg_end,
+                                                              cid, memo, create_date, creating_user))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
 
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite.
