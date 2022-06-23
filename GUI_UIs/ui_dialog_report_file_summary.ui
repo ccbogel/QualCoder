@@ -29,25 +29,6 @@
       <property name="verticalSpacing">
        <number>2</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_files">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>File summary report</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
@@ -55,6 +36,95 @@
         </property>
         <widget class="QListWidget" name="listWidget"/>
         <widget class="QTextEdit" name="textEdit"/>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupBox">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>38</height>
+         </size>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QLabel" name="label_search_results">
+         <property name="geometry">
+          <rect>
+           <x>330</x>
+           <y>0</y>
+           <width>181</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Search Results for:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_search_results">
+         <property name="geometry">
+          <rect>
+           <x>511</x>
+           <y>0</y>
+           <width>181</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Search results for text</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_search_next">
+         <property name="geometry">
+          <rect>
+           <x>699</x>
+           <y>0</y>
+           <width>28</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Search for next occurence in results</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_files">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>281</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>File summary report</string>
+         </property>
+        </widget>
        </widget>
       </item>
      </layout>
