@@ -29,6 +29,7 @@ from copy import deepcopy
 import logging
 import os
 from PIL import Image
+import re
 import sys
 import traceback
 import qualcoder.vlc as vlc
@@ -36,6 +37,7 @@ import qualcoder.vlc as vlc
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
+from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
 
@@ -86,6 +88,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.fill_tree()
@@ -439,4 +445,33 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 text += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs")
                 text += "  " + _("Average percent of media: ") + str(percent_of_media) + "%\n"
         return text
+
+    def search_results_next(self):
+        """ Search textedit for text """
+
+        search_text = self.ui.lineEdit_search_results.text()
+        if search_text == "":
+            return
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            self.ui.textEdit.setTextCursor(cursor)
+        te_text = self.ui.textEdit.toPlainText()
+        pattern = None
+        flags = 0
+        try:
+            pattern = re.compile(search_text, flags)
+        except re.error as e_:
+            logger.warning('re error Bad escape ' + str(e_))
+        if pattern is None:
+            return
+        for match in pattern.finditer(te_text):
+            if match.start() > self.ui.textEdit.textCursor().position():
+                cursor = self.ui.textEdit.textCursor()
+                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                self.ui.textEdit.setTextCursor(cursor)
+                break
 
