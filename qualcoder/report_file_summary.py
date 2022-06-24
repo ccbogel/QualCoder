@@ -29,12 +29,14 @@ import logging
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
+import re
 import sys
 import traceback
 import qualcoder.vlc as vlc
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets, QtGui
 
+from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -90,6 +92,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.listWidget.setStyleSheet(treefont)
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.get_files()
@@ -161,7 +167,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         text = file_name + "\n\n"
-        text += _("MEMO: ") + "\n" + file_['memo'] + "\n"
+        if file_['memo'] is not None:
+            text += _("MEMO: ") + "\n" + file_['memo'] + "\n"
         text += self.get_attributes(file_['id'])
         text += self.get_case_assignment(file_['id'])
 
@@ -465,3 +472,33 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             text += "  " + _("Percent: ") + str(round((r[3] / len(fulltext)) * 100, 2)) + "%"
             text += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
         return text
+
+    def search_results_next(self):
+        """ Search textedit for text """
+
+        search_text = self.ui.lineEdit_search_results.text()
+        if search_text == "":
+            return
+        if self.ui.textEdit.toPlainText() == "":
+            return
+        if self.ui.textEdit.textCursor().position() >= len(self.ui.textEdit.toPlainText()):
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            self.ui.textEdit.setTextCursor(cursor)
+        te_text = self.ui.textEdit.toPlainText()
+        pattern = None
+        flags = 0
+        try:
+            pattern = re.compile(search_text, flags)
+        except re.error as e_:
+            logger.warning('re error Bad escape ' + str(e_))
+        if pattern is None:
+            return
+        for match in pattern.finditer(te_text):
+            if match.start() > self.ui.textEdit.textCursor().position():
+                cursor = self.ui.textEdit.textCursor()
+                cursor.setPosition(match.start(), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
+                self.ui.textEdit.setTextCursor(cursor)
+                break
+
