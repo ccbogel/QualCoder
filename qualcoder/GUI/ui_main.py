@@ -219,18 +219,18 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "QualCoder"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_action_log), _translate("MainWindow", "Action Log"))
-        self.label_manage.setText(_translate("MainWindow", "Select an option in the Files and Cases menu"))
+        self.label_manage.setText(_translate("MainWindow", "Select an option in the Files and Cases menu. CTRL TAB to switch tabs."))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_manage), _translate("MainWindow", "Manage"))
-        self.label_coding.setText(_translate("MainWindow", "Select an option in the Coding menu"))
+        self.label_coding.setText(_translate("MainWindow", "Select an option in the Coding menu. CTRL TAB to switch tabs."))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
-        self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu"))
+        self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu. CTRL TAB to switch tabs."))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
         self.menuProject.setTitle(_translate("MainWindow", "Project"))
         self.menuOpen_Recent_Project.setTitle(_translate("MainWindow", "Open Recent Project"))
