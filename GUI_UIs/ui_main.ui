@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_action_log">
        <attribute name="title">
@@ -50,7 +50,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Files and Cases menu</string>
+         <string>Select an option in the Files and Cases menu. CTRL TAB to switch tabs.</string>
         </property>
        </widget>
       </widget>
@@ -68,7 +68,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Coding menu</string>
+         <string>Select an option in the Coding menu. CTRL TAB to switch tabs.</string>
         </property>
        </widget>
       </widget>
@@ -86,7 +86,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Reports menu</string>
+         <string>Select an option in the Reports menu. CTRL TAB to switch tabs.</string>
         </property>
        </widget>
       </widget>
