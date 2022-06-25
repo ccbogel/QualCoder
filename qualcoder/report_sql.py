@@ -688,5 +688,17 @@ code_text.important as "Important(yes=1, no=0)" from source left join code_text 
 left join code_name on code_name.cid = code_text.cid where code_text.memo != "" \n\
 -- TO DISPLAY CODING FOR SELECTED CODE OR FILE, UNCOMMENT THE FOLLOWING:\n\
 -- AND code_name.name = "CODE NAME"  -- TO SELECT SPECIFIC CODE\n\
--- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE'
+-- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE',
+'-- FILES THAT ARE NOT CODED with code id 1\n\
+select source.name from source where source.id not in\n\
+(select code_text.fid from code_text where code_text.cid=1\n\
+union select code_av.id from code_av where code_av.cid=1\n\
+union select code_image.id from code_image where code_image.cid=1)',
+'-- CODES NOTT USED IN A FILE. Example using file id 1 presuming a text file.\n\
+select code_name.name from code_name where code_name.cid not in\n\
+-- Uncomment the appropriate line below for another file type if needed\n\
+(select code_text.cid from code_text where code_text.fid=1)  -- comment out for another file type\n\
+-- (select code_av.cid from code_av where code_av.id=1) -- uncomment for av files\n\
+-- (select code_image.cid from code_image where code_image.id=1) -- uncomment for image files'
+
 ]
