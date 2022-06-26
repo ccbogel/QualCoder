@@ -1033,12 +1033,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         # seltext length, longest first, so overlapping shorter text is superimposed.
         sql = "select code_text.cid, code_text.fid, seltext, code_text.pos0, code_text.pos1, "
         sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1, "
-        sql += "code_text.important "
+        sql += "code_text.important, code_text.ctid "
         sql += "from code_text left join code_av on code_text.avid = code_av.avid "
         sql += " where code_text.fid=? and code_text.owner=? order by length(seltext) desc"
         cur.execute(sql, values)
         code_results = cur.fetchall()
-        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'avid', 'av_pos0', 'av_pos1', 'important'
+        keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'avid', 'av_pos0', 'av_pos1', \
+               'important', 'ctid'
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
@@ -2464,6 +2465,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         play_text_avid = None
         action_important = None
         action_not_important = None
+        action_change_code = None
         action_annotate = None
         action_edit_annotate = None
         for item in self.code_text:
@@ -2476,6 +2478,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 action_code_memo = QtGui.QAction(_("Memo coded text M"))
                 action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                action_change_code = QtGui.QAction(_("Change code"))
             if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
@@ -2495,6 +2498,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             menu.addAction(action_important)
         if action_not_important:
             menu.addAction(action_not_important)
+        if action_change_code:
+            menu.addAction(action_change_code)
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
@@ -2546,18 +2551,71 @@ class DialogCodeAV(QtWidgets.QDialog):
             if action == action_video_position_timestamp:
                 self.set_video_to_timestamp_position(cursor.position())
                 return
-        except:
-            pass
+        except Exception as e:
+            print("action_video_position_timestamp ", str(e))
+            return
         if action == action_start_pos:
             self.change_text_code_pos(cursor.position(), "start")
             return
         if action == action_end_pos:
             self.change_text_code_pos(cursor.position(), "end")
             return
-
+        if action == action_change_code:
+            self.change_code_to_another_code(cursor.position())
+            return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
+
+    def change_code_to_another_code(self, position):
+        """ Change code to another code """
+
+        # Get coded segments at this position
+        if self.transcription is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if position >= item['pos0'] and position <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                coded_text_list.append(item)
+        if not coded_text_list:
+            return
+        text_item = []
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select codes"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if not text_item:
+            return
+        # Get replacement code
+        codes_list = deepcopy(self.codes)
+        to_remove = None
+        for code_ in codes_list:
+            if code_['cid'] == text_item['cid']:
+                to_remove = code_
+        if to_remove:
+            codes_list.remove(to_remove)
+        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        replacememt_code = ui.get_selected()
+        if not replacememt_code:
+            return
+        cur = self.app.conn.cursor()
+        sql = "update code_text set cid=? where ctid=?"
+        try:
+            cur.execute(sql, [replacememt_code['cid'], text_item['ctid']])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            pass
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def is_annotated(self, position):
         """ Check if position is annotated to provide annotation menu option.
