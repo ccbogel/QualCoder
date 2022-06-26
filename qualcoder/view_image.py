@@ -225,14 +225,17 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def get_coded_areas(self):
         """ Get the coded area details for the rectangles.
+        Order by area descending so when items are drawn to the scen its largest to smallest on top.
         Called by init and by unmark. """
 
         self.code_areas = []
-        sql = "select imid,id,x1, y1, width, height, memo, date, owner, cid, important from code_image"
+        sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
+              "code_image.cid, important, code_name.name from code_image join code_name on code_name.cid=code_image.cid" \
+              " order by width*height desc"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         results = cur.fetchall()
-        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important'
+        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name'
         for row in results:
             self.code_areas.append(dict(zip(keys, row)))
 
@@ -945,17 +948,23 @@ class DialogCodeImage(QtWidgets.QDialog):
     def scene_context_menu(self, pos):
         """ Scene context menu for setting importance, unmarking coded areas and adding memos. """
 
-        # outside image area, no context menu
+        # Outside image area, no context menu
         for item in self.scene.items():
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 if pos.x() > item.boundingRect().width() or pos.y() > item.boundingRect().height():
                     self.selection = None
                     return
         global_pos = QtGui.QCursor.pos()
-        item = self.find_coded_areas_for_pos(pos)
-        # No coded area item in this mouse position
-        if item is None:
+        items = self.find_coded_areas_for_pos(pos)
+        if not items:
             return
+        item = items[0]
+        if len(items) > 1:
+            ui = DialogSelectItems(self.app, items, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            item = ui.get_selected()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo'))
@@ -967,33 +976,27 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_not_important = None
         if item['important'] == 1:
             action_not_important = menu.addAction(_("Remove important mark"))
-        self.fill_coded_area_label(item)
         action = menu.exec(global_pos)
         if action is None:
             return
         if action == action_memo:
             self.coded_area_memo(item)
-            self.app.delete_backup = False
-            return
         if action == action_unmark:
             self.unmark(item)
-            self.app.delete_backup = False
-            return
         if action == action_important:
             self.set_coded_importance(item)
-            return
         if action == action_not_important:
             self.set_coded_importance(item, False)
-            return
         if action == action_move_resize:
             self.move_or_resize_coding(item)
+        items = self.find_coded_areas_for_pos(pos)
+        self.fill_coded_area_label(items)
 
     def move_or_resize_coding(self, item):
-        """ Move or resize a coding rectangle, in pixels
+        """ Move or resize a coding rectangle, in pixels.
 
         params:
-        :name item: Details of the coded image rectangle
-        :type item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
+        :name item: Dictionary of image id, x1, y1, width, height, memo, date, owner, cid, important
         """
 
         ui = DialogMoveResizeRectangle(self.app)
@@ -1024,13 +1027,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         if item['y1'] + item['height'] > self.pixmap.height():
             overreach = item['y1'] + item['height'] - self.pixmap.height()
             item['height'] -= overreach + 1
-
         cur = self.app.conn.cursor()
         cur.execute("update code_image set x1=?,y1=?,width=?,height=? where imid=?",
                     (item['x1'], item['y1'], item['width'], item['height'], item['imid']))
         self.app.conn.commit()
         self.redraw_scene()
-        self.fill_coded_area_label(item)
+        self.app.delete_backup = False
 
     def find_coded_areas_for_pos(self, pos):
         """ Find any coded areas for this position AND for this coder.
@@ -1038,39 +1040,43 @@ class DialogCodeImage(QtWidgets.QDialog):
         params:
         :name pos:
         :type pos:
-        returns: None or coded item
+        returns: [] or coded items
         """
 
         if self.file_ is None:
             return
+        items = []
         for item in self.code_areas:
             if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
                 if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
                         and pos.y() >= item['y1'] * self.scale and pos.y() <= (
                         item['y1'] + item['height']) * self.scale:
-                    return item
-        return None
+                    items.append(item)
+        return items
 
-    def fill_coded_area_label(self, item):
+    def fill_coded_area_label(self, items):
         """ Fill details of label about the currently clicked on coded area.
         Called by: right click scene menu, """
 
-        if item is None:
+        if not items:
             return
-        codename = ""
-        for c in self.codes:
-            if c['cid'] == item['cid']:
-                codename = c['name']
-                break
-        msg = codename
-        msg += "\nx:" + str(int(item['x1'])) + " y:" + str(int(item['y1']))
-        msg += " w:" + str(int(item['width'])) + " h:" + str(int(item['height']))
-        area = item['width'] * item['height']
-        pic_area = self.pixmap.width() * self.pixmap.height()
-        percent_area = round(area / pic_area * 100, 2)
-        msg += " area: " + str(percent_area) + "%"
+        msg = ""
+        ttip = ""
+        for i in items:
+            codename = ""
+            for c in self.codes:
+                if c['cid'] == i['cid']:
+                    codename = c['name']
+                    msg += codename
+            msg += "\nx:" + str(int(i['x1'])) + " y:" + str(int(i['y1']))
+            msg += " w:" + str(int(i['width'])) + " h:" + str(int(i['height']))
+            area = i['width'] * i['height']
+            pic_area = self.pixmap.width() * self.pixmap.height()
+            percent_area = round(area / pic_area * 100, 2)
+            msg += " area: " + str(percent_area) + "%\n"
+            ttip = msg + "\n" + i['memo']
         self.ui.label_coded_area.setText(msg)
-        self.ui.label_coded_area.setToolTip(item['memo'])
+        self.ui.label_coded_area.setToolTip(ttip)
 
     def set_coded_importance(self, item, important=True):
         """ Set or unset importance to coded image item.
@@ -1094,7 +1100,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         param:
             item : dictionary of coded area """
 
-        ui = DialogMemo(self.app, _("Memo for coded area of ") + self.file_['name'],
+        ui = DialogMemo(self.app, _("Memo for code: ") + item['name'],
                         item['memo'])
         ui.exec()
         memo = ui.memo
@@ -1103,7 +1109,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute('update code_image set memo=? where imid=?', (ui.memo, item['imid']))
             self.app.conn.commit()
-        # re-draw to update memos in tooltips
+            self.app.delete_backup = False
+        # Re-draw to update memos in tooltips
         self.draw_coded_areas()
 
     def undo_last_unmarked_code(self):
@@ -1124,6 +1131,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.get_coded_areas()
         self.redraw_scene()
         self.fill_code_counts_in_tree()
+        self.app.delete_backup = False
 
     def unmark(self, item):
         """ Remove coded area.
@@ -1137,6 +1145,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.get_coded_areas()
         self.redraw_scene()
         self.fill_code_counts_in_tree()
+        self.app.delete_backup = False
 
     def create_code_area(self, p1):
         """ Create coded area coordinates from mouse release.
@@ -1195,7 +1204,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             if self.codes[i]['cid'] == int(cid):
                 color = QtGui.QColor(self.codes[i]['color'])
         if color is None:
-            print("ERROR")
             return
         rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
         rect_item.setToolTip(code_.text(0))
