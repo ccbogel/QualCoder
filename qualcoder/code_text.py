@@ -38,7 +38,6 @@ import traceback
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtGui import QHelpEvent
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
@@ -105,7 +104,6 @@ class DialogCodeText(QtWidgets.QWidget):
     search_term = ""
     search_type = "3"  # 3 chars or 5 chars or 1 for Enter
     selected_code_index = 0
-    eventFilter = None
     important = False  # Show/hide important codes
     attributes = []  # Show selected files using these attributes in list widget
     # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
@@ -156,9 +154,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox_edit_mode.hide()
         ee = _("EDITING TEXT MODE (Ctrl+E)") + " "
         ee += _(
-            "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
+            "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / "
+            "case-assigned) and underlined (coded, annotated, case-assigned).")
         ee += " " + _(
-            "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
+            "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is "
+            "typed over or deleted.")
         self.ui.label_editing.setText(ee)
         self.edit_pos = 0
         self.edit_mode = False
@@ -876,7 +876,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     text_ = filedata['fulltext']
                     for match in pattern.finditer(text_):
                         self.search_indices.append((filedata, match.start(), len(match.group(0))))
-                except:
+                except re.error:
                     logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)
         else:
             try:
@@ -885,7 +885,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         # Get result as first dictionary item
                         source_name = self.app.get_file_texts([self.file_['id'], ])[0]
                         self.search_indices.append((source_name, match.start(), len(match.group(0))))
-            except:
+            except re.error:
                 logger.exception('Failed searching current file for %s', self.search_term)
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
@@ -1237,8 +1237,9 @@ class DialogCodeText(QtWidgets.QWidget):
                      text_item['owner']))
         self.app.conn.commit()
         for i in self.code_text:
-            if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] and text_item['pos0'] == i['pos0'] \
-                    and text_item['pos1'] == i['pos1'] and text_item['owner'] == self.app.settings['codername']:
+            if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] \
+                    and text_item['pos0'] == i['pos0'] and text_item['pos1'] == i['pos1'] \
+                    and text_item['owner'] == self.app.settings['codername']:
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1370,7 +1371,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
             if selected is not None and action == action_edit_memo:
-                self.add_edit__cat_or_code_memo(selected)
+                self.add_edit_cat_or_code_memo(selected)
             if selected is not None and action == action_delete:
                 self.delete_category_or_code(selected)
             if selected is not None and action == action_show_coded_media:
@@ -1727,7 +1728,6 @@ class DialogCodeText(QtWidgets.QWidget):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
-        #tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
@@ -2294,7 +2294,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
-    def add_edit__cat_or_code_memo(self, selected):
+    def add_edit_cat_or_code_memo(self, selected):
         """ View and edit a memo for a category or code. """
 
         if selected.text(1)[0:3] == 'cid':
@@ -3027,7 +3027,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 anid = cur.fetchone()[0]
                 item['anid'] = anid
                 self.annotations.append(item)
-                self.parent_textEdit.append(_("Annotation added at position: ") \
+                self.parent_textEdit.append(_("Annotation added at position: ")
                                             + str(item['pos0']) + "-" + str(item['pos1']) + _(" for: ") + self.file_[
                                                 'name'])
                 self.get_coded_text_update_eventfilter_tooltips()
@@ -3262,7 +3262,7 @@ class DialogCodeText(QtWidgets.QWidget):
             name += _("\nWith: ") + text_ + _("\nUsing line ending: ") + ending
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
-        self.parent_textEdit.append(_("Automatic code sentence in files:") \
+        self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
                                     + _("\nWith text fragment: ") 
                                     + text.decode("utf-8") 
@@ -3344,7 +3344,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     except Exception as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
-                self.parent_textEdit.append(_("Automatic coding in files: ") + filenames \
+                self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
                                             + _(". with text: ") + txt)
         if len(undo_list) > 0:
             name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
