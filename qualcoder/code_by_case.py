@@ -998,6 +998,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
         action_code_memo = None
         action_start_pos = None
         action_end_pos = None
+        action_change_code = None
         action_important = None
         action_not_important = None
         action_annotate = None
@@ -1014,6 +1015,7 @@ class DialogCodeByCase(QtWidgets.QWidget):
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
                     action_not_important = QtGui.QAction(_("Remove important mark"))
+                action_change_code = QtGui.QAction(_("Change code"))
         if action_unmark:
             menu.addAction(action_unmark)
         if action_code_memo:
@@ -1026,6 +1028,8 @@ class DialogCodeByCase(QtWidgets.QWidget):
             menu.addAction(action_important)
         if action_not_important:
             menu.addAction(action_not_important)
+        if action_change_code:
+            menu.addAction(action_change_code)
 
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
@@ -1073,9 +1077,65 @@ class DialogCodeByCase(QtWidgets.QWidget):
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
             return
+        if action == action_change_code:
+            self.change_code_to_another_code(cursor.position())
+            return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
+
+    def change_code_to_another_code(self, position):
+        """ Change code to another code """
+
+        if self.case_ is None or not self.case_['files']:
+            return
+        # Get coded segments at this position
+        coded_text_list = []
+        file_ = self.case_['files'][self.case_['file_index']]
+
+        for item in self.code_text:
+            #if position + file_['start'] >= item['pos0'] and position + file_['start'] <= item['pos1'] and \
+            if position >= item['pos0'] and position <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                coded_text_list.append(item)
+        if not coded_text_list:
+            return
+        text_item = []
+        if len(coded_text_list) == 1:
+            text_item = coded_text_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select codes"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            text_item = ui.get_selected()
+        if not text_item:
+            return
+        # Get replacement code
+        codes_list = deepcopy(self.codes)
+        to_remove = None
+        for code_ in codes_list:
+            if code_['cid'] == text_item['cid']:
+                to_remove = code_
+        if to_remove:
+            codes_list.remove(to_remove)
+        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        replacememt_code = ui.get_selected()
+        if not replacememt_code:
+            return
+        cur = self.app.conn.cursor()
+        sql = "update code_text set cid=? where ctid=?"
+        try:
+            cur.execute(sql, [replacememt_code['cid'], text_item['ctid']])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            pass
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def recursive_set_current_item(self, item, text_):
         """ Set matching item to be the current selected item.
