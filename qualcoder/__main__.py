@@ -1173,6 +1173,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Create edit and delete codes. Apply and remove codes and annotations to
          files. Organised by Case. Useful for an imported survey. """
 
+        msg = "Plan to remove code by case function as it is becoming a lot more difficult to update.\n"
+        msg += "If this function is vital for you use please let me know"
+        Message(self.app, "To remove function", msg).exec()
+        return
+
         cases = self.app.get_casenames()
         if len(cases) == 0:
             msg = _("This project contains no cases.")
@@ -1726,7 +1731,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute(
                 "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
-        # TODO Database version 6
+        # Database version 6
         try:
             cur.execute("select name, description, date from graph")
         except sqlite3.OperationalError:
