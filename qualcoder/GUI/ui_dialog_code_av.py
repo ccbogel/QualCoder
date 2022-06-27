@@ -162,9 +162,10 @@ class Ui_Dialog_code_av(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_av.setWindowTitle(_translate("Dialog_code_av", "Code Audio Video"))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
-        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Play / Pause</p><p>Ctrl + S start/pause</p><p>Ctrl + P start/pause</p></body></html>"))
+        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "Play / Pause. Ctrl + P start/pause"))
         self.label_volume.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Volume</p></body></html>"))
-        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.</p></body></html>"))
+        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.\n"
+"Key shortcut: Ctrl S"))
         self.pushButton_coding.setText(_translate("Dialog_code_av", "Start segment"))
         self.label_segment.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.</p></body></html>"))
         self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
