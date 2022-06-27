@@ -81,7 +81,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Play / Pause. Ctrl + P start/pause</string>
       </property>
       <property name="text">
        <string/>
@@ -148,7 +148,8 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.
+Key shortcut: Ctrl S</string>
       </property>
       <property name="text">
        <string>Start segment</string>
