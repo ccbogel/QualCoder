@@ -1352,17 +1352,13 @@ class DialogCodeText(QtWidgets.QWidget):
                 return
         if changed_start == 0 and changed_end == 0:
             return
-        int_dialog.done(1)  # need this, as reactiveated when called again with same int value.
-
+        int_dialog.done(1)  # Need this, as reactivated when called again with same int value.
         # Update database, reload code_text and highlights
         new_pos0 = code_to_edit['pos0'] + changed_start
         new_pos1 = code_to_edit['pos1'] + changed_end
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=?, pos1=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-        cur.execute(sql,
-                    (new_pos0, new_pos1, code_to_edit['cid'], code_to_edit['fid'], code_to_edit['pos0'],
-                     code_to_edit['pos1'],
-                     self.app.settings['codername']))
+        sql = "update code_text set pos0=?, pos1=? where ctid=?"
+        cur.execute(sql, [new_pos0, new_pos1, code_to_edit['ctid']])
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1870,10 +1866,8 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
-        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-        cur.execute(sql,
-                    (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] + 1, code_['pos1'],
-                     self.app.settings['codername']))
+        sql = "update code_text set pos0=?, seltext=? where ctid=?"
+        cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1888,10 +1882,9 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
-        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+        sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql,
-                    (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] - 1,
-                     self.app.settings['codername']))
+                    (code_['pos1'], seltext, code_['ctid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1906,10 +1899,8 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
-        sql = "update code_text set pos1=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-        cur.execute(sql,
-                    (code_['pos1'], seltext, code_['cid'], code_['fid'], code_['pos0'], code_['pos1'] + 1,
-                     self.app.settings['codername']))
+        sql = "update code_text set pos1=?, seltext=? where ctid=?"
+        cur.execute(sql, (code_['pos1'], seltext, code_['ctid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1924,10 +1915,8 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?) from source where id=?"
         cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
         seltext = cur.fetchone()[0]
-        sql = "update code_text set pos0=?, seltext=? where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-        cur.execute(sql,
-                    (code_['pos0'], seltext, code_['cid'], code_['fid'], code_['pos0'] - 1, code_['pos1'],
-                     self.app.settings['codername']))
+        sql = "update code_text set pos0=?, seltext=? where ctid=?"
+        cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1968,7 +1957,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
         if not found_larger and indexes == []:
             return
-        # loop around to highest index
+        # Loop around to highest index
         if not found_larger and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
@@ -3014,8 +3003,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         for item in to_unmark:
-            cur.execute("delete from code_text where cid=? and pos0=? and pos1=? and owner=? and fid=?",
-                        (item['cid'], item['pos0'], item['pos1'], self.app.settings['codername'], item['fid']))
+            cur.execute("delete from code_text where ctid=?", (item['ctid']))
             self.app.conn.commit()
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
