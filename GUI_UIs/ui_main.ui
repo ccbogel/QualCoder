@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_action_log">
        <attribute name="title">
@@ -45,12 +45,12 @@
          <rect>
           <x>20</x>
           <y>20</y>
-          <width>511</width>
+          <width>861</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Files and Cases menu. CTRL TAB to switch tabs.</string>
+         <string>Select an option in the Files and Cases menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
         </property>
        </widget>
       </widget>
@@ -63,12 +63,12 @@
          <rect>
           <x>20</x>
           <y>20</y>
-          <width>581</width>
+          <width>811</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Coding menu. CTRL TAB to switch tabs.</string>
+         <string>Select an option in the Coding menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
         </property>
        </widget>
       </widget>
@@ -81,12 +81,12 @@
          <rect>
           <x>20</x>
           <y>20</y>
-          <width>511</width>
+          <width>831</width>
           <height>17</height>
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Reports menu. CTRL TAB to switch tabs.</string>
+         <string>Select an option in the Reports menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
         </property>
        </widget>
       </widget>
