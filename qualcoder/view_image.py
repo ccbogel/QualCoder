@@ -1160,6 +1160,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if code_.text(1)[0:3] == 'cat':
             return
         cid = int(code_.text(1)[4:])  # must be integer
+        code_name = code_.text(0)
         x = self.selection.x()
         y = self.selection.y()
         width = p1.x() - x
@@ -1186,7 +1187,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
                 'width': width_unscaled, 'height': height_unscaled, 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                'cid': cid, 'memo': '', 'important': None}
+                'cid': cid, 'memo': '', 'important': None, 'name': code_name}
         cur = self.app.conn.cursor()
         cur.execute(
             "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,"
