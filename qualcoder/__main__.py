@@ -1445,7 +1445,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
         cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
                     "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
-                    "tooltip text, ctid integer);")
+                    "tooltip text, ctid integer,memo_ctid integer, memo_imid integer, memo_avid integer);")
         cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                     "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                     "linewidth real, linetype text, isvisible integer);")
@@ -1764,7 +1764,25 @@ class MainWindow(QtWidgets.QMainWindow):
                         "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
-            self.ui.textEdit.append(_("Adding graph tables. Updating database to version") + " v6")
+            self.ui.textEdit.append(_("Updating database to version") + " v6")
+        # Database v7
+        try:
+            cur.execute("select memo_ctid from gr_free_text_item")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE gr_free_text_item ADD memo_ctid integer')
+            self.app.conn.commit()
+        try:
+            cur.execute("select memo_imid from gr_free_text_item")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE gr_free_text_item ADD memo_imid integer')
+            self.app.conn.commit()
+        try:
+            cur.execute("select memo_avid from gr_free_text_item")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE gr_free_text_item ADD memo_avid integer')
+            self.app.conn.commit()
+        cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
+        self.ui.textEdit.append(_("Updating database to version") + " v7")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
