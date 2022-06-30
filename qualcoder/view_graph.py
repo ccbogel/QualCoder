@@ -152,19 +152,19 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_codes_of_text.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_text.pressed.connect(self.show_codes_of_text_files)
+        self.ui.pushButton_codes_of_text.pressed.connect(self.add_codes_of_text_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
         self.ui.pushButton_codes_of_images.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_images.pressed.connect(self.show_codes_of_image_files)
+        self.ui.pushButton_codes_of_images.pressed.connect(self.add_codes_of_image_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_codes_of_av.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_av.pressed.connect(self.show_codes_of_av_files)
+        self.ui.pushButton_codes_of_av.pressed.connect(self.add_codes_of_av_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_memos_of_file.pressed.connect(self.show_memos_of_file)
+        self.ui.pushButton_memos_of_file.pressed.connect(self.add_memos_of_file)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -505,13 +505,13 @@ class ViewGraph(QDialog):
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
         if action == action_add_coded_text:
-            self.show_codes_of_text_files(position.x(), position.y())
+            self.add_codes_of_text_files(position.x(), position.y())
         if action == action_add_coded_image:
-            self.show_codes_of_image_files(position.x(), position.y())
+            self.add_codes_of_image_files(position.x(), position.y())
         if action == action_add_coded_av:
-            self.show_codes_of_av_files(position.x(), position.y())
+            self.add_codes_of_av_files(position.x(), position.y())
         if action == action_memos:
-            self.show_memos_of_file(position.x(), position.y())
+            self.add_memos_of_file(position.x(), position.y())
         if action == action_add_line:
             self.add_lines_to_graph()
         if action == action_add_files:
@@ -519,7 +519,7 @@ class ViewGraph(QDialog):
         if action == action_add_cases:
             self.add_cases_to_graph()
 
-    def show_codes_of_av_files(self, x=10, y=10):
+    def add_codes_of_av_files(self, x=10, y=10):
         """ Show selected codes of selected audio/video files as av graphics items. """
 
         # Select files
@@ -575,7 +575,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_codes_of_image_files(self, x=10, y=10):
+    def add_codes_of_image_files(self, x=10, y=10):
         """ Show selected codes of selected image files as pixmap graphics items. """
 
         # Select files
@@ -630,7 +630,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_codes_of_text_files(self, x=10, y=10):
+    def add_codes_of_text_files(self, x=10, y=10):
         """ Show selected codes of selected text files as free text graphics items. """
 
         # Select files
@@ -683,7 +683,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_memos_of_file(self, x=10, y=10):
+    def add_memos_of_file(self, x=10, y=10):
         """ Show selected memos of coded segments of selected files in free text items. """
 
         files_wth_names = self.app.get_filenames()
@@ -741,7 +741,12 @@ class ViewGraph(QDialog):
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            memo_avid = None
+            memo_imid = None
+            memo_ctid = None
+            # TODO fill ids corerctly
+
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, memo_ctid, memo_imid, memo_avid)
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
@@ -1121,29 +1126,61 @@ class ViewGraph(QDialog):
 
         cur = self.app.conn.cursor()
 
-        sql_pix = "SELECT imid FROM  gr_pix_item where grid=? and imid not in (select imid from code_image)"
-        cur.execute(sql_pix, [grid])
+        sql_pix = "SELECT imid FROM  gr_pix_item where imid not in (select imid from code_image)"
+        cur.execute(sql_pix)
         res_pix = cur.fetchall()
         for r in res_pix:
-            cur.execute("delete from gr_pix_item where grid=? and imid=?", [grid, r[0]])
+            cur.execute("delete from gr_pix_item where imid=?", [r[0]])
             self.app.conn.commit()
-        sql_av = "select avid from gr_av_item where grid=? and avid not in (select avid from code_av)"
-        cur.execute(sql_av, [grid])
+        sql_av = "select avid from gr_av_item where avid not in (select avid from code_av)"
+        cur.execute(sql_av)
         res_av = cur.fetchall()
         for r in res_av:
-            cur.execute("delete from gr_av_item where grid=? and avid=?", [grid, r[0]])
+            cur.execute("delete from gr_av_item where avid=?", [r[0]])
             self.app.conn.commit()
-        sql_case = "select caseid from gr_case_text_item where grid=? and caseid not in (select caseid from cases)"
-        cur.execute(sql_case, [grid])
+        sql_case = "select caseid from gr_case_text_item where caseid not in (select caseid from cases)"
+        cur.execute(sql_case)
         res_case = cur.fetchall()
-        for r in res_av:
-            cur.execute("delete from gr_case_item where grid=? and caseid=?", [grid, r[0]])
+        for r in res_case:
+            cur.execute("delete from gr_case_item where caseid=?", [r[0]])
             self.app.conn.commit()
-        sql_file = "select fid from gr_file_text_item where grid=? and fid not in (select id from source)"
-        cur.execute(sql_file, [grid])
+        sql_file = "select fid from gr_file_text_item where fid not in (select id from source)"
+        cur.execute(sql_file)
         res_file = cur.fetchall()
-        for r in res_av:
-            cur.execute("delete gr_file_item where grid=? and fid=?", [grid, r[0]])
+        for r in res_file:
+            cur.execute("delete gr_file_item where fid=?", [r[0]])
+            self.app.conn.commit()
+        # Text codings
+        sql_text = "select ctid from gr_free_text_item where ctid is not null and ctid != -1 and ctid not in " \
+                   "(select ctid from code_text)"
+        cur.execute(sql_text)
+        res_text = cur.fetchall()
+        for r in res_text:
+            cur.execute("delete gr_free_text_item where ctid=?", [r[0]])
+            self.app.conn.commit()
+        # Text coding memos
+        sql_memo_text = "select memo_ctid from gr_free_text_item where memo_ctid is not null and memo_ctid not in " \
+                        "(select ctid from code_text)"
+        cur.execute(sql_memo_text)
+        res_memo_text = cur.fetchall()
+        for r in res_memo_text:
+            cur.execute("delete gr_free_text_item where memo_ctid=?", [r[0]])
+            self.app.conn.commit()
+        # Image coding memos
+        sql_memo_image = "select memo_imid from gr_free_text_item where memo_imid is not null and memo_imid not in " \
+                         "(select imid from code_image)"
+        cur.execute(sql_memo_image)
+        res_memo_image = cur.fetchall()
+        for r in res_memo_image:
+            cur.execute("delete gr_free_text_item where memo_imid=?", [r[0]])
+            self.app.conn.commit()
+        # AV coding memos
+        sql_memo_av = "select memo_avid from gr_free_text_item where memo_avid is not null and memo_avid not in " \
+                      "(select avid from code_av)"
+        cur.execute(sql_memo_av)
+        res_memo_av = cur.fetchall()
+        for r in res_memo_av:
+            cur.execute("delete gr_free_text_item where memo_avid=?", [r[0]])
             self.app.conn.commit()
 
     def load_graph(self):
@@ -1953,13 +1990,15 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     freetextid = -1
     text = "text"
     ctid = -1  # Used for a coded text display to show code in context
+    memo_ctid = None
+    memo_imid = None
+    memo_avid = None
     font_size = 9
     color = "black"
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
 
-    # TODO Freetext fix params, memo_ctid, memo_imid, memo_avid
     def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None):
         """ Free text object.
@@ -1989,6 +2028,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.remove = False
         self.ctid = ctid
+        self.memo_ctid = memo_ctid
+        self.memo_imid = memo_imid
+        self.memo_avid = memo_avid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
