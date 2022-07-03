@@ -708,22 +708,26 @@ class ViewGraph(QDialog):
                 res = cur.fetchall()
                 for r in res:
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
-                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4]})
-                sql_img = 'select cid,id,x1,y1,width,height,memo from code_image where cid=? and id=? and memo !=""'
+                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4], 'imid': None,
+                                  'avid': None})
+                sql_img = 'select cid,id,x1,y1,width,height,memo,imid from code_image where cid=? and id=? and memo !=""'
                 cur.execute(sql_img, [code['cid'], file_['id']])
                 res_img = cur.fetchall()
                 for r in res_img:
                     tt = "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " + \
                          _("height:") + str(int(r[5]))
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
-                                  'codename': code['name'], 'filename': file_['name']})
-                sql_av = 'select cid,id,pos0,pos1,memo from code_av where cid=? and id=? and memo !="" order by pos0 asc'
+                                  'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
+                                  'ctid': None})
+                sql_av = 'select cid,id,pos0,pos1,memo, avid from code_av where cid=? and id=? and memo !="" ' \
+                         'order by pos0 asc'
                 cur.execute(sql_av, [code['cid'], file_['id']])
                 res_av = cur.fetchall()
                 for r in res_av:
                     tt = str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
-                                  'codename': code['name'], 'filename': file_['name']})
+                                  'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
+                    'ctid': None})
         if not memos:
             Message(self.app, _("No memos"), _("No memos for selection")).exec()
             return
@@ -741,12 +745,10 @@ class ViewGraph(QDialog):
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            memo_avid = None
-            memo_imid = None
-            memo_ctid = None
-            # TODO fill ids corerctly
-
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, memo_ctid, memo_imid, memo_avid)
+            '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
+                 memo_ctid=None, memo_imid=None, memo_avid=None '''
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, s['ctid'], None,
+                                        s['imid'], s['avid'])
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
@@ -969,10 +971,12 @@ class ViewGraph(QDialog):
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
                 sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
-                      "ctid) values (?,?,?,?,?,?,?,?,?,?)"
+                      "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
                 tt = i.toolTip()
+                #TODO Issue here
+                print("FREE TEXT ITEM", i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid, i.text)
                 cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
-                                  tt, i.ctid])
+                                  tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
                 self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
                 sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
@@ -1384,7 +1388,7 @@ class ViewGraph(QDialog):
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9],i[10],i[11])
+            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11])
             if i[7] != "":
                 item.setToolTip(i[7])
             self.scene.addItem(item)
