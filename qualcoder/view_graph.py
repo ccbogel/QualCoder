@@ -747,8 +747,8 @@ class ViewGraph(QDialog):
                         freetextid = item.freetextid + 1
             '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None '''
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, s['ctid'], None,
-                                        s['imid'], s['avid'])
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
+                                        s['ctid'], s['imid'], s['avid'])
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
