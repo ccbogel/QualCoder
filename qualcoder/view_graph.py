@@ -973,8 +973,6 @@ class ViewGraph(QDialog):
                 sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
                       "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
                 tt = i.toolTip()
-                #TODO Issue here
-                print("FREE TEXT ITEM", i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid, i.text)
                 cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
                                   tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
                 self.app.conn.commit()
@@ -2002,6 +2000,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    code_text_entry = ""
 
     def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None):
@@ -2045,9 +2044,30 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(colors[color])
         if self.boundingRect().width() > self.MAX_WIDTH:
             self.setTextWidth(self.MAX_WIDTH)
+        self.check_coding()
+
+    def check_coding(self):
+        """ Check text coding segment is current.
+        Flag if so, but do not automatically update. """
+
+        if self.ctid == -1:
+            self.code_text_entry = self.text
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select seltext from code_text where ctid=?", [self.ctid])
+        res = cur.fetchone()
+        current_text = res[0]
+        if res is None:
+            print("text coding not in coe_text table")
+            self.code_text_entry = self.text
+            return
+        self.code_text_entry = current_text
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
+        update_text_action = None
+        if self.ctid > 0 and self.text != self.code_text_entry:
+            update_text_action = menu.addAction(_("Update coding text"))
         edit_action = menu.addAction(_("Edit text"))
         context_action = None
         if self.ctid != -1:
@@ -2068,6 +2088,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         white_action = menu.addAction(_("White text"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
+            return
+        if action == update_text_action:
+            self.text = self.code_text_entry
+            cur = self.app.conn.cursor()
+            # TODO add grfreeid !!!!
+            cur.execute("update gr_free_text_item set freetext=? where gfreeid=?")
+            self.app.conn.commit()
             return
         if action == context_action:
             cur = self.app.conn.cursor()
