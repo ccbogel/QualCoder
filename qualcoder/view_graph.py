@@ -50,12 +50,12 @@ from .select_items import DialogSelectItems
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-
 colors = {"red": QtCore.Qt.GlobalColor.red, "green": QtCore.Qt.GlobalColor.green,
-           "cyan": QtCore.Qt.GlobalColor.cyan, "magenta": QtCore.Qt.GlobalColor.magenta,
-           "yellow": QtGui.QColor("#FFD700"), "blue": QtGui.QColor("#6495ED"),
-           "orange": QtGui.QColor("#FFA500"), "gray": QtGui.QColor("#808080"),
-           "black": QtCore.Qt.GlobalColor.black, "white": QtCore.Qt.GlobalColor.white}
+          "cyan": QtCore.Qt.GlobalColor.cyan, "magenta": QtCore.Qt.GlobalColor.magenta,
+          "yellow": QtGui.QColor("#FFD700"), "blue": QtGui.QColor("#6495ED"),
+          "orange": QtGui.QColor("#FFA500"), "gray": QtGui.QColor("#808080"),
+          "black": QtCore.Qt.GlobalColor.black, "white": QtCore.Qt.GlobalColor.white}
+
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -152,19 +152,19 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_codes_of_text.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_text.pressed.connect(self.show_codes_of_text_files)
+        self.ui.pushButton_codes_of_text.pressed.connect(self.add_codes_of_text_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
         self.ui.pushButton_codes_of_images.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_images.pressed.connect(self.show_codes_of_image_files)
+        self.ui.pushButton_codes_of_images.pressed.connect(self.add_codes_of_image_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_codes_of_av.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_av.pressed.connect(self.show_codes_of_av_files)
+        self.ui.pushButton_codes_of_av.pressed.connect(self.add_codes_of_av_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_memos_of_file.pressed.connect(self.show_memos_of_file)
+        self.ui.pushButton_memos_of_file.pressed.connect(self.add_memos_of_file)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -505,13 +505,13 @@ class ViewGraph(QDialog):
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
         if action == action_add_coded_text:
-            self.show_codes_of_text_files(position.x(), position.y())
+            self.add_codes_of_text_files(position.x(), position.y())
         if action == action_add_coded_image:
-            self.show_codes_of_image_files(position.x(), position.y())
+            self.add_codes_of_image_files(position.x(), position.y())
         if action == action_add_coded_av:
-            self.show_codes_of_av_files(position.x(), position.y())
+            self.add_codes_of_av_files(position.x(), position.y())
         if action == action_memos:
-            self.show_memos_of_file(position.x(), position.y())
+            self.add_memos_of_file(position.x(), position.y())
         if action == action_add_line:
             self.add_lines_to_graph()
         if action == action_add_files:
@@ -519,7 +519,7 @@ class ViewGraph(QDialog):
         if action == action_add_cases:
             self.add_cases_to_graph()
 
-    def show_codes_of_av_files(self, x=10, y=10):
+    def add_codes_of_av_files(self, x=10, y=10):
         """ Show selected codes of selected audio/video files as av graphics items. """
 
         # Select files
@@ -575,7 +575,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_codes_of_image_files(self, x=10, y=10):
+    def add_codes_of_image_files(self, x=10, y=10):
         """ Show selected codes of selected image files as pixmap graphics items. """
 
         # Select files
@@ -625,12 +625,11 @@ class ViewGraph(QDialog):
             y += 10
             item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
             msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            if s['memo'] != "":
-                msg += "\n" + _("Memo: ") + s['memo']
+            msg += "\n" + _("Memo: ") + s['memo']
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_codes_of_text_files(self, x=10, y=10):
+    def add_codes_of_text_files(self, x=10, y=10):
         """ Show selected codes of selected text files as free text graphics items. """
 
         # Select files
@@ -683,7 +682,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def show_memos_of_file(self, x=10, y=10):
+    def add_memos_of_file(self, x=10, y=10):
         """ Show selected memos of coded segments of selected files in free text items. """
 
         files_wth_names = self.app.get_filenames()
@@ -708,22 +707,26 @@ class ViewGraph(QDialog):
                 res = cur.fetchall()
                 for r in res:
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
-                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4]})
-                sql_img = 'select cid,id,x1,y1,width,height,memo from code_image where cid=? and id=? and memo !=""'
+                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4], 'imid': None,
+                                  'avid': None})
+                sql_img = 'select cid,id,x1,y1,width,height,memo,imid from code_image where cid=? and id=? and memo !=""'
                 cur.execute(sql_img, [code['cid'], file_['id']])
                 res_img = cur.fetchall()
                 for r in res_img:
-                    tt = "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " +\
+                    tt = "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " + \
                          _("height:") + str(int(r[5]))
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
-                                  'codename': code['name'], 'filename': file_['name']})
-                sql_av = 'select cid,id,pos0,pos1,memo from code_av where cid=? and id=? and memo !="" order by pos0 asc'
+                                  'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
+                                  'ctid': None})
+                sql_av = 'select cid,id,pos0,pos1,memo, avid from code_av where cid=? and id=? and memo !="" ' \
+                         'order by pos0 asc'
                 cur.execute(sql_av, [code['cid'], file_['id']])
                 res_av = cur.fetchall()
                 for r in res_av:
                     tt = str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
-                                  'codename': code['name'], 'filename': file_['name']})
+                                  'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
+                    'ctid': None})
         if not memos:
             Message(self.app, _("No memos"), _("No memos for selection")).exec()
             return
@@ -741,7 +744,10 @@ class ViewGraph(QDialog):
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color)
+            '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
+                 memo_ctid=None, memo_imid=None, memo_avid=None '''
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
+                                        s['ctid'], s['imid'], s['avid'])
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
@@ -964,20 +970,22 @@ class ViewGraph(QDialog):
                 self.app.conn.commit()
             if isinstance(i, FreeTextGraphicsItem):
                 sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
-                      "ctid) values (?,?,?,?,?,?,?,?,?,?)"
+                      "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
                 tt = i.toolTip()
                 cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
-                                  tt, i.ctid])
+                                  tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
                 self.app.conn.commit()
             if isinstance(i, CaseTextGraphicsItem):
                 sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
                       "values (?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                cur.execute(sql,
+                            [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, FileTextGraphicsItem):
                 sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color, displaytext) " \
                       "values (?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                cur.execute(sql,
+                            [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 self.app.conn.commit()
             if isinstance(i, PixmapGraphicsItem):
                 sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip) values " \
@@ -988,7 +996,8 @@ class ViewGraph(QDialog):
             if isinstance(i, AVGraphicsItem):
                 sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
                       "(?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
+                cur.execute(sql,
+                            [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
                 self.app.conn.commit()
             if isinstance(i, LinkGraphicsItem):
                 sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
@@ -1109,6 +1118,141 @@ class ViewGraph(QDialog):
             self.load_graph_menu_option = _("Newest to oldest")
         self.ui.pushButton_loadgraph.setToolTip(_("Load graph") + "\n" + self.load_graph_menu_option)
 
+    def remove_expired_graph_items(self, grid):
+        """ Some items may no longer exist in the database and need to be removed from the saved graph objects.
+        Applies to: gr_case_text_item, gr_file_text_item, gr_pix_item, gr_av_item and
+        gr_text_item for coded text, and for memos of coded text, av, images.
+        param:
+            grid: Integer : graph id """
+
+        cur = self.app.conn.cursor()
+
+        sql_pix = "SELECT imid FROM  gr_pix_item where imid not in (select imid from code_image)"
+        cur.execute(sql_pix)
+        res_pix = cur.fetchall()
+        for r in res_pix:
+            cur.execute("delete from gr_pix_item where imid=?", [r[0]])
+            self.app.conn.commit()
+        sql_av = "select avid from gr_av_item where avid not in (select avid from code_av)"
+        cur.execute(sql_av)
+        res_av = cur.fetchall()
+        for r in res_av:
+            cur.execute("delete from gr_av_item where avid=?", [r[0]])
+            self.app.conn.commit()
+        sql_case = "select caseid from gr_case_text_item where caseid not in (select caseid from cases)"
+        cur.execute(sql_case)
+        res_case = cur.fetchall()
+        for r in res_case:
+            cur.execute("delete from gr_case_item where caseid=?", [r[0]])
+            self.app.conn.commit()
+        sql_file = "select fid from gr_file_text_item where fid not in (select id from source)"
+        cur.execute(sql_file)
+        res_file = cur.fetchall()
+        for r in res_file:
+            cur.execute("delete gr_file_item where fid=?", [r[0]])
+            self.app.conn.commit()
+        # Text codings
+        sql_text = "select ctid from gr_free_text_item where ctid is not null and ctid != -1 and ctid not in " \
+                   "(select ctid from code_text)"
+        cur.execute(sql_text)
+        res_text = cur.fetchall()
+        for r in res_text:
+            cur.execute("delete gr_free_text_item where ctid=?", [r[0]])
+            self.app.conn.commit()
+        # Text coding memos
+        sql_memo_text = "select memo_ctid from gr_free_text_item where memo_ctid is not null and memo_ctid not in " \
+                        "(select ctid from code_text)"
+        cur.execute(sql_memo_text)
+        res_memo_text = cur.fetchall()
+        for r in res_memo_text:
+            cur.execute("delete gr_free_text_item where memo_ctid=?", [r[0]])
+            self.app.conn.commit()
+        # Image coding memos
+        sql_memo_image = "select memo_imid from gr_free_text_item where memo_imid is not null and memo_imid not in " \
+                         "(select imid from code_image)"
+        cur.execute(sql_memo_image)
+        res_memo_image = cur.fetchall()
+        for r in res_memo_image:
+            cur.execute("delete gr_free_text_item where memo_imid=?", [r[0]])
+            self.app.conn.commit()
+        # AV coding memos
+        sql_memo_av = "select memo_avid from gr_free_text_item where memo_avid is not null and memo_avid not in " \
+                      "(select avid from code_av)"
+        cur.execute(sql_memo_av)
+        res_memo_av = cur.fetchall()
+        for r in res_memo_av:
+            cur.execute("delete gr_free_text_item where memo_avid=?", [r[0]])
+            self.app.conn.commit()
+
+    def update_coded_image_areas(self):
+        """ Check coding area and memo is current in gr_pix_item.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("update gr_pix_item set px=(select x1 from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set py=(select y1 from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set w=(select width from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set h=(select height from code_image where code_image.imid=gr_pix_item.imid)")
+        # Tooltips
+        cur.execute("select grpixid, source.name, code_name.name, code_image.memo from gr_pix_item "
+                    "join code_image on code_image.imid=gr_pix_item.imid "
+                    "join code_name on code_name.cid= code_image.cid "
+                    "join source on source.id=code_image.id")
+        res = cur.fetchall()
+        for r in res:
+            tt = _("File: ") + r[1] + "\n"
+            tt += _("Code: ") + r[2] + "\n"
+            tt += _("Memo: ") + r[3]
+            cur.execute("update gr_pix_item set tooltip=? where grpixid=?", [tt, r[0]])
+        self.app.conn.commit()
+
+    def update_coded_av_segments(self):
+        """ Check coding segment and memo is current.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("update gr_av_item set pos0=(select pos0 from code_av where code_av.avid=gr_av_item.avid)")
+        cur.execute("update gr_av_item set pos1=(select pos1 from code_av where code_av.avid=gr_av_item.avid)")
+        self.app.conn.commit()
+        # Tooltips
+        cur.execute("select gr_avid, source.name, code_name.name, gr_av_item.pos0, gr_av_item.pos1, code_av.memo "
+                    "from gr_av_item join code_av on code_av.avid=gr_av_item.avid "
+                    "join code_name on code_name.cid= code_av.cid "
+                    "join source on source.id=code_av.id")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += str(r[3]) + " - " + str(r[4]) + "\n"
+                tt += _("Memo: ") + r[5]
+                cur.execute("update gr_av_item set tooltip=? where gr_avid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+
+    def update_coded_text_tooltip_code_and_memos(self):
+        """ Check text coding code name and memo is current.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        # Tooltips
+        cur.execute("select gfreeid, tooltip, source.name, code_name.name, code_text.memo from gr_free_text_item "
+                    "join code_text on code_text.ctid=gr_free_text_item.ctid "
+                    "join code_name on code_name.cid= code_text.cid "
+                    "join source on source.id=code_text.fid "
+                    "where gr_free_text_item.ctid > 0")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[2] + "\n"
+                tt += _("Code: ") + r[3] + "\n"
+                tt += _("Memo: ") + r[4]
+                cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+
     def load_graph(self):
         """ Load a saved graph.
         Load each text component first then link then the cdct_line_items then the free_lines_items.
@@ -1116,6 +1260,9 @@ class ViewGraph(QDialog):
         eg name, memo, date?, owner?, color, child_names?
         """
 
+        self.update_coded_image_areas()
+        self.update_coded_av_segments()
+        self.update_coded_text_tooltip_code_and_memos()
         cur = self.app.conn.cursor()
         sql = "select name, grid, description, scene_width, scene_height from graph order by upper(name) asc"
         if self.load_graph_menu_option == "Alphabet descending":
@@ -1137,6 +1284,7 @@ class ViewGraph(QDialog):
         if not graph:
             return
         grid = graph['grid']
+        self.remove_expired_graph_items(grid)
         self.scene.clear()
         self.scene.set_width(graph['width'])
         self.scene.set_height(graph['height'])
@@ -1197,7 +1345,7 @@ class ViewGraph(QDialog):
         cur.execute(sql, [grid])
         result = cur.fetchall()
         res = []
-        keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "fromimid","fromavid", \
+        keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "fromimid", "fromavid", \
                "tofreetextid", "tocatid", "tocid", "tocaseid", "tofileid", "toimid", "toavid", "color", \
                "linewidth", "linetype"
         for row in result:
@@ -1271,7 +1419,8 @@ class ViewGraph(QDialog):
             cur.execute("select name, memo from cases where caseid=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
-                self.scene.addItem(CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
+                self.scene.addItem(
+                    CaseTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
             else:
                 err_msg += _("Case: ") + str(i[2]) + " "
         return err_msg
@@ -1290,7 +1439,8 @@ class ViewGraph(QDialog):
             cur.execute("select name, memo from source where id=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
-                self.scene.addItem(FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
+                self.scene.addItem(
+                    FileTextGraphicsItem(self.app, res_name[0], i[2], i[0], i[1], i[3], i[4], i[5], i[6]))
             else:
                 err_msg += _("File: ") + str(i[2]) + " "
         return err_msg
@@ -1301,13 +1451,13 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select freetextid, x, y, free_text, font_size, color, bold, tooltip, ctid from gr_free_text_item " \
-              "where grid=?"
+        sql = "select freetextid, x, y, free_text, font_size, color, bold, tooltip, ctid, memo_ctid, memo_imid, " \
+              "memo_avid, gfreeid from gr_free_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8])
+            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11], i[12])
             if i[7] != "":
                 item.setToolTip(i[7])
             self.scene.addItem(item)
@@ -1319,9 +1469,9 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select imid, x, y, px,py,w,h,filepath, tooltip from gr_pix_item where grid=?"
+        sql_pix = "select imid, x, y, px,py,w,h,filepath, tooltip from gr_pix_item where grid=?"
         cur = self.app.conn.cursor()
-        cur.execute(sql, [grid])
+        cur.execute(sql_pix, [grid])
         res = cur.fetchall()
         for i in res:
             item = PixmapGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
@@ -1336,9 +1486,9 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql = "select avid, x, y, pos0,pos1,filepath, tooltip, color from gr_av_item where grid=?"
+        sql_av = "select avid, x, y, pos0,pos1,filepath, tooltip, color from gr_av_item where grid=?"
         cur = self.app.conn.cursor()
-        cur.execute(sql, [grid])
+        cur.execute(sql_av, [grid])
         res = cur.fetchall()
         for i in res:
             item = AVGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[7])
@@ -1384,6 +1534,10 @@ class ViewGraph(QDialog):
                 if i[4] is not None:
                     cdcat = _("Code")
                 err_msg += cdcat + _(" does not exist: ") + str(i[3]) + " " + str(i[4]) + " "
+                cur.execute("delete from gr_cdct_text_item where grid=? and supercatid=? and catid=? and cid=?",
+                            [grid, i[2], i[3], i[4]])
+                print("removing ", i)
+                self.app.conn.execute()
         return err_msg
 
     def delete_saved_graph(self):
@@ -1395,7 +1549,7 @@ class ViewGraph(QDialog):
         res = cur.fetchall()
         names_list = []
         for r in res:
-            names_list.append({'name': r[0], 'grid': r[1]})       
+            names_list.append({'name': r[0], 'grid': r[1]})
         ui = DialogSelectItems(self.app, names_list, _("Delete stored graphs"), "multi")
         ok = ui.exec()
         if not ok:
@@ -1909,13 +2063,20 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     freetextid = -1
     text = "text"
     ctid = -1  # Used for a coded text display to show code in context
+    memo_ctid = None
+    memo_imid = None
+    memo_avid = None
     font_size = 9
     color = "black"
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    # For db stored free text graph items
+    gfreeid = None
+    code_text_entry = ""
 
-    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1):
+    def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
+                 memo_ctid=None, memo_imid=None, memo_avid=None, gfreeid=None):
         """ Free text object.
          param:
             app  : the main App class
@@ -1926,6 +2087,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             color : String
             bold : boolean
             ctid : Integer : code_text identifier for coded file and memo segments
+            memo_ctid
+            memo_imid
+            memo_avid
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
@@ -1940,6 +2104,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.project_path = app.project_path
         self.remove = False
         self.ctid = ctid
+        self.memo_ctid = memo_ctid
+        self.memo_imid = memo_imid
+        self.memo_avid = memo_avid
+        self.gfreeid = gfreeid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -1950,9 +2118,30 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(colors[color])
         if self.boundingRect().width() > self.MAX_WIDTH:
             self.setTextWidth(self.MAX_WIDTH)
+        self.check_coding()
+
+    def check_coding(self):
+        """ Check text coding segment is current.
+        Flag if so, but do not automatically update. """
+
+        if self.ctid == -1:
+            self.code_text_entry = self.text
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select seltext from code_text where ctid=?", [self.ctid])
+        res = cur.fetchone()
+        current_text = res[0]
+        if res is None:
+            print("text coding not in coe_text table")
+            self.code_text_entry = self.text
+            return
+        self.code_text_entry = current_text
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
+        update_text_action = None
+        if self.gfreeid is not None and self.ctid > 0 and self.text != self.code_text_entry:
+            update_text_action = menu.addAction(_("Update coding text"))
         edit_action = menu.addAction(_("Edit text"))
         context_action = None
         if self.ctid != -1:
@@ -1973,6 +2162,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         white_action = menu.addAction(_("White text"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
+            return
+        if action == update_text_action:
+            self.text = self.code_text_entry
+            cur = self.app.conn.cursor()
+            cur.execute("update gr_free_text_item set free_text=? where gfreeid=?", [ self.code_text_entry, self.gfreeid])
+            self.app.conn.commit()
+            self.setPlainText(self.text)
             return
         if action == context_action:
             cur = self.app.conn.cursor()
@@ -2043,7 +2239,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def paint(self, painter, option, widget=None):
         painter.save()
-        if self.color in("black", "gray"):
+        if self.color in ("black", "gray"):
             color = QtGui.QColor("#fafafa")
             painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
         if self.color == "white":
@@ -2231,7 +2427,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.path_ = path_
         self.color = color
         self.abs_path_ = self.app.project_path + path_
-        if path_[0:7] in("audio:", "video:"):
+        if path_[0:7] in ("audio:", "video:"):
             self.abs_path_ = path_[7:]
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
@@ -2322,8 +2518,10 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     path_ = ""
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    # For db stored free pixmap graph items
+    grpixid = None
 
-    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_=""):
+    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None):
         """ pixmap object.
          param:
             app  : the main App class
@@ -2335,6 +2533,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             pwidth : Integer
             pheight : Integer
             imid : Integer code_image primary key
+            grpixid
          """
 
         super(PixmapGraphicsItem, self).__init__(None)
@@ -2345,6 +2544,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.py = py
         self.pwidth = pwidth
         self.pheight = pheight
+        self.grpixid = grpixid
         self.path_ = path_
         abs_path_ = self.app.project_path + path_
         if path_[0:7] == "images:":
@@ -2444,7 +2644,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        #self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
+        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
@@ -2711,4 +2911,3 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         color_obj = colors[self.color]
         self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
         self.setLine(from_x, from_y, to_x, to_y)
-
