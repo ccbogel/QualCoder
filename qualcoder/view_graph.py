@@ -164,7 +164,7 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_memos_of_file.pressed.connect(self.add_memos_of_file)
+        self.ui.pushButton_memos_of_file.pressed.connect(self.add_memos_of_coded)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -511,7 +511,7 @@ class ViewGraph(QDialog):
         if action == action_add_coded_av:
             self.add_codes_of_av_files(position.x(), position.y())
         if action == action_memos:
-            self.add_memos_of_file(position.x(), position.y())
+            self.add_memos_of_coded(position.x(), position.y())
         if action == action_add_line:
             self.add_lines_to_graph()
         if action == action_add_files:
@@ -682,7 +682,7 @@ class ViewGraph(QDialog):
             item.setToolTip(msg)
             self.scene.addItem(item)
 
-    def add_memos_of_file(self, x=10, y=10):
+    def add_memos_of_coded(self, x=10, y=10):
         """ Show selected memos of coded segments of selected files in free text items. """
 
         files_wth_names = self.app.get_filenames()
@@ -713,7 +713,7 @@ class ViewGraph(QDialog):
                 cur.execute(sql_img, [code['cid'], file_['id']])
                 res_img = cur.fetchall()
                 for r in res_img:
-                    tt = "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " + \
+                    tt = _("Memo for area: ") + "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " + \
                          _("height:") + str(int(r[5]))
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
                                   'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
@@ -723,10 +723,10 @@ class ViewGraph(QDialog):
                 cur.execute(sql_av, [code['cid'], file_['id']])
                 res_av = cur.fetchall()
                 for r in res_av:
-                    tt = str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
+                    tt = _("Memo for duration: ") + str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
                     memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
                                   'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
-                    'ctid': None})
+                                  'ctid': None})
         if not memos:
             Message(self.app, _("No memos"), _("No memos for selection")).exec()
             return
@@ -1185,8 +1185,8 @@ class ViewGraph(QDialog):
             self.app.conn.commit()
 
     def update_coded_image_areas(self):
-        """ Check coding area and memo is current in gr_pix_item.
-        Automatically update. """
+        """ Update coding area and memo the current information in gr_pix_item.
+        """
 
         cur = self.app.conn.cursor()
         cur.execute("update gr_pix_item set px=(select x1 from code_image where code_image.imid=gr_pix_item.imid)")
@@ -1207,8 +1207,8 @@ class ViewGraph(QDialog):
         self.app.conn.commit()
 
     def update_coded_av_segments(self):
-        """ Check coding segment and memo is current.
-        Automatically update. """
+        """ Update coding segment and memo to the current information in gr_av_item.
+        """
 
         cur = self.app.conn.cursor()
         cur.execute("update gr_av_item set pos0=(select pos0 from code_av where code_av.avid=gr_av_item.avid)")
@@ -1231,13 +1231,13 @@ class ViewGraph(QDialog):
             except IndexError:
                 pass
 
-    def update_coded_text_tooltip_code_and_memos(self):
-        """ Check text coding code name and memo is current.
-        Automatically update. """
+    def update_coded_text_tooltip_files_codes_and_memos(self):
+        """ Update the text coding codename and memo to the current information in gr_free_text_item.
+        """
 
         cur = self.app.conn.cursor()
         # Tooltips
-        cur.execute("select gfreeid, tooltip, source.name, code_name.name, code_text.memo from gr_free_text_item "
+        cur.execute("select gfreeid, source.name, code_name.name, code_text.memo from gr_free_text_item "
                     "join code_text on code_text.ctid=gr_free_text_item.ctid "
                     "join code_name on code_name.cid= code_text.cid "
                     "join source on source.id=code_text.fid "
@@ -1245,9 +1245,66 @@ class ViewGraph(QDialog):
         res = cur.fetchall()
         for r in res:
             try:
-                tt = _("File: ") + r[2] + "\n"
-                tt += _("Code: ") + r[3] + "\n"
-                tt += _("Memo: ") + r[4]
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += _("Memo: ") + r[3]
+                cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+
+    def update_memo_tooltip_files_and_codes(self):
+        """ For the text memo items. Update the tooltip file name, code name and memo to the current information
+        in gr_free_text_item.
+        """
+
+        cur = self.app.conn.cursor()
+        # Tooltips for memo text codings
+        cur.execute("select gfreeid, source.name, code_name.name, code_text.seltext from gr_free_text_item "
+                    "join code_text on code_text.ctid=gr_free_text_item.memo_ctid "
+                    "join code_name on code_name.cid= code_text.cid "
+                    "join source on source.id=code_text.fid "
+                    "where gr_free_text_item.memo_ctid > 0")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += _("Memo for: ") + r[3]
+                cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+        # Tooltips for memo image codings
+        cur.execute("select gfreeid, source.name, code_name.name, x1,y1,width,height from gr_free_text_item "
+                    "join code_image on code_image.imid=gr_free_text_item.memo_imid "
+                    "join code_name on code_name.cid= code_image.cid "
+                    "join source on source.id=code_image.id "
+                    "where gr_free_text_item.memo_imid > 0")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += _("Memo for area: ") + "x:" + str(int(r[3])) + " y:" + str(int(r[4])) + " " + _("width:") + \
+                      str(int(r[5])) + " " + _("height:") + str(int(r[6]))
+                cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+        # Tooltips for memo AV codings
+        cur.execute(
+            "select gfreeid, source.name, code_name.name, code_av.pos0, code_av.pos1 from gr_free_text_item "
+            "join code_av on code_av.avid=gr_free_text_item.memo_avid "
+            "join code_name on code_name.cid= code_av.cid "
+            "join source on source.id=code_av.id "
+            "where gr_free_text_item.memo_avid > 0")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += _("Memo for duration: ") + str(int(r[3])) + "  - " + str(int(r[4])) + _("msecs")
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
             except IndexError:
@@ -1262,7 +1319,8 @@ class ViewGraph(QDialog):
 
         self.update_coded_image_areas()
         self.update_coded_av_segments()
-        self.update_coded_text_tooltip_code_and_memos()
+        self.update_coded_text_tooltip_files_codes_and_memos()
+        self.update_memo_tooltip_files_and_codes()
         cur = self.app.conn.cursor()
         sql = "select name, grid, description, scene_width, scene_height from graph order by upper(name) asc"
         if self.load_graph_menu_option == "Alphabet descending":
@@ -1457,7 +1515,8 @@ class ViewGraph(QDialog):
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11], i[12])
+            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11],
+                                        i[12])
             if i[7] != "":
                 item.setToolTip(i[7])
             self.scene.addItem(item)
@@ -2166,7 +2225,8 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == update_text_action:
             self.text = self.code_text_entry
             cur = self.app.conn.cursor()
-            cur.execute("update gr_free_text_item set free_text=? where gfreeid=?", [ self.code_text_entry, self.gfreeid])
+            cur.execute("update gr_free_text_item set free_text=? where gfreeid=?",
+                        [self.code_text_entry, self.gfreeid])
             self.app.conn.commit()
             self.setPlainText(self.text)
             return
