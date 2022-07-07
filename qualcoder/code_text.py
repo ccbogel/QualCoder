@@ -576,7 +576,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.mark()
         # When a code is selected undo the show selected code features
         self.highlight()
-        # Reload button icons as they dissapear on Windows
+        # Reload button icons as they disappear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
         self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
@@ -1211,11 +1211,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if important:
             importance = 1
         cur = self.app.conn.cursor()
-        sql = "update code_text set important=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?"
+        sql = "update code_text set important=? where ctid=?"
         for item in text_items:
-            cur.execute(sql,
-                        (importance, item['cid'], item['fid'], item['seltext'], item['pos0'], item['pos1'],
-                         item['owner']))
+            cur.execute(sql, [importance, item['ctid']])
             self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3003,7 +3001,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Delete from db, remove from coding and update highlights
         cur = self.app.conn.cursor()
         for item in to_unmark:
-            cur.execute("delete from code_text where ctid=?", (item['ctid']))
+            cur.execute("delete from code_text where ctid=?", [item['ctid']])
             self.app.conn.commit()
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3378,8 +3376,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     try:
                         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
                             owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                    (item['cid'], item['fid'], item['seltext'], item['pos0'],
-                                     item['pos1'], item['owner'], item['memo'], item['date']))
+                                    [item['cid'], item['fid'], item['seltext'], item['pos0'],
+                                     item['pos1'], item['owner'], item['memo'], item['date']])
                         self.app.conn.commit()
                         # Record a list of undo sql
                         undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
