@@ -1353,9 +1353,9 @@ class ViewGraph(QDialog):
         err_msg += self.load_free_text_graphics_items(grid)
         err_msg += self.load_pixmap_graphics_items(grid)
         err_msg += self.load_av_graphics_items(grid)
-        # Now load lines
-        err_msg += self.load_cdct_line_graphics_items(grid)
-        err_msg += self.load_free_line_graphics_items(grid)
+        # Load lines
+        self.load_cdct_line_graphics_items(grid)
+        self.load_free_line_graphics_items(grid)
         if err_msg != "":
             Message(self.app, _("Load graph errors"), err_msg).exec()
         self.ui.label_loaded_graph.setText(graph['name'])
@@ -1365,39 +1365,43 @@ class ViewGraph(QDialog):
         """ Find the to and from widgets using matching catid and cid.
           Then when found add the line item. """
 
-        err_msg = ""
         sql = "select fromcatid,fromcid,tocatid,tocid,linewidth,linetype,color," \
-              "isvisible from gr_cdct_line_item where grid=?"
+              "isvisible,glineid from gr_cdct_line_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
-        res = cur.fetchall()
+        result = cur.fetchall()
+        res = []
+        keys = "fromcatid", "fromcid", "tocatid", "tocid", "linewidth", "linetype", "color", "isvisible", "glineid"
+        for row in result:
+            res.append(dict(zip(keys, row)))
         for line in res:
             # Add link which includes the scene text items and associated data, add links before text_items
             from_item = None
             to_item = None
             for i in self.scene.items():
                 if isinstance(i, TextGraphicsItem):
-                    if from_item is None and i.code_or_cat['catid'] == line[0] and i.code_or_cat['cid'] == line[1]:
+                    if from_item is None and i.code_or_cat['catid'] == line['fromcatid'] and \
+                            i.code_or_cat['cid'] == line['fromcid']:
                         from_item = i
-                    if to_item is None and i.code_or_cat['catid'] == line[2] and i.code_or_cat['cid'] == line[3]:
+                    if to_item is None and i.code_or_cat['catid'] == line['tocatid'] and \
+                            i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
             if from_item is not None and to_item is not None:
-                item = LinkGraphicsItem(self.app, from_item, to_item, line[4], line[5], line[6], line[7])
+                item = LinkGraphicsItem(self.app, from_item, to_item, line['linewidth'], line['linetype'],
+                                        line['color'], line['isvisible'])
                 self.scene.addItem(item)
-            if from_item is None:
-                err_msg += "\n" + _("Link line. No from item. ") + "Catid:" + str(line[0]) + " Cid:" + str(line[1])
-            if to_item is None:
-                err_msg += "\n" + _("Link line. No to item. ") + "Catid:" + str(line[2]) + " Cid:" + str(line[3])
-        return err_msg
+            else:
+                cur.execute("delete from gr_cdct_line_item where glineid=?", [line['gflineid']])
+                self.app.conn.commit()
+        return
 
     def load_free_line_graphics_items(self, grid):
         """ Find the to and from widgets.
         Several matching options: catid and cid; fileid; caseid; imid; avid; freetextid.
         Then when found add the free line item. """
 
-        err_msg = ""
         sql = "select fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid,fromimid,fromavid," \
-              "tofreetextid,tocatid,tocid, tocaseid,tofileid, toimid, toavid,color, linewidth,linetype " \
+              "tofreetextid,tocatid,tocid, tocaseid,tofileid, toimid, toavid,color, linewidth,linetype,gflineid " \
               "from gr_free_line_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
@@ -1405,7 +1409,7 @@ class ViewGraph(QDialog):
         res = []
         keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "fromimid", "fromavid", \
                "tofreetextid", "tocatid", "tocid", "tocaseid", "tofileid", "toimid", "toavid", "color", \
-               "linewidth", "linetype"
+               "linewidth", "linetype", "gflineid"
         for row in result:
             res.append(dict(zip(keys, row)))
         for line in res:
@@ -1452,16 +1456,15 @@ class ViewGraph(QDialog):
                 if to_item is None and line['toavid'] is not None and isinstance(i, AVGraphicsItem):
                     if i.avid == line['toavid']:
                         to_item = i
-
+            # Add line graphics item OR remove database entry
             if from_item is not None and to_item is not None:
                 line_item = FreeLineGraphicsItem(self.app, from_item, to_item, line['color'], line['linewidth'],
                                                  line['linetype'])
                 self.scene.addItem(line_item)
-            if from_item is None:
-                err_msg += "\n" + _("Link Line. No From item. ")
-            if to_item is None:
-                err_msg += "\n" + _("Link line. No To item. ")
-        return err_msg
+            else:
+                cur.execute("delete from gr_free_line_item where gflineid=?", [line['gflineid']])
+                self.app.conn.commit()
+        return
 
     def load_case_text_graphics_items(self, grid):
         """ Load the case graphics items.
@@ -2132,7 +2135,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     MAX_HEIGHT = 300
     # For db stored free text graph items
     gfreeid = None
-    code_text_entry = ""
+    updated_text = ""
 
     def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None, gfreeid=None):
@@ -2146,9 +2149,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             color : String
             bold : boolean
             ctid : Integer : code_text identifier for coded file and memo segments
-            memo_ctid
-            memo_imid
-            memo_avid
+            memo_ctid : Integer or None
+            memo_imid : Integer or None
+            memo_avid : Integer or None
+            gfreeid : Integer or None
          """
 
         super(FreeTextGraphicsItem, self).__init__(None)
@@ -2183,23 +2187,57 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """ Check text coding segment is current.
         Flag if so, but do not automatically update. """
 
-        if self.ctid == -1:
-            self.code_text_entry = self.text
+        # Free text item - not a coded text, nor a memo text, so no disparity
+        self.updated_text = self.text
+        # Get current coded text
+        if self.ctid > 0:
+            cur = self.app.conn.cursor()
+            cur.execute("select seltext from code_text where ctid=?", [self.ctid])
+            res = cur.fetchone()
+            current_text = res[0]
+            if res is None:
+                self.updated_text = self.text
+                return
+            self.updated_text = current_text
             return
-        cur = self.app.conn.cursor()
-        cur.execute("select seltext from code_text where ctid=?", [self.ctid])
-        res = cur.fetchone()
-        current_text = res[0]
-        if res is None:
-            print("text coding not in coe_text table")
-            self.code_text_entry = self.text
+        # Get current coded text memo text
+        if self.memo_ctid is not None:
+            cur = self.app.conn.cursor()
+            cur.execute("select memo from code_text where ctid=?", [self.memo_ctid])
+            res = cur.fetchone()
+            current_text = res[0]
+            if res is None:
+                self.updated_text = self.text
+                return
+            self.updated_text = current_text
             return
-        self.code_text_entry = current_text
+        # Get current coded image memo text
+        if self.memo_imid is not None:
+            cur = self.app.conn.cursor()
+            cur.execute("select memo from code_image where imid=?", [self.memo_imid])
+            res = cur.fetchone()
+            current_text = res[0]
+            if res is None:
+                self.updated_text = self.text
+                return
+            self.updated_text = current_text
+            return
+        # Get current coded av memo text
+        if self.memo_avid is not None:
+            print("AV!")
+            cur = self.app.conn.cursor()
+            cur.execute("select memo from code_av where avid=?", [self.memo_avid])
+            res = cur.fetchone()
+            current_text = res[0]
+            if res is None:
+                self.updated_text = self.text
+                return
+            self.updated_text = current_text
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         update_text_action = None
-        if self.gfreeid is not None and self.ctid > 0 and self.text != self.code_text_entry:
+        if self.gfreeid is not None and self.text != self.updated_text:
             update_text_action = menu.addAction(_("Update coding text"))
         edit_action = menu.addAction(_("Edit text"))
         context_action = None
@@ -2223,10 +2261,10 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action is None:
             return
         if action == update_text_action:
-            self.text = self.code_text_entry
+            self.text = self.updated_text
             cur = self.app.conn.cursor()
             cur.execute("update gr_free_text_item set free_text=? where gfreeid=?",
-                        [self.code_text_entry, self.gfreeid])
+                        [self.updated_text, self.gfreeid])
             self.app.conn.commit()
             self.setPlainText(self.text)
             return
