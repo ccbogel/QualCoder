@@ -625,8 +625,7 @@ class ViewGraph(QDialog):
             y += 10
             item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
             msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            if s['memo'] != "":
-                msg += "\n" + _("Memo: ") + s['memo']
+            msg += "\n" + _("Memo: ") + s['memo']
             item.setToolTip(msg)
             self.scene.addItem(item)
 
@@ -1185,6 +1184,75 @@ class ViewGraph(QDialog):
             cur.execute("delete gr_free_text_item where memo_avid=?", [r[0]])
             self.app.conn.commit()
 
+    def update_coded_image_areas(self):
+        """ Check coding area and memo is current in gr_pix_item.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("update gr_pix_item set px=(select x1 from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set py=(select y1 from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set w=(select width from code_image where code_image.imid=gr_pix_item.imid)")
+        cur.execute("update gr_pix_item set h=(select height from code_image where code_image.imid=gr_pix_item.imid)")
+        # Tooltips
+        cur.execute("select grpixid, source.name, code_name.name, code_image.memo from gr_pix_item "
+                    "join code_image on code_image.imid=gr_pix_item.imid "
+                    "join code_name on code_name.cid= code_image.cid "
+                    "join source on source.id=code_image.id")
+        res = cur.fetchall()
+        for r in res:
+            tt = _("File: ") + r[1] + "\n"
+            tt += _("Code: ") + r[2] + "\n"
+            tt += _("Memo: ") + r[3]
+            cur.execute("update gr_pix_item set tooltip=? where grpixid=?", [tt, r[0]])
+        self.app.conn.commit()
+
+    def update_coded_av_segments(self):
+        """ Check coding segment and memo is current.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("update gr_av_item set pos0=(select pos0 from code_av where code_av.avid=gr_av_item.avid)")
+        cur.execute("update gr_av_item set pos1=(select pos1 from code_av where code_av.avid=gr_av_item.avid)")
+        self.app.conn.commit()
+        # Tooltips
+        cur.execute("select gr_avid, source.name, code_name.name, gr_av_item.pos0, gr_av_item.pos1, code_av.memo "
+                    "from gr_av_item join code_av on code_av.avid=gr_av_item.avid "
+                    "join code_name on code_name.cid= code_av.cid "
+                    "join source on source.id=code_av.id")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[1] + "\n"
+                tt += _("Code: ") + r[2] + "\n"
+                tt += str(r[3]) + " - " + str(r[4]) + "\n"
+                tt += _("Memo: ") + r[5]
+                cur.execute("update gr_av_item set tooltip=? where gr_avid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+
+    def update_coded_text_tooltip_code_and_memos(self):
+        """ Check text coding code name and memo is current.
+        Automatically update. """
+
+        cur = self.app.conn.cursor()
+        # Tooltips
+        cur.execute("select gfreeid, tooltip, source.name, code_name.name, code_text.memo from gr_free_text_item "
+                    "join code_text on code_text.ctid=gr_free_text_item.ctid "
+                    "join code_name on code_name.cid= code_text.cid "
+                    "join source on source.id=code_text.fid "
+                    "where gr_free_text_item.ctid > 0")
+        res = cur.fetchall()
+        for r in res:
+            try:
+                tt = _("File: ") + r[2] + "\n"
+                tt += _("Code: ") + r[3] + "\n"
+                tt += _("Memo: ") + r[4]
+                cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
+                self.app.conn.commit()
+            except IndexError:
+                pass
+
     def load_graph(self):
         """ Load a saved graph.
         Load each text component first then link then the cdct_line_items then the free_lines_items.
@@ -1192,6 +1260,9 @@ class ViewGraph(QDialog):
         eg name, memo, date?, owner?, color, child_names?
         """
 
+        self.update_coded_image_areas()
+        self.update_coded_av_segments()
+        self.update_coded_text_tooltip_code_and_memos()
         cur = self.app.conn.cursor()
         sql = "select name, grid, description, scene_width, scene_height from graph order by upper(name) asc"
         if self.load_graph_menu_option == "Alphabet descending":
@@ -1381,12 +1452,12 @@ class ViewGraph(QDialog):
 
         err_msg = ""
         sql = "select freetextid, x, y, free_text, font_size, color, bold, tooltip, ctid, memo_ctid, memo_imid, " \
-              "memo_avid from gr_free_text_item where grid=?"
+              "memo_avid, gfreeid from gr_free_text_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql, [grid])
         res = cur.fetchall()
         for i in res:
-            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11])
+            item = FreeTextGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[8], i[9], i[10], i[11], i[12])
             if i[7] != "":
                 item.setToolTip(i[7])
             self.scene.addItem(item)
@@ -2000,10 +2071,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    # For db stored free text graph items
+    gfreeid = None
     code_text_entry = ""
 
     def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
-                 memo_ctid=None, memo_imid=None, memo_avid=None):
+                 memo_ctid=None, memo_imid=None, memo_avid=None, gfreeid=None):
         """ Free text object.
          param:
             app  : the main App class
@@ -2034,6 +2107,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.memo_ctid = memo_ctid
         self.memo_imid = memo_imid
         self.memo_avid = memo_avid
+        self.gfreeid = gfreeid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -2066,7 +2140,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         update_text_action = None
-        if self.ctid > 0 and self.text != self.code_text_entry:
+        if self.gfreeid is not None and self.ctid > 0 and self.text != self.code_text_entry:
             update_text_action = menu.addAction(_("Update coding text"))
         edit_action = menu.addAction(_("Edit text"))
         context_action = None
@@ -2092,9 +2166,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == update_text_action:
             self.text = self.code_text_entry
             cur = self.app.conn.cursor()
-            # TODO add grfreeid !!!!
-            cur.execute("update gr_free_text_item set freetext=? where gfreeid=?")
+            cur.execute("update gr_free_text_item set free_text=? where gfreeid=?", [ self.code_text_entry, self.gfreeid])
             self.app.conn.commit()
+            self.setPlainText(self.text)
             return
         if action == context_action:
             cur = self.app.conn.cursor()
@@ -2444,8 +2518,10 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     path_ = ""
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
+    # For db stored free pixmap graph items
+    grpixid = None
 
-    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_=""):
+    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None):
         """ pixmap object.
          param:
             app  : the main App class
@@ -2457,6 +2533,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             pwidth : Integer
             pheight : Integer
             imid : Integer code_image primary key
+            grpixid
          """
 
         super(PixmapGraphicsItem, self).__init__(None)
@@ -2467,6 +2544,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.py = py
         self.pwidth = pwidth
         self.pheight = pheight
+        self.grpixid = grpixid
         self.path_ = path_
         abs_path_ = self.app.project_path + path_
         if path_[0:7] == "images:":
