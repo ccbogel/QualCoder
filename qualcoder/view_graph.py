@@ -2238,7 +2238,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         menu = QtWidgets.QMenu()
         update_text_action = None
         if self.gfreeid is not None and self.text != self.updated_text:
-            update_text_action = menu.addAction(_("Update coding text"))
+            update_text_action = menu.addAction(_("Update text"))
         edit_action = menu.addAction(_("Edit text"))
         context_action = None
         if self.ctid != -1:
@@ -2247,20 +2247,27 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
         remove_action = menu.addAction(_('Remove'))
-        red_action = menu.addAction(_("Red text"))
-        green_action = menu.addAction(_("Green text"))
-        yellow_action = menu.addAction(_("Yellow text"))
-        blue_action = menu.addAction(_("Blue text"))
-        cyan_action = menu.addAction(_("Cyan text"))
-        magenta_action = menu.addAction(_("Magenta text"))
-        orange_action = menu.addAction(_("Orange text"))
-        gray_action = menu.addAction(_("Gray text"))
-        black_action = menu.addAction(_("Black text"))
-        white_action = menu.addAction(_("White text"))
+        red_action = menu.addAction(_("Red"))
+        green_action = menu.addAction(_("Green"))
+        yellow_action = menu.addAction(_("Yellow"))
+        blue_action = menu.addAction(_("Blue"))
+        cyan_action = menu.addAction(_("Cyan"))
+        magenta_action = menu.addAction(_("Magenta"))
+        orange_action = menu.addAction(_("Orange"))
+        gray_action = menu.addAction(_("Gray"))
+        black_action = menu.addAction(_("Black"))
+        white_action = menu.addAction(_("White"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
         if action == update_text_action:
+            ui = DialogMemo(self.app, _("Update text to"), self.updated_text)
+            ui.ui.pushButton_clear.setVisible(False)
+            ui.setFixedSize(QtCore.QSize(450, 220))
+            ui.ui.textEdit.setReadOnly(True)
+            accepted = ui.exec()
+            if not accepted:
+                return
             self.text = self.updated_text
             cur = self.app.conn.cursor()
             cur.execute("update gr_free_text_item set free_text=? where gfreeid=?",
