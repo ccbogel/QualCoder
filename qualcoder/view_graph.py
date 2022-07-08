@@ -1149,7 +1149,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_file)
         res_file = cur.fetchall()
         for r in res_file:
-            cur.execute("delete gr_file_item where fid=?", [r[0]])
+            cur.execute("delete from gr_file_item where fid=?", [r[0]])
             self.app.conn.commit()
         # Text codings
         sql_text = "select ctid from gr_free_text_item where ctid is not null and ctid != -1 and ctid not in " \
@@ -1157,7 +1157,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_text)
         res_text = cur.fetchall()
         for r in res_text:
-            cur.execute("delete gr_free_text_item where ctid=?", [r[0]])
+            cur.execute("delete from gr_free_text_item where ctid=?", [r[0]])
             self.app.conn.commit()
         # Text coding memos
         sql_memo_text = "select memo_ctid from gr_free_text_item where memo_ctid is not null and memo_ctid not in " \
@@ -1165,7 +1165,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_memo_text)
         res_memo_text = cur.fetchall()
         for r in res_memo_text:
-            cur.execute("delete gr_free_text_item where memo_ctid=?", [r[0]])
+            cur.execute("delete from gr_free_text_item where memo_ctid=?", [r[0]])
             self.app.conn.commit()
         # Image coding memos
         sql_memo_image = "select memo_imid from gr_free_text_item where memo_imid is not null and memo_imid not in " \
@@ -1173,7 +1173,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_memo_image)
         res_memo_image = cur.fetchall()
         for r in res_memo_image:
-            cur.execute("delete gr_free_text_item where memo_imid=?", [r[0]])
+            cur.execute("delete from gr_free_text_item where memo_imid=?", [r[0]])
             self.app.conn.commit()
         # AV coding memos
         sql_memo_av = "select memo_avid from gr_free_text_item where memo_avid is not null and memo_avid not in " \
@@ -1181,7 +1181,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_memo_av)
         res_memo_av = cur.fetchall()
         for r in res_memo_av:
-            cur.execute("delete gr_free_text_item where memo_avid=?", [r[0]])
+            cur.execute("delete from gr_free_text_item where memo_avid=?", [r[0]])
             self.app.conn.commit()
 
     def update_coded_image_areas(self):
