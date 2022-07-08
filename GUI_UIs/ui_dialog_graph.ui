@@ -19,7 +19,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>40</height>
+       <height>44</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -228,13 +228,13 @@ Right-click for options</string>
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>4</y>
+        <y>0</y>
         <width>481</width>
-        <height>28</height>
+        <height>44</height>
        </rect>
       </property>
       <property name="text">
-       <string>Changing to another report will clear an unsaved graph.</string>
+       <string>Changing to another report will lose unsaved graph.</string>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_codes_of_text">
