@@ -1358,7 +1358,8 @@ class ViewGraph(QDialog):
         self.load_free_line_graphics_items(grid)
         if err_msg != "":
             Message(self.app, _("Load graph errors"), err_msg).exec()
-        self.ui.label_loaded_graph.setText(graph['name'])
+        label = _("Changing to another report will lose unsaved graph.") + "\n" + graph['name']
+        self.ui.label_loaded_graph.setText(label)
         self.ui.label_loaded_graph.setToolTip(graph['description'])
 
     def load_cdct_line_graphics_items(self, grid):
