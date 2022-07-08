@@ -46,11 +46,14 @@
           <x>20</x>
           <y>20</y>
           <width>861</width>
-          <height>17</height>
+          <height>71</height>
          </rect>
         </property>
         <property name="text">
          <string>Select an option in the Files and Cases menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -64,11 +67,14 @@
           <x>20</x>
           <y>20</y>
           <width>811</width>
-          <height>17</height>
+          <height>71</height>
          </rect>
         </property>
         <property name="text">
          <string>Select an option in the Coding menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -82,11 +88,14 @@
           <x>20</x>
           <y>20</y>
           <width>831</width>
-          <height>17</height>
+          <height>71</height>
          </rect>
         </property>
         <property name="text">
          <string>Select an option in the Reports menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -160,7 +169,6 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
-    <addaction name="actionCode_by_case"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
