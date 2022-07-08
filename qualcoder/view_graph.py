@@ -1194,7 +1194,7 @@ class ViewGraph(QDialog):
         cur.execute("update gr_pix_item set w=(select width from code_image where code_image.imid=gr_pix_item.imid)")
         cur.execute("update gr_pix_item set h=(select height from code_image where code_image.imid=gr_pix_item.imid)")
         # Tooltips
-        cur.execute("select grpixid, source.name, code_name.name, code_image.memo from gr_pix_item "
+        cur.execute("select grpixid, source.name, code_name.name, code_image.memo, code_image.imid from gr_pix_item "
                     "join code_image on code_image.imid=gr_pix_item.imid "
                     "join code_name on code_name.cid= code_image.cid "
                     "join source on source.id=code_image.id")
@@ -1202,6 +1202,8 @@ class ViewGraph(QDialog):
         for r in res:
             tt = _("File: ") + r[1] + "\n"
             tt += _("Code: ") + r[2] + "\n"
+            if self.app.settings['showids']:
+                tt += "imid: " + str(r[4]) + "\n"
             tt += _("Memo: ") + r[3]
             cur.execute("update gr_pix_item set tooltip=? where grpixid=?", [tt, r[0]])
         self.app.conn.commit()
@@ -1215,8 +1217,8 @@ class ViewGraph(QDialog):
         cur.execute("update gr_av_item set pos1=(select pos1 from code_av where code_av.avid=gr_av_item.avid)")
         self.app.conn.commit()
         # Tooltips
-        cur.execute("select gr_avid, source.name, code_name.name, gr_av_item.pos0, gr_av_item.pos1, code_av.memo "
-                    "from gr_av_item join code_av on code_av.avid=gr_av_item.avid "
+        cur.execute("select gr_avid, source.name, code_name.name, gr_av_item.pos0, gr_av_item.pos1, code_av.memo, "
+                    "code_av.avid from gr_av_item join code_av on code_av.avid=gr_av_item.avid "
                     "join code_name on code_name.cid= code_av.cid "
                     "join source on source.id=code_av.id")
         res = cur.fetchall()
@@ -1225,6 +1227,8 @@ class ViewGraph(QDialog):
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
                 tt += str(r[3]) + " - " + str(r[4]) + "\n"
+                if self.app.settings['showids']:
+                    tt += "avid: " + str(r[6]) + "\n"
                 tt += _("Memo: ") + r[5]
                 cur.execute("update gr_av_item set tooltip=? where gr_avid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1237,7 +1241,8 @@ class ViewGraph(QDialog):
 
         cur = self.app.conn.cursor()
         # Tooltips
-        cur.execute("select gfreeid, source.name, code_name.name, code_text.memo from gr_free_text_item "
+        cur.execute("select gfreeid, source.name, code_name.name, code_text.memo, code_text.ctid "
+                    "from gr_free_text_item "
                     "join code_text on code_text.ctid=gr_free_text_item.ctid "
                     "join code_name on code_name.cid= code_text.cid "
                     "join source on source.id=code_text.fid "
@@ -1247,6 +1252,8 @@ class ViewGraph(QDialog):
             try:
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
+                if self.app.settings['showids']:
+                    tt += "ctid: " + str(r[4]) + "\n"
                 tt += _("Memo: ") + r[3]
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1260,7 +1267,8 @@ class ViewGraph(QDialog):
 
         cur = self.app.conn.cursor()
         # Tooltips for memo text codings
-        cur.execute("select gfreeid, source.name, code_name.name, code_text.seltext from gr_free_text_item "
+        cur.execute("select gfreeid, source.name, code_name.name, code_text.seltext, code_text.ctid "
+                    "from gr_free_text_item "
                     "join code_text on code_text.ctid=gr_free_text_item.memo_ctid "
                     "join code_name on code_name.cid= code_text.cid "
                     "join source on source.id=code_text.fid "
@@ -1270,13 +1278,16 @@ class ViewGraph(QDialog):
             try:
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
+                if self.app.settings['showids']:
+                    tt += "ctid: " + str(r[4]) + "\n"
                 tt += _("Memo for: ") + r[3]
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
             except IndexError:
                 pass
         # Tooltips for memo image codings
-        cur.execute("select gfreeid, source.name, code_name.name, x1,y1,width,height from gr_free_text_item "
+        cur.execute("select gfreeid, source.name, code_name.name, x1,y1,width,height, code_image.imid "
+                    "from gr_free_text_item "
                     "join code_image on code_image.imid=gr_free_text_item.memo_imid "
                     "join code_name on code_name.cid= code_image.cid "
                     "join source on source.id=code_image.id "
@@ -1286,6 +1297,8 @@ class ViewGraph(QDialog):
             try:
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
+                if self.app.settings['showids']:
+                    tt += "imid: " + str(r[7]) + "\n"
                 tt += _("Memo for area: ") + "x:" + str(int(r[3])) + " y:" + str(int(r[4])) + " " + _("width:") + \
                       str(int(r[5])) + " " + _("height:") + str(int(r[6]))
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
@@ -1294,7 +1307,8 @@ class ViewGraph(QDialog):
                 pass
         # Tooltips for memo AV codings
         cur.execute(
-            "select gfreeid, source.name, code_name.name, code_av.pos0, code_av.pos1 from gr_free_text_item "
+            "select gfreeid, source.name, code_name.name, code_av.pos0, code_av.pos1, code_av.avid "
+            "from gr_free_text_item "
             "join code_av on code_av.avid=gr_free_text_item.memo_avid "
             "join code_name on code_name.cid= code_av.cid "
             "join source on source.id=code_av.id "
@@ -1304,6 +1318,8 @@ class ViewGraph(QDialog):
             try:
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
+                if self.app.settings['showids']:
+                    tt += "avid: " + str(r[5]) + "\n"
                 tt += _("Memo for duration: ") + str(int(r[3])) + "  - " + str(int(r[4])) + _("msecs")
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
