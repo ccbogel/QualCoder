@@ -1078,7 +1078,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo "
+            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo, ctid "
             sql += " from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1098,7 +1098,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
-                   'codename_memo', 'source_memo'
+                   'codename_memo', 'source_memo', 'ctid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
@@ -1113,7 +1113,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
             sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
-            sql += "code_name.memo, source.memo "
+            sql += "code_name.memo, source.memo, imid "
             sql += " from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1133,7 +1133,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'codename_memo', 'source_memo'
+                   'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
@@ -1143,7 +1143,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo "
+            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo, avid "
             sql += " from code_av join code_name "
             sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1163,7 +1163,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
-                   'codename_memo', 'source_memo'
+                   'codename_memo', 'source_memo', 'avid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
@@ -1184,7 +1184,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "cases.memo, code_text.memo, code_name.memo, source.memo "
+            sql += "cases.memo, code_text.memo, code_name.memo, source.memo, ctid "
             sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
@@ -1207,7 +1207,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             results = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo'
+                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid'
             for row in results:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
@@ -1222,8 +1222,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "code_image.memo, cases.memo, code_name.memo, source.memo from "
-            sql += "code_image join code_name on code_name.cid = code_image.cid "
+            sql += "code_image.memo, cases.memo, code_name.memo, source.memo, imid "
+            sql += "from code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
             sql += " join source on case_text.fid = source.id "
@@ -1244,7 +1244,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             imgresults = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
-                   'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
+                   'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid'
             for row in imgresults:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
@@ -1255,7 +1255,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             av_sql = "select distinct code_name.name, color, cases.name as case_name, "
             av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
-            av_sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo "
+            av_sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo, avid "
             av_sql += " from code_av join code_name on code_name.cid = code_av.cid "
             av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             av_sql += "code_av.id = case_text.fid "
@@ -1276,8 +1276,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 cur.execute(av_sql, parameters)
             avresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', \
-                   'coder', 'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo'
+            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
+                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid'
             for row in avresults:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
@@ -1736,6 +1736,19 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if res is not None and res[0] != "" and res[0] is not None:
                     head += ", " + _("Case memo: ") + res[0]
         head += " " + _("Coder: ") + item['coder']
+        if self.app.settings['showids']:
+            try:
+                head += ", ctid: " + str(item['ctid'])
+            except KeyError:
+                pass
+            try:
+                head += ", imid: " + str(item['imid'])
+            except KeyError:
+                pass
+            try:
+                head += ", avid: " + str(item['avid'])
+            except KeyError:
+                pass
 
         cursor = self.ui.textEdit.textCursor()
         fmt = QtGui.QTextCharFormat()
