@@ -172,7 +172,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if f[0] == fid:
                     filename = f[1]
 
-            sql = "select fid, code_text.cid, pos0, pos1, name from code_text join code_name on \
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext from code_text join code_name on \
              code_name.cid=code_text.cid where code_text.owner=? and fid=? \
              and code_text.cid in (" + code_ids + ") \
             order by code_text.cid"
@@ -190,6 +190,8 @@ class DialogReportRelations(QtWidgets.QDialog):
             pos0 = 2
             pos1 = 3
             name = 4
+            ctid = 5
+            seltext = 6
             while len(coded) > 0:
                 c0 = coded.pop()
                 for c1 in coded:
@@ -205,6 +207,10 @@ class DialogReportRelations(QtWidgets.QDialog):
                         relation['c1_pos0'] = c1[pos0]
                         relation['c1_pos1'] = c1[pos1]
                         relation['owner'] = coder_name
+                        relation['ctid0'] = c0[ctid]
+                        relation['ctid0_text'] = c0[seltext]
+                        relation['ctid1'] = c1[ctid]
+                        relation['ctid1_text'] = c1[seltext]
                         self.result_relations.append(relation)
         self.display_relations()
 
@@ -451,10 +457,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         text_overlap = 12
         text_after = 13
         owner = 14
+        ctid0 = 15
+        ctid1 = 16
         col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0",
                      _("Overlap") + " 1",
                      _("Union") + " 0", _("Union") + " 1",
-                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner")]
+                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner"), "ctid0", "ctid1"]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -519,9 +527,6 @@ class DialogReportRelations(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, distance, item)
-            item = QtWidgets.QTableWidgetItem(str(i['owner']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, owner, item)
             item = QtWidgets.QTableWidgetItem(i['text_before'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, text_before, item)
@@ -531,6 +536,17 @@ class DialogReportRelations(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(i['text_after'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, text_after, item)
+            item = QtWidgets.QTableWidgetItem(str(i['owner']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, owner, item)
+            item = QtWidgets.QTableWidgetItem(str(i['ctid0']))
+            item.setToolTip(i['ctid0_text'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, ctid0, item)
+            item = QtWidgets.QTableWidgetItem(str(i['ctid1']))
+            item.setToolTip(i['ctid1_text'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, ctid1, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
     def fill_tree(self):
@@ -633,7 +649,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                      "Code1", "Code1 " + _("name"),
                      "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
                      _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
-                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner")]
+                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
+                     "ctid0", "ctid1", "text0", "text1"]
         with open(filepath, 'w', encoding='UTF8') as f:
             writer = csv.writer(f, quoting=csv.QUOTE_ALL)
             writer.writerow(col_names)
@@ -658,6 +675,10 @@ class DialogReportRelations(QtWidgets.QDialog):
                 row.append(r['text_overlap'])
                 row.append(r['text_after'])
                 row.append(r['owner'])
+                row.append(r['ctid0'])
+                row.append(r['ctid1'])
+                row.append(r['ctid0_text'])
+                row.append(r['ctid1_text'])
                 writer.writerow(row)
 
         msg = _("Code relations csv file exported to: ") + filepath
