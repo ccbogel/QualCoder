@@ -238,8 +238,11 @@ https://alternativeto.net/software/qualcoder
 Also, if you like Qualcoder a lot, write an article about it.
 
 ## FaceBook group:
-To allow everyone to discuss all things Qual?coder.
+To allow everyone to discuss all things QualCoder.
 
+FaceBook page:
 [https://www.facebook.com/qualcoder](https://www.facebook.com/qualcoder)
 
+FaceBook group:
+[https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
 
