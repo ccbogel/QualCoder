@@ -50,7 +50,6 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
-#from qualcoder.code_by_case import DialogCodeByCase
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
@@ -800,7 +799,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
-        #self.ui.actionCode_by_case.triggered.connect(self.code_by_case)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
         # Reports menu
@@ -917,7 +915,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
         self.ui.actionCode_audio_video.setEnabled(False)
-        #self.ui.actionCode_by_case.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -957,7 +954,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
-        #self.ui.actionCode_by_case.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -1168,24 +1164,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
-
-    '''def code_by_case(self):
-        """ Create edit and delete codes. Apply and remove codes and annotations to
-         files. Organised by Case. Useful for an imported survey. """
-        cases = self.app.get_casenames()
-        if len(cases) == 0:
-            msg = _("This project contains no cases.")
-            Message(self.app, _('No cases'), msg).exec()
-            return
-        files = self.app.get_filenames()
-        if len(files) == 0:
-            msg = _("This project contains no files.")
-            Message(self.app, _('No files'), msg).exec()
-            return
-        self.ui.label_coding.hide()
-        ui = DialogCodeByCase(self.app, self.ui.textEdit, self.ui.tab_reports)
-        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.tab_layout_helper(self.ui.tab_coding, ui)'''
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)

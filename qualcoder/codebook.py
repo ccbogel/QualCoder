@@ -31,9 +31,9 @@ import os
 import sys
 import traceback
 
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
-from .helpers import Message
+from .helpers import ExportDirectoryPathDialog, Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -67,7 +67,8 @@ class Codebook:
         self.get_code_frequencies()
         self.tree = QtWidgets.QTreeWidget()
         self.fill_tree()
-        self.export()
+        #elf.export_plaintext()
+        self.export_odt()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes
@@ -140,7 +141,72 @@ class Codebook:
                 it += 1
                 item = it.value()
 
-    def export(self):
+    def export_odt(self):
+        """ Export ODT version of the codebook """
+
+        filename = "Codebook.odt"
+        exp_path = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_path.filepath
+        if filepath is None:
+            return
+
+        # Create TextEdit document
+        text_edit = QtWidgets.QTextEdit()
+        fmt1 = QtGui.QTextBlockFormat()
+        fmt1.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+        cursor = QtGui.QTextCursor()
+        text_edit.textCursor().beginEditBlock()
+        text_edit.textCursor().setBlockFormat(fmt1)
+        text_edit.textCursor().insertHtml("<p style=font-size:16pt;font-weight:400>Codebook: " + self.app.project_name + "</p><br/>")
+        text_edit.textCursor().endEditBlock()
+
+        it = QtWidgets.QTreeWidgetItemIterator(self.tree)
+        item = it.value()
+        while item:
+            self.depthgauge(item)
+            cat = False
+            if item.text(1).split(':')[0] == "catid":
+                cat = True
+            id_ = int(item.text(1).split(':')[1])
+            memo = ""
+            owner = ""
+            prefix = ""
+            for i in range(0, self.depthgauge(item)):
+                prefix += "..."
+            if cat:
+                category_text = '<br/><span style=font-size:14pt>' + prefix + _("Category: ") + self.convert_entities(item.text(0)) + "</span><br/>"
+                for i in self.categories:
+                    if i['catid'] == id_:
+                        memo = i['memo']
+                        #owner = i['owner']
+                text_edit.textCursor().beginEditBlock()
+                text_edit.textCursor().setBlockFormat(fmt1)
+                text_edit.textCursor().insertHtml(category_text)
+                text_edit.textCursor().endEditBlock()
+            else:  # Code
+                for i in self.code_names:
+                    if i['cid'] == id_:
+                        color = i['color']
+                        #owner = i['owner']
+                code_text = prefix + '<span style="color:' + color + '">' + _("Code: ") + '</span>'
+                code_text += self.convert_entities(item.text(0))
+                code_text += ", Count: " + item.text(3) + "<br/>"
+                text_edit.textCursor().beginEditBlock()
+                text_edit.textCursor().setBlockFormat(fmt1)
+                text_edit.textCursor().insertHtml(code_text)
+                text_edit.textCursor().endEditBlock()
+            it += 1
+            item = it.value()
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filepath)
+        tw.setFormat(b'ODF')  # byte array needed for Windows 10
+        tw.write(text_edit.document())
+
+        Message(self.app, _('Codebook exported'),
+                _("ODT file of codebook exported:") + "\n" + filepath).exec()
+        self.parent_textEdit.append(_("Codebook exported to ") + filepath)
+
+    def export_plaintext(self):
         """ Export codes to a plain text file, filename will have .txt ending. """
 
         filename = "codebook.txt"
@@ -187,7 +253,7 @@ class Codebook:
         f = open(filename, 'w')
         f.write(filedata)
         f.close()
-        Message(self.app, _('Codebook exported'), _("Text representation of codebook exported:") + "\n" + filename).exec()
+        Message(self.app, _('Codebook exported'), _("Plain text file of codebook exported:") + "\n" + filename).exec()
         self.parent_textEdit.append(_("Codebook exported to ") + filename)
 
     def depthgauge(self, item):
@@ -218,3 +284,20 @@ class Codebook:
             result = cur.fetchone()
             if result is not None:
                 c['freq'] += result[0]
+
+    @staticmethod
+    def convert_entities(text):
+        """ Helper function to convert predefiend xml entnties " ' < > &
+        into numeric equivalents #nnn;
+        Also convert None type into ""
+        param: text : String - usually a memo, description, code or category
+        """
+
+        if text is None:
+            return ""
+        text = text.replace('&', '&#038;')  # &#x26; &amp;
+        text = text.replace('"', '&#034;')  # &#x22; &quot;
+        text = text.replace("'", '&#039;')  # &#x27; &apos;
+        text = text.replace('<', '&#060;')  # &#x3C; &lt;
+        text = text.replace('>', '&#062;')  # &#x3E; &gt;
+        return text
