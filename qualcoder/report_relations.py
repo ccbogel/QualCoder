@@ -41,6 +41,7 @@ from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message
+from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -65,6 +66,7 @@ class DialogReportRelations(QtWidgets.QDialog):
     coder_names = []
     categories = []
     codes = []
+    files = []
     result_relations = []
 
     def __init__(self, app, parent_textedit):
@@ -97,12 +99,51 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
+        self.ui.pushButton_select_files.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        # Default to select all files
+        cur = self.app.conn.cursor()
+        sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
+        cur.execute(sql)
+        res = cur.fetchall()
+        self.files = []
+        for r in res:
+            self.files.append({'name': r[0], 'fid': r[1]})
+
+    def select_files(self):
+        """ Select files for analysis. """
+
+        cur = self.app.conn.cursor()
+        sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
+        cur.execute(sql)
+        res = cur.fetchall()
+        all_files = [{'name': '', 'fid': -1}]
+        for r in res:
+            all_files.append({'name': r[0], 'fid': r[1]})
+        ui = DialogSelectItems(self.app, all_files, _("Select files"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        self.files = []
+        selected = ui.get_selected()
+        for s in selected:
+            if s['fid'] == -1:
+                self.files = all_files[1:]
+                self.ui.pushButton_select_files.setToolTip(_("All files selected"))
+                return
+        tt = _("Files selected: ")
+        for s in selected:
+            self.files.append(s)
+            tt += "\n" + s['name']
+        self.ui.pushButton_select_files.setToolTip(tt)
 
     def get_code_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -130,6 +171,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             return
         code_ids = code_ids[1:]
         self.ui.label_codes.setText(_("Codes: ") + codes_str)
+        self.ui.label_codes.setToolTip(_("Codes: ") + codes_str)
         self.result_relations = []
         if self.ui.radioButton_this.isChecked():
             self.calculate_relations_for_coder(self.app.settings['codername'], code_ids)
@@ -146,45 +188,55 @@ class DialogReportRelations(QtWidgets.QDialog):
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
         """
 
-        cur = self.app.conn.cursor()
-        sql = "select distinct fid from code_text where owner=? and code_text.cid in (" + code_ids + ") \
-            order by fid"
-        cur.execute(sql, [coder_name, ])
-        result = cur.fetchall()
-        file_ids = []
-        file_ids_str = ""
-        for r in result:
-            file_ids.append(r[0])
-            file_ids_str += "," + str(r[0])
-        if not file_ids:
+        combo_rel_type = self.ui.comboBox_relation_type.currentText()
+        selected_relations = ['E', 'I', 'O', 'P']
+        if combo_rel_type == "Overlap":
+            selected_relations = ['O']
+        if combo_rel_type == "Inclusion":
+            selected_relations = ['I']
+        if combo_rel_type == "Exact":
+            selected_relations = ['E']
+        if combo_rel_type == "Proximity":
+            selected_relations = ['P']
+        if combo_rel_type == "Overlap Inclusion":
+            selected_relations = ['O', 'I']
+        if combo_rel_type == "Overlap Inclusion Exact":
+            selected_relations = ['O', 'I', 'E']
+
+        selected_fids = ""
+        for f in self.files:
+            selected_fids += "," + str(f['fid'])
+        try:
+            selected_fids = selected_fids[1:]
+        except IndexError:
             return
 
-        # To add file names to relation result - makes easier for diplaying results
-        file_ids_str = file_ids_str[1:]
-        sql = "select distinct id, name from source where id in (" + file_ids_str + ")"
-        cur.execute(sql)
-        file_id_names = cur.fetchall()
+        cur = self.app.conn.cursor()
+        sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
+              "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
+              "fid in (" + selected_fids + ") order by fid"
+        cur.execute(sql, [coder_name, ])
+        result = cur.fetchall()
+        file_ids_names = []
+        for r in result:
+            file_ids_names.append({'fid': r[0], 'filename': r[1]})
+        if not file_ids_names:
+            return
 
-        # Look at each text file separately,
-        for fid in file_ids:
-            filename = ""
-            for f in file_id_names:
-                if f[0] == fid:
-                    filename = f[1]
-
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext from code_text join code_name on \
-             code_name.cid=code_text.cid where code_text.owner=? and fid=? \
-             and code_text.cid in (" + code_ids + ") \
-            order by code_text.cid"
-            cur.execute(sql, [coder_name, fid])
+        # Get codings for each selected text file separately
+        for fid_name in file_ids_names:
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext from code_text join code_name on " \
+                "code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
+                "and code_text.cid in (" + code_ids + ") " \
+                " order by code_text.cid"
+            cur.execute(sql, [coder_name, fid_name['fid']])
             result = cur.fetchall()
             coded = []
             for row in result:
-                if row[0] in file_ids or file_ids == []:
+                if row[0] == fid_name['fid']:
                     coded.append(row)
 
             # TODO later, find the closest Other code for relation analysis
-
             # Look at each code again other codes, when done remove from list of codes
             cid = 1
             pos0 = 2
@@ -200,8 +252,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                         # Add extra details for output
                         relation['c0_name'] = c0[name]
                         relation['c1_name'] = c1[name]
-                        relation['fid'] = fid
-                        relation['file_name'] = filename
+                        relation['fid'] = fid_name['fid']
+                        relation['file_name'] = fid_name['filename']
                         relation['c0_pos0'] = c0[pos0]
                         relation['c0_pos1'] = c0[pos1]
                         relation['c1_pos0'] = c1[pos0]
@@ -211,7 +263,9 @@ class DialogReportRelations(QtWidgets.QDialog):
                         relation['ctid0_text'] = c0[seltext]
                         relation['ctid1'] = c1[ctid]
                         relation['ctid1_text'] = c1[seltext]
-                        self.result_relations.append(relation)
+                        # Append relation based on comboBox selection
+                        if relation['relation'] in selected_relations:
+                            self.result_relations.append(relation)
         self.display_relations()
 
     def closest_relation(self, c0, c1):
