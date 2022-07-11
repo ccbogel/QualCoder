@@ -65,7 +65,7 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>450</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -81,7 +81,7 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>360</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -195,6 +195,22 @@
       </property>
       <property name="text">
        <string>Relationship</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_summary_stats">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>30</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Summary statistics</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
