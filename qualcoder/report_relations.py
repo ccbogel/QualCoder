@@ -79,6 +79,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.ui.label_statistics.hide()
+        self.ui.tableWidget_statistics.hide()
         try:
             s0 = int(self.app.settings['dialogcodecrossovers_splitter0'])
             s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
@@ -102,11 +104,16 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_calculate.pressed.connect(self.coder_code_relations)
+        self.ui.pushButton_calculate.pressed.connect(self.calculate_code_relations)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_select_files.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_two_head_icon), "png")
+        self.ui.pushButton_summary_stats.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_summary_stats.pressed.connect(self.summary_statistics)
+        self.ui.pushButton_summary_stats.hide()  # TODO TEMP
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         # Default to select all files
@@ -152,10 +159,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.coder_names = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_codes_categories()
 
-    def coder_code_relations(self):
+    def calculate_code_relations(self):
         """ Calculate the relations for selected codes for THIS coder or ALL coders.
         For codings in code_text only. """
 
+        self.ui.label_statistics.hide()
+        self.ui.tableWidget_statistics.hide()
         sel_codes = []
         codes_str = ""
         code_ids = ""
@@ -174,13 +183,13 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.label_codes.setToolTip(_("Codes: ") + codes_str)
         self.result_relations = []
         if self.ui.radioButton_this.isChecked():
-            self.calculate_relations_for_coder(self.app.settings['codername'], code_ids)
+            self.calculate_relations_for_coder_and_selected_codes(self.app.settings['codername'], code_ids)
         else:
             for coder_name in self.coder_names:
-                self.calculate_relations_for_coder(coder_name, code_ids)
-        self.display_relations()
+                self.calculate_relations_for_coder_and_selected_codes(coder_name, code_ids)
+        self.fill_table()
 
-    def calculate_relations_for_coder(self, coder_name, code_ids):
+    def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
         """ Calculate the relations for selected codes for selected coder.
         For codings in code_text only.
 
@@ -266,7 +275,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                         # Append relation based on comboBox selection
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
-        self.display_relations()
+        self.fill_table()
 
     def closest_relation(self, c0, c1):
         # TODO later
@@ -489,7 +498,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         ui.exec()
         return
 
-    def display_relations(self):
+    def fill_table(self):
         """ A table of:
         Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
@@ -602,6 +611,14 @@ class DialogReportRelations(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, ctid1, item)
         self.ui.tableWidget.resizeColumnsToContents()
+
+    def summary_statistics(self):
+        """ Show summary coding distance statistics """
+
+        print("TODO")
+        self.ui.label_statistics.show()
+        self.ui.tableWidget_statistics.show()
+        self.ui.tableWidget_statistics.setFocus()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
