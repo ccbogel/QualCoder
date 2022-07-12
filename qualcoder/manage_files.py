@@ -1344,8 +1344,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(msg)
         self.source.append(entry)
 
-    # @staticmethod
-    def convert_odt_to_text(import_file):
+    def convert_odt_to_text(self, import_file):
         """ Convert odt to very rough equivalent with headings, list items and tables for
         html display in qTextEdits. """
 
@@ -1360,6 +1359,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             return ""
         data = data[data_start + 22: data_end]
         # print(data)
+        data = data.replace('</text:index-title-template>', '')
+        data = data.replace('</text:index-entry-span>', '')
+        data = data.replace('</text:table-of-content-entry-template>', '')
+        data = data.replace('</text:index-title>', '')
+        data = data.replace('</text:index-body>', '')
+        data = data.replace('</text:table-of-contents>', '')
+        data = data.replace('</text:table-of-content-source>', '')
         data = data.replace('<text:h', '\n<text:h')
         data = data.replace('</text:h>', '\n\n')
         data = data.replace('</text:list-item>', '\n')
@@ -1367,6 +1373,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         data = data.replace('</text:p>', '\n')
         data = data.replace('</text:a>', ' ')
         data = data.replace('</text:list>', '')
+        data = data.replace('</text:sequence>', '')
         data = data.replace('<text:list-item>', '')
         data = data.replace('<table:table table:name=', '\n=== TABLE ===\n<table:table table:name=')
         data = data.replace('</table:table>', '=== END TABLE ===\n')
@@ -1383,6 +1390,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                 text_ += data[i]
             if data[i] == ">":
                 tagged = False
+        text_ = text_.replace("&apos;", "'")
+        text_ = text_.replace("&quot;", '"')
+        text_ = text_.replace("&gt;", '>')
+        text_ = text_.replace("&lt;", '<')
+        text_ = text_.replace("&amp;", '&')
         return text_
 
     def export(self):
