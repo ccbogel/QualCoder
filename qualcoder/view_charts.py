@@ -1256,6 +1256,7 @@ class ViewCharts(QDialog):
         TODO include in filters: Selected Attributes for Cases - uses attribute_file_ids and attributes_msg
         """
 
+        self.get_selected_categories_and_codes()
         codes = deepcopy(self.codes)
         if len(codes) > 40:
             codes = codes[:40]
