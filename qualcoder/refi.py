@@ -32,6 +32,7 @@ import logging
 from lxml import etree
 from operator import itemgetter
 import os
+from random import randint
 import re
 import shutil
 import sqlite3
@@ -47,6 +48,7 @@ import zipfile
 
 from PyQt6 import QtWidgets, QtCore
 
+from .color_selector import colors
 from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
@@ -208,7 +210,7 @@ class RefiImport:
                 if is_codable == "true":
                     color = parent.get("color")
                     if color is None:
-                        color = "#999999"
+                        color = colors[randint(0, 119)]
                     try:
                         # print(is_codable, name, "inserting into code name")
                         cur = self.app.conn.cursor()
@@ -233,7 +235,7 @@ class RefiImport:
             # print("No children or description ", name)
             color = parent.get("color")
             if color is None:
-                color = "#999999"
+                color = colors[randint(0, 119)]
             try:
                 cur = self.app.conn.cursor()
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
@@ -254,7 +256,7 @@ class RefiImport:
             # print("Only a description child: ", name)
             color = parent.get("color")
             if color is None:
-                color = "#999999"
+                color = colors[randint(0, 119)]
             try:
                 cur = self.app.conn.cursor()
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
