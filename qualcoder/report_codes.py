@@ -1915,9 +1915,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for _ in vertical_labels:
+        for vl in vertical_labels:
             column_list = []
-            for _ in horizontal_labels:
+            for hl in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -1937,7 +1937,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                             if r['result_type'] == 'text':
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                    memo = _("Coded memo: ") + r['coded_memo']
+                                    self.te[row][col].append(memo)
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
@@ -1955,11 +1956,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text':
                                 self.te[row][col].append(r['text'])
-                                #TODO try and find cause of TypeError str object not callable
                                 try:
                                     if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                        memo = _("Coded memo: ")
-                                        memo += r['coded_memo']
+                                        # Removed _() translation function as it creates a TypeError MacOS1.4
+                                        memo = _("Coded memo: ") + r['coded_memo']
                                         self.te[row][col].append(memo)
                                 except TypeError as e:
                                     msg = str(e)
@@ -2008,7 +2008,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Find sub-code and traverse upwards to map to category
             if item.text(1)[0:3] == 'cid':
                 sub_code = {'codename': item.text(0), 'cid': item.text(1)}
-                # May be None of a top level code - as this will have no parent
+                # Maybe None of a top level code - as this will have no parent
                 if item.parent() is not None:
                     sub_code['top'] = item.parent().text(0)
                     sub_codes.append(sub_code)
@@ -2054,9 +2054,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         choice = self.ui.comboBox_memos.currentText()
-        for _ in id_and_name:
+        for idn in id_and_name:
             column_list = []
-            for _ in horizontal_labels:
+            for hl in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -2077,7 +2077,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                             if r['result_type'] == 'text':
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te.append(_("Coded memo: ") + r['coded_memo'])
+                                    memo = _("Coded memo: ") + r['coded_memo']
+                                    self.te.append(memo)
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2097,7 +2098,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                             if r['result_type'] == 'text':
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te.append(_("Coded memo: ") + r['coded_memo'])
+                                    memo = _("Coded memo: ") + r['coded_memo']
+                                    self.te.append(memo)
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2195,9 +2197,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
-        for _ in id_and_name:
+        for idn in id_and_name:
             column_list = []
-            for _ in horizontal_labels:
+            for hl in horizontal_labels:
                 tedit = QtWidgets.QTextEdit("")
                 tedit.setReadOnly(True)
                 tedit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
