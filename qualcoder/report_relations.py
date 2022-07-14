@@ -619,6 +619,15 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.label_statistics.show()
         self.ui.tableWidget_statistics.show()
         self.ui.tableWidget_statistics.setFocus()
+        rows = self.ui.tableWidget_statistics.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget_statistics.removeRow(0)
+
+        for i in self.result_relations:
+            # i['distance'] can be None -> must change to 0
+            print(i['fid'], i['cid0'], i['cid1'], i['relation'], i['distance'])
+        
+        
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
