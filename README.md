@@ -224,7 +224,7 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2021) QualCoder 3.0 [Computer software]. Retrieved from
+Curtain, C. (2022) QualCoder 3.0 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.0
 
 
