@@ -47,7 +47,7 @@ class Ui_Dialog_CodeRelations(object):
         self.pushButton_select_files.setText("")
         self.pushButton_select_files.setObjectName("pushButton_select_files")
         self.comboBox_relation_type = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_relation_type.setGeometry(QtCore.QRect(170, 57, 131, 25))
+        self.comboBox_relation_type.setGeometry(QtCore.QRect(170, 60, 221, 25))
         self.comboBox_relation_type.setObjectName("comboBox_relation_type")
         self.comboBox_relation_type.addItem("")
         self.comboBox_relation_type.addItem("")
