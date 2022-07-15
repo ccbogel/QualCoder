@@ -30,6 +30,7 @@ from copy import copy
 import csv
 import logging
 import os
+import statistics
 import sys
 import traceback
 
@@ -113,7 +114,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_two_head_icon), "png")
         self.ui.pushButton_summary_stats.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_summary_stats.pressed.connect(self.summary_statistics)
-        self.ui.pushButton_summary_stats.hide()  # TODO TEMP
+        self.ui.pushButton_summary_stats.setEnabled(False)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         # Default to select all files
@@ -188,7 +189,11 @@ class DialogReportRelations(QtWidgets.QDialog):
             for coder_name in self.coder_names:
                 self.calculate_relations_for_coder_and_selected_codes(coder_name, code_ids)
         self.fill_table()
-
+        if self.result_relations != []:
+            self.ui.pushButton_summary_stats.setEnabled(True)
+        else:
+            self.ui.pushButton_summary_stats.setEnabled(False)
+            
     def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
         """ Calculate the relations for selected codes for selected coder.
         For codings in code_text only.
@@ -275,7 +280,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                         # Append relation based on comboBox selection
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
-        self.fill_table()
+        #self.fill_table()
 
     def closest_relation(self, c0, c1):
         # TODO later
@@ -592,7 +597,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, union1, item)
-            item = QtWidgets.QTableWidgetItem(str(i['distance']).replace("None", ""))
+            item = QtWidgets.QTableWidgetItem(str(i['distance']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, distance, item)
             item = QtWidgets.QTableWidgetItem(i['text_before'])
@@ -627,51 +632,70 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r in range(0, rows):
             self.ui.tableWidget_statistics.removeRow(0)
 
-        # Relation keys are immutable tuples as dictionary keys
-        relation_keys = []
+        # Setup list of dictionaries with cid0 and cid1 as identifiers
+        relations_summary = []
         for i in self.result_relations:
-            # i['distance'] can be None -> must change to 0
-            print(i['fid'], i['file_name'], i['cid0'], i['c0_name'], i['cid1'], i['c1_name'],
-                  i['relation'], i['distance'])
-            key_tuple = (i['cid0'], i['cid1'])
-            if key_tuple not in relation_keys:
-                relation_keys.append(key_tuple)
-
-        relation_dict_list = []
-        for rk in relation_keys:
+            relation = {'cid0': i['cid0'], 'cid1': i['cid1']}
+            if relation not in relations_summary:
+                relations_summary.append(relation)
+        # Fill each dictionary with data and statistics
+        for r in relations_summary:
             data = []
-            for r in self.result_relations:
-                if r['cid0'] == rk[0] and r['cid1'] == rk[1]:
-                    data.append(r)
-            rel_dict = {'cid0': rk[0], 'cid1': rk[1],'data': data}
+            distances = []
+            for res in self.result_relations:
+                if r['cid0'] == res['cid0'] and r['cid1'] == res['cid1']:
+                    data.append(res)
+                    distances.append(res['distance'])
+            r['data'] = data
             #TODO do stats summary here
-            rel_dict['count'] = len(data)
-
+            r['count'] = len(data)
+            r['max'] = max(distances)
+            r['min'] = min(distances)
+            r['mean'] = statistics.mean(distances)
+            r['stdev'] = statistics.stdev(distances)
+            r['quantiles'] = statistics.quantiles(distances, method='inclusive')
 
             
-            relation_dict_list.append(rel_dict)
-
         # Fill table
-        col_statsnames = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "Max"]
-        self.ui.tableWidget_statistics.setColumnCount(len(col_statsnames))
-        self.ui.tableWidget_statistics.setHorizontalHeaderLabels(col_statsnames)
+        col_stats_names = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "1st Q",
+                          "Median", "3rd Q", "Max", "mean", "std dev"]
+        self.ui.tableWidget_statistics.setColumnCount(len(col_stats_names))
+        self.ui.tableWidget_statistics.setHorizontalHeaderLabels(col_stats_names)
         
-        for row, rd in enumerate(relation_dict_list):
-            print(rd)
+        for row, rel in enumerate(relations_summary):
             self.ui.tableWidget_statistics.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(str(rd['cid0']))
+            item = QtWidgets.QTableWidgetItem(str(rel['cid0']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c0_name'])
             self.ui.tableWidget_statistics.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(str(i['cid1']))
+            item = QtWidgets.QTableWidgetItem(str(rel['cid1']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c1_name'])
             self.ui.tableWidget_statistics.setItem(row, 1, item)
-            item = QtWidgets.QTableWidgetItem(str(rd['count']))
+            item = QtWidgets.QTableWidgetItem(str(rel['count']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 2, item)
-        
-        
+            item = QtWidgets.QTableWidgetItem(str(rel['min']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 3, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][0]))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 4, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][1]))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 5, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][2]))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 6, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['max']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 7, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['mean']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 8, item)
+            item = QtWidgets.QTableWidgetItem(str(rel['stdev']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 9, item)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
