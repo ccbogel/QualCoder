@@ -333,6 +333,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 result['text_overlap'] = txt[0]
                 result['text_before'] = ""
                 result['text_after'] = ""
+                result['distance'] = 0
             return result
 
         # Check for Proximity
@@ -373,6 +374,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
+            result['distance'] = 0
             return result
 
         # c1 inside c0
@@ -395,6 +397,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
+            result['distance'] = 0
             return result
 
         # Check for Overlap
@@ -424,6 +427,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
+            result['distance'] = 0
             return result
 
         # c1 overlaps on the right side, left side is not overlapping
@@ -450,6 +454,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             txt_after = cur.fetchone()
             if txt_after is not None:
                 result['text_after'] = txt_after[0]
+            result['distance'] = 0
             return result
 
     def table_menu(self, position):
@@ -615,7 +620,6 @@ class DialogReportRelations(QtWidgets.QDialog):
     def summary_statistics(self):
         """ Show summary coding distance statistics """
 
-        print("TODO")
         self.ui.label_statistics.show()
         self.ui.tableWidget_statistics.show()
         self.ui.tableWidget_statistics.setFocus()
@@ -623,9 +627,49 @@ class DialogReportRelations(QtWidgets.QDialog):
         for r in range(0, rows):
             self.ui.tableWidget_statistics.removeRow(0)
 
+        # Relation keys are immutable tuples as dictionary keys
+        relation_keys = []
         for i in self.result_relations:
             # i['distance'] can be None -> must change to 0
-            print(i['fid'], i['cid0'], i['cid1'], i['relation'], i['distance'])
+            print(i['fid'], i['file_name'], i['cid0'], i['c0_name'], i['cid1'], i['c1_name'],
+                  i['relation'], i['distance'])
+            key_tuple = (i['cid0'], i['cid1'])
+            if key_tuple not in relation_keys:
+                relation_keys.append(key_tuple)
+
+        relation_dict_list = []
+        for rk in relation_keys:
+            data = []
+            for r in self.result_relations:
+                if r['cid0'] == rk[0] and r['cid1'] == rk[1]:
+                    data.append(r)
+            rel_dict = {'cid0': rk[0], 'cid1': rk[1],'data': data}
+            #TODO do stats summary here
+            rel_dict['count'] = len(data)
+
+
+            
+            relation_dict_list.append(rel_dict)
+
+        # Fill table
+        col_statsnames = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "Max"]
+        self.ui.tableWidget_statistics.setColumnCount(len(col_statsnames))
+        self.ui.tableWidget_statistics.setHorizontalHeaderLabels(col_statsnames)
+        
+        for row, rd in enumerate(relation_dict_list):
+            print(rd)
+            self.ui.tableWidget_statistics.insertRow(row)
+            item = QtWidgets.QTableWidgetItem(str(rd['cid0']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            item.setToolTip(i['c0_name'])
+            self.ui.tableWidget_statistics.setItem(row, 0, item)
+            item = QtWidgets.QTableWidgetItem(str(i['cid1']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            item.setToolTip(i['c1_name'])
+            self.ui.tableWidget_statistics.setItem(row, 1, item)
+            item = QtWidgets.QTableWidgetItem(str(rd['count']))
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget_statistics.setItem(row, 2, item)
         
         
 
