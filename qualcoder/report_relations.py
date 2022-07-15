@@ -647,14 +647,19 @@ class DialogReportRelations(QtWidgets.QDialog):
                     data.append(res)
                     distances.append(res['distance'])
             r['data'] = data
-            #TODO do stats summary here
+            # Statistics descriptive summary
             r['count'] = len(data)
             r['max'] = max(distances)
             r['min'] = min(distances)
             r['mean'] = statistics.mean(distances)
-            r['stdev'] = statistics.stdev(distances)
-            r['quantiles'] = statistics.quantiles(distances, method='inclusive')
-
+            try:
+                r['stdev'] = statistics.stdev(distances)
+            except statistics.StatisticsError:
+                r['stdev'] = ""
+            try:
+                r['quantiles'] = statistics.quantiles(distances, method='inclusive')
+            except statistics.StatisticsError:
+                r['quantiles'] = ["", "", ""]
             
         # Fill table
         col_stats_names = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "1st Q",
