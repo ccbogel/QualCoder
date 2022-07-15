@@ -69,6 +69,7 @@ class DialogReportRelations(QtWidgets.QDialog):
     codes = []
     files = []
     result_relations = []
+    result_summary = []
 
     def __init__(self, app, parent_textedit):
 
@@ -76,6 +77,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.app = app
         self.parent_textEdit = parent_textedit
         self.get_code_data()
+        self.result_relations = []
+        self.result_summary = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
@@ -193,7 +196,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.pushButton_summary_stats.setEnabled(True)
         else:
             self.ui.pushButton_summary_stats.setEnabled(False)
-            
+
     def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
         """ Calculate the relations for selected codes for selected coder.
         For codings in code_text only.
@@ -228,7 +231,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
               "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
-              "fid in (" + selected_fids + ") order by fid"
+                                                                            "fid in (" + selected_fids + ") order by fid"
         cur.execute(sql, [coder_name, ])
         result = cur.fetchall()
         file_ids_names = []
@@ -240,9 +243,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         # Get codings for each selected text file separately
         for fid_name in file_ids_names:
             sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext from code_text join code_name on " \
-                "code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
-                "and code_text.cid in (" + code_ids + ") " \
-                " order by code_text.cid"
+                  "code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
+                  "and code_text.cid in (" + code_ids + ") " \
+                                                        " order by code_text.cid"
             cur.execute(sql, [coder_name, fid_name['fid']])
             result = cur.fetchall()
             coded = []
@@ -280,7 +283,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                         # Append relation based on comboBox selection
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
-        #self.fill_table()
+        # self.fill_table()
 
     def closest_relation(self, c0, c1):
         # TODO later
@@ -625,6 +628,7 @@ class DialogReportRelations(QtWidgets.QDialog):
     def summary_statistics(self):
         """ Show summary coding distance statistics """
 
+        self.result_summary = []
         self.ui.label_statistics.show()
         self.ui.tableWidget_statistics.show()
         self.ui.tableWidget_statistics.setFocus()
@@ -633,17 +637,18 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget_statistics.removeRow(0)
 
         # Setup list of dictionaries with cid0 and cid1 as identifiers
-        relations_summary = []
         for i in self.result_relations:
             relation = {'cid0': i['cid0'], 'cid1': i['cid1']}
-            if relation not in relations_summary:
-                relations_summary.append(relation)
+            if relation not in self.result_summary:
+                self.result_summary.append(relation)
         # Fill each dictionary with data and statistics
-        for r in relations_summary:
+        for r in self.result_summary:
             data = []
             distances = []
             for res in self.result_relations:
                 if r['cid0'] == res['cid0'] and r['cid1'] == res['cid1']:
+                    r['c0_name'] = res['c0_name']
+                    r['c1_name'] = res['c1_name']
                     data.append(res)
                     distances.append(res['distance'])
             r['data'] = data
@@ -651,31 +656,31 @@ class DialogReportRelations(QtWidgets.QDialog):
             r['count'] = len(data)
             r['max'] = max(distances)
             r['min'] = min(distances)
-            r['mean'] = statistics.mean(distances)
+            r['mean'] = round(statistics.mean(distances), 5)
             try:
-                r['stdev'] = statistics.stdev(distances)
+                r['stdev'] = round(statistics.stdev(distances), 5)
             except statistics.StatisticsError:
                 r['stdev'] = ""
             try:
                 r['quantiles'] = statistics.quantiles(distances, method='inclusive')
             except statistics.StatisticsError:
                 r['quantiles'] = ["", "", ""]
-            
+
         # Fill table
         col_stats_names = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "1st Q",
-                          "Median", "3rd Q", "Max", "mean", "std dev"]
+                           "Median", "3rd Q", "Max", "mean", "std dev"]
         self.ui.tableWidget_statistics.setColumnCount(len(col_stats_names))
         self.ui.tableWidget_statistics.setHorizontalHeaderLabels(col_stats_names)
-        
-        for row, rel in enumerate(relations_summary):
+
+        for row, rel in enumerate(self.result_summary):
             self.ui.tableWidget_statistics.insertRow(row)
             item = QtWidgets.QTableWidgetItem(str(rel['cid0']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(i['c0_name'])
+            item.setToolTip(rel['c0_name'])
             self.ui.tableWidget_statistics.setItem(row, 0, item)
             item = QtWidgets.QTableWidgetItem(str(rel['cid1']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(i['c1_name'])
+            item.setToolTip(rel['c1_name'])
             self.ui.tableWidget_statistics.setItem(row, 1, item)
             item = QtWidgets.QTableWidgetItem(str(rel['count']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
@@ -762,7 +767,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
-                top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                top_item.setFlags(
+                    Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -778,7 +784,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    child.setFlags(
+                        Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -786,7 +793,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()
 
     def export_csv_file(self):
-        """ Export data as csv, called projectname_relations.csv.
+        """ Export data as csv file(s),
+        The main file is called projectname_relations.csv.
+        The summary file (if generated) is called projectname_relations_stats.csv
         The csv is comma delimited and all fields quoted. """
 
         if not self.result_relations:
@@ -833,9 +842,25 @@ class DialogReportRelations(QtWidgets.QDialog):
                 row.append(r['ctid0_text'])
                 row.append(r['ctid1_text'])
                 writer.writerow(row)
-
         msg = _("Code relations csv file exported to: ") + filepath
         Message(self.app, _('Csv file Export'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+        # Write statistical summary file
+        if not self.result_summary:
+            return
+        stats_filepath = filepath[:-4] + "_stats.csv"
+        stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
+                    "Median", "Q3", _("Maximum"), "Mean", "std dev"]
+        with open(stats_filepath, 'w', encoding='UTF8') as f:
+            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+            writer.writerow(stats_col_names)
+            for r in self.result_summary:
+                row = [r['cid0'], r['c0_name'], r['cid1'], r['c1_name'], str(r['count']), str(r['min']),
+                       str(r['quantiles'][0]), str(r['quantiles'][1]), str(r['quantiles'][2]), str(r['max']),
+                       str(r['mean']), str(r['stdev'])]
+                writer.writerow(row)
+        msg = _("Code relations stats csv file exported to: ") + filepath
+        Message(self.app, _('Csv summary file Export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def closeEvent(self, event):
