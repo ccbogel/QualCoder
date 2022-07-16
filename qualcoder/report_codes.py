@@ -2192,8 +2192,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
-        for i, vl in enumerate(vertical_labels):
-            self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Clear and fill the tableWidget
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
@@ -2202,6 +2200,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
         self.ui.tableWidget.setRowCount(len(id_and_name))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
+        for i, vl in enumerate(vertical_labels):
+            self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         for idn in id_and_name:
