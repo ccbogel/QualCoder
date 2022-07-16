@@ -1913,6 +1913,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
         self.ui.tableWidget.setRowCount(len(vertical_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
+        for i, vl in enumerate(vertical_labels):
+            self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         for vl in vertical_labels:
@@ -1980,6 +1982,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_categories(self, results_, ids, type_="file"):
@@ -2051,6 +2054,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
         self.ui.tableWidget.setRowCount(len(id_and_name))
         self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
+        for i, vl in enumerate(vertical_labels):
+            self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
         self.te = []
         choice = self.ui.comboBox_memos.currentText()
@@ -2114,6 +2119,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_top_categories(self, results_, ids, type_="file"):
@@ -2186,7 +2192,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
-
+        for i, vl in enumerate(vertical_labels):
+            self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Clear and fill the tableWidget
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
@@ -2256,6 +2263,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
         self.ui.splitter.setSizes([100, 300, 300])
 
     def table_text_edit_menu(self, position):
