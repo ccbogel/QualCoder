@@ -68,7 +68,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Files, Cases, Coders, text limiters, Attribute limiters.
         Export reports as plain text, ODT, html or csv.
 
-        Text context of a coded text portion is shown in the thord splitter pan in a text edit.
+        Text context of a coded text portion is shown in the third splitter panel in a text edit.
         Case matrix is also shown in a qtablewidget in the third splitter pane.
         If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the
         text in context.
@@ -1644,6 +1644,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(0)
         self.ui.tableWidget.setRowCount(0)
         matrix_option = self.ui.comboBox_matrix.currentText()
+        if matrix_option == "":
+            self.ui.splitter.setSizes([200, 400, 0])
+            return
         if matrix_option in ("Categories by case", "Top categories by case", "Codes by case") and self.case_ids == "":
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
         if matrix_option in ("Categories by file", "Top categories by file", "Codes by file") and self.case_ids != "":
@@ -1660,6 +1663,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.matrix_fill_by_codes(self.results, self.case_ids, "case")
         if matrix_option == "Codes by file" and self.case_ids == "":
             self.matrix_fill_by_codes(self.results, self.file_ids)
+        self.ui.splitter.setSizes([100, 100, 500])
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -1983,7 +1987,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
-        self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_categories(self, results_, ids, type_="file"):
         """ Fill a tableWidget with rows of case or file name and columns of categories.
@@ -2120,7 +2123,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
-        self.ui.splitter.setSizes([100, 300, 300])
 
     def matrix_fill_by_top_categories(self, results_, ids, type_="file"):
         """ Fill a tableWidget with rows of case or file name and columns of top level categories.
@@ -2264,7 +2266,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
-        self.ui.splitter.setSizes([100, 300, 300])
 
     def table_text_edit_menu(self, position):
         """ Context menu for textEdit.
