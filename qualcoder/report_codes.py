@@ -2086,7 +2086,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
                                     memo = _("Coded memo: ") + r['coded_memo']
-                                    self.te.append(memo)
+                                    self.te[row][col].append(memo)
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2107,7 +2107,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
                                     memo = _("Coded memo: ") + r['coded_memo']
-                                    self.te.append(memo)
+                                    self.te[row][col].append(memo)
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
