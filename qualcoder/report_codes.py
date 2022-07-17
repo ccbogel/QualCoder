@@ -243,7 +243,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tt += str(img_res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
             if f['memo'] is not None and f['memo'] != "":
-                tt += _("\nMemo: ") + f['memo']
+                tt += _("\nMEMO: ") + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget_files.addItem(item)
 
@@ -256,7 +256,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             tt = ""
             item = QtWidgets.QListWidgetItem(c['name'])
             if c['memo'] is not None and c['memo'] != "":
-                tt = _("Memo: ") + c['memo']
+                tt = _("MEMO: ") + c['memo']
             item.setToolTip(tt)
             self.ui.listWidget_cases.addItem(item)
 
@@ -1004,6 +1004,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
+        '''prog_dialog = QtWidgets.QProgressDialog(_("Running"), _("Searching"), 0, 2, self)
+        prog_dialog.setValue(0)
+        prog_dialog.setAutoClose(True)
+        prog_dialog.show()'''
         # Prepare results table and results lists
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
@@ -1017,6 +1021,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Add search terms to textEdit
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
+
         self.ui.textEdit.insertPlainText(_("Search parameters") + "\n==========\n")
         if coder == "":
             self.ui.textEdit.insertPlainText(_("Coding by: All coders") + "\n")
@@ -1169,7 +1174,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp['file_or_case'] = file_or_case
                 text_ = str(tmp['file_or_casename']) + " "
                 if len(tmp['coded_memo']) > 0:
-                    text_ += "\nMemo: " + tmp['coded_memo']
+                    text_ += "\nMEMO: " + tmp['coded_memo']
                 text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
                 tmp['text'] = text_
                 self.html_links.append({'imagename': None, 'image': None,
@@ -1283,7 +1288,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tmp['file_or_case'] = file_or_case
                 tmp_text = str(tmp['file_or_casename']) + " "
                 if len(tmp['coded_memo']) > 0:
-                    tmp_text += "\nMemo: " + tmp['coded_memo']
+                    tmp_text += "\nMEMO: " + tmp['coded_memo']
                 tmp_text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
                 tmp['text'] = tmp_text
                 self.html_links.append({'imagename': None, 'image': None,
@@ -1300,6 +1305,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.case_ids = ""
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
+        #del prog_dialog
 
     def get_prettext_and_posttext(self):
         """ Get surrounding text 200 characters.
@@ -1616,7 +1622,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
-                self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
+                self.ui.textEdit.insertPlainText(_("CODED MEMO: ") + row['coded_memo'] + "\n")
             if row['result_type'] == 'text' and choice != "Only memos":
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
@@ -1642,7 +1648,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     cursor.setCharFormat(fmt_normal)
                 self.ui.textEdit.insertPlainText("\n")
                 if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
-                    self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
+                    self.ui.textEdit.insertPlainText(_("CODED MEMO: ") + row['coded_memo'] + "\n")
             if row['result_type'] == 'image' and choice != "Only memos":
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
             if row['result_type'] == 'av' and choice != "Only memos":
@@ -1717,7 +1723,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.html_links.append({'imagename': imagename, 'image': image,
                                 'avname': None, 'av0': None, 'av1': None, 'avtext': None})
         if img['coded_memo'] != "":
-            text_edit.insertPlainText(_("Memo: ") + img['coded_memo'] + "\n")
+            text_edit.insertPlainText(_("CODED MEMO: ") + img['coded_memo'] + "\n")
 
     def heading(self, item):
         """ Takes a dictionary item and creates a html heading for the coded text portion.
@@ -1737,10 +1743,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += item['codename'] + ", "
         choice = self.ui.comboBox_memos.currentText()
         if choice in ("All memos", "Only memos") and item['codename_memo'] != "" and item['codename_memo'] is not None:
-            head += _("Code memo: ") + item['codename_memo'] + "<br />"
+            head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
         if choice in ("All memos", "Only memos") and item['source_memo'] != "" and item['source_memo'] is not None:
-            head += _(" File memo: ") + item['source_memo']
+            head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: ") + item['file_or_casename']
             if choice in ("All memos", "Only memos"):
@@ -1748,7 +1754,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
                 if res is not None and res[0] != "" and res[0] is not None:
-                    head += ", " + _("Case memo: ") + res[0]
+                    head += ", " + _("CASE MEMO: ") + res[0]
         head += " " + _("Coder: ") + item['coder']
         if self.app.settings['showids']:
             try:
@@ -1854,10 +1860,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         if choice in ("All memos", "Only memos") and item['codename_memo'] != "":
-            head += _("Code memo: ") + item['codename_memo'] + "<br />"
+            head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
         if choice in ("All memos", "Only memos") and item['source_memo'] != "":
-            head += _(" File memo: ") + item['source_memo']
+            head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case:':
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
             if choice in ("All memos", "Only memos"):
@@ -1865,7 +1871,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
                 if res is not None and res != "":
-                    head += ", " + _("Case memo: ") + res[0]
+                    head += ", " + _("CASE MEMO: ") + res[0]
         head += item['coder']
         cursor = text_edit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -1951,14 +1957,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'text' and choice != "Only memos":
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                    self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memos":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -1974,12 +1980,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'text' and choice != "Only memos":
                                 self.te[row][col].append(r['text'])
                                 try:
                                     if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                        self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                        self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                                 except TypeError as e:
                                     msg = str(e)
                                     msg += "\nMatrix Coded Memo Error:\nchoice: " + str(choice) + "\n"
@@ -1987,7 +1993,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                     logger.error(msg)
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memos":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2101,9 +2107,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].append(r['text'])
                             if r['result_type'] == 'text' and choice in ("All memos", "Code text memos", "Only memos") \
                                     and r['coded_memo'] != "":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memos":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2124,10 +2130,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 if choice != "Only memos":
                                     self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos" "Only memos") and r['coded_memo'] != "":
-                                    memo = _("Coded memo: ") + r['coded_memo']
-                                    self.te[row][col].append(memo)
+                                    self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memos":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2249,13 +2254,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             self.matrix_links.append(r)
                             if r['result_type'] == 'text' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'text' and choice != "Only memos":
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                    self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memo":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
@@ -2273,13 +2278,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             self.matrix_links.append(r)
                             if r['result_type'] == 'text' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'text' and choice != "Only memos":
                                 self.te[row][col].append(r['text'])
                                 if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
-                                    self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                    self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice == "Only memos":
-                                self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
+                                self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'image' and choice != "Only memos":
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av':
