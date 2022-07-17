@@ -83,8 +83,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.ui.label_statistics.hide()
-        self.ui.tableWidget_statistics.hide()
         try:
             s0 = int(self.app.settings['dialogcodecrossovers_splitter0'])
             s1 = int(self.app.settings['dialogcodecrossovers_splitter1'])
@@ -113,11 +111,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_select_files.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_two_head_icon), "png")
-        self.ui.pushButton_summary_stats.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_summary_stats.pressed.connect(self.summary_statistics)
-        self.ui.pushButton_summary_stats.setEnabled(False)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         # Default to select all files
@@ -167,8 +160,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         """ Calculate the relations for selected codes for THIS coder or ALL coders.
         For codings in code_text only. """
 
-        self.ui.label_statistics.hide()
-        self.ui.tableWidget_statistics.hide()
         sel_codes = []
         codes_str = ""
         code_ids = ""
@@ -192,10 +183,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             for coder_name in self.coder_names:
                 self.calculate_relations_for_coder_and_selected_codes(coder_name, code_ids)
         self.fill_table()
-        if self.result_relations != []:
-            self.ui.pushButton_summary_stats.setEnabled(True)
-        else:
-            self.ui.pushButton_summary_stats.setEnabled(False)
+        self.summary_statistics()
 
     def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
         """ Calculate the relations for selected codes for selected coder.
@@ -626,16 +614,13 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
 
     def summary_statistics(self):
-        """ Show summary coding distance statistics """
+        """ Show summary coding distance statistics.
+         Called after the main results are produced. """
 
         self.result_summary = []
-        self.ui.label_statistics.show()
-        self.ui.tableWidget_statistics.show()
-        self.ui.tableWidget_statistics.setFocus()
         rows = self.ui.tableWidget_statistics.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget_statistics.removeRow(0)
-
         # Setup list of dictionaries with cid0 and cid1 as identifiers
         for i in self.result_relations:
             relation = {'cid0': i['cid0'], 'cid1': i['cid1']}
