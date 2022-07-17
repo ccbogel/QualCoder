@@ -37,8 +37,7 @@ import sys
 import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
-from PyQt6.QtGui import QHelpEvent
-from PyQt6.QtCore import Qt  #, QTextCodec
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
@@ -149,7 +148,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.label_memos.setPixmap(pm)
-        options = [_("None"), _("Code text memos"), _("All memos"), _("Annotations")]
+        options = [_("None"), _("Code text memos"), _("All memos"), _("Annotations"),
+                    _("Only memos")]
         self.ui.comboBox_memos.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
@@ -1605,9 +1605,20 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_bold = QtGui.QTextCharFormat()
         fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
         choice = self.ui.comboBox_memos.currentText()
+        if choice == "Only memos":
+            temp_res = []
+            for i in self.results:
+                if i['coded_memo'] != "":
+                    temp_res.append(i)
+            self.results = temp_res
         for i, row in enumerate(self.results):
             self.heading(row)
-            if row['result_type'] == 'text':
+            if choice == "Only memos" and row['coded_memo'] != "":
+                cursor = self.ui.textEdit.textCursor()
+                pos0 = len(self.ui.textEdit.toPlainText())
+                self.ui.textEdit.insertPlainText("\n")
+                self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
+            if row['result_type'] == 'text' and choice != "Only memos":
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
@@ -1633,9 +1644,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.textEdit.insertPlainText("\n")
                 if choice in ("All memos", "Code text memos") and row['coded_memo'] != "":
                     self.ui.textEdit.insertPlainText(_("Coded memo: ") + row['coded_memo'] + "\n")
-            if row['result_type'] == 'image':
+            if row['result_type'] == 'image' and choice != "Only memos":
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
-            if row['result_type'] == 'av':
+            if row['result_type'] == 'av' and choice != "Only memos":
                 self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
             self.text_links.append(row)
         self.eventFilterTT.set_positions(self.text_links)
@@ -1726,14 +1737,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         choice = self.ui.comboBox_memos.currentText()
-        if choice == "All memos" and item['codename_memo'] != "" and item['codename_memo'] is not None:
+        if choice in ("All memos", "Only memos") and item['codename_memo'] != "" and item['codename_memo'] is not None:
             head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if choice == "All memos" and item['source_memo'] != "" and item['source_memo'] is not None:
+        if choice in ("All memos", "Only memos") and item['source_memo'] != "" and item['source_memo'] is not None:
             head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: ") + item['file_or_casename']
-            if choice == "All memos":
+            if choice in ("All memos", "Only memos"):
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
@@ -1843,14 +1854,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         choice = self.ui.comboBox_memos.currentText()
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
-        if choice == "All memos" and item['codename_memo'] != "":
+        if choice in ("All memos", "Only memos") and item['codename_memo'] != "":
             head += _("Code memo: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if choice == "All memos" and item['source_memo'] != "":
+        if choice in ("All memos", "Only memos") and item['source_memo'] != "":
             head += _(" File memo: ") + item['source_memo']
         if item['file_or_case'] == 'Case:':
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
-            if choice == "All memos":
+            if choice in ("All memos", "Only memos"):
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
@@ -1941,8 +1952,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
-                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos", "Only memos") and r['coded_memo'] != "":
                                     memo = _("Coded memo: ") + r['coded_memo']
                                     self.te[row][col].append(memo)
                                 self.te[row][col].insertPlainText("\n")
@@ -1952,7 +1964,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].insertPlainText(r['text'] + "\n")
                             self.matrix_links.append(r)
                     self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
-        else:
+        else:  # Not transposed
             for row in range(len(vertical_labels)):
                 for col in range(len(horizontal_labels)):
                     for counter, r in enumerate(results):
@@ -1961,9 +1973,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
                                 try:
-                                    if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                    if choice in ("All memos", "Code text memos", "Only memos") and r['coded_memo'] != "":
                                         # Removed _() translation function as it creates a TypeError MacOS1.4
                                         memo = _("Coded memo: ") + r['coded_memo']
                                         self.te[row][col].append(memo)
@@ -1986,7 +1999,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(260)
 
     def matrix_fill_by_categories(self, results_, ids, type_="file"):
         """ Fill a tableWidget with rows of case or file name and columns of categories.
@@ -2083,8 +2096,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
-                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos", "Only memos") and r['coded_memo'] != "":
                                     memo = _("Coded memo: ") + r['coded_memo']
                                     self.te[row][col].append(memo)
                             if r['result_type'] == 'image':
@@ -2094,7 +2108,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertPlainText("\n")
                             self.matrix_links.append(r)
                     self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
-        else:
+        else:  # Not transposed
             for row in range(len(vertical_labels)):
                 for col in range(len(horizontal_labels)):
                     self.te[row][col].setReadOnly(True)
@@ -2104,8 +2118,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                             r['col'] = col
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
-                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos" "Only memos") and r['coded_memo'] != "":
                                     memo = _("Coded memo: ") + r['coded_memo']
                                     self.te[row][col].append(memo)
                             if r['result_type'] == 'image':
@@ -2122,7 +2137,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(260)
 
     def matrix_fill_by_top_categories(self, results_, ids, type_="file"):
         """ Fill a tableWidget with rows of case or file name and columns of top level categories.
@@ -2229,8 +2244,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             self.matrix_links.append(r)
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
-                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos", "Only memos") and r['coded_memo'] != "":
                                     self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
@@ -2238,7 +2254,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].append(r['text'] + "\n")  # The time duration
                             self.te[row][col].insertPlainText("\n")
                     self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
-        else:
+        else:  # Not transposed
             for row in range(len(vertical_labels)):
                 for col in range(len(horizontal_labels)):
                     self.te[row][col].setReadOnly(True)
@@ -2249,8 +2265,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                             self.te[row][col].insertHtml(self.matrix_heading(r, self.te[row][col]))
                             self.matrix_links.append(r)
                             if r['result_type'] == 'text':
-                                self.te[row][col].append(r['text'])
-                                if choice in ("All memos", "Code text memos") and r['coded_memo'] != "":
+                                if choice != "Only memos":
+                                    self.te[row][col].append(r['text'])
+                                if choice in ("All memos", "Code text memos", "Only memos") and r['coded_memo'] != "":
                                     self.te[row][col].append(_("Coded memo: ") + r['coded_memo'])
                             if r['result_type'] == 'image':
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
@@ -2265,7 +2282,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         if self.ui.tableWidget.rowCount() == 1:
             self.ui.tableWidget.verticalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.ui.tableWidget.verticalHeader().setMaximumWidth(300)
+        self.ui.tableWidget.verticalHeader().setMaximumWidth(260)
 
     def table_text_edit_menu(self, position):
         """ Context menu for textEdit.
