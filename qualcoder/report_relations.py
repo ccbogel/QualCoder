@@ -219,7 +219,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
               "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
-                                                                            "fid in (" + selected_fids + ") order by fid"
+              "fid in (" + selected_fids + ") order by fid"
         cur.execute(sql, [coder_name, ])
         result = cur.fetchall()
         file_ids_names = []
@@ -230,10 +230,9 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         # Get codings for each selected text file separately
         for fid_name in file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext from code_text join code_name on " \
-                  "code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
-                  "and code_text.cid in (" + code_ids + ") " \
-                                                        " order by code_text.cid"
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, code_text.memo from code_text " \
+                  "join code_name on code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
+                  "and code_text.cid in (" + code_ids + ") order by code_text.cid"
             cur.execute(sql, [coder_name, fid_name['fid']])
             result = cur.fetchall()
             coded = []
@@ -249,6 +248,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             name = 4
             ctid = 5
             seltext = 6
+            coded_memo = 7
             while len(coded) > 0:
                 c0 = coded.pop()
                 for c1 in coded:
@@ -268,6 +268,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                         relation['ctid0_text'] = c0[seltext]
                         relation['ctid1'] = c1[ctid]
                         relation['ctid1_text'] = c1[seltext]
+                        relation['coded_memo0'] = c0[coded_memo]
+                        relation['coded_memo1'] = c1[coded_memo]
                         # Append relation based on comboBox selection
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
@@ -523,10 +525,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         owner = 14
         ctid0 = 15
         ctid1 = 16
+        memo0 = 17
+        memo1 = 18
         col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0",
-                     _("Overlap") + " 1",
-                     _("Union") + " 0", _("Union") + " 1",
-                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner"), "ctid0", "ctid1"]
+                     _("Overlap") + " 1", _("Union") + " 0", _("Union") + " 1",
+                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner"), "ctid0", "ctid1",
+                     _("Memo") + "0", _("Memo") + "1"]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -611,6 +615,12 @@ class DialogReportRelations(QtWidgets.QDialog):
             item.setToolTip(i['ctid1_text'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, ctid1, item)
+            item = QtWidgets.QTableWidgetItem(i['coded_memo0'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, memo0, item)
+            item = QtWidgets.QTableWidgetItem(i['coded_memo1'])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, memo1, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
     def summary_statistics(self):
@@ -797,7 +807,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                      "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
                      _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
                      _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
-                     "ctid0", "ctid1", "text0", "text1"]
+                     "ctid0", "ctid1", "text0", "text1", _("Memo") + "0", _("Memo") + "1"]
         with open(filepath, 'w', encoding='UTF8') as f:
             writer = csv.writer(f, quoting=csv.QUOTE_ALL)
             writer.writerow(col_names)
@@ -826,6 +836,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 row.append(r['ctid1'])
                 row.append(r['ctid0_text'])
                 row.append(r['ctid1_text'])
+                row.append(r['coded_memo0'])
+                row.append(r['coded_memo1'])
                 writer.writerow(row)
         msg = _("Code relations csv file exported to: ") + filepath
         Message(self.app, _('Csv file Export'), msg, "information").exec()
