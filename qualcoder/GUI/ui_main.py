@@ -171,10 +171,13 @@ class Ui_MainWindow(object):
         self.actionCode_by_case.setObjectName("actionCode_by_case")
         self.actionCharts = QtGui.QAction(MainWindow)
         self.actionCharts.setObjectName("actionCharts")
+        self.actionExport_codebook_with_memos = QtGui.QAction(MainWindow)
+        self.actionExport_codebook_with_memos.setObjectName("actionExport_codebook_with_memos")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
         self.menuExport.addAction(self.actionExport_codebook)
+        self.menuExport.addAction(self.actionExport_codebook_with_memos)
         self.menuImport.addAction(self.actionImport_survey)
         self.menuImport.addAction(self.actionREFI_Codebook_import)
         self.menuImport.addAction(self.actionREFI_QDA_Project_import)
@@ -269,7 +272,7 @@ class Ui_MainWindow(object):
         self.actionCoding_comparison.setText(_translate("MainWindow", "Coding comparison"))
         self.actionText_mining.setText(_translate("MainWindow", "Text mining"))
         self.actionView_Graph.setText(_translate("MainWindow", "View Graph"))
-        self.actionExport_codebook.setText(_translate("MainWindow", "Export codebook"))
+        self.actionExport_codebook.setText(_translate("MainWindow", "Export codebook as ODT file"))
         self.actionCode_image.setText(_translate("MainWindow", "Code image"))
         self.actionCode_frequencies.setText(_translate("MainWindow", "Code frequencies"))
         self.actionCoding_Matrix.setText(_translate("MainWindow", "Coding Matrix"))
@@ -291,6 +294,7 @@ class Ui_MainWindow(object):
         self.actionCoding_comparison_by_file.setText(_translate("MainWindow", "Coding comparison by file"))
         self.actionCode_by_case.setText(_translate("MainWindow", "Code by case"))
         self.actionCharts.setText(_translate("MainWindow", "Charts"))
+        self.actionExport_codebook_with_memos.setText(_translate("MainWindow", "Export codebook with memos as ODT file"))
 
 
 if __name__ == "__main__":
