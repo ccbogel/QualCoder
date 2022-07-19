@@ -777,6 +777,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_Codebook_import.triggered.connect(self.refi_codebook_import)
         self.ui.actionREFI_QDA_Project_import.triggered.connect(self.refi_project_import)
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
+        self.ui.actionExport_codebook.triggered.connect(self.codebook)
+        self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
 
@@ -799,7 +801,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
-        self.ui.actionExport_codebook.triggered.connect(self.codebook)
 
         # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -1224,6 +1225,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """
 
         Codebook(self.app, self.ui.textEdit)
+
+    def codebook_with_memos(self):
+        """ Export a text file code book of categories and codes with their memos.
+        """
+
+        Codebook(self.app, self.ui.textEdit, memos=True)
 
     def refi_project_export(self):
         """ Export the project as a qpdx zipped folder.
