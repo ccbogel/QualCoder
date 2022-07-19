@@ -129,6 +129,7 @@
      <addaction name="actionProject_Exchange_Export"/>
      <addaction name="actionREFI_Codebook_export"/>
      <addaction name="actionExport_codebook"/>
+     <addaction name="actionExport_codebook_with_memos"/>
     </widget>
     <widget class="QMenu" name="menuImport">
      <property name="title">
@@ -339,7 +340,7 @@
   </action>
   <action name="actionExport_codebook">
    <property name="text">
-    <string>Export codebook</string>
+    <string>Export codebook as ODT file</string>
    </property>
   </action>
   <action name="actionCode_image">
@@ -446,6 +447,11 @@
   <action name="actionCharts">
    <property name="text">
     <string>Charts</string>
+   </property>
+  </action>
+  <action name="actionExport_codebook_with_memos">
+   <property name="text">
+    <string>Export codebook with memos as ODT file</string>
    </property>
   </action>
  </widget>
