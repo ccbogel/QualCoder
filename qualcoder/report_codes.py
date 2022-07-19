@@ -1004,9 +1004,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
-        prog_dialog = QtWidgets.QProgressDialog("Running", "Searching", 1, 5, None)
-        prog_dialog.setValue(1)
+        prog_dialog = QtWidgets.QProgressDialog("Running", "", 1, 5, None)
+        prog_dialog.setWindowTitle(_("Searching"))
+        prog_dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowCloseButtonHint)
         prog_dialog.setAutoClose(True)
+        prog_dialog.setValue(1)
         prog_dialog.show()
         QtCore.QCoreApplication.processEvents()
         rows = self.ui.tableWidget.rowCount()
