@@ -58,8 +58,6 @@ from .select_items import DialogSelectItems  # for isinstance()
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-CHAR_LIMIT = 50000  # For loading text file chunks
-
 
 def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
@@ -2511,10 +2509,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.filenames) > 1:
             next_action = menu.addAction(_("Next file"))
             latest_action = menu.addAction(_("File with latest coding"))
-        if file_['characters'] > CHAR_LIMIT:
-            next_chars_action = menu.addAction(str(CHAR_LIMIT) + _(" next  characters"))
+        if file_['characters'] > self.app.settings['codetext_chunksize']:
+            next_chars_action = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
-                prev_chars_action = menu.addAction(str(CHAR_LIMIT) + _(" previous  characters"))
+                prev_chars_action = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
         go_to_bookmark_action = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
@@ -2533,7 +2531,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.prev_chars(file_, selected)
 
     def prev_chars(self, file_, selected):
-        """ Load previous CHAR_LIMIT chunk of the text file.
+        """ Load previous ext chunk of the text file.
         params:
             file_  : selected file, Dictionary
             selected:  list widget item """
@@ -2542,15 +2540,18 @@ class DialogCodeText(QtWidgets.QWidget):
         if file_['start'] == 0:
             return
         file_['end'] = file_['start']
-        file_['start'] = file_['start'] - CHAR_LIMIT
+        file_['start'] = file_['start'] - self.app.settings['codetext_chunksize']
         # Forward track to the first line ending for a better start of text chunk
         line_ending = False
         i = 0
-        while file_['start'] + i < file_['end'] and not line_ending:
-            if file_['fulltext'][file_['start'] + i] == "\n":
-                line_ending = True
-            else:
-                i += 1
+        try:
+            while file_['start'] + i < file_['end'] and not line_ending:
+                if file_['fulltext'][file_['start'] + i] == "\n":
+                    line_ending = True
+                else:
+                    i += 1
+        except IndexError:
+            pass
         file_['start'] += i
         # Check displayed text not going before start of characters
         if file_['start'] < 0:
@@ -2564,7 +2565,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.load_file(file_)
 
     def next_chars(self, file_, selected):
-        """ Load next CHAR_LIMIT chunk of the text file.
+        """ Load next text chunk of the text file.
         params:
             file_  : selected file, Dictionary
             selected:  list widget item """
@@ -2572,7 +2573,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # First time
         if file_['start'] == 0 and file_['end'] == file_['characters']:
             # Backtrack to the first line ending for a better end of text chunk
-            i = CHAR_LIMIT
+            i = self.app.settings['codetext_chunksize']
             line_ending = False
             while i > 0 and not line_ending:
                 if file_['fulltext'][i] == "\n":
@@ -2580,20 +2581,23 @@ class DialogCodeText(QtWidgets.QWidget):
                 else:
                     i -= 1
             if i <= 0:
-                file_['end'] = CHAR_LIMIT
+                file_['end'] = self.app.settings['codetext_chunksize']
             else:
                 file_['end'] = i
         else:
-            file_['start'] = file_['start'] + CHAR_LIMIT
+            file_['start'] = file_['start'] + self.app.settings['codetext_chunksize']
             # Backtrack from start to next line ending for a better start of text chunk
             line_ending = False
-            while file_['start'] > 0 and not line_ending:
-                if file_['fulltext'][file_['start']] == "\n":
-                    line_ending = True
-                else:
-                    file_['start'] -= 1
+            try:
+                while file_['start'] > 0 and not line_ending:
+                    if file_['fulltext'][file_['start']] == "\n":
+                        line_ending = True
+                    else:
+                        file_['start'] -= 1
+            except IndexError:
+                pass
             # Backtrack from end to next line ending for a better end of text chunk
-            i = CHAR_LIMIT
+            i = self.app.settings['codetext_chunksize']
             if file_['start'] + i >= file_['characters']:
                 i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
             line_ending = False
@@ -2770,7 +2774,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def unlight(self):
         """ Remove all text highlighting from current file. """
 
-        if self.text is None:
+        if self.text is None or self.text == "":
             return
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)

@@ -406,7 +406,7 @@ class App(object):
             config.write(configfile)
 
     def _load_config_ini(self):
-        """ load config settings, and convert some to int. """
+        """ load config settings, and convert some to Integer. """
 
         config = configparser.ConfigParser()
         config.read(self.configpath)
@@ -420,6 +420,8 @@ class App(object):
             result['treefontsize'] = default.getint('treefontsize')
         if 'backup_num' in default:
             result['backup_num'] = default.getint('backup_num')
+        if 'codetext_chunksize' in default:
+            result['codetext_chunksize'] = default.getint('codetext_chunksize')
         return result
 
     def check_and_add_additional_settings(self, settings_data):
@@ -461,7 +463,7 @@ class App(object):
                 'docfontsize',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet', 'backup_num'
+                'stylesheet', 'backup_num', 'codetext_chunksize'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -472,6 +474,8 @@ class App(object):
                     settings_data[key] = "[]"
                 if key == "backup_num":
                     settings_data[key] = 5
+                if key == "codetext_chunksize":
+                    settings_data[key] = 50000
         # write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
@@ -638,7 +642,8 @@ class App(object):
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
-            'stylesheet': 'original'
+            'stylesheet': 'original',
+            'codetext_chunksize': 50000
         }
 
     def get_file_texts(self, fileids=None):
