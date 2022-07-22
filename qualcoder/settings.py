@@ -110,6 +110,11 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         self.ui.spinBox_docfontsize.setValue(self.settings['docfontsize'])
         self.ui.comboBox_coders.currentIndexChanged.connect(self.combobox_coder_changed)
+        index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
+                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_text_chunk_size.setCurrentIndex(index)
         self.ui.checkBox_auto_backup.stateChanged.connect(self.backup_state_changed)
         if self.settings['showids'] == 'True':
             self.ui.checkBox.setChecked(True)
@@ -200,6 +205,7 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
             restart_qualcoder = True
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
+        self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
         self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
