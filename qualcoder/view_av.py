@@ -3080,7 +3080,7 @@ class ToolTipEventFilter(QtCore.QObject):
             cursor = receiver.cursorForPosition(event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
-            txt = ""
+            text_ = ""
             multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
             multiple = 0
             # Occasional None type error
@@ -3090,31 +3090,31 @@ class ToolTipEventFilter(QtCore.QObject):
             for item in self.code_text:
                 if item['pos0'] <= pos and item['pos1'] >= pos:
                     try:
-                        txt += '<p style="background-color:' + item['color']
-                        txt += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
+                        text_ += '<p style="background-color:' + item['color']
+                        text_ += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
                         if item['avid'] is not None:
-                            txt += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
-                            txt += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
+                            text_ += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
+                            text_ += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
                         if item['memo'] is not None and item['memo'] != "":
-                            txt += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                            text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
-                            txt += "<br /><em>IMPORTANT</em>"
-                        txt += "</p>"
+                            text_ += "<br /><em>IMPORTANT</em>"
+                        text_ += "</p>"
                         multiple += 1
                     except KeyError as e_:
-                        msg_ = "Codes ToolTipEventFilter " + str(e_) + ". Possible key error: "
+                        msg_ = "Codes ToolTipEventFilter " + str(e_) + ". Key error: "
                         msg_ += str(item) + "\n" + str(self.code_text)
                         logger.error(msg_)
             if multiple > 1:
-                txt = multiple_msg + txt
+                text_ = multiple_msg + text_
             # Check annotations
-            for item in self.annotations:
+            for ann in self.annotations:
                 # if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
-                if item['pos0'] <= pos and item['pos1'] >= pos:
-                    txt += "<p>" + _("ANNOTATED") + "</p>"
+                if ann['pos0'] <= pos and ann['pos1'] >= pos:
+                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
                     break
-            if txt != "":
-                receiver.setToolTip(txt)
+            if text_ != "":
+                receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
