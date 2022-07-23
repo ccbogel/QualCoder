@@ -74,7 +74,7 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_important.setGeometry(QtCore.QRect(430, 0, 161, 23))
         self.checkBox_important.setObjectName("checkBox_important")
         self.comboBox_memos = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_memos.setGeometry(QtCore.QRect(410, 80, 151, 30))
+        self.comboBox_memos.setGeometry(QtCore.QRect(410, 80, 171, 30))
         self.comboBox_memos.setObjectName("comboBox_memos")
         self.label_memos = QtWidgets.QLabel(self.groupBox)
         self.label_memos.setGeometry(QtCore.QRect(370, 80, 30, 30))
