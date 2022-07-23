@@ -3839,7 +3839,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
                         text_ += item['name'] + "</em><br />" + seltext
                         if item['memo'] is not None and item['memo'] != "":
-                            text_ += "<br /><em>" + _("Memo: ") + item['memo'] + "</em>"
+                            text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
                             text_ += "<br /><em>IMPORTANT</em>"
                         text_ += "</p>"
@@ -3851,9 +3851,9 @@ class ToolTipEventFilter(QtCore.QObject):
             if multiple > 1:
                 text_ = multiple_msg + text_
             # Check annotations
-            for item in self.annotations:
-                if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
-                    text_ += "<p>" + _("ANNOTATED") + "</p>"
+            for ann in self.annotations:
+                if ann['pos0'] - self.offset <= pos and ann['pos1'] - self.offset >= pos:
+                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
