@@ -148,7 +148,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.label_memos.setPixmap(pm)
-        options = [_("None"), _("Coded memos"), _("All memos"), _("Only memos"), _("Only coded memos"), _("Annotations")]
+        options = [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
+                   _("Only coded memos"), _("Annotations")]
         self.ui.comboBox_memos.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
@@ -1658,7 +1659,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     cursor.setCharFormat(fmt_normal)
                 if memo_choice != "Only coded memos":
                     self.ui.textEdit.insertPlainText("\n")
-                if memo_choice in ("All memos", "Coded memos", "Only coded memos") and row['coded_memo'] != "":
+                if memo_choice in ("Also all memos", "Also coded memos", "Only coded memos") and row['coded_memo'] != "":
                     self.ui.textEdit.insertPlainText(_("CODED MEMO: ") + row['coded_memo'] + "\n")
             if row['result_type'] == 'image' and memo_choice not in ("Only memos", "Only coded memos"):
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
@@ -1753,14 +1754,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
-        if memo_choice in ("All memos", "Only memos") and item['codename_memo'] != "" and item['codename_memo'] is not None:
+        if memo_choice in ("Also code memos", "Also all memos", "Only memos") and item['codename_memo'] != "" and \
+                item['codename_memo'] is not None:
             head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if memo_choice in ("All memos", "Only memos") and item['source_memo'] != "" and item['source_memo'] is not None:
+        if memo_choice in ("Also all memos", "Only memos") and item['source_memo'] != "" and item['source_memo'] is not None:
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: ") + item['file_or_casename']
-            if memo_choice in ("All memos", "Only memos"):
+            if memo_choice in ("Also all memos", "Only memos"):
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
@@ -1870,14 +1872,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         memo_choice = self.ui.comboBox_memos.currentText()
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
-        if memo_choice in ("All memos", "Only memos") and item['codename_memo'] != "":
-            head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
+        if memo_choice in ("Also all memos", "Also code memos", "Only memos") and item['codename_memo'] != "":
+            head += _("CODE MEMO: All memo") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if memo_choice in ("All memos", "Only memos") and item['source_memo'] != "":
+        if memo_choice in ("Also alll memos", "Only memos") and item['source_memo'] != "":
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case:':
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
-            if memo_choice in ("All memos", "Only memos"):
+            if memo_choice in ("Also all memos", "Only memos"):
                 cur = self.app.conn.cursor()
                 cur.execute("select memo from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
@@ -2081,9 +2083,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_labels)
+        # Keep horizontal labels to 80 chars per line
+        horizontal_label_wrap = []
+        for hl in horizontal_labels:
+            segs = re.findall('.{1,80}', hl)
+            horizontal_label_wrap.append("\n".join(segs))
+        self.ui.tableWidget.setHorizontalHeaderLabels(horizontal_label_wrap)
         self.ui.tableWidget.setRowCount(len(vertical_labels))
-        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels)
+        # Keep vertical labels to 30 chars per line
+        vertical_labels_wrap = []
+        for vl in vertical_labels:
+            segs = re.findall('.{1,30}', vl)
+            vertical_labels_wrap.append("\n".join(segs))
+        self.ui.tableWidget.setVerticalHeaderLabels(vertical_labels_wrap)
         for i, vl in enumerate(vertical_labels):
             self.ui.tableWidget.verticalHeaderItem(i).setToolTip(vl)
         # Need to create a table of separate textEdits for reference for cursorPositionChanged event.
@@ -2111,7 +2123,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                             if r['result_type'] == 'text' and memo_choice not in ("Only memos", "Only coded memos"):
                                 self.te[row][col].append(r['text'])
-                                if memo_choice in ("All memos", "Coded memos") and r['coded_memo'] != "":
+                                if memo_choice in ("Also alll memos", "Also coded memos") and r['coded_memo'] != "":
                                     self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image' and memo_choice in ("Only memos", "Only coded memos"):
@@ -2135,7 +2147,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                             if r['result_type'] == 'text' and memo_choice not in ("Only memos", "Only coded memos"):
                                 self.te[row][col].append(r['text'])
                                 try:
-                                    if memo_choice in ("All memos", "Coded memos") and r['coded_memo'] != "":
+                                    if memo_choice in ("Also all memos", "Also coded memos") and r['coded_memo'] != "":
                                         self.te[row][col].append(_("CODED MEMO: ") + r['coded_memo'])
                                 except TypeError as e:
                                     msg = str(e)
