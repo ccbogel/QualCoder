@@ -113,6 +113,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        '''self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.stats_table_menu)'''
         # Default to select all files
         cur = self.app.conn.cursor()
         sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
@@ -274,10 +276,6 @@ class DialogReportRelations(QtWidgets.QDialog):
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
         # self.fill_table()
-
-    def closest_relation(self, c0, c1):
-        # TODO later
-        pass
 
     def relation(self, c0, c1):
         """ Relation function as in RQDA
@@ -462,13 +460,33 @@ class DialogReportRelations(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         try:
             row = self.ui.tableWidget.currentRow()
+            col = self.ui.tableWidget.currentColumn()
         except AttributeError:
             # No table for table menu
             return
         action_show_context = menu.addAction(_("View in context"))
+        action_sort_ascending = menu.addAction(_("Sort ascending"))
+        action_sort_descending = menu.addAction(_("Sort descending"))
+        #action_show_all_rows = menu.addAction(_("Clear filter"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_show_context:
             self.show_context()
+        if action == action_sort_ascending:
+            self.sort_ascending(col)
+        if action == action_sort_descending:
+            self.sort_descending(col)
+        '''if action == action_show_all_rows:
+            pass'''
+
+    def sort_ascending(self, col):
+        """ Sort table descending based on this column. """
+
+        self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
+
+    def sort_descending(self, col):
+        """ Sort table ascending based on this column. """
+
+        self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
 
     def show_context(self):
         """ Show context of coding in dialog.
@@ -506,6 +524,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is: inclusion, overlap, exact, proximity
+
+        https://stackoverflow.com/questions/60512920/sorting-numbers-in-qtablewidget-work-doesnt-right-pyqt5
         """
 
         fid = 0
@@ -538,15 +558,18 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.removeRow(0)
         for r, i in enumerate(self.result_relations):
             self.ui.tableWidget.insertRow(r)
-            item = QtWidgets.QTableWidgetItem(str(i['fid']))
+            item = QtWidgets.QTableWidgetItem()  # str(i['fid']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['fid'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['file_name'])
             self.ui.tableWidget.setItem(r, fid, item)
-            item = QtWidgets.QTableWidgetItem(str(i['cid0']))
+            item = QtWidgets.QTableWidgetItem()  #str(i['cid0']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['cid0'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
             self.ui.tableWidget.setItem(r, code0, item)
-            item = QtWidgets.QTableWidgetItem(str(i['cid1']))
+            item = QtWidgets.QTableWidgetItem()  # str(i['cid1']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['cid1'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
             self.ui.tableWidget.setItem(r, code1, item)
@@ -561,7 +584,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 ttip = _("Inclusion")
             item.setToolTip(ttip)
             self.ui.tableWidget.setItem(r, relation_type, item)
-            item = QtWidgets.QTableWidgetItem(str(i['whichmin']).replace("None", ""))
+            item = QtWidgets.QTableWidgetItem()  #str(i['whichmin']).replace("None", ""))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['whichmin'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             if i['whichmin'] is not None:
                 ttip = i['c0_name']
@@ -569,8 +593,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                     ttip = i['c1_name']
                 item.setToolTip(ttip)
             self.ui.tableWidget.setItem(r, min_, item)
-
-            item = QtWidgets.QTableWidgetItem(str(i['whichmax']).replace("None", ""))
+            item = QtWidgets.QTableWidgetItem()  #str(i['whichmax']).replace("None", ""))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['whichmax'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             if i['whichmax'] is not None:
                 ttip = i['c0_name']
@@ -592,7 +616,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(r, union1, item)
-            item = QtWidgets.QTableWidgetItem(str(i['distance']))
+            item = QtWidgets.QTableWidgetItem()  #str(i['distance']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['distance'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, distance, item)
             item = QtWidgets.QTableWidgetItem(i['text_before'])
@@ -607,11 +632,13 @@ class DialogReportRelations(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(i['owner']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, owner, item)
-            item = QtWidgets.QTableWidgetItem(str(i['ctid0']))
+            item = QtWidgets.QTableWidgetItem()  #str(i['ctid0']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['ctid0'])
             item.setToolTip(i['ctid0_text'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, ctid0, item)
-            item = QtWidgets.QTableWidgetItem(str(i['ctid1']))
+            item = QtWidgets.QTableWidgetItem()  #str(i['ctid1']))
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['ctid1'])
             item.setToolTip(i['ctid1_text'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, ctid1, item)
