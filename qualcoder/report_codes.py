@@ -149,7 +149,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
         self.ui.label_memos.setPixmap(pm)
         options = [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
-                   _("Only coded memos"), _("Annotations")]
+                   _("Only coded memos"), _("Annotations"), _("Codebook memos")]
         self.ui.comboBox_memos.addItems(options)
         cur = self.app.conn.cursor()
         sql = "select count(name) from attribute_type"
@@ -768,6 +768,34 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item.child(i).setSelected(True)
             self.recursive_set_selected(item.child(i))
 
+    def search_codebook(self):
+        """ Codebook """
+
+        self.te = []
+        self.ui.tableWidget.setColumnCount(0)
+        self.ui.tableWidget.setRowCount(0)
+        self.ui.checkBox_matrix_transpose.setChecked(False)
+        self.ui.comboBox_matrix.setCurrentIndex(0)
+        self.ui.splitter.setSizes([200, 400, 0])
+        # Select all code items under selected categories
+        self.recursive_set_selected(self.ui.treeWidget.invisibleRootItem())
+        cur = self.app.conn.cursor()
+        results = []
+        for i in self.ui.treeWidget.selectedItems():
+            if i.text(1)[0:5] == "catid":
+                cur.execute('select name, memo from code_cat where catid=?', [i.text(1)[6:]])
+                res = cur.fetchone()
+                if res is not None:
+                    results.append([_("Category"), res[0], res[1]])
+            if i.text(1)[0:3] == 'cid':
+                cur.execute('select name, memo from code_name where cid=?', [i.text(1)[4:]])
+                res = cur.fetchone()
+                if res is not None:
+                    results.append([_("Code"), res[0], res[1]])
+        for r in results:
+            self.ui.textEdit.append(r[0] + ": " + r[1] + "\n" + _("MEMO: ") + r[2] + "\n")
+        self.ui.comboBox_export.setEnabled(True)
+
     def search_annotations(self):
         """ Find and display annotations from selected text files. """
 
@@ -982,18 +1010,20 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def search(self):
         """ Search for selected codings.
-        There are three main search pathways.
+        There are four main search pathways.
         1:  file selection only.
         2: case selection combined with files selection. (No files selected presumes ALL files)
         3: attribute selection, which may include files or cases.
+        4. codebook memo selection
         """
 
-        # If Annotations is selected only look at selected text file annotations. Separate search and report method.
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice == "Annotations":
             self.search_annotations()
             return
-
+        if memo_choice == "Codebook memos":
+            self.search_codebook()
+            return
         # Get variables for search: search text, coders, codes, files,cases, attribute file ids
         coder = self.ui.comboBox_coders.currentText()
         self.html_links = []  # For html file output with media
