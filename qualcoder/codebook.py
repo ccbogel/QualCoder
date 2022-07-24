@@ -56,18 +56,19 @@ class Codebook:
     parent_textEdit = None
     code_names = []
     categories = []
+    memos = False
     tree = None
 
-    def __init__(self, app, parent_textedit):
+    def __init__(self, app, parent_textedit, memos=False):
 
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
+        self.memos = memos
         self.code_names, self.categories = self.app.get_codes_categories()
         self.get_code_frequencies()
         self.tree = QtWidgets.QTreeWidget()
         self.fill_tree()
-        #elf.export_plaintext()
         self.export_odt()
 
     def fill_tree(self):
@@ -175,25 +176,31 @@ class Codebook:
                 prefix += "..."
             if cat:
                 category_text = '<br/><span style=font-size:14pt>' + prefix + _("Category: ") + self.convert_entities(item.text(0)) + "</span><br/>"
+                memo = ""
                 for i in self.categories:
                     if i['catid'] == id_:
-                        memo = i['memo']
-                        #owner = i['owner']
+                        memo = self.convert_entities(i['memo'])
                 text_edit.textCursor().beginEditBlock()
                 text_edit.textCursor().setBlockFormat(fmt1)
                 text_edit.textCursor().insertHtml(category_text)
+                if self.memos and memo != "":
+                    text_edit.insertHtml("<span style=font-size:8pt>MEMO: " + memo + "</span><br/>")
                 text_edit.textCursor().endEditBlock()
             else:  # Code
+                memo = ""
+                color = "#999999"
                 for i in self.code_names:
                     if i['cid'] == id_:
                         color = i['color']
-                        #owner = i['owner']
+                        memo = self.convert_entities(i['memo'])
                 code_text = prefix + '<span style="color:' + color + '">' + _("Code: ") + '</span>'
                 code_text += self.convert_entities(item.text(0))
                 code_text += ", Count: " + item.text(3) + "<br/>"
                 text_edit.textCursor().beginEditBlock()
                 text_edit.textCursor().setBlockFormat(fmt1)
                 text_edit.textCursor().insertHtml(code_text)
+                if self.memos and memo != "":
+                    text_edit.insertHtml("<span style=font-size:8pt>MEMO: " + memo + "</span><br/>")
                 text_edit.textCursor().endEditBlock()
             it += 1
             item = it.value()
