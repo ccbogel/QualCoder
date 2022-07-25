@@ -62,7 +62,7 @@ class DialogSQL(QtWidgets.QDialog):
     the __init__() method.
     A gui to allow the user to enter sql queries and return results.
     Data outputs are as tab (or other) separated files.
-    EXTRA_SQL is listed at end of module for additional complex queries. """
+    DEFAULT_SQL is listed at end of module for additional complex queries. """
 
     app = None
     schema = None
@@ -270,11 +270,12 @@ class DialogSQL(QtWidgets.QDialog):
                 self.file_data.append(row_results)
                 self.ui.tableWidget_results.insertRow(row)
                 for col, value in enumerate(row_results):
-                    if value is None:
-                        value = ""
-                    cell = QtWidgets.QTableWidgetItem(str(value))
-                    cell.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-                    self.ui.tableWidget_results.setItem(row, col, cell)
+                    '''if value is None:
+                        value = ""'''
+                    item = QtWidgets.QTableWidgetItem()
+                    item.setData(QtCore.Qt.ItemDataRole.DisplayRole, value)
+                    item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+                    self.ui.tableWidget_results.setItem(row, col, item)
             self.ui.tableWidget_results.resizeColumnsToContents()
             # Keep column widths reasonable, 450 pixels max
             for i in range(self.ui.tableWidget_results.columnCount()):
@@ -339,7 +340,7 @@ class DialogSQL(QtWidgets.QDialog):
         default_item = QtWidgets.QTreeWidgetItem()
         default_item.setText(0, _("Default Queries"))
         self.ui.treeWidget.addTopLevelItem(default_item)
-        for query in EXTRA_SQL:
+        for query in DEFAULT_SQL:
             item = QtWidgets.QTreeWidgetItem()
             title = query.split('\n')[0]
             item.setText(0, title)
@@ -486,8 +487,6 @@ class DialogSQL(QtWidgets.QDialog):
         action_sort_descending = menu.addAction(_("Sort descending"))
         action_sort_descending.triggered.connect(self.sort_descending)
         action = menu.exec(self.ui.tableWidget_results.mapToGlobal(position))
-    # TODO need to add numerical filters
-    # TODO need to store or determine type of data to do this
 
     def sort_ascending(self):
         """ Sort rows on selected column in ascending order. """
@@ -654,16 +653,20 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
             return QtWidgets.QTableWidgetItem.__lt__(self, other)
 
 
-# Extra queries
-EXTRA_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
+# Default queries
+DEFAULT_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
-'-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename",  \
-code_text.fid, code_text.pos0, code_text.pos1,  code_text.seltext  from  code_name \
-join  code_text on  code_name.cid = code_text.cid',
+'-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
+code_text.fid, code_text.pos0, code_text.pos1, code_text.seltext from code_name \
+join  code_text on code_name.cid = code_text.cid\n\
+join source on source.id=code_text.fid\n\
+-- UNCOMMENT "--" LINES BELOW TO GET DETAILS FOR A CODE AND OR A FILE\n\
+-- AND codename="CODENAME" -- FILL CODENAME WITH CODE NAME\n\
+-- AND source.name="FILENAME" -- FILL FILENAME WITH FILE NAME',
 '-- GET_CODING_TABLE\n-- Implementation of RQDA function\n\
 select code_text.cid, code_text.fid, code_name.name as "codename", \
-source.name as "filename" , code_text.pos1 - code_text.pos0 as "CodingLength",\
+source.name as "filename", code_text.pos1 - code_text.pos0 as "CodingLength",\
 code_text.pos0 as "index1", code_text.pos1 as "index2" \
 from code_text join code_name on code_text.cid = code_name.cid \
 join source on code_text.fid = source.id',
