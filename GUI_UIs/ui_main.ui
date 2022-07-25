@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_action_log">
        <attribute name="title">
@@ -50,7 +50,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Files and Cases menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+         <string>Select an option in the Files and Cases menu. </string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -71,7 +71,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Coding menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+         <string>Select an option in the Coding menu. </string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -92,7 +92,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Select an option in the Reports menu. CTRL TAB to go forward in tabs. CTRL SHIFT TAB to go backwards.</string>
+         <string>Select an option in the Reports menu. </string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
