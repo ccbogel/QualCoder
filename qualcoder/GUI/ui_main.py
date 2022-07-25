@@ -263,7 +263,7 @@ class Ui_MainWindow(object):
         self.actionImport_Attributes.setText(_translate("MainWindow", "Import Attributes"))
         self.actionCoding_reports.setText(_translate("MainWindow", "Coding reports"))
         self.actionCoding_summary.setText(_translate("MainWindow", "Coding summary"))
-        self.actionSQL_statements.setText(_translate("MainWindow", "SQL statements"))
+        self.actionSQL_statements.setText(_translate("MainWindow", "Database queries"))
         self.actionContents.setText(_translate("MainWindow", "Contents"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionImport_survey.setText(_translate("MainWindow", "Import survey"))
