@@ -295,7 +295,7 @@
   </action>
   <action name="actionSQL_statements">
    <property name="text">
-    <string>SQL statements</string>
+    <string>Database queries</string>
    </property>
   </action>
   <action name="actionContents">
