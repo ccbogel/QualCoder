@@ -1361,6 +1361,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.results.append(tmp)
         QtCore.QCoreApplication.processEvents()
         prog_dialog.setValue(2)
+        # Trim results for option: Only coded memos
+        if self.ui.comboBox_memos.currentText() in ("Only memos", "Only coded memos"):
+            tmp = []
+            for r in self.results:
+                if r['coded_memo'] != "":
+                    tmp.append(r)
+            self.results = tmp
+
         # Organise results by code name, ascending
         self.results = sorted(self.results, key=lambda i_: i_['codename'])
         self.fill_text_edit_with_search_results()
@@ -1675,12 +1683,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_bold = QtGui.QTextCharFormat()
         fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
         memo_choice = self.ui.comboBox_memos.currentText()
-        if memo_choice == "Only memos":
-            temp_res = []
-            for i in self.results:
-                if i['coded_memo'] != "":
-                    temp_res.append(i)
-            self.results = temp_res
         for i, row in enumerate(self.results):
             self.heading(row)
             if memo_choice in ("Only memos", "Only coded memos") and row['coded_memo'] != "":
