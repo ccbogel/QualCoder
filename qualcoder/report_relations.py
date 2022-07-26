@@ -113,8 +113,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        '''self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.stats_table_menu)'''
+        self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.table_statistics_menu)
         # Default to select all files
         cur = self.app.conn.cursor()
         sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
@@ -454,7 +454,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             return result
 
     def table_menu(self, position):
-        """ Context menu to show row text in original context. """
+        """ Context menu to show row text in original context, row ordering. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -472,21 +472,33 @@ class DialogReportRelations(QtWidgets.QDialog):
         if action == action_show_context:
             self.show_context()
         if action == action_sort_ascending:
-            self.sort_ascending(col)
+            self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
         if action == action_sort_descending:
-            self.sort_descending(col)
+            self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
         '''if action == action_show_all_rows:
             pass'''
 
-    def sort_ascending(self, col):
-        """ Sort table descending based on this column. """
+    def table_statistics_menu(self, position):
+        """ Context menu to order rows. """
 
-        self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
-
-    def sort_descending(self, col):
-        """ Sort table ascending based on this column. """
-
-        self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        try:
+            row = self.ui.tableWidget_statistics.currentRow()
+            col = self.ui.tableWidget_statistics.currentColumn()
+        except AttributeError:
+            # No table for table menu
+            return
+        action_sort_ascending = menu.addAction(_("Sort ascending"))
+        action_sort_descending = menu.addAction(_("Sort descending"))
+        #action_show_all_rows = menu.addAction(_("Clear filter"))
+        action = menu.exec(self.ui.tableWidget_statistics.mapToGlobal(position))
+        if action == action_sort_ascending:
+            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
+        if action == action_sort_descending:
+            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
+        '''if action == action_show_all_rows:
+            pass'''
 
     def show_context(self):
         """ Show context of coding in dialog.
@@ -687,8 +699,11 @@ class DialogReportRelations(QtWidgets.QDialog):
                 r['quantiles'] = statistics.quantiles(distances, method='inclusive')
             except statistics.StatisticsError:
                 r['quantiles'] = ["", "", ""]
+        self.fill_table_statistics()
 
-        # Fill table
+    def fill_table_statistics(self):
+        """ Fill statistics table with statistical summary of results """
+
         col_stats_names = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "1st Q",
                            "Median", "3rd Q", "Max", "mean", "std dev"]
         self.ui.tableWidget_statistics.setColumnCount(len(col_stats_names))
@@ -696,36 +711,46 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         for row, rel in enumerate(self.result_summary):
             self.ui.tableWidget_statistics.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(str(rel['cid0']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['cid0'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(rel['c0_name'])
             self.ui.tableWidget_statistics.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['cid1']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['cid1'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             item.setToolTip(rel['c1_name'])
             self.ui.tableWidget_statistics.setItem(row, 1, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['count']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['count'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 2, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['min']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['min'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 3, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][0]))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['quantiles'][0])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 4, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][1]))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['quantiles'][1])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 5, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['quantiles'][2]))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['quantiles'][2])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 6, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['max']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['max'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 7, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['mean']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['mean'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 8, item)
-            item = QtWidgets.QTableWidgetItem(str(rel['stdev']))
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['stdev'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 9, item)
 
