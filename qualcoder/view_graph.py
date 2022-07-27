@@ -669,11 +669,13 @@ class ViewGraph(QDialog):
         for s in selected_codings:
             x += 10
             y += 10
-            freetextid = 1
+            # Find highest freetextid across items, then add one
+            freetextid = 0
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
-                        freetextid = item.freetextid + 1
+                        freetextid = item.freetextid
+            freetextid += 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
             item.ctid = s['ctid']
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
@@ -739,11 +741,13 @@ class ViewGraph(QDialog):
         for s in selected_memos:
             x += 10
             y += 10
-            freetextid = 1
+            # Find highest freetextid and add one
+            freetextid = 0
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
-                        freetextid = item.freetextid + 1
+                        freetextid = item.freetextid
+            freetextid += 1
             '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None '''
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
@@ -826,11 +830,14 @@ class ViewGraph(QDialog):
     def add_text_item_to_graph(self, x=20, y=20):
         """ Add text item to graph. """
 
-        freetextid = 1
+        # Find highest freetextid and then add one
+        freetextid = 0
         for item in self.scene.items():
             if isinstance(item, FreeTextGraphicsItem):
+                print(freetextid)
                 if item.freetextid > freetextid:
-                    freetextid = item.freetextid + 1
+                    freetextid = item.freetextid
+        freetextid += 1
         text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
         if ok:
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, text_)
