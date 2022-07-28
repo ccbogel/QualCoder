@@ -59,6 +59,10 @@ class Ui_Dialog_CodeRelations(object):
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(170, 30, 131, 22))
         self.label.setObjectName("label")
+        self.pushButton_boxplots = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_boxplots.setGeometry(QtCore.QRect(420, 30, 28, 28))
+        self.pushButton_boxplots.setText("")
+        self.pushButton_boxplots.setObjectName("pushButton_boxplots")
         self.verticalLayout.addWidget(self.groupBox)
         self.label_codes = QtWidgets.QLabel(Dialog_CodeRelations)
         self.label_codes.setMinimumSize(QtCore.QSize(0, 30))
@@ -127,6 +131,7 @@ class Ui_Dialog_CodeRelations(object):
         self.comboBox_relation_type.setItemText(5, _translate("Dialog_CodeRelations", "Overlap Inclusion"))
         self.comboBox_relation_type.setItemText(6, _translate("Dialog_CodeRelations", "Overlap Inclusion Exact"))
         self.label.setText(_translate("Dialog_CodeRelations", "Relationship"))
+        self.pushButton_boxplots.setToolTip(_translate("Dialog_CodeRelations", "Boxplots of distance between code pairs."))
         self.label_codes.setText(_translate("Dialog_CodeRelations", "Codes:"))
         self.label_summary_stats.setText(_translate("Dialog_CodeRelations", "Summary statistics"))
 
