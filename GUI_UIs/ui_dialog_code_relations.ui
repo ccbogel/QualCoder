@@ -197,6 +197,22 @@
        <string>Relationship</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_boxplots">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>30</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Boxplots of distance between code pairs.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
