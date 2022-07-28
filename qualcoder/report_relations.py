@@ -30,6 +30,8 @@ from copy import copy
 import csv
 import logging
 import os
+import pandas as pd
+import plotly.express as px
 import statistics
 import sys
 import traceback
@@ -70,6 +72,7 @@ class DialogReportRelations(QtWidgets.QDialog):
     files = []
     result_relations = []
     result_summary = []
+    dataframe = None
 
     def __init__(self, app, parent_textedit):
 
@@ -79,6 +82,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.get_code_data()
         self.result_relations = []
         self.result_summary = []
+        self.dataframe = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
         self.ui.setupUi(self)
@@ -111,6 +115,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_select_files.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
+        self.ui.pushButton_boxplots.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -275,7 +283,6 @@ class DialogReportRelations(QtWidgets.QDialog):
                         # Append relation based on comboBox selection
                         if relation['relation'] in selected_relations:
                             self.result_relations.append(relation)
-        # self.fill_table()
 
     def relation(self, c0, c1):
         """ Relation function as in RQDA
@@ -478,28 +485,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         '''if action == action_show_all_rows:
             pass'''
 
-    def table_statistics_menu(self, position):
-        """ Context menu to order rows. """
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        try:
-            row = self.ui.tableWidget_statistics.currentRow()
-            col = self.ui.tableWidget_statistics.currentColumn()
-        except AttributeError:
-            # No table for table menu
-            return
-        action_sort_ascending = menu.addAction(_("Sort ascending"))
-        action_sort_descending = menu.addAction(_("Sort descending"))
-        #action_show_all_rows = menu.addAction(_("Clear filter"))
-        action = menu.exec(self.ui.tableWidget_statistics.mapToGlobal(position))
-        if action == action_sort_ascending:
-            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
-        if action == action_sort_descending:
-            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
-        '''if action == action_show_all_rows:
-            pass'''
-
     def show_context(self):
         """ Show context of coding in dialog.
         Called by table_menu.
@@ -676,6 +661,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             if relation not in self.result_summary:
                 self.result_summary.append(relation)
         # Fill each dictionary with data and statistics
+        pandas_data = []
         for r in self.result_summary:
             data = []
             distances = []
@@ -685,6 +671,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                     r['c1_name'] = res['c1_name']
                     data.append(res)
                     distances.append(res['distance'])
+                    pandas_data.append([r['c0_name'] + ":" + r['c1_name'], res['distance']])
             r['data'] = data
             # Statistics descriptive summary
             r['count'] = len(data)
@@ -699,7 +686,18 @@ class DialogReportRelations(QtWidgets.QDialog):
                 r['quantiles'] = statistics.quantiles(distances, method='inclusive')
             except statistics.StatisticsError:
                 r['quantiles'] = ["", "", ""]
+        columns = [_("Code pair"), _("Distance (characters)")]
+        self.dataframe = pd.DataFrame(data=pandas_data, columns=columns)
         self.fill_table_statistics()
+
+    def create_boxplots(self):
+        """ Create multiple boxplots. """
+
+        if self.dataframe is None:
+            return
+        fig = px.box(self.dataframe, x="Code pair", y="Distance (characters)", title=_("Code relations"))
+        fig.update_traces(quartilemethod="inclusive")  # or "inclusive", or "linear" by default
+        fig.show()
 
     def fill_table_statistics(self):
         """ Fill statistics table with statistical summary of results """
@@ -753,6 +751,28 @@ class DialogReportRelations(QtWidgets.QDialog):
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['stdev'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget_statistics.setItem(row, 9, item)
+
+    def table_statistics_menu(self, position):
+        """ Context menu to order rows. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        try:
+            row = self.ui.tableWidget_statistics.currentRow()
+            col = self.ui.tableWidget_statistics.currentColumn()
+        except AttributeError:
+            # No table for table menu
+            return
+        action_sort_ascending = menu.addAction(_("Sort ascending"))
+        action_sort_descending = menu.addAction(_("Sort descending"))
+        #action_show_all_rows = menu.addAction(_("Clear filter"))
+        action = menu.exec(self.ui.tableWidget_statistics.mapToGlobal(position))
+        if action == action_sort_ascending:
+            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
+        if action == action_sort_descending:
+            self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
+        '''if action == action_show_all_rows:
+            pass'''
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
