@@ -161,7 +161,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition
+pip3 install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -210,9 +210,12 @@ You can make an alias to the file and place it on your desktop.
 
 Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
-`pip install -U py2app`  or for a system installation of python `sudo pip install -U py2app`
+1) Install Python dependency modules using `pip3`:
 
-`python3 setup.py py2app` 
+`pip3 install py2app pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
+
+2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
+`python3 setup.py py2app`
  
 ## Dependencies
 Required:
