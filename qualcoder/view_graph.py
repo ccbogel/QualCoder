@@ -669,13 +669,11 @@ class ViewGraph(QDialog):
         for s in selected_codings:
             x += 10
             y += 10
-            # Find highest freetextid across items, then add one
-            freetextid = 0
+            freetextid = 1
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
-                        freetextid = item.freetextid
-            freetextid += 1
+                        freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
             item.ctid = s['ctid']
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
@@ -741,13 +739,11 @@ class ViewGraph(QDialog):
         for s in selected_memos:
             x += 10
             y += 10
-            # Find highest freetextid and add one
-            freetextid = 0
+            freetextid = 1
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
-                        freetextid = item.freetextid
-            freetextid += 1
+                        freetextid = item.freetextid + 1
             '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None '''
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
@@ -762,11 +758,11 @@ class ViewGraph(QDialog):
         """ Add one or more free lines from an item to one or more destination items. """
 
         # From item selection
-        names = self.named_text_items()
-        names_dict_list = []
-        for n in names:
-            names_dict_list.append({'name': n})
-        ui = DialogSelectItems(self.app, names_dict_list, _("Line start item"), "single")
+        texts = self.graphics_items_text()
+        texts_dict_list = []
+        for t in texts:
+            texts_dict_list.append({'name': t})
+        ui = DialogSelectItems(self.app, texts_dict_list, _("Line start item"), "single")
         ok = ui.exec()
         if not ok:
             return
@@ -780,8 +776,8 @@ class ViewGraph(QDialog):
                 if item.text == text_from:
                     from_item = item
         # To Items selection
-        names_dict_list.remove(selected)
-        ui = DialogSelectItems(self.app, names_dict_list, _("Line end item(s)"), "multi")
+        texts_dict_list.remove(selected)
+        ui = DialogSelectItems(self.app, texts_dict_list, _("Line end item(s)"), "multi")
         ok = ui.exec()
         if not ok:
             return
@@ -830,35 +826,37 @@ class ViewGraph(QDialog):
     def add_text_item_to_graph(self, x=20, y=20):
         """ Add text item to graph. """
 
-        # Find highest freetextid and then add one
-        freetextid = 0
+        freetextid = 1
         for item in self.scene.items():
             if isinstance(item, FreeTextGraphicsItem):
-                print(freetextid)
                 if item.freetextid > freetextid:
-                    freetextid = item.freetextid
-        freetextid += 1
+                    freetextid = item.freetextid + 1
         text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
-        if ok:
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, text_)
-            self.scene.addItem(item)
+        if not ok:
+            return
+        texts = self.graphics_items_text()
+        if text_ in texts:
+            Message(self.app, _("Warning"), _("Another item has this exact text")).exec()
+            return
+        item = FreeTextGraphicsItem(self.app, freetextid, x, y, text_)
+        self.scene.addItem(item)
 
-    def named_text_items(self):
-        """ Used to get a list of all named FreeText and Case and File graphics items.
-         Use to show names in a dialog, to allow links between these items.
+    def graphics_items_text(self):
+        """ Used to get a list of all FreeText and Case and File graphics items text.
+         Use to show text in a dialog, to allow links between these items.
          Called by: add_lines_to_graph
 
          return: names : List of Strings
          """
 
-        names = []
+        texts = []
         for item in self.scene.items():
             if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
                     isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
                     isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
-                names.append(item.text)
-        names.sort()
-        return names
+                texts.append(item.text)
+        texts.sort()
+        return texts
 
     def add_files_to_graph(self):
         """ Add Text file items to graph. """
