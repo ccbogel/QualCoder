@@ -152,7 +152,7 @@ class ViewGraph(QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_codes_of_text.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_codes_of_text.pressed.connect(self.add_codes_of_text_files)
+        self.ui.pushButton_codes_of_text.pressed.connect(self.add_coded_text_of_text_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
         self.ui.pushButton_codes_of_images.setIcon(QtGui.QIcon(pm))
@@ -505,7 +505,7 @@ class ViewGraph(QDialog):
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
         if action == action_add_coded_text:
-            self.add_codes_of_text_files(position.x(), position.y())
+            self.add_coded_text_of_text_files(position.x(), position.y())
         if action == action_add_coded_image:
             self.add_codes_of_image_files(position.x(), position.y())
         if action == action_add_coded_av:
@@ -565,15 +565,21 @@ class ViewGraph(QDialog):
             return
         selected_codings = ui.get_selected()
         for s in selected_codings:
-            x += 10
-            y += 10
-            item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
-            msg = "AVID:" + str(s['avid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            msg += "\n" + str(s['pos0']) + " - " + str(s['pos1']) + _("msecs")
-            if s['memo'] != "":
-                msg += "\n" + _("Memo: ") + s['memo']
-            item.setToolTip(msg)
-            self.scene.addItem(item)
+            add_item = True
+            for item in self.scene.items():
+                if isinstance(item, AVGraphicsItem):
+                    if item.avid == s['avid']:
+                        add_item = False
+            if add_item:
+                x += 10
+                y += 10
+                item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
+                msg = "AVID:" + str(s['avid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+                msg += "\n" + str(s['pos0']) + " - " + str(s['pos1']) + _("msecs")
+                if s['memo'] != "":
+                    msg += "\n" + _("Memo: ") + s['memo']
+                item.setToolTip(msg)
+                self.scene.addItem(item)
 
     def add_codes_of_image_files(self, x=10, y=10):
         """ Show selected codes of selected image files as pixmap graphics items. """
@@ -621,15 +627,21 @@ class ViewGraph(QDialog):
             return
         selected_codings = ui.get_selected()
         for s in selected_codings:
-            x += 10
-            y += 10
-            item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
-            msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            msg += "\n" + _("Memo: ") + s['memo']
-            item.setToolTip(msg)
-            self.scene.addItem(item)
+            add_item = True
+            for item in self.scene.items():
+                if isinstance(item, PixmapGraphicsItem):
+                    if item.imid == s['imid']:
+                        add_item = False
+            if add_item:
+                x += 10
+                y += 10
+                item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
+                msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+                msg += "\n" + _("Memo: ") + s['memo']
+                item.setToolTip(msg)
+                self.scene.addItem(item)
 
-    def add_codes_of_text_files(self, x=10, y=10):
+    def add_coded_text_of_text_files(self, x=10, y=10):
         """ Show selected codes of selected text files as free text graphics items. """
 
         # Select files
@@ -670,17 +682,21 @@ class ViewGraph(QDialog):
             x += 10
             y += 10
             freetextid = 1
+            add_item = True
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
-            item.ctid = s['ctid']
-            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            if s['memo'] != "":
-                msg += "\n" + _("Memo: ") + s['memo']
-            item.setToolTip(msg)
-            self.scene.addItem(item)
+                    if item.text == s['name']:
+                        add_item = False
+            if add_item:
+                item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
+                item.ctid = s['ctid']
+                msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+                if s['memo'] != "":
+                    msg += "\n" + _("Memo: ") + s['memo']
+                item.setToolTip(msg)
+                self.scene.addItem(item)
 
     def add_memos_of_coded(self, x=10, y=10):
         """ Show selected memos of coded segments of selected files in free text items. """
@@ -740,19 +756,21 @@ class ViewGraph(QDialog):
             x += 10
             y += 10
             freetextid = 1
+            add_item = True
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            '''app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
-                 memo_ctid=None, memo_imid=None, memo_avid=None '''
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
+                    if item.text == s['name']:
+                        add_item = False
+            if add_item:
+                item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
                                         s['ctid'], s['imid'], s['avid'])
-            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            if s['tooltip'] != "":
-                msg += "\n" + _("Memo for: ") + s['tooltip']
-            item.setToolTip(msg)
-            self.scene.addItem(item)
+                msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+                if s['tooltip'] != "":
+                    msg += "\n" + _("Memo for: ") + s['tooltip']
+                item.setToolTip(msg)
+                self.scene.addItem(item)
 
     def add_lines_to_graph(self):
         """ Add one or more free lines from an item to one or more destination items. """
@@ -868,8 +886,14 @@ class ViewGraph(QDialog):
             return
         selected = ui.get_selected()
         for i, s in enumerate(selected):
-            file_item = FileTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
-            self.scene.addItem(file_item)
+            add_item = True
+            for item in self.scene.items():
+                if isinstance(item, FileTextGraphicsItem):
+                    if item.file_id == s['id']:
+                        add_item = False
+            if add_item:
+                file_item = FileTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
+                self.scene.addItem(file_item)
 
     def get_files(self):
         """ Get list of files.
@@ -896,8 +920,14 @@ class ViewGraph(QDialog):
             return
         selected = ui.get_selected()
         for i, s in enumerate(selected):
-            case_item = CaseTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
-            self.scene.addItem(case_item)
+            add_item = True
+            for item in self.scene.items():
+                if isinstance(item, CaseTextGraphicsItem):
+                    if item.case_id == s['id']:
+                        add_item = False
+            if add_item:
+                case_item = CaseTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
+                self.scene.addItem(case_item)
 
     def get_cases(self):
         """ Get list of cases.
