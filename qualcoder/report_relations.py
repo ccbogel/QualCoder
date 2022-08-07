@@ -465,16 +465,21 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        cell_value = ""
         try:
             row = self.ui.tableWidget.currentRow()
             col = self.ui.tableWidget.currentColumn()
+            cell_value = self.ui.tableWidget.item(row, col).text()
         except AttributeError:
             # No table for table menu
             return
         action_show_context = menu.addAction(_("View in context"))
         action_sort_ascending = menu.addAction(_("Sort ascending"))
         action_sort_descending = menu.addAction(_("Sort descending"))
-        #action_show_all_rows = menu.addAction(_("Clear filter"))
+        action_filter_equals = menu.addAction(_("Filter equals: ") + cell_value)
+        action_filter_greater = menu.addAction(_("Filter greater or equals: ") + cell_value)
+        action_filter_lower = menu.addAction(_("Filter lower or equals: ") + cell_value)
+        action_clear_filter = menu.addAction(_("Clear filter"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_show_context:
             self.show_context()
@@ -482,8 +487,34 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
         if action == action_sort_descending:
             self.ui.tableWidget.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
-        '''if action == action_show_all_rows:
-            pass'''
+        if action == action_clear_filter:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
+        if action == action_filter_equals:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
+                if self.ui.tableWidget.item(r, col).text() != cell_value:
+                    self.ui.tableWidget.setRowHidden(r, True)
+        if action == action_filter_greater:
+            val_type = "str"
+            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
+                val_type = "int"
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
+                if val_type == "str" and self.ui.tableWidget.item(r, col).text() < cell_value:
+                    self.ui.tableWidget.setRowHidden(r, True)
+                if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) < int(cell_value):
+                    self.ui.tableWidget.setRowHidden(r, True)
+        if action == action_filter_lower:
+            val_type = "str"
+            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
+                val_type = "int"
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
+                if val_type == "str" and self.ui.tableWidget.item(r, col).text() > cell_value:
+                    self.ui.tableWidget.setRowHidden(r, True)
+                if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) > int(cell_value):
+                    self.ui.tableWidget.setRowHidden(r, True)
 
     def show_context(self):
         """ Show context of coding in dialog.
@@ -757,22 +788,31 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        cell_value = ""
         try:
             row = self.ui.tableWidget_statistics.currentRow()
             col = self.ui.tableWidget_statistics.currentColumn()
+            cell_value = self.ui.tableWidget_statistics.item(row, col).text()
         except AttributeError:
             # No table for table menu
             return
         action_sort_ascending = menu.addAction(_("Sort ascending"))
         action_sort_descending = menu.addAction(_("Sort descending"))
-        #action_show_all_rows = menu.addAction(_("Clear filter"))
+        action_filter_equals = menu.addAction(_("Filter equals: ") + cell_value)
+        action_clear_filter = menu.addAction(_("Clear filter"))
         action = menu.exec(self.ui.tableWidget_statistics.mapToGlobal(position))
         if action == action_sort_ascending:
             self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.AscendingOrder)
         if action == action_sort_descending:
             self.ui.tableWidget_statistics.sortItems(col, QtCore.Qt.SortOrder.DescendingOrder)
-        '''if action == action_show_all_rows:
-            pass'''
+        if action == action_clear_filter:
+            for r in range(0, self.ui.tableWidget_statistics.rowCount()):
+                self.ui.tableWidget_statistics.setRowHidden(r, False)
+        if action == action_filter_equals:
+            for r in range(0, self.ui.tableWidget_statistics.rowCount()):
+                self.ui.tableWidget_statistics.setRowHidden(r, False)
+                if self.ui.tableWidget_statistics.item(r, col).text() != cell_value:
+                    self.ui.tableWidget_statistics.setRowHidden(r, True)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
