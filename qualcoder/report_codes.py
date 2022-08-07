@@ -1879,6 +1879,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_all = menu.addAction(_("Copy all to clipboard"))
+        action_hide_top_groupbox = None
+        action_show_top_groupbox = None
+        if self.ui.groupBox.isHidden():
+            action_show_top_groupbox = menu.addAction(_("Show control panel"))
+        if not self.ui.groupBox.isHidden():
+            action_hide_top_groupbox = menu.addAction(_("Hide control panel"))
         action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -1891,6 +1897,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             cb = QtWidgets.QApplication.clipboard()
             te_text = self.ui.textEdit.toPlainText()
             cb.setText(te_text)
+        if action == action_show_top_groupbox:
+            self.ui.groupBox.setVisible(True)
+        if action == action_hide_top_groupbox:
+            self.ui.groupBox.setVisible(False)
 
     def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.

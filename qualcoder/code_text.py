@@ -1037,7 +1037,6 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_not_important)
         if action_change_code:
             menu.addAction(action_change_code)
-
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
@@ -1051,6 +1050,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
+        action_hide_top_groupbox = None
+        action_show_top_groupbox = None
+        if self.ui.groupBox.isHidden():
+            action_show_top_groupbox = menu.addAction(_("Show control panel"))
+        if not self.ui.groupBox.isHidden():
+            action_hide_top_groupbox = menu.addAction(_("Hide control panel"))
         action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -1093,6 +1098,12 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_change_code:
             self.change_code_to_another_code(cursor.position())
+            return
+        if action == action_show_top_groupbox:
+            self.ui.groupBox.setVisible(True)
+            return
+        if action == action_hide_top_groupbox:
+            self.ui.groupBox.setVisible(False)
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
