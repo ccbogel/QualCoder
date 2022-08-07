@@ -956,7 +956,23 @@ class DialogCodeImage(QtWidgets.QDialog):
                     return
         global_pos = QtGui.QCursor.pos()
         items = self.find_coded_areas_for_pos(pos)
+        # Menu for show/hide top panel
         if not items:
+            menu = QtWidgets.QMenu()
+            menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            action_hide_top_groupbox = None
+            action_show_top_groupbox = None
+            if self.ui.groupBox_2.isHidden():
+                action_show_top_groupbox = menu.addAction(_("Show control panel"))
+            if not self.ui.groupBox_2.isHidden():
+                action_hide_top_groupbox = menu.addAction(_("Hide control panel"))
+            action = menu.exec(global_pos)
+            if action is None:
+                return
+            if action == action_show_top_groupbox:
+                self.ui.groupBox_2.setVisible(True)
+            if action == action_hide_top_groupbox:
+                self.ui.groupBox_2.setVisible(False)
             return
         item = items[0]
         if len(items) > 1:
