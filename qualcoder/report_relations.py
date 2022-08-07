@@ -119,6 +119,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_boxplots.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.clicked.connect(self.search_text)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -459,6 +463,43 @@ class DialogReportRelations(QtWidgets.QDialog):
                 result['text_after'] = txt_after[0]
             result['distance'] = 0
             return result
+
+    def search_text(self):
+        """ Search for text in the results. """
+
+        search_text = self.ui.lineEdit_search_results.text()
+        if search_text == "":
+            return
+        row_count = self.ui.tableWidget.rowCount()
+        col_count = self.ui.tableWidget.columnCount()
+        if row_count == 0:
+            return
+        current_row = 0
+        current_col = 0
+        try:
+            current_row = self.ui.tableWidget.currentRow()
+            current_col = self.ui.tableWidget.currentColumn()
+        except AttributeError:
+            # No table for table menu
+            return
+        cell_counter_pos = current_row * col_count + current_col
+        found_row = -1
+        found_col = -1
+        for row in range(0, row_count):
+            for col in range(0, col_count):
+                try:
+                    cell = self.ui.tableWidget.item(row, col).text()
+                    if cell_counter_pos < row * col_count + col  and found_row == -1 and search_text in cell:
+                        found_row = row
+                        found_col = col
+                        break
+                except AttributeError:
+                    pass
+                if found_row != -1:
+                    break
+        if found_row == -1:
+            return
+        self.ui.tableWidget.setCurrentCell(found_row, found_col)
 
     def table_menu(self, position):
         """ Context menu to show row text in original context, row ordering. """
