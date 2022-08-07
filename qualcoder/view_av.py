@@ -1603,7 +1603,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             Ctrl + R to rewind 5 seconds.
             Alt + F forward 30 seconds
             Ctrl + P to play/pause On start rewind 1 second
-            Ctrl + S to start and stop a/n av segment creation
+            Ctr + D to play/pause On start rewind 1 second
+            Ctrl + S to start and stop av segment creation
 
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
@@ -1703,7 +1704,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return True'''
 
         #  Ctrl + P pause/play toggle
-        if key == QtCore.Qt.Key.Key_P and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+        if (key == QtCore.Qt.Key.Key_P or key == QtCore.Qt.Key.Key_D) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.play_pause()
         #  Ctrl S to start and end A/V segment recording
         if key == QtCore.Qt.Key.Key_S and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
