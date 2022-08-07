@@ -65,7 +65,7 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>690</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -200,7 +200,7 @@
      <widget class="QPushButton" name="pushButton_boxplots">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>660</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -208,6 +208,51 @@
       </property>
       <property name="toolTip">
        <string>Boxplots of distance between code pairs.</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_search_results">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>30</y>
+        <width>181</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Search Results for:</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit_search_results">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>57</y>
+        <width>181</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search results for text</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_search_next">
+      <property name="geometry">
+       <rect>
+        <x>594</x>
+        <y>57</y>
+        <width>30</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Search for next occurence in results</string>
       </property>
       <property name="text">
        <string/>
