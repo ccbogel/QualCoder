@@ -162,7 +162,7 @@ class Ui_Dialog_code_av(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_code_av.setWindowTitle(_translate("Dialog_code_av", "Code Audio Video"))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
-        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "Play / Pause. Ctrl + P start/pause"))
+        self.pushButton_play.setToolTip(_translate("Dialog_code_av", "Ctrl P or Ctrl D Play/Pause"))
         self.label_volume.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Volume</p></body></html>"))
         self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.\n"
 "Key shortcut: Ctrl S"))
