@@ -81,7 +81,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Play / Pause. Ctrl + P start/pause</string>
+       <string>Ctrl P or Ctrl D Play/Pause</string>
       </property>
       <property name="text">
        <string/>
