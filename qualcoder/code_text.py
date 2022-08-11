@@ -1991,7 +1991,7 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setForeground(QBrush(QColor(foregroundcol)))
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(tt_code_text, self.codes, self.annotations, self.file_['start'])
+        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations, self.file_['start'])
         # Need to reload arrow iconsas they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -2067,7 +2067,7 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setForeground(QBrush(QColor(foregroundcol)))
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(tt_code_text, self.codes, self.annotations, self.file_['start'])
+        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations, self.file_['start'])
         # Need to reload arrow icons as they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -2775,9 +2775,9 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes_and_annotations(imp_coded, self.codes, self.annotations, self.file_['start'])
+            self.eventFilterTT.set_codes_and_annotations(self.app, mp_coded, self.codes, self.annotations, self.file_['start'])
         else:
-            self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations,
+            self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations,
                                                          self.file_['start'])
         self.unlight()
         self.highlight()
@@ -3790,8 +3790,9 @@ class ToolTipEventFilter(QtCore.QObject):
     code_text = None
     annotations = None
     offset = 0
+    app = None
 
-    def set_codes_and_annotations(self, code_text, codes, annotations, offset):
+    def set_codes_and_annotations(self, app, code_text, codes, annotations, offset):
         """ Code_text contains the coded text to be displayed in a tooptip.
         Annotations - a mention is made if current position is annotated
 
@@ -3803,6 +3804,7 @@ class ToolTipEventFilter(QtCore.QObject):
             beginning at the offset
         """
 
+        self.app = app
         self.code_text = code_text
         self.codes = codes
         self.annotations = annotations
@@ -3848,7 +3850,10 @@ class ToolTipEventFilter(QtCore.QObject):
                     try:
                         color = TextColor(item['color']).recommendation
                         text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                        text_ += item['name'] + "</em><br />" + seltext
+                        text_ += item['name'] + "</em>"
+                        if self.app.settings['showids'] == 'True':
+                            text_ += " [ctid:" + str(item['ctid']) + "]"
+                        text_ += "<br />" + seltext
                         if item['memo'] is not None and item['memo'] != "":
                             text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
