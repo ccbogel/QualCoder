@@ -224,7 +224,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             tt = _("Minimum: ") + str(res[0]) + "\n"
             tt += _("Maximum: ") + str(res[1])
         if valuetype == "character":
-            sql = "select distinct value from attribute where name=? and attr_type=? and length(value)>0 limit 10"
+            sql = "select distinct value from attribute where name=? and attr_type=? and length(value)>0 limit 20"
             cur.execute(sql, [name, case_or_file])
             res = cur.fetchall()
             for r in res:

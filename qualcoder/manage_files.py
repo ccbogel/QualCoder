@@ -1669,7 +1669,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             tt = _("Minimum: ") + str(res[0]) + "\n"
             tt += _("Maximum: ") + str(res[1])
         if value_type == "character":
-            sql = 'select distinct value from attribute where name=? and attr_type="file" and length(value)>0 limit 10'
+            sql = 'select distinct value from attribute where name=? and attr_type="file" and length(value)>0 limit 20'
             cur.execute(sql, [attribute_name])
             res = cur.fetchall()
             for r in res:
