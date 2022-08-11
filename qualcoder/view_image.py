@@ -710,6 +710,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for c in self.codes:
                     if c['cid'] == item['cid']:
                         tooltip = c['name'] + " (" + item['owner'] + ")"
+                        if self.app.settings['showids'] == "True":
+                            tooltip += "[imid:" + str(item['imid']) + "]"
                         if item['memo'] != "":
                             tooltip += "\nMemo: " + item['memo']
                         if item['important'] == 1:
