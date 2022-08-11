@@ -1649,6 +1649,35 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
 
+    def get_tooltip_values(self, attribute_name):
+        """ Get values to display in tooltips for the value list column.
+        param: attribute_name : String """
+
+        tt = ""
+        cur = self.app.conn.cursor()
+        sql_val_type = 'select valuetype from attribute_type where caseOrFile="file" and name=?'
+        cur.execute(sql_val_type, [attribute_name])
+        res_val_type = cur.fetchone()
+        value_type = "character"
+        if res_val_type is not None:
+            value_type = res_val_type[0]
+        if value_type == "numeric":
+            sql = 'select min(cast(value as real)), max(cast(value as real)) from attribute where name=? and ' \
+                  'attr_type="file"'
+            cur.execute(sql, [attribute_name])
+            res = cur.fetchone()
+            tt = _("Minimum: ") + str(res[0]) + "\n"
+            tt += _("Maximum: ") + str(res[1])
+        if value_type == "character":
+            sql = 'select distinct value from attribute where name=? and attr_type="file" and length(value)>0 limit 10'
+            cur.execute(sql, [attribute_name])
+            res = cur.fetchall()
+            for r in res:
+                tt += "\n" + r[0]
+            if len(tt) > 1:
+                tt = tt[1:]
+        return tt
+
     def fill_table(self):
         """ Fill the table widget with file details. """
 
@@ -1696,11 +1725,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Add the attribute values
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
-                    # print(fid, a[2], a[0], header)
-                    # print(type(fid), type(a[2]), type(a[0]), type(header))
                     if fid == a[2] and a[0] == header:
-                        # print("found", a)
-                        self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
+                        item = QtWidgets.QTableWidgetItem(str(a[1]))
+                        tt = self.get_tooltip_values(a[0])
+                        item.setToolTip(tt)
+                        self.ui.tableWidget.setItem(row, col, item)
         dialog_w = self.size().width() - 20
         table_w = 0
         for i in range(self.ui.tableWidget.columnCount()):

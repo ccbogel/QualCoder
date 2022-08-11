@@ -726,12 +726,44 @@ class DialogCases(QtWidgets.QDialog):
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if cid == a[2] and a[0] == header:
-                        self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(str(a[1])))
+                        item = QtWidgets.QTableWidgetItem(str(a[1]))
+                        tt = self.get_tooltip_values(a[0])
+                        item.setToolTip(tt)
+                        self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids'] == 'True':
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
+
+    def get_tooltip_values(self, attribute_name):
+        """ Get values to display in tooltips for the value list column.
+        param: attribute_name : String """
+
+        tt = ""
+        cur = self.app.conn.cursor()
+        sql_val_type = 'select valuetype from attribute_type where caseOrFile="case" and name=?'
+        cur.execute(sql_val_type, [attribute_name])
+        res_val_type = cur.fetchone()
+        value_type = "character"
+        if res_val_type is not None:
+            value_type = res_val_type[0]
+        if value_type == "numeric":
+            sql = 'select min(cast(value as real)), max(cast(value as real)) from attribute where name=? and ' \
+                  'attr_type="case"'
+            cur.execute(sql, [attribute_name])
+            res = cur.fetchone()
+            tt = _("Minimum: ") + str(res[0]) + "\n"
+            tt += _("Maximum: ") + str(res[1])
+        if value_type == "character":
+            sql = 'select distinct value from attribute where name=? and attr_type="case" and length(value)>0 limit 10'
+            cur.execute(sql, [attribute_name])
+            res = cur.fetchall()
+            for r in res:
+                tt += "\n" + r[0]
+            if len(tt) > 1:
+                tt = tt[1:]
+        return tt
 
     def view(self):
         """ View all of the text associated with this case.
