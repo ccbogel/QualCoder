@@ -654,8 +654,14 @@ class ViewGraph(QDialog):
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
-                    codings.append({'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3], 'filename': file_['name'],
-                                    'codename': code['name'], 'ctid': r[4]})
+                    coding_displayed = False
+                    for item in self.scene.items():
+                        if isinstance(item, FreeTextGraphicsItem):
+                            if item.ctid == r[4]:
+                                coding_displayed = True
+                    if not coding_displayed:
+                        codings.append({'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3], 'filename': file_['name'],
+                                        'codename': code['name'], 'ctid': r[4]})
         if not codings:
             Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
             return
@@ -665,29 +671,21 @@ class ViewGraph(QDialog):
             return
         selected_codings = ui.get_selected()
         color = self.color_selection("text")
-        already_added = 0
         for s in selected_codings:
             x += 10
             y += 10
             freetextid = 1
-            add_item = True
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-                    if item.text == s['name']:
-                        add_item = False
-                        already_added += 1
-            if add_item:
-                item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
-                item.ctid = s['ctid']
-                msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-                if s['memo'] != "":
-                    msg += "\n" + _("Memo: ") + s['memo']
-                item.setToolTip(msg)
-                self.scene.addItem(item)
-        if already_added > 0:
-            Message(self.app, _("Already exists"), str(already_added) + _(" coded text items already displayed.")).exec()
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
+            item.ctid = s['ctid']
+            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            if s['memo'] != "":
+                msg += "\n" + _("Memo: ") + s['memo']
+            item.setToolTip(msg)
+            self.scene.addItem(item)
 
     def add_memos_of_coded(self, x=10, y=10):
         """ Show selected memos of coded segments of selected files in free text items. """
@@ -713,27 +711,45 @@ class ViewGraph(QDialog):
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
-                    memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
-                                  'codename': code['name'], 'filename': file_['name'], 'ctid': r[4], 'imid': None,
-                                  'avid': None})
+                    coding_memo_displayed = False
+                    for item in self.scene.items():
+                        if isinstance(item, FreeTextGraphicsItem):
+                            if item.text == r[3]:
+                                coding_memo_displayed = True
+                    if not coding_memo_displayed:
+                        memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
+                                      'codename': code['name'], 'filename': file_['name'], 'ctid': r[4], 'imid': None,
+                                      'avid': None})
                 sql_img = 'select cid,id,x1,y1,width,height,memo,imid from code_image where cid=? and id=? and memo !=""'
                 cur.execute(sql_img, [code['cid'], file_['id']])
                 res_img = cur.fetchall()
                 for r in res_img:
-                    tt = _("Memo for area: ") + "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") + str(int(r[4])) + " " + \
-                         _("height:") + str(int(r[5]))
-                    memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
-                                  'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
-                                  'ctid': None})
+                    coding_memo_displayed = False
+                    for item in self.scene.items():
+                        if isinstance(item, FreeTextGraphicsItem):
+                            if item.text == r[6]:
+                                coding_memo_displayed = True
+                    if not coding_memo_displayed:
+                        tt = _("Memo for area: ") + "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") \
+                             + str(int(r[4])) + " " + _("height:") + str(int(r[5]))
+                        memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
+                                      'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
+                                      'ctid': None})
                 sql_av = 'select cid,id,pos0,pos1,memo, avid from code_av where cid=? and id=? and memo !="" ' \
                          'order by pos0 asc'
                 cur.execute(sql_av, [code['cid'], file_['id']])
                 res_av = cur.fetchall()
                 for r in res_av:
-                    tt = _("Memo for duration: ") + str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
-                    memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
-                                  'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
-                                  'ctid': None})
+                    coding_memo_displayed = False
+                    for item in self.scene.items():
+                        if isinstance(item, FreeTextGraphicsItem):
+                            if item.text == r[4]:
+                                coding_memo_displayed = True
+                    if not coding_memo_displayed:
+                        tt = _("Memo for duration: ") + str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
+                        memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
+                                      'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
+                                      'ctid': None})
         if not memos:
             Message(self.app, _("No memos"), _("No memos for selection")).exec()
             return
@@ -747,21 +763,17 @@ class ViewGraph(QDialog):
             x += 10
             y += 10
             freetextid = 1
-            add_item = True
             for item in self.scene.items():
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-                    if item.text == s['name']:
-                        add_item = False
-            if add_item:
-                item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
-                                        s['ctid'], s['imid'], s['avid'])
-                msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-                if s['tooltip'] != "":
-                    msg += "\n" + _("Memo for: ") + s['tooltip']
-                item.setToolTip(msg)
-                self.scene.addItem(item)
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
+                                    s['ctid'], s['imid'], s['avid'])
+            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            if s['tooltip'] != "":
+                msg += "\n" + _("Memo for: ") + s['tooltip']
+            item.setToolTip(msg)
+            self.scene.addItem(item)
 
     def add_lines_to_graph(self):
         """ Add one or more free lines from an item to one or more destination items. """
