@@ -1048,9 +1048,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes_and_annotations(imp_coded, self.codes, self.annotations)
+            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations)
         else:
-            self.eventFilterTT.set_codes_and_annotations(self.code_text, self.codes, self.annotations)
+            self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations)
         self.unlight()
         self.highlight()
 
@@ -3063,8 +3063,12 @@ class ToolTipEventFilter(QtCore.QObject):
     codes = None
     code_text = None
     annotations = None
+    app = None
 
-    def set_codes_and_annotations(self, code_text, codes, annotations):
+    def set_codes_and_annotations(self, app, code_text, codes, annotations):
+        """ Update codes and coded text and annotations for tooltips. """
+
+        self.app = app
         self.code_text = code_text
         self.codes = codes
         self.annotations = annotations
@@ -3075,7 +3079,7 @@ class ToolTipEventFilter(QtCore.QObject):
                     item['color'] = c['color']
 
     def eventFilter(self, receiver, event):
-        """ Tool tip event filter for ?textEdit """
+        """ Tool tip event filter for textEdit """
 
         if event.type() == QtCore.QEvent.Type.ToolTip:
             cursor = receiver.cursorForPosition(event.pos())
@@ -3093,6 +3097,8 @@ class ToolTipEventFilter(QtCore.QObject):
                     try:
                         text_ += '<p style="background-color:' + item['color']
                         text_ += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
+                        if self.app.settings['showids'] == 'True':
+                            text_ += " [ctid:" + str(item['ctid']) + "] "
                         if item['avid'] is not None:
                             text_ += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
                             text_ += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
@@ -3425,6 +3431,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
         seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
+        if self.app.settings['showids'] == 'True':
+            tooltip += " [avid:" + str(self.segment['avid']) + "]"
         if self.segment['memo'] != "":
             tooltip += "\n" + _("MEMO: ") + self.segment['memo']
         if self.segment['seltext'] is not None and self.segment['seltext'] != "":
