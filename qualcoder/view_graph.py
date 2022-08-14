@@ -2286,7 +2286,6 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             return
         # Get current coded av memo text
         if self.memo_avid is not None:
-            print("AV!")
             cur = self.app.conn.cursor()
             cur.execute("select memo from code_av where avid=?", [self.memo_avid])
             res = cur.fetchone()
@@ -2302,9 +2301,12 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.gfreeid is not None and self.text != self.updated_text:
             update_text_action = menu.addAction(_("Update text"))
         edit_action = menu.addAction(_("Edit text"))
-        context_action = None
-        if self.ctid != -1:
-            context_action = menu.addAction(_("Code in context"))
+        text_context_action = None
+        if (self.ctid is not None and self.ctid != -1) or (self.memo_ctid is not None and self.memo_ctid != -1):
+            text_context_action = menu.addAction(_("Code in context"))
+        image_context_action = None
+        if self.memo_imid is not None and self.memo_imid != -1:
+            image_context_action = menu.addAction(_("Code in context"))
         bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
@@ -2337,13 +2339,32 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.app.conn.commit()
             self.setPlainText(self.text)
             return
-        if action == context_action:
+        if action == image_context_action:
+            cur = self.app.conn.cursor()
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_image.owner,code_image.memo,"
+                        "x1, y1,width,height, source.name, source.id, source.mediapath "
+                        "from code_image join code_name on code_name.cid=code_image.cid join source on "
+                        "source.id=code_image.id where code_image.imid=?",
+                        [self.memo_imid])
+            res = cur.fetchone()
+            if res is None:
+                Message(self.app, _("Error"), _("Cannot find image coding in database")).exec()
+                return
+            data = {'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4],
+                    'x1': res[5], 'y1': res[6], 'width': res[7],'height': res[8], 'file_or_casename': res[9],
+                    'fid': res[10], 'file_or_case': 'File', 'mediapath': res[11]}
+            DialogCodeInImage(self.app, data).exec()
+
+        if action == text_context_action:
+            text_id = self.ctid
+            if text_id == -1:
+                text_id = self.memo_ctid
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_text.owner,code_text.memo,"
                         "pos0, pos1, source.name, source.id "
                         "from code_text join code_name on code_name.cid=code_text.cid join source on "
                         "source.id=code_text.fid where code_text.ctid=?",
-                        [self.ctid])
+                        [text_id])
             res = cur.fetchone()
             if res is None:
                 Message(self.app, _("Error"), _("Cannot find text coding in database")).exec()
