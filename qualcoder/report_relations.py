@@ -867,10 +867,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         header = [_("Code Tree"), _("Id")]
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
-        '''if self.app.settings['showids'] == 'False':
-            self.ui.treeWidget.setColumnHidden(1, True)
-        else:
-            self.ui.treeWidget.setColumnHidden(1, False)'''
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # add top level categories

@@ -341,7 +341,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         header.append("Total")
         self.ui.treeWidget.setColumnCount(len(header))
         self.ui.treeWidget.setHeaderLabels(header)
-        if self.app.settings['showids'] == 'False':
+        if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
@@ -669,7 +669,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.setHeaderLabels(
             [_("Code Tree"), "Id", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"])
         self.ui.treeWidget.hideColumn(1)
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             self.ui.treeWidget.showColumn(1)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
