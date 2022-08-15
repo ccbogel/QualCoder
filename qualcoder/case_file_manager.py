@@ -280,7 +280,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, 2, item)
 
         self.ui.tableWidget.hideColumn(0)
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()
 

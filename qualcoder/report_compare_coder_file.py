@@ -744,7 +744,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.setColumnCount(2)
         self.ui.treeWidget.setHeaderLabels([_("Code Tree"), "Id"])
         self.ui.treeWidget.hideColumn(1)
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             self.ui.treeWidget.showColumn(1)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)

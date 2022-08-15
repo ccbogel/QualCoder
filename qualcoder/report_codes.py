@@ -376,7 +376,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo"), _("Count")])
         self.ui.treeWidget.header().setToolTip(_("Codes and categories"))
-        if self.app.settings['showids'] == 'False':
+        if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
