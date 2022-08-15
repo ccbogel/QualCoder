@@ -733,7 +733,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
 
     def get_tooltip_values(self, attribute_name):

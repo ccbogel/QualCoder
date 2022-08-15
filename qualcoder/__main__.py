@@ -406,7 +406,7 @@ class App(object):
             config.write(configfile)
 
     def _load_config_ini(self):
-        """ load config settings, and convert some to Integer. """
+        """ load config settings, and convert some to Integer or Boolean. """
 
         config = configparser.ConfigParser()
         config.read(self.configpath)
@@ -422,6 +422,10 @@ class App(object):
             result['backup_num'] = default.getint('backup_num')
         if 'codetext_chunksize' in default:
             result['codetext_chunksize'] = default.getint('codetext_chunksize')
+        if result['showids'] == 'False':
+            result['showids'] = False
+        else:
+            result['showids'] = True
         return result
 
     def check_and_add_additional_settings(self, settings_data):

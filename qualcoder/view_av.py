@@ -575,7 +575,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if self.app.settings['showids'] == 'False':
+        if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
@@ -3097,7 +3097,7 @@ class ToolTipEventFilter(QtCore.QObject):
                     try:
                         text_ += '<p style="background-color:' + item['color']
                         text_ += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
-                        if self.app.settings['showids'] == 'True':
+                        if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "] "
                         if item['avid'] is not None:
                             text_ += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
@@ -3431,7 +3431,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         seg_time = "[" + msecs_to_hours_mins_secs(self.segment['pos0']) + " - "
         seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             tooltip += " [avid:" + str(self.segment['avid']) + "]"
         if self.segment['memo'] != "":
             tooltip += "\n" + _("MEMO: ") + self.segment['memo']

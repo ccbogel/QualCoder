@@ -182,7 +182,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, JID_COLUMN, item)
 
         self.ui.tableWidget.verticalHeader().setVisible(False)
-        if self.app.settings['showids'] == 'True':
+        if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(JID_COLUMN)
         else:
             self.ui.tableWidget.hideColumn(JID_COLUMN)

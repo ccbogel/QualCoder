@@ -384,7 +384,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if self.app.settings['showids'] == 'False':
+        if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
@@ -710,7 +710,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for c in self.codes:
                     if c['cid'] == item['cid']:
                         tooltip = c['name'] + " (" + item['owner'] + ")"
-                        if self.app.settings['showids'] == "True":
+                        if self.app.settings['showids']:
                             tooltip += "[imid:" + str(item['imid']) + "]"
                         if item['memo'] != "":
                             tooltip += "\nMemo: " + item['memo']

@@ -591,7 +591,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
-        if self.app.settings['showids'] == 'False':
+        if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
@@ -3851,7 +3851,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         color = TextColor(item['color']).recommendation
                         text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
                         text_ += item['name'] + "</em>"
-                        if self.app.settings['showids'] == 'True':
+                        if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "]"
                         text_ += "<br />" + seltext
                         if item['memo'] is not None and item['memo'] != "":

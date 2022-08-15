@@ -2307,6 +2307,9 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         image_context_action = None
         if self.memo_imid is not None and self.memo_imid != -1:
             image_context_action = menu.addAction(_("Code in context"))
+        av_context_action = None
+        if self.memo_avid is not None and self.memo_avid != -1:
+            av_context_action = menu.addAction(_("Code in context"))
         bold_action = menu.addAction(_("Bold toggle"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
@@ -2350,11 +2353,25 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if res is None:
                 Message(self.app, _("Error"), _("Cannot find image coding in database")).exec()
                 return
-            data = {'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4],
+            data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
                     'x1': res[5], 'y1': res[6], 'width': res[7],'height': res[8], 'file_or_casename': res[9],
                     'fid': res[10], 'file_or_case': 'File', 'mediapath': res[11]}
             DialogCodeInImage(self.app, data).exec()
-
+        if action == av_context_action:
+            cur = self.app.conn.cursor()
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,code_av.memo,"
+                        "pos0, pos1, source.name, source.id, source.mediapath "
+                        "from code_av join code_name on code_name.cid=code_av.cid join source on "
+                        "source.id=code_av.id where code_av.avid=?",
+                        [self.memo_avid])
+            res = cur.fetchone()
+            if res is None:
+                Message(self.app, _("Error"), _("Cannot find A/V coding in database")).exec()
+                return
+            data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
+                    'pos0': res[5], 'pos1': res[6], 'file_or_casename': res[7],
+                    'fid': res[8], 'file_or_case': 'File', 'mediapath': res[9]}
+            DialogCodeInAV(self.app, data).exec()
         if action == text_context_action:
             text_id = self.ctid
             if text_id == -1:
@@ -2369,7 +2386,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if res is None:
                 Message(self.app, _("Error"), _("Cannot find text coding in database")).exec()
                 return
-            data = {'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4],
+            data = {'cid': res[0], 'codename': res[1],  'color': res[2], 'coder': res[3],  'memo': res[4],
                     'pos0': res[5], 'pos1': res[6], 'file_or_casename': res[7], 'fid': res[8], 'file_or_case': 'File'}
             DialogCodeInText(self.app, data).exec()
         if action == remove_action:
