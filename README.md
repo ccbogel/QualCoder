@@ -40,12 +40,12 @@ py -m pip install --upgrade pip
  
 4. Build and install Qualcoder, from the downloaded folder type
 
-`py setup.py install`
+`py -m pip install .`
 
 The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.9`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 5. Run QualCoder from cmd.exe
-Move to the QualCoder-master folder, then type 
+If not already there, move to the same drive letter e.g. C: then type:
 
 `py -m qualcoder`
 
