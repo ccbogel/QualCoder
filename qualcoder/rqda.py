@@ -129,8 +129,18 @@ class RqdaImport:
         res = r_cur.fetchall()
         i = 0
         for r in res:
-            q_cur.execute("insert into source (id, name, fulltext,memo, owner, date, mediapath) values (?,?,?,?,?,?,?)",
-                          [r[0], r[1], r[2], r[3], r[4], self.convert_date(r[5]), None])
+            try:
+                q_cur.execute("insert into source (id, name, fulltext,memo, owner, date, mediapath) values (?,?,?,?,?,?,?)",
+                              [r[0], r[1], r[2], r[3], r[4], self.convert_date(r[5]), None])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError:
+                # Fix for duplicated RQDA text file names. QualCoder has a Unique constraint on file names
+                new_name = r[1] + "_" + str(randint(0, 9)) + str(randint(0, 9)) + str(randint(0, 9))
+                q_cur.execute("insert into source (id, name, fulltext,memo, owner, date, mediapath) values (?,?,?,?,?,?,?)",
+                              [r[0], new_name, r[2], r[3], r[4], self.convert_date(r[5]), None])
+                self.app.conn.commit()
+                msg = _("Duplicate filename: ") + r[1] + _(" --> Replaced with: ") + new_name
+                self.parent_textEdit.append(msg)
             i += 1
         self.parent_textEdit.append(str(i) + _(" files imported"))
         r_cur.execute("select fid,position,annotation, owner, date from annotation")
@@ -142,6 +152,7 @@ class RqdaImport:
                               [r[0], r[1], r[1] + 1, r[2], r[3], self.convert_date(r[4])])
                 i += 1
         self.parent_textEdit.append(str(i) + _(" annotations imported"))
+        self.app.conn.commit()
         r_cur.execute("select name,journal, owner, date from journal")
         res = r_cur.fetchall()
         i = 0
@@ -165,7 +176,7 @@ class RqdaImport:
         res = r_cur.fetchall()
         i = 0  # Do not use enumerate as res could be None
         for r in res:
-            # There are no supercatids in rqda
+            # There are no supercatids in RQDA
             try:
                 q_cur.execute("insert into code_cat (catid,name, memo, owner, date,supercatid) values (?,?,?,?,?,?)",
                               [r[0], r[1], r[2], r[3], self.convert_date(r[4]), None])
@@ -173,7 +184,7 @@ class RqdaImport:
             except sqlite3.IntegrityError:
                 pass
         self.parent_textEdit.append(str(i) + _(" code categories imported"))
-        # get catids for each code cid
+        # Get catids for each code cid
         r_cur.execute("select cid, catid from treecode")
         treecodes = r_cur.fetchall()
         r_cur.execute("select id, name, memo,color, owner, date from freecode")
@@ -184,7 +195,7 @@ class RqdaImport:
             treecode = None
             for t in treecodes:
                 if t[0] == r[0]:
-                    treecode = t[1]  # the corresponding catid
+                    treecode = t[1]  # Corresponding catid
             try:
                 q_cur.execute("insert into code_name (cid, catid,name, memo,color, owner, date) values (?,?,?,?,?,?,?)",
                               [r[0], treecode, r[1], r[2], code_color, r[4], self.convert_date(r[5])])
