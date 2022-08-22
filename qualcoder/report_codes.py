@@ -30,6 +30,7 @@ from copy import copy, deepcopy
 import csv
 import logging
 import os
+import openpyxl
 from PIL import Image
 import re
 from shutil import copyfile
@@ -71,7 +72,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         Case matrix is also shown in a qtablewidget in the third splitter pane.
         If a case matrix is displayed, the text-in-context method overrides it and replaces the matrix with the
         text in context.
-        TODO - export case matrix
     """
 
     app = None
@@ -492,7 +492,6 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_option_selected(self):
         """ ComboBox export option selected. """
 
-        # TODO add case matrix as csv, xlsx options
         text_ = self.ui.comboBox_export.currentText()
         if text_ == "":
             return
@@ -505,6 +504,49 @@ class DialogReportCodes(QtWidgets.QDialog):
         if text_ == "csv":
             self.export_csv_file()
         self.ui.comboBox_export.setCurrentIndex(0)
+        if self.te:
+            reply = QtWidgets.QMessageBox.question(self, _("Export Matrix"), _("Export matrix results"),
+                                                   QtWidgets.QMessageBox.StandardButton.Yes,
+                                                   QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                self.export_matrix()
+
+    def export_matrix(self):
+        """ Export matrix as xlsx spreadsheet. """
+
+        row_count = self.ui.tableWidget.rowCount()
+        col_count = self.ui.tableWidget.columnCount()
+        if row_count == 0 or col_count == 0:
+            return
+        filename = "Report_matrix.xlsx"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
+            return
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        # Headers
+        for c in range(0, col_count):
+            cell = ws.cell(row=1, column=c + 2)
+            cell.value = self.ui.tableWidget.horizontalHeaderItem(c).text()
+
+        for r in range(0, row_count):
+            cell = ws.cell(row=r + 2, column=1)
+            cell.value = self.ui.tableWidget.verticalHeaderItem(r).text()
+        # Data
+        for c in range(0, col_count):
+            for r in range(0, row_count):
+                te = self.te[r][c]
+                try:
+                    data_text = te.toPlainText()
+                except AttributeError:  # None type error
+                    data_text = ""
+                cell = ws.cell(row=r + 2, column=c + 2)
+                cell.value = data_text
+        wb.save(filepath)
+        msg = _('Matrix exported: ') + filepath
+        Message(self.app, _('Matrix exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
 
     def export_text_file(self):
         """ Export report to a plain text file with .txt ending.
