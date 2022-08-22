@@ -422,10 +422,11 @@ class App(object):
             result['backup_num'] = default.getint('backup_num')
         if 'codetext_chunksize' in default:
             result['codetext_chunksize'] = default.getint('codetext_chunksize')
-        if result['showids'] == 'False':
-            result['showids'] = False
-        else:
-            result['showids'] = True
+        if 'showids' in default:
+            if default['showids'] == "False":
+                result['showids'] = False
+            else:
+                result['showids'] = True
         return result
 
     def check_and_add_additional_settings(self, settings_data):
@@ -464,7 +465,7 @@ class App(object):
                 'dialogcodecrossovers_w', 'dialogcodecrossovers_h',
                 'dialogcodecrossovers_splitter0', 'dialogcodecrossovers_splitter1',
                 'dialogmanagelinks_w', 'dialogmanagelinks_h',
-                'docfontsize',
+                'docfontsize', 'showids',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize'
@@ -480,6 +481,8 @@ class App(object):
                     settings_data[key] = 5
                 if key == "codetext_chunksize":
                     settings_data[key] = 50000
+                if key == 'showids':
+                    settings_data[key] = False
         # write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
