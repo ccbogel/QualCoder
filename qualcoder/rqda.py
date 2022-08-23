@@ -26,6 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
+import datetime
 import logging
 import os
 from random import randint
@@ -95,11 +96,17 @@ class RqdaImport:
         return: standard format date
         """
 
-        yyyy = r_date[-4:]
-        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        mm = str(months.index(r_date[4:7]) + 1)
-        if len(mm) == 1:
-            mm = "0" + mm
+        nowdate = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H:%M:%S")
+        if len(r_date) < 20:
+            return nowdate
+        try:
+            yyyy = r_date[-4:]
+            months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            mm = str(months.index(r_date[4:7]) + 1)
+            if len(mm) == 1:
+                mm = "0" + mm
+        except ValueError:
+            return nowdate
         # Day can have a leading space, so '12' or ' 9'
         dd = r_date[8:10]
         if dd[0] == " ":
