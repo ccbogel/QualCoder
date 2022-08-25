@@ -713,7 +713,8 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            if item.text == r[3]:
+                            #if item.text == r[3]:
+                            if item.memo_ctid is not None and item.memo_ctid == r[4]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         memos.append({'cid': r[0], 'fid': r[1], 'tooltip': r[2], 'name': r[3], 'filetype': 'text',
@@ -726,7 +727,8 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            if item.text == r[6]:
+                            #if item.text == r[6]:
+                            if item.memo_imid is not None and item.memo_imid == r[7]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         tt = _("Memo for area: ") + "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") \
@@ -742,7 +744,8 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            if item.text == r[4]:
+                            #if item.text == r[4]:
+                            if item.memo_avid is not None and item.memo_avid == r[5]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
                         tt = _("Memo for duration: ") + str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
