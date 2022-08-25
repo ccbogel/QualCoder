@@ -11,7 +11,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION 
 
 NOTE: Latest (25 August 2022) major change is to do: `pip install python-vlc`  
-e.g. for Windows py -m pip install python-vlc
+e.g. for Windows: `py -m pip install python-vlc`
 I have changed how QualCoder accesses the python to vlc bindings
 
 ### Prerequisites
