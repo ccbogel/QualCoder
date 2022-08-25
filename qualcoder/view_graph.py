@@ -264,7 +264,8 @@ class ViewGraph(QDialog):
         model = self.get_refined_model(top_node, model)
         return model
 
-    def get_refined_model(self, node, model):
+    @staticmethod
+    def get_refined_model(node, model):
         """ Return a refined model of this top node and all its children.
         Called by: get_refined_model_with_category_counts
 
@@ -397,7 +398,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
                             m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
                             (m.code_or_cat['cid'] is None and n.code_or_cat['cid'] is None):
-                        item = LinkGraphicsItem(self.app, m, n, 2, True)
+                        item = LinkGraphicsItem(m, n, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Add links from Codes to Categories
         for m in self.scene.items():
@@ -407,7 +408,7 @@ class ViewGraph(QDialog):
                     if isinstance(n, TextGraphicsItem) and n.code_or_cat['cid'] is not None and \
                             m.code_or_cat['cid'] is None and \
                             m.code_or_cat['catid'] == n.code_or_cat['catid']:
-                        item = LinkGraphicsItem(self.app, m, n, 2, True)
+                        item = LinkGraphicsItem(m, n, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()
@@ -554,7 +555,6 @@ class ViewGraph(QDialog):
         ok = ui.exec()
         if not ok:
             return
-        already_added = 0
         selected_codings = ui.get_selected()
         for s in selected_codings:
             x += 10
@@ -618,7 +618,6 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected_codings = ui.get_selected()
-        already_added = 0
         for s in selected_codings:
             x += 10
             y += 10
@@ -679,7 +678,7 @@ class ViewGraph(QDialog):
                 if isinstance(item, FreeTextGraphicsItem):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
-            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, 0, s['ctid'])
+            item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, s['ctid'])
             item.ctid = s['ctid']
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['memo'] != "":
@@ -768,7 +767,7 @@ class ViewGraph(QDialog):
                     if item.freetextid > freetextid:
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
-                                    s['ctid'], s['imid'], s['avid'])
+                                        s['ctid'], s['imid'], s['avid'])
             msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
@@ -818,7 +817,7 @@ class ViewGraph(QDialog):
                     if item.text == text_to:
                         to_item = item
             if from_item != to_item and not (from_item is None or to_item is None):
-                line_item = FreeLineGraphicsItem(self.app, from_item, to_item, color)
+                line_item = FreeLineGraphicsItem(from_item, to_item, color)
                 self.scene.addItem(line_item)
 
     def color_selection(self, obj_type="line"):
@@ -900,6 +899,7 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         for i, s in enumerate(selected):
             file_item = FileTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
+            file_item.setToolTip(_("File"))  # Need to add tooltip here, for some unknown reason
             self.scene.addItem(file_item)
 
     def get_files(self):
@@ -937,6 +937,7 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         for i, s in enumerate(selected):
             case_item = CaseTextGraphicsItem(self.app, s['name'], s['id'], i * 10, i * 10)
+            case_item.setToolTip(_("Case"))  # Need to add tooltip here, for some unknown reason
             self.scene.addItem(case_item)
 
     def get_cases(self):
@@ -1133,7 +1134,8 @@ class ViewGraph(QDialog):
                 self.app.conn.commit()
         self.app.delete_backup = False
 
-    def line_type_to_text(self, line_type):
+    @staticmethod
+    def line_type_to_text(line_type):
         """ Convert line type to text. for graph line items. """
 
         text_ = "solid"
@@ -1163,15 +1165,13 @@ class ViewGraph(QDialog):
             self.load_graph_menu_option = _("Newest to oldest")
         self.ui.pushButton_loadgraph.setToolTip(_("Load graph") + "\n" + self.load_graph_menu_option)
 
-    def remove_expired_graph_items(self, grid):
+    def remove_expired_graph_items(self):
         """ Some items may no longer exist in the database and need to be removed from the saved graph objects.
         Applies to: gr_case_text_item, gr_file_text_item, gr_pix_item, gr_av_item and
         gr_text_item for coded text, and for memos of coded text, av, images.
-        param:
-            grid: Integer : graph id """
+        """
 
         cur = self.app.conn.cursor()
-
         sql_pix = "SELECT imid FROM  gr_pix_item where imid not in (select imid from code_image)"
         cur.execute(sql_pix)
         res_pix = cur.fetchall()
@@ -1373,7 +1373,7 @@ class ViewGraph(QDialog):
 
     def load_graph(self):
         """ Load a saved graph.
-        Load each text component first then link then the cdct_line_items then the free_lines_items.
+        Load each text component first, then link the cdct_line_items then the free_lines_items.
         For cdct_text_items, fill extra details:
         eg name, memo, date?, owner?, color, child_names?
         """
@@ -1402,12 +1402,11 @@ class ViewGraph(QDialog):
         graph = ui.get_selected()
         if not graph:
             return
-        grid = graph['grid']
-        self.remove_expired_graph_items(grid)
+        self.remove_expired_graph_items()
         self.scene.clear()
         self.scene.set_width(graph['width'])
         self.scene.set_height(graph['height'])
-        err_msg = ""
+        grid = graph['grid']
         err_msg = self.load_code_or_cat_text_graphics_items(grid)
         err_msg += self.load_file_text_graphics_items(grid)
         err_msg += self.load_case_text_graphics_items(grid)
@@ -1449,7 +1448,7 @@ class ViewGraph(QDialog):
                             i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
             if from_item is not None and to_item is not None:
-                item = LinkGraphicsItem(self.app, from_item, to_item, line['linewidth'], line['linetype'],
+                item = LinkGraphicsItem(from_item, to_item, line['linewidth'], line['linetype'],
                                         line['color'], line['isvisible'])
                 self.scene.addItem(item)
             else:
@@ -1520,7 +1519,7 @@ class ViewGraph(QDialog):
                         to_item = i
             # Add line graphics item OR remove database entry
             if from_item is not None and to_item is not None:
-                line_item = FreeLineGraphicsItem(self.app, from_item, to_item, line['color'], line['linewidth'],
+                line_item = FreeLineGraphicsItem(from_item, to_item, line['color'], line['linewidth'],
                                                  line['linetype'])
                 self.scene.addItem(line_item)
             else:
@@ -1765,7 +1764,6 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     item.setPos(item.code_or_cat['x'], item.code_or_cat['y'])
         for item in self.items():
             if isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
-                # isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem):
                 item.redraw()
         for item in self.items():
             if isinstance(item, FreeLineGraphicsItem) or isinstance(item, FreeTextGraphicsItem) \
@@ -2354,7 +2352,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 Message(self.app, _("Error"), _("Cannot find image coding in database")).exec()
                 return
             data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
-                    'x1': res[5], 'y1': res[6], 'width': res[7],'height': res[8], 'file_or_casename': res[9],
+                    'x1': res[5], 'y1': res[6], 'width': res[7], 'height': res[8], 'file_or_casename': res[9],
                     'fid': res[10], 'file_or_case': 'File', 'mediapath': res[11]}
             DialogCodeInImage(self.app, data).exec()
         if action == av_context_action:
@@ -2386,7 +2384,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if res is None:
                 Message(self.app, _("Error"), _("Cannot find text coding in database")).exec()
                 return
-            data = {'cid': res[0], 'codename': res[1],  'color': res[2], 'coder': res[3],  'memo': res[4],
+            data = {'cid': res[0], 'codename': res[1], 'color': res[2], 'coder': res[3], 'memo': res[4],
                     'pos0': res[5], 'pos1': res[6], 'file_or_casename': res[7], 'fid': res[8], 'file_or_case': 'File'}
             DialogCodeInText(self.app, data).exec()
         if action == remove_action:
@@ -2468,7 +2466,18 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     tooltip = ""
     remove = False
 
-    def __init__(self, app, from_widget, to_widget, color="gray", line_width=2, line_type="solid"):
+    def __init__(self, from_widget, to_widget, color="gray", line_width=2, line_type="solid"):
+        """ User created connecting line.
+         param:
+            from_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
+                FileTextGraphicsItem, CaseTextGraphicsItem
+            to_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
+                FileTextGraphicsItem, CaseTextGraphicsItem
+            color : String
+            line_width : Integer
+            line_type : String
+        """
+
         super(FreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
@@ -2980,7 +2989,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Takes the coordinate from the two TextGraphicsItems. """
 
-    app = None  # not used yet
     from_widget = None
     from_pos = None
     to_widget = None
@@ -2990,10 +2998,9 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     text = ""
     color = "gray"
 
-    def __init__(self, app, from_widget, to_widget, line_width=2, line_type="solid",
+    def __init__(self, from_widget, to_widget, line_width=2, line_type="solid",
                  color="gray", isvisible=True):
-        """ app is not used yet.
-        param: app  : the main App class
+        """ Links codes and categories. Called when codes or categories of categories are inserted.
          param: from_widget  : TextGraphicsItem
          param: to_widget : TextGraphicsItem
          param: line_width : Real
