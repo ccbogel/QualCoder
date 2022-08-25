@@ -55,6 +55,10 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems.
 
+0. Install pip
+
+`sudo apt install python3-pip`
+
 1. Install venv
 I am using python3.9  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
 
