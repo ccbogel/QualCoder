@@ -55,7 +55,11 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems.
 
-0. Install pip
+1. install vlc (download from site) or:
+
+`sudo apt install vlc`
+
+2. Install pip
 
 `sudo apt install python3-pip`
 
@@ -64,9 +68,9 @@ I am using python3.9  you can choose another recent version if you prefer, and i
 
 `sudo apt install python3.9-venv`
 
-2. Download and unzip the Qualcoder folder.
+3. Download and unzip the Qualcoder folder.
 
-3. Open a terminal and move (cd) into that folder. 
+4. Open a terminal and move (cd) into that folder. 
 You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.0 folder.
 Inside the QualCoder-master folder:
 
@@ -77,21 +81,21 @@ Note: To exit venv type `deactivate`
 
 `source qualcoder/bin/activate`
 
-4. Update pip so that it installs the most recent python packages.
+5. Update pip so that it installs the most recent python packages.
 
 `pip install --upgrade pip`
 
-5. Install the needed python modules.
+6. Install the needed python modules.
 
 `pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pandas plotly pydub python-vlc SpeechRecognition`
 
-6. Install QualCoder, type the following, the dot is important:
+7. Install QualCoder, type the following, the dot is important:
 
 `python3 -m pip install .`
 
 You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
 
-7. To run type
+8. To run type
 
 `qualcoder`
 
