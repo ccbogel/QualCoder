@@ -32,7 +32,7 @@ from PIL import Image
 import re
 import sys
 import traceback
-import qualcoder.vlc as vlc
+import vlc  # qualcoder.vlc as vlc
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt

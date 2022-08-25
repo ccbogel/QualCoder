@@ -63,38 +63,7 @@ from .speech_to_text import SpeechToText
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-'''# https://stackoverflow.com/questions/59014318/filenotfounderror-could-not-find-module-libvlc-dll
-if sys.platform.startswith("win"):
-    try:
-        # Older x86 32 bit location
-        os.add_dll_directory(r'C:\Program Files (x86)\VideoLAN\VLC')
-    except Exception as e:
-        logger.debug(str(e))
-        # Commented below out, as this would be less common location.
-        # Uncomment if desired
-        # QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
-    try:
-        os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC')
-    except Exception as e:
-        # Commented below out, uncomment if desired
-        # QtWidgets.QMessageBox.critical(None, _('Add DLL Exception'), str(e))
-        logger.debug(str(e))
-vlc_msg = ""
-imp = True
-try:'''
-import qualcoder.vlc as vlc
-'''except Exception as e:
-    vlc_msg = str(e) + "\n"
-    if sys.platform.startswith("win"):
-        imp = False
-    if not imp:
-        msg = str(e) + "\n"
-        msg += "view_av. Cannot import vlc\n"
-        msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
-        msg += "32 bit python AND 32 bit VLC installed."
-        print(msg)
-        vlc_msg = msg
-    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)'''
+import vlc  # qualcoder.vlc as vlc
 
 
 def exception_handler(exception_type, value, tb_obj):

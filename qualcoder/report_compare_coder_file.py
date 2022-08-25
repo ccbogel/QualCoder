@@ -43,19 +43,7 @@ from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCode
 from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog
 from .information import DialogInformation
 
-vlc_msg = ""
-try:
-    import qualcoder.vlc as vlc
-except Exception as e:
-    vlc_msg = str(e) + "\n"
-    if sys.platform.startswith("win"):
-        msg = str(e) + "\n"
-        msg += "view_av. Cannot import vlc\n"
-        msg += "Ensure you have 64 bit python AND 64 bit VLC installed OR\n"
-        msg += "32 bit python AND 32 bit VLC installed."
-        print(msg)
-        vlc_msg = msg
-    QtWidgets.QMessageBox.critical(None, _('Cannot import vlc'), vlc_msg)
+import vlc  # qualcoder.vlc as vlc
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -80,7 +68,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     """
 
     app = None
-    parent_textEdit = None
+    parent_textedit = None
     coders = []
     selected_coders = []
     categories = []
@@ -91,11 +79,11 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     codes = []
     comparisons = ""
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_text_edit):
 
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textedit = parent_text_edit
         self.comparisons = ""
         self.selected_coders = []
         QtWidgets.QDialog.__init__(self)
@@ -285,7 +273,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(self.ui.textEdit.document())
         msg_ = _("Report exported: ") + filepath
-        self.parent_textEdit.append(msg_)
+        self.parent_textedit.append(msg_)
         Message(self.app, _('Report exported'), msg_, "information").exec()
 
     def results(self):
