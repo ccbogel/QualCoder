@@ -34,7 +34,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 py -m pip install --upgrade pip
 
-`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
+`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition`
 
  Wait, until all modules are installed .
  
@@ -83,7 +83,7 @@ Note: To exit venv type `deactivate`
 
 5. Install the needed python modules.
 
-`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pandas plotly pydub SpeechRecognition`
+`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pandas plotly pydub python-vlc SpeechRecognition`
 
 6. Install QualCoder, type the following, the dot is important:
 
@@ -113,7 +113,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub SpeechRecognition`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc SpeechRecognition`
 
 If success, all requirements are satisfied.
 
@@ -165,7 +165,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip3 install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition
+pip3 install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -216,7 +216,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install py2app pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub SpeechRecognition`
+`pip3 install py2app pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition`
 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
 `python3 setup.py py2app`
