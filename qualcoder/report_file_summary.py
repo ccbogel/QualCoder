@@ -32,7 +32,7 @@ from PIL.ExifTags import TAGS
 import re
 import sys
 import traceback
-import qualcoder.vlc as vlc
+import vlc  # qualcoder.vlc as vlc
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 

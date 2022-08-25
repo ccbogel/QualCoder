@@ -60,7 +60,7 @@ from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for 
 from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
 from .report_codes import DialogReportCodes  # for isInstance()
 
-import qualcoder.vlc as vlc
+import vlc  # qualcoder.vlc as vlc
 
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
@@ -664,7 +664,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
-
             instance = vlc.Instance()
             # mediaplayer = instance.media_player_new()
             try:

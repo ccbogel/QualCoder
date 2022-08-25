@@ -34,7 +34,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-import qualcoder.vlc as vlc
+import vlc  # qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks

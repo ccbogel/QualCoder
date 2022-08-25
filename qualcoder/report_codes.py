@@ -47,7 +47,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
-import qualcoder.vlc as vlc
+import vlc  # qualcoder.vlc as vlc
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
