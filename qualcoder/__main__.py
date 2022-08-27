@@ -540,12 +540,14 @@ class App(object):
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         style = "* {font-size: 12px; color: #000000;}\n\
+        QWidget {background-color: #efefef; color: #000000}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
+        QMenu {border: 1px solid #808080;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QTreeWidget {font-size: 12px;}\n\
