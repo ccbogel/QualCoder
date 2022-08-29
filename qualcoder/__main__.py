@@ -77,7 +77,7 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
-qualcoder_version = "QualCoder 3.1"
+qualcoder_version = "QualCoder 3.2"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
