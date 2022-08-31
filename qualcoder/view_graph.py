@@ -798,8 +798,11 @@ class ViewGraph(QDialog):
                     isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                 if item.text == text_from:
                     from_item = item
-        # To Items selection
+        # To Items selection, remove the from item, and remove matching text items
         texts_dict_list.remove(selected)
+        for i in texts_dict_list[:]:
+            if i['name'] == text_from:
+                texts_dict_list.remove(i)
         ui = DialogSelectItems(self.app, texts_dict_list, _("Line end item(s)"), "multi")
         ok = ui.exec()
         if not ok:
@@ -817,6 +820,7 @@ class ViewGraph(QDialog):
                 if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
                         isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
                         isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+                    # Cannot link same text items
                     if item.text == text_to:
                         to_item = item
             if from_item != to_item and not (from_item is None or to_item is None):
