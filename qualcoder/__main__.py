@@ -542,6 +542,7 @@ class App(object):
         style = "* {font-size: 12px; color: #000000;}\n\
         QWidget {background-color: #efefef; color: #000000}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
+        QDialog {border: 1px solid #808080;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\

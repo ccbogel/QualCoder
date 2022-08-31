@@ -790,6 +790,8 @@ class ViewGraph(QDialog):
         if not ok:
             return
         selected = ui.get_selected()
+        if not selected:
+            return
         text_from = selected['name']
         from_item = None
         for item in self.scene.items():
