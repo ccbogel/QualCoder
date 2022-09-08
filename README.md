@@ -246,7 +246,7 @@ Run this line:
 
 `pyinstaller -w -n "QualCoder-3.1" --icon=QC_Logo.ico --onefile qualcoder/__main__.py`
 
-The execuable file will be inside a folder called dist
+The executable file will be inside a folder called dist
 
 This 'file' contains all the python modules packaged up for use on that operating system, and can be shared to others who use the same operating system.
 
@@ -262,8 +262,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2022) QualCoder 3.0 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.0
+Curtain, C. (2022) QualCoder 3.1 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.1
 
 
 ## Leave a review
