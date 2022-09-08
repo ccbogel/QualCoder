@@ -229,11 +229,33 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
 `python3 setup.py py2app`
+
+## Creating an executable file
+
+Download pyinstaller
+
+`pip install pyinstaller` 
+
+or upgrade it if already installed
+
+`pip install --upgrade pyinstaller`
+
+Move to the Qualcoder-master folder or the release folder.
+
+Run this line:
+
+`pyinstaller -w -n "QualCoder-3.1" --icon=QC_Logo.ico --onefile qualcoder/__main__.py`
+
+The execuable file will be inside a folder called dist
+
+This 'file' contains all the python modules packaged up for use on that operating system, and can be shared to others who use the same operating system.
+
+However, you do still need to install the VLC software.
  
 ## Dependencies
 Required:
 
-Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub,  SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
