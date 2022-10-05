@@ -42,10 +42,11 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
 from .add_item_name import DialogAddItemName
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogCodeInAllFiles, DialogGetStartAndEndMarks, ExportDirectoryPathDialog
+from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo

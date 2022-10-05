@@ -39,6 +39,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
@@ -46,7 +47,7 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
-from .helpers import Message, DialogCodeInAllFiles
+from .helpers import Message
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()

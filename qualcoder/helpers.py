@@ -262,7 +262,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         text_cursor.setPosition(cur_pos)
 
 
-class DialogCodeInAllFiles(QtWidgets.QDialog):
+'''class DialogCodeInAllFiles(QtWidgets.QDialog):
     """ Display all coded media for this code, in a modal dialog.
     Coded media comes from ALL files for this coder.
     Need to store textedit start and end positions so that code in context can be used.
@@ -271,6 +271,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
     app = None
     code_dict = None
+    codes = []
+    categories = []
     text_results = []
     image_results = []
     av_results = []
@@ -304,8 +306,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.te = QtWidgets.QTextEdit()
         self.gridLayout.addWidget(self.te, 1, 0)
+        self.te.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.te.customContextMenuRequested.connect(self.text_edit_menu)
         msg = _("Click on heading for coding in context") + "\n\n"
         self.te.append(msg)
+
+        self.codes, self.categories = self.app.get_codes_categories()
 
         # Get coded text by file for this coder data
         cur = self.app.conn.cursor()
@@ -501,6 +507,48 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 ui.exec()
                 break
 
+    def text_edit_menu(self, position):
+        """ Context menu for textEdit.
+        Mark, unmark, annotate. """
+
+        cursor = self.te.cursorForPosition(position)
+        pos = cursor.position()
+        # Check the clicked position for a text result
+        item = None
+        for row in self.text_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                item = {'type': 'text', 'res': row}
+                break
+        # Check the position for an image result
+        for row in self.image_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                item = {'type': 'image', 'res': row}
+                break
+        # Check the position for an a/v result
+        for row in self.av_results:
+            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+                item = {'type': 'av', 'res': row}
+                break
+        if not item:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_annotate = None
+        action_code_memo = None
+        action_end_pos = None
+        action_start_pos = None
+        action_mark = menu.addAction(_("Add another code"))
+        action_change_code = None
+        action_unmark = menu.addAction(_("Remove code"))
+        action = menu.exec(self.te.mapToGlobal(position))
+        if action is None:
+            return
+        print(item)
+        if action == action_mark:
+            pass
+        if action == action_unmark:
+            pass
+    '''
 
 class DialogCodeInAV(QtWidgets.QDialog):
     """ View coded section in original image.
