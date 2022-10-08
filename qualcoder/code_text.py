@@ -2724,6 +2724,8 @@ class DialogCodeText(QtWidgets.QWidget):
         param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
 
+        if file_ is None:
+            return
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
                 self.ui.listWidget.item(x).setSelected(True)
