@@ -2780,7 +2780,7 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes_and_annotations(self.app, mp_coded, self.codes, self.annotations, self.file_['start'])
+            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations, self.file_['start'])
         else:
             self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations,
                                                          self.file_['start'])
