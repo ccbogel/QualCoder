@@ -2114,11 +2114,13 @@ class DialogCodeText(QtWidgets.QWidget):
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
+        Re-load the file as codings may have changed.
         param:
             code_dict : code dictionary
         """
 
         DialogCodeInAllFiles(self.app, code_dict)
+        self.load_file(self.file_)
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.

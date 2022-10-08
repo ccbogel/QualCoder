@@ -60,6 +60,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
     app = None
     code_dict = None
+    case_or_file = None
     codes = []
     categories = []
     text_results = []
@@ -68,7 +69,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     te = None
 
     def __init__(self, app, code_dict, case_or_file="File", parent=None):
-        """ Create dialog with textEdit widget.
+        """ Create dialog with textEdit widget to show all codings of this code.
+        Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
         param:
             app : class containing app details such as database connection
             code_dict : dictionary of this code {name, color, cid, catid, date, owner, memo}
@@ -78,6 +80,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.code_dict = code_dict
+        self.case_or_file = case_or_file
         QtWidgets.QDialog.__init__(self)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -97,21 +100,32 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.te, 1, 0)
         self.te.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.te.customContextMenuRequested.connect(self.text_edit_menu)
-        msg = _("Click on heading for coding in context") + "\n\n"
+        msg = _("Left click on heading for coding in context") + "\n"
+        msg += _("Right click on heading to unmark or to add codes") + "\n\n"
         self.te.append(msg)
 
         self.codes, self.categories = self.app.get_codes_categories()
+        self.get_coded_segments_all_files()
+        self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
+        self.exec()
 
-        # Get coded text by file for this coder data
+    def get_coded_segments_all_files(self):
+        """ Get coded text by file for this coder data """
+
+        self.te.blockSignals(True)
+        self.te.clear()
+        msg = _("Left click on heading for coding in context") + "\n"
+        msg += _("Right click on heading to unmark or to add codes") + "\n\n"
+        self.te.append(msg)
         cur = self.app.conn.cursor()
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id from "
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id,ctid from "
         sql += "code_text "
         sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
         sql += " where code_name.cid=? and code_text.owner=?"
         sql += " order by source.name, pos0"
-        if case_or_file == "Case":
+        if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id from code_text "
+            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id, ctid from code_text "
             sql += " join code_name on code_name.cid = code_text.cid "
             sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += " code_text.fid = case_text.fid "
@@ -123,17 +137,17 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         self.text_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid'
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid', 'ctid'
         for row in results:
             self.text_results.append(dict(zip(keys, row)))
 
         # Text insertion into textEdit
         for row in self.text_results:
-            row['file_or_case'] = case_or_file
+            row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
             fgc = "; color:" + TextColor(row['color']).recommendation + ";"
             title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
-            if case_or_file == "File":
+            if self.case_or_file == "File":
                 title += _(" File: ") + row['file_or_casename']
             else:
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
@@ -145,14 +159,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += " source.mediapath, source.id, code_image.memo "
+        sql += " source.mediapath, source.id, code_image.memo, imid "
         sql += " from code_image join code_name "
         sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
         sql += "where code_name.cid =? and code_image.owner=? "
         sql += " order by source.name"
-        if case_or_file == "Case":
+        if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo  "
+            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo,imid  "
             sql += "from code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -162,16 +176,17 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         self.image_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo'
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo', \
+               'imid'
         for row in results:
             self.image_results.append(dict(zip(keys, row)))
         # Image - textEdit insertion
         for counter, row in enumerate(self.image_results):
-            row['file_or_case'] = case_or_file
+            row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
             fgc = "; color:" + TextColor(row['color']).recommendation + ";"
             title = '<p><span style=\"background-color:' + row['color'] + fgc + '\">'
-            if case_or_file == "Case":
+            if self.case_or_file == "Case":
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
@@ -186,13 +201,13 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         # Get coded A/V by file for this coder data
         sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "source.mediapath, source.id from code_av join code_name "
+        sql += "source.mediapath, source.id, avid from code_av join code_name "
         sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
         sql += "where code_name.cid =? and code_av.owner=? "
         sql += " order by source.name"
-        if case_or_file == "Case":
+        if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, code_av.pos0, code_av.pos1, code_av.memo, "
-            sql += "source.mediapath, source.id from "
+            sql += "source.mediapath, source.id, avid from "
             sql += "code_av join code_name on code_name.cid = code_av.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_av.id = case_text.fid "
@@ -202,16 +217,16 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         self.av_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid'
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid'
         for row in results:
             self.av_results.append(dict(zip(keys, row)))
         # A/V - textEdit insertion
         for row in self.av_results:
-            row['file_or_case'] = case_or_file
+            row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
             fgc = "; color:" + TextColor(row['color']).recommendation + ";"
             title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
-            if case_or_file == "Case":
+            if self.case_or_file == "Case":
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
@@ -222,8 +237,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml('<br />[' + start + ' - ' + end + '] ')
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("Memo: " + row['memo'] + "\n\n")
-        self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
-        self.exec()
+        self.te.blockSignals(False)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
@@ -336,4 +350,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if action == action_mark:
             pass
         if action == action_unmark:
-            pass
+            cur = self.app.conn.cursor()
+            if item['type'] == "text":
+                cur.execute("delete from code_text where ctid=?", [item['res']['ctid']])
+                self.app.conn.commit()
+            if item['type'] == "image":
+                cur.execute("delete from code_image where imid=?", [item['res']['imid']])
+                self.app.conn.commit()
+            if item['type'] == "av":
+                cur.execute("delete from code_av where avid=?", [item['res']['avid']])
+                self.app.conn.commit()
+            self.get_coded_segments_all_files()
