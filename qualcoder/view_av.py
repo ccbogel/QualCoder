@@ -1403,11 +1403,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
+        Re-load the codings may have changed.
         param:
             code_dict : code dictionary
         """
 
         DialogCodeInAllFiles(self.app, code_dict)
+        self.update_dialog_codes_and_categories()
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
