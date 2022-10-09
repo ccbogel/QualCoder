@@ -26,8 +26,10 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
+import datetime
 import logging
 import os
+import sqlite3
 import sys
 import traceback
 
@@ -35,6 +37,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .color_selector import TextColor
 from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText
+from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -340,15 +343,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         action_code_memo = None
         action_end_pos = None
         action_start_pos = None
-        action_mark = menu.addAction(_("Add another code"))
-        action_change_code = None
+        action_mark = menu.addAction(_("Appy more codes to this segment"))
         action_unmark = menu.addAction(_("Remove code"))
         action = menu.exec(self.te.mapToGlobal(position))
         if action is None:
             return
-        print(item)
         if action == action_mark:
-            pass
+            self.mark_with_more_codes(item)
+            return
         if action == action_unmark:
             cur = self.app.conn.cursor()
             if item['type'] == "text":
@@ -361,3 +363,55 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_av where avid=?", [item['res']['avid']])
                 self.app.conn.commit()
             self.get_coded_segments_all_files()
+            return
+
+    def mark_with_more_codes(self, item):
+        """ Select and apply more codes to this coded segment. """
+
+        codes = []
+        for c in self.codes:
+            if c['cid'] != self.code_dict['cid']:
+                codes.append(c)
+        ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur = self.app.conn.cursor()
+        for i, s in enumerate(selection):
+            if item['type'] == "text":
+                try:
+                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                        memo,date, important) values(?,?,?,?,?,?,?,?,?)", (s['cid'], item['res']['fid'],
+                                                                           item['res']['text'], item['res']['pos0'],
+                                                                           item['res']['pos1'],
+                                                                           self.app.settings['codername'],
+                                                                           "", now_date, None))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
+            if item['type'] == "image":
+                try:
+                    cur.execute(
+                        "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) "
+                        "values(?,?,?,?,?,?,?,?,?,?)",
+                        (item['res']['fid'], item['res']['x1'] + (i + 1) * 3, item['res']['y1'] + (1 + i) * 3,
+                         item['res']['width'] + (1 + i) * 3, item['res']['height'] + (1 + i) * 3,
+                         s['cid'], "", now_date, self.app.settings['codername'], None))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
+            if item['type'] == "av":
+                try:
+                    sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
+                    values = [item['res']['fid'], item['res']['pos0'], item['res']['pos1'],
+                              s['cid'], "", now_date, self.app.settings['codername']]
+                    cur.execute(sql, values)
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
+
+
