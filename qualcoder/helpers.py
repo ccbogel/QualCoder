@@ -236,6 +236,9 @@ class DialogCodeInText(QtWidgets.QDialog):
         cur_pos = self.data['pos1']
         text_cursor.setPosition(cur_pos)
         self.te.setTextCursor(text_cursor)
+        if self.event_filter_on:
+            tt = _("Resize coding\nAlt+Left Arrow, Alt+Right Arrow\nShift+LeftArrow, Shift+Right Arrow")
+            self.te.setToolTip(tt)
 
     def draw_initial_coded_text(self):
         """ Can be called multiple times via key strokes, so  initally set formatting to none. """
