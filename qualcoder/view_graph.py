@@ -37,11 +37,12 @@ import traceback
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
 
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
-from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInAllFiles, DialogCodeInText, \
+from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
     ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .save_sql_query import DialogSaveSql
