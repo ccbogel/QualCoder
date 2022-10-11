@@ -193,6 +193,7 @@ class DialogCodeInText(QtWidgets.QDialog):
     data = None
     te = None
     code_resize_timer = 0
+    event_filter_on = True
 
     def __init__(self, app, data, parent=None):
         """ Prepare QDialog window.
@@ -225,32 +226,42 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.te.setPlainText(file_text['fulltext'])
         self.te.ensureCursorVisible()
         self.te.installEventFilter(self)
+        self.te.setReadOnly(True)
         grid_layout = QtWidgets.QGridLayout(self)
         grid_layout.addWidget(self.te, 1, 0)
         self.resize(400, 300)
-        cursor = self.te.textCursor()
-        cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
-        fmt = QtGui.QTextCharFormat()
-        brush = QtGui.QBrush(QtGui.QColor(data['color']))
-        fmt.setBackground(brush)
-        text_brush = QtGui.QBrush(QtGui.QColor(TextColor(data['color']).recommendation))
-        fmt.setForeground(text_brush)
-        fmt.setFontUnderline(True)
-        fmt.setUnderlineColor(QtGui.QColor(data['color']))
-        cursor.setCharFormat(fmt)
+        self.draw_initial_coded_text()
         # Make marked text visible in view.
         text_cursor = self.te.textCursor()
-        cur_pos = data['pos1']
+        cur_pos = self.data['pos1']
         text_cursor.setPosition(cur_pos)
         self.te.setTextCursor(text_cursor)
-        self.te.setReadOnly(True)
+
+    def draw_initial_coded_text(self):
+        """ Can be called multiple times via key strokes, so  initally set formatting to none. """
+
+        cursor = self.te.textCursor()
+        cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(len(self.te.toPlainText()) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setCharFormat(QtGui.QTextCharFormat())
+
+        cursor.setPosition(self.data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(self.data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        fmt = QtGui.QTextCharFormat()
+        brush = QtGui.QBrush(QtGui.QColor(self.data['color']))
+        fmt.setBackground(brush)
+        text_brush = QtGui.QBrush(QtGui.QColor(TextColor(self.data['color']).recommendation))
+        fmt.setForeground(text_brush)
+        fmt.setFontUnderline(True)
+        fmt.setUnderlineColor(QtGui.QColor(self.data['color']))
+        cursor.setCharFormat(fmt)
 
     def add_coded_text(self, data):
         """ Add a second coded segment to the text.
         Merge with the original. The original has an underline which is merged into this new format.
         Called in report_relations.show_context """
 
+        self.event_filter_on = False
         cursor = self.te.textCursor()
         cursor.setPosition(data['pos0'], QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(data['pos1'], QtGui.QTextCursor.MoveMode.KeepAnchor)
@@ -273,6 +284,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         Extend start and end code positions using shift arrow left, shift arrow right
         """
 
+        if not self.event_filter_on:
+            return
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
@@ -284,84 +297,82 @@ class DialogCodeInText(QtWidgets.QDialog):
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
-            #TODO
-            #cursor_pos = self.te.textCursor().position()
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
             self.code_resize_timer = datetime.datetime.now()
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
-                print("alt L")
-                pass #self.shrink_to_left(codes_here[0])
+                self.shrink_to_left()
                 return True
             if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier:
-                print("alt R")
-                pass #self.shrink_to_right(codes_here[0])
+                self.shrink_to_right()
                 return True
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                print("shift L")
-                pass #self.extend_left(codes_here[0])
+                self.extend_left()
                 return True
             if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                print("shift R")
-                pass #self.extend_right(codes_here[0])
+                self.extend_right()
                 return True
         return False
 
-    '''def extend_left(self, code_):
+    def extend_left(self):
         """ Shift left arrow. """
 
-        if code_['pos0'] < 1:
+        if self.data['pos0'] < 1:
             return
-        code_['pos0'] -= 1
+        self.data['pos0'] -= 1
         cur = self.app.conn.cursor()
         text_sql = "select substr(fulltext,?,?) from source where id=?"
-        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
-        cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
+        cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.draw_initial_coded_text()
 
-    def extend_right(self, code_):
+    def extend_right(self):
         """ Shift right arrow. """
 
-        if code_['pos1'] + 1 >= len(self.ui.textEdit.toPlainText()):
+        if self.data['pos1'] + 1 >= len(self.te.toPlainText()):
             return
-        code_['pos1'] += 1
+        self.data['pos1'] += 1
         cur = self.app.conn.cursor()
         text_sql = "select substr(fulltext,?,?) from source where id=?"
-        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
         cur.execute(sql,
-                    (code_['pos1'], seltext, code_['ctid']))
+                    (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.draw_initial_coded_text()
 
-    def shrink_to_left(self, code_):
+    def shrink_to_left(self):
         """ Alt left arrow, shrinks code from the right end of the code. """
 
-        if code_['pos1'] <= code_['pos0'] + 1:
+        if self.data['pos1'] <= self.data['pos0'] + 1:
             return
-        code_['pos1'] -= 1
+        self.data['pos1'] -= 1
         cur = self.app.conn.cursor()
         text_sql = "select substr(fulltext,?,?) from source where id=?"
-        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos1=?, seltext=? where ctid=?"
-        cur.execute(sql, (code_['pos1'], seltext, code_['ctid']))
+        cur.execute(sql, (self.data['pos1'], seltext, self.data['ctid']))
         self.app.conn.commit()
+        self.draw_initial_coded_text()
 
-    def shrink_to_right(self, code_):
+    def shrink_to_right(self):
         """ Alt right arrow shrinks code from the left end of the code. """
 
-        if code_['pos0'] >= code_['pos1'] - 1:
+        if self.data['pos0'] >= self.data['pos1'] - 1:
             return
-        code_['pos0'] += 1
+        self.data['pos0'] += 1
         cur = self.app.conn.cursor()
         text_sql = "select substr(fulltext,?,?) from source where id=?"
-        cur.execute(text_sql, [code_['pos0'] + 1, code_['pos1'] - code_['pos0'], code_['fid']])
+        cur.execute(text_sql, [self.data['pos0'] + 1, self.data['pos1'] - self.data['pos0'], self.data['fid']])
         seltext = cur.fetchone()[0]
         sql = "update code_text set pos0=?, seltext=? where ctid=?"
-        cur.execute(sql, (code_['pos0'], seltext, code_['ctid']))
-        self.app.conn.commit()'''
+        cur.execute(sql, (self.data['pos0'], seltext, self.data['ctid']))
+        self.app.conn.commit()
+        self.draw_initial_coded_text()
 
 
 class DialogCodeInAV(QtWidgets.QDialog):
