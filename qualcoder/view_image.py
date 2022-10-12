@@ -820,7 +820,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
-        Re-load the file as codings may have changed.
+        Re-load the codings may have changed.
         param:
             code_dict : code dictionary
         """
@@ -910,7 +910,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                 return True
-            if key == QtCore.Qt.Key.Key_Minus  or key == QtCore.Qt.Key.Key_Q:
+            if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
@@ -1386,7 +1386,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
         param:
-            catid : None to add to without category, catid to add to to category. """
+            catid : None to add to without category, catid to add to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec()
@@ -1430,7 +1430,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
-        If category deleted, sub-level items are retained.
+        If category deleted, sublevel items are retained.
         param:
             selected : QTreeWidgetItem """
 
@@ -1470,7 +1470,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. Sub-level items are retained.
+        and fill treeWidget. Sublevel items are retained.
         param:
             selected : QTreeWidgetItem """
 
@@ -1654,6 +1654,7 @@ class DialogViewImage(QtWidgets.QDialog):
     image_data = None
     pixmap = None
     scene = None
+    degrees = 0  # for rotation
 
     def __init__(self, app, image_data, parent=None):
         """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -1663,6 +1664,7 @@ class DialogViewImage(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.image_data = image_data
+        self.degrees = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
@@ -1715,6 +1717,8 @@ class DialogViewImage(QtWidgets.QDialog):
         scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = int(scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
+        transform = QtGui.QTransform().rotate(self.degrees)
+        pixmap = pixmap.transformed(transform)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -1747,4 +1751,14 @@ class DialogViewImage(QtWidgets.QDialog):
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
+            if key == QtCore.Qt.Key.Key_L:
+                self.degrees -= 90
+                if self.degrees < 0:
+                    self.degrees = 270
+                self.redraw_scene()
+            if key == QtCore.Qt.Key.Key_R:
+                self.degrees += 90
+                if self.degrees > 270:
+                    self.degrees = 0
+                self.redraw_scene()
         return False
