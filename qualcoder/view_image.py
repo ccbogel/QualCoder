@@ -90,6 +90,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     important = False  # Show/hide imporant flagged codes
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
+    degrees = 0  # for rotation
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -113,6 +114,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.selection = None
         self.important = False
         self.attributes = []
+        self.degrees = 0
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -623,6 +625,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by: select_image_menu, listwidgetitem_view_file
         """
 
+        self.degrees = 0
         self.ui.label_coded_area.setText("Coded area")
         self.ui.label_coded_area.setToolTip("")
         source = self.app.project_path + self.file_['mediapath']
@@ -690,6 +693,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = int(self.scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
+        transform = QtGui.QTransform().rotate(self.degrees)
+        pixmap = pixmap.transformed(transform)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -1697,6 +1702,8 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         self.ui.textEdit.setText(self.image_data['memo'])
+        tt = _("L rotate clockwise\nR rotate anti-clockwise\n+ - zoom in and out")
+        self.ui.graphicsView.setToolTip(tt)
 
         # Scale initial picture by height to mostly fit inside scroll area
         # Tried other methods e.g. sizes of components, but nothing was correct.
