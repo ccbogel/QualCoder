@@ -157,7 +157,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        #self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
@@ -686,7 +686,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def redraw_scene(self):
         """ Resize image. Triggered by user change in slider. Or resize or move of a coded area.
-        Also called by unmark, as all items need to be redrawn. """
+        Called by unmark, and Menu rotate action, as all items need to be redrawn. """
 
         if self.pixmap is None:
             return
@@ -700,7 +700,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
-        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+        scale_text = _("Scale: ") + str(int(self.scale * 100)) + "%"
+        self.ui.horizontalSlider.setToolTip(scale_text)
+        msg = _("Width") + ": " + str(self.pixmap.width()) + " " + _("Height") + ": " + str(self.pixmap.height()) + "\n"
+        msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
+        self.ui.label_code.setText(msg)
 
     def draw_coded_areas(self):
         """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
@@ -723,10 +727,26 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if item['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
+                # Degrees 0
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
                 width = item['width'] * self.scale
                 height = item['height'] * self.scale
+                if self.degrees == 90:
+                    y = (item['x1']) * self.scale
+                    x = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
+                    height = item['width'] * self.scale
+                    width = item['height'] * self.scale
+                if self.degrees == 180:
+                    x = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
+                    y = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
+                    width = item['width'] * self.scale
+                    height = item['height'] * self.scale
+                if self.degrees == 270:
+                    y = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
+                    x = (item['y1']) * self.scale
+                    height = item['width'] * self.scale
+                    width = item['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
                 rect_item.setToolTip(tooltip)
@@ -736,9 +756,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                     if not self.important:
                         self.scene.addItem(rect_item)
 
-    def fill_code_label(self):
-        """ Fill code label with currently selected item's code name. """
-
+    '''def fill_code_label(self):
+        """ Fill code label with currently selected item's code name.
+        Label also used for giving pixmap details on scaling or rotating. """
+        
         current = self.ui.treeWidget.currentItem()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.setText(_("NO CODE SELECTED"))
@@ -752,7 +773,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 palette.setColor(QtGui.QPalette.ColorRole.Window, code_color)
                 self.ui.label_code.setPalette(palette)
                 self.ui.label_code.setAutoFillBackground(True)
-                break
+                break'''
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -971,6 +992,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if not items:
             menu = QtWidgets.QMenu()
             menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            action_rotate = menu.addAction(_("Rotate clockwise"))
+            action_rotate_counter = menu.addAction(_("Rotate counter-clockwise"))
             action_hide_top_groupbox = None
             action_show_top_groupbox = None
             if self.ui.groupBox_2.isHidden():
@@ -984,6 +1007,16 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.ui.groupBox_2.setVisible(True)
             if action == action_hide_top_groupbox:
                 self.ui.groupBox_2.setVisible(False)
+            if action == action_rotate:
+                self.degrees += 90
+                if self.degrees > 270:
+                    self.degrees = 0
+                self.redraw_scene()
+            if action == action_rotate_counter:
+                self.degrees -= 90
+                if self.degrees < 0:
+                    self.degrees = 270
+                self.redraw_scene()
             return
         item = items[0]
         if len(items) > 1:
@@ -1072,6 +1105,15 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
+        # Reposition pos based on rotation
+        pix_h_scaled = self.pixmap.height() * self.scale
+        pix_w_scaled = self.pixmap.width() * self.scale
+        if self.degrees == 90:
+            pos = QtCore.QPointF(pos.y(), pix_h_scaled - pos.x())
+        if self.degrees == 180:
+            pos = QtCore.QPointF(pix_w_scaled - pos.x(), pix_h_scaled - pos.y())
+        if self.degrees == 270:
+            pos = QtCore.QPointF(pix_w_scaled - pos.y(), pos.x())
         items = []
         for item in self.code_areas:
             if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
@@ -1179,7 +1221,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         The point and width and height must be based on the original image size,
         so add in scale factor.
         param:
-            p1 : QPoint of mouse release """
+            p1 : QtCore.QPointF of mouse release """
 
         code_ = self.ui.treeWidget.currentItem()
         if code_ is None:
@@ -1188,10 +1230,26 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         cid = int(code_.text(1)[4:])  # must be integer
         code_name = code_.text(0)
+        pix_h_scaled = self.pixmap.height() * self.scale
+        pix_w_scaled = self.pixmap.width() * self.scale
+        width = p1.x() - self.selection.x()
+        height = p1.y() - self.selection.y()
         x = self.selection.x()
         y = self.selection.y()
-        width = p1.x() - x
-        height = p1.y() - y
+        # Reposition x and y and width, height based on rotation
+        if self.degrees == 90:
+            x = y
+            # Need to use the p1 x point (mouse release point) as the y low values are reversed on the right hand side
+            y = pix_h_scaled - p1.x()
+            width, height = height, width
+        if self.degrees == 180:
+            x = pix_w_scaled - p1.x()
+            y = pix_h_scaled - p1.y()
+        if self.degrees == 270:
+            y = x
+            # Need to use the p1 y point (mouse release point) as the y low values are reversed on the left hand side
+            x = pix_w_scaled - p1.y()
+            width, height = height, width
         if width < 0:
             x = x + width
             width = abs(width)
@@ -1203,8 +1261,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
                     self.selection = None
+                    print("outside")
                     return
-
         x_unscaled = round(x / self.scale)
         y_unscaled = round(y / self.scale)
         width_unscaled = round(width / self.scale)
@@ -1226,16 +1284,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         imid = cur.fetchone()[0]
         item['imid'] = imid
         self.code_areas.append(item)
-        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        color = None
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == int(cid):
-                color = QtGui.QColor(self.codes[i]['color'])
-        if color is None:
-            return
-        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
-        rect_item.setToolTip(code_.text(0))
-        self.scene.addItem(rect_item)
+        self.redraw_scene()
         self.selection = None
         self.app.delete_backup = False
         self.fill_code_counts_in_tree()
