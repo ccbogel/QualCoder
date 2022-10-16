@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_memo">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -50,9 +50,9 @@
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>50</x>
         <y>8</y>
-        <width>321</width>
+        <width>331</width>
         <height>21</height>
        </rect>
       </property>
@@ -60,17 +60,17 @@
        <string>Coder:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_code">
+     <widget class="QLabel" name="label_image">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>50</x>
         <y>45</y>
-        <width>381</width>
+        <width>341</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>Code:</string>
+       <string>Image details</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -143,6 +143,22 @@
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_export">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="4" column="0">
@@ -173,6 +189,9 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="topMargin">
+       <number>1</number>
+      </property>
       <item row="0" column="0">
        <widget class="QSplitter" name="splitter_2">
         <property name="orientation">
@@ -282,7 +301,7 @@
             <x>0</x>
             <y>0</y>
             <width>467</width>
-            <height>487</height>
+            <height>512</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
