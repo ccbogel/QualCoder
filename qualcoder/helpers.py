@@ -186,7 +186,9 @@ class DialogGetStartAndEndMarks(QtWidgets.QDialog):
 
 class DialogCodeInText(QtWidgets.QDialog):
     """ View the coded text in context of the original text file in a modal dialog.
-    Called by: reports.DialogReportCodes after results are produced
+
+    Called by: DialogCodeInAllFiles.show_context_of_clicked_heading,
+    reports.DialogReportCodes, when results are produced
     """
 
     app = None
@@ -382,7 +384,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
     """ View coded section in original image.
     Scalable and scrollable image. The slider values range from 10 to 99.
 
-    Called by: reports.DialogReportCodes after results are produced
+    Called by: DialogCodeInAllFiles.show_context_of_clicked_heading,
+    reports.DialogReportCodes, when results are produced
     """
 
     app = None
@@ -476,7 +479,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
 class DialogCodeInImage(QtWidgets.QDialog):
     """ View coded section in original image.
 
-    Called by: reports.DialogReportCodes, when results are produced
+    Called by: DialogCodeInAllFiles.show_context_of_clicked_heading,
+    reports.DialogReportCodes, when results are produced
     """
 
     app = None
@@ -485,6 +489,8 @@ class DialogCodeInImage(QtWidgets.QDialog):
     label = None
     scale = None
     scene = None
+    degrees = 0
+    export_key_timer = 0
 
     def __init__(self, app, data, parent=None):
         """ Image_data contains details to show the image and the coded section.
@@ -499,6 +505,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.app = app
         self.data = data
         self.scale = 1
+        self.export_key_timer = datetime.datetime.now()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
@@ -518,20 +525,15 @@ class DialogCodeInImage(QtWidgets.QDialog):
             return
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
+        tt = _("L rotate clockwise\nR rotate anti-clockwise\n+ - zoom in and out\nE Export Image")
+        self.ui.graphicsView.setToolTip(tt)
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.installEventFilter(self)
-
         self.pixmap = QtGui.QPixmap.fromImage(image)
-        self.pixmap = QtGui.QPixmap.fromImage(image)
-        pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
-        pixmap_item.setPos(0, 0)
-        self.scene.setSceneRect(QtCore.QRectF(0, 0, self.pixmap.width(), self.pixmap.height()))
-        self.scene.addItem(pixmap_item)
         self.ui.horizontalSlider.setValue(99)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         self.ui.scrollArea.setWidget(self.label)
-        self.ui.scrollArea.resize(self.pixmap.width(), self.pixmap.height())
-        self.ui.horizontalSlider.valueChanged[int].connect(self.change_scale)
+        self.ui.horizontalSlider.valueChanged[int].connect(self.draw_scene)
         # Scale initial picture by height to mostly fit inside scroll area
         # Tried other methods e.g. sizes of components, but nothing was correct.
         if self.pixmap.height() > self.height() - 30 - 80:  # slider 30 and textedit 80 heights
@@ -540,13 +542,14 @@ class DialogCodeInImage(QtWidgets.QDialog):
             if slider_value > 100:
                 slider_value = 100
             self.ui.horizontalSlider.setValue(slider_value)
-        self.draw_coded_area()
+        self.draw_scene()
 
     def draw_coded_area(self):
         """ Draw the coded rectangle in the scene.
          The coded memo can be in the data as ['memo'] if data from DialogCodeText, DialogCodeImage, DialogCodeAV
          It is in the data as ['coded memo'] if data from DialogReportCodes
-         DialogReportCodes can produce various memos on output: source memo, coded memo, codename memo
+         DialogReportCodes can produce various memos on output: source memo, coded memo, codename memo.
+         Called by: draw_scene
          """
 
         tooltip = self.data['codename']
@@ -558,43 +561,66 @@ class DialogCodeInImage(QtWidgets.QDialog):
             tooltip += "\nMemo: " + self.data['coded memo']
         except KeyError:
             pass
+
+        # Degrees 0
         x = self.data['x1'] * self.scale
         y = self.data['y1'] * self.scale
         width = self.data['width'] * self.scale
         height = self.data['height'] * self.scale
+        if self.degrees == 90:
+            y = (self.data['x1']) * self.scale
+            x = (self.pixmap.height() - self.data['y1'] - self.data['height']) * self.scale
+            height = self.data['width'] * self.scale
+            width = self.data['height'] * self.scale
+        if self.degrees == 180:
+            x = (self.pixmap.width() - self.data['x1'] - self.data['width']) * self.scale
+            y = (self.pixmap.height() - self.data['y1'] - self.data['height']) * self.scale
+            width = self.data['width'] * self.scale
+            height = self.data['height'] * self.scale
+        if self.degrees == 270:
+            y = (self.pixmap.width() - self.data['x1'] - self.data['width']) * self.scale
+            x = (self.data['y1']) * self.scale
+            height = self.data['width'] * self.scale
+            width = self.data['height'] * self.scale
+
         rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
         rect_item.setPen(QtGui.QPen(QtGui.QColor(self.data['color']), 2, QtCore.Qt.PenStyle.DashLine))
         rect_item.setToolTip(tooltip)
         self.scene.addItem(rect_item)
 
-    def change_scale(self):
-        """ Resize image. Triggered by user change in slider.
-        Also called by unmark, as all items need to be redrawn. """
+    def draw_scene(self):
+        """ Resize image. Triggered by user change in slider or + - keys
+        Called by: draw_scene
+        """
 
         if self.pixmap is None:
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = int(self.scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
+        transform = QtGui.QTransform().rotate(self.degrees)
+        pixmap = pixmap.transformed(transform)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
+        self.scene.setSceneRect(QtCore.QRectF(0, 0, pixmap.width(), pixmap.height()))
+        self.ui.scrollArea.resize(pixmap.width(), pixmap.height())
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_area()
+        self.ui.graphicsView.update()
         msg = _("Key + or W zoom in. Key - or Q zoom out") + "\n"
         msg += _("Scale: ") + str(int(self.scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
     def eventFilter(self, object, event):
-        """ Using this event filter to identify treeWidgetItem drop events.
-        http://doc.qt.io/qt-5/qevent.html#Type-enum
-        QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
-        https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
-        Also use eventFilter for QGraphicsView.
+        """ Using this event filter for QGraphicsView.
 
         Key events on scene
-        minus reduce the scale
-        plus increase the scale
+        - reduce the scale
+        + increase the scale
+        L rotate left
+        R rotate right
+        E Export image
         """
 
         if type(event) == QtGui.QKeyEvent:
@@ -614,4 +640,47 @@ class DialogCodeInImage(QtWidgets.QDialog):
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
+            if key == QtCore.Qt.Key.Key_R:
+                self.degrees -= 90
+                if self.degrees < 0:
+                    self.degrees = 270
+                self.draw_scene()
+                return True
+            if key == QtCore.Qt.Key.Key_L:
+                self.degrees += 90
+                if self.degrees > 270:
+                    self.degrees = 0
+                self.draw_scene()
+                return True
+            if key == QtCore.Qt.Key.Key_E:
+                # Prevent E key event double-activating
+                now = datetime.datetime.now()
+                overlap_diff = now - self.export_key_timer
+                if overlap_diff.total_seconds() > 2:
+                    self.export_image()
+                self.export_key_timer = datetime.datetime.now()
+                return True
         return False
+
+    def export_image(self):
+        """ Export the QGraphicsScene as a png image with transparent background.
+        Called by QButton_export.
+        """
+
+        filename = "Image_with_code.png"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
+            return
+        width = self.scene.sceneRect().width()
+        height = self.scene.sceneRect().height()
+        rect_area = QtCore.QRectF(0.0, 0.0, width, height)
+        image = QtGui.QImage(int(width), int(height), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # Render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
+        painter.end()
+        image.setText("Description", self.data['codename'])
+        image.save(filepath)
+        Message(self.app, _("Image exported"), filepath).exec()
