@@ -28,6 +28,7 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+import html
 import logging
 import os
 from random import randint
@@ -47,7 +48,7 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
-from .helpers import Message
+from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -134,8 +135,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        self.ui.label_code.setStyleSheet(tree_font)  # usually smaller font
-        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
+        self.ui.label_image.setStyleSheet(tree_font)  # Usually smaller font
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
@@ -145,6 +145,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_memo.setEnabled(False)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.pressed.connect(self.export_html_file)
+        self.ui.pushButton_export.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -157,7 +162,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        #self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
@@ -642,6 +646,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.scene.removeItem(items[i])
         self.setWindowTitle(_("Image: ") + self.file_['name'])
         self.ui.pushButton_memo.setEnabled(True)
+        self.ui.pushButton_export.setEnabled(True)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
         pixmap_item.setPos(0, 0)
@@ -704,7 +709,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.setToolTip(scale_text)
         msg = _("Width") + ": " + str(self.pixmap.width()) + " " + _("Height") + ": " + str(self.pixmap.height()) + "\n"
         msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
-        self.ui.label_code.setText(msg)
+        self.ui.label_image.setText(msg)
 
     def draw_coded_areas(self):
         """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
@@ -756,24 +761,77 @@ class DialogCodeImage(QtWidgets.QDialog):
                     if not self.important:
                         self.scene.addItem(rect_item)
 
-    '''def fill_code_label(self):
-        """ Fill code label with currently selected item's code name.
-        Label also used for giving pixmap details on scaling or rotating. """
-        
-        current = self.ui.treeWidget.currentItem()
-        if current.text(1)[0:3] == 'cat':
-            self.ui.label_code.setText(_("NO CODE SELECTED"))
+    def export_html_file(self):
+        """ Export the QGraphicsScene as a png image with transparent background.
+               Called by QButton_export.
+               """
+
+        filename = self.file_['name'].replace(".", "_") + ".html"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
             return
-        self.ui.label_code.setText(_("Code: ") + current.text(0))
-        # update background colour of label
-        for c in self.codes:
-            if current.text(0) == c['name']:
-                palette = self.ui.label_code.palette()
-                code_color = QtGui.QColor(c['color'])
-                palette.setColor(QtGui.QPalette.ColorRole.Window, code_color)
-                self.ui.label_code.setPalette(palette)
-                self.ui.label_code.setAutoFillBackground(True)
-                break'''
+        pic_width = self.pixmap.width() * self.scale  # self.scene.sceneRect().width()
+        pic_height = self.pixmap.height() * self.scale  # self.scene.sceneRect().height()
+        if self.degrees in (90, 270):
+            pic_width, pic_height = pic_height, pic_width
+        rect_area = QtCore.QRectF(0.0, 0.0, pic_width, pic_height)
+        image = QtGui.QImage(int(pic_width), int(pic_height), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # Render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
+        painter.end()
+        # Convert to base64 as String not bytes
+        byte_array = QtCore.QByteArray()
+        buffer = QtCore.QBuffer(byte_array)
+        buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+        image.save(buffer, 'PNG')
+        base64_string = byte_array.toBase64().data().decode("UTF-8")
+        # Create html file
+        h = "<!DOCTYPE html>\n<html>\n<head>\n<title>Coded Image</title>\n</head>\n"
+        h += "<body>\n<div>\n"
+        h += "<h1>" + html.escape(filename) + "</h1>\n"
+        h += '<img src="data:image/png;base64,' + base64_string + '" usemap="#coded_areas" />'
+        # Create image map
+        h += "<map name='coded_areas'>\n"
+        for c in self.code_areas:
+            # Coordinates are x1,y1 to x2,y2 for a rectangle. Adjust for scale and rotation.
+            # Degrees 0
+            x1 = c['x1'] * self.scale
+            y1 = c['y1'] * self.scale
+            x2 = x1 + c['width'] * self.scale
+            y2 = y1 + c['height'] * self.scale
+            if self.degrees == 90:
+                y1 = (c['x1']) * self.scale
+                x1 = (self.pixmap.height() - c['y1'] - c['height']) * self.scale
+                y2 = y1 + c['width'] * self.scale
+                x2 = x1 + c['height'] * self.scale
+            if self.degrees == 180:
+                x1 = (self.pixmap.width() - c['x1'] - c['width']) * self.scale
+                y1 = (self.pixmap.height() - c['y1'] - c['height']) * self.scale
+                x2 = x1 + c['width'] * self.scale
+                y2 = y1 + c['height'] * self.scale
+            if self.degrees == 270:
+                y1 = (self.pixmap.width() - c['x1'] - c['width']) * self.scale
+                x1 = (c['y1']) * self.scale
+                y2 = y1 + c['width'] * self.scale
+                x2 = x1 + c['height'] * self.scale
+            tag = '<area shape="rect" coords="' + str(x1) + "," + str(y1) + ","
+            tag += str(x2) + "," + str(y2) + '" '
+            tag += 'title="' + html.escape(c['name'])
+            if c['memo'] != "":
+                tag += html.escape('\n' + c['memo'])
+            tag += '" href="#1" >\n'
+            h += tag
+        h += "</map>\n"
+        if self.file_['memo'] != "":
+            h += '<h2>Image memo</h2>\n'
+            h += '<p>' + html.escape(self.file_['memo']) + '</p>\n'
+        h += "</div>\n</body>\n</html>"
+        with open(filepath, 'w', encoding='utf-8-sig') as f:
+            f.write(h)
+        Message(self.app, _("Image exported"), filepath).exec()
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -1788,6 +1846,7 @@ class DialogViewImage(QtWidgets.QDialog):
         """ Using this event filter to apply key events.
         Key events on scene
         + and- keys
+        L and R rotation
         """
 
         # Hide / unHide top groupbox
