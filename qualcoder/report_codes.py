@@ -47,7 +47,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
-import vlc  # qualcoder.vlc as vlc
+import vlc
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -81,8 +81,9 @@ class DialogReportCodes(QtWidgets.QDialog):
     categories = []
     files = []
     cases = []
-    html_links = []  # For html output with media link (images, av)
     results = []
+    # html results need media links {imagename, QImage, avname, av0, av1, avtext}
+    html_links = []
     te = []  # Matrix (table) [row][col] of textEditWidget results
     # Variables for search restrictions
     file_ids = ""
@@ -1820,7 +1821,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if img['mediapath'][0:7] == "images:":
             imagename = str(counter) + '-' + "/images/" + img['mediapath'].split('/')[-1]
         # imagename is now: 0-/images/filename.jpg  # where 0- is the counter 1-, 2- etc
-
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         cursor = text_edit.textCursor()
@@ -1903,6 +1903,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.textEdit.toPlainText() == "":
             return
         cursor_context_pos = self.ui.textEdit.cursorForPosition(position)
+        # This bit to get image details for 180 degree rotation
+        # https://stackoverflow.com/questions/18700945/qtextbrowser-how-to-identify-image-from-mouse-click-position
+        fmt = cursor_context_pos.charFormat()
+        img_fmt = None
+        html_link = None
+        if fmt.isImageFormat():
+            img_fmt = fmt.toImageFormat()  # QtGui.QTextImageFormat
+            #print("name", img_fmt.name(), img_fmt.height(), img_fmt.width())
+            for h in self.html_links:
+                if h['imagename'] == img_fmt.name():
+                    html_link = h
+                    break
+
         pos = cursor_context_pos.position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
@@ -1912,8 +1925,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_view = None
         found = None
         for row in self.results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
-                found = True
+            if row['textedit_start'] <= pos < row['textedit_end']:
+                found = row
                 break
         if found:
             action_view = menu.addAction(_("View in context"))
@@ -1921,6 +1934,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_all = menu.addAction(_("Copy all to clipboard"))
+        action_rotate_180 = None
+        if img_fmt:
+            action_rotate_180 = menu.addAction(_("Rotate image 180 degrees"))
         action_hide_top_groupbox = None
         action_show_top_groupbox = None
         if self.ui.groupBox.isHidden():
@@ -1943,17 +1959,38 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.groupBox.setVisible(True)
         if action == action_hide_top_groupbox:
             self.ui.groupBox.setVisible(False)
+        if action == action_rotate_180:
+            self.rotate_image(img_fmt, html_link, 180)
+
+    def rotate_image(self, img_fmt, html_link, degrees):
+        """  Rotate image 180 degrees.
+        Tried to do 90 and 270 degree rotations but could not update the image format width and height.
+        param:
+            TextImage Format img_fmt
+            Dictionary html_link {imagename, image:QImage, avname, av0, av1, avtext}
+        """
+
+        #print(img_fmt.height(), img_fmt.width(), html_link)
+        document = self.ui.textEdit.document()
+        url = QtCore.QUrl(img_fmt.name())  # Location in document
+        image = html_link['image']
+        transform = QtGui.QTransform().rotate(degrees)
+        image = image.transformed(transform)
+        html_link['image'] = image
+        img_fmt.setHeight(image.height())
+        img_fmt.setWidth(image.width())
+        document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
 
     def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
         Called by: textEdit.cursorPositionChanged, after results are filled.
-        text/image/av results contain textedit_start and textedit_end which map the cursor position to the specific result.
+        text/image/av results contain textedit_start and textedit_end which map the cursor position to the result.
         Called by context menu.
         """
 
         pos = cursor_context_pos.position()
         for row in self.results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 if row['result_type'] == 'text':
                     ui = DialogCodeInText(self.app, row)
                     ui.exec()
