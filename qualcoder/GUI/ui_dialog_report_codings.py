@@ -104,8 +104,6 @@ class Ui_Dialog_reportCodings(object):
         self.comboBox_sort.setGeometry(QtCore.QRect(10, 80, 91, 30))
         self.comboBox_sort.setObjectName("comboBox_sort")
         self.comboBox_sort.addItem("")
-        self.comboBox_sort.setItemText(0, "")
-        self.comboBox_sort.addItem("")
         self.comboBox_sort.addItem("")
         self.comboBox_sort.addItem("")
         self.comboBox_sort.addItem("")
@@ -173,10 +171,10 @@ class Ui_Dialog_reportCodings(object):
         self.label_search_results.setText(_translate("Dialog_reportCodings", "Search Results for:"))
         self.pushButton_search_next.setToolTip(_translate("Dialog_reportCodings", "Search for next occurence in results"))
         self.comboBox_sort.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Results sort order.</p><p>Set this before running results.</p></body></html>"))
-        self.comboBox_sort.setItemText(1, _translate("Dialog_reportCodings", "A - z"))
-        self.comboBox_sort.setItemText(2, _translate("Dialog_reportCodings", "Z - a"))
-        self.comboBox_sort.setItemText(3, _translate("Dialog_reportCodings", "10 - 1"))
-        self.comboBox_sort.setItemText(4, _translate("Dialog_reportCodings", "1 - 10"))
+        self.comboBox_sort.setItemText(0, _translate("Dialog_reportCodings", "A - z"))
+        self.comboBox_sort.setItemText(1, _translate("Dialog_reportCodings", "Z - a"))
+        self.comboBox_sort.setItemText(2, _translate("Dialog_reportCodings", "10 - 1"))
+        self.comboBox_sort.setItemText(3, _translate("Dialog_reportCodings", "1 - 10"))
 
 
 if __name__ == "__main__":
