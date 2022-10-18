@@ -124,7 +124,7 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>280</x>
         <y>84</y>
         <width>24</width>
         <height>24</height>
@@ -140,7 +140,7 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>310</x>
         <y>81</y>
         <width>91</width>
         <height>30</height>
@@ -348,6 +348,44 @@
       <property name="text">
        <string/>
       </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_sort">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>80</y>
+        <width>91</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Results sort order&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>html</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>odt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>csv</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </item>
