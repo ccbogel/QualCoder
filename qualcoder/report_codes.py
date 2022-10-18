@@ -1412,8 +1412,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                     tmp.append(r)
             self.results = tmp
 
-        # Organise results by code name, ascending
-        self.results = sorted(self.results, key=lambda i_: i_['codename'])
+        # Organise results
+        self.sort_search_results()
         self.fill_text_edit_with_search_results()
         # Clean up for next search. Except attributes list
         self.attribute_file_ids = []
@@ -1422,6 +1422,49 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         del prog_dialog
+
+    def sort_search_results(self):
+        """ Sort results by alphabet or by code count, ascending or descending. """
+
+        sort_by = self.ui.comboBox_sort.currentText()
+        if sort_by == "A - z":
+            self.results = sorted(self.results, key=lambda i_: i_['codename'])
+            return
+        if sort_by == "Z - a":
+            self.results = sorted(self.results, key=lambda i_: i_['codename'], reverse=True)
+            return
+
+        # Order code names by frequency
+        # Get unique code names
+        tmp_names = []
+        for r in self.results:
+            tmp_names.append(r['codename'])
+        codenames = list(set(tmp_names))
+        # Create list dictionary of code name and code count
+        name_and_count = []
+        for codename in codenames:
+            count = 0
+            for r in self.results:
+                if r['codename'] == codename:
+                    count += 1
+            name_and_count.append({'codename': codename, 'count': count})
+        tmp_results = []
+        if sort_by == "1 - 10":
+            small_to_large = sorted(name_and_count, key=lambda d: d['count'])
+            for s in small_to_large:
+                for r in self.results:
+                    if s['codename'] == r['codename']:
+                        tmp_results.append(r)
+            self.results = tmp_results
+            return
+        if sort_by == "10 - 1":
+            large_to_small = sorted(name_and_count, key=lambda  d: d['count'], reverse=True)
+            for s in large_to_small:
+                for r in self.results:
+                    if s['codename'] == r['codename']:
+                        tmp_results.append(r)
+            self.results = tmp_results
+            return
 
     def get_prettext_and_posttext(self):
         """ Get surrounding text 200 characters.

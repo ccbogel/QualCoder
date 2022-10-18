@@ -69,7 +69,7 @@
      <widget class="QPushButton" name="pushButton_search">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>110</x>
         <y>80</y>
         <width>30</width>
         <height>30</height>
@@ -108,7 +108,7 @@
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>200</x>
         <y>81</y>
         <width>34</width>
         <height>30</height>
@@ -124,7 +124,7 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>240</x>
         <y>84</y>
         <width>24</width>
         <height>24</height>
@@ -140,7 +140,7 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>270</x>
         <y>81</y>
         <width>91</width>
         <height>30</height>
@@ -348,6 +348,39 @@
       <property name="text">
        <string/>
       </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_sort">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>91</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>A - z</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Z - a</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 - 1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1 - 10</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </item>
