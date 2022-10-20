@@ -82,7 +82,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     files = []
     cases = []
     results = []
-    # html results need media links {imagename, QImage, avname, av0, av1, avtext}
+    # html results need media links {imagename, QImage, char_pos, avname, av0, av1, avtext}
     html_links = []
     te = []  # Matrix (table) [row][col] of textEditWidget results
     # Variables for search restrictions
@@ -1849,10 +1849,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
-        if image.width() > 300:
-            scaler_w = 300 / image.width()
-        if image.height() > 300:
-            scaler_h = 300 / image.height()
+        if image.width() > 400:
+            scaler_w = 400 / image.width()
+        if image.height() > 400:
+            scaler_h = 400 / image.height()
         if scaler_w < scaler_h:
             scaler = scaler_w
         else:
@@ -1867,14 +1867,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         cursor = text_edit.textCursor()
+        char_pos = cursor.position()
         image_format = QtGui.QTextImageFormat()
         image_format.setWidth(image.width() * scaler)
         image_format.setHeight(image.height() * scaler)
         image_format.setName(url.toString())
         cursor.insertImage(image_format)
         text_edit.insertHtml("<br />")
-        self.html_links.append({'imagename': imagename, 'image': image,
-                                'avname': None, 'av0': None, 'av1': None, 'avtext': None})
+        self.html_links.append({'imagename': imagename, 'image': image, 'image_char_pos': char_pos, 'avname': None,
+                                'av0': None, 'av1': None, 'avtext': None})
         if img['coded_memo'] != "":
             text_edit.insertPlainText(_("MEMO: ") + img['coded_memo'] + "\n")
 
@@ -1946,7 +1947,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.ui.textEdit.toPlainText() == "":
             return
         cursor_context_pos = self.ui.textEdit.cursorForPosition(position)
-        # This bit to get image details for 180 degree rotation
+        # This bit to get image details for  rotation
         # https://stackoverflow.com/questions/18700945/qtextbrowser-how-to-identify-image-from-mouse-click-position
         fmt = cursor_context_pos.charFormat()
         img_fmt = None
@@ -1979,7 +1980,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_copy_all = menu.addAction(_("Copy all to clipboard"))
         action_rotate_180 = None
         if img_fmt:
-            action_rotate_180 = menu.addAction(_("Rotate image 180 degrees"))
+            action_rotate_180 = menu.addAction(_("Rotate image 90 degrees"))
         action_hide_top_groupbox = None
         action_show_top_groupbox = None
         if self.ui.groupBox.isHidden():
@@ -2003,9 +2004,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action == action_hide_top_groupbox:
             self.ui.groupBox.setVisible(False)
         if action == action_rotate_180:
-            self.rotate_image(img_fmt, html_link, 180)
+            self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
 
-    def rotate_image(self, img_fmt, html_link, degrees):
+    def rotate_image(self, cursor_context_pos, img_fmt, html_link, degrees):
         """  Rotate image 180 degrees.
         Tried to do 90 and 270 degree rotations but could not update the image format width and height.
         param:
@@ -2013,16 +2014,32 @@ class DialogReportCodes(QtWidgets.QDialog):
             Dictionary html_link {imagename, image:QImage, avname, av0, av1, avtext}
         """
 
-        #print(img_fmt.height(), img_fmt.width(), html_link)
         document = self.ui.textEdit.document()
         url = QtCore.QUrl(img_fmt.name())  # Location in document
         image = html_link['image']
         transform = QtGui.QTransform().rotate(degrees)
         image = image.transformed(transform)
         html_link['image'] = image
-        img_fmt.setHeight(image.height())
-        img_fmt.setWidth(image.width())
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
+        scaler_w = 1.0
+        scaler_h = 1.0
+        if image.width() > 400:
+            scaler_w = 400 / image.width()
+        if image.height() > 400:
+            scaler_h = 400 / image.height()
+        if scaler_w < scaler_h:
+            scaler = scaler_w
+        else:
+            scaler = scaler_h
+        img_fmt.setWidth(image.width() * scaler)
+        img_fmt.setHeight(image.height() * scaler)
+        # Image is locate at a one character position, remove and replace with the new image
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(html_link['image_char_pos'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(html_link['image_char_pos'] + 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        cursor.removeSelectedText()
+        cursor_context_pos.insertImage(img_fmt)
 
     def show_context_from_text_edit(self, cursor_context_pos):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
