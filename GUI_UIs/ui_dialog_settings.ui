@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>721</width>
+    <width>786</width>
     <height>619</height>
    </rect>
   </property>
@@ -242,9 +242,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>384</y>
-     <width>900</width>
-     <height>23</height>
+     <y>376</y>
+     <width>461</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -258,7 +258,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>417</y>
+     <y>410</y>
      <width>691</width>
      <height>91</height>
     </rect>
@@ -304,9 +304,9 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>390</x>
      <y>277</y>
-     <width>151</width>
+     <width>201</width>
      <height>21</height>
     </rect>
    </property>
@@ -323,7 +323,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_speaker">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>610</x>
      <y>270</y>
      <width>71</width>
      <height>28</height>
@@ -397,14 +397,14 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_backups_to_keep">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>347</y>
-     <width>151</width>
-     <height>61</height>
+     <x>466</x>
+     <y>380</y>
+     <width>161</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Number of auto-backups to keep</string>
+    <string>Number of backups</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -417,7 +417,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>635</x>
-     <y>384</y>
+     <y>380</y>
      <width>48</width>
      <height>26</height>
     </rect>
@@ -478,9 +478,9 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>356</x>
+     <x>360</x>
      <y>315</y>
-     <width>161</width>
+     <width>211</width>
      <height>24</height>
     </rect>
    </property>
@@ -497,7 +497,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_text_chunk_size">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>580</x>
      <y>314</y>
      <width>101</width>
      <height>28</height>
