@@ -505,6 +505,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if text_ == "csv":
             self.export_csv_file()
         self.ui.comboBox_export.setCurrentIndex(0)
+        #TODO
         if self.te:
             reply = QtWidgets.QMessageBox.question(self, _("Export Matrix"), _("Export matrix results"),
                                                    QtWidgets.QMessageBox.StandardButton.Yes,
@@ -1121,10 +1122,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             file_or_case = "File"
         if self.case_ids != "":
             file_or_case = "Case"
-        # Add search terms to textEdit
+
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
-
+        self.te = []
+        # Add search terms to textEdit
         if memo_choice == "Only memos":
             self.ui.textEdit.insertPlainText(_("Only memos shown. Coded data not shown.") + "\n")
         if memo_choice == "Only coded memos":
