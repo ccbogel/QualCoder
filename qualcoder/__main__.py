@@ -585,7 +585,7 @@ class App(object):
             'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
-            'fontsize': 12,
+            'fontsize': 14,
             'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
@@ -1760,23 +1760,28 @@ class MainWindow(QtWidgets.QMainWindow):
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Updating database to version") + " v6")
         # Database v7
+        db7_update = False
         try:
             cur.execute("select memo_ctid from gr_free_text_item")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE gr_free_text_item ADD memo_ctid integer')
             self.app.conn.commit()
+            db7_update = True
         try:
             cur.execute("select memo_imid from gr_free_text_item")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE gr_free_text_item ADD memo_imid integer')
             self.app.conn.commit()
+            db7_update = True
         try:
             cur.execute("select memo_avid from gr_free_text_item")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE gr_free_text_item ADD memo_avid integer')
             self.app.conn.commit()
-        cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
-        self.ui.textEdit.append(_("Updating database to version") + " v7")
+            db7_update = True
+        if db7_update:
+            cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
+            self.ui.textEdit.append(_("Updating database to version") + " v7")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
