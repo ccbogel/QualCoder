@@ -128,9 +128,9 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>330</x>
         <y>15</y>
-        <width>141</width>
+        <width>161</width>
         <height>21</height>
        </rect>
       </property>
@@ -224,22 +224,6 @@ Key shortcut: Ctrl S</string>
       </property>
       <property name="text">
        <string>1.0x</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_time_3">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>12</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_rewind_30">
