@@ -977,7 +977,7 @@ class ViewGraph(QDialog):
             return
         # Scene size is too big.
         max_x, max_y = self.scene.suggested_scene_size()
-        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)  # Source area
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 10, max_y + 10)  # Source area
         image = QtGui.QImage(int(max_x + 10), int(max_y + 10), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
