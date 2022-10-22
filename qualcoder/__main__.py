@@ -585,7 +585,7 @@ class App(object):
             'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
-            'fontsize': 14,
+            'fontsize': 12,
             'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
