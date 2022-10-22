@@ -177,9 +177,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
-        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
         self.ui.label_volume.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         # Buttons need to be 36x36 pixels for 32x32 icons
