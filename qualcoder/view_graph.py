@@ -977,11 +977,11 @@ class ViewGraph(QDialog):
             return
         # Scene size is too big.
         max_x, max_y = self.scene.suggested_scene_size()
-        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 10, max_y + 10)
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 5, max_y + 5)  # Source area
         image = QtGui.QImage(int(max_x + 10), int(max_y + 10), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        # Render method requires QRectF NOT QRect
+        # Render method requires QRectF NOT QRect. painter, target area, source area
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
         painter.end()
         image.save(filepath)
@@ -2774,7 +2774,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         if path_[0:7] == "images:":
             abs_path_ = path_[7:]
         image = QtGui.QImageReader(abs_path_).read()
-        image = image.copy(px, py, pwidth, pheight)
+        image = image.copy(int(px), int(py), int(pwidth), int(pheight))
         # Scale to max 200 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
         scaler_h = 1.0
