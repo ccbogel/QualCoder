@@ -737,7 +737,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected.text(1)[0:3] == 'cat':
             for c in self.categories:
                 if c['catid'] == int(selected.text(1)[6:]):
-                    txt += (c['memo'])
+                    if c['memo'] is not None:
+                        txt += c['memo']
                     break
             self.ui.textEdit_info.hide()
         else:  # Code is selected
