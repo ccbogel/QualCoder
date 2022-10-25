@@ -881,7 +881,13 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if isinstance(item, TextGraphicsItem):
                 names_and_groups.append({'name': item.text, 'group': _('Code or Category')})
-            if isinstance(item, FreeTextGraphicsItem):
+            if isinstance(item, FreeTextGraphicsItem) and item.ctid > -1:
+                names_and_groups.append({'name': item.text, 'group': _('Coded text item')})
+            if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and (item.memo_ctid is not None or
+                item.memo_imid is not None or item.memo_avid is not None):
+                names_and_groups.append({'name': item.text, 'group': _('Memo text item')})
+            if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_ctid is None and \
+                    item.memo_imid is None and item.memo_avid is None:
                 names_and_groups.append({'name': item.text, 'group': _('Free text item')})
             if isinstance(item, FileTextGraphicsItem):
                 names_and_groups.append({'name': item.text, 'group': _('File item')})
