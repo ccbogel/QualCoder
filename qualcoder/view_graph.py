@@ -728,7 +728,6 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            #if item.text == r[6]:
                             if item.memo_imid is not None and item.memo_imid == r[7]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
@@ -782,11 +781,8 @@ class ViewGraph(QDialog):
         """ Add one or more free lines from an item to one or more destination items. """
 
         # From item selection
-        texts = self.graphics_items_text()
-        texts_dict_list = []
-        for t in texts:
-            texts_dict_list.append({'name': t})
-        ui = DialogSelectItems(self.app, texts_dict_list, _("Line start item"), "single")
+        texts_and_groups = self.graphics_items_text_and_group()
+        ui = DialogSelectItems(self.app, texts_and_groups, _("Line start item"), "single")
         ok = ui.exec()
         if not ok:
             return
@@ -802,11 +798,11 @@ class ViewGraph(QDialog):
                 if item.text == text_from:
                     from_item = item
         # To Items selection, remove the from item, and remove matching text items
-        texts_dict_list.remove(selected)
-        for i in texts_dict_list[:]:
+        texts_and_groups.remove(selected)
+        for i in texts_and_groups[:]:
             if i['name'] == text_from:
-                texts_dict_list.remove(i)
-        ui = DialogSelectItems(self.app, texts_dict_list, _("Line end item(s)"), "multi")
+                texts_and_groups.remove(i)
+        ui = DialogSelectItems(self.app, texts_and_groups, _("Line end item(s)"), "multi")
         ok = ui.exec()
         if not ok:
             return
@@ -864,29 +860,39 @@ class ViewGraph(QDialog):
         text_, ok = QtWidgets.QInputDialog.getText(self, _('Text object'), _('Enter text:'))
         if not ok:
             return
-        texts = self.graphics_items_text()
-        if text_ in texts:
-            Message(self.app, _("Warning"), _("Another item has this exact text")).exec()
-            return
+        texts = self.graphics_items_text_and_group()
+        for t in texts:
+            if text_ == t['name']:
+                Message(self.app, _("Warning"), _("Another item has this exact text")).exec()
+                return
         item = FreeTextGraphicsItem(self.app, freetextid, x, y, text_)
         self.scene.addItem(item)
 
-    def graphics_items_text(self):
+    def graphics_items_text_and_group(self):
         """ Used to get a list of all FreeText and Case and File graphics items text.
-         Use to show text in a dialog, to allow links between these items.
-         Called by: add_lines_to_graph
+        Adds a group key to be able to groups the text items for the selection dialog.
+        Use to show text in a dialog, to allow links between these items.
+        Called by: add_lines_to_graph, add_text_item_to_graph
 
-         return: names : List of Strings
+         return: names_groups : List of Dictionaries of Name Strings, Group strings
          """
 
-        texts = []
+        names_and_groups = []
         for item in self.scene.items():
-            if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-                    isinstance(item, FileTextGraphicsItem) or isinstance(item, CaseTextGraphicsItem) or \
-                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
-                texts.append(item.text)
-        texts.sort()
-        return texts
+            if isinstance(item, TextGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('Code or Category')})
+            if isinstance(item, FreeTextGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('Free text item')})
+            if isinstance(item, FileTextGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('File item')})
+            if isinstance(item, CaseTextGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('Case item')})
+            if isinstance(item, PixmapGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('Image item')})
+            if isinstance(item, AVGraphicsItem):
+                names_and_groups.append({'name': item.text, 'group': _('AV item')})
+        names_and_groups = sorted(names_and_groups, key=lambda d: d['name'])
+        return names_and_groups
 
     def add_files_to_graph(self):
         """ Add Text file items to graph. """
