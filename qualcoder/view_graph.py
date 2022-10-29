@@ -880,75 +880,50 @@ class ViewGraph(QDialog):
         names_and_groups = []
         cur = self.app.conn.cursor()
 
-
-        # By file
+        # By code
         for item in self.scene.items():
             if isinstance(item, FreeTextGraphicsItem) and item.ctid > -1:
-                cur.execute("select source.name from source join code_text on code_text.fid=source.id where ctid=?",
+                cur.execute("select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
                             [item.ctid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_ctid is not None:
-                cur.execute("select source.name from source join code_text on code_text.fid=source.id where ctid=?",
+                cur.execute("select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
                             [item.memo_ctid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_imid is not None:
-                cur.execute("select source.name from source join code_image on code_image.id=source.id where imid=?",
+                cur.execute("select code_name.name from source join code_image on code_image.cid=code_name.cid where imid=?",
                             [item.memo_imid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_avid is not None:
-                cur.execute("select source.name from source join code_av on code_av.id=source.id where avid=?",
+                cur.execute("select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
                             [item.memo_avid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
-            if isinstance(item, FileTextGraphicsItem):
-                cur.execute("select source.name from source where id=?", [item.file_id])
-                res = cur.fetchone()[0]
-                names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, PixmapGraphicsItem):
-                cur.execute("select source.name from source join code_image on code_image.id=source.id where imid=?",
+                cur.execute("select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
                             [item.imid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, AVGraphicsItem):
-                cur.execute("select source.name from source join code_av on code_av.id=source.id where avid=?",
+                print(item, item.avid)
+                cur.execute("select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
                             [item.avid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
-
             if isinstance(item, TextGraphicsItem):
-                names_and_groups.append({'name': item.text, 'group': _('Code or Category')})
+                names_and_groups.append({'name': item.text, 'group': item.text})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_ctid is None and \
                     item.memo_imid is None and item.memo_avid is None:
                 names_and_groups.append({'name': item.text, 'group': _('Free text item')})
             if isinstance(item, CaseTextGraphicsItem):
                 names_and_groups.append({'name': item.text, 'group': _('Case item')})
-        names_and_groups = sorted(names_and_groups, key=lambda d: d['name'])
-        # By item type
-        '''for item in self.scene.items():
-            if isinstance(item, FreeTextGraphicsItem) and item.ctid > -1:
-                names_and_groups.append({'name': item.text, 'group': _('Coded text item')})
-            if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and (item.memo_ctid is not None or
-                item.memo_imid is not None or item.memo_avid is not None):
-                names_and_groups.append({'name': item.text, 'group': _('Memo text item')})
             if isinstance(item, FileTextGraphicsItem):
                 names_and_groups.append({'name': item.text, 'group': _('File item')})
-            if isinstance(item, PixmapGraphicsItem):
-                names_and_groups.append({'name': item.text, 'group': _('Image item')})
-            if isinstance(item, AVGraphicsItem):
-                names_and_groups.append({'name': item.text, 'group': _('AV item')})
-                
-            if isinstance(item, TextGraphicsItem):
-                names_and_groups.append({'name': item.text, 'group': _('Code or Category')})
-            if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_ctid is None and \
-                    item.memo_imid is None and item.memo_avid is None:
-                names_and_groups.append({'name': item.text, 'group': _('Free text item')})
-            if isinstance(item, CaseTextGraphicsItem):
-                names_and_groups.append({'name': item.text, 'group': _('Case item')})'''
-        names_and_groups = sorted(names_and_groups, key=lambda d: d['name'])
-        return names_and_groups
+        sorted_names_and_groups = sorted(names_and_groups, key=lambda d: d['name'])
+        return sorted_names_and_groups
 
     def add_files_to_graph(self):
         """ Add Text file items to graph. """
