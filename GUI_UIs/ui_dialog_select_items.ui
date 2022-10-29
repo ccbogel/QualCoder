@@ -14,15 +14,15 @@
    <string>Select Items</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QListView" name="listView"/>
-   </item>
    <item row="1" column="0">
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QComboBox" name="comboBox2">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QListView" name="listView"/>
    </item>
    <item row="2" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
