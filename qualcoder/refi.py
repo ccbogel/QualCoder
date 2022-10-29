@@ -40,11 +40,7 @@ import sqlite3
 import sys
 import traceback
 import uuid
-
-try:
-    import qualcoder.vlc as vlc
-except ImportError:
-    pass
+import vlc
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
@@ -1882,7 +1878,15 @@ class RefiExport(QtWidgets.QDialog):
             with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
 
-        export_path = self.app.project_path[:-4]
+        #TODO
+        # Incorrect XML schema: Element '{urn:QDA-XML:project:1.0}FloatValue': '' is not a valid value of the atomic type 'xs:decimal'., line 68
+        # <FloatValue></FloatValue>
+        options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
+        directory = QtWidgets.QFileDialog.getExistingDirectory(None,
+                                                               _("Select directory to save file"),
+                                                               self.app.settings['directory'], options)
+
+        export_path = directory + "/" + self.app.project_name[:-4]
         shutil.make_archive(prep_path, 'zip', prep_path)
         os.rename(prep_path + ".zip", prep_path + ".qdpx")
 
