@@ -908,7 +908,6 @@ class ViewGraph(QDialog):
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, AVGraphicsItem):
-                print(item, item.avid)
                 cur.execute("select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
                             [item.avid])
                 res = cur.fetchone()[0]
@@ -1706,7 +1705,6 @@ class ViewGraph(QDialog):
                 err_msg += cdcat + _(" does not exist: ") + str(i[3]) + " " + str(i[4]) + " "
                 cur.execute("delete from gr_cdct_text_item where grid=? and supercatid=? and catid=? and cid=?",
                             [grid, i[2], i[3], i[4]])
-                print("removing ", i)
                 self.app.conn.execute()
         return err_msg
 
