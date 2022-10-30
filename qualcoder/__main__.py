@@ -546,6 +546,7 @@ class App(object):
         QComboBox:hover,QPushButton:hover {border: 2px solid #ffaa00;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
+        QTextEdit {background-color: #fcfcfc;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QMenu {border: 1px solid #808080;}\n\
