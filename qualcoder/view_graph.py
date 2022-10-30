@@ -893,7 +893,7 @@ class ViewGraph(QDialog):
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_imid is not None:
-                cur.execute("select code_name.name from source join code_image on code_image.cid=code_name.cid where imid=?",
+                cur.execute("select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
                             [item.memo_imid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
