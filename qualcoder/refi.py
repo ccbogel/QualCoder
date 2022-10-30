@@ -1239,7 +1239,7 @@ class RefiImport:
         if path_type == "relative":
             media_path = "docs:" + self.base_path + source_path
             # print(source_path, media_path)
-        # TODO media_path varaible is not used, dont actually use the PDF document, but keep the PDF in the Documents folder
+        # TODO media_path variable is not used, dont actually use the PDF document, but keep the PDF in the Documents folder
 
         """ The PDF source contains a text representation:
         <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
@@ -1877,10 +1877,6 @@ class RefiExport(QtWidgets.QDialog):
         for notefile in self.note_files:
             with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
-
-        #TODO
-        # Incorrect XML schema: Element '{urn:QDA-XML:project:1.0}FloatValue': '' is not a valid value of the atomic type 'xs:decimal'., line 68
-        # <FloatValue></FloatValue>
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
@@ -1994,7 +1990,8 @@ class RefiExport(QtWidgets.QDialog):
         """ Variables are associated with Sources and Cases.
         Stores a list of the variables with guids for later use.
         Called by project_xml.
-        TODO not sure how to handle empty (N/A) numeric variables. e.g.
+        TODO not sure how to handle empty (N/A) numeric variables.
+        TODO xs:decimal schema does not allow for null values
         <VariableRef targetGUID="7d936548-f82a-4819-9315-a7aa81b61bc3" />
         <FloatValue></FloatValue></VariableValue>
 
