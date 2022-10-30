@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
-    <widget class="QComboBox" name="comboBox2">
+    <widget class="QComboBox" name="comboBox">
      <property name="enabled">
       <bool>true</bool>
      </property>
