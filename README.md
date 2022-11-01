@@ -16,7 +16,7 @@ e.g. for Windows: `py -m pip install python-vlc`
 
 
 ### Prerequisites
-You will need to have a python3.6 or newer version installed and a 64 bit VLC player installed. Optional: ffmpeg installed for speech to text and waveform image.
+You will need to have a python3.7 (Updated requirement from 2 Nov 2022) or newer version installed and a 64 bit VLC player installed. Optional: ffmpeg installed for speech to text and waveform image.
 
 ### Windows
 
@@ -32,7 +32,7 @@ Consider using a virtual environment, I have not tested using venv on a Windows 
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
-2. Download and install the Python programming language. The minimum version for QualCoder is 3.6.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
+2. Download and install the Python programming language. The minimum version for QualCoder is 3.7.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
@@ -47,7 +47,7 @@ py -m pip install --upgrade pip
 
 `py -m pip install .`
 
-The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.9`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 5. Run QualCoder from cmd.exe
 If not already there, move to the same drive letter e.g. C: then type:
@@ -255,7 +255,7 @@ However, you do still need to install the VLC software.
 ## Dependencies
 Required:
 
-Python 3.6+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.7+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
