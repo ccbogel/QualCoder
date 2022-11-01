@@ -1,19 +1,14 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 (python 3.6 or newer versions) and Qt6.
+QualCoder is a qualitative data analysis application written in python3 and Qt6.
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
 
-This project has been tested under Ubuntu 20.04 and Windows 10. It has been used on MacOS and various Linux distros.
+This project has been tested under Ubuntu 22.04 and Windows 10. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
 ## INSTALLATION 
-
-NOTE: Latest (25 August 2022) major change. I have changed how QualCoder accesses the python to vlc bindings, so you need to install another python module.
-
-e.g. for Windows: `py -m pip install python-vlc`
-
 
 ### Prerequisites
 You will need to have a python3.7 (Updated requirement from 2 Nov 2022) or newer version installed and a 64 bit VLC player installed. Optional: ffmpeg installed for speech to text and waveform image.
@@ -39,7 +34,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 py -m pip install --upgrade pip
 
-`py -m pip install wheel pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition`
+`py -m pip install wheel pyqt6 chardet ebooklib ffmpeg-python lxml openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc SpeechRecognition`
 
  Wait, until all modules are installed .
  
@@ -92,7 +87,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed python modules.
 
-`pip install lxml ply six pdfminer chardet pyqt6 pillow pdfminer.six openpyxl ebooklib pandas plotly pydub python-vlc SpeechRecognition`
+`pip install chardet ebooklib ffmpeg-python lxml ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc six SpeechRecognition`
 
 7. Install QualCoder, type the following, the dot is important:
 
@@ -122,7 +117,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc SpeechRecognition`
+`sudo python3 -m pip install ebooklib ffmpeg-python plotly pydub python-vlc SpeechRecognition`
 
 If success, all requirements are satisfied.
 
@@ -174,7 +169,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip3 install pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition
+pip3 install chardet ebooklib ffmpeg-python lxml openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc six SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -225,7 +220,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install py2app pyqt6 lxml pillow six ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub python-vlc SpeechRecognition`
+`pip3 install chardet ebooklib ffmpeg-python lxml py2app pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc six SpeechRecognition`
 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
 `python3 setup.py py2app`
