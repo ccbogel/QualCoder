@@ -32,12 +32,19 @@ from PIL.ExifTags import TAGS
 import re
 import sys
 import traceback
-import vlc  # qualcoder.vlc as vlc
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
+from .helpers import msecs_to_hours_mins_secs
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -157,7 +164,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
 
-        file_ = ""
+        file_ = {}
         file_name = self.ui.listWidget.currentItem().text()
         for f in self.files:
             if f['name'] == file_name:
@@ -166,15 +173,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if file_ == "":
             return
         cur = self.app.conn.cursor()
-        text = file_name + "\n\n"
+        text_ = file_name + "\n\n"
         if file_['memo'] is not None:
-            text += _("MEMO: ") + "\n" + file_['memo'] + "\n"
-        text += self.get_attributes(file_['id'])
-        text += self.get_case_assignment(file_['id'])
-
+            text_ += _("MEMO: ") + "\n" + file_['memo'] + "\n"
+        text_ += self.get_attributes(file_['id'])
+        text_ += self.get_case_assignment(file_['id'])
         cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
         res = cur.fetchone()
-        text += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
+        text_ += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
         media_path = ""
         file_type = ""
         if res[3] is None or res[3] == "":
@@ -201,24 +207,23 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         elif res[3][0:8] == "/images/":
             media_path = _("Internal image file")
             file_type = "image"
-        text += _("Media path: ") + media_path + "\n"
+        text_ += _("Media path: ") + media_path + "\n"
         if file_type == "text":
-            text += self.text_statistics(file_['id'])
+            text_ += self.text_statistics(file_['id'])
         if file_type == "image":
-            text += self.image_statistics(file_['id'])
+            text_ += self.image_statistics(file_['id'])
         if file_type == "audio":
-            text += self.audio_statistics(file_['id'])
+            text_ += self.audio_statistics(file_['id'])
         if file_type == "video":
-            text += self.video_statistics(file_['id'])
-
-        self.ui.textEdit.setText(text)
+            text_ += self.video_statistics(file_['id'])
+        self.ui.textEdit.setText(text_)
 
     def get_case_assignment(self, id_):
         """ Get case or cases associated with this file.
         Show text positions if a text file.
         param: id : Integer """
 
-        text = "\n" + _("CASE:") + "\n"
+        text_ = "\n" + _("CASE:") + "\n"
         cur = self.app.conn.cursor()
         sql = "select cases.name, pos0, pos1 from case_text \
               join cases on cases.caseid=case_text.caseid \
@@ -227,19 +232,19 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             if row[1] == 0 and row[2] == 0:
-                text += row[0] + "\n"
+                text_ += row[0] + "\n"
             else:
-                text += row[0] + " [" + str(row[1]) + " - " + str(row[2]) + "]" + "\n"
+                text_ += row[0] + " [" + str(row[1]) + " - " + str(row[2]) + "]" + "\n"
         if not result:
-            text += _("No case assignment") + "\n"
-        text += "\n"
-        return text
+            text_ += _("No case assignment") + "\n"
+        text_ += "\n"
+        return text_
 
     def get_attributes(self, id_):
         """ Get attributes and return text representation.
         param: id : Integer """
 
-        text = _("ATTRIBUTES:") + "\n"
+        text_ = _("ATTRIBUTES:") + "\n"
         cur = self.app.conn.cursor()
         sql = "select attribute.name, value from attribute join attribute_type on \
             attribute_type.name=attribute.name where attribute_type.caseOrFile='file' and \
@@ -249,15 +254,15 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if not result:
             return ""
         for row in result:
-            text += row[0] + ": " + str(row[1]) + " | "
-        text += "\n"
-        return text
+            text_ += row[0] + ": " + str(row[1]) + " | "
+        text_ += "\n"
+        return text_
 
     def video_statistics(self, id_):
         """ Get video statistics for image file
         param: id : Integer """
 
-        text = _("METADATA:") + "\n"
+        text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
         cur.execute("select mediapath from source where id=?", [id_])
         mediapath = cur.fetchone()[0]
@@ -266,24 +271,22 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             abs_path = mediapath[6:]
         else:
             abs_path = self.app.project_path + mediapath
-
-        instance = vlc.Instance()
-        mediaplayer = instance.media_player_new()
-        media = instance.media_new(abs_path)
-        media.parse()
-        mediaplayer.play()
-        mediaplayer.pause()
-        msecs = media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        text += _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
-        for k in meta_keys:
-            meta = media.get_meta(k)
-            if meta is not None:
-                text += str(k) + ":  " + meta + "\n"
+        msecs = None
+        if vlc:
+            instance = vlc.Instance()
+            mediaplayer = instance.media_player_new()
+            media = instance.media_new(abs_path)
+            media.parse()
+            mediaplayer.play()
+            mediaplayer.pause()
+            msecs = media.get_duration()
+            text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
+            for k in meta_keys:
+                meta = media.get_meta(k)
+                if meta is not None:
+                    text_ += str(k) + ":  " + meta + "\n"
+        else:
+            text_ = _("Duration: Cannot obtain. VLC not installed.")
 
         # Codes
         sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)), sum(pos1-pos0) "
@@ -292,11 +295,12 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
+        text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
-            text += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
-            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
+            if msecs:
+                text_ += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
+            text_ += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
 
         # Transcript
         cur.execute("select name from source where id=?", [id_])
@@ -304,16 +308,16 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         cur.execute("select id from source where name=?", [filename + ".transcribed"])
         res = cur.fetchone()
         if res is not None:
-            text += "\n" + _("TRANSCRIPT:") + filename + ".transcribed" + "\n"
-            text += self.text_statistics(res[0])
-            text += _("END OF TRANSCRIPT") + "\n"
-        return text
+            text_ += "\n" + _("TRANSCRIPT:") + filename + ".transcribed" + "\n"
+            text_ += self.text_statistics(res[0])
+            text_ += _("END OF TRANSCRIPT") + "\n"
+        return text_
 
     def audio_statistics(self, id_):
         """ Get audio statistics for image file
         param: file_ Dictionary of {name, id, memo} """
 
-        text = _("METADATA:") + "\n"
+        text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
         cur.execute("select mediapath from source where id=?", [id_])
         mediapath = cur.fetchone()[0]
@@ -322,21 +326,20 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             abs_path = mediapath[6:]
         else:
             abs_path = self.app.project_path + mediapath
-        instance = vlc.Instance()
-        mediaplayer = instance.media_player_new()
-        media = instance.media_new(abs_path)
-        media.parse()
-        msecs = media.get_duration()
-        secs = int(msecs / 1000)
-        mins = int(secs / 60)
-        remainder_secs = str(secs - mins * 60)
-        if len(remainder_secs) == 1:
-            remainder_secs = "0" + remainder_secs
-        text += _("Duration: ") + str(mins) + ":" + remainder_secs + "\n"
-        for k in meta_keys:
-            meta = media.get_meta(k)
-            if meta is not None:
-                text += str(k) + ":  " + meta + "\n"
+        msecs = None
+        if vlc:
+            instance = vlc.Instance()
+            mediaplayer = instance.media_player_new()
+            media = instance.media_new(abs_path)
+            media.parse()
+            msecs = media.get_duration()
+            text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
+            for k in meta_keys:
+                meta = media.get_meta(k)
+                if meta is not None:
+                    text_ += str(k) + ":  " + meta + "\n"
+        else:
+            text_ = _("Duration: Cannot obtain. VLC not installed.")
 
         # Codes
         sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)), sum(pos1 - pos0) "
@@ -345,27 +348,27 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_av.cid order by count(code_av.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
+        text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
-            text += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
-            text += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
+            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
+            text_ += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
+            text_ += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
         # Transcript
         cur.execute("select name from source where id=?", [id_])
         filename = cur.fetchone()[0]
         cur.execute("select id from source where name=?", [filename + ".transcribed"])
         res = cur.fetchone()
         if res is not None:
-            text += "\n" + _("TRANSCRIPT: ") + filename + ".transcribed" + "\n"
-            text += self.text_statistics(res[0])
-            text += _("END OF TRANSCRIPT") + "\n"
-        return text
+            text_ += "\n" + _("TRANSCRIPT: ") + filename + ".transcribed" + "\n"
+            text_ += self.text_statistics(res[0])
+            text_ += _("END OF TRANSCRIPT") + "\n"
+        return text_
 
     def image_statistics(self, id_):
         """ Get image statistics for image file
         param: id: Integer """
 
-        text = _("METADATA:") + "\n"
+        text_ = _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
         cur.execute("select mediapath from source where id=?", [id_])
         mediapath = cur.fetchone()[0]
@@ -377,7 +380,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         # Image size and metadata
         image = Image.open(abs_path)
         w, h = image.size
-        text += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}" + "  " + _("Area: ") + f"{w * h:,d}" + \
+        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}" + "  " + _("Area: ") + f"{w * h:,d}" + \
                 _(" pixels") + "\n"
         image_type = abs_path[-3:].lower()
         # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
@@ -392,14 +395,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                 if isinstance(data, bytes):
                     try:
                         data = data.decode()
-                        text += f"{tag:25}: {data}" + "\n"
+                        text_ += f"{tag:25}: {data}" + "\n"
                     except UnicodeDecodeError as e:
                         logger.debug(e)
         # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
         if image_type == "png":
             for tag, value in image.info.items():
                 key = TAGS.get(tag, tag)
-                text += key + " " + str(value) + "\n"
+                text_ += key + " " + str(value) + "\n"
         # Codes
         sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)), "
         sql += "sum(width*height) "
@@ -408,27 +411,27 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_image.cid order by count(code_image.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
+        text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         # Calculate statistics
         for r in res:
             area = int(r[3] * r[4])
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
-            text += _("Percent: ") + str(round(r[5] / (w * h) * 100, 2)) + "%  "
-            text += _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
-        return text
+            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
+            text_ += _("Percent: ") + str(round(r[5] / (w * h) * 100, 2)) + "%  "
+            text_ += _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
+        return text_
 
     def text_statistics(self, id_):
         """ Get details of text file statistics
         param: id Integer
         """
 
-        text = _("STATISTICS:") + "\n"
+        text_ = _("STATISTICS:") + "\n"
         cur = self.app.conn.cursor()
         cur.execute("select fulltext from source where id=?", [id_])
         fulltext = cur.fetchone()[0]
         if fulltext is None:
             fulltext = ""
-        text += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
+        text_ += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
         # Remove punctuation. Convert to lower case
         chars = ""
         for c in range(0, len(fulltext)):
@@ -439,8 +442,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         chars = chars.lower()
         word_list = chars.split()
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        text += "\n" + msg + "\n"
-        text += "\n" + _("Words: ") + f"{len(word_list):,d}" + "\n"
+        text_ += "\n" + msg + "\n"
+        text_ += "\n" + _("Words: ") + f"{len(word_list):,d}" + "\n"
         # Word frequency
         d = {}
         for word in word_list:
@@ -450,14 +453,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
-        text += _("Unique words: ") + str(len(word_freq)) + "\n"
+        text_ += _("Unique words: ") + str(len(word_freq)) + "\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
         if max_count > 100:
             max_count = 100
-        text += _("Top 100 words") + "\n"
+        text_ += _("Top 100 words") + "\n"
         for i in range(0, max_count):
-            text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
+            text_ += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
         # Codes
         sql = "select code_name.name, code_text.cid, count(code_text.cid), sum(length(code_text.seltext)), "
         sql += "round(avg(length(code_text.seltext))) from code_text join code_name "
@@ -465,13 +468,13 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_text.cid order by count(code_text.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
-        text += "\n\n" + _("CODE COUNTS:") + "\n"
+        text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         # Calculate code statistics
         for r in res:
-            text += r[0] + "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
-            text += "  " + _("Percent: ") + str(round((r[3] / len(fulltext)) * 100, 2)) + "%"
-            text += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
-        return text
+            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
+            text_ += "  " + _("Percent: ") + str(round((r[3] / len(fulltext)) * 100, 2)) + "%"
+            text_ += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
+        return text_
 
     def search_results_next(self):
         """ Search textedit for text """
