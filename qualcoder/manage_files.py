@@ -52,7 +52,7 @@ from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .edit_textfile import DialogEditTextFile
-from .helpers import Message, ExportDirectoryPathDialog, msecs_to_hours_mins_secs
+from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
@@ -60,14 +60,19 @@ from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for 
 from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
 from .report_codes import DialogReportCodes  # for isInstance()
 
-import vlc  # qualcoder.vlc as vlc
-
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -664,17 +669,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
-            instance = vlc.Instance()
-            # mediaplayer = instance.media_player_new()
-            try:
-                media = instance.media_new(abs_path)
-                media.parse()
-                msecs = media.get_duration()
-                duration_txt = msecs_to_hours_mins_secs(msecs)
-                metadata += _("Duration: ") + duration_txt
-            except AttributeError as e_:
-                logger.debug(str(e_))
-                metadata += _("Cannot locate media. ") + abs_path + "\n" + str(e_)
+            if vlc:
+                try:
+                    instance = vlc.Instance()
+                    media = instance.media_new(abs_path)
+                    media.parse()
+                    msecs = media.get_duration()
+                    duration_txt = msecs_to_hours_mins_secs(msecs)
+                    metadata += _("Duration: ") + duration_txt
+                    return icon, metadata
+                except AttributeError as e_:
+                    logger.debug(str(e_))
+                    metadata += _("Cannot locate media. ") + abs_path + "\n" + str(e_)
+                    return icon, metadata
+            else:
+                metadata += _("Cannot get media duration.\nVLC not installed.")
                 return icon, metadata
         bytes_ = 0
         try:
@@ -682,7 +691,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         except OSError:
             pass
         metadata += "\nBytes: " + str(bytes_)
-        if bytes_ > 1024 and bytes_ < 1024 * 1024:
+        if 1024 < bytes_ < 1024 * 1024:
             metadata += "  " + str(int(bytes_ / 1024)) + "KB"
         if bytes_ > 1024 * 1024:
             metadata += "  " + str(int(bytes_ / 1024 / 1024)) + "MB"
@@ -858,6 +867,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             x  :  row number Integer
         """
 
+        if not vlc:
+            msg = _("VLC not installed cannot play audio or video.")
+            Message(self.app, _('View AV error'), msg, "warning").exec()
+            return
         # Check media exists
         abs_path = ""
         if self.source[x]['mediapath'][0:6] in ('/audio', '/video'):
