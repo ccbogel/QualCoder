@@ -47,7 +47,13 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
-import vlc
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -1630,6 +1636,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select id, name, mediapath from source where id=? order by name"
         file_lengths = []
+        erroneous_msecs = False
         for id_ in file_ids:
             cur.execute(sql, [id_])
             res = cur.fetchone()
@@ -1640,14 +1647,17 @@ class DialogReportCodes(QtWidgets.QDialog):
                 abs_path = res[2][6:]
             else:
                 abs_path = self.app.project_path + res[2]
-            instance = vlc.Instance()
-            msecs = 1
-            try:
-                media = instance.media_new(abs_path)
-                media.parse()
-                msecs = media.get_duration()
-            except FileNotFoundError:
-                pass
+            msecs = 1  # Default erroneous value for media duration
+            if vlc:
+                instance = vlc.Instance()
+                try:
+                    media = instance.media_new(abs_path)
+                    media.parse()
+                    msecs = media.get_duration()
+                except FileNotFoundError:
+                    erroneous_msecs = True
+            else:
+                erroneous_msecs = True
             res_dict = {"fid": res[0], "file_duration": msecs, "filename": res[1]}
             file_lengths.append(res_dict)
         # Stats results dictionary preparation
@@ -1672,7 +1682,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         msg = _("A/V code statistics:")
         for st in final_stats:
             msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
-            msg += _("Percent of file: ") + str(st['percent']) + "%"
+            if not erroneous_msecs:
+                msg += _("Percent of file: ") + str(st['percent']) + "%"
+            else:
+                msg += _("Percent of file: Unknown. Either VLC not installer or file not found.")
         msg += "\n========"
         if len(final_stats) == 0:
             msg = ""
