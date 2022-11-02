@@ -43,7 +43,12 @@ from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCode
 from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog
 from .information import DialogInformation
 
-import vlc  # qualcoder.vlc as vlc
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -331,18 +336,24 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         source = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ("audio:", "video:"):
             source = self.file_['mediapath'][7:]
-        instance = vlc.Instance()
-        try:
-            media = instance.media_new(source)
-            media.parse()
-            msecs = media.get_duration()
-            duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
-        except Exception as e_:
-            msg_ = _("Cannot open: ") + source + "\n" + str(e_)
-            logger.debug(msg_)
-            Message(self.app, _("A/V Error"), msg_, "warning").exec()
-            logger.warning(msg_)
-            return
+        if vlc:
+            instance = vlc.Instance()
+            try:
+                media = instance.media_new(source)
+                media.parse()
+                msecs = media.get_duration()
+                duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
+            except Exception as e_:
+                msg_ = _("Cannot open: ") + source + "\n" + str(e_)
+                logger.debug(msg_)
+                Message(self.app, _("A/V Error"), msg_, "warning").exec()
+                logger.warning(msg_)
+                return
+        else:
+            msecs = 1
+            duration_txt = _("A/V Duration: Unknown, Set at 1 millisecond") + "\n"
+            duration_txt += _("Statistical comparisons will be incorrect. VLC not installed.")
+
         self.ui.textEdit.append(duration_txt)
         # coded0 and coded1 are the total segment lengths coded by coder 0 and coder 1
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'duration': msecs, 'coded0': 0, 'coded1': 0}
