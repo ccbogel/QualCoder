@@ -35,10 +35,16 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-import vlc  # qualcoder.vlc as vlc
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_start_and_end_marks import Ui_Dialog_StartAndEndMarks
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -417,6 +423,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         if platform.system() == "Darwin":  # for MacOS
             self.frame = QtWidgets.QMacCocoaViewContainer(0)
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
+        if not vlc:
+            return
         # Create a vlc instance with an empty vlc media player
         # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
         self.instance = vlc.Instance()
