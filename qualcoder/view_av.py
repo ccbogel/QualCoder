@@ -61,10 +61,15 @@ from .report_codes import DialogReportCodes
 from .select_items import DialogSelectItems
 from .speech_to_text import SpeechToText
 
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
+
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-import vlc  # qualcoder.vlc as vlc
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -175,6 +180,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
+        if not vlc:
+            return
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
@@ -305,6 +312,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.TickPosition.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
         self.ui.horizontalSlider.sliderMoved.connect(self.set_position)
@@ -3447,8 +3455,8 @@ class DialogViewAV(QtWidgets.QDialog):
     mediaplayer = None
     media = None
 
-    # Variables for searching through journal(s)
-    search_indices = []  # A list of tuples of (journal name, match.start, match length)
+    # Variables for searching through text
+    search_indices = []  # A list of tuples of (text name, match.start, match length)
     search_index = 0
 
     # Variables used for editing the transcribed text file
@@ -3495,6 +3503,8 @@ class DialogViewAV(QtWidgets.QDialog):
         except KeyError:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        if not vlc:
+            return
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -3510,13 +3520,9 @@ class DialogViewAV(QtWidgets.QDialog):
         tt += _(
             "Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.")
         self.ui.label_note.setToolTip(tt)
-
         self.ui.textEdit.installEventFilter(self)
         self.installEventFilter(self)  # for rewind, play/stop
-
-        # Get waveform
         self.get_waveform()
-
         # Get the transcription text and fill textedit
         self.transcription = None
         cur = self.app.conn.cursor()
@@ -3552,10 +3558,10 @@ class DialogViewAV(QtWidgets.QDialog):
                 # print("tr_id", tr_id, "file id", self.file_['id'])
                 cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
                 try:
-                    # Called twice, and raises and error: 'sqlite3.Connection' object has no attribute 'conmmit'
+                    # Called twice, and raises and error: 'sqlite3.Connection' object has no attribute 'commit'
                     self.app.conn.conmmit()
-                except:
-                    pass
+                except Exception as e_:
+                    print(e_)
             cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.get_cases_codings_annotations()
@@ -3626,6 +3632,7 @@ class DialogViewAV(QtWidgets.QDialog):
         title = self.abs_path.split('/')[-1]
         self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
+        #TODO consider using QVideoWidget
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
         if platform.system() == "Darwin":  # for MacOS
@@ -3685,6 +3692,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.media.parse()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+        #TODO consider using QVideoWidget
         # The media player has to be connected to the QFrame (otherwise the
         # video would be displayed in it's own window). This is platform
         # specific, so we must give the ID of the QFrame (or similar object) to
