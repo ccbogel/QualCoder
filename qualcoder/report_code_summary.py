@@ -32,7 +32,6 @@ from PIL import Image
 import re
 import sys
 import traceback
-import vlc  # qualcoder.vlc as vlc
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -40,6 +39,13 @@ from PyQt6.QtCore import Qt
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -406,7 +412,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             av_res: List of id, pos0, pos1, owner, memo
         """
 
-        text = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
+        text_ = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
         cur = self.app.conn.cursor()
         sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or " \
               "mediapath like '/audio%' or mediapath like 'audio:%') "
@@ -419,14 +425,16 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             else:
                 abs_path = self.app.project_path + r[1]
             # Media duration
-            instance = vlc.Instance()
-            mediaplayer = instance.media_player_new()
-            media = instance.media_new(abs_path)
-            media.parse()
-            mediaplayer.play()
-            mediaplayer.pause()
-            msecs = media.get_duration()
-            media_secs = int(msecs / 1000)
+            media_secs = None
+            if vlc:
+                instance = vlc.Instance()
+                mediaplayer = instance.media_player_new()
+                media = instance.media_new(abs_path)
+                media.parse()
+                mediaplayer.play()
+                mediaplayer.pause()
+                msecs = media.get_duration()
+                media_secs = int(msecs / 1000)
             total_coded_secs = 0
             count = 0
             avg_coded_secs = 0
@@ -438,13 +446,13 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 avg_coded_secs = int(total_coded_secs / count)
             except ZeroDivisionError:
                 pass
-            percent_of_media = round(avg_coded_secs / media_secs * 100, 3)
             if count > 0:
-                text += _("Media: ") + abs_path.split("/")[-1] + "  "
-                text += _("Count: ") + str(count) + "   "
-                text += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs")
-                text += "  " + _("Average percent of media: ") + str(percent_of_media) + "%\n"
-        return text
+                text_ += _("Media: ") + abs_path.split("/")[-1] + "  "
+                text_ += _("Count: ") + str(count) + "   "
+                text_ += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs") + " "
+                if media_secs:
+                    text_ += _("Average percent of media: ") + str(round(avg_coded_secs / media_secs * 100, 3)) + "%\n"
+        return text_
 
     def search_results_next(self):
         """ Search textedit for text """
