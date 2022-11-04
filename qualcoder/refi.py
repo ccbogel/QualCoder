@@ -470,6 +470,7 @@ class RefiImport:
             value = None
             if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                 for v_element in el.getchildren():
+                    value = None
                     if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
                         var_guid = v_element.get("targetGUID")
                     if v_element.tag in (
@@ -625,6 +626,7 @@ class RefiImport:
                     value = None
                     if vv.tag == "{urn:QDA-XML:project:1.0}VariableValue":
                         for v_element in vv.getchildren():
+                            value = None
                             if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
                                 guid = v_element.get("targetGUID")
                                 case_vars.append(guid)
@@ -1999,6 +2001,7 @@ class RefiExport(QtWidgets.QDialog):
         Called by project_xml.
         TODO not sure how to handle empty (N/A) numeric variables.
         TODO xs:decimal schema does not allow for null values
+        TODO I do not inssert the floatvalue tag!
         <VariableRef targetGUID="7d936548-f82a-4819-9315-a7aa81b61bc3" />
         <FloatValue></FloatValue></VariableValue>
 
@@ -2209,7 +2212,7 @@ class RefiExport(QtWidgets.QDialog):
                     guid = v['guid']
                     var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
-            if var_type == 'numeric':
+            if var_type == 'numeric' and a[1] != '':
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
             if var_type == 'character':
                 xml += '<TextValue>' + html.escape(a[1]) + '</TextValue>\n'
@@ -2268,7 +2271,7 @@ class RefiExport(QtWidgets.QDialog):
                     guid = v['guid']
                     var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
-            if var_type == 'numeric':
+            if var_type == 'numeric' and a[1] != '':  # test
                 xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
             if var_type == 'character':
                 xml += '<TextValue>' + html.escape(a[1]) + '</TextValue>\n'
