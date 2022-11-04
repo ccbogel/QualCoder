@@ -1738,7 +1738,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if fid == a[2] and a[0] == header:
-                        item = QtWidgets.QTableWidgetItem(str(a[1]))
+                        s = ''
+                        if a[1] is not None:
+                            s = str(a[1])
+                        item = QtWidgets.QTableWidgetItem(s)
                         tt = self.get_tooltip_values(a[0])
                         item.setToolTip(tt)
                         self.ui.tableWidget.setItem(row, col, item)

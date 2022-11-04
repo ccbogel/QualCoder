@@ -143,7 +143,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.text_edit_menu)
         self.insert_nonexisting_attribute_placeholders()
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
-        self.fill_table_widget()
+        self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 1])
@@ -316,7 +316,7 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute(sql, (name, "", id_[0], 'case', now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_table_widget()
+        self.fill_table()
         self.parent_text_edit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
         self.app.delete_backup = False
 
@@ -417,7 +417,7 @@ class DialogCases(QtWidgets.QDialog):
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_table_widget()
+        self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
         self.parent_text_edit.append(msg)
@@ -493,7 +493,7 @@ class DialogCases(QtWidgets.QDialog):
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.load_cases_and_attributes()
-        self.fill_table_widget()
+        self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
         self.parent_text_edit.append(msg)
@@ -528,7 +528,7 @@ class DialogCases(QtWidgets.QDialog):
                         (att[0], "case", "", item['caseid'], item['date'], item['owner']))
         self.app.conn.commit()
         self.cases.append(item)
-        self.fill_table_widget()
+        self.fill_table()
         self.parent_text_edit.append(_("Case added: ") + item['name'])
         self.app.delete_backup = False
 
@@ -563,7 +563,7 @@ class DialogCases(QtWidgets.QDialog):
                     self.parent_text_edit.append("Case deleted: " + c['name'])
         self.load_cases_and_attributes()
         self.app.delete_backup = False
-        self.fill_table_widget()
+        self.fill_table()
 
     def cell_modified(self):
         """ If the case name has been changed in the table widget update the database.
@@ -689,9 +689,9 @@ class DialogCases(QtWidgets.QDialog):
         cur.execute(sql, [self.cases[x]['caseid'], ])
         files = cur.fetchall()
         self.cases[x]['files'] = files
-        self.fill_table_widget()
+        self.fill_table()
 
-    def fill_table_widget(self):
+    def fill_table(self):
         """ Fill the table widget with case details. """
 
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
@@ -726,7 +726,10 @@ class DialogCases(QtWidgets.QDialog):
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if cid == a[2] and a[0] == header:
-                        item = QtWidgets.QTableWidgetItem(str(a[1]))
+                        s = ''
+                        if a[1] is not None:
+                            s = str(a[1])
+                        item = QtWidgets.QTableWidgetItem(s)
                         tt = self.get_tooltip_values(a[0])
                         item.setToolTip(tt)
                         self.ui.tableWidget.setItem(row, col, item)
