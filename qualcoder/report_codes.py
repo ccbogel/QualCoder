@@ -1834,20 +1834,64 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         if matrix_option in ("Categories by case", "Top categories by case", "Codes by case") and self.case_ids == "":
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
-        if matrix_option in ("Categories by file", "Top categories by file", "Codes by file") and self.case_ids != "":
-            Message(self.app, _("No file matrix"), _("Cases are selected")).exec()
-        if matrix_option == "Categories by case" and self.case_ids != "":
-            self.matrix_by_categories(self.results, self.case_ids, "case")
-        if matrix_option == "Categories by file" and self.case_ids == "":
-            self.matrix_by_categories(self.results, self.file_ids)
+            return
+
         if matrix_option == "Top categories by case" and self.case_ids != "":
             self.matrix_by_top_categories(self.results, self.case_ids, "case")
         if matrix_option == "Top categories by file" and self.case_ids == "":
             self.matrix_by_top_categories(self.results, self.file_ids)
+        # Top categories BY FILE for SELECTED CASES
+        if matrix_option == "Top categories by file" and self.case_ids != "":
+            # Need to create file ids comma separated string
+            files_id_name = self.app.get_filenames()
+            file_ids = []
+            for r in self.results:
+                file_ids.append(r['fid'])
+                # Need to replace Case with File and need to replace file_or_casename
+                r['file_or_case'] = 'File'
+                for f in files_id_name:
+                    if f['id'] == r['fid']:
+                        r['file_or_casename'] = f['name']
+            file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
+            self.matrix_by_top_categories(self.results, file_ids)
+
+        if matrix_option == "Categories by case" and self.case_ids != "":
+            self.matrix_by_categories(self.results, self.case_ids, "case")
+        if matrix_option == "Categories by file" and self.case_ids == "":
+            self.matrix_by_categories(self.results, self.file_ids)
+        # Categories BY FILE for SELECTED CASES
+        if matrix_option == "Categories by file" and self.case_ids != "":
+            # Need to create file ids comma separated string
+            files_id_name = self.app.get_filenames()
+            file_ids = []
+            for r in self.results:
+                file_ids.append(r['fid'])
+                # Need to replace Case with File and need to replace file_or_casename
+                r['file_or_case'] = 'File'
+                for f in files_id_name:
+                    if f['id'] == r['fid']:
+                        r['file_or_casename'] = f['name']
+            file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
+            self.matrix_by_categories(self.results, file_ids)
+
         if matrix_option == "Codes by case" and self.case_ids != "":
             self.matrix_by_codes(self.results, self.case_ids, "case")
         if matrix_option == "Codes by file" and self.case_ids == "":
             self.matrix_by_codes(self.results, self.file_ids)
+        # Codes BY FILE for SELECTED CASES
+        if matrix_option == "Codes by file" and self.case_ids != "":
+            # Need to create file ids comma separated string
+            files_id_name = self.app.get_filenames()
+            file_ids = []
+            for r in self.results:
+                file_ids.append(r['fid'])
+                # Need to replace Case with File and need to replace file_or_casename
+                r['file_or_case'] = 'File'
+                for f in files_id_name:
+                    if f['id'] == r['fid']:
+                        r['file_or_casename'] = f['name']
+            file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
+            self.matrix_by_codes(self.results, file_ids)
         self.ui.splitter.setSizes([100, 100, 500])
 
     def put_image_into_textedit(self, img, counter, text_edit):
