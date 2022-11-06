@@ -68,8 +68,7 @@ setup(
         'pandas',
         'plotly',
         'pydub',
-        'SpeechRecognition',
-        'vlc'
+        'SpeechRecognition'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
