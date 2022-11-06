@@ -41,7 +41,7 @@ else:
 
 setup(
     name='Qualcoder',
-    version='3.1',
+    version='3.2',
     url='http://github.com/ccbogel/QualCoder',
     author='Colin Curtain',
     author_email='ccbogel@hotmail.com',
@@ -55,7 +55,7 @@ setup(
     ],
     keywords='qualitative data analysis',
     packages=find_packages(include=['qualcoder','qualcoder.*']),
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[
         'pyqt6',
         'lxml',
@@ -68,7 +68,8 @@ setup(
         'pandas',
         'plotly',
         'pydub',
-        'SpeechRecognition'
+        'SpeechRecognition',
+        'vlc'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
