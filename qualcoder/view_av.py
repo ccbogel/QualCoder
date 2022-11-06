@@ -181,6 +181,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         if not vlc:
+            self.ui.groupBox_2.hide()
+            self.ui.textEdit.setText(_("VLC is not installed. Cannot code audio/video"))
             return
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
