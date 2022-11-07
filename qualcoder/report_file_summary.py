@@ -41,8 +41,15 @@ from .helpers import msecs_to_hours_mins_secs
 
 # If VLC not installed, it will not crash
 vlc = None
+meta_keys = []
 try:
     import vlc
+    meta_keys = [vlc.Meta.Actors, vlc.Meta.Album, vlc.Meta.AlbumArtist, vlc.Meta.Artist,
+                 vlc.Meta.ArtworkURL, vlc.Meta.Copyright, vlc.Meta.Date, vlc.Meta.Description,
+                 vlc.Meta.Director, vlc.Meta.DiscTotal, vlc.Meta.EncodedBy,
+                 vlc.Meta.Episode, vlc.Meta.Genre, vlc.Meta.Language, vlc.Meta.NowPlaying, vlc.Meta.Publisher,
+                 vlc.Meta.Rating, vlc.Meta.Season, vlc.Meta.Setting, vlc.Meta.ShowName, vlc.Meta.Title,
+                 vlc.Meta.TrackID, vlc.Meta.TrackNumber, vlc.Meta.TrackTotal, vlc.Meta.URL]
 except Exception as e:
     print(e)
 
@@ -58,14 +65,6 @@ def exception_handler(exception_type, value, tb_obj):
     print(text)
     logger.error(_("Uncaught exception:") + "\n" + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
-meta_keys = [vlc.Meta.Actors, vlc.Meta.Album, vlc.Meta.AlbumArtist, vlc.Meta.Artist,
-             vlc.Meta.ArtworkURL, vlc.Meta.Copyright, vlc.Meta.Date, vlc.Meta.Description,
-             vlc.Meta.Director, vlc.Meta.DiscTotal, vlc.Meta.EncodedBy,
-             vlc.Meta.Episode, vlc.Meta.Genre, vlc.Meta.Language, vlc.Meta.NowPlaying, vlc.Meta.Publisher,
-             vlc.Meta.Rating, vlc.Meta.Season, vlc.Meta.Setting, vlc.Meta.ShowName, vlc.Meta.Title,
-             vlc.Meta.TrackID, vlc.Meta.TrackNumber, vlc.Meta.TrackTotal, vlc.Meta.URL]
 
 
 class DialogReportFileSummary(QtWidgets.QDialog):
