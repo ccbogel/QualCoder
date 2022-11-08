@@ -77,6 +77,13 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 
+# Check if VLC installed, for warning message for code_av
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
+
 qualcoder_version = "QualCoder 3.2"
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -810,7 +817,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_survey.setShortcut('Alt+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
 
-        # Codes menu
+        # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCodes.setShortcut('Alt+T')
         self.ui.actionCode_image.triggered.connect(self.image_coding)
@@ -1205,6 +1212,10 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = _("This project contains no audio/video files.")
             Message(self.app, _('No a/v files'), msg).exec()
             return
+        if not vlc:
+            msg = _("VLC is not installed. Cannot code audio/video files.")
+            Message(self.app, _('Install VLC'), msg).exec()
+            return
         self.ui.label_coding.hide()
         try:
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
@@ -1332,7 +1343,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         print("closeEvent", e_)
                 # TODO calls twice ?
                 QtWidgets.QApplication.instance().quit()
-                #QtWidgets.qApp.quit()
+                # QtWidgets.qApp.quit()
                 return
             if event is False:
                 return
