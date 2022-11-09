@@ -27,7 +27,6 @@ https://github.com/ccbogel/QualCoder
 
 import datetime
 import os
-import platform
 import sys
 import logging
 import traceback
@@ -41,7 +40,6 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -50,10 +48,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception:") + "\n" + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception:") + "\n" + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogManageAttributes(QtWidgets.QDialog):
@@ -68,10 +66,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
     parent_tetEdit = None
     attributes = []
 
-    def __init__(self, app, parent_textEdit):
+    def __init__(self, app, parent_text_edit):
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
@@ -146,12 +144,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         # Update attributes list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         item = {'name': name, 'memo': "", 'owner': self.app.settings['codername'],
-            'date': now_date, 'valuetype': value_type,
-            'caseOrFile': case_or_file}
+                'date': now_date, 'valuetype': value_type,
+                'caseOrFile': case_or_file}
         self.attributes.append(item)
         cur = self.app.conn.cursor()
         cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
-            (item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
+                    (item['name'], item['date'], item['owner'], item['memo'], item['caseOrFile'], item['valuetype']))
         self.app.conn.commit()
         sql = "select id from source"
         cur.execute(sql)
@@ -208,7 +206,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         y = self.ui.tableWidget.currentColumn()
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for Attribute ") + self.attributes[x]['name'],
-            self.attributes[x]['memo'])
+                            self.attributes[x]['memo'])
             ui.exec()
             memo = ui.memo
             if memo != self.attributes[x]['memo']:
@@ -254,7 +252,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         y = self.ui.tableWidget.currentColumn()
         if y == self.NAME_COLUMN:
             new_name = str(self.ui.tableWidget.item(x, y).text()).strip()
-            # Check that no other attribute has this text and this is is not empty
+            # Check that no other attribute has this text and this is not empty
             update = True
             if new_name == "":
                 update = False
@@ -267,7 +265,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
                 cur.execute("update attribute_type set name=? where name=?", (new_name, self.attributes[x]['name']))
                 cur.execute("update attribute set name=? where name=?", (new_name, self.attributes[x]['name']))
                 self.app.conn.commit()
-                self.parent_textEdit.append(_("Attribute renamed from: ") + self.attributes[x]['name'] + _(" to ") + new_name)
+                self.parent_textEdit.append(
+                    _("Attribute renamed from: ") + self.attributes[x]['name'] + _(" to ") + new_name)
                 self.attributes[x]['name'] = new_name
             else:  # Put the original text in the cell
                 self.ui.tableWidget.item(x, y).setText(self.attributes[x]['name'])
