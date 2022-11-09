@@ -35,7 +35,6 @@ import traceback
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
 
-
 from .GUI.ui_case_file_manager import Ui_Dialog_case_file_manager
 from .confirm_delete import DialogConfirmDelete
 from .helpers import DialogGetStartAndEndMarks, Message
@@ -78,11 +77,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     case_text = []
     selected_text_file = None
 
-    def __init__(self, app_, parent_textEdit, case):
+    def __init__(self, app_, parent_text_edit, case):
 
         sys.excepthook = exception_handler
         self.app = app_
-        self.parent_textEdit = parent_textEdit
+        self.parent_textEdit = parent_text_edit
         self.case = case
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_case_file_manager()
@@ -113,7 +112,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
         self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.textBrowser.customContextMenuRequested.connect(self.textBrowser_menu)
+        self.ui.textBrowser.customContextMenuRequested.connect(self.text_browser_menu)
         self.ui.textBrowser.setOpenLinks(False)
         try:
             s0 = int(self.app.settings['dialogcasefilemanager_splitter0'])
@@ -188,7 +187,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
 
     def add_file_to_case(self, file_):
         """ The entire text of the selected file is added to the selected case.
-        Also a non-text file is linked to to the case here. The text positions will be 0 and 0.
+        Also, a non-text file is linked to the case here. The text positions will be 0 and 0.
         param:
             file_: tuple of id, name,fulltext, mediapath, memo, owner, date
         return:
@@ -200,12 +199,12 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if file_[2] is not None:
             text_len = len(file_[2]) - 1
         link = {'caseid': self.case['caseid'], 'fid': file_[0], 'pos0': 0,
-            'pos1': text_len, 'owner': self.app.settings['codername'],
-            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+                'pos1': text_len, 'owner': self.app.settings['codername'],
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
 
         # Check for an existing duplicated linked file first
         cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
-            (link['caseid'], link['fid'], link['pos0'], link['pos1']))
+                    (link['caseid'], link['fid'], link['pos0'], link['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
             msg = _("This file has already been linked to this case ") + file_[1] + "\n"
@@ -213,7 +212,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # Even non-text files can be assigned to the case here
         sql = "insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
         cur.execute(sql, (link['caseid'], link['fid'], link['pos0'], link['pos1'],
-            link['owner'], link['date'], link['memo']))
+                          link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
         msg = file_[1] + _(" added to case.") + "\n"
         return msg
@@ -285,7 +284,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
 
     def double_clicked_to_view(self):
-        """ Double click on a row allow viewing of that file.
+        """ Double-click on a row allow viewing of that file.
         rows begin at 0  to n.
         param:
             row: signal emitted by doubleclick event """
@@ -368,13 +367,13 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         cur.execute("select caseid, fid, pos0, pos1, owner, date, memo from case_text where fid = ? and caseid = ?",
-            [self.selected_text_file[ID], self.case['caseid']])
+                    [self.selected_text_file[ID], self.case['caseid']])
         result = cur.fetchall()
         for row in result:
             self.case_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
-                'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
+                                   'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
 
-    def textBrowser_menu(self, position):
+    def text_browser_menu(self, position):
         """ Context menu for textBrowser. Mark, unmark, copy, select all. """
 
         if self.ui.textBrowser.toPlainText() == "":
@@ -394,7 +393,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         if selected_text != "":
             action_copy = menu.addAction(_("Copy"))
         for item in self.case_text:
-            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+            if item['pos0'] <= cursor.position() <= item['pos1']:
                 action_unmark = menu.addAction(_("Unmark"))
                 break
         action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
@@ -415,9 +414,9 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         pos0 = self.ui.textBrowser.textCursor().selectionStart()
         pos1 = self.ui.textBrowser.textCursor().selectionEnd()
         for c in self.case_text:
-            if pos0 >= c['pos0'] and pos0 <= c['pos1']:
+            if c['pos0'] <= pos0 <= c['pos1']:
                 return True
-            if pos1 >= c['pos0'] and pos1 <= c['pos1']:
+            if c['pos0'] <= pos1 <= c['pos1']:
                 return True
         return False
 
@@ -460,9 +459,10 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
-            except:
+            except Exception as err:
                 msg = "highlight, text length " + str(len(self.ui.textBrowser.toPlainText()))
                 msg += "\npos0:" + str(item['pos0']) + ", pos1:" + str(item['pos1'])
+                msg += "\n" + str(err)
                 logger.debug(msg)
 
     def mark(self):
@@ -492,10 +492,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         result = cur.fetchall()
         if len(result) > 0:
             Message(self.app, _("Already Linked"),
-                _("This segment has already been linked to this case"), "warning").exec()
+                    _("This segment has already been linked to this case"), "warning").exec()
             return
         cur.execute("insert into case_text (caseid,fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
-                (item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
+                    (
+                    item['caseid'], item['fid'], item['pos0'], item['pos1'], item['owner'], item['date'], item['memo']))
         self.app.conn.commit()
         # File may not be assigned in the table widget as Yes
         self.get_files()
@@ -515,7 +516,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         location = self.ui.textBrowser.textCursor().selectionStart()
         unmarked = None
         for item in self.case_text:
-            if location >= item['pos0'] and location <= item['pos1']:
+            if item['pos0'] <= location <= item['pos1']:
                 unmarked = item
         if unmarked is None:
             return
@@ -523,7 +524,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # Delete from database, remove from case_text and update gui
         cur = self.app.conn.cursor()
         cur.execute("delete from case_text where fid=? and caseid=? and pos0=? and pos1=?",
-            (unmarked['fid'], unmarked['caseid'], unmarked['pos0'], unmarked['pos1']))
+                    (unmarked['fid'], unmarked['caseid'], unmarked['pos0'], unmarked['pos1']))
         self.app.conn.commit()
         if unmarked in self.case_text:
             self.case_text.remove(unmarked)
@@ -570,7 +571,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for f in selected_files:
             cur.execute("select name, id, fulltext, memo, owner, date from source where id=?",
-                [f[0]])
+                        [f[0]])
             currentfile = cur.fetchone()
             text = currentfile[2]
             text_starts = [match.start() for match in re.finditer(re.escape(start_mark), text)]
@@ -588,9 +589,9 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 if text_end_iterator >= 0:
                     pos1 = text_ends[text_end_iterator]
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
-                        'pos0': start_pos, 'pos1': pos1,
-                        'owner': self.app.settings['codername'],
-                        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
+                            'pos0': start_pos, 'pos1': pos1,
+                            'owner': self.app.settings['codername'],
+                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'memo': ""}
                     # Check if already assigned to case_text
                     sql = "select id from case_text where caseid=? and fid=? and pos0=? and pos1=?"
                     cur.execute(sql, [item['caseid'], item['fid'], item['pos0'], item['pos1']])
@@ -598,7 +599,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     if res is None:
                         sql = "insert into case_text (caseid,fid,pos0,pos1,owner,date,memo) values(?,?,?,?,?,?,?)"
                         cur.execute(sql, (item['caseid'], item['fid'], item['pos0'], item['pos1'],
-                              item['owner'], item['date'], item['memo']))
+                                          item['owner'], item['date'], item['memo']))
                         entries += 1
                         self.app.conn.commit()
                     else:
