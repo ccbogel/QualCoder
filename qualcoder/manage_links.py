@@ -123,7 +123,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         if action is None:
             return
         if action == action_open_file_dialog:
-            self.file_dialog_selection_selection(row)
+            self.file_dialog_selection(row)
 
     def file_dialog_selection(self, row):
         """ Select a file using  a file dialog to replace the bad link.
