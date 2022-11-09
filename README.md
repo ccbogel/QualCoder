@@ -11,11 +11,9 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION 
 
 ### Prerequisites
-You will need to have a python3.7 or newer version installed and a 64 bit VLC player installed. Optional: ffmpeg installed for speech to text and waveform image.
+You will need to have a python3.7 or newer version installed. Optional: VLC for audio/video coding. ffmpeg installed for speech to text and waveform image. VLC is required, for QualCoder releases 3.1 and lower.
 
 ### Windows
-
-Install  [VLC](https://www.videolan.org/vlc/download-windows.html) or from the Windows Store. 
 
 Newer releases contain an exe file (created on Windows 10, 64 bit).Double-click to run. Look at the Releases in the right hand side column. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
@@ -55,7 +53,7 @@ Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Do
 
 It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems.
 
-1. install vlc (download from site) or:
+1. REcommend that you install vlc (download from site) or:
 
 `sudo apt install vlc`
 
@@ -268,7 +266,7 @@ https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
 
-Also, if you like Qualcoder a lot, write an article about it.
+Also, if you like Qualcoder a lot and want to advertise interst in it's use, please write an article about your experience using QualCoder.
 
 ## FaceBook group:
 To allow everyone to discuss all things QualCoder.
