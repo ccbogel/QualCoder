@@ -42,6 +42,8 @@ import sys
 import traceback
 import zipfile
 
+from PyQt6 import QtWidgets
+
 from .docx import opendocx, getdocumenttext
 from .helpers import Message
 from .html_parser import *
@@ -315,8 +317,9 @@ class ReplaceTextFile:
                             break
                         try:
                             text += line
-                        except Exception:
+                        except Exception as err:
                             import_errors += 1
+                            print(err)
                     # Associated with notepad files
                     if text[0:6] == "\ufeff":
                         text = text[6:]
