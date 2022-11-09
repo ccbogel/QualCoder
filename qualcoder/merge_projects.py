@@ -102,7 +102,8 @@ class MergeProjects:
             self.insert_new_attribute_types()
             self.insert_attributes()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
-            self.summary_msg += _("Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
+            self.summary_msg += _(
+                "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
             self.projects_merged = True
             self.app.delete_backup = False
@@ -280,7 +281,7 @@ class MergeProjects:
         new_case_ids = []
         for case_s in self.cases_s:
             cur_d.execute("insert into cases (name, memo, owner, date) values (?,?,?,?)",
-                        [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
+                          [case_s['name'], case_s['memo'], case_s['owner'], case_s['date']])
             self.app.conn.commit()
             cur_d.execute("select last_insert_rowid()")
             case_id = cur_d.fetchone()[0]
@@ -413,7 +414,7 @@ class MergeProjects:
         # Insert new attribute type and placeholder in attribute table
         for a in self.attribute_types_s:
             cur_d.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
-                        (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
+                          (a['name'], a['date'], a['owner'], a['memo'], a['caseOrFile'], a['valuetype']))
             self.app.conn.commit()
             self.summary_msg += _("Adding attribute (") + a['caseOrFile'] + "): " + a['name'] + "\n"
             # Create attribute placeholders for new attributes, does NOT create for existing destination attributes
@@ -455,7 +456,8 @@ class MergeProjects:
                               [a['name'], a['newid'], a['attr_type']])
                 res = cur_d.fetchall()
                 if not res:
-                    cur_d.execute(sql_insert, (a['name'], a['newid'], a['attr_type'],a['value'], a['date'], a['owner']))
+                    cur_d.execute(sql_insert,
+                                  (a['name'], a['newid'], a['attr_type'], a['value'], a['date'], a['owner']))
                     self.app.conn.commit()
                     attribute_count += 1
                 else:
@@ -469,7 +471,7 @@ class MergeProjects:
         """ Load the database data into Lists of Dictionaries.
 
         return:
-            True or False if data was able to be loaded
+            True or False if data could be loaded
         """
 
         self.journals_s = []
@@ -632,6 +634,7 @@ class MergeProjects:
         cur_s.execute(sql_attributes)
         res_attributes = cur_s.fetchall()
         for i in res_attributes:
-            attribute = {"name": i[0], "attr_type": i[1], "value": i[2], "id": i[3], "newid": -1, "date": i[4], "owner": i[5]}
+            attribute = {"name": i[0], "attr_type": i[1], "value": i[2], "id": i[3], "newid": -1, "date": i[4],
+                         "owner": i[5]}
             self.attributes_s.append(attribute)
         return True
