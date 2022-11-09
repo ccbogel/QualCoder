@@ -714,7 +714,6 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            #if item.text == r[3]:
                             if item.memo_ctid is not None and item.memo_ctid == r[4]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
@@ -744,7 +743,7 @@ class ViewGraph(QDialog):
                     coding_memo_displayed = False
                     for item in self.scene.items():
                         if isinstance(item, FreeTextGraphicsItem):
-                            #if item.text == r[4]:
+                            # if item.text == r[4]:
                             if item.memo_avid is not None and item.memo_avid == r[5]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
@@ -883,33 +882,39 @@ class ViewGraph(QDialog):
         # By code
         for item in self.scene.items():
             if isinstance(item, FreeTextGraphicsItem) and item.ctid > -1:
-                cur.execute("select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
-                            [item.ctid])
+                cur.execute(
+                    "select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
+                    [item.ctid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_ctid is not None:
-                cur.execute("select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
-                            [item.memo_ctid])
+                cur.execute(
+                    "select code_name.name from code_name join code_text on code_text.cid=code_name.cid where ctid=?",
+                    [item.memo_ctid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_imid is not None:
-                cur.execute("select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
-                            [item.memo_imid])
+                cur.execute(
+                    "select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
+                    [item.memo_imid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, FreeTextGraphicsItem) and item.ctid == -1 and item.memo_avid is not None:
-                cur.execute("select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
-                            [item.memo_avid])
+                cur.execute(
+                    "select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
+                    [item.memo_avid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, PixmapGraphicsItem):
-                cur.execute("select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
-                            [item.imid])
+                cur.execute(
+                    "select code_name.name from code_name join code_image on code_image.cid=code_name.cid where imid=?",
+                    [item.imid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, AVGraphicsItem):
-                cur.execute("select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
-                            [item.avid])
+                cur.execute(
+                    "select code_name.name from code_name join code_av on code_av.cid=code_name.cid where avid=?",
+                    [item.avid])
                 res = cur.fetchone()[0]
                 names_and_groups.append({'name': item.text, 'group': res})
             if isinstance(item, TextGraphicsItem):
@@ -2611,11 +2616,11 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         x_overlap = False
         # fix from_x value to middle of from widget if to_widget overlaps in x position
-        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+        if from_x < to_x < from_x + self.from_widget.boundingRect().width():
             from_x = from_x + self.from_widget.boundingRect().width() / 2
             x_overlap = True
         # fix to_x value to middle of to widget if from_widget overlaps in x position
-        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+        if to_x < from_x < to_x + self.to_widget.boundingRect().width():
             to_x = to_x + self.to_widget.boundingRect().width() / 2
             x_overlap = True
 
@@ -2628,11 +2633,11 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         y_overlap = False
         # Fix from_y value to middle of from widget if to_widget overlaps in y position
-        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+        if from_y < to_y < from_y + self.from_widget.boundingRect().height():
             from_y = from_y + self.from_widget.boundingRect().height() / 2
             y_overlap = True
         # Fix from_y value to middle of to widget if from_widget overlaps in y position
-        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+        if to_y < from_y < to_y + self.to_widget.boundingRect().height():
             to_y = to_y + self.to_widget.boundingRect().height() / 2
             y_overlap = True
 
@@ -3135,11 +3140,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         x_overlap = False
         # Fix from_x value to middle of from widget if to_widget overlaps in x position
-        if to_x > from_x and to_x < from_x + self.from_widget.boundingRect().width():
+        if from_x < to_x < from_x + self.from_widget.boundingRect().width():
             from_x = from_x + self.from_widget.boundingRect().width() / 2
             x_overlap = True
         # Fix to_x value to middle of to widget if from_widget overlaps in x position
-        if from_x > to_x and from_x < to_x + self.to_widget.boundingRect().width():
+        if to_x < from_x < to_x + self.to_widget.boundingRect().width():
             to_x = to_x + self.to_widget.boundingRect().width() / 2
             x_overlap = True
 
@@ -3152,11 +3157,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         y_overlap = False
         # Fix from_y value to middle of from widget if to_widget overlaps in y position
-        if to_y > from_y and to_y < from_y + self.from_widget.boundingRect().height():
+        if from_y < to_y < from_y + self.from_widget.boundingRect().height():
             from_y = from_y + self.from_widget.boundingRect().height() / 2
             y_overlap = True
         # Fix from_y value to middle of to widget if from_widget overlaps in y position
-        if from_y > to_y and from_y < to_y + self.to_widget.boundingRect().height():
+        if to_y < from_y < to_y + self.to_widget.boundingRect().height():
             to_y = to_y + self.to_widget.boundingRect().height() / 2
             y_overlap = True
         # Fix from_y value if to_widget is above the from_widget
