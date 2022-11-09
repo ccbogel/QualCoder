@@ -5,8 +5,8 @@ authors:
     given-names: Colin
     orcid: https://orcid.org/0000-0001-5029-7541
 title: "QualCoder"
-version: 3.0
+version: 3.1
 keywords: qualitative
 license: MIT
-repository-code: https://github.com/ccbogel/QualCoder/releases/tag/3.0
-date-released: 2022-05-20
+repository-code: https://github.com/ccbogel/QualCoder/releases/tag/3.1
+date-released: 2022-08-22
