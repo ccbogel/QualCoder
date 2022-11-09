@@ -249,7 +249,7 @@ class DialogCodeInText(QtWidgets.QDialog):
             self.te.setToolTip(tt)
 
     def draw_initial_coded_text(self):
-        """ Can be called multiple times via key strokes, so  initally set formatting to none. """
+        """ Can be called multiple times via keystrokes, so  initally set formatting to none. """
 
         cursor = self.te.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -420,7 +420,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
-        if platform.system() == "Darwin":  # for MacOS
+        if platform.system() == "Darwin":  # for macOS
             self.frame = QtWidgets.QMacCocoaViewContainer(0)
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
         if not vlc:
@@ -437,7 +437,9 @@ class DialogCodeInAV(QtWidgets.QDialog):
                 self.media = self.instance.media_new(self.app.project_path + self.data['mediapath'])
             if self.data['mediapath'][0:6] in ('audio:', 'video:'):
                 self.media = self.instance.media_new(self.data['mediapath'][6:])
-        except Exception as e:
+        except Exception as err:
+            logger.warning((str(err)))
+            print(err)
             Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.data['mediapath'],
                     "warning").exec()
             self.close()
@@ -456,7 +458,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
             self.mediaplayer.set_xwindow(int(self.frame.winId()))
         elif platform.system() == "Windows":  # for Windows
             self.mediaplayer.set_hwnd(int(self.winId()))
-        elif platform.system() == "Darwin":  # for MacOS
+        elif platform.system() == "Darwin":  # for macOS
             self.mediaplayer.set_nsobject(int(self.winId()))
 
         # The vlc MediaPlayer needs a float value between 0 and 1 for AV position,
@@ -555,7 +557,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     def draw_coded_area(self):
         """ Draw the coded rectangle in the scene.
          The coded memo can be in the data as ['memo'] if data from DialogCodeText, DialogCodeImage, DialogCodeAV
-         It is in the data as ['coded memo'] if data from DialogReportCodes
+         It is in the data as ['coded memo'] if data from DialogReportCodes.
          DialogReportCodes can produce various memos on output: source memo, coded memo, codename memo.
          Called by: draw_scene
          """
@@ -620,7 +622,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         msg += _("Scale: ") + str(int(self.scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
-    def eventFilter(self, object, event):
+    def eventFilter(self, object_, event):
         """ Using this event filter for QGraphicsView.
 
         Key events on scene
@@ -633,7 +635,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
 
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            mod = event.modifiers()
+            # mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
