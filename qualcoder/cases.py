@@ -36,7 +36,6 @@ import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QHelpEvent
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -196,7 +195,7 @@ class DialogCases(QtWidgets.QDialog):
     def count_selected_items(self):
         """ Update label with the count of selected rows.
          Also clear the text edit if multiple rows are selected.
-         :return
+         return:
             item_count """
 
         indexes = self.ui.tableWidget.selectedIndexes()
@@ -326,11 +325,11 @@ class DialogCases(QtWidgets.QDialog):
         if self.cases:
             logger.warning(_("Cases have already been created."))
         filename, ok = QtWidgets.QFileDialog.getOpenFileName(None,
-                                                         _('Select cases file'),
-                                                         self.app.settings['directory'],
-                                                         "(*.csv *.CSV *.xlsx *.XLSX)",
-                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                         )
+                                                             _('Select cases file'),
+                                                             self.app.settings['directory'],
+                                                             "(*.csv *.CSV *.xlsx *.XLSX)",
+                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                             )
         if filename == "":
             return
         if filename[-4:].lower() == ".csv":
@@ -400,7 +399,7 @@ class DialogCases(QtWidgets.QDialog):
                 try:
                     sql = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
                     cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
-                                   attribute_value_type[col], 'case'))
+                                      attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
@@ -476,7 +475,7 @@ class DialogCases(QtWidgets.QDialog):
                     sql = "insert into attribute_type (name,date,owner,memo, \
                     valueType, caseOrFile) values(?,?,?,?,?,?)"
                     cur.execute(sql, (att_name, now_date, self.app.settings['codername'], "",
-                                   attribute_value_type[col], 'case'))
+                                      attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
                     logger.error(_("attribute:") + att_name + ", " + str(e))
@@ -544,7 +543,7 @@ class DialogCases(QtWidgets.QDialog):
             ids_to_delete.append(int(self.ui.tableWidget.item(itemWidget.row(),
                                                               self.ID_COLUMN).text()))
             case_names_to_delete = case_names_to_delete + "\n" + str(self.ui.tableWidget.item(itemWidget.row(),
-                                                                                            self.NAME_COLUMN).text())
+                                                                                              self.NAME_COLUMN).text())
         table_rows_to_delete.sort(reverse=True)
         if len(case_names_to_delete) == 0:
             return
@@ -769,7 +768,7 @@ class DialogCases(QtWidgets.QDialog):
         return tt
 
     def view(self):
-        """ View all of the text associated with this case.
+        """ View all the text associated with this case.
         Add links to open image and A/V files. """
 
         row = self.ui.tableWidget.currentRow()
@@ -879,14 +878,14 @@ class DialogCases(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_link = None
         for item in self.display_text_links:
-            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+            if item['pos0'] <= cursor.position() <= item['pos1']:
                 action_link = menu.addAction(_("Open"))
         action = menu.exec(self.ui.textBrowser.mapToGlobal(position))
         if action is None:
             return
 
         for item in self.display_text_links:
-            if cursor.position() >= item['pos0'] and cursor.position() <= item['pos1']:
+            if item['pos0'] <= cursor.position() <= item['pos1']:
                 ui = None
                 if item['mediapath'][:6] == "video:":
                     abs_path = item['mediapath'].split(':')[1]
@@ -955,13 +954,12 @@ class ToolTipEventFilter(QtCore.QObject):
         # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
         # Added check for media_data, it may be None
         if event.type() == QtCore.QEvent.Type.ToolTip and self.media_data:
-            help_event = event  #TODO QHelpEvent(event)
-            # cursor = QtGui.QTextCursor()
+            help_event = event
             cursor = receiver.cursorForPosition(help_event.pos())
             pos = cursor.position()
             receiver.setToolTip("")
             for item in self.media_data:
-                if item['pos0'] <= pos and item['pos1'] >= pos:
+                if item['pos0'] <= pos <= item['pos1']:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
