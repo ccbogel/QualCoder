@@ -704,8 +704,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
-        print("Trying without QTextCodec")
-        #tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
+        # print("Trying without QTextCodec")
+        # tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
         need_media_folders = False
         for item in self.html_links:
@@ -1749,8 +1749,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         flags = 0
         try:
             pattern = re.compile(search_text, flags)
-        except re.error as e_:
-            logger.warning('re error Bad escape ' + str(e_))
+        except re.error as err:
+            logger.warning('re error Bad escape ' + str(err))
         if pattern is None:
             return
         for match in pattern.finditer(te_text):
@@ -1786,6 +1786,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i, row in enumerate(self.results):
             self.heading(row)
             if memo_choice in ("Only memos", "Only coded memos") and row['coded_memo'] != "":
+                # TODO review
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
