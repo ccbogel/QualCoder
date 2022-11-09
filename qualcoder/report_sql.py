@@ -58,7 +58,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class DialogSQL(QtWidgets.QDialog):
-    """ Uses single inheritance, sub-class QDialog and set up the user interface in
+    """ Uses single inheritance, subclass QDialog and set up the user interface in
     the __init__() method.
     A gui to allow the user to enter sql queries and return results.
     Data outputs are as tab (or other) separated files.
@@ -428,7 +428,7 @@ class DialogSQL(QtWidgets.QDialog):
         if action == action_select_all:
             cursor.setPosition(0)
             cursor.setPosition(len(self.ui.textEdit_sql.toPlainText()),
-                QtGui.QTextCursor.MoveMode.KeepAnchor)
+                               QtGui.QTextCursor.MoveMode.KeepAnchor)
             self.ui.textEdit_sql.setTextCursor(cursor)
         if action == action_select_all_from:
             cursor.insertText("SELECT * FROM ")
@@ -492,19 +492,19 @@ class DialogSQL(QtWidgets.QDialog):
         """ Sort rows on selected column in ascending order. """
 
         self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.SortOrder.AscendingOrder)
-        self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" asc]"))
+        self.ui.label.setText(str(len(self.file_data) - 1) + _(" rows [") + self.file_data[0][self.col] + _(" asc]"))
 
     def sort_descending(self):
         """ Sort rows on selected column in descending order. """
 
         self.ui.tableWidget_results.sortItems(self.col, QtCore.Qt.SortOrder.DescendingOrder)
-        self.ui.label.setText(str(len(self.file_data)-1) + _(" rows [") + self.file_data[0][self.col] + _(" desc]"))
+        self.ui.label.setText(str(len(self.file_data) - 1) + _(" rows [") + self.file_data[0][self.col] + _(" desc]"))
 
     def filter_text_like(self):
         """ Hide rows where cells in the column do not contain the text fragment. """
 
-        text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
+        text_, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Text contains:"),
+                                                   QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().find(text_) == -1:
@@ -517,8 +517,8 @@ class DialogSQL(QtWidgets.QDialog):
     def filter_text_starts_with(self):
         """ Hide rows where cells in the column do not contain the text start fragment. """
 
-        text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
+        text_, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Text contains:"),
+                                                   QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.ui.tableWidget_results.rowCount()):
                 if self.ui.tableWidget_results.item(r, self.col).text().startswith(text_) is False:
@@ -583,7 +583,7 @@ class NewTableWidget(QtWidgets.QTableWidget):
         action_sort_ascending.triggered.connect(self.sort_ascending)
         action_sort_descending = menu.addAction(_("Sort descending"))
         action_sort_descending.triggered.connect(self.sort_descending)
-        menu.exec_(event.globalPos())
+        menu.exec(event.globalPos())
 
     def sort_ascending(self):
         """ Sort rows on selected column in ascending order. """
@@ -598,8 +598,8 @@ class NewTableWidget(QtWidgets.QTableWidget):
     def filter_text_like(self):
         """ Hide rows where cells in the column do not contain the text fragment. """
 
-        text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
+        text_, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Text contains:"),
+                                                   QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.rowCount()):
                 if str(self.item(r, self.col).text()).find(text_) == -1:
@@ -608,8 +608,8 @@ class NewTableWidget(QtWidgets.QTableWidget):
     def filter_text_starts_with(self):
         """ Hide rows where cells in the column do not contain the text start fragment. """
 
-        text_, ok = QtWidgets.QInputDialog.getText(None, _("Text filter"), _("Text contains:"),
-        QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
+        text_, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Text contains:"),
+                                                   QtWidgets.QLineEdit.EchoMode.Normal, str(self.cell_value))
         if ok and text_ != '':
             for r in range(0, self.rowCount()):
                 if str(self.item(r, self.col).text()).startswith(text_) is False:
@@ -657,20 +657,20 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 DEFAULT_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
-'-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
+               '-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
 code_text.fid, code_text.pos0, code_text.pos1, code_text.seltext from code_name \
 join  code_text on code_name.cid = code_text.cid\n\
 join source on source.id=code_text.fid\n\
 -- UNCOMMENT "--" LINES BELOW TO GET DETAILS FOR A CODE AND OR A FILE\n\
 -- AND codename="CODENAME" -- FILL CODENAME WITH CODE NAME\n\
 -- AND source.name="FILENAME" -- FILL FILENAME WITH FILE NAME',
-'-- GET_CODING_TABLE\n-- Implementation of RQDA function\n\
+               '-- GET_CODING_TABLE\n-- Implementation of RQDA function\n\
 select code_text.cid, code_text.fid, code_name.name as "codename", \
 source.name as "filename", code_text.pos1 - code_text.pos0 as "CodingLength",\
 code_text.pos0 as "index1", code_text.pos1 as "index2" \
 from code_text join code_name on code_text.cid = code_name.cid \
 join source on code_text.fid = source.id',
-'-- CODED TEXT WITH EACH CASE\nselect code_name.name as codename, cases.name as casename,\
+               '-- CODED TEXT WITH EACH CASE\nselect code_name.name as codename, cases.name as casename,\
  code_text.pos0, code_text.pos1, code_text.fid, seltext as "coded text", code_text.owner \
  from code_text join code_name on code_name.cid = code_text.cid \
 join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid \
@@ -679,29 +679,29 @@ where \n\
 -- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
 -- and \n\
 (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
-'-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\
+               '-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\
 annotation.fid as "File ID" , source.name as "File name", annotation.pos0 as "Start position", \n\
 annotation.pos1 as "End position", annotation.owner as "Coder name", annotation.date as "Date" from annotation \n\
 left join source on source.id = annotation.fid \n\
 -- DISPLAY ANNOTATIONS FOR SELECTED FILE, UNCOMMENT THE FOLLOWING: \n\
 -- AND source.name = "FILE NAME"',
-'-- ALL OR SELECTED CODINGS MEMOS\nselect code_text.memo as "Coding memo", code_text.cid as "Code ID", code_name.name as "Code name", \n\
+               '-- ALL OR SELECTED CODINGS MEMOS\nselect code_text.memo as "Coding memo", code_text.cid as "Code ID", code_name.name as "Code name", \n\
 code_text.fid as "File ID", source.name as "File name", code_text.owner as "Coder name", code_text.date as "Date", \n\
 code_text.important as "Important(yes=1, no=0)" from source left join code_text on code_text.fid = source.id \n\
 left join code_name on code_name.cid = code_text.cid where code_text.memo != "" \n\
 -- TO DISPLAY CODING FOR SELECTED CODE OR FILE, UNCOMMENT THE FOLLOWING:\n\
 -- AND code_name.name = "CODE NAME"  -- TO SELECT SPECIFIC CODE\n\
 -- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE',
-'-- FILES THAT ARE NOT CODED with code id 1\n\
+               '-- FILES THAT ARE NOT CODED with code id 1\n\
 select source.name from source where source.id not in\n\
 (select code_text.fid from code_text where code_text.cid=1\n\
 union select code_av.id from code_av where code_av.cid=1\n\
 union select code_image.id from code_image where code_image.cid=1)',
-'-- CODES NOTT USED IN A FILE. Example using file id 1 presuming a text file.\n\
+               '-- CODES NOTT USED IN A FILE. Example using file id 1 presuming a text file.\n\
 select code_name.name from code_name where code_name.cid not in\n\
 -- Uncomment the appropriate line below for another file type if needed\n\
 (select code_text.cid from code_text where code_text.fid=1)  -- comment out for another file type\n\
 -- (select code_av.cid from code_av where code_av.id=1) -- uncomment for av files\n\
 -- (select code_image.cid from code_image where code_image.id=1) -- uncomment for image files'
 
-]
+               ]
