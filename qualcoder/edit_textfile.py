@@ -242,7 +242,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             for c in self.annotations:
                 changed = False
@@ -250,7 +250,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             for c in self.casetext:
                 changed = False
@@ -259,7 +259,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             self.highlight()
             self.prev_text = copy(self.text)
@@ -284,7 +284,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     changed = True
                     self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
                     c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
@@ -304,7 +304,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                         changed = True
                         self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
                         c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
@@ -325,7 +325,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     changed = True
                     self.code_deletions.append("delete from case_text where id=" + str(c['id']))
                     c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from case_text where id=" + str(c['id']))
