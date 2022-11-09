@@ -179,10 +179,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
-        if not vlc:
-            self.ui.groupBox_2.hide()
-            self.ui.textEdit.setText(_("VLC is not installed. Cannot code audio/video"))
-            return
         # Labels need to be 32x32 pixels for 32x32 icons
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
@@ -1639,16 +1635,20 @@ class DialogCodeAV(QtWidgets.QDialog):
                 now = datetime.datetime.now()
                 diff = now - self.code_resize_timer
                 self.code_resize_timer = datetime.datetime.now()
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier \
+                        and diff.microseconds > msec_gap:
                     self.shrink_to_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier \
+                        and diff.microseconds > msec_gap:
                     self.shrink_to_right(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier \
+                        and diff.microseconds > msec_gap:
                     self.extend_left(codes_here[0])
                     return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier and diff.microseconds > msec_gap:
+                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier \
+                        and diff.microseconds > msec_gap:
                     self.extend_right(codes_here[0])
                     return True
             '''selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -1680,7 +1680,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 return True'''
 
         #  Ctrl + P pause/play toggle
-        if (key == QtCore.Qt.Key.Key_P or key == QtCore.Qt.Key.Key_D) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+        if (key == QtCore.Qt.Key.Key_P or key == QtCore.Qt.Key.Key_D) and \
+                mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.play_pause()
         #  Ctrl S to start and end A/V segment recording
         if key == QtCore.Qt.Key.Key_S and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -3911,7 +3912,8 @@ class DialogViewAV(QtWidgets.QDialog):
         mods = event.modifiers()
         # print("KEY ", key, "MODS ", mods)
         #  ctrl S or ctrl P pause/play toggle
-        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+        if (key == QtCore.Qt.Key.Key_S or key == QtCore.Qt.Key.Key_P) and \
+                mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.play_pause()
         # Rewind 5 seconds   Ctrl + R
         if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -3937,10 +3939,12 @@ class DialogViewAV(QtWidgets.QDialog):
             self.pause()
             self.delete_speakernames()
         # Increase play rate  Ctrl + Shift + >
-        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
+        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
+                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.increase_play_rate()
         # Decrease play rate  Ctrl + Shift + <
-        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
+        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
+                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.decrease_play_rate()
         if key == QtCore.Qt.Key.Key_U and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.change_label_image_waveform_spectrogram("waveform")
