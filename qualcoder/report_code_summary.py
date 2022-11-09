@@ -56,10 +56,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception:") + "\n" + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception:") + "\n" + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogReportCodeSummary(QtWidgets.QDialog):
@@ -235,8 +235,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         item.setText(3, str(result[0]))
                     else:
                         item.setText(3, "")
-                except Exception as e:
-                    msg = "Fill code counts error\n" + str(e) + "\n"
+                except Exception as err:
+                    msg = "Fill code counts error\n" + str(err) + "\n"
                     msg += sql + "\n"
                     msg += "cid " + str(cid) + "\n"
                     logger.debug(msg)
@@ -368,7 +368,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         """
 
         text = "\n" + _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
-        if img_res == []:
+        if not img_res:
             return text
         cur = self.app.conn.cursor()
         sql = "select id, mediapath from source where (mediapath like '/images%' or mediapath like 'images:%') "
@@ -482,4 +482,3 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.ui.textEdit.setTextCursor(cursor)
                 break
-
