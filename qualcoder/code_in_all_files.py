@@ -296,19 +296,19 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         pos = self.te.textCursor().position()
         # Check the clicked position for a text result
         for row in self.text_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 ui = DialogCodeInText(self.app, row)
                 ui.exec()
                 return
         # Check the position for an image result
         for row in self.image_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 ui = DialogCodeInImage(self.app, row)
                 ui.exec()
                 return
         # Check the position for an a/v result
         for row in self.av_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 ui = DialogCodeInAV(self.app, row)
                 ui.exec()
                 break
@@ -322,27 +322,23 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Check the clicked position for a text result
         item = None
         for row in self.text_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 item = {'type': 'text', 'res': row}
                 break
         # Check the position for an image result
         for row in self.image_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 item = {'type': 'image', 'res': row}
                 break
         # Check the position for an a/v result
         for row in self.av_results:
-            if pos >= row['textedit_start'] and pos < row['textedit_end']:
+            if row['textedit_start'] <= pos < row['textedit_end']:
                 item = {'type': 'av', 'res': row}
                 break
         if not item:
             return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_annotate = None
-        action_code_memo = None
-        action_end_pos = None
-        action_start_pos = None
         action_mark = menu.addAction(_("Appy more codes to this segment"))
         action_unmark = menu.addAction(_("Remove code"))
         action = menu.exec(self.te.mapToGlobal(position))
@@ -413,5 +409,3 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except sqlite3.IntegrityError:
                     pass
-
-
