@@ -837,7 +837,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
-        If case sensitive is checked then text searched is matched for case sensitivity.
+        If case-sensitive is checked then text searched is matched for case sensitivity.
         """
 
         if self.file_ is None:
@@ -1119,7 +1119,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 coded_text_list.append(item)
         if not coded_text_list:
@@ -1180,7 +1180,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Returns True or False """
 
         for note in self.annotations:
-            if (position + self.file_['start'] >= note['pos0'] and position + self.file_['start'] <= note['pos1']) \
+            if (note['pos0'] <= position + self.file_['start'] <= note['pos1']) \
                     and note['fid'] == self.file_['id']:
                 return True
         return False
@@ -1200,7 +1200,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername'] and \
                     ((not important and item['important'] == 1) or (important and item['important'] != 1)):
                 coded_text_list.append(item)
@@ -1272,7 +1272,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if position + self.file_['start'] >= item['pos0'] and position + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 coded_text_list.append(item)
         if not coded_text_list:
@@ -1316,7 +1316,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         code_list = []
         for item in self.code_text:
-            if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 code_list.append(item)
         if not code_list:
@@ -1647,8 +1647,7 @@ class DialogCodeText(QtWidgets.QWidget):
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
         for item in self.code_text:
-            if cursor_pos + self.file_['start'] >= item['pos0'] and \
-                    cursor_pos + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 codes_here.append(item)
         # Annotate selected
@@ -1734,7 +1733,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlaps_at_pos_idx = 0
         pos = self.ui.textEdit.textCursor().position()
         for item in self.code_text:
-            if item['pos0'] <= pos + self.file_['start'] and item['pos1'] >= pos + self.file_['start']:
+            if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
                 # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 self.overlaps_at_pos.append(item)
         if len(self.overlaps_at_pos) < 2:
@@ -1844,8 +1843,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor_pos = self.ui.textEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
-                if cursor_pos + self.file_['start'] >= item['pos0'] and \
-                        cursor_pos + self.file_['start'] <= item['pos1'] and \
+                if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
@@ -1966,7 +1964,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
         if not found_larger and indexes == []:
             return
-        # Loop around to highest index
+        # Loop around to the highest index
         if not found_larger and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
@@ -1993,7 +1991,8 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setForeground(QBrush(QColor(foregroundcol)))
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations, self.file_['start'])
+        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
+                                                     self.file_['start'])
         # Need to reload arrow iconsas they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -2046,7 +2045,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
         if not found_smaller and indexes == []:
             return
-        # Loop around to highest index
+        # Loop around to the highest index
         if not found_smaller and indexes != []:
             cur_pos = indexes[0]['pos0'] - self.file_['start']
             end_pos = indexes[0]['pos1'] - self.file_['start']
@@ -2069,7 +2068,8 @@ class DialogCodeText(QtWidgets.QWidget):
         fmt.setForeground(QBrush(QColor(foregroundcol)))
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations, self.file_['start'])
+        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
+                                                     self.file_['start'])
         # Need to reload arrow icons as they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -2186,7 +2186,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
         msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
-        reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
+        reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
                                                msg, QtWidgets.QMessageBox.StandardButton.Yes,
                                                QtWidgets.QMessageBox.StandardButton.No)
         if reply == QtWidgets.QMessageBox.StandardButton.No:
@@ -2214,7 +2214,7 @@ class DialogCodeText(QtWidgets.QWidget):
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
         param:
-            catid : None to add to without category, catid to add to to category. """
+            catid : None to add to without category, catid to add to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec()
@@ -2527,7 +2527,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if file_['characters'] > self.app.settings['codetext_chunksize']:
             next_chars_action = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
-                prev_chars_action = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
+                prev_chars_action = menu.addAction(
+                    str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
         go_to_bookmark_action = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
@@ -2781,7 +2782,8 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations, self.file_['start'])
+            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations,
+                                                         self.file_['start'])
         else:
             self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations,
                                                          self.file_['start'])
@@ -2844,11 +2846,12 @@ class DialogCodeText(QtWidgets.QWidget):
                     # Cursor pos could be negative if annotation was for an earlier text portion
                     cursor = self.ui.textEdit.textCursor()
                     if note['fid'] == self.file_['id'] and \
-                            int(note['pos0']) - self.file_['start'] >= 0 and \
-                            int(note['pos1']) - self.file_['start'] > 0 and \
-                            int(note['pos1']) - self.file_['start'] <= len(self.ui.textEdit.toPlainText()):
-                        cursor.setPosition(int(note['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
-                        cursor.setPosition(int(note['pos1']) - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+                            0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
+                            len(self.ui.textEdit.toPlainText()):
+                        cursor.setPosition(int(note['pos0']) - self.file_['start'],
+                                           QtGui.QTextCursor.MoveMode.MoveAnchor)
+                        cursor.setPosition(int(note['pos1']) - self.file_['start'],
+                                           QtGui.QTextCursor.MoveMode.KeepAnchor)
                         format_bold = QtGui.QTextCharFormat()
                         format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
                         cursor.mergeCharFormat(format_bold)
@@ -2866,7 +2869,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for i in self.code_text:
             for j in self.code_text:
                 if j != i:
-                    if j['pos0'] <= i['pos0'] and j['pos1'] >= i['pos0']:
+                    if j['pos0'] <= i['pos0'] <= j['pos1']:
                         if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
                             overlaps.append([j['pos0'], j['pos1']])
                         elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
@@ -2938,7 +2941,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
         result = cur.fetchall()
         if len(result) > 0:
-            # The event can trigger multiple times, so dont present a warning to the user
+            # The event can trigger multiple times, so do not present a warning to the user
             return
         self.code_text.append(coded)
         self.highlight()
@@ -3001,7 +3004,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         unmarked_list = []
         for item in self.code_text:
-            if location + self.file_['start'] >= item['pos0'] and location + self.file_['start'] <= item['pos1'] and \
+            if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 unmarked_list.append(item)
         if not unmarked_list:
@@ -3052,8 +3055,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # Find annotation at this position for this file
         if cursor_pos is None:
             for note in self.annotations:
-                if ((pos0 + self.file_['start'] >= note['pos0'] and pos0 + self.file_['start'] <= note['pos1']) or
-                    (pos1 + self.file_['start'] >= note['pos0'] and pos1 + self.file_['start'] <= note['pos1'])) \
+                if ((note['pos0'] <= pos0 + self.file_['start'] <= note['pos1']) or
+                    (note['pos0'] <= pos1 + self.file_['start'] <= note['pos1'])) \
                         and note['fid'] == self.file_['id']:
                     item = note  # use existing annotation
                     details = item['owner'] + " " + item['date']
@@ -3328,9 +3331,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
-                                    + _("\nWith text fragment: ") 
-                                    + text.decode("utf-8") 
-                                    + _("\nUsing line ending: ") 
+                                    + _("\nWith text fragment: ")
+                                    + text.decode("utf-8")
+                                    + _("\nUsing line ending: ")
                                     + ending + "\n" + msg)
         self.app.delete_backup = False
         # Update tooltip filter and code tree code counts
@@ -3581,7 +3584,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             for c in self.ed_annotations:
                 changed = False
@@ -3589,7 +3592,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             for c in self.ed_casetext:
                 changed = False
@@ -3598,7 +3601,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start < c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             self.ed_highlight()
             self.prev_text = copy(self.text)
@@ -3623,7 +3626,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     changed = True
                     self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
                     c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
@@ -3643,7 +3646,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         changed = True
                         self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
                         c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
@@ -3664,7 +3667,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     changed = True
                     self.code_deletions.append("delete from case_text where id=" + str(c['id']))
                     c['npos0'] = None
-                if c['npos0'] is not None and not changed and pre_start > c['npos0'] and pre_start <= c['npos1']:
+                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
                     c['npos1'] += pre_chars + post_chars
                     if c['npos1'] < c['npos0']:
                         self.code_deletions.append("delete from case_text where id=" + str(c['id']))
@@ -3835,7 +3838,7 @@ class ToolTipEventFilter(QtCore.QObject):
                 # Call Base Class Method to Continue Normal Event Processing
                 return super(ToolTipEventFilter, self).eventFilter(receiver, event)
             for item in self.code_text:
-                if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos and \
+                if item['pos0'] - self.offset <= pos <= item['pos1'] - self.offset and \
                         item['seltext'] is not None:
                     seltext = item['seltext']
                     seltext = seltext.replace("\n", "")
@@ -3874,7 +3877,7 @@ class ToolTipEventFilter(QtCore.QObject):
                 text_ = multiple_msg + text_
             # Check annotations
             for ann in self.annotations:
-                if ann['pos0'] - self.offset <= pos and ann['pos1'] - self.offset >= pos:
+                if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset:
                     text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
