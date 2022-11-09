@@ -158,7 +158,8 @@ class Codebook:
         cursor = QtGui.QTextCursor()
         text_edit.textCursor().beginEditBlock()
         text_edit.textCursor().setBlockFormat(fmt1)
-        text_edit.textCursor().insertHtml("<p style=font-size:16pt;font-weight:400>Codebook: " + self.app.project_name + "</p><br/>")
+        text_edit.textCursor().insertHtml(
+            "<p style=font-size:16pt;font-weight:400>Codebook: " + self.app.project_name + "</p><br/>")
         text_edit.textCursor().endEditBlock()
 
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
@@ -169,13 +170,12 @@ class Codebook:
             if item.text(1).split(':')[0] == "catid":
                 cat = True
             id_ = int(item.text(1).split(':')[1])
-            memo = ""
-            owner = ""
             prefix = ""
             for i in range(0, self.depthgauge(item)):
                 prefix += "..."
             if cat:
-                category_text = '<br/><span style=font-size:14pt>' + prefix + _("Category: ") + self.convert_entities(item.text(0)) + "</span><br/>"
+                category_text = '<br/><span style=font-size:14pt>' + prefix + _("Category: ") + \
+                                self.convert_entities(item.text(0)) + "</span><br/>"
                 memo = ""
                 for i in self.categories:
                     if i['catid'] == id_:
@@ -219,7 +219,8 @@ class Codebook:
         filename = "codebook.txt"
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
-            _("Select directory to save file"), self.app.settings['directory'], options)
+                                                               _("Select directory to save file"),
+                                                               self.app.settings['directory'], options)
         if directory == "":
             return
         filename = directory + "/" + filename
