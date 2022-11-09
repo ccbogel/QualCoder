@@ -31,7 +31,7 @@ import base64
 import configparser
 import datetime
 import gettext
-import json  # To get latest Github release information
+import json  # To get the latest GitHub release information
 import logging
 from logging.handlers import RotatingFileHandler
 import os
@@ -762,7 +762,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        # Test of MacOS menu bar
+        # Test of macOS menu bar
         self.ui.menubar.setNativeMenuBar(False)
         self.get_latest_github_release()
         try:
@@ -1221,9 +1221,9 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeAV(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
-        except Exception as e_:
-            logger.debug(str(e_))
-            Message(self.app, _("A/V Coding"), str(e_), "warning").exec()
+        except Exception as err:
+            logger.debug(str(err))
+            Message(self.app, _("A/V Coding"), str(err), "warning").exec()
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -1262,7 +1262,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def refi_project_export(self):
         """ Export the project as a qpdx zipped folder.
          Follows the REFI Project Exchange standards.
-         CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
          NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
         """
 
@@ -1339,9 +1338,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     try:
                         self.app.conn.commit()
                         self.app.conn.close()
-                    except Exception as e_:
-                        print("closeEvent", e_)
-                # TODO calls twice ?
+                    except Exception as err:
+                        print("closeEvent", err)
+                        logger.warning("close event " + str(err))
+                # TODO calls twice, do not know how to fix
                 QtWidgets.QApplication.instance().quit()
                 # QtWidgets.qApp.quit()
                 return
@@ -1377,7 +1377,7 @@ class MainWindow(QtWidgets.QMainWindow):
         counter = 0
         extension = ""
         while os.path.exists(project_path + extension + ".qda"):
-            #print("C", counter, project_path + extension + ".qda")
+            # print("C", counter, project_path + extension + ".qda")
             if counter > 0:
                 extension = "_" + str(counter)
             counter += 1
@@ -1388,8 +1388,8 @@ class MainWindow(QtWidgets.QMainWindow):
             os.mkdir(self.app.project_path + "/audio")
             os.mkdir(self.app.project_path + "/video")
             os.mkdir(self.app.project_path + "/documents")
-        except Exception as e_:
-            logger.critical(_("Project creation error ") + str(e_))
+        except Exception as err:
+            logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
             self.app = App()
             return
@@ -1488,14 +1488,14 @@ class MainWindow(QtWidgets.QMainWindow):
                                     + _("About: ") + str(self.project['about']) + "\n"
                                     + _("Coder:") + str(self.app.settings['codername']) + "\n"
                                     + "========")
-        except Exception as e_:
+        except Exception as err:
             msg = _("Problem creating database ")
-            logger.warning(msg + self.app.project_path + " Exception:" + str(e_))
+            logger.warning(msg + self.app.project_path + " Exception:" + str(err))
             self.ui.textEdit.append("\n" + msg + "\n" + self.app.project_path)
-            self.ui.textEdit.append(str(e_))
+            self.ui.textEdit.append(str(err))
             self.close_project()
             return
-        # New project, so tell open project NOT to backup, as there will be nothing in there to backup
+        # New project, so tell open project NOT to back up, as there will be nothing in there to back up
         self.open_project(self.app.project_path, "yes")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         # Remove widgets from each tab
@@ -1566,7 +1566,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_project(self, path_="", newproject="no"):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
-        Do not backup on a newly created project, as it wont contain data.
+        Do not back up on a newly created project, as it will not contain data.
         A backup is created if settings backup is True.
         The backup is deleted, if no changes.
         Backups are created using the date and 24 hour suffix: _BKUP_yyyymmdd_hh
@@ -1599,9 +1599,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(path) > 3 and proj_path[-4:] == ".qda":
             try:
                 self.app.create_connection(proj_path)
-            except Exception as e_:
+            except Exception as err:
                 self.app.conn = None
-                msg += " " + str(e_)
+                msg += " " + str(err)
                 logger.debug(msg)
         if self.app.conn is None:
             msg += "\n" + proj_path
@@ -1618,8 +1618,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 logger.debug("This is not a QualCoder database")
                 self.close_project()
                 return
-        except Exception as e_:
-            logger.debug("This in not a QualCoder database " + str(e_))
+        except Exception as err:
+            logger.debug("This in not a QualCoder database " + str(err))
             self.close_project()
             return
 
@@ -1646,8 +1646,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_text ADD avid integer")
                 self.app.conn.commit()
-            except Exception as e_:
-                logger.debug(str(e_))
+            except Exception as err:
+                logger.debug(str(err))
         try:
             cur.execute("select bookmarkfile from project")
         except sqlite3.OperationalError:
@@ -1657,8 +1657,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur.execute("ALTER TABLE project ADD bookmarkpos integer")
                 self.app.conn.commit()
                 self.ui.textEdit.append(_("Updating database to version") + " v2")
-            except Exception as e_:
-                logger.debug(str(e_))
+            except Exception as err:
+                logger.debug(str(err))
         # Database version v3
         cur = self.app.conn.cursor()
         try:
@@ -1667,8 +1667,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_text ADD important integer")
                 self.app.conn.commit()
-            except Exception as e_:
-                logger.debug(str(e_))
+            except Exception as err:
+                logger.debug(str(err))
                 cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_av")
@@ -1676,8 +1676,8 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 cur.execute("ALTER TABLE code_av ADD important integer")
                 self.app.conn.commit()
-            except Exception as e_:
-                logger.debug(str(e_))
+            except Exception as err:
+                logger.debug(str(err))
         cur = self.app.conn.cursor()
         try:
             cur.execute("select important from code_image")
@@ -1686,8 +1686,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 cur.execute("ALTER TABLE code_image ADD important integer")
                 self.app.conn.commit()
                 self.ui.textEdit.append(_("Updating database to version") + " v3")
-            except Exception as e_:
-                logger.debug(str(e_))
+            except Exception as err:
+                logger.debug(str(err))
         # Database version v4
         try:
             cur.execute("select ctid from code_text")
@@ -1838,7 +1838,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
-        Do not backup if the name already exists.
+        Do not back up if the name already exists.
         A backup can be generated in the subsequent hour."""
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%M-%S")
@@ -1850,10 +1850,10 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.settings['backup_av_files'] == 'True':
             try:
                 shutil.copytree(self.app.project_path, backup)
-            except FileExistsError as e_:
+            except FileExistsError as err:
                 msg = _("There is already a backup with this name")
-                print(str(e_) + "\n" + msg)
-                logger.warning(_(msg) + "\n" + str(e_))
+                print(str(err) + "\n" + msg)
+                logger.warning(_(msg) + "\n" + str(err))
         else:
             shutil.copytree(self.app.project_path, backup,
                             ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
@@ -1953,7 +1953,7 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
-        # Added if statement for the first opening of QualCoder. Otherwise looks odd closing a project that is not there.
+        # Added if statement for the first opening of QualCoder. Otherwise, looks odd closing a project that is not there.
         if self.app.project_name != "":
             self.ui.textEdit.append("Closing project: " + self.app.project_name)
             self.ui.textEdit.append("========\n")
@@ -1978,7 +1978,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_backup_folders(self):
         """ Delete the most current backup created on opening a project,
         providing the project was not changed in any way.
-        Delete oldest backups if more than BACKUP_NUM are created.
+        Delete the oldest backups if more than BACKUP_NUM are created.
         Backup name format: directories/projectname_BKUP_yyyymmdd_hh.qda
         Requires: self.settings['backup_num'] """
 
@@ -1987,8 +1987,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.delete_backup_path_name != "" and self.app.delete_backup:
             try:
                 shutil.rmtree(self.app.delete_backup_path_name)
-            except Exception as e_:
-                print(str(e_))
+            except Exception as err:
+                print(str(err))
+                logger.warning(str(err))
         # Get a list of backup folders for current project
         parts = self.app.project_path.split('/')
         project_name_and_suffix = parts[-1]
@@ -2012,8 +2013,9 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 shutil.rmtree(directory + f_)
                 self.ui.textEdit.append(_("Deleting: ") + directory + f_)
-            except Exception as e_:
-                print(str(e_))
+            except Exception as err:
+                print(str(err))
+                logger.warning(str(err))
 
     def get_latest_github_release(self):
         """ Get latest github release.
@@ -2037,9 +2039,9 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
                 self.ui.textEdit.append(_json['html_url'] + "\n")
-        except Exception as e_:
-            print(e_)
-            logger.debug(str(e_))
+        except Exception as err:
+            print(err)
+            logger.warning(str(err))
 
 
 def gui():
@@ -2058,10 +2060,6 @@ def gui():
     # Use two character language setting
     lang = settings.get('language', 'en')
     # Test for pyinstall data files
-    '''if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        print('Running in a PyInstaller bundle')
-    else:
-        print('Running in a normal Python process')'''
     locale_dir = os.path.join(path, 'locale')
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
@@ -2104,15 +2102,15 @@ def gui():
         try:
             translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
             print("locale directory for python translations: ", locale_dir)
-        except Exception as e_:
-            print("Error accessing python translations mo file\n", e_)
+        except Exception as err:
+            print("Error accessing python translations mo file\n", err)
             print("Locale directory for python translations: ", locale_dir)
             try:
                 print("Trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
                 mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-            except Exception as e2_:
-                print("No " + lang + ".mo translation file loaded", e2_)
+            except Exception as err2:
+                print("No " + lang + ".mo translation file loaded", err2)
     translator.install()
     ex = MainWindow(qual_app)
     if project_path:
