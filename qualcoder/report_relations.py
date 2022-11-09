@@ -233,7 +233,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
               "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
-              "fid in (" + selected_fids + ") order by fid"
+                                                                            "fid in (" + selected_fids + ") order by fid"
         cur.execute(sql, [coder_name, ])
         result = cur.fetchall()
         file_ids_names = []
@@ -293,7 +293,7 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         whichmin is the code with the lowest pos0, or None if equal
         whichmax is the code with the highest pos1 or None if equal
-        operlapindex is the combined lowest to highest positions. Only used for E, O, P
+        operlapindex is the combined lowest to the highest positions. Only used for E, O, P
         unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
 
         Returns:
@@ -489,7 +489,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             for col in range(0, col_count):
                 try:
                     cell = self.ui.tableWidget.item(row, col).text()
-                    if cell_counter_pos < row * col_count + col  and found_row == -1 and search_text in cell:
+                    if cell_counter_pos < row * col_count + col and found_row == -1 and search_text in cell:
                         found_row = row
                         found_col = col
                         break
@@ -996,7 +996,7 @@ class DialogReportRelations(QtWidgets.QDialog):
             return
         stats_filepath = filepath[:-4] + "_stats.csv"
         stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
-                    "Median", "Q3", _("Maximum"), "Mean", "std dev"]
+                           "Median", "Q3", _("Maximum"), "Mean", "std dev"]
         with open(stats_filepath, 'w', encoding='UTF8') as f:
             writer = csv.writer(f, quoting=csv.QUOTE_ALL)
             writer.writerow(stats_col_names)
