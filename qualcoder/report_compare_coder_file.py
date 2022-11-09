@@ -343,8 +343,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 media.parse()
                 msecs = media.get_duration()
                 duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
-            except Exception as e_:
-                msg_ = _("Cannot open: ") + source + "\n" + str(e_)
+            except Exception as err:
+                msg_ = _("Cannot open: ") + source + "\n" + str(err)
                 logger.debug(msg_)
                 Message(self.app, _("A/V Error"), msg_, "warning").exec()
                 logger.warning(msg_)
@@ -883,11 +883,11 @@ class DialogDualCodedImage(QtWidgets.QDialog):
         """ Draw coded areas for both coders """
 
         for c in self.coded0:
-            self.draw_coded_area(c, "Coder0", "#F4FA58")
+            self.draw_coded_area(c, "#F4FA58")
         for c in self.coded1:
-            self.draw_coded_area(c, "Coder1", "#81BEf7")
+            self.draw_coded_area(c, "#81BEf7")
 
-    def draw_coded_area(self, coded, coder, color):
+    def draw_coded_area(self, coded, color):
         """ Draw the coded rectangle in the scene.
          Provide detailed tooltip. """
 
