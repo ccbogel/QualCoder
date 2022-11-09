@@ -1175,8 +1175,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         items = []
         for item in self.code_areas:
             if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
-                if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
-                        and pos.y() >= item['y1'] * self.scale and pos.y() <= (
+                if item['x1'] * self.scale <= pos.x() <= (item['x1'] + item['width']) * self.scale \
+                        and item['y1'] * self.scale <= pos.y() <= (
                         item['y1'] + item['height']) * self.scale:
                     items.append(item)
         return items
@@ -1470,7 +1470,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             parent : QTreeWidgetItem """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
-        reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
+        reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
                                                msg, QtWidgets.QMessageBox.StandardButton.Yes,
                                                QtWidgets.QMessageBox.StandardButton.No)
         if reply == QtWidgets.QMessageBox.StandardButton.No:
