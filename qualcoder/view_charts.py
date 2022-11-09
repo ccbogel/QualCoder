@@ -348,8 +348,8 @@ class ViewCharts(QDialog):
 
         if self.attribute_file_ids:
             file_ids = ""
-            for id in self.attribute_file_ids:
-                file_ids += "," + str(id)
+            for id_ in self.attribute_file_ids:
+                file_ids += "," + str(id_)
             return _("Attributes: ") + self.attributes_msg + " ", " in (" + file_ids[1:] + ")"
 
         file_name = self.ui.comboBox_file.currentText()
@@ -1304,7 +1304,7 @@ class ViewCharts(QDialog):
                     code_counts.append(self.heatmap_counter_by_file_and_code(owner, f[0], code_['cid']))
                 data.append(code_counts)
         if heatmap_type == "Case":
-            if not self.attribute_case_ids_and_names:  #self.attribute_file_ids:
+            if not self.attribute_case_ids_and_names:  # self.attribute_file_ids:
                 sql = "select caseid, name from cases order by name"
                 cur.execute(sql)
                 cases = cur.fetchall()
@@ -1392,6 +1392,4 @@ class ViewCharts(QDialog):
         self.ui.comboBox_heatmap.blockSignals(True)
         self.ui.comboBox_heatmap.setCurrentIndex(0)
         self.ui.comboBox_heatmap.blockSignals(False)
-
-
 
