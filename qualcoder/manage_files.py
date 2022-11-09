@@ -74,7 +74,6 @@ try:
 except Exception as e:
     print(e)
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -366,9 +365,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         msg = _("Export to ") + destination + "\n"
         try:
             move(self.app.project_path + mediapath, destination)
-        except Exception as e_:
-            logger.debug(str(e_))
-            Message(self.app, _("Cannot export"), _("Cannot export as linked file\n") + str(e_), "warning").exec()
+        except Exception as err:
+            logger.warning(str(err))
+            Message(self.app, _("Cannot export"), _("Cannot export as linked file\n") + str(err), "warning").exec()
             return
         new_mediapath = ""
         if file_directory == "documents":
@@ -678,9 +677,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     duration_txt = msecs_to_hours_mins_secs(msecs)
                     metadata += _("Duration: ") + duration_txt
                     return icon, metadata
-                except AttributeError as e_:
-                    logger.debug(str(e_))
-                    metadata += _("Cannot locate media. ") + abs_path + "\n" + str(e_)
+                except AttributeError as err:
+                    logger.warning(str(err))
+                    metadata += _("Cannot locate media. ") + abs_path + "\n" + str(err)
                     return icon, metadata
             else:
                 metadata += _("Cannot get media duration.\nVLC not installed.")
@@ -808,7 +807,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
 
-            # Check numeric for numeric attributes, clear "" if cannot be cast
+            # Check numeric for numeric attributes, clear "" if it cannot be cast
             cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?", (attribute_name,))
             result = cur.fetchone()
             if result is None:
@@ -890,10 +889,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem())
             else:
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
-        except Exception as e_:
-            logger.debug(e_)
-            print(e_)
-            Message(self.app, _('view AV error'), str(e_), "warning").exec()
+        except Exception as err:
+            logger.warning(str(err))
+            print(err)
+            Message(self.app, _('view AV error'), str(err), "warning").exec()
             self.av_dialog_open = None
             return
 
@@ -988,7 +987,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
         Can import from plain text files, also import from html, odt, docx and md.
-        md is text markdown format.
+        md is text Markdown format.
         Note importing from html, odt, docx all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as mp3, wav, m4a which are stored in an audio directory.
@@ -1003,7 +1002,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
-                                                           self.default_import_directory,
+                                                          self.default_import_directory,
                                                           options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                           )
         imports = response[0]
@@ -1022,7 +1021,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             fileinfo = os.stat(f)
             if fileinfo.st_size >= 2147483647:
                 link_path = f
-            # Need process events, if many large files are imported, which leaves the FileDialog open and covering the screen.
+            # Need process events, if many large files are imported, leaves the FileDialog open and covering the screen.
             QtWidgets.QApplication.processEvents()
             filename = f.split("/")[-1]
             destination = self.app.project_path
@@ -1052,9 +1051,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                         self.load_file_text(destination, "docs:" + link_path)
                         try:
                             os.remove(destination)
-                        except OSError as e_:
-                            logger.debug(
-                                "Remove decrypted pdf linked file from /documents\n" + destination + "\n" + str(e_))
+                        except OSError as err:
+                            logger.warning(
+                                "Remove decrypted pdf linked file from /documents\n" + destination + "\n" + str(err))
                 else:
                     # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
                     pdf_msg = _(
@@ -1100,20 +1099,20 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if link_path == "":
                     try:
                         self.load_file_text(f)
-                    except Exception as e_:
-                        print(e_)
-                        logger.warning(str(e_))
+                    except Exception as err:
+                        print(err)
+                        logger.warning(str(err))
                     try:
                         copyfile(f, destination)
-                    except OSError as e_:
-                        logger.warning(str(e_))
+                    except OSError as err:
+                        logger.warning(str(err))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
                 else:
                     try:
                         self.load_file_text(f, "docs:" + link_path)
-                    except Exception as e_:
-                        print(e_)
-                        logger.warning(str(e_))
+                    except Exception as err:
+                        print(err)
+                        logger.warning(str(err))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
         if pdf_msg != "":
             self.parent_text_edit.append(pdf_msg)
@@ -1156,7 +1155,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         name_split = mediapath.split("/")
         filename = name_split[-1]
         if any(d['name'] == filename for d in self.source):
-            QtWidgets.QMessageBox.warning(None, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
+            QtWidgets.QMessageBox.warning(self, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
         entry = {'name': filename, 'id': -1, 'fulltext': None, 'memo': "", 'mediapath': mediapath,
                  'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -1241,8 +1240,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     bytes_ = d.get_body_content()
                     string = bytes_.decode('utf-8')
                     text_ += html_to_text(string) + "\n\n"  # add line to paragraph spacing for visual format
-                except TypeError as e_:
-                    logger.debug("ebooklib get_body_content error " + str(e_))
+                except TypeError as err:
+                    logger.debug("ebooklib get_body_content error " + str(err))
         # Import PDF
         if import_file[-4:].lower() == '.pdf':
             fp = open(import_file, 'rb')  # read binary mode
@@ -1280,7 +1279,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         break
                     html_text += line
                 text_ = html_to_text(html_text)
-                QtWidgets.QMessageBox.warning(None, _('Warning'), str(import_errors) + _(" lines not imported"))
+                QtWidgets.QMessageBox.warning(self, _('Warning'), str(import_errors) + _(" lines not imported"))
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
         # coding = chardet.detect(file.content).get('encoding')
@@ -1296,13 +1295,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                             break
                         try:
                             text_ += line
-                        except Exception as e_:
-                            logger.debug("Importing plain text file, line ignored: " + str(e_))
+                        except Exception as err:
+                            logger.warning("Importing plain text file, line ignored: " + str(err))
                             import_errors += 1
                     if text_[0:6] == "\ufeff":  # associated with notepad files
                         text_ = text_[6:]
-            except Exception as e_:
-                Message(self.app, _("Warning"), _("Cannot import") + str(import_file) + "\n" + str(e_),
+            except Exception as err:
+                logger.warning(str(err))
+                Message(self.app, _("Warning"), _("Cannot import") + str(import_file) + "\n" + str(err),
                         "warning").exec()
                 return
             if import_errors > 0:
@@ -1317,7 +1317,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         name_split = import_file.split("/")
         filename = name_split[-1]
         if any(d['name'] == filename for d in self.source):
-            QtWidgets.QMessageBox.warning(None, _('Duplicate file'),
+            QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
                                           _("Duplicate filename.\nFile not imported"))
             return
 
@@ -1471,8 +1471,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             try:
                 copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
                 msg += destination + "\n"
-            except FileNotFoundError as e_:
-                logger.warning(str(e_))
+            except FileNotFoundError as err:
+                logger.warning(str(err))
                 document_stored = False
 
         # Export transcribed files, user created text files, text representations of linked files
@@ -1520,8 +1520,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 try:
                     if s['mediapath'] is None:
                         os.remove(self.app.project_path + "/documents/" + s['name'])
-                except OSError as e_:
-                    logger.warning(_("Deleting file error: ") + str(e_))
+                except OSError as err:
+                    logger.warning(_("Deleting file error: ") + str(err))
                 # Delete stored coded sections and source details
                 cur.execute("delete from source where id = ?", [s['id']])
                 cur.execute("delete from code_text where fid = ?", [s['id']])
@@ -1548,8 +1548,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     filepath = self.app.project_path + s['mediapath']
                     try:
                         os.remove(filepath)
-                    except OSError as e_:
-                        logger.warning(_("Deleting file error: ") + str(e_))
+                    except OSError as err:
+                        logger.warning(_("Deleting file error: ") + str(err))
                 # Delete stored coded sections and source details
                 cur.execute("delete from source where id = ?", [s['id']])
                 cur.execute("delete from code_image where id = ?", [s['id']])
@@ -1578,7 +1578,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     def delete(self):
         """ Delete one file from database and update model and widget.
         Deletes only one file due to table single selection mode
-        Also, delete the file from sub-directories, if not externally linked.
+        Also, delete the file from subdirectories, if not externally linked.
         Called by: right-click table context menu.
         """
 
@@ -1607,8 +1607,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             try:
                 if self.source[row]['mediapath'] is None:
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
-            except OSError as e_:
-                logger.warning(_("Deleting file error: ") + str(e_))
+            except OSError as err:
+                logger.warning(_("Deleting file error: ") + str(err))
             # Delete stored coded sections and source details
             cur.execute("delete from source where id = ?", [file_id])
             cur.execute("delete from code_text where fid = ?", [file_id])
@@ -1636,8 +1636,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 filepath = self.app.project_path + self.source[row]['mediapath']
                 try:
                     os.remove(filepath)
-                except OSError as e_:
-                    logger.warning(_("Deleting file error: ") + str(e_))
+                except OSError as err:
+                    logger.warning(_("Deleting file error: ") + str(err))
             # Delete stored coded sections and source details
             cur.execute("delete from source where id = ?", [file_id])
             cur.execute("delete from code_image where id = ?", [file_id])
