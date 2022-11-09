@@ -511,7 +511,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if text_ == "csv":
             self.export_csv_file()
         self.ui.comboBox_export.setCurrentIndex(0)
-        #TODO
         if self.te:
             reply = QtWidgets.QMessageBox.question(self, _("Export Matrix"), _("Export matrix results"),
                                                    QtWidgets.QMessageBox.StandardButton.Yes,
@@ -527,8 +526,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if row_count == 0 or col_count == 0:
             return
         filename = "Report_matrix.xlsx"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dlg.filepath
         if filepath is None:
             return
         wb = openpyxl.Workbook()
@@ -565,8 +564,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = "Report_codings.txt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dlg.filepath
         if filepath is None:
             return
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
@@ -588,8 +587,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         filename = "Report_codings.odt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dlg.filepath
         if filepath is None:
             return
         tw = QtGui.QTextDocumentWriter()
@@ -676,8 +675,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                         csv_data[row][col] = d
                         row += 1
         filename = "Report_codings.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dlg.filepath
         if filepath is None:
             return
         with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
@@ -698,8 +697,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
         html_filename = "Report_codings.html"
-        e = ExportDirectoryPathDialog(self.app, html_filename)
-        filepath = e.filepath
+        exp_dlg = ExportDirectoryPathDialog(self.app, html_filename)
+        filepath = exp_dlg.filepath
         if filepath is None:
             return
         tw = QtGui.QTextDocumentWriter()
@@ -714,22 +713,22 @@ class DialogReportCodes(QtWidgets.QDialog):
                 need_media_folders = True
         html_folder_name = ""
         if need_media_folders:
-            # Create folder with sub-folders for inages, audio and video
+            # Create folder with sub-folders for images, audio and video
             html_folder_name = filepath[:-5]
             try:
                 os.mkdir(html_folder_name)
                 os.mkdir(html_folder_name + "/images")
                 os.mkdir(html_folder_name + "/audio")
                 os.mkdir(html_folder_name + "/video")
-            except Exception as e:
-                logger.warning(_("html folder creation error ") + str(e))
-                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(e), "critical").exec()
+            except Exception as err:
+                logger.warning(_("html folder creation error ") + str(err))
+                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(err), "critical").exec()
                 return
         try:
             with open(filepath, 'r') as f:
                 html = f.read()
-        except Exception as e:
-            logger.warning(_('html file reading error:') + str(e))
+        except Exception as err:
+            logger.warning(_('html file reading error:') + str(err))
             return
 
         # Change html links to reference the html folder
@@ -1362,8 +1361,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             else:
                 cur.execute(sql, parameters)
             imgresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', 'fid', \
-                   'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid'
+            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid'
             for row in imgresults:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
@@ -1466,7 +1465,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.results = tmp_results
             return
         if sort_by == "10 - 1":
-            large_to_small = sorted(name_and_count, key=lambda  d: d['count'], reverse=True)
+            large_to_small = sorted(name_and_count, key=lambda d: d['count'], reverse=True)
             for s in large_to_small:
                 for r in self.results:
                     if s['codename'] == r['codename']:
@@ -1959,7 +1958,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 item['codename_memo'] is not None:
             head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if memo_choice in ("Also all memos", "Only memos") and item['source_memo'] != "" and item['source_memo'] is not None:
+        if memo_choice in ("Also all memos", "Only memos") and item['source_memo'] != "" and \
+                item['source_memo'] is not None:
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: ") + item['file_or_casename']
@@ -2013,7 +2013,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         html_link = None
         if fmt.isImageFormat():
             img_fmt = fmt.toImageFormat()  # QtGui.QTextImageFormat
-            #print("name", img_fmt.name(), img_fmt.height(), img_fmt.width())
+            # print("name", img_fmt.name(), img_fmt.height(), img_fmt.width())
             for h in self.html_links:
                 if h['imagename'] == img_fmt.name():
                     html_link = h
@@ -2413,8 +2413,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                                 try:
                                     if memo_choice in ("Also all memos", "Also coded memos") and r['coded_memo'] != "":
                                         self.te[row][col].append(_("MEMO: ") + r['coded_memo'])
-                                except TypeError as e:
-                                    msg = str(e)
+                                except TypeError as err:
+                                    msg = str(err)
                                     msg += "\nMatrix Coded Memo Error:\nchoice: " + str(memo_choice) + "\n"
                                     msg += "Result dictionary:\n" + str(r) + "\n"
                                     logger.error(msg)
@@ -2456,7 +2456,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_view = None
         found = None
         for m in self.matrix_links:
-            if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
+            if m['row'] == x and m['col'] == y and m['textedit_start'] <= pos < m['textedit_end']:
                 found = True
         if found:
             action_view = menu.addAction(_("View in context"))
@@ -2476,7 +2476,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cb.setText(te_text)
         if action == action_view:
             for m in self.matrix_links:
-                if m['row'] == x and m['col'] == y and pos >= m['textedit_start'] and pos < m['textedit_end']:
+                if m['row'] == x and m['col'] == y and m['textedit_start'] <= pos < m['textedit_end']:
                     if 'mediapath' not in m:
                         ui = DialogCodeInText(self.app, m)
                         ui.exec()
@@ -2515,7 +2515,7 @@ class ToolTipEventFilter(QtCore.QObject):
             if self.media_data is None:
                 return super(ToolTipEventFilter, self).eventFilter(receiver, event)
             for item in self.media_data:
-                if item['textedit_start'] <= pos and item['textedit_end'] >= pos:
+                if item['textedit_start'] <= pos <= item['textedit_end']:
                     receiver.setToolTip(_("Right click to view"))
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
