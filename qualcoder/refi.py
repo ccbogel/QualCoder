@@ -403,8 +403,8 @@ class RefiImport:
         # Remove temporary extract folder
         try:
             shutil.rmtree(self.folder_name)
-        except OSError as e_:
-            logger.debug(str(e_) + " " + self.folder_name)
+        except OSError as err:
+            logger.debug(str(err) + " " + self.folder_name)
         # Change the username to an owner name from the import
         if len(self.users) > 0:
             self.app.settings['codername'] = self.users[0]['name']
@@ -511,9 +511,9 @@ class RefiImport:
 
         typeOfVariable: Text, Boolean, Integer, Float, Date, Datetime
 
-        :param element
+        param: element
 
-        :return count of variables
+        return: count of variables
         """
 
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
@@ -614,9 +614,9 @@ class RefiImport:
                     item['caseid'] = cur.fetchone()[0]
                     self.cases.append(item)
                     count += 1
-                except Exception as e_:
-                    self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(e_))
-                    logger.error("item:" + str(item) + ", " + str(e_))
+                except Exception as err:
+                    self.parent_textEdit.append(_('Error entering Case into database') + '\n' + str(err))
+                    logger.warning("item:" + str(item) + ", " + str(err))
 
                 # Use case_vars to update attribute-type from 'file' to 'case'
                 case_vars = []
@@ -701,9 +701,9 @@ class RefiImport:
         check file location and if not found ask user for the new file location.
         This check occurs in qualcoder.py
 
-        :param element: Sources element object
+        param element: Sources element object
 
-        :return count of sources
+        return: count of sources
         """
 
         count = 0
@@ -800,9 +800,9 @@ class RefiImport:
             media_path = "/images/" + name
             try:
                 shutil.copyfile(source_path, destination)
-            except (FileNotFoundError, PermissionError, shutil.SameFileError) as e_:
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
                 self.parent_textEdit.append(
-                    _('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(e_))
+                    _('Cannot copy Image file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
         if path_type == "absolute":
             media_path = "images:" + source_path
         if path_type == "relative":
@@ -896,9 +896,9 @@ class RefiImport:
             media_path = "/audio/" + name
             try:
                 shutil.copyfile(source_path, destination)
-            except Exception as e_:
+            except Exception as err:
                 self.parent_textEdit.append(
-                    _('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(e_))
+                    _('Cannot copy Audio file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
         if path_type == "absolute":
             media_path = "audio:" + source_path
         if path_type == "relative":
@@ -958,9 +958,9 @@ class RefiImport:
             media_path = "/video/" + name
             try:
                 shutil.copyfile(source_path, destination)
-            except (FileNotFoundError, PermissionError, shutil.SameFileError) as e_:
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
                 self.parent_textEdit.append(
-                    _('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(e_))
+                    _('Cannot copy Video file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
         if path_type == "absolute":
             media_path = "video:" + source_path
         if path_type == "relative":
@@ -1063,12 +1063,12 @@ class RefiImport:
         if source_path[-1] != "/":
             source_path += "/"
         source_path += plain_text_path
-        #print("Source path: ", source_path)
-        #print("Destination: ", destination)
+        # print("Source path: ", source_path)
+        # print("Destination: ", destination)
         try:
             shutil.copyfile(source_path, destination)
-        except shutil.Error as e_:
-            msg = _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(e_)
+        except shutil.Error as err:
+            msg = _('Cannot copy transcript file from: ') + source_path + "\nto: " + destination + '\n' + str(err)
             logger.debug(msg)
             self.parent_textEdit.append(msg)
         # Load transcription text into database with filename matching and suffixed with .txt
@@ -1086,10 +1086,10 @@ class RefiImport:
                         pass
                 if text[0:6] == "\ufeff":  # Associated with notepad files
                     text = text[6:]
-        except Exception as e_:
-            print(e_)
-            logger.debug(str(e_))
-            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(e_), "warning").exec()
+        except Exception as err:
+            print(err)
+            logger.debug(str(err))
+            Message(self.app, _("Warning"), _("Cannot import") + str(destination) + "\n" + str(err), "warning").exec()
 
         memo = ""
         if name is not None:
@@ -1237,9 +1237,9 @@ class RefiImport:
             try:
                 shutil.copyfile(source_path, destination)
                 # print("PDF IMPORT", source_path, destination)
-            except Exception as e_:
+            except Exception as err:
                 self.parent_textEdit.append(
-                    _('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(e_))
+                    _('Cannot copy PDF file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
         if path_type == "absolute":
             media_path = "docs:" + source_path
         if path_type == "relative":
@@ -1343,20 +1343,20 @@ class RefiImport:
                 id_ = cur.fetchone()[0]
                 source['id'] = id_
                 self.sources.append(source)
-        except Exception as e_:
-            print("Error text source", e_)
-            logger.warning(str(e_))
-            self.parent_textEdit.append(_("Cannot read from TextSource: ") + source_path + "\n" + str(e_))
+        except Exception as err:
+            print("Error text source", err)
+            logger.warning(str(err))
+            self.parent_textEdit.append(_("Cannot read from TextSource: ") + source_path + "\n" + str(err))
 
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
             try:
                 shutil.copyfile(source_path, destination)
-            except Exception as e_:
-                logger.warning(str(e_))
+            except Exception as err:
+                logger.warning(str(err))
                 self.parent_textEdit.append(
-                    _('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(e_))
+                    _('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
 
         # Parse PlainTextSelection elements for Coding elements
         for el in element.getchildren():
@@ -1471,12 +1471,12 @@ class RefiImport:
                 try:
                     cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
                         memo,date) values(?,?,?,?,?,?,?,?)", (cid, source['id'],
-                                                          seltext, pos0, pos1, creating_user, memo, create_date))
+                                                              seltext, pos0, pos1, creating_user, memo, create_date))
                     self.app.conn.commit()
                 except sqlite3.IntegrityError:
-                    self.parent_textEdit.append(_("Duplicated text coding for code and coder. Only one loaded.") + 
-                                        " cid:" + str(cid) + " fid: " + str(source['id']) + _(" Positions:") + 
-                                        str(pos0) + " - " + str(pos1))
+                    self.parent_textEdit.append(_("Duplicated text coding for code and coder. Only one loaded.") +
+                                                " cid:" + str(cid) + " fid: " + str(source['id']) + _(" Positions:") +
+                                                str(pos0) + " - " + str(pos1))
         if annotation:
             sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
             cur.execute(sql, [source['id'], int(pos0), int(pos1), memo, creating_user, create_date])
@@ -1503,9 +1503,9 @@ class RefiImport:
         <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
 
-        :param element Notes
+        param: element Notes
 
-        : return count of Notes
+        return: count of Notes
         """
 
         cur = self.app.conn.cursor()
@@ -1705,10 +1705,10 @@ class RefiImport:
         There is no user table in QualCoder sqlite.
         Store each user in dictionary with name and guid.
 
-        :param element: Users element
-        :type element: xml tag
+        param element: Users element
+        type element: xml tag
 
-        :return count of users
+        return count of users
         """
 
         count = 0
@@ -1724,9 +1724,9 @@ class RefiImport:
             1. file_xml: Input xml file
             2. file_xsd: xsd file which needs to be validated against xml
 
-        :param xsd_type codebook or project
+        param: xsd_type codebook or project
 
-        :return true or false passing validation
+        return: true or false passing validation
         """
 
         file_xsd = codebook
@@ -1828,16 +1828,16 @@ class RefiExport(QtWidgets.QDialog):
         try:
             os.mkdir(prep_path)
             os.mkdir(prep_path + "/Sources")
-        except Exception as e_:
-            logger.error(_("Project export error ") + str(e_))
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e_), "warning").exec()
+        except Exception as err:
+            logger.error(_("Project export error ") + str(err))
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
             return
         try:
             with open(prep_path + '/project.qde', 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
-        except Exception as e_:
-            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(e_), "warning").exec()
-            logger.debug(str(e_))
+        except Exception as err:
+            Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
+            logger.debug(str(err))
             return
 
         add_line_ending_for_maxqda = False
@@ -1857,9 +1857,9 @@ class RefiExport(QtWidgets.QDialog):
                     else:
                         shutil.copyfile(self.app.project_path + s['mediapath'],
                                         self.app.settings['directory'] + '/' + s['filename'])
-                except FileNotFoundError as e_:
-                    txt_errors += "Error in media export: " + s['filename'] + "\n" + str(e_)
-                    msg = "ERROR in refi.export_project. media export: " + s['filename'] + "\n" + str(e_)
+                except FileNotFoundError as err:
+                    txt_errors += "Error in media export: " + s['filename'] + "\n" + str(err)
+                    msg = "ERROR in refi.export_project. media export: " + s['filename'] + "\n" + str(err)
                     print(msg)
                     logger.warning(msg)
             if s['mediapath'] is None:  # an internal document
@@ -1878,10 +1878,10 @@ class RefiExport(QtWidgets.QDialog):
                             f.write(s['fulltext'].replace("\n", "\r\n"))
                         else:
                             f.write(s['fulltext'])
-                    except Exception as e_:
-                        txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(e_)
-                        logger.error(str(e_) + '\nIn plaintext file export: ' + s['plaintext_filename'])
-                        print(e_)
+                    except Exception as err:
+                        txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(err)
+                        logger.error(str(err) + '\nIn plaintext file export: ' + s['plaintext_filename'])
+                        print(err)
 
         for notefile in self.note_files:
             with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
@@ -1908,8 +1908,8 @@ class RefiExport(QtWidgets.QDialog):
         try:
             shutil.rmtree(prep_path)
             os.remove(prep_path + ".qdpx")
-        except FileNotFoundError as e_:
-            logger.debug(str(e_))
+        except FileNotFoundError as err:
+            logger.warning(str(err))
         msg = export_path + ".qpdx\n"
         msg += _("REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n")
         msg += _("This project exchange is not guaranteed compliant with the exchange standard.\n")
@@ -1938,10 +1938,10 @@ class RefiExport(QtWidgets.QDialog):
             msg += filename
             Message(self.app, _("Codebook exported"), _(msg)).exec()
             self.parent_textEdit.append(_("Codebook exported") + "\n" + _(msg))
-        except Exception as e_:
-            logger.warning(str(e_))
-            Message(self.app, _("Codebook NOT exported"), str(e_)).exec()
-            self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(e_)))
+        except Exception as err:
+            logger.warning(str(err))
+            Message(self.app, _("Codebook NOT exported"), str(err)).exec()
+            self.parent_textEdit.append(_("Codebook NOT exported") + "\n" + _(str(err)))
 
     def user_guid(self, username):
         """ Requires a username. returns matching guid """
@@ -2816,8 +2816,8 @@ class RefiExport(QtWidgets.QDialog):
                 media_length = vlc_media.get_duration() - 1
                 if media_length == -1:
                     media_length = 0
-            except Exception as e_:
-                msg_ = str(e_) + "\n" + media_name
+            except Exception as err:
+                msg_ = str(err) + "\n" + media_name
                 Message(self.app, _("A/V Media not found"), msg_, "warning").exec()
                 logger.warning(msg_)
         else:
@@ -2876,7 +2876,7 @@ class RefiExport(QtWidgets.QDialog):
                       'filename': filename, 'plaintext_filename': plaintext_filename,
                       'external': None}
             # external is an absolute path
-            # Make it so that no media > 2Gb is able to be imported internally into the project
+            # Make it so that no media > 2Gb to be imported internally into the project
             if source['mediapath'] is not None:
                 # fileinfo = os.stat(self.app.project_path + source['mediapath'])
                 # f fileinfo.st_size >= 2147483647:
@@ -3019,7 +3019,7 @@ class RefiExport(QtWidgets.QDialog):
         return xml
 
     def create_guid(self):
-        """ Create globally unique guid for each component. 128 bit integer, 32 chars
+        """ Create globally unique guid for each component. 128-bit integer, 32 chars
         Format:
         ([0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12})|(\{[0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12}\})
 
@@ -3041,12 +3041,12 @@ class RefiExport(QtWidgets.QDialog):
 
     def codebook_exchange_xml(self):
         """ See: https://www.qdasoftware.org/wp-content/uploads/2019/03/QDAS-XML-1-0.pdf
-        GUID: 128 bit integer used to identify resources, globally unique
+        GUID: 128-bit integer used to identify resources, globally unique
         lxml parser: error occurs when defining UTF-8 encoding in first line
         ValueError:
         Unicode strings with encoding declaration are not supported.
         Please use bytes input or XML fragments without declaration.
-        This does not validate DONT USE"""
+        """
 
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
         self.xml += '<CodeBook xmlns="urn:QDA-XML:codebook:1:0" '
