@@ -96,12 +96,9 @@ class DialogInformation(QtWidgets.QDialog):
 about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
-<p>Depends on python minimum version 3.6 (I recommend 3.10). \
-<p>Modules required: pyqt6 lxml Pillow ebooklib ply chardet pdfminer.six openpyxl pandas plotly pydub \
-SpeechRecognition</p>\
-<p>A recent version of VLC (64 bit) needs to be installed. \
-ffmpeg is optional, but recommended to be installed for speech to text and waveform images.</p>\
-<p>Tested on: Ubuntu 20.04, mostly tested on Windows 10, used on Mac OS and on other Linux distros.</p>\
+<p>Optional: Install VLC for audio and video coding.<br /> \
+Optional: Install ffmpeg for speech to text and waveform images.</p>\
+<p>Tested on: Ubuntu 22.04, Windows 10/11, used on macOS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software. \
@@ -114,13 +111,13 @@ Julius Reich for creating the cool QualCoder logo. \
  To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
-images, audio and video. It also contains the sqlite database, named data.qda, to store coding data.</p>\
+images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.</p>\
 <p>QualCoder creates a .qualcoder folder inside your home directory. \
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
-<p>QualCoder is written in python using Qt6 for the graphical interface.</p>\
-<p>The REFI-QDA Project import and export seem to work ok, but should not be fully relied upon. </p>\
+<p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
+<p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
 <h2 class="western">License</h2>\
 <p>MIT License</p>\
 <p>Copyright (c) 2022 Colin Curtain</p>\
