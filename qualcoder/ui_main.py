@@ -175,6 +175,8 @@ class Ui_MainWindow(object):
         self.actionExport_codebook_with_memos.setObjectName("actionExport_codebook_with_memos")
         self.actionImport_references_RIS_format = QtGui.QAction(MainWindow)
         self.actionImport_references_RIS_format.setObjectName("actionImport_references_RIS_format")
+        self.actionManage_references = QtGui.QAction(MainWindow)
+        self.actionManage_references.setObjectName("actionManage_references")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -202,6 +204,7 @@ class Ui_MainWindow(object):
         self.menuFiles_and_Cases.addAction(self.actionManage_journals)
         self.menuFiles_and_Cases.addAction(self.actionManage_attributes)
         self.menuFiles_and_Cases.addAction(self.actionManage_bad_links_to_files)
+        self.menuFiles_and_Cases.addAction(self.actionManage_references)
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
@@ -299,6 +302,7 @@ class Ui_MainWindow(object):
         self.actionCharts.setText(_translate("MainWindow", "Charts"))
         self.actionExport_codebook_with_memos.setText(_translate("MainWindow", "Export codebook with memos as ODT file"))
         self.actionImport_references_RIS_format.setText(_translate("MainWindow", "Import references RIS format"))
+        self.actionManage_references.setText(_translate("MainWindow", "Manage references"))
 
 
 if __name__ == "__main__":
