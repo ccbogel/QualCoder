@@ -804,6 +804,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
+        self.ui.actionImport_references_RIS_format.triggered.connect(self.import_references)
 
         # File cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
@@ -816,6 +817,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
         self.ui.actionImport_survey.setShortcut('Alt+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
+        self.ui.actionManage_references.triggered.connect(self.manage_references)
 
         # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
@@ -928,6 +930,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
+        self.ui.actionImport_references_RIS_format.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -935,6 +938,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setEnabled(False)
         self.ui.actionImport_survey.setEnabled(False)
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
+        self.ui.actionManage_references.setEnabled(False)
         # codes menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
@@ -968,12 +972,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
+        self.ui.actionImport_references_RIS_format.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
         self.ui.actionManage_cases.setEnabled(True)
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey.setEnabled(True)
+        self.ui.actionManage_references.setEnabled(True)
         # Codes menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
@@ -1128,6 +1134,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
+
+    def manage_references(self):
+        """ Manage references.
+        Link to files. Unlink from files. """
+
+        print("TODO manage refs")
+
+    def import_references(self):
+        """ Import references in RIS format. """
+
+        print("TODO import refs")
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
