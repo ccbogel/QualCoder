@@ -139,6 +139,7 @@
      <addaction name="actionREFI_Codebook_import"/>
      <addaction name="actionREFI_QDA_Project_import"/>
      <addaction name="actionRQDA_Project_import"/>
+     <addaction name="actionImport_references_RIS_format"/>
     </widget>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
@@ -452,6 +453,11 @@
   <action name="actionExport_codebook_with_memos">
    <property name="text">
     <string>Export codebook with memos as ODT file</string>
+   </property>
+  </action>
+  <action name="actionImport_references_RIS_format">
+   <property name="text">
+    <string>Import references RIS format</string>
    </property>
   </action>
  </widget>
