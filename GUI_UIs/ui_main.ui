@@ -163,6 +163,7 @@
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
     <addaction name="actionManage_bad_links_to_files"/>
+    <addaction name="actionManage_references"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -458,6 +459,11 @@
   <action name="actionImport_references_RIS_format">
    <property name="text">
     <string>Import references RIS format</string>
+   </property>
+  </action>
+  <action name="actionManage_references">
+   <property name="text">
+    <string>Manage references</string>
    </property>
   </action>
  </widget>
