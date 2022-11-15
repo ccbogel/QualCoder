@@ -75,18 +75,28 @@ class ImportRis:
         List tags: 'A1', 'A2', 'A3', 'A4', 'AU', 'KW', 'N1'  # authors, KW keywords, N1 Notes
         """
 
-        tags = rispy.LIST_TYPE_TAGS
-        print("List tags ", tags)
+        #list_tags = rispy.LIST_TYPE_TAGS
+        #print("List tags ", list_tags)
         tag_keys = rispy.TAG_KEY_MAPPING
         print("Tag keys ", tag_keys)
+
+        tagmap = ['type_of_reference', 'primary_title', 'first_authors', 'secondary_authors', 'publication_year',
+                  'volume', 'number', 'publisher', 'place_published', 'issn', 'doi', 'edition', 'journal_name',
+                  'start_page', 'keywords', 'url', 'id']
 
         print("filepath", filepath)
         with open(filepath, 'r') as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
             print(entry)
-            # not all keys are used
-            print(entry['id'])
-            print(entry['first_authors'])
-            print(entry['type_of_reference'])
+            # not all keys are used, but like this tagmap order,so doing a for loop on the tagmap items
+            for tm in tagmap:
+                try:
+                    if isinstance(entry[tm], list):
+                        data = "; ".join(entry[tm])
+                    else:
+                        data = entry[tm]
+                    print(tm + ": " + data)
+                except KeyError:
+                    print(" No item  for tag: " + tm)
             print("================")
