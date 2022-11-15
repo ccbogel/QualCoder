@@ -61,6 +61,7 @@ from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
 from qualcoder.memo import DialogMemo
 from qualcoder.refi import RefiExport, RefiImport
+from qualcoder.ris import ImportRis
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
@@ -1145,6 +1146,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Import references in RIS format. """
 
         print("TODO import refs")
+        ImportRis(self.app, self.ui.textEdit)
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
