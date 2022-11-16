@@ -51,7 +51,8 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 class ImportRis:
-    """ Import an RIS format bibliography and store in database. """
+    """ Import an RIS format bibliography and store in database.
+    References in RIS can be poorly created often due to how the researcher created them. """
 
     app = None
     parent_text_edit = None
@@ -62,7 +63,7 @@ class ImportRis:
         self.parent_text_edit = parent_text_edit
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select RIS references file'),
                                                           self.app.settings['directory'],
-                                                          "(*.ris *.RIS)",
+                                                          "(*.txt *.ris *.RIS)",
                                                           options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                           )
         # print("Response ", response)
@@ -78,25 +79,29 @@ class ImportRis:
         #list_tags = rispy.LIST_TYPE_TAGS
         #print("List tags ", list_tags)
         tag_keys = rispy.TAG_KEY_MAPPING
-        print("Tag keys ", tag_keys)
-
-        tagmap = ['type_of_reference', 'primary_title', 'first_authors', 'secondary_authors', 'publication_year',
-                  'volume', 'number', 'publisher', 'place_published', 'issn', 'doi', 'edition', 'journal_name',
-                  'start_page', 'keywords', 'url', 'id']
-
+        for tk in tag_keys:
+            print(tk, tag_keys[tk])
+        cur = self.app.conn.cursor()
+        cur.execute("select max(risid) from ris")
+        res = cur.fetchone()
+        max_risid = 0
+        if res is not None:
+            max_risid = res[0]
+        
         print("filepath", filepath)
         with open(filepath, 'r') as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
             print(entry)
-            # not all keys are used, but like this tagmap order,so doing a for loop on the tagmap items
-            for tm in tagmap:
-                try:
-                    if isinstance(entry[tm], list):
-                        data = "; ".join(entry[tm])
-                    else:
-                        data = entry[tm]
-                    print(tm + ": " + data)
-                except KeyError:
-                    print(" No item  for tag: " + tm)
+            try:
+                del entry['id']
+            except KeyError:
+                pass
+            print(entry.keys())
+            for k in entry:
+                if isinstance(entry[k], list):
+                    data = "; ".join(entry[k])
+                else:
+                    data = entry[k]
+                print(k + ": " + data)
             print("================")

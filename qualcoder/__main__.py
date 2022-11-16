@@ -1484,8 +1484,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     "tooltip text);")
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
+        cur.execute("CREATE TABLE ris (risid integer, tag text, keymap text, value text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v8', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
@@ -1812,7 +1813,16 @@ class MainWindow(QtWidgets.QMainWindow):
             db7_update = True
         if db7_update:
             cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
+            self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v7")
+        # Database version v8
+        try:
+            cur.execute("select risid from ris")
+        except sqlite3.OperationalError:
+            cur.execute("CREATE TABLE ris (risid integer, tag text, keymap text, value text);")
+            cur.execute('update project set databaseversion="v8", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v8")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
