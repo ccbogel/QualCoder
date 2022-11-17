@@ -89,7 +89,7 @@ class ImportRis:
             max_risid = res[0]
         
         print("filepath", filepath)
-        with open(filepath, 'r') as ris_file:
+        with open(filepath, 'r', encoding="utf-8", errors="surrogateescape") as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
             print(entry)
