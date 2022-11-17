@@ -81,27 +81,36 @@ class ImportRis:
         tag_keys = rispy.TAG_KEY_MAPPING
         for tk in tag_keys:
             print(tk, tag_keys[tk])
+        wording_to_tags = dict((v, k) for k, v in tag_keys.items())
+
         cur = self.app.conn.cursor()
         cur.execute("select max(risid) from ris")
         res = cur.fetchone()
         max_risid = 0
         if res is not None:
             max_risid = res[0]
+            if max_risid is None:
+                max_risid = 0
+            #print("max_risid", max_risid, type(max_risid))
         
         print("filepath", filepath)
         with open(filepath, 'r', encoding="utf-8", errors="surrogateescape") as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
             print(entry)
+            # TODO check entry does not already exist fn()
+            max_risid += 1
             try:
                 del entry['id']
             except KeyError:
                 pass
             print(entry.keys())
-            for k in entry:
-                if isinstance(entry[k], list):
-                    data = "; ".join(entry[k])
+            for tag_wording in entry:
+                if isinstance(entry[tag_wording], list):
+                    data = "; ".join(entry[tag_wording])
                 else:
-                    data = entry[k]
-                print(k + ": " + data)
+                    data = entry[tag_wording]
+                print("risid", max_risid, wording_to_tags[tag_wording], tag_wording, data)
+                sql = "insert into ris (risid,tag,keymap,value) values (?,?,?,?)"
+                
             print("================")
