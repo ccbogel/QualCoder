@@ -25,6 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
+import collections
 import logging
 import os
 import rispy
@@ -74,6 +75,8 @@ class ImportRis:
     def import_ris_file(self, filepath):
         """ Open file and extract RIS information.
         List tags: 'A1', 'A2', 'A3', 'A4', 'AU', 'KW', 'N1'  # authors, KW keywords, N1 Notes
+        longtag is the extended wording of a tag
+        tag_keys is the dictionary of 2 char short tag keys (e.g. AU) and the longtag wording
         """
 
         #list_tags = rispy.LIST_TYPE_TAGS
@@ -81,7 +84,7 @@ class ImportRis:
         tag_keys = rispy.TAG_KEY_MAPPING
         for tk in tag_keys:
             print(tk, tag_keys[tk])
-        wording_to_tags = dict((v, k) for k, v in tag_keys.items())
+        longtag_to_tag = dict((v, k) for k, v in tag_keys.items())
 
         cur = self.app.conn.cursor()
         cur.execute("select max(risid) from ris")
@@ -91,26 +94,59 @@ class ImportRis:
             max_risid = res[0]
             if max_risid is None:
                 max_risid = 0
-            #print("max_risid", max_risid, type(max_risid))
-        
-        print("filepath", filepath)
+        #print("filepath", filepath)
         with open(filepath, 'r', encoding="utf-8", errors="surrogateescape") as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
-            print(entry)
-            # TODO check entry does not already exist fn()
+            #if not self.check_entry_exists(entry):
             max_risid += 1
             try:
                 del entry['id']
             except KeyError:
                 pass
-            print(entry.keys())
-            for tag_wording in entry:
-                if isinstance(entry[tag_wording], list):
-                    data = "; ".join(entry[tag_wording])
+            #print(entry.keys())
+            for longtag in entry:
+                if isinstance(entry[longtag], list):
+                    data = "; ".join(entry[longtag])
                 else:
-                    data = entry[tag_wording]
-                print("risid", max_risid, wording_to_tags[tag_wording], tag_wording, data)
-                sql = "insert into ris (risid,tag,keymap,value) values (?,?,?,?)"
-                
+                    data = entry[longtag]
+                #print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
+                sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
+                cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
+            self.app.conn.commit()
             print("================")
+
+    def check_entry_exists(self, entry):
+        """ Check if this entry exists.
+        param: entry - dictionary of longtag and value
+        return: exists - boolean
+        TODO Does Not WOrk """
+
+        exists = False
+        #print(entry)
+        res_list = []
+        cur = self.app.conn.cursor()
+        sql = "select risid from ris where longtag=? and value=?"
+        length_adjuster = 0
+        for longtag in entry:
+            if isinstance(entry[longtag], list):
+                data = "; ".join(entry[longtag])
+                if len(entry[longtag]) > 1:
+                    length_adjuster = len(entry[longtag]) - 1
+            else:
+                data = entry[longtag]
+            #print("Parameters ", longtag, data)
+            cur.execute(sql, [longtag, data])
+            res = cur.fetchall()
+            for r in res:
+                res_list.append(r[0])
+        #print("len entry ", len(entry) - length_adjuster)
+        frequencies = collections.Counter(res_list)
+        freq_dict = dict(frequencies)
+        for k in freq_dict:
+            if freq_dict[k] == len(entry) - length_adjuster:
+                print(k, "matching")
+                exists = True
+        return exists
+
+
