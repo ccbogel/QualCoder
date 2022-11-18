@@ -85,16 +85,16 @@ class ImportRis:
         #for tk in tag_keys:
         #    print(tk, tag_keys[tk])
         longtag_to_tag = dict((v, k) for k, v in tag_keys.items())
-
         cur = self.app.conn.cursor()
         cur.execute("select max(risid) from ris")
         res = cur.fetchone()
+        new_entries = 0
+        duplicates = 0
         max_risid = 0
         if res is not None:
             max_risid = res[0]
             if max_risid is None:
                 max_risid = 0
-        #print("filepath", filepath)
         with open(filepath, 'r', encoding="utf-8", errors="surrogateescape") as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
@@ -102,7 +102,10 @@ class ImportRis:
                 del entry['id']
             except KeyError:
                 pass
-            if not self.entry_exists(entry):
+            if self.entry_exists(entry):
+                duplicates += 1
+            else:
+                new_entries += 1
                 max_risid += 1
                 #print(entry.keys())
                 for longtag in entry:
@@ -114,10 +117,22 @@ class ImportRis:
                     sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
                     cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
             self.app.conn.commit()
-            print("================")
+
+        if new_entries > 0:
+            msg = _("Bibliography loaded from: ") + filepath + "\n"
+            msg += _("New Entries: ") + str(new_entries) + "\n"
+            if duplicates > 0:
+                msg += _("Duplicates not inserted: ") + str(duplicates)
+            self.parent_text_edit.append(msg + "\n========")
+        else:
+            msg = _("No new references loaded from: ") + filepath + "\n"
+            if duplicates > 0:
+                msg += _("References already exist")
+            self.parent_text_edit.append(msg + "\n========")
 
     def entry_exists(self, entry):
         """ Check if this entry exists.
+        Criteria for exists: each entry matches for tag and value. Identical number of data points.
         param: entry - dictionary of longtag and value
         return: exists - boolean
         """
@@ -138,13 +153,12 @@ class ImportRis:
             #print("res for",longtag,data,res)
             for r in res:
                 res_list.append(r[0])
-        #print("len entry ", len(entry))
-        #print("res_list", res_list)
+        #print("len entry ", len(entry), "res_list", res_list)
+        # Check number of db matching data points equals the number of data points in entry
         frequencies = collections.Counter(res_list)
         freq_dict = dict(frequencies)
         for k in freq_dict:
             if freq_dict[k] == len(entry):
-                #print(k, "matching")
                 exists = True
         return exists
 

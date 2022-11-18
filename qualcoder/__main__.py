@@ -1145,7 +1145,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def import_references(self):
         """ Import references in RIS format. """
 
-        print("TODO import refs")
         ImportRis(self.app, self.ui.textEdit)
 
     def import_survey(self):
