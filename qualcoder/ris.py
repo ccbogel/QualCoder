@@ -82,8 +82,8 @@ class ImportRis:
         #list_tags = rispy.LIST_TYPE_TAGS
         #print("List tags ", list_tags)
         tag_keys = rispy.TAG_KEY_MAPPING
-        for tk in tag_keys:
-            print(tk, tag_keys[tk])
+        #for tk in tag_keys:
+        #    print(tk, tag_keys[tk])
         longtag_to_tag = dict((v, k) for k, v in tag_keys.items())
 
         cur = self.app.conn.cursor()
@@ -98,54 +98,53 @@ class ImportRis:
         with open(filepath, 'r', encoding="utf-8", errors="surrogateescape") as ris_file:
             entries = rispy.load(ris_file)
         for entry in entries:
-            #if not self.check_entry_exists(entry):
-            max_risid += 1
             try:
                 del entry['id']
             except KeyError:
                 pass
-            #print(entry.keys())
-            for longtag in entry:
-                if isinstance(entry[longtag], list):
-                    data = "; ".join(entry[longtag])
-                else:
-                    data = entry[longtag]
-                #print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
-                sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
-                cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
+            if not self.entry_exists(entry):
+                max_risid += 1
+                #print(entry.keys())
+                for longtag in entry:
+                    if isinstance(entry[longtag], list):
+                        data = "; ".join(entry[longtag])
+                    else:
+                        data = entry[longtag]
+                    #print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
+                    sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
+                    cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
             self.app.conn.commit()
             print("================")
 
-    def check_entry_exists(self, entry):
+    def entry_exists(self, entry):
         """ Check if this entry exists.
         param: entry - dictionary of longtag and value
         return: exists - boolean
-        TODO Does Not WOrk """
+        """
 
         exists = False
         #print(entry)
         res_list = []
         cur = self.app.conn.cursor()
         sql = "select risid from ris where longtag=? and value=?"
-        length_adjuster = 0
         for longtag in entry:
             if isinstance(entry[longtag], list):
                 data = "; ".join(entry[longtag])
-                if len(entry[longtag]) > 1:
-                    length_adjuster = len(entry[longtag]) - 1
             else:
                 data = entry[longtag]
             #print("Parameters ", longtag, data)
             cur.execute(sql, [longtag, data])
             res = cur.fetchall()
+            #print("res for",longtag,data,res)
             for r in res:
                 res_list.append(r[0])
-        #print("len entry ", len(entry) - length_adjuster)
+        #print("len entry ", len(entry))
+        #print("res_list", res_list)
         frequencies = collections.Counter(res_list)
         freq_dict = dict(frequencies)
         for k in freq_dict:
-            if freq_dict[k] == len(entry) - length_adjuster:
-                print(k, "matching")
+            if freq_dict[k] == len(entry):
+                #print(k, "matching")
                 exists = True
         return exists
 
