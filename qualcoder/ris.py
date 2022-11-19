@@ -50,6 +50,15 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(text_)
     mb.exec()
 
+def format_ris(ris_list):
+    """ Format items in list for display.
+    TY = EJOUR,JOUR
+        title
+        authors
+        journal name, year, date, volume, issue
+        ?doi ? abstract
+     """
+
 
 class ImportRis:
     """ Import an RIS format bibliography and store in database.
@@ -161,5 +170,65 @@ class ImportRis:
             if freq_dict[k] == len(entry):
                 exists = True
         return exists
+
+
+ref_type = {
+'ABST': 'Abstract',
+'ADVS': 'Audiovisual material',
+'AGGR': 'Aggregated Database',
+'ANCIENT': 'Ancient Text',
+'ART': 'Art Work',
+'BILL': 'Bill',
+'BLOG': 'Blog',
+'BOOK': 'Whole book',
+'CASE': 'Case',
+'CHAP': 'Book chapter',
+'CHART': 'Chart',
+'CLSWK': 'Classical Work',
+'COMP': 'Computer program',
+'CONF': 'Conference proceeding',
+'CPAPER': 'Conference paper',
+'CTLG': 'Catalog',
+'DATA': 'Data file',
+'DBASE': 'Online Database',
+'DICT': 'Dictionary',
+'EBOOK': 'Electronic Book',
+'ECHAP': 'Electronic Book Section',
+'EDBOOK': 'Edited Book',
+'EJOUR': 'Electronic Article',
+'WEB': 'Web Page',
+'ENCYC': 'Encyclopedia',
+'EQUA': 'Equation',
+'FIGURE': 'Figure',
+'GEN': 'Generic',
+'GOVDOC': 'Government Document',
+'GRANT': 'Grant',
+'HEAR': 'Hearing',
+'ICOMM': 'Internet Communication',
+'INPR': 'In Press',
+'JFULL': 'Journal (full)',
+'JOUR': 'Journal',
+'LEGAL': 'Legal Rule or Regulation',
+'MANSCPT': 'Manuscript',
+'MAP': 'Map',
+'MGZN': 'Magazine article',
+'MPCT': 'Motion picture',
+'MULTI': 'Online Multimedia',
+'MUSIC': 'Music score',
+'NEWS': 'Newspaper',
+'PAMP': 'Pamphlet',
+'PAT': 'Patent',
+'PCOMM': 'Personal communication',
+'RPRT': 'Report',
+'SER': 'Serial publication',
+'SLIDE': 'Slide',
+'SOUND': 'Sound recording',
+'STAND': 'Standard',
+'STAT': 'Statute',
+'THES': 'Thesis/Dissertation',
+'UNBILL': 'Unenacted Bill',
+'UNPB': 'Unpublished work',
+'VIDEO': 'Video recording'
+}
 
 
